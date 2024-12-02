@@ -7,6 +7,7 @@ import org.http4k.core.Method
 import org.http4k.core.NoOp
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
+import org.http4k.routing.experimental.RoutedHttpHandler
 import org.http4k.util.Appendable
 
 fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
@@ -23,17 +24,21 @@ fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
     )
 }
 
-fun newContract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
-    NewContractRoutingHttpHandler(
-        renderer, security, tags.all.toSet(),
-        descriptionSecurity,
-        descriptionPath,
-        preFlightExtraction,
-        routes.all,
-        preSecurityFilter = preSecurityFilter,
-        postSecurityFilter = postSecurityFilter,
-        includeDescriptionRoute = includeDescriptionRoute,
-        webhooks = webhooks
+fun newContract(fn: ContractBuilder.() -> Unit): RoutedHttpHandler = ContractBuilder().apply(fn).run {
+    RoutedHttpHandler(
+        listOf(
+            NewContractRouteMatcher(
+                renderer, security, tags.all.toSet(),
+                descriptionSecurity,
+                descriptionPath,
+                preFlightExtraction,
+                routes.all,
+                preSecurityFilter = preSecurityFilter,
+                postSecurityFilter = postSecurityFilter,
+                includeDescriptionRoute = includeDescriptionRoute,
+                webhooks = webhooks
+            )
+        )
     )
 }
 
@@ -65,8 +70,6 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): ContractRouteSpec2<A, B>
     ContractRouteSpec1({ it }, RouteMeta(), this) / next
 
 infix fun String.bind(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
-
-infix fun String.newBind(router: NewContractRoutingHttpHandler): NewContractRoutingHttpHandler = router.withBasePath(this)
 
 infix fun <A> PathLens<A>.bindContract(method: Method) =
     ContractRouteSpec1({ it }, RouteMeta(), this).bindContract(method)
