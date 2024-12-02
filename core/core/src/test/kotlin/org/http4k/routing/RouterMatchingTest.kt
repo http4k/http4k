@@ -89,9 +89,9 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `fallback router`() {
-        assertThat(Fallback(Request(GET, "")), equalTo(PredicateResult.Matched))
-        assertThat(Fallback(Request(POST, "")), equalTo(PredicateResult.Matched))
+    fun `all router`() {
+        assertThat(All(Request(GET, "")), equalTo(PredicateResult.Matched))
+        assertThat(All(Request(POST, "")), equalTo(PredicateResult.Matched))
     }
 
     @Test
