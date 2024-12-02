@@ -90,7 +90,8 @@ data class PredicateRouteMatcher(
         is NotMatched -> HttpMatchResult(1, filter.then { _: Request -> Response(result.status) })
     }
 
-    override fun withBasePath(prefix: String): RouteMatcher = TemplatedHttpRoute(UriTemplate.from(prefix), handler)
+    override fun withBasePath(prefix: String): RouteMatcher =
+        TemplatedHttpRoute(UriTemplate.from(prefix), handler, predicate, filter)
 
     override fun withPredicate(other: Predicate): RouteMatcher = PredicateRouteMatcher(handler, predicate.and(other))
     override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
