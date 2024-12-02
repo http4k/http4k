@@ -6,7 +6,8 @@ import org.http4k.core.Status
 import org.http4k.core.UriTemplate
 import org.http4k.routing.All
 import org.http4k.routing.Predicate
-import org.http4k.routing.PredicateResult
+import org.http4k.routing.PredicateResult.Matched
+import org.http4k.routing.PredicateResult.NotMatched
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.and
 import org.http4k.routing.asPredicate
@@ -54,11 +55,11 @@ data class TemplatedSseRoute(
 
     internal fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (val result = predicate(request)) {
-            is PredicateResult.Matched -> SseMatchResult(0, AddUriTemplate(uriTemplate).then(handler))
-            is PredicateResult.NotMatched -> SseMatchResult(1) { _: Request -> SseResponse(result.status) { it.close() } }
+            is Matched -> SseMatchResult(0, AddUriTemplate(uriTemplate).then(handler))
+            is NotMatched -> SseMatchResult(1) { _: Request -> SseResponse(result.status) { it.close() } }
         }
 
-        else -> SseMatchResult(2) { _: Request -> SseResponse(Status.NOT_FOUND) { it.close() } }
+        else -> SseMatchResult(2) { _: Request -> SseResponse(Status.NOT_FOUND, handled = false) { it.close() } }
     }
 
     fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))

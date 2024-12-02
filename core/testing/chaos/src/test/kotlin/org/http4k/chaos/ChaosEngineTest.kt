@@ -71,7 +71,7 @@ class ChaosEngineTest {
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(originalChaos))
-        assertThat(appWithChaos(Request(POST, "/")), hasStatus(METHOD_NOT_ALLOWED))
+        assertThat(appWithChaos(Request(POST, "/")), hasStatus(METHOD_NOT_ALLOWED)) // FIXME should be NOT_FOUND because we dropped NOT_ALLOWED
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
         assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
