@@ -3,10 +3,8 @@ package org.http4k.routing
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.core.then
 
 /**
  * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
@@ -38,8 +36,8 @@ internal data class SinglePageAppRouteMatcher(
         }
     }
 
-    override fun withBasePath(new: String) =
-        SinglePageAppRouteMatcher(new + pathSegments, staticMatcher.withBasePath(new) as StaticRouteMatcher)
+    override fun withBasePath(prefix: String) =
+        SinglePageAppRouteMatcher(prefix + pathSegments, staticMatcher.withBasePath(prefix) as StaticRouteMatcher)
 
     override fun withPredicate(other: Predicate): RouteMatcher = this
     override fun withFilter(new: Filter): RouteMatcher = staticMatcher.withFilter(new)
