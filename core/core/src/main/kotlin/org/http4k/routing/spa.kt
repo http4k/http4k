@@ -1,9 +1,12 @@
 package org.http4k.routing
 
 import org.http4k.core.ContentType
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.core.then
 
 /**
  * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
@@ -24,7 +27,7 @@ fun singlePageApp(
 
 internal data class SinglePageAppRouteMatcher(
     private val pathSegments: String,
-    private val staticMatcher: StaticRouteMatcher
+    private val staticMatcher: StaticRouteMatcher,
 ) : RouteMatcher {
 
     override fun match(request: Request): HttpMatchResult {
@@ -39,6 +42,7 @@ internal data class SinglePageAppRouteMatcher(
         SinglePageAppRouteMatcher(new + pathSegments, staticMatcher.withBasePath(new) as StaticRouteMatcher)
 
     override fun withPredicate(other: Predicate): RouteMatcher = this
+    override fun withFilter(new: Filter): RouteMatcher = staticMatcher.withFilter(new)
 
     override fun toString() = "SPA at $pathSegments"
 

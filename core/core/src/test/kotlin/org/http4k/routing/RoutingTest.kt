@@ -3,6 +3,7 @@ package org.http4k.routing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -222,6 +223,7 @@ class RoutingTest {
         var count = 0
         val filter = Filter { next ->
             {
+                println("applying")
                 next(it.replaceHeader("header", "value" + count++))
             }
         }
