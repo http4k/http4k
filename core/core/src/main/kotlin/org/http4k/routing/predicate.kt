@@ -26,6 +26,7 @@ sealed class PredicateResult{
 
 val Any: Predicate = Predicate("any") { true }
 val Fallback: Predicate = Predicate("any") { true }
+val orElse = Fallback
 fun Predicate.and(other: Predicate): Predicate = Predicate("($this AND $other)") { this(it) is Matched && other(it) is Matched }
 fun Predicate.or(other: Predicate): Predicate = Predicate("($this OR $other)") { this(it) is Matched || other(it) is Matched }
 fun Predicate.not(): Predicate = Predicate("NOT $this") { this(it) !is Matched  }
