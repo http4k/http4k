@@ -1,15 +1,11 @@
 package org.http4k.routing
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isA
-import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -30,9 +26,7 @@ import org.http4k.routing.experimental.newRoutes
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicInteger
 
- class NewStaticRoutingHttpHandlerTest {
-
-    protected open val prefix = "/prefix"
+class NewStaticRoutingHttpHandlerTest {
 
     private val pkg = javaClass.`package`.name.replace('.', '/')
 
