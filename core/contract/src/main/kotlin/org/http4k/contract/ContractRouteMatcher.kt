@@ -11,6 +11,7 @@ import org.http4k.core.Status
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import org.http4k.routing.Fallback
 import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.Predicate
 import org.http4k.routing.RouteMatcher
@@ -22,6 +23,7 @@ import org.http4k.routing.RouterMatch.MatchedWithoutHandler
 import org.http4k.routing.RouterMatch.MatchingHandler
 import org.http4k.routing.RouterMatch.MethodNotMatched
 import org.http4k.routing.RouterMatch.Unmatched
+import org.http4k.routing.and
 
 data class ContractRouteMatcher(
     private val renderer: ContractRenderer,
@@ -35,7 +37,8 @@ data class ContractRouteMatcher(
     private val preSecurityFilter: Filter = Filter.NoOp,
     private val postSecurityFilter: Filter = Filter.NoOp,
     private val includeDescriptionRoute: Boolean = false,
-    private val webhooks: Map<String, List<WebCallback>> = emptyMap()
+    private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
+    private val predicate: Predicate = Fallback
 ) : RouteMatcher {
     private val contractRoot = PathSegments(rootAsString)
 
@@ -71,7 +74,7 @@ data class ContractRouteMatcher(
 
     override fun withBasePath(prefix: String) = copy(rootAsString = prefix + rootAsString)
 
-    override fun withPredicate(other: Predicate): RouteMatcher = this
+    override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
 
     val description = RouterDescription(rootAsString,
         routes.map { it.toRouter(PathSegments("$it$descriptionPath")).description }
