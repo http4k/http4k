@@ -11,7 +11,7 @@ import org.http4k.core.Status
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import org.http4k.routing.Fallback
+import org.http4k.routing.All
 import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.Predicate
 import org.http4k.routing.RouteMatcher
@@ -38,7 +38,7 @@ data class ContractRouteMatcher(
     private val postSecurityFilter: Filter = Filter.NoOp,
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
-    private val predicate: Predicate = Fallback,
+    private val predicate: Predicate = All,
 ) : RouteMatcher {
     private val contractRoot = PathSegments(rootAsString)
 
