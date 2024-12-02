@@ -1,7 +1,14 @@
 package org.http4k.routing.experimental
 
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.routing.HttpMatchResult
+import org.http4k.routing.Predicate
+import org.http4k.routing.RouteMatcher
 import java.io.File
 import java.time.Instant
 
@@ -9,13 +16,25 @@ internal data class DirectoryResourceLoader(
     val baseDir: String,
     val mimeTypes: MimeTypes = MimeTypes(),
     val directoryRenderer: DirectoryRenderer? = null
-) : ResourceLoading {
+) : RouteMatcher {
 
-    override fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
+    override fun match(request: Request): HttpMatchResult =
+        when (val match = match(request.uri.path)) {
+            is HttpHandler -> HttpMatchResult(0, match)
+            else -> HttpMatchResult(2, { Response(NOT_FOUND) })
+        }
+
+    private fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
         when {
             !isUnder(baseDir) -> null
             isFile -> FileResource(this, mimeTypes.forFile(path))
-            isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let { directoryRenderingHandler(this, it) }
+            isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let {
+                directoryRenderingHandler(
+                    this,
+                    it
+                )
+            }
+
             else -> null
         }
     }
@@ -27,6 +46,15 @@ internal data class DirectoryResourceLoader(
     private fun directoryRenderingHandler(dir: File, renderer: DirectoryRenderer) =
         ResourceListingHandler(
             ResourceSummary(dir.name, Instant.ofEpochMilli(dir.lastModified())),
-            dir.listFiles().sortedBy { it.name }.map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) },
-            renderer)
+            dir.listFiles()?.sortedBy { it.name }
+                ?.map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) }
+                ?: emptyList(),
+            renderer
+        )
+
+    override fun withBasePath(prefix: String) = this
+
+    override fun withPredicate(other: Predicate) = this
+
+    override fun withFilter(new: Filter) = this
 }
