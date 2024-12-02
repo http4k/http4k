@@ -38,7 +38,12 @@ internal data class SinglePageAppRouteMatcher(
             handler(request).let {
                 when {
                     it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
-                    else -> HttpMatchResult(2, filter.then { _: Request -> handler(Request(GET, pathSegments)) })
+                    else -> handler(Request(GET, pathSegments)).let {
+                        when {
+                            it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
+                            else -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+                        }
+                    }
                 }
             }
         }
