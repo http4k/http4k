@@ -93,7 +93,8 @@ data class PredicateRouteMatcher(
     override fun withBasePath(prefix: String): RouteMatcher =
         TemplatedHttpRoute(UriTemplate.from(prefix), handler, predicate, filter)
 
-    override fun withPredicate(other: Predicate): RouteMatcher = PredicateRouteMatcher(handler, predicate.and(other))
+    override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
+
     override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
 }
 
