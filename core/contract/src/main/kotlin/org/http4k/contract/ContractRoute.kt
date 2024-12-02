@@ -1,6 +1,10 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion
+import org.http4k.contract.RouterMatch.MatchedWithoutHandler
+import org.http4k.contract.RouterMatch.MatchingHandler
+import org.http4k.contract.RouterMatch.MethodNotMatched
+import org.http4k.contract.RouterMatch.Unmatched
 import org.http4k.contract.openapi.operationId
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -19,13 +23,7 @@ import org.http4k.core.toPathSegmentDecoded
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
-import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription
-import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
-import org.http4k.routing.RouterMatch.MethodNotMatched
-import org.http4k.routing.RouterMatch.Unmatched
 
 class ContractRoute internal constructor(
     val method: Method,
