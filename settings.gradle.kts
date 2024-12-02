@@ -21,7 +21,7 @@ refreshVersions {
 
 gradle.startParameter.isContinueOnFailure = true
 
-val exclusions = setOf("gradle-plugins")
+val exclusions = setOf("gradle-plugins", "connect")
 
 rootDir.walkTopDown()
     .filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
