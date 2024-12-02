@@ -24,7 +24,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
 import org.http4k.lens.multipartForm
 import org.http4k.lens.string
-import org.http4k.routing.bind
+import org.http4k.routing.experimental.newBind
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -43,7 +43,7 @@ abstract class AutoContractRendererContract<NODE : Any>(
             Body.string(ContentType("custom/v2")).toLens()
         )
 
-        val router = "/basepath" bind contract {
+        val router = "/basepath" newBind newContract {
             renderer = rendererToUse
             tags += Tag("hello", "world")
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
