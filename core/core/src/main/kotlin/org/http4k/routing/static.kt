@@ -22,12 +22,14 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 fun static(
     resourceLoader: ResourceLoader = Classpath(),
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
-): RoutingHttpHandler = RoutingHttpHandler(listOf(StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())))
+) = RoutingHttpHandler(listOf(StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())))
 
 data class StaticRouteMatcher(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
-    private val extraFileExtensionToContentTypes: Map<String, ContentType>): RouteMatcher {
+    private val extraFileExtensionToContentTypes: Map<String, ContentType>,
+    private val predicate: Predicate = All
+    ): RouteMatcher {
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
@@ -40,7 +42,7 @@ data class StaticRouteMatcher(
 
     override fun withBasePath(prefix: String): RouteMatcher = copy(pathSegments = prefix + pathSegments)
 
-    override fun withPredicate(other: Predicate): RouteMatcher = this
+    override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
 
     override fun toString() = "Static files $pathSegments"
 }
