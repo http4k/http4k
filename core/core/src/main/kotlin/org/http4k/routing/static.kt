@@ -22,9 +22,9 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 fun static(
     resourceLoader: ResourceLoader = Classpath(),
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
-): RoutingHttpHandler = RoutingHttpHandler(listOf(NewStaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())))
+): RoutingHttpHandler = RoutingHttpHandler(listOf(StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())))
 
-data class NewStaticRouteMatcher(
+data class StaticRouteMatcher(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>): RouteMatcher {

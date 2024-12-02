@@ -17,14 +17,14 @@ fun singlePageApp(
         listOf(
             SinglePageAppRouteMatcher(
                 "",
-                NewStaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+                StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
             )
         )
     )
 
 internal data class SinglePageAppRouteMatcher(
     private val pathSegments: String,
-    private val staticMatcher: NewStaticRouteMatcher
+    private val staticMatcher: StaticRouteMatcher
 ) : RouteMatcher {
 
     override fun match(request: Request): HttpMatchResult {
@@ -36,7 +36,7 @@ internal data class SinglePageAppRouteMatcher(
     }
 
     override fun withBasePath(new: String) =
-        SinglePageAppRouteMatcher(new + pathSegments, staticMatcher.withBasePath(new) as NewStaticRouteMatcher)
+        SinglePageAppRouteMatcher(new + pathSegments, staticMatcher.withBasePath(new) as StaticRouteMatcher)
 
     override fun withPredicate(other: Predicate): RouteMatcher = this
 
