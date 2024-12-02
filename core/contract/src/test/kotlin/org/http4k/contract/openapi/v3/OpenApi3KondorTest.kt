@@ -7,10 +7,10 @@ import com.ubertob.kondor.json.num
 import com.ubertob.kondor.json.obj
 import com.ubertob.kondor.json.str
 import org.http4k.contract.ContractRendererContract
+import org.http4k.contract.contract
 import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.v3.KondorJsonSchemaCreator
 import org.http4k.contract.meta
-import org.http4k.contract.newContract
 import org.http4k.contract.openapi.AddSimpleFieldToRootNode
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
@@ -22,7 +22,7 @@ import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.format.KondorJson
 import org.http4k.format.autoBody
-import org.http4k.routing.experimental.newBind
+import org.http4k.routing.bind
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 
@@ -99,7 +99,7 @@ class OpenApi3KondorTest : ContractRendererContract<JsonNode>(
         val topLevelObjectLens = JTopLevelObject.autoBody().toLens()
         val example = TopLevelObject(NestedObject(null, 123))
 
-        val router = "/basepath" newBind newContract {
+        val router = "/basepath" bind contract {
             renderer = rendererToUse
 
             routes += "/body_json_schema_data_class" meta {
