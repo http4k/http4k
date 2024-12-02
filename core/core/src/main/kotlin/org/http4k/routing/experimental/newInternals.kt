@@ -14,6 +14,14 @@ import org.http4k.routing.RoutedResponse
 import org.http4k.routing.experimental.PredicateResult.Matched
 import org.http4k.routing.experimental.PredicateResult.NotMatched
 
+/**
+ * Composite HttpHandler which can potentially service many different URL patterns. Should
+ * return a 404 Response if it cannot service a particular Request.
+ *
+ * Note that generally there should be no reason for the API user to implement this interface over and above the
+ * implementations that already exist. The interface is public only because we have not found a way to hide it from
+ * the API user in an API-consistent manner.
+ */
 data class RoutedHttpHandler(
     val routes: List<NewRouteMatcher>,
     val filter: Filter = Filter.NoOp
