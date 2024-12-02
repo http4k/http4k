@@ -4,7 +4,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.RequestContext
 import org.http4k.core.Store
-import org.http4k.routing.RoutingWsHandler
+import org.http4k.routing.ws.RoutingWsHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
