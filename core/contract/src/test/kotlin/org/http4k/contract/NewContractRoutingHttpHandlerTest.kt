@@ -245,19 +245,20 @@ class NewContractRoutingHttpHandlerTest {
         assertThat(root(Request(GET, "/root/bob")).status, equalTo(OK))
     }
 
-//    @Test
-//    fun `post-security filter is applied after security`() {
-//        val root = "/root" newBind newContract {
-//            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-//            routes += "/bob" bindContract GET to { it -> Response(OK).body(it.body) }
-//        }.withPostSecurityFilter { next ->
-//            {
-//                next(it.body("body"))
-//            }
-//        }
-//
-//        assertThat(root(Request(GET, "/root/bob?key=bob")), hasStatus(OK).and(hasBody("body")))
-//    }
+    @Test
+    fun `post-security filter is applied after security`() {
+        val root = "/root" newBind newContract {
+            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
+            routes += "/bob" bindContract GET to { it -> Response(OK).body(it.body) }
+            postSecurityFilter = Filter { next ->
+                {
+                    next(it.body("body"))
+                }
+            }
+        }
+
+        assertThat(root(Request(GET, "/root/bob?key=bob")), hasStatus(OK).and(hasBody("body")))
+    }
 
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {

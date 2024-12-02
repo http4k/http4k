@@ -69,15 +69,7 @@ data class NewContractRouteMatcher(
         } else unmatched
     }
 
-    fun withPostSecurityFilter(new: Filter) = copy(postSecurityFilter = postSecurityFilter.then(new))// FIXME
-
-    /**
-     * NOTE: By default, filters for Contracts are applied *before* the Security filter. Use withPostSecurityFilter()
-     * to achieve population of filters after security.
-     */
-    fun withFilter(new: Filter) = copy(preSecurityFilter = new.then(preSecurityFilter))     // FIXME
-
-    override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
+    override fun withBasePath(prefix: String) = copy(rootAsString = prefix + rootAsString)
 
     override fun withPredicate(other: Predicate): NewRouteMatcher = this
 
