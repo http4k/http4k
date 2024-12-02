@@ -1,1 +1,1 @@
-"template=route-contract AND all"
+"template=route-contract AND (Headers [host] AND method == GET)"
