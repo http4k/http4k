@@ -1,5 +1,9 @@
 package org.http4k.contract
 
+import org.http4k.contract.RouterMatch.MatchedWithoutHandler
+import org.http4k.contract.RouterMatch.MatchingHandler
+import org.http4k.contract.RouterMatch.MethodNotMatched
+import org.http4k.contract.RouterMatch.Unmatched
 import org.http4k.contract.security.NoSecurity.filter
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
@@ -18,11 +22,6 @@ import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RouterDescription
-import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
-import org.http4k.routing.RouterMatch.MethodNotMatched
-import org.http4k.routing.RouterMatch.Unmatched
 import org.http4k.routing.and
 
 data class ContractRouteMatcher(
@@ -57,7 +56,8 @@ data class ContractRouteMatcher(
                     is MatchedWithoutHandler -> notFound
                     is MethodNotMatched -> notFound
                     is Unmatched -> notFound
-                })
+                }
+            )
         )
     }
 
