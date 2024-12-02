@@ -1,0 +1,34 @@
+{
+  "description" : "or",
+  "children" : [ {
+    "description" : "and",
+    "children" : [ {
+      "description" : "Host or URI: 'host'",
+      "children" : [ ]
+    }, {
+      "description" : "and",
+      "children" : [ {
+        "description" : "method == GET",
+        "children" : [ ]
+      }, {
+        "description" : "template == 'route-contract'",
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "description" : "and",
+    "children" : [ {
+      "description" : "Host or URI: 'anotherHost'",
+      "children" : [ ]
+    }, {
+      "description" : "and",
+      "children" : [ {
+        "description" : "method == GET",
+        "children" : [ ]
+      }, {
+        "description" : "template == 'route-contract'",
+        "children" : [ ]
+      } ]
+    } ]
+  } ]
+}
