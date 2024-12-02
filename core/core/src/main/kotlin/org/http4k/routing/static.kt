@@ -15,6 +15,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.routing.PredicateResult.Matched
+import org.http4k.routing.PredicateResult.NotMatched
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 
 
@@ -25,7 +27,15 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 fun static(
     resourceLoader: ResourceLoader = Classpath(),
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
-) = RoutingHttpHandler(listOf(StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())))
+) = RoutingHttpHandler(
+    listOf(
+        StaticRouteMatcher(
+            "",
+            resourceLoader,
+            extraFileExtensionToContentTypes.asList().toMap()
+        )
+    )
+)
 
 data class StaticRouteMatcher(
     private val pathSegments: String,
@@ -33,15 +43,19 @@ data class StaticRouteMatcher(
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
     private val predicate: Predicate = All,
     private val filter: Filter = Filter.NoOp
-    ): RouteMatcher {
+) : RouteMatcher {
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request): HttpMatchResult = handler(request).let {
-        when {
-            it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
-            else -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+    override fun match(request: Request) = when (predicate(request)) {
+        is Matched -> handler(request).let {
+            when {
+                it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
+                else -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+            }
         }
+
+        is NotMatched -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher = copy(pathSegments = prefix + pathSegments)
