@@ -53,7 +53,7 @@ data class RouterDescription(val description: String, val children: List<RouterD
  * The result of a matching operation. May or may not contain a matched HttpHandler.
  */
 sealed class RouterMatch(
-    private val priority: Int,
+    val priority: Int,
     open val description: RouterDescription,
     open val subMatches: List<RouterMatch>
 ) : Comparable<RouterMatch> {
