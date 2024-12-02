@@ -37,13 +37,13 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.extend
-import org.http4k.routing.Predicate
+import org.http4k.routing.asPredicate
 import org.http4k.routing.bind
 import java.util.UUID
 
-private fun forAction(name: String) = Predicate("", Status.NOT_FOUND, { r: Request ->
+private fun forAction(name: String) = { r: Request ->
     r.method == Method.POST && r.header("X-Amz-Target") == "AmazonSQS.$name"
-})
+}.asPredicate()
 
 fun AwsRestJsonFake.createQueue(queues: Storage<List<SQSMessage>>, awsAccount: AwsAccount) =
     forAction("CreateQueue") bind route<CreateQueue> { data ->
