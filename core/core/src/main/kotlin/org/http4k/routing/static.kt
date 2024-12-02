@@ -47,7 +47,7 @@ data class StaticRouteMatcher(
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request) = when (predicate(request)) {
+    override fun match(request: Request): HttpMatchResult = when (predicate(request)) {
         is Matched -> handler(request).let {
             when {
                 it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
@@ -59,7 +59,6 @@ data class StaticRouteMatcher(
     }
 
     override fun withBasePath(prefix: String): RouteMatcher = copy(pathSegments = prefix + pathSegments)
-
     override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
     override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
 
