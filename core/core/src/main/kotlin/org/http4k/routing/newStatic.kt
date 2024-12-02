@@ -38,4 +38,6 @@ data class NewStaticRouteMatcher(
     override fun withBasePath(prefix: String): NewRouteMatcher = copy(pathSegments = prefix + pathSegments)
 
     override fun withPredicate(other: Predicate): NewRouteMatcher = this
+
+    override fun toString() = "Static files $pathSegments"
 }
