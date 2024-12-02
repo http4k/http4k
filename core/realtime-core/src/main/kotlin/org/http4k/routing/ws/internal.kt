@@ -28,7 +28,7 @@ data class RoutingWsHandler(
 
     fun withBasePath(prefix: String) = copy(routes = routes.map { it.withBasePath(prefix) })
 
-    fun withFilter(filter: WsFilter) = copy(filter = filter.then(filter))
+    fun withFilter(new: WsFilter) = copy(filter = new.then(filter))
 
     fun withPredicate(predicate: Predicate) =
         copy(routes = routes.map { it.withPredicate(predicate) })
