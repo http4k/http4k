@@ -46,7 +46,9 @@ class ContractRoute internal constructor(
         override val description = RouterDescription(spec.describe(contractRoot))
 
         override fun match(request: Request): RouterMatch =
-            if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
+            if ((request.method == OPTIONS || request.method == method) && request.pathSegments()
+                    .startsWith(spec.pathFn(contractRoot))
+            ) {
                 try {
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
@@ -77,6 +79,7 @@ class ContractRoute internal constructor(
                     .then(PreFlightExtractionFilter(meta, Companion.All))
                     .then(matchResult)(request)
             }
+
             is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
             is Unmatched -> Response(NOT_FOUND)
             is MatchedWithoutHandler -> Response(NOT_FOUND)
@@ -94,12 +97,14 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
 }
 
-private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
+private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? =
+    toList().let { if (it.size > index) fn(it[index]) else null }
 
 private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
     when (toList().size) {
         lenses.size -> ExtractedParts(
             lenses.mapIndexed { i, lens -> lens to this(i) { lens(it.toPathSegmentDecoded()) } }.toMap()
         )
+
         else -> null
     }

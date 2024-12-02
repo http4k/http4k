@@ -15,9 +15,15 @@ import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RouterDescription
 import org.http4k.routing.RouterMatch
-import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.RouterMatch.MatchedWithoutHandler
+import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.routing.RouterMatch.Unmatched
+import org.http4k.routing.experimental.HttpMatchResult
+import org.http4k.routing.experimental.NewRouteMatcher
+import org.http4k.routing.experimental.Predicate
 
-data class NewContractRoutingHttpHandler(
+data class NewContractRouteMatcher(
     private val renderer: ContractRenderer,
     private val security: Security?,
     private val tags: Set<Tag>,
@@ -30,8 +36,38 @@ data class NewContractRoutingHttpHandler(
     private val postSecurityFilter: Filter = Filter.NoOp,
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap()
-) : RoutingHttpHandler {
+) : NewRouteMatcher {
     private val contractRoot = PathSegments(rootAsString)
+
+    override fun match(request: Request): HttpMatchResult {
+        val m = internalMatch(request)
+        return HttpMatchResult(
+            m.priority,
+            when (m) {
+                is MatchingHandler -> m
+                is MatchedWithoutHandler -> { _: Request -> Response(Status.NOT_FOUND) }
+                is MethodNotMatched ->  { _: Request -> Response(Status.METHOD_NOT_ALLOWED) }
+
+                is Unmatched -> { _: Request -> Response(Status.NOT_FOUND) }
+            }
+        )
+    }
+
+    private fun internalMatch(request: Request): RouterMatch {
+        val unmatched: RouterMatch = Unmatched(description)
+
+        return if (request.isIn(contractRoot)) {
+            routers.fold(unmatched) { memo, (routeFilter, router) ->
+                when (memo) {
+                    is MatchingHandler -> memo
+                    else -> when (val matchResult = router.match(request)) {
+                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult), description)
+                        else -> minOf(memo, matchResult)
+                    }
+                }
+            }
+        } else unmatched
+    }
 
     fun withPostSecurityFilter(new: Filter) = copy(postSecurityFilter = postSecurityFilter.then(new))
 
@@ -39,11 +75,13 @@ data class NewContractRoutingHttpHandler(
      * NOTE: By default, filters for Contracts are applied *before* the Security filter. Use withPostSecurityFilter()
      * to achieve population of filters after security.
      */
-    override fun withFilter(new: Filter) = copy(preSecurityFilter = new.then(preSecurityFilter))
+    fun withFilter(new: Filter) = copy(preSecurityFilter = new.then(preSecurityFilter))     // FIXME
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    override val description = RouterDescription(rootAsString,
+    override fun withPredicate(other: Predicate): NewRouteMatcher = this
+
+    val description = RouterDescription(rootAsString,
         routes.map { it.toRouter(PathSegments("$it$descriptionPath")).description }
     )
 
@@ -53,15 +91,13 @@ data class NewContractRoutingHttpHandler(
         .then { renderer.notFound() }
 
     private val handler: HttpHandler = {
-        when (val matchResult = match(it)) {
-            is RouterMatch.MatchingHandler -> matchResult(it)
-            is RouterMatch.MethodNotMatched -> notFound(it)
-            is RouterMatch.Unmatched -> notFound(it)
-            is RouterMatch.MatchedWithoutHandler -> notFound(it)
+        when (val matchResult = internalMatch(it)) {
+            is MatchingHandler -> matchResult(it)
+            is MethodNotMatched -> notFound(it)
+            is Unmatched -> notFound(it)
+            is MatchedWithoutHandler -> notFound(it)
         }
     }
-
-    override fun invoke(request: Request): Response = handler(request)
 
     private val descriptionRoute =
         ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
@@ -96,25 +132,6 @@ data class NewContractRoutingHttpHandler(
         .then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
-
-    override fun match(request: Request): RouterMatch {
-        val unmatched: RouterMatch = RouterMatch.Unmatched(description)
-
-        return if (request.isIn(contractRoot)) {
-            routers.fold(unmatched) { memo, (routeFilter, router) ->
-                when (memo) {
-                    is RouterMatch.MatchingHandler -> memo
-                    else -> when (val matchResult = router.match(request)) {
-                        is RouterMatch.MatchingHandler -> RouterMatch.MatchingHandler(
-                            routeFilter.then(matchResult),
-                            description
-                        )
-                        else -> minOf(memo, matchResult)
-                    }
-                }
-            }
-        } else unmatched
-    }
 
     private fun identify(route: ContractRoute) =
         route.describeFor(contractRoot).let { routeIdentity ->
