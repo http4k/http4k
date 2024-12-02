@@ -9,6 +9,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -23,10 +24,13 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.experimental.RoutedHttpHandler
+import org.http4k.routing.experimental.newBind
+import org.http4k.routing.experimental.newRoutes
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicInteger
 
-open class NewStaticRoutingHttpHandlerTest {
+ class NewStaticRoutingHttpHandlerTest {
 
     protected open val prefix = "/prefix"
 
@@ -34,7 +38,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up contents of existing root file`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
 
         val request = Request(GET, of("/svc/mybob.xml"))
         val criteria = hasBody("<xml>content</xml>") and hasHeader("Content-type", APPLICATION_XML.value)
@@ -43,7 +47,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `does not serve contents of existing root file outside the scope`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val criteria = hasStatus(NOT_FOUND)
         val request = Request(GET, of("/mybob.xml"))
 
@@ -52,7 +56,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `can register custom mime types`() {
-        val handler = "/svc" bind static(Classpath(), "myxml" to APPLICATION_XML)
+        val handler = "/svc" newBind newStatic(Classpath(), "myxml" to APPLICATION_XML)
         val request = Request(GET, of("/svc/mybob.myxml"))
         val criteria = hasStatus(OK) and hasBody("<myxml>content</myxml>") and hasHeader(
             "Content-type",
@@ -64,7 +68,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `defaults to index html if is no route`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val request = Request(GET, of("/svc"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-type", TEXT_HTML.value)
@@ -74,7 +78,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `defaults to index html if is no route - root-context`() {
-        val handler = "/" bind newStatic()
+        val handler = "/" newBind newStatic()
         val request = Request(GET, of("/"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-type", TEXT_HTML.value)
@@ -84,7 +88,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `defaults to index html if is no route - non-root-context`() {
-        val handler = "/svc" bind static(Classpath("org"))
+        val handler = "/svc" newBind newStatic(Classpath("org"))
         val request = Request(GET, of("/svc"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
@@ -94,22 +98,25 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `can apply filters`() {
+        val calls = AtomicInteger(0)
         val rewritePathToRootIndex = Filter { next ->
             {
-                next(it.uri(it.uri.path("/index.html")))
+                calls.incrementAndGet()
+                next(it)
             }
         }
-        val handler = rewritePathToRootIndex.then("/" bind static(Classpath("")))
-        val request = Request(GET, of("/asdas"))
+        val handler = rewritePathToRootIndex.then("/" newBind newStatic(Classpath("")))
+        val request = Request(GET, of("/index.html"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-Type", TEXT_HTML.value)
 
         assertThat(handler(request), criteria)
+        assertThat(calls.get(), equalTo(1))
     }
 
     @Test
     fun `non existing index html if is no route`() {
-        val handler = "/svc" bind static(Classpath("org/http4k"))
+        val handler = "/svc" newBind newStatic(Classpath("org/http4k"))
         val request = Request(GET, of("/svc"))
         val criteria = hasStatus(NOT_FOUND)
 
@@ -119,8 +126,8 @@ open class NewStaticRoutingHttpHandlerTest {
     @Test
     fun `looks up contents of existing subdir file - non-root context`() {
         val handlers = listOf(
-            "/svc" bind newStatic(),
-            "/svc/" bind newStatic()
+            "/svc" newBind newStatic(),
+            "/svc/" newBind newStatic()
         )
 
         handlers.forEach { handler ->
@@ -136,7 +143,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up contents of existing subdir file`() {
-        val handler = "/" bind newStatic()
+        val handler = "/" newBind newStatic()
         val request = Request(GET, of("/$pkg/StaticRouter.js"))
         val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader(
             "Content-type",
@@ -148,7 +155,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `can alter the root path`() {
-        val handler = "/svc" bind static(Classpath(pkg))
+        val handler = "/svc" newBind newStatic(Classpath(pkg))
         val request = Request(GET, of("/svc/StaticRouter.js"))
         val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader(
             "Content-type",
@@ -160,7 +167,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up non existent-file`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val request = Request(GET, of("/svc/NotHere.xml"))
         val criteria = hasStatus(NOT_FOUND)
 
@@ -169,7 +176,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `Classpath ResourceLoader cannot serve a directory without an index file`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val request = Request(GET, of("/svc/org/http4k"))
         val criteria = hasStatus(NOT_FOUND)
 
@@ -178,7 +185,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `Classpath ResourceLoader can serve a directory with an index file`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val request = Request(GET, of("/svc/org"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
@@ -188,7 +195,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `Directory ResourceLoader cannot serve a directory without an index file`() {
-        val handler = "/svc" bind static(ResourceLoader.Directory("../http4k-core/src/test/resources"))
+        val handler = "/svc" newBind newStatic(ResourceLoader.Directory("../http4k-core/src/test/resources"))
         val request = Request(GET, of("/svc/org/http4k"))
         val criteria = hasStatus(NOT_FOUND)
 
@@ -197,7 +204,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `Directory ResourceLoader can serve a directory with an index file`() {
-        val handler = "/svc" bind static(ResourceLoader.Directory("../core/src/test/resources"))
+        val handler = "/svc" newBind newStatic(ResourceLoader.Directory("../core/src/test/resources"))
         val request = Request(GET, of("/svc/org"))
         val criteria =
             hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
@@ -207,7 +214,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up non existent path`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val request = Request(GET, of("/bob/StaticRouter.js"))
         val criteria = hasStatus(NOT_FOUND)
 
@@ -216,7 +223,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `can't subvert the path`() {
-        val handler = "/svc" bind newStatic()
+        val handler = "/svc" newBind newStatic()
         val request1 = Request(GET, of("/svc/../svc/Bob.xml"))
         val criteria = hasStatus(NOT_FOUND)
 
@@ -227,29 +234,20 @@ open class NewStaticRoutingHttpHandlerTest {
     }
 
     @Test
-    fun `as a router when does not fine file`() {
-        val handler = "/svc" bind newStatic()
-
-        assertThat(handler.match(Request(GET, of("/svc/../svc/Bob.xml"))), isA<RouterMatch.Unmatched>())
-    }
-
-    @Test
-    fun `as a router finds file`() {
-        val handler = "/svc" bind newStatic()
-        val req = Request(GET, of("/svc/mybob.xml"))
-
-    }
-
-    @Test
     fun `can add filter to router`() {
+        val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
-            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+            {
+                calls.incrementAndGet()
+                next(it)
+            }
         }
-        val handler = "/svc" bind changePathFilter.then(newStatic())
-        val request = Request(GET, of("/svc/notmybob.xml"))
+        val handler = "/svc" newBind changePathFilter.then(newStatic())
+        val request = Request(GET, of("/svc/mybob.xml"))
         val criteria = hasStatus(OK)
 
         assertThat(handler(request), criteria)
+        assertThat(calls.get(), equalTo(1))
     }
 
     @Test
@@ -258,11 +256,11 @@ open class NewStaticRoutingHttpHandlerTest {
         val changePathFilter = Filter { next ->
             {
                 calls.incrementAndGet()
-                next(it.uri(it.uri.path("/svc/mybob.xml")))
+                next(it)
             }
         }
-        val handler = changePathFilter.then("/svc" bind newStatic())
-        val request = Request(GET, of("/svc/notmybob.xml"))
+        val handler = changePathFilter.then("/svc" newBind newStatic())
+        val request = Request(GET, of("/svc/mybob.xml"))
         val criteria = hasStatus(OK)
 
         assertThat(handler(request), criteria)
@@ -271,7 +269,8 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `application of filter - nested and first`() {
-        val handler = routes("/first" bind newStatic(), "/second" bind GET to { Response(INTERNAL_SERVER_ERROR) })
+        val handler =
+            newRoutes("/first" newBind newStatic(), "/second" newBind GET to { Response(INTERNAL_SERVER_ERROR) })
 
         handler.assertFilterCalledOnce("/first/mybob.xml", OK)
         handler.assertFilterCalledOnce("/first/notmybob.xml", NOT_FOUND)
@@ -281,10 +280,10 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `application of filter - nested and middle`() {
-        val handler = routes(
-            "/first" bind GET to { Response(INTERNAL_SERVER_ERROR) },
-            "/second" bind newStatic(),
-            "/third" bind GET to { Response(I_M_A_TEAPOT) }
+        val handler = newRoutes(
+            "/first" newBind GET to { Response(INTERNAL_SERVER_ERROR) },
+            "/second" newBind newStatic(),
+            "/third" newBind GET to { Response(I_M_A_TEAPOT) }
         )
 
         handler.assertFilterCalledOnce("/first", INTERNAL_SERVER_ERROR)
@@ -296,10 +295,10 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `application of filter - nested and last`() {
-        val handler = routes(
-            "/first" bind GET to { Response(INTERNAL_SERVER_ERROR) },
-            "/second" bind GET to { Response(I_M_A_TEAPOT) },
-            "/third" bind newStatic()
+        val handler = newRoutes(
+            "/first" newBind GET to { Response(INTERNAL_SERVER_ERROR) },
+            "/second" newBind GET to { Response(I_M_A_TEAPOT) },
+            "/third" newBind newStatic()
         )
         handler.assertFilterCalledOnce("/first", INTERNAL_SERVER_ERROR)
         handler.assertFilterCalledOnce("/second", I_M_A_TEAPOT)
@@ -309,7 +308,7 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `application of filter - unnested`() {
-        val handler = "/first" bind newStatic()
+        val handler = "/first" newBind newStatic()
         handler.assertFilterCalledOnce("/first/mybob.xml", OK)
         handler.assertFilterCalledOnce("/first/notmybob.xml", NOT_FOUND)
         handler.assertFilterCalledOnce("/second", NOT_FOUND)
@@ -325,12 +324,12 @@ open class NewStaticRoutingHttpHandlerTest {
 
     @Test
     fun `nested static`() {
-        val handler = routes("/foo" bind routes("/bob" bind GET to newStatic()))
+        val handler = newRoutes("/foo" newBind newRoutes("/bob" newBind GET to newStatic()))
 
         assertThat(handler(Request(GET, "/foo/bob/mybob.xml")), hasStatus(OK))
     }
 
-    private fun RoutingHttpHandler.assertFilterCalledOnce(path: String, expected: Status) {
+    private fun RoutedHttpHandler.assertFilterCalledOnce(path: String, expected: Status) {
         val calls = AtomicInteger(0)
         val handler = Filter { next -> { calls.incrementAndGet(); next(it) } }.then(this)
         assertThat(handler(Request(GET, of(path))), hasStatus(expected))
