@@ -42,10 +42,8 @@ fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Routin
     RoutingHttpHandler(
         hostToHandler.flatMap { (host, handler) ->
             when (handler) {
-                is RoutingHttpHandler ->
-                    handler.routes.map { it.withPredicate(hostHeaderOrUriHost(host)) }
-
-                else -> listOf(TemplatedHttpRoute(UriTemplate.from(""), handler, hostHeaderOrUriHost(host)))
+                is RoutingHttpHandler -> handler.routes.map { it.withPredicate(hostHeaderOrUriHost(host)) }
+                else -> listOf(PredicateRouteMatcher(handler, hostHeaderOrUriHost(host)))
             }
         }
     )
