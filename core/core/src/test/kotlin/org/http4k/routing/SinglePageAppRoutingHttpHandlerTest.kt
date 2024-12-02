@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(
         validPath,
-        StaticRoutingHttpHandler(
+        NewStaticRoutingHttpHandler(
             pathSegments = validPath,
             resourceLoader = ResourceLoader.Classpath(),
             extraFileExtensionToContentTypes = emptyMap()

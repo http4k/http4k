@@ -20,12 +20,12 @@ fun singlePageApp(
 ): RoutingHttpHandler =
     SinglePageAppRoutingHandler(
         "",
-        StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+        NewStaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
     )
 
 internal data class SinglePageAppRoutingHandler(
     private val pathSegments: String,
-    private val staticHandler: StaticRoutingHttpHandler
+    private val staticHandler: NewStaticRoutingHttpHandler
 ) : RoutingHttpHandler {
 
     override fun invoke(request: Request): Response {
@@ -49,10 +49,10 @@ internal data class SinglePageAppRoutingHandler(
     }
 
     override fun withFilter(new: Filter) =
-        copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
+        copy(staticHandler = staticHandler.withFilter(new) as NewStaticRoutingHttpHandler)
 
     override fun withBasePath(new: String) =
-        SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
+        SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as NewStaticRoutingHttpHandler)
 
     override val description = RouterDescription("SPA at $pathSegments", listOf(staticHandler.description))
 
