@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.0.0.0 (uncut)
+- **http4k-core** : [Breaking] Complete rewrite of the routing logic to work identically across HTTP, WS and SSE. [FIXME] <-- Insert breaking changes
+- **http4k-contract** : [Breaking] withPostSecurityFilter() removed as is part of the contract DSL.
+
 ### v5.38.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : [Unlikely break] Split of RequestWithRoute into Request and RoutedMessage 
