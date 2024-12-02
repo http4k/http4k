@@ -168,16 +168,17 @@ class NewContractRoutingHttpHandlerTest {
         assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
     }
 
-//    @Test
-//    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
-//        val root = org.http4k.routing.newRoutes(
-//            "/root/bar" newBind newContract {
-//               routes += "/foo/bar" bindContract OPTIONS to { Response(NOT_IMPLEMENTED) })
-//        }
-//        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
-//
-//        assertThat(response.status, equalTo(NOT_IMPLEMENTED))
-//    }
+    @Test
+    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
+        val root = newRoutes(
+            "/root/bar" newBind newContract {
+                routes += "/foo/bar" bindContract GET to { _ -> Response(NOT_IMPLEMENTED) }
+            }
+        )
+        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+
+        assertThat(response.status, equalTo(NOT_IMPLEMENTED))
+    }
 
     @Test
     fun `identifies called route using identity header on request`() {
