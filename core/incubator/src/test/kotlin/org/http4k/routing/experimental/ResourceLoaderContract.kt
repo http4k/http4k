@@ -7,19 +7,17 @@ import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
-import org.http4k.routing.Router
-import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchingHandler
+import org.http4k.routing.HttpMatchResult
+import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RouterMatch.Unmatched
 import org.junit.jupiter.api.Test
 
-abstract class ResourceLoaderContract(private val loader: Router) {
+abstract class ResourceLoaderContract(private val loader: RouteMatcher) {
 
     @Test
     fun `loads existing file`() {
@@ -58,15 +56,15 @@ abstract class ResourceLoaderContract(private val loader: Router) {
         if (expected == null)
             assertThat(loader.match(request), isA<Unmatched>())
         else {
-            val response = loader.match(request).matchOrExplode().invoke(request)
+            val response = loader.match(request).handler(request)
             assertThat(response, hasBody(expected))
-            assertThat(response, hasHeader("Content-Length", expected.length.toString()) or hasHeader("Content-Length", absent()))
+            assertThat(
+                response,
+                hasHeader("Content-Length", expected.length.toString()) or hasHeader("Content-Length", absent())
+            )
             assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirectives().toHeaderValue()))
         }
     }
 
-    private fun RouterMatch.matchOrExplode(): HttpHandler = when (this) {
-        is MatchingHandler -> this
-        else -> error("Unmatched, got $this")
-    }
+    private fun HttpMatchResult.matchOrExplode() = handler
 }
