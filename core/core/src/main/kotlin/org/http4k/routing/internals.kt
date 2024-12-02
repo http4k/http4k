@@ -76,6 +76,17 @@ data class TemplatedHttpRoute(
     }
 }
 
+class PredicateRouteMatcher(private val handler: HttpHandler, private val predicate: Predicate) : RouteMatcher {
+    override fun match(request: Request) = when (val result = predicate(request)) {
+        is Matched -> HttpMatchResult(0, handler)
+        is NotMatched -> HttpMatchResult(1) { _: Request -> Response(result.status) }
+    }
+
+    override fun withBasePath(prefix: String): RouteMatcher = TemplatedHttpRoute(UriTemplate.from(prefix), handler)
+
+    override fun withPredicate(other: Predicate): RouteMatcher = PredicateRouteMatcher(handler, predicate.and(other))
+}
+
 data class HttpMatchResult(val priority: Int, val handler: HttpHandler)
 
 data class HttpPathMethod(val path: String, val method: Method) {
