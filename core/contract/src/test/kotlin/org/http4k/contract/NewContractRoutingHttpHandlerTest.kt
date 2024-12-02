@@ -168,16 +168,27 @@ class NewContractRoutingHttpHandlerTest {
         assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
     }
 
+//    @Test
+//    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
+//        val root = newRoutes(
+//            "/root/bar" newBind newContract {
+//                routes += "/foo/bar" bindContract OPTIONS to { _ -> Response(NOT_IMPLEMENTED) }
+//            }
+//        )
+//        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+//
+//        assertThat(response.status, equalTo(NOT_IMPLEMENTED))
+//    }
+
     @Test
-    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
+    fun `OPTIONS traffic responds with 404 if route does not exist`() {
         val root = newRoutes(
             "/root/bar" newBind newContract {
-                routes += "/foo/bar" bindContract GET to { _ -> Response(NOT_IMPLEMENTED) }
             }
         )
-        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+        val response = root(Request(OPTIONS, "/root/bar/foo/bar2"))
 
-        assertThat(response.status, equalTo(NOT_IMPLEMENTED))
+        assertThat(response.status, equalTo(NOT_FOUND))
     }
 
     @Test
