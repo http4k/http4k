@@ -6,7 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.routing.path
-import org.http4k.routing.ws.bind
+import org.http4k.routing.websocket.bind
 import org.junit.jupiter.api.Test
 
 class WsFilterTest {
