@@ -137,17 +137,20 @@ fun ResponseFilters.ReportSseTransaction(
                 response.withConsumer { sse ->
                     response.consumer(object : Sse by sse {
                         override fun close() {
-                            sse.close()
-                            recordFn(
-                                transactionLabeler(
-                                    SseTransaction(
-                                        request = request,
-                                        response = response,
-                                        start = start,
-                                        duration = Duration.between(start, timeSource())
+                            try {
+                                sse.close()
+                            } finally {
+                                recordFn(
+                                    transactionLabeler(
+                                        SseTransaction(
+                                            request = request,
+                                            response = response,
+                                            start = start,
+                                            duration = Duration.between(start, timeSource())
+                                        )
                                     )
                                 )
-                            )
+                            }
                         }
                     })
                 }
