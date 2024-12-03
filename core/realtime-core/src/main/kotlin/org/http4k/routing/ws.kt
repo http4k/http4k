@@ -1,6 +1,6 @@
 package org.http4k.routing
 
-import org.http4k.routing.ws.RoutingWsHandler
+import org.http4k.routing.websocket.RoutingWsHandler
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsResponse
