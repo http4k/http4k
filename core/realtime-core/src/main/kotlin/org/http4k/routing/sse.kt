@@ -18,10 +18,14 @@ fun sse(vararg list: RoutingSseHandler): RoutingSseHandler = sse(list.toList())
 fun sse(routers: List<RoutingSseHandler>) =
     RoutingSseHandler(routers.flatMap { it.routes })
 
-data class RoutedSseResponse(
+class RoutedSseResponse(
     val delegate: SseResponse,
     override val xUriTemplate: UriTemplate,
 ) : SseResponse by delegate, RoutedMessage {
     override fun withConsumer(consumer: SseConsumer) =
         RoutedSseResponse(delegate.withConsumer(consumer), xUriTemplate)
+
+    override fun equals(other: Any?): Boolean = delegate == other
+
+    override fun hashCode(): Int = delegate.hashCode()
 }
