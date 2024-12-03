@@ -4,8 +4,8 @@ import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.routing.RoutedMessage
 import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
 
 sealed class HttpEvent(
     val uri: Uri,
@@ -30,7 +30,8 @@ sealed class HttpEvent(
             if (tx.request is RoutedRequest) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
         )
 
-        override fun toString() = "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+        override fun toString() =
+            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
 
         companion object
     }
@@ -47,10 +48,11 @@ sealed class HttpEvent(
             tx.request.method,
             tx.response.status,
             tx.duration.toMillis(),
-            if (tx.response is RoutedResponse) tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+            if (tx.response is RoutedMessage) tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
         )
 
-        override fun toString() = "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+        override fun toString() =
+            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
     }
 
     override fun equals(other: Any?): Boolean {
