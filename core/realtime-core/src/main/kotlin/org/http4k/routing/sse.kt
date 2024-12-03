@@ -12,7 +12,7 @@ fun sse(vararg methods: Pair<Method, SseHandler>): SseHandler = {
     methods.toMap()[it.method]?.invoke(it) ?: SseResponse { it.close() }
 }
 
-fun sse(vararg list: RoutingSseHandler) = sse(list.toList())
+fun sse(vararg list: RoutingSseHandler): RoutingSseHandler = sse(list.toList())
 
 fun sse(routers: List<RoutingSseHandler>) =
     RoutingSseHandler(routers.flatMap { it.routes })
