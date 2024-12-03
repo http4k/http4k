@@ -29,7 +29,7 @@ import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class NewResourceLoadingHandlerTest {
+class ResourceLoadingHandlerTest {
 
     private val resources = HashMap<String, Resource>()
     private val handler = "/root" bind static(InMemoryResourceLoader(resources))

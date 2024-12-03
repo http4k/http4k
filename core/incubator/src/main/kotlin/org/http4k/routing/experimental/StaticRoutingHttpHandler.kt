@@ -21,12 +21,10 @@ fun static(
     resourceLoader: RouteMatcher,
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ) = RoutingHttpHandler(
-    listOf(
-        NewStaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
-    )
+    listOf(StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 )
 
-data class NewStaticRouteMatcher(
+data class StaticRouteMatcher(
     private val pathSegments: String,
     private val resourceLoader: RouteMatcher,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
