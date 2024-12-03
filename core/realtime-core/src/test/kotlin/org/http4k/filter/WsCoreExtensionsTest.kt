@@ -11,10 +11,8 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.with
 import org.http4k.lens.RequestContextKey
-import org.http4k.sse.SseFilter
-import org.http4k.sse.SseResponse
-import org.http4k.sse.then
 import org.http4k.testing.testWsClient
+import org.http4k.util.TickingClock
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsMessage
@@ -24,9 +22,11 @@ import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.BUGGYCLOSE
 import org.http4k.websocket.then
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.time.Duration.ofSeconds
 import java.util.concurrent.atomic.AtomicReference
 
 class WsCoreExtensionsTest {
@@ -37,15 +37,15 @@ class WsCoreExtensionsTest {
     @Test
     fun `can initialise and populate sse request context`() {
         val found = AtomicReference<Credentials>(null)
-        val handler = ServerFilters.InitialiseSseRequestContext(contexts)
-            .then(SseFilter { next ->
+        val handler = ServerFilters.InitialiseWsRequestContext(contexts)
+            .then(WsFilter { next ->
                 {
                     next(it.with(key of credentials))
                 }
             })
             .then {
                 found.set(key(it))
-                SseResponse { _ -> }
+                WsResponse { _ -> }
             }
 
         handler(Request(GET, "/"))
@@ -138,5 +138,22 @@ class WsCoreExtensionsTest {
         })
 
         assertThat(error.get(), equalTo(e))
+    }
+
+    @Test
+    fun `reporting latency for request`() {
+        var called = false
+        val request = Request(GET, "")
+        val response = WsResponse { it.close() }
+
+        val tickingClock = TickingClock()
+        val socket = ResponseFilters.ReportWsTransaction(tickingClock) { (req, resp, duration) ->
+            called = true
+            assertThat(req, equalTo(request))
+            assertThat(resp, equalTo(response))
+            assertThat(duration, equalTo(ofSeconds(1)))
+        }.then { response }
+        socket.testWsClient(request)
+        assertTrue(called)
     }
 }
