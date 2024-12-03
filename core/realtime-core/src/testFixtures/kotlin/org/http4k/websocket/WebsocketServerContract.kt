@@ -19,8 +19,8 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.lens.string
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import org.http4k.routing.websocket.bind
 import org.http4k.routing.websockets
-import org.http4k.routing.ws.bind
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
