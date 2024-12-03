@@ -1,15 +1,15 @@
 package org.http4k.core
 
-import org.http4k.sse.SseResponse
+import org.http4k.websocket.WsResponse
 import java.time.Duration
 import java.time.Instant
 
-data class SseTransaction(
+data class WsTransaction(
     override val request: Request,
-    override val response: SseResponse,
+    override val response: WsResponse,
     override val duration: Duration,
     override val labels: Map<String, String> = defaultLabels(request, response),
     override val start: Instant
-) : ProtocolTransaction<SseResponse> {
+) : ProtocolTransaction<WsResponse> {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
 }
