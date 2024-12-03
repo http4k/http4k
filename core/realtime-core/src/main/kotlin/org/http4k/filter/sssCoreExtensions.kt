@@ -84,7 +84,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                             .joinToString("\n")
                     )
 
-                    response.consumer { sse ->
+                    response.withConsumer { sse ->
                         response.consumer(object : Sse by sse {
                             override fun send(message: SseMessage) = apply {
                                 sse.send(message)
