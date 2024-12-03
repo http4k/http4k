@@ -15,4 +15,10 @@ fun websockets(ws: WsConsumer): WsHandler = { WsResponse(ws) }
 data class RoutedWsResponse(
     val delegate: WsResponse,
     override val xUriTemplate: UriTemplate,
-) : WsResponse by delegate, RoutedMessage
+) : WsResponse by delegate, RoutedMessage {
+    override fun withConsumer(consumer: WsConsumer): WsResponse =
+        RoutedWsResponse(delegate.withConsumer(consumer), xUriTemplate)
+
+    override fun withSubprotocol(subprotocol: String?): WsResponse =
+        RoutedWsResponse(delegate.withSubprotocol(subprotocol), xUriTemplate)
+}

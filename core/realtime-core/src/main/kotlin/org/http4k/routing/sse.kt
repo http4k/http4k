@@ -21,4 +21,7 @@ fun sse(routers: List<RoutingSseHandler>) =
 data class RoutedSseResponse(
     val delegate: SseResponse,
     override val xUriTemplate: UriTemplate,
-) : SseResponse by delegate, RoutedMessage
+) : SseResponse by delegate, RoutedMessage {
+    override fun withConsumer(consumer: SseConsumer) =
+        RoutedSseResponse(delegate.withConsumer(consumer), xUriTemplate)
+}
