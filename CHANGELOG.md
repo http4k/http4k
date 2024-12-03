@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v6.0.0.0 (uncut)
 - **http4k-core** : [Breaking] Complete rewrite of the routing logic to work identically across HTTP, WS and SSE. [FIXME] <-- Insert breaking changes
 - sse change packages
+- sse now logs transactions
 - ws change packages
 - 
 - **http4k-contract** : [Breaking] withPostSecurityFilter() removed as is part of the contract DSL.  
