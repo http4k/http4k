@@ -4,6 +4,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.RequestContext
 import org.http4k.core.Store
+import org.http4k.core.WsTransaction
 import org.http4k.routing.websocket.RoutingWsHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsFilter
@@ -15,6 +16,9 @@ import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.then
 import java.io.PrintStream
+import java.time.Clock
+import java.time.Duration
+import java.time.Instant
 
 fun ServerFilters.CatchAllWs(
     onError: (Throwable) -> WsResponse = ::originalWsBehaviour,
@@ -111,3 +115,55 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
 
 private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
+
+
+/**
+ * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
+ * create custom labels.
+ * This is useful for logging metrics. Note that the passed function blocks the response from completing.
+ */
+fun ResponseFilters.ReportWsTransaction(
+    clock: Clock = Clock.systemUTC(),
+    transactionLabeler: WsTransactionLabeler = { it },
+    recordFn: (WsTransaction) -> Unit
+): WsFilter = ReportWsTransaction(clock::instant, transactionLabeler, recordFn)
+
+/**
+ * General reporting WsFilter for an ReportWsTransaction. Pass an optional WsTransactionLabeler to
+ * create custom labels.
+ * This is useful for logging metrics. Note that the passed function blocks the response from completing.
+ */
+fun ResponseFilters.ReportWsTransaction(
+    timeSource: () -> Instant,
+    transactionLabeler: WsTransactionLabeler = { it },
+    recordFn: (WsTransaction) -> Unit
+) = WsFilter { next ->
+    { request ->
+        timeSource().let { start ->
+            next(request).let { response ->
+                response.withConsumer { ws ->
+                    response.consumer(object : Websocket by ws {
+                        override fun close(status: WsStatus) {
+                            try {
+                                ws.close(status)
+                            } finally {
+                                recordFn(
+                                    transactionLabeler(
+                                        WsTransaction(
+                                            request = request,
+                                            response = response,
+                                            start = start,
+                                            duration = Duration.between(start, timeSource())
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    }
+}
+
+typealias WsTransactionLabeler = (WsTransaction) -> WsTransaction
