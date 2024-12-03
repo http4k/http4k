@@ -1,4 +1,4 @@
-package org.http4k.routing.ws
+package org.http4k.routing.websocket
 
 import org.http4k.core.Method
 import org.http4k.core.UriTemplate

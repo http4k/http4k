@@ -84,7 +84,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                             .joinToString("\n")
                     )
 
-                    response.copy(consumer = { sse ->
+                    response.consumer { sse ->
                         response.consumer(object : Sse by sse {
                             override fun send(message: SseMessage) = apply {
                                 sse.send(message)
@@ -97,7 +97,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                                 out.println("***** SSE CLOSED on ${req.method}: ${req.uri} *****")
                             }
                         })
-                    })
+                    }
                 }
             } catch (e: Exception) {
                 out.println("***** SSE RESPONSE FAILED to ${req.method}: ${req.uri} *****")
