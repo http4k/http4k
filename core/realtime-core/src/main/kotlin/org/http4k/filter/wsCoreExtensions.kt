@@ -152,6 +152,7 @@ fun ResponseFilters.ReportWsTransaction(
                                         WsTransaction(
                                             request = request,
                                             response = response,
+                                            status = status,
                                             start = start,
                                             duration = Duration.between(start, timeSource())
                                         )
