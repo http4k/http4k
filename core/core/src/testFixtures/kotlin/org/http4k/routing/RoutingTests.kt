@@ -19,7 +19,7 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class NewRoutingTests {
+class RoutingTests {
 
     private val aValidHandler = { request: Request ->
         val body: String =
