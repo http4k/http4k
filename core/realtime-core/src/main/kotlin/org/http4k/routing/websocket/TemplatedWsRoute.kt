@@ -4,8 +4,10 @@ import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 import org.http4k.routing.All
 import org.http4k.routing.Predicate
-import org.http4k.routing.PredicateResult
+import org.http4k.routing.PredicateResult.Matched
+import org.http4k.routing.PredicateResult.NotMatched
 import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RoutedWsResponse
 import org.http4k.routing.and
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
@@ -23,9 +25,9 @@ data class TemplatedWsRoute(
     }
 
     internal fun match(request: Request) = when {
-        uriTemplate.matches(request.uri.path) -> when (val result = predicate(request)) {
-            is PredicateResult.Matched -> WsMatchResult(0, AddUriTemplate(uriTemplate).then(handler))
-            is PredicateResult.NotMatched -> notMachResult
+        uriTemplate.matches(request.uri.path) -> when (predicate(request)) {
+            is Matched -> WsMatchResult(0, AddUriTemplate(uriTemplate).then(handler))
+            is NotMatched -> notMachResult
         }
 
         else -> notMachResult
@@ -39,11 +41,11 @@ data class TemplatedWsRoute(
 
     private fun AddUriTemplate(uriTemplate: UriTemplate) = WsFilter { next ->
         {
-            next(RoutedRequest(it, uriTemplate))
+            RoutedWsResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
         }
     }
 
-    companion object{
+    companion object {
         internal val notMachResult = WsMatchResult(1) { _: Request -> WsResponse { it.close(WsStatus.REFUSE) } }
     }
 }
