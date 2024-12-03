@@ -21,6 +21,7 @@ import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.BUGGYCLOSE
+import org.http4k.websocket.WsStatus.Companion.NORMAL
 import org.http4k.websocket.then
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -144,13 +145,14 @@ class WsCoreExtensionsTest {
     fun `reporting latency for request`() {
         var called = false
         val request = Request(GET, "")
-        val response = WsResponse { it.close() }
+        val response = WsResponse { it.close(NORMAL) }
 
         val tickingClock = TickingClock()
-        val socket = ResponseFilters.ReportWsTransaction(tickingClock) { (req, resp, duration) ->
+        val socket = ResponseFilters.ReportWsTransaction(tickingClock) { (req, resp, status, duration) ->
             called = true
             assertThat(req, equalTo(request))
             assertThat(resp, equalTo(response))
+            assertThat(status, equalTo(NORMAL))
             assertThat(duration, equalTo(ofSeconds(1)))
         }.then { response }
         socket.testWsClient(request)
