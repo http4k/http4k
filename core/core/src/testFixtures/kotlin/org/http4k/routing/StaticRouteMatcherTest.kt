@@ -23,7 +23,7 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicInteger
 
-class NewStaticRoutingHttpHandlerTest {
+class StaticRouteMatcherTest {
 
     private val pkg = javaClass.`package`.name.replace('.', '/')
 

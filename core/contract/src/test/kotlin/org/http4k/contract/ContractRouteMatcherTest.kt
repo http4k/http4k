@@ -41,7 +41,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-class NewContractRoutingHttpHandlerTest {
+class ContractRouteMatcherTest {
 
     private val validPath = "/route-contract"
 
