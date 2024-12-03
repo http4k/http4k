@@ -12,10 +12,15 @@ fun websockets(routers: List<RoutingWsHandler>) = RoutingWsHandler(routers.flatM
 
 fun websockets(ws: WsConsumer): WsHandler = { WsResponse(ws) }
 
-data class RoutedWsResponse(
+class RoutedWsResponse(
     val delegate: WsResponse,
     override val xUriTemplate: UriTemplate,
 ) : WsResponse by delegate, RoutedMessage {
+
+    override fun equals(other: Any?): Boolean = delegate == other
+
+    override fun hashCode(): Int = delegate.hashCode()
+
     override fun withConsumer(consumer: WsConsumer): WsResponse =
         RoutedWsResponse(delegate.withConsumer(consumer), xUriTemplate)
 
