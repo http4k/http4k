@@ -4,13 +4,13 @@ import org.http4k.core.Headers
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 
-interface SseResponse {
+interface SseResponse : SseConsumer {
     val status: Status
     val headers: Headers
     val handled: Boolean
     val consumer: SseConsumer
 
-    fun consumer(consumer: SseConsumer): SseResponse
+    fun withConsumer(consumer: SseConsumer): SseResponse
 
     companion object {
         operator fun invoke(consumer: SseConsumer): SseResponse =
@@ -28,5 +28,5 @@ internal data class MemorySseResponse(
     override val handled: Boolean = true,
     override val consumer: SseConsumer
 ) : SseResponse, SseConsumer by consumer {
-    override fun consumer(consumer: SseConsumer): SseResponse = copy(consumer = consumer)
+    override fun withConsumer(consumer: SseConsumer): SseResponse = copy(consumer = consumer)
 }

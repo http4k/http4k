@@ -47,7 +47,7 @@ fun ServerFilters.InitialiseWsRequestContext(contexts: Store<RequestContext>) = 
 
 fun ServerFilters.SetWsSubProtocol(subprotocol: String) = WsFilter { next ->
     {
-        next(it).copy(subprotocol = subprotocol)
+        next(it).withSubprotocol(subprotocol)
     }
 }
 
@@ -79,8 +79,7 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
             try {
                 next(req).let { response ->
                     out.println("***** WS RESPONSE ${response.subprotocol} to ${req.method}: ${req.uri} *****")
-
-                    response.copy(consumer = { ws ->
+                    response.withConsumer { ws ->
                         response.consumer(object : Websocket by ws {
                             override fun send(message: WsMessage) {
                                 ws.send(message)
@@ -100,7 +99,7 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
                                 out.println("***** WS CLOSED with ${status.code} on ${req.method}: ${req.uri} *****")
                             }
                         })
-                    })
+                    }
                 }
             } catch (e: Exception) {
                 out.println("***** WS RESPONSE FAILED to ${req.method}: ${req.uri} *****")
