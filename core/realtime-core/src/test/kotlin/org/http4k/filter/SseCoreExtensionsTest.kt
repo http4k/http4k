@@ -138,17 +138,16 @@ class SseCoreExtensionsTest {
     fun `reporting latency for request`() {
         var called = false
         val request = Request(GET, "")
-        val response = SseResponse { _ -> }
+        val response = SseResponse { it.close() }
 
         val tickingClock = TickingClock()
-        ResponseFilters.ReportSseTransaction(tickingClock) { (req, resp, duration) ->
+        val socket = ResponseFilters.ReportSseTransaction(tickingClock) { (req, resp, duration) ->
             called = true
             assertThat(req, equalTo(request))
             assertThat(resp, equalTo(response))
             assertThat(duration, equalTo(ofSeconds(1)))
-        }.then { response }(request)
-
+        }.then { response }
+        socket.testSseClient(request)
         assertTrue(called)
     }
-
 }
