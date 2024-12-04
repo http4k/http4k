@@ -80,8 +80,8 @@ data class TemplatedHttpRoute(
 }
 
 data class SimpleRouteMatcher(
-    private val handler: HttpHandler,
     private val router: Router,
+    private val handler: HttpHandler,
     private val filter: Filter = Filter.NoOp
 ) : RouteMatcher {
 

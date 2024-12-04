@@ -20,7 +20,7 @@ infix fun String.bind(action: HttpHandler) =
     RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(this), action)))
 
 infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler =
-    RoutingHttpHandler(listOf(SimpleRouteMatcher(handler, this)))
+    RoutingHttpHandler(listOf(SimpleRouteMatcher(this, handler)))
 
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = handler.withRouter(this)
 
@@ -43,7 +43,7 @@ fun reverseProxyRouting(vararg hostToHandler: Pair<String, HttpHandler>): Routin
         hostToHandler.flatMap { (host, handler) ->
             when (handler) {
                 is RoutingHttpHandler -> handler.routes.map { it.withRouter(hostHeaderOrUriHost(host)) }
-                else -> listOf(SimpleRouteMatcher(handler, hostHeaderOrUriHost(host)))
+                else -> listOf(SimpleRouteMatcher(hostHeaderOrUriHost(host), handler))
             }
         }
     )
