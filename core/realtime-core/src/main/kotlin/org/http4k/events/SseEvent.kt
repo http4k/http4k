@@ -7,13 +7,8 @@ import org.http4k.core.Uri
 import org.http4k.routing.RoutedMessage
 import org.http4k.routing.RoutedRequest
 
-sealed class SseEvent(
-    val uri: Uri,
-    val method: Method,
-    val status: Status,
-    val latency: Long,
-    val xUriTemplate: String,
-    ) : Event {
+sealed class SseEvent(uri: Uri, val method: Method, status: Status, latency: Long, xUriTemplate: String)
+    : ProtocolEvent(uri, ProtocolStatus(status.code, status.description, status.clientGenerated), latency, xUriTemplate, "sse") {
 
     class Incoming(
         uri: Uri,
@@ -31,7 +26,7 @@ sealed class SseEvent(
         )
 
         override fun toString() =
-            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol)"
 
         companion object
     }
@@ -52,7 +47,7 @@ sealed class SseEvent(
         )
 
         override fun toString() =
-            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol))"
     }
 
     override fun equals(other: Any?): Boolean {

@@ -8,12 +8,12 @@ import org.http4k.routing.RoutedRequest
 import org.http4k.websocket.WsStatus
 
 sealed class WsEvent(
-    val uri: Uri,
+     uri: Uri,
     val method: Method,
-    val status: WsStatus,
-    val latency: Long,
-    val xUriTemplate: String,
-) : Event {
+     status: WsStatus,
+     latency: Long,
+     xUriTemplate: String,
+) : ProtocolEvent(uri, ProtocolStatus(status.code, status.description, false), latency, xUriTemplate, "ws") {
 
     class Incoming(
         uri: Uri,
@@ -31,7 +31,7 @@ sealed class WsEvent(
         )
 
         override fun toString() =
-            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol)"
 
         companion object
     }
@@ -52,7 +52,7 @@ sealed class WsEvent(
         )
 
         override fun toString() =
-            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate,protocol=$protocol)"
     }
 
     override fun equals(other: Any?): Boolean {

@@ -8,13 +8,12 @@ import org.http4k.routing.RoutedMessage
 import org.http4k.routing.RoutedRequest
 
 sealed class HttpEvent(
-    val uri: Uri,
+    uri: Uri,
     val method: Method,
-    val status: Status,
-    val latency: Long,
-    val xUriTemplate: String,
-) : Event {
-
+    status: Status,
+    latency: Long,
+    xUriTemplate: String,
+) : ProtocolEvent(uri, ProtocolStatus(status.code, status.description, status.clientGenerated), latency, xUriTemplate, "http") {
     class Incoming(
         uri: Uri,
         method: Method,
@@ -31,7 +30,7 @@ sealed class HttpEvent(
         )
 
         override fun toString() =
-            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+            "Incoming(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol)"
 
         companion object
     }
@@ -52,7 +51,7 @@ sealed class HttpEvent(
         )
 
         override fun toString() =
-            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate)"
+            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol)"
     }
 
     override fun equals(other: Any?): Boolean {
