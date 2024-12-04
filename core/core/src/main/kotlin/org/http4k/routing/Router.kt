@@ -19,16 +19,18 @@ interface Router {
         ) = object : Router {
             override val description: String = description
             override fun invoke(request: Request): RoutingResult =
-                if (predicate(request)) Matched else NotMatched(notMatchedStatus)
+                if (predicate(request)) Matched(description) else NotMatched(notMatchedStatus, description)
 
             override fun toString(): String = description
         }
     }
 }
 
-sealed class RoutingResult {
-    data object Matched : RoutingResult()
-    data class NotMatched(val status: Status = NOT_FOUND) : RoutingResult()
+sealed interface RoutingResult {
+    val description: String
+
+    data class Matched(override val description: String) : RoutingResult
+    data class NotMatched(val status: Status = NOT_FOUND, override val description: String) : RoutingResult
 }
 
 val All = Router("all") { true }
