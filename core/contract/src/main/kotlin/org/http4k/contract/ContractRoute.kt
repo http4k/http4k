@@ -23,7 +23,6 @@ import org.http4k.core.toPathSegmentDecoded
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
-import org.http4k.routing.RouterDescription
 
 class ContractRoute internal constructor(
     val method: Method,
@@ -39,9 +38,9 @@ class ContractRoute internal constructor(
 
     fun toRouter(contractRoot: PathSegments) = object : ContractRouter {
 
-        override fun toString() = description.description
+        override fun toString() = description
 
-        override val description = RouterDescription(spec.describe(contractRoot))
+        override val description = spec.describe(contractRoot)
 
         override fun match(request: Request): ContractRouterMatch =
             if ((request.method == OPTIONS || request.method == method) && request.pathSegments()
