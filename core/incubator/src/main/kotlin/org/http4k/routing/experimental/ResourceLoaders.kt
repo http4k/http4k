@@ -29,9 +29,9 @@ object ResourceLoaders {
         override fun match(request: Request): RoutingMatch<Response> {
             val resourcePath = basePackagePath.withLeadingSlash().pathJoin(request.uri.path.orIndexFile())
             return when (val resource = javaClass.getResource(resourcePath)) {
-                null -> RoutingMatch(2, { _: Request -> Response(Status.NOT_FOUND) })
+                null -> RoutingMatch(2, "", { _: Request -> Response(Status.NOT_FOUND) })
                 else -> RoutingMatch(
-                    0, resource.toResource(
+                    0, "", resource.toResource(
                         mimeTypes.forFile(resourcePath),
                         lastModifiedFinder(resourcePath)
                     )
