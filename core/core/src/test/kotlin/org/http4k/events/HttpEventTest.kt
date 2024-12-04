@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
+import org.http4k.events.HttpEvent.Incoming
 import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
@@ -50,9 +51,9 @@ class HttpEventTest {
 
     @Test
     fun `incoming uses template if available`() {
-        assertThat(HttpEvent.Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
+        assertThat(Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
         assertThat(
-            HttpEvent.Incoming(
+            Incoming(
                 HttpTransaction(
                     request = RoutedRequest(Request(GET, "/bob"), UriTemplate.from("bar")),
                     response = Response(OK),
@@ -65,6 +66,12 @@ class HttpEventTest {
 
     @Test
     fun `incoming equals`() {
-        assertThat(HttpEvent.Incoming(tx), equalTo(HttpEvent.Incoming(tx)))
+        assertThat(Incoming(tx), equalTo(Incoming(tx)))
+    }
+
+    @Test
+    fun `toString is working as expected`() {
+        assertThat(Incoming(tx).toString(), equalTo("Incoming(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
+        assertThat(Outgoing(tx).toString(), equalTo("Outgoing(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)\""))
     }
 }
