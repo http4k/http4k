@@ -1,24 +1,25 @@
 package org.http4k.routing.sse
 
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.Router
-import org.http4k.sse.NoOp
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
-import org.http4k.sse.then
+import org.http4k.sse.SseResponse
 
 data class RoutingSseHandler(
     val routes: List<TemplatedSseRoute>,
-    private val filter: SseFilter = SseFilter.NoOp
 ) : SseHandler {
-    override fun invoke(request: Request) = filter.then(routes
+    override fun invoke(request: Request) = routes
         .map { it.match(request) }
         .sortedBy(SseMatchResult::priority)
-        .first().handler)(request)
+        .firstOrNull()
+        ?.handler?.invoke(request)
+        ?: SseResponse(NOT_FOUND, handled = false) { it.close() }
 
     fun withBasePath(prefix: String) = copy(routes = routes.map { it.withBasePath(prefix) })
 
-    fun withFilter(new: SseFilter) = copy(filter = new.then(filter))
+    fun withFilter(new: SseFilter) = copy(routes = routes.map { it.withFilter(new) })
 
     fun withRouter(router: Router) =
         copy(routes = routes.map { it.withRouter(router) })
