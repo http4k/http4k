@@ -8,15 +8,15 @@ import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
 
 /**
- * Applies the generic routing logic regardless of protocol
+ * Applies the generic templating routing logic regardless of protocol
  */
 abstract class TemplatedRoute<R, F : ((Request) -> R) -> (Request) -> R, Self : RouteMatcher<R, F>>(
     protected val uriTemplate: UriTemplate,
     protected val handler: (Request) -> R,
     protected val router: Router,
     protected val filter: F,
-    private val invalidResult: (Status) -> R,
-    private val addUriTemplateFilter: F
+    private val responseFor: (Status) -> R,
+    private val addUriTemplateFilter: ((Request) -> R) -> (Request) -> R
 ) : RouteMatcher<R, F> {
 
     init {
@@ -26,10 +26,10 @@ abstract class TemplatedRoute<R, F : ((Request) -> R) -> (Request) -> R, Self : 
     override fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
             is Matched -> RoutingMatchResult(0, addUriTemplateFilter(filter(handler)))
-            is NotMatched -> RoutingMatchResult(1, filter { invalidResult(result.status) })
+            is NotMatched -> RoutingMatchResult(1, filter { responseFor(result.status) })
         }
 
-        else -> RoutingMatchResult(2, filter { _: Request -> invalidResult(NOT_FOUND) })
+        else -> RoutingMatchResult(2, filter { _: Request -> responseFor(NOT_FOUND) })
     }
 
     override fun toString() = "template=$uriTemplate AND ${router.description}"

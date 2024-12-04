@@ -31,17 +31,14 @@ class TemplatedHttpRoute(
     handler = handler,
     router = router,
     filter = filter,
-    invalidResult = { Response(it) },
-    addUriTemplateFilter = Filter { next -> { RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+    responseFor = { Response(it) },
+    addUriTemplateFilter = { next -> { RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
 ) {
-
-    override fun withBasePath(prefix: String) =
-        TemplatedHttpRoute(uriTemplate.prefixedWith(prefix), handler, router, filter)
+    override fun withBasePath(prefix: String) = TemplatedHttpRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 
     override fun withFilter(new: Filter) = TemplatedHttpRoute(uriTemplate, handler, router, new.then(filter))
 
     override fun withRouter(other: Router) = TemplatedHttpRoute(uriTemplate, handler, router.and(other), filter)
-
 }
 
 data class SimpleRouteMatcher(

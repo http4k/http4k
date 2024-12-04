@@ -47,11 +47,10 @@ class TemplatedWsRoute(
     handler = handler,
     router = router,
     filter = filter,
-    invalidResult = { WsResponse { it.close(REFUSE) } },
-    addUriTemplateFilter = WsFilter { next -> { RoutedWsResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+    responseFor = { WsResponse { it.close(REFUSE) } },
+    addUriTemplateFilter = { next -> { RoutedWsResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
 ) {
-    override fun withBasePath(prefix: String) =
-        TemplatedWsRoute(uriTemplate.prefixedWith(prefix), handler, router, filter)
+    override fun withBasePath(prefix: String) = TemplatedWsRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 
     override fun withFilter(new: WsFilter) = TemplatedWsRoute(uriTemplate, handler, router, new.then(filter))
 

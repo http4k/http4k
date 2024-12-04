@@ -26,8 +26,7 @@ class RoutedSseResponse(
     val delegate: SseResponse,
     override val xUriTemplate: UriTemplate,
 ) : SseResponse by delegate, RoutedMessage {
-    override fun withConsumer(consumer: SseConsumer) =
-        RoutedSseResponse(delegate.withConsumer(consumer), xUriTemplate)
+    override fun withConsumer(consumer: SseConsumer) = RoutedSseResponse(delegate.withConsumer(consumer), xUriTemplate)
 
     override fun equals(other: Any?): Boolean = delegate == other
 
@@ -56,12 +55,10 @@ class TemplatedSseRoute(
     handler = handler,
     router = router,
     filter = filter,
-    invalidResult = { SseResponse(it, emptyList(), false, Sse::close) },
-    addUriTemplateFilter = SseFilter { next -> { RoutedSseResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+    responseFor = { SseResponse(it, emptyList(), false, Sse::close) },
+    addUriTemplateFilter = { next -> { RoutedSseResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
 ) {
-
-    override fun withBasePath(prefix: String) =
-        TemplatedSseRoute(uriTemplate.prefixedWith(prefix), handler, router, filter)
+    override fun withBasePath(prefix: String) = TemplatedSseRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 
     override fun withFilter(new: SseFilter) = TemplatedSseRoute(uriTemplate, handler, router, new.then(filter))
 
