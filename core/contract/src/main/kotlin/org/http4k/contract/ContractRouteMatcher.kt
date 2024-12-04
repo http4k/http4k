@@ -20,7 +20,6 @@ import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.Router
-import org.http4k.routing.RouterDescription
 import org.http4k.routing.RoutingMatchResult
 import org.http4k.routing.and
 
@@ -83,9 +82,8 @@ data class ContractRouteMatcher(
 
     override fun withFilter(new: Filter): RouteMatcher<Response> = copy(preSecurityFilter = new.then(preSecurityFilter))
 
-    val description = RouterDescription(rootAsString,
-        routes.map { it.toRouter(PathSegments("$it$descriptionPath")).description }
-    )
+    val description =
+        routes.joinToString("\n") { it.toRouter(PathSegments("$rootAsString/$it$descriptionPath")).description }
 
     private val descriptionRoute =
         ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
