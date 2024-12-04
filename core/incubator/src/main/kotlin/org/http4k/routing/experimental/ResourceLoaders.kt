@@ -6,9 +6,9 @@ import org.http4k.core.MimeTypes
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.Router
+import org.http4k.routing.RoutingMatchResult
 import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit.SECONDS
@@ -25,12 +25,12 @@ object ResourceLoaders {
         // fractions of seconds.
         private val constantLastModified: Instant? = Instant.now().truncatedTo(SECONDS),
         private val lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
-    ) : RouteMatcher {
-        override fun match(request: Request): HttpMatchResult {
+    ) : RouteMatcher<Response> {
+        override fun match(request: Request): RoutingMatchResult<Response> {
             val resourcePath = basePackagePath.withLeadingSlash().pathJoin(request.uri.path.orIndexFile())
             return when (val resource = javaClass.getResource(resourcePath)) {
-                null -> HttpMatchResult(2, { _: Request -> Response(Status.NOT_FOUND) })
-                else -> HttpMatchResult(
+                null -> RoutingMatchResult(2, { _: Request -> Response(Status.NOT_FOUND) })
+                else -> RoutingMatchResult(
                     0, resource.toResource(
                         mimeTypes.forFile(resourcePath),
                         lastModifiedFinder(resourcePath)
@@ -39,11 +39,11 @@ object ResourceLoaders {
             }
         }
 
-        override fun withBasePath(prefix: String): RouteMatcher = this
+        override fun withBasePath(prefix: String): RouteMatcher<Response> = this
 
-        override fun withRouter(other: Router): RouteMatcher = this
+        override fun withRouter(other: Router): RouteMatcher<Response> = this
 
-        override fun withFilter(new: Filter): RouteMatcher = this
+        override fun withFilter(new: Filter): RouteMatcher<Response> = this
     }
 
     private fun String.orIndexFile() = if (isEmpty() || endsWith("/")) pathJoin("index.html") else this
@@ -51,12 +51,12 @@ object ResourceLoaders {
     private fun URL.toResource(contentType: ContentType, lastModified: Instant?) =
         URLResource(this, contentType, lastModified)
 
-    fun Directory(baseDir: String, mimeTypes: MimeTypes = MimeTypes()): RouteMatcher =
+    fun Directory(baseDir: String, mimeTypes: MimeTypes = MimeTypes()): RouteMatcher<Response> =
         DirectoryResourceLoader(baseDir, mimeTypes, null)
 
     fun ListingDirectory(
         baseDir: String,
         mimeTypes: MimeTypes = MimeTypes(),
         directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
-    ): RouteMatcher = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
+    ): RouteMatcher<Response> = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
 }
