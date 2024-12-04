@@ -25,7 +25,7 @@ object ResourceLoaders {
         // fractions of seconds.
         private val constantLastModified: Instant? = Instant.now().truncatedTo(SECONDS),
         private val lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
-    ) : RouteMatcher<Response> {
+    ) : RouteMatcher<Response, Filter> {
         override fun match(request: Request): RoutingMatchResult<Response> {
             val resourcePath = basePackagePath.withLeadingSlash().pathJoin(request.uri.path.orIndexFile())
             return when (val resource = javaClass.getResource(resourcePath)) {
@@ -39,11 +39,11 @@ object ResourceLoaders {
             }
         }
 
-        override fun withBasePath(prefix: String): RouteMatcher<Response> = this
+        override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = this
 
-        override fun withRouter(other: Router): RouteMatcher<Response> = this
+        override fun withRouter(other: Router): RouteMatcher<Response, Filter> = this
 
-        override fun withFilter(new: Filter): RouteMatcher<Response> = this
+        override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = this
     }
 
     private fun String.orIndexFile() = if (isEmpty() || endsWith("/")) pathJoin("index.html") else this
@@ -51,12 +51,12 @@ object ResourceLoaders {
     private fun URL.toResource(contentType: ContentType, lastModified: Instant?) =
         URLResource(this, contentType, lastModified)
 
-    fun Directory(baseDir: String, mimeTypes: MimeTypes = MimeTypes()): RouteMatcher<Response> =
+    fun Directory(baseDir: String, mimeTypes: MimeTypes = MimeTypes()): RouteMatcher<Response, Filter> =
         DirectoryResourceLoader(baseDir, mimeTypes, null)
 
     fun ListingDirectory(
         baseDir: String,
         mimeTypes: MimeTypes = MimeTypes(),
         directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
-    ): RouteMatcher<Response> = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
+    ): RouteMatcher<Response, Filter> = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
 }
