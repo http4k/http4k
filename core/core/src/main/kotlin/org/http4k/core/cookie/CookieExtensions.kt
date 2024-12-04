@@ -5,7 +5,7 @@ import org.http4k.core.Response
 import org.http4k.unquoted
 import java.time.Instant
 
-fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.fullCookieString())
+fun Response.cookie(cookie: Cookie, unquotedValue: Boolean = false) = header("Set-Cookie", cookie.fullCookieString(unquotedValue))
 
 fun Request.removeCookie(name: String) =
     cookies().filterNot { it.name == name }.fold(removeHeader("Cookie")) { acc, c -> acc.cookie(c) }
