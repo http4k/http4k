@@ -33,12 +33,6 @@ class KeyConditionBuilder<HashKey : Any, SortKey : Any> internal constructor(
     val hashKey = HashKeySubstitute(schema.hashKeyAttribute)
     val sortKey = SortKeySubstitute(schema.sortKeyAttribute)
 
-    @Deprecated(
-        "Use the special value 'hashKey' in place of the hash key attribute",
-        replaceWith = ReplaceWith("hashKey eq value")
-    )
-    infix fun Attribute<HashKey>.eq(value: HashKey) = HashKeySubstitute(this).eq(value)
-
     infix fun HashKeySubstitute.eq(value: HashKey) = object : PartitionKeyCondition<HashKey, SortKey> {
         override val expression = "#$expressionAttributeName = :$expressionAttributeName"
         override val attributeNames = mapOf("#$expressionAttributeName" to attribute.name)
@@ -67,41 +61,12 @@ class KeyConditionBuilder<HashKey : Any, SortKey : Any> internal constructor(
             )
         }
 
-    @Deprecated(
-        "Use the special value 'sortKey' in place of the sort key attribute",
-        replaceWith = ReplaceWith("sortKey lt value")
-    )
-    infix fun Attribute<SortKey>.lt(value: SortKey) = sortKeyOperator("<", value)
-
-    @Deprecated(
-        "Use the special value 'sortKey' in place of the sort key attribute",
-        replaceWith = ReplaceWith("sortKey le value")
-    )
-    infix fun Attribute<SortKey>.le(value: SortKey) = sortKeyOperator("<=", value)
-
-    @Deprecated(
-        "Use the special value 'sortKey' in place of the sort key attribute",
-        replaceWith = ReplaceWith("sortKey gt value")
-    )
-    infix fun Attribute<SortKey>.gt(value: SortKey) = sortKeyOperator(">", value)
-
-    @Deprecated(
-        "Use the special value 'sortKey' in place of the sort key attribute",
-        replaceWith = ReplaceWith("sortKey ge value")
-    )
     infix fun Attribute<SortKey>.ge(value: SortKey) = sortKeyOperator(">=", value)
     infix fun SortKeySubstitute.eq(value: SortKey) = sortKeyOperator("=", value)
     infix fun SortKeySubstitute.lt(value: SortKey) = sortKeyOperator("<", value)
     infix fun SortKeySubstitute.le(value: SortKey) = sortKeyOperator("<=", value)
     infix fun SortKeySubstitute.gt(value: SortKey) = sortKeyOperator(">", value)
     infix fun SortKeySubstitute.ge(value: SortKey) = sortKeyOperator(">=", value)
-
-    @Deprecated(
-        "Use the special value 'sortKey' in place of the sort key attribute",
-        replaceWith = ReplaceWith("sortKey.between(value1, value2)")
-    )
-    fun between(attr: Attribute<SortKey>, value1: SortKey, value2: SortKey) =
-        SortKeySubstitute(attr).between(value1, value2)
 
     fun SortKeySubstitute.between(value1: SortKey, value2: SortKey): SortKeyCondition<HashKey, SortKey>? =
         attribute?.let {
@@ -114,12 +79,6 @@ class KeyConditionBuilder<HashKey : Any, SortKey : Any> internal constructor(
                 )
             )
         }
-
-    @Deprecated(
-        "Use the special value 'sortKey' in place of the sort key attribute",
-        replaceWith = ReplaceWith("sortKey beginsWith value")
-    )
-    infix fun Attribute<SortKey>.beginsWith(value: SortKey) = SortKeySubstitute(this).beginsWith(value)
 
     infix fun SortKeySubstitute.beginsWith(value: SortKey): SortKeyCondition<HashKey, SortKey>? =
         attribute?.let {
@@ -202,10 +161,6 @@ class FilterExpressionBuilder internal constructor() {
     infix fun <T> Attribute<T>.gt(other: Attribute<T>) = filterOperator(">", other)
     infix fun <T> Attribute<T>.ge(value: T) = filterOperator(">=", value)
     infix fun <T> Attribute<T>.ge(other: Attribute<T>) = filterOperator(">=", other)
-
-    @Deprecated("Use attribute.between(value1, value2)", replaceWith = ReplaceWith("attr.between(value1, value2)"))
-    @JvmName("deprecatedBetween")
-    fun <T> between(attr: Attribute<T>, value1: T, value2: T) = attr.between(value1, value2)
 
     fun <T> Attribute<T>.between(value1: T, value2: T) = nextAttributeName().let { attributeName ->
         FilterExpression(

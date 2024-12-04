@@ -16,16 +16,6 @@ interface AccessTokens {
         tokenRequest: AuthorizationCodeAccessTokenRequest,
     ): Result<AccessToken, AccessTokenError>
 
-    @Deprecated(
-        "AuthorizationCode is already present in the tokenRequest, so use that",
-        ReplaceWith("create(clientId, tokenRequest: AuthorizationCodeAccessTokenRequest)")
-    )
-    fun create(
-        clientId: ClientId,
-        tokenRequest: AuthorizationCodeAccessTokenRequest,
-        authorizationCode: AuthorizationCode
-    ): Result<AccessToken, AccessTokenError> = create(clientId, tokenRequest)
-
     /**
      * creates a new access token for a given client.
      */
