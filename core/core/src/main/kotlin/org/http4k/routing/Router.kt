@@ -32,7 +32,9 @@ sealed class RoutingResult {
 }
 
 val All = Router("all") { true }
+
 val orElse = All
+
 fun Router.and(other: Router) = when (this) {
     All -> other
     else -> when (other) {
