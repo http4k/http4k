@@ -15,9 +15,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.routing.PredicateResult.Matched
-import org.http4k.routing.PredicateResult.NotMatched
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.RoutingResult.Matched
+import org.http4k.routing.RoutingResult.NotMatched
 
 
 /**
@@ -41,13 +41,13 @@ data class StaticRouteMatcher(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
-    private val predicate: Predicate = All,
+    private val router: Router = All,
     private val filter: Filter = Filter.NoOp
 ) : RouteMatcher {
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request): HttpMatchResult = when (predicate(request)) {
+    override fun match(request: Request): HttpMatchResult = when (router(request)) {
         is Matched -> handler(request).let {
             when {
                 it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
@@ -60,7 +60,7 @@ data class StaticRouteMatcher(
 
     override fun withBasePath(prefix: String): RouteMatcher = copy(pathSegments = prefix + pathSegments)
     override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
-    override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
+    override fun withRouter(other: Router): RouteMatcher = copy(router = router.and(other))
 
     override fun toString() = "Static files $pathSegments"
 }
