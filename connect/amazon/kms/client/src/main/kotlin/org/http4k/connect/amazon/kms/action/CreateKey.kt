@@ -11,10 +11,8 @@ import se.ansman.kotshi.JsonSerializable
 @Http4kConnectAction
 @JsonSerializable
 data class CreateKey(
-    @Deprecated("Use KeySpec")
-    val CustomerMasterKeySpec: CustomerMasterKeySpec? = null,
-    val KeyUsage: KeyUsage? = null,
     val KeySpec: CustomerMasterKeySpec? = null,
+    val KeyUsage: KeyUsage? = null,
     val BypassPolicyLockoutSafetyCheck: Boolean? = null,
     val CustomKeyStoreId: String? = null,
     val Description: String? = null,
