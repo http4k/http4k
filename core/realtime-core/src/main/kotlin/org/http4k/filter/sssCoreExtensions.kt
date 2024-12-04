@@ -6,7 +6,7 @@ import org.http4k.core.RequestContext
 import org.http4k.core.SseTransaction
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Store
-import org.http4k.routing.sse.RoutingSseHandler
+import org.http4k.routing.RoutingSseHandler
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler

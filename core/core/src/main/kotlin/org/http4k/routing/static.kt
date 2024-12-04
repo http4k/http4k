@@ -43,7 +43,7 @@ data class StaticRouteMatcher(
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
     private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher<Response>{
+) : RouteMatcher<Response, Filter>{
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
@@ -58,9 +58,9 @@ data class StaticRouteMatcher(
         is NotMatched -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
-    override fun withBasePath(prefix: String): RouteMatcher<Response> = copy(pathSegments = prefix + pathSegments)
-    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(filter = new.then(filter))
-    override fun withRouter(other: Router): RouteMatcher<Response> = copy(router = router.and(other))
+    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
+    override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
     override fun toString() = "Static files $pathSegments"
 }

@@ -5,7 +5,7 @@ import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 
 /**
- * Standard interface for creating a configured WebServer which supports Websockets
+ * Standard interface for creating a configured Server which supports Websockets or SSE
  */
 interface PolyServerConfig : ServerConfig {
     override fun toServer(http: HttpHandler): Http4kServer = toServer(http, null)

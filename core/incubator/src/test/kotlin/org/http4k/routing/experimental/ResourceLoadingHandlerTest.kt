@@ -240,17 +240,17 @@ private class IndeterminateLengthResource : Resource {
     override fun openStream() = EmptyInputStream.INSTANCE!!
 }
 
-private class InMemoryResourceLoader(val resources: Map<String, Resource>) : RouteMatcher<Response>{
+private class InMemoryResourceLoader(val resources: Map<String, Resource>) : RouteMatcher<Response, Filter>{
     override fun match(request: Request) = resources[request.uri.path]
         ?.let {
             RoutingMatchResult(0, it)
         } ?: RoutingMatchResult(2, { req: Request -> Response(NOT_FOUND) })
 
-    override fun withBasePath(prefix: String): RouteMatcher<Response> = this
+    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = this
 
-    override fun withRouter(other: Router): RouteMatcher<Response> = this
+    override fun withRouter(other: Router): RouteMatcher<Response, Filter> = this
 
-    override fun withFilter(new: Filter): RouteMatcher<Response> = this
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = this
 }
 
 /**

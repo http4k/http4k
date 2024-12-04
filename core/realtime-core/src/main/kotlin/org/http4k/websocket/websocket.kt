@@ -1,7 +1,7 @@
 package org.http4k.websocket
 
 import org.http4k.core.Request
-import org.http4k.routing.websocket.RoutingWsHandler
+import org.http4k.routing.RoutingWsHandler
 import org.http4k.websocket.WsStatus.Companion.NORMAL
 
 /**
