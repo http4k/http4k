@@ -9,7 +9,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.debug
-import org.http4k.routing.Predicate
+import org.http4k.routing.Router
 import org.http4k.routing.bind
 
 internal fun ForwardCallsToPluginServer(
@@ -17,7 +17,7 @@ internal fun ForwardCallsToPluginServer(
     http: HttpHandler,
     baseUri: Uri,
     toFilter: (Request) -> Filter
-) = Predicate("", Status.NOT_FOUND, { req: Request -> req.uri.path.startsWith("/${pluginId}") }) bind
+) = Router("", Status.NOT_FOUND, { req: Request -> req.uri.path.startsWith("/${pluginId}") }) bind
     {
         val pluginServer = toFilter(it)
             .then(SetHostFrom(baseUri))

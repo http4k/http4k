@@ -7,8 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.HttpMatchResult
-import org.http4k.routing.Predicate
 import org.http4k.routing.RouteMatcher
+import org.http4k.routing.Router
 import java.io.File
 import java.time.Instant
 
@@ -54,7 +54,7 @@ internal data class DirectoryResourceLoader(
 
     override fun withBasePath(prefix: String) = this
 
-    override fun withPredicate(other: Predicate) = this
+    override fun withRouter(other: Router) = this
 
     override fun withFilter(new: Filter) = this
 }
