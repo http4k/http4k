@@ -23,8 +23,8 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.HttpMatchResult
-import org.http4k.routing.Predicate
 import org.http4k.routing.RouteMatcher
+import org.http4k.routing.Router
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -248,7 +248,7 @@ private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Rou
 
     override fun withBasePath(prefix: String): RouteMatcher = this
 
-    override fun withPredicate(other: Predicate): RouteMatcher = this
+    override fun withRouter(other: Router): RouteMatcher = this
 
     override fun withFilter(new: Filter): RouteMatcher = this
 }
