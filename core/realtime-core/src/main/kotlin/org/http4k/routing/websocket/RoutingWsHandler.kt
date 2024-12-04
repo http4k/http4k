@@ -2,6 +2,7 @@ package org.http4k.routing.websocket
 
 import org.http4k.core.Request
 import org.http4k.routing.Router
+import org.http4k.routing.RoutingMatchResult
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsResponse
@@ -12,7 +13,7 @@ data class RoutingWsHandler(
 ) : WsHandler {
     override fun invoke(request: Request) = routes
         .map { it.match(request) }
-        .sortedBy(WsMatchResult::priority)
+        .sortedBy(RoutingMatchResult<WsResponse>::priority)
         .firstOrNull()
         ?.handler?.invoke(request)
         ?: WsResponse { it.close(REFUSE) }

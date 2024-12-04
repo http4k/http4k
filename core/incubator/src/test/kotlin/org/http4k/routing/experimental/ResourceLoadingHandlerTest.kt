@@ -22,9 +22,9 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.Router
+import org.http4k.routing.RoutingMatchResult
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -240,17 +240,17 @@ private class IndeterminateLengthResource : Resource {
     override fun openStream() = EmptyInputStream.INSTANCE!!
 }
 
-private class InMemoryResourceLoader(val resources: Map<String, Resource>) : RouteMatcher {
+private class InMemoryResourceLoader(val resources: Map<String, Resource>) : RouteMatcher<Response>{
     override fun match(request: Request) = resources[request.uri.path]
         ?.let {
-            HttpMatchResult(0, it)
-        } ?: HttpMatchResult(2, { req: Request -> Response(NOT_FOUND) })
+            RoutingMatchResult(0, it)
+        } ?: RoutingMatchResult(2, { req: Request -> Response(NOT_FOUND) })
 
-    override fun withBasePath(prefix: String): RouteMatcher = this
+    override fun withBasePath(prefix: String): RouteMatcher<Response> = this
 
-    override fun withRouter(other: Router): RouteMatcher = this
+    override fun withRouter(other: Router): RouteMatcher<Response> = this
 
-    override fun withFilter(new: Filter): RouteMatcher = this
+    override fun withFilter(new: Filter): RouteMatcher<Response> = this
 }
 
 /**

@@ -6,6 +6,7 @@ import org.http4k.routing.All
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedWsResponse
 import org.http4k.routing.Router
+import org.http4k.routing.RoutingMatchResult
 import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
 import org.http4k.routing.and
@@ -28,11 +29,11 @@ data class TemplatedWsRoute(
 
     internal fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (router(request)) {
-            is Matched -> WsMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
-            is NotMatched -> WsMatchResult(1, filter.then { _: Request -> WsResponse { it.close(REFUSE) } })
+            is Matched -> RoutingMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
+            is NotMatched -> RoutingMatchResult(1, filter.then { _: Request -> WsResponse { it.close(REFUSE) } })
         }
 
-        else -> WsMatchResult(1, filter.then { _: Request -> WsResponse { it.close(REFUSE) } })
+        else -> RoutingMatchResult(1, filter.then { _: Request -> WsResponse { it.close(REFUSE) } })
     }
 
     fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))

@@ -43,24 +43,24 @@ data class StaticRouteMatcher(
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
     private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher {
+) : RouteMatcher<Response>{
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request): HttpMatchResult = when (router(request)) {
+    override fun match(request: Request) = when (router(request)) {
         is Matched -> handler(request).let {
             when {
-                it.status != NOT_FOUND -> HttpMatchResult(0, filter.then { _: Request -> it })
-                else -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+                it.status != NOT_FOUND -> RoutingMatchResult(0, filter.then { _: Request -> it })
+                else -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
             }
         }
 
-        is NotMatched -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+        is NotMatched -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
-    override fun withBasePath(prefix: String): RouteMatcher = copy(pathSegments = prefix + pathSegments)
-    override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
-    override fun withRouter(other: Router): RouteMatcher = copy(router = router.and(other))
+    override fun withBasePath(prefix: String): RouteMatcher<Response> = copy(pathSegments = prefix + pathSegments)
+    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(filter = new.then(filter))
+    override fun withRouter(other: Router): RouteMatcher<Response> = copy(router = router.and(other))
 
     override fun toString() = "Static files $pathSegments"
 }

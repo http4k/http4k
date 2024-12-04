@@ -3,6 +3,7 @@ package org.http4k.routing.sse
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.Router
+import org.http4k.routing.RoutingMatchResult
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseResponse
@@ -12,7 +13,7 @@ data class RoutingSseHandler(
 ) : SseHandler {
     override fun invoke(request: Request) = routes
         .map { it.match(request) }
-        .sortedBy(SseMatchResult::priority)
+        .sortedBy(RoutingMatchResult<SseResponse>::priority)
         .firstOrNull()
         ?.handler?.invoke(request)
         ?: SseResponse(NOT_FOUND, handled = false) { it.close() }
