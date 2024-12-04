@@ -16,7 +16,7 @@ internal data class DirectoryResourceLoader(
     val baseDir: String,
     val mimeTypes: MimeTypes = MimeTypes(),
     val directoryRenderer: DirectoryRenderer? = null
-) : RouteMatcher<Response> {
+) : RouteMatcher<Response, Filter> {
 
     override fun match(request: Request): RoutingMatchResult<Response> =
         when (val match = match(request.uri.path)) {

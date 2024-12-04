@@ -13,6 +13,7 @@ changes with their rationale when appropriate:
 - ws now logs transactions
 - ws debugging
 - KMS CustomerKeySpec removed -> replaced with KeySpec
+- routing changes mean things are no longer data classes
 
 - 
 ### v5.38.0.0
