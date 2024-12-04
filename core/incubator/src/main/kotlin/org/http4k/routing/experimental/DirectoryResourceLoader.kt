@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.Router
-import org.http4k.routing.RoutingMatchResult
+import org.http4k.routing.RoutingMatch
 import java.io.File
 import java.time.Instant
 
@@ -18,10 +18,10 @@ internal data class DirectoryResourceLoader(
     val directoryRenderer: DirectoryRenderer? = null
 ) : RouteMatcher<Response, Filter> {
 
-    override fun match(request: Request): RoutingMatchResult<Response> =
+    override fun match(request: Request): RoutingMatch<Response> =
         when (val match = match(request.uri.path)) {
-            is HttpHandler -> RoutingMatchResult(0, match)
-            else -> RoutingMatchResult(2, { Response(NOT_FOUND) })
+            is HttpHandler -> RoutingMatch(0, match)
+            else -> RoutingMatch(2, { Response(NOT_FOUND) })
         }
 
     private fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
