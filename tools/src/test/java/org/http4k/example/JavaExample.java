@@ -12,7 +12,7 @@ import org.http4k.server.SunHttp;
 
 import static org.http4k.core.Http4kKt.then;
 import static org.http4k.core.Method.POST;
-import static org.http4k.routing.RoutingKt.bind;
+import static org.http4k.routing.BindKt.bind;
 import static org.http4k.routing.RoutingKt.routes;
 import static org.http4k.server.Http4kServerKt.asServer;
 
