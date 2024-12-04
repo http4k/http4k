@@ -46,8 +46,8 @@ data class SimpleRouteMatcher(
 ) : RouteMatcher<Response, Filter> {
 
     override fun match(request: Request) = when (val result = router(request)) {
-        is Matched -> RoutingMatch(0, filter.then(handler))
-        is NotMatched -> RoutingMatch(1, filter.then { _: Request -> Response(result.status) })
+        is Matched -> RoutingMatch(0, result.description, filter.then(handler))
+        is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request -> Response(result.status) })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> =

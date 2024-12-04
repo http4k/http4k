@@ -47,15 +47,15 @@ data class StaticRouteMatcher(
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request) = when (router(request)) {
+    override fun match(request: Request) = when (val result = router(request)) {
         is Matched -> handler(request).let {
             when {
-                it.status != NOT_FOUND -> RoutingMatch(0, filter.then { _: Request -> it })
-                else -> RoutingMatch(2, filter.then { _: Request -> Response(NOT_FOUND) })
+                it.status != NOT_FOUND -> RoutingMatch(0, result.description, filter.then { _: Request -> it })
+                else -> RoutingMatch(2, result.description, filter.then { _: Request -> Response(NOT_FOUND) })
             }
         }
 
-        is NotMatched -> RoutingMatch(2, filter.then { _: Request -> Response(NOT_FOUND) })
+        is NotMatched -> RoutingMatch(2, result.description, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)

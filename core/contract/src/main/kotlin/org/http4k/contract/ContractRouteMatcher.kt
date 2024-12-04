@@ -49,6 +49,7 @@ data class ContractRouteMatcher(
         val m = internalMatch(request)
         return RoutingMatch(
             m.priority,
+            "",
             filter.then(
                 when (m) {
                     is MatchingHandler -> m

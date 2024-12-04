@@ -9,7 +9,9 @@ interface RouteMatcher<R, F> {
     fun withFilter(new: F): RouteMatcher<R, F>
 }
 
-data class RoutingMatch<R>(private val priority: Int, private val handler: (Request) -> R) :
+data class RoutingMatch<R>(private val priority: Int,
+                           private val description: String,
+                           private val handler: (Request) -> R) :
     Comparable<RoutingMatch<R>>, (Request) -> R by handler {
     override fun compareTo(other: RoutingMatch<R>) = priority.compareTo(other.priority)
 }
