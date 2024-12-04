@@ -7,19 +7,19 @@ import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
 
 interface Router {
-    val description: String
+    val description: RouterDescription
     operator fun invoke(request: Request): RoutingResult
 
     companion object {
 
         operator fun invoke(
-            description: String = "",
+            description: String,
             notMatchedStatus: Status = NOT_FOUND,
             predicate: (Request) -> Boolean
         ) = object : Router {
-            override val description: String = description
+            override val description = RouterDescription(description)
             override fun invoke(request: Request): RoutingResult =
-                if (predicate(request)) Matched(description) else NotMatched(notMatchedStatus, description)
+                if (predicate(request)) Matched(this.description) else NotMatched(notMatchedStatus, this.description)
 
             override fun toString(): String = description
         }
@@ -27,10 +27,10 @@ interface Router {
 }
 
 sealed interface RoutingResult {
-    val description: String
+    val description: RouterDescription
 
-    data class Matched(override val description: String) : RoutingResult
-    data class NotMatched(val status: Status = NOT_FOUND, override val description: String) : RoutingResult
+    data class Matched(override val description: RouterDescription) : RoutingResult
+    data class NotMatched(val status: Status = NOT_FOUND, override val description: RouterDescription) : RoutingResult
 }
 
 val All = Router("all") { true }
