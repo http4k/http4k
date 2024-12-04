@@ -7,8 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.routing.HttpMatchResult
-import org.http4k.routing.Predicate
 import org.http4k.routing.RouteMatcher
+import org.http4k.routing.Router
 import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit.SECONDS
@@ -41,7 +41,7 @@ object ResourceLoaders {
 
         override fun withBasePath(prefix: String): RouteMatcher = this
 
-        override fun withPredicate(other: Predicate): RouteMatcher = this
+        override fun withRouter(other: Router): RouteMatcher = this
 
         override fun withFilter(new: Filter): RouteMatcher = this
     }
