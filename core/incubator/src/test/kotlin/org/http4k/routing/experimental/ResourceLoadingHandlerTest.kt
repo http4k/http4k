@@ -243,8 +243,8 @@ private class IndeterminateLengthResource : Resource {
 private class InMemoryResourceLoader(val resources: Map<String, Resource>) : RouteMatcher<Response, Filter>{
     override fun match(request: Request) = resources[request.uri.path]
         ?.let {
-            RoutingMatch(0, it)
-        } ?: RoutingMatch(2, { req: Request -> Response(NOT_FOUND) })
+            RoutingMatch(0, "", it)
+        } ?: RoutingMatch(2, "", { req: Request -> Response(NOT_FOUND) })
 
     override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = this
 
