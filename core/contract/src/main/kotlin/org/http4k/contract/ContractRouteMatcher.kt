@@ -7,14 +7,14 @@ import org.http4k.contract.ContractRouterMatch.Unmatched
 import org.http4k.contract.security.NoSecurity.filter
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.routing.All
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
@@ -37,7 +37,7 @@ data class ContractRouteMatcher(
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
     private val router: Router = All,
-) : RouteMatcher<Response, Filter>{
+) : RouteMatcher<Response, Filter> {
     private val contractRoot = PathSegments(rootAsString)
 
     private val notFound = preSecurityFilter
@@ -80,7 +80,8 @@ data class ContractRouteMatcher(
 
     override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
-    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(preSecurityFilter = new.then(preSecurityFilter))
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> =
+        copy(preSecurityFilter = new.then(preSecurityFilter))
 
     val description =
         routes.joinToString("\n") { it.toRouter(PathSegments("$rootAsString/$it$descriptionPath")).description }
@@ -88,12 +89,12 @@ data class ContractRouteMatcher(
     private val descriptionRoute =
         ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
             .let {
-                val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract Method.GET to { _ ->
-                    Response(
-                        Status.OK
-                    )
-                } else null)
-                it bindContract Method.GET to { _ ->
+                val extra = listOfNotNull(
+                    when {
+                        includeDescriptionRoute -> it bindContract GET to { _ -> Response(Status.OK) }
+                        else -> null
+                    })
+                it bindContract GET to { _ ->
                     renderer.description(
                         contractRoot,
                         security,
@@ -110,7 +111,7 @@ data class ContractRouteMatcher(
                 .then(preSecurityFilter)
                 .then(it.meta.security?.filter ?: security?.filter ?: Filter.NoOp)
                 .then(postSecurityFilter)
-                .then(ServerFilters.CatchLensFailure(renderer::badRequest))
+                .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } + (identify(descriptionRoute)
         .then(preSecurityFilter)
