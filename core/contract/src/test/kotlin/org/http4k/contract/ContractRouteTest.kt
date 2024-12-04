@@ -27,6 +27,7 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
+import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.junit.jupiter.api.Test
 
 class ContractRouteTest {
@@ -91,7 +92,7 @@ class ContractRouteTest {
         val router = route.toRouter(Root)
         assertThat(
             router.match(Request(GET, "/")),
-            equalTo(MatchingHandler(handler) as ContractRouterMatch)
+            equalTo(MatchingHandler(unavailable, handler) as ContractRouterMatch)
         )
         assertThat(router.match(Request(POST, "/")), equalTo(Unmatched as ContractRouterMatch))
         assertThat(router.match(Request(GET, "/bob")), equalTo(Unmatched as ContractRouterMatch))
