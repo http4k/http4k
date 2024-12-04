@@ -12,6 +12,7 @@ changes with their rationale when appropriate:
 - ws now logs transactions
 - ws debugging
 - KMS CustomerKeySpec removed -> replaced with KeySpec
+- routing changes mean things are no longer data classes
 - **http4k-contract** : [Breaking] withPostSecurityFilter() removed as is part of the contract DSL.  
 
 ### v5.38.0.0 (uncut)

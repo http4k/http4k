@@ -1,12 +1,10 @@
 package org.http4k.routing
 
 import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
-import org.http4k.routing.RoutingResult.Matched
-import org.http4k.routing.RoutingResult.NotMatched
 import org.http4k.sse.NoOp
+import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
@@ -51,36 +49,22 @@ data class SsePathMethod(val path: String, val method: Method) {
     }
 }
 
-data class TemplatedSseRoute(
-    private val uriTemplate: UriTemplate,
-    private val handler: SseHandler,
-    private val router: Router = All,
-    private val filter: SseFilter = SseFilter.NoOp
-): RouteMatcher<SseResponse, SseFilter> {
-    init {
-        require(handler !is RoutingSseHandler)
-    }
+class TemplatedSseRoute(
+    uriTemplate: UriTemplate, handler: SseHandler, router: Router = All, filter: SseFilter = SseFilter.NoOp
+) : TemplatedRoute<SseResponse, SseFilter, TemplatedSseRoute>(
+    uriTemplate = uriTemplate,
+    handler = handler,
+    router = router,
+    filter = filter,
+    invalidResult = { SseResponse(it, emptyList(), false, Sse::close) },
+    addUriTemplateFilter = SseFilter { next -> { RoutedSseResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+) {
 
-    override fun match(request: Request) = when {
-        uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
-            is Matched -> RoutingMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
-            is NotMatched -> RoutingMatchResult(1, filter.then { _: Request -> SseResponse(result.status, handled = false) { it.close() } })
-        }
+    override fun withBasePath(prefix: String) =
+        TemplatedSseRoute(uriTemplate.prefixedWith(prefix), handler, router, filter)
 
-        else -> RoutingMatchResult(2, filter.then { _: Request -> SseResponse(NOT_FOUND, handled = false) { it.close() } })
-    }
+    override fun withFilter(new: SseFilter) = TemplatedSseRoute(uriTemplate, handler, router, new.then(filter))
 
-    override fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
+    override fun withRouter(other: Router) = TemplatedSseRoute(uriTemplate, handler, router.and(other), filter)
 
-    override fun withFilter(new: SseFilter) = copy(filter = new.then(filter))
-
-    override fun withRouter(other: Router) = copy(router = router.and(other))
-
-    override fun toString() = "template=$uriTemplate AND ${router.description}"
-
-    private fun AddUriTemplate(uriTemplate: UriTemplate) = SseFilter { next ->
-        {
-            RoutedSseResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
-        }
-    }
 }

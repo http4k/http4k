@@ -23,39 +23,25 @@ class RoutingHttpHandler(
     routes: List<RouteMatcher<Response, Filter>>
 ) : RoutingHandler<Response, Filter, RoutingHttpHandler>(routes, Response(NOT_FOUND), ::RoutingHttpHandler)
 
-data class TemplatedHttpRoute(
-    private val uriTemplate: UriTemplate,
-    private val handler: HttpHandler,
-    private val router: Router = All,
-    private val filter: Filter = Filter.NoOp
-) : RouteMatcher<Response, Filter> {
 
-    init {
-        require(handler !is RoutingHandler<*, *, *>)
-    }
+class TemplatedHttpRoute(
+    uriTemplate: UriTemplate, handler: HttpHandler, router: Router = All, filter: Filter = Filter.NoOp
+) : TemplatedRoute<Response, Filter, TemplatedHttpRoute>(
+    uriTemplate = uriTemplate,
+    handler = handler,
+    router = router,
+    filter = filter,
+    invalidResult = { Response(it) },
+    addUriTemplateFilter = Filter { next -> { RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+) {
 
-    override fun match(request: Request) = when {
-        uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
-            is Matched -> RoutingMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
-            is NotMatched -> RoutingMatchResult(1, filter.then { _: Request -> Response(result.status) })
-        }
+    override fun withBasePath(prefix: String) =
+        TemplatedHttpRoute(uriTemplate.prefixedWith(prefix), handler, router, filter)
 
-        else -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
-    }
+    override fun withFilter(new: Filter) = TemplatedHttpRoute(uriTemplate, handler, router, new.then(filter))
 
-    override fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
+    override fun withRouter(other: Router) = TemplatedHttpRoute(uriTemplate, handler, router.and(other), filter)
 
-    override fun withRouter(other: Router) = copy(router = router.and(other))
-
-    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
-
-    override fun toString() = "template=$uriTemplate AND ${router.description}"
-
-    private fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
-        {
-            RoutedResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
-        }
-    }
 }
 
 data class SimpleRouteMatcher(

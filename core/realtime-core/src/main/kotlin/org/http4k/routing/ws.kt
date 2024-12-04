@@ -1,14 +1,13 @@
 package org.http4k.routing
 
 import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 import org.http4k.websocket.NoOp
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsResponse
-import org.http4k.websocket.WsStatus
+import org.http4k.websocket.WsStatus.Companion.REFUSE
 import org.http4k.websocket.then
 
 fun websockets(vararg list: RoutingWsHandler) = websockets(list.toList())
@@ -37,44 +36,26 @@ class RoutingWsHandler(
     routes: List<RouteMatcher<WsResponse, WsFilter>>
 ) : RoutingHandler<WsResponse, WsFilter, RoutingWsHandler>(
     routes,
-    WsResponse { it.close(WsStatus.REFUSE) },
+    WsResponse { it.close(REFUSE) },
     ::RoutingWsHandler
 )
 
-data class TemplatedWsRoute(
-    private val uriTemplate: UriTemplate,
-    private val handler: WsHandler,
-    private val router: Router = All,
-    private val filter: WsFilter = WsFilter.NoOp
-) : RouteMatcher<WsResponse, WsFilter> {
-    init {
-        require(handler !is RoutingWsHandler)
-    }
+class TemplatedWsRoute(
+    uriTemplate: UriTemplate, handler: WsHandler, router: Router = All, filter: WsFilter = WsFilter.NoOp
+) : TemplatedRoute<WsResponse, WsFilter, TemplatedWsRoute>(
+    uriTemplate = uriTemplate,
+    handler = handler,
+    router = router,
+    filter = filter,
+    invalidResult = { WsResponse { it.close(REFUSE) } },
+    addUriTemplateFilter = WsFilter { next -> { RoutedWsResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+) {
+    override fun withBasePath(prefix: String) =
+        TemplatedWsRoute(uriTemplate.prefixedWith(prefix), handler, router, filter)
 
-    override fun match(request: Request) = when {
-        uriTemplate.matches(request.uri.path) -> when (router(request)) {
-            is RoutingResult.Matched -> RoutingMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
-            is RoutingResult.NotMatched -> RoutingMatchResult(
-                1,
-                filter.then { _: Request -> WsResponse { it.close(WsStatus.REFUSE) } })
-        }
+    override fun withFilter(new: WsFilter) = TemplatedWsRoute(uriTemplate, handler, router, new.then(filter))
 
-        else -> RoutingMatchResult(1, filter.then { _: Request -> WsResponse { it.close(WsStatus.REFUSE) } })
-    }
-
-    override fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
-
-    override fun withRouter(other: Router) = copy(router = router.and(other))
-
-    override fun withFilter(new: WsFilter) = copy(filter = new.then(filter))
-
-    override fun toString() = "template=$uriTemplate AND ${router.description}"
-
-    private fun AddUriTemplate(uriTemplate: UriTemplate) = WsFilter { next ->
-        {
-            RoutedWsResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate)
-        }
-    }
+    override fun withRouter(other: Router) = TemplatedWsRoute(uriTemplate, handler, router.and(other), filter)
 }
 
 data class WsPathMethod(val path: String, val method: Method) {
