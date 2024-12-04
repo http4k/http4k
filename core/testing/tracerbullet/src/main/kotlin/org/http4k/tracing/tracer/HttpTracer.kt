@@ -1,7 +1,7 @@
 package org.http4k.tracing.tracer
 
-import org.http4k.events.HttpEvent
 import org.http4k.events.MetadataEvent
+import org.http4k.events.ProtocolEvent.Outgoing
 import org.http4k.tracing.Actor
 import org.http4k.tracing.ActorResolver
 import org.http4k.tracing.ActorType.System
@@ -13,13 +13,13 @@ import org.http4k.tracing.X_HTTP4K_INCOMING_EVENT
 
 fun HttpTracer(actorFrom: ActorResolver) = Tracer { eventNode, tracer ->
     eventNode
-        .takeIf { it.event.event is HttpEvent.Outgoing }
+        .takeIf { it.event.event is Outgoing }
         ?.toTrace(actorFrom, tracer)
         ?.let(::listOf) ?: emptyList()
 }
 
 private fun EventNode.toTrace(actorFrom: ActorResolver, tracer: Tracer): Trace {
-    val parentEvent = event.event as HttpEvent.Outgoing
+    val parentEvent = event.event as Outgoing
 
     return RequestResponse(
         actorFrom(event),
