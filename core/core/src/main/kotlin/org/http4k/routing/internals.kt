@@ -23,10 +23,13 @@ import org.http4k.routing.RoutingResult.NotMatched
 data class RoutingHttpHandler(
     val routes: List<RouteMatcher>
 ) : HttpHandler {
+
     override fun invoke(request: Request) = routes
         .map { it.match(request) }
         .sortedBy(HttpMatchResult::priority)
-        .first().handler(request)
+        .firstOrNull()
+        ?.handler?.invoke(request)
+        ?: Response(NOT_FOUND)
 
     fun withBasePath(prefix: String) = copy(routes = routes.map { it.withBasePath(prefix) })
 
