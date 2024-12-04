@@ -81,7 +81,7 @@ class RouterMatchingTest {
         val router = Router("foo", Status.NOT_FOUND, { r: Request -> r.method == GET })
         assertThat(router(Request(GET, "")), isA<Matched>())
         assertThat(router(Request(POST, "")), isA<NotMatched>())
-        assertThat(router.description, equalTo("foo"))
+        assertThat(router.description, equalTo(RouterDescription("foo")))
     }
 
     @Test
