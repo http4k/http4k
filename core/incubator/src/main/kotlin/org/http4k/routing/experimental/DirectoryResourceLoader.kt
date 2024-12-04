@@ -20,8 +20,8 @@ internal data class DirectoryResourceLoader(
 
     override fun match(request: Request): RoutingMatch<Response> =
         when (val match = match(request.uri.path)) {
-            is HttpHandler -> RoutingMatch(0, match)
-            else -> RoutingMatch(2, { Response(NOT_FOUND) })
+            is HttpHandler -> RoutingMatch(0, "", match)
+            else -> RoutingMatch(2, "", { Response(NOT_FOUND) })
         }
 
     private fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
