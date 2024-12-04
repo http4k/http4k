@@ -25,11 +25,11 @@ abstract class TemplatedRoute<R, F : ((Request) -> R) -> (Request) -> R, Self : 
 
     override fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
-            is Matched -> RoutingMatchResult(0, addUriTemplateFilter(filter(handler)))
-            is NotMatched -> RoutingMatchResult(1, filter { responseFor(result.status) })
+            is Matched -> RoutingMatch(0, addUriTemplateFilter(filter(handler)))
+            is NotMatched -> RoutingMatch(1, filter { responseFor(result.status) })
         }
 
-        else -> RoutingMatchResult(2, filter { _: Request -> responseFor(NOT_FOUND) })
+        else -> RoutingMatch(2, filter { _: Request -> responseFor(NOT_FOUND) })
     }
 
     override fun toString() = "template=$uriTemplate AND ${router.description}"

@@ -6,7 +6,6 @@ import org.http4k.core.Method
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.routing.RoutingResult.Matched
@@ -21,8 +20,7 @@ fun routes(routers: List<RoutingHttpHandler>) = RoutingHttpHandler(routers.flatM
 
 class RoutingHttpHandler(
     routes: List<RouteMatcher<Response, Filter>>
-) : RoutingHandler<Response, Filter, RoutingHttpHandler>(routes, Response(NOT_FOUND), ::RoutingHttpHandler)
-
+) : RoutingHandler<Response, Filter, RoutingHttpHandler>(routes, ::RoutingHttpHandler)
 
 class TemplatedHttpRoute(
     uriTemplate: UriTemplate, handler: HttpHandler, router: Router = All, filter: Filter = Filter.NoOp
@@ -48,8 +46,8 @@ data class SimpleRouteMatcher(
 ) : RouteMatcher<Response, Filter> {
 
     override fun match(request: Request) = when (val result = router(request)) {
-        is Matched -> RoutingMatchResult(0, filter.then(handler))
-        is NotMatched -> RoutingMatchResult(1, filter.then { _: Request -> Response(result.status) })
+        is Matched -> RoutingMatch(0, filter.then(handler))
+        is NotMatched -> RoutingMatch(1, filter.then { _: Request -> Response(result.status) })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> =

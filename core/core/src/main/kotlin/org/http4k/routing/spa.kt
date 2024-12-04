@@ -37,18 +37,18 @@ internal data class SinglePageAppRouteMatcher(
         is Matched -> {
             handler(request).let {
                 when {
-                    it.status != NOT_FOUND -> RoutingMatchResult(0, filter.then { _: Request -> it })
+                    it.status != NOT_FOUND -> RoutingMatch(0, filter.then { _: Request -> it })
                     else -> handler(Request(GET, pathSegments)).let {
                         when {
-                            it.status != NOT_FOUND -> RoutingMatchResult(0, filter.then { _: Request -> it })
-                            else -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+                            it.status != NOT_FOUND -> RoutingMatch(0, filter.then { _: Request -> it })
+                            else -> RoutingMatch(2, filter.then { _: Request -> Response(NOT_FOUND) })
                         }
                     }
                 }
             }
         }
 
-        is NotMatched -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+        is NotMatched -> RoutingMatch(2, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)
