@@ -4,6 +4,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
+import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
 
@@ -29,7 +30,7 @@ abstract class TemplatedRoute<R, F : ((Request) -> R) -> (Request) -> R, Self : 
             is NotMatched -> RoutingMatch(1, result.description, filter { responseFor(result.status) })
         }
 
-        else -> RoutingMatch(2, "", filter { _: Request -> responseFor(NOT_FOUND) })
+        else -> RoutingMatch(2, unavailable, filter { _: Request -> responseFor(NOT_FOUND) })
     }
 
     override fun toString() = "template=$uriTemplate AND ${router.description}"

@@ -88,7 +88,7 @@ class RouterMatchingTest {
     fun `method router`() {
         val router = GET.asRouter()
         assertThat(router(Request(GET, "")), isA<Matched>())
-        assertThat(router(Request(POST, "")), equalTo(NotMatched(METHOD_NOT_ALLOWED, "method == GET")))
+        assertThat(router(Request(POST, "")), equalTo(NotMatched(METHOD_NOT_ALLOWED, RouterDescription("method == GET"))))
     }
 
     @Test

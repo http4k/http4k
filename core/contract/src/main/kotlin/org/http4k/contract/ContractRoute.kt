@@ -23,6 +23,7 @@ import org.http4k.core.toPathSegmentDecoded
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
+import org.http4k.routing.RouterDescription.Companion.unavailable
 
 class ContractRoute internal constructor(
     val method: Method,
@@ -51,6 +52,7 @@ class ContractRoute internal constructor(
                         .extract(spec.pathLenses.toList())
                         ?.let {
                             MatchingHandler(
+                                unavailable,
                                 if (request.method == OPTIONS) {
                                     { Response(OK) }
                                 } else toHandler(it))

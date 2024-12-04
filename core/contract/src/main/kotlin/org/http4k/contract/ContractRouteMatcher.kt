@@ -20,6 +20,7 @@ import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.Router
+import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingMatch
 import org.http4k.routing.and
 
@@ -49,7 +50,7 @@ data class ContractRouteMatcher(
         val m = internalMatch(request)
         return RoutingMatch(
             m.priority,
-            "",
+            m.description,
             filter.then(
                 when (m) {
                     is MatchingHandler -> m
@@ -69,7 +70,7 @@ data class ContractRouteMatcher(
                 when (memo) {
                     is MatchingHandler -> memo
                     else -> when (val matchResult = router.match(request)) {
-                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult))
+                        is MatchingHandler -> MatchingHandler(unavailable, routeFilter.then(matchResult))
                         else -> minOf(memo, matchResult)
                     }
                 }
