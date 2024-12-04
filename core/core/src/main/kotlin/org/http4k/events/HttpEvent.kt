@@ -5,6 +5,7 @@ import org.http4k.core.Method
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.events.ProtocolEvent.Incoming
+import org.http4k.events.ProtocolEvent.Outgoing
 import org.http4k.routing.RoutedMessage
 import org.http4k.routing.RoutedRequest
 
@@ -32,7 +33,7 @@ object HttpEvent {
         status: Status,
         latency: Long,
         xUriTemplate: String,
-    ) = ProtocolEvent.Outgoing(uri, method, status, latency, xUriTemplate, "http")
+    ) = Outgoing(uri, method, status, latency, xUriTemplate, "http")
 
     fun Outgoing(tx: HttpTransaction) = Outgoing(
         tx.request.uri,
