@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -17,7 +18,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RouteMatcher
 import org.junit.jupiter.api.Test
 
-abstract class ResourceLoaderContract(private val loader: RouteMatcher<Response>) {
+abstract class ResourceLoaderContract(private val loader: RouteMatcher<Response, Filter>) {
 
     @Test
     fun `loads existing file`() {

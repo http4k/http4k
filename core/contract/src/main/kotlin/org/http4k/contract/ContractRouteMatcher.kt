@@ -37,7 +37,7 @@ data class ContractRouteMatcher(
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
     private val router: Router = All,
-) : RouteMatcher<Response>{
+) : RouteMatcher<Response, Filter>{
     private val contractRoot = PathSegments(rootAsString)
 
     private val notFound = preSecurityFilter
@@ -78,9 +78,9 @@ data class ContractRouteMatcher(
 
     override fun withBasePath(prefix: String) = copy(rootAsString = prefix + rootAsString)
 
-    override fun withRouter(other: Router): RouteMatcher<Response> = copy(router = router.and(other))
+    override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
-    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(preSecurityFilter = new.then(preSecurityFilter))
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(preSecurityFilter = new.then(preSecurityFilter))
 
     val description =
         routes.joinToString("\n") { it.toRouter(PathSegments("$rootAsString/$it$descriptionPath")).description }
