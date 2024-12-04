@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.Router
-import org.http4k.routing.RoutingMatchResult
+import org.http4k.routing.RoutingMatch
 import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit.SECONDS
@@ -26,11 +26,11 @@ object ResourceLoaders {
         private val constantLastModified: Instant? = Instant.now().truncatedTo(SECONDS),
         private val lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
     ) : RouteMatcher<Response, Filter> {
-        override fun match(request: Request): RoutingMatchResult<Response> {
+        override fun match(request: Request): RoutingMatch<Response> {
             val resourcePath = basePackagePath.withLeadingSlash().pathJoin(request.uri.path.orIndexFile())
             return when (val resource = javaClass.getResource(resourcePath)) {
-                null -> RoutingMatchResult(2, { _: Request -> Response(Status.NOT_FOUND) })
-                else -> RoutingMatchResult(
+                null -> RoutingMatch(2, { _: Request -> Response(Status.NOT_FOUND) })
+                else -> RoutingMatch(
                     0, resource.toResource(
                         mimeTypes.forFile(resourcePath),
                         lastModifiedFinder(resourcePath)

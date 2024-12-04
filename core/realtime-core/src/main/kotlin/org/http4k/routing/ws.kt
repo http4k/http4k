@@ -36,7 +36,6 @@ class RoutingWsHandler(
     routes: List<RouteMatcher<WsResponse, WsFilter>>
 ) : RoutingHandler<WsResponse, WsFilter, RoutingWsHandler>(
     routes,
-    WsResponse { it.close(REFUSE) },
     ::RoutingWsHandler
 )
 
