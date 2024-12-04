@@ -21,12 +21,12 @@ import org.http4k.routing.RoutingResult.NotMatched
  * the API user in an API-consistent manner.
  */
 data class RoutingHttpHandler(
-    val routes: List<RouteMatcher>
+    val routes: List<RouteMatcher<Response>>
 ) : HttpHandler {
 
     override fun invoke(request: Request) = routes
         .map { it.match(request) }
-        .sortedBy(HttpMatchResult::priority)
+        .sortedBy(RoutingMatchResult<Response>::priority)
         .firstOrNull()
         ?.handler?.invoke(request)
         ?: Response(NOT_FOUND)
@@ -38,14 +38,14 @@ data class RoutingHttpHandler(
     fun withRouter(router: Router) =
         copy(routes = routes.map { it.withRouter(router) })
 
-    override fun toString() = routes.sortedBy(RouteMatcher::toString).joinToString("\n")
+    override fun toString() = routes.sortedBy(RouteMatcher<Response>::toString).joinToString("\n")
 }
 
-interface RouteMatcher {
-    fun match(request: Request): HttpMatchResult
-    fun withBasePath(prefix: String): RouteMatcher
-    fun withRouter(other: Router): RouteMatcher
-    fun withFilter(new: Filter): RouteMatcher
+interface RouteMatcher<R> {
+    fun match(request: Request): RoutingMatchResult<R>
+    fun withBasePath(prefix: String): RouteMatcher<R>
+    fun withRouter(other: Router): RouteMatcher<R>
+    fun withFilter(new: Filter): RouteMatcher<R>
 }
 
 data class TemplatedHttpRoute(
@@ -53,25 +53,26 @@ data class TemplatedHttpRoute(
     private val handler: HttpHandler,
     private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher {
+) : RouteMatcher<Response> {
+
     init {
         require(handler !is RoutingHttpHandler)
     }
 
     override fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
-            is Matched -> HttpMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
-            is NotMatched -> HttpMatchResult(1, filter.then { _: Request -> Response(result.status) })
+            is Matched -> RoutingMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
+            is NotMatched -> RoutingMatchResult(1, filter.then { _: Request -> Response(result.status) })
         }
 
-        else -> HttpMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
+        else -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
     override fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 
     override fun withRouter(other: Router) = copy(router = router.and(other))
 
-    override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
+    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(filter = new.then(filter))
 
     override fun toString() = "template=$uriTemplate AND ${router.description}"
 
@@ -86,22 +87,22 @@ data class SimpleRouteMatcher(
     private val router: Router,
     private val handler: HttpHandler,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher {
+) : RouteMatcher<Response> {
 
     override fun match(request: Request) = when (val result = router(request)) {
-        is Matched -> HttpMatchResult(0, filter.then(handler))
-        is NotMatched -> HttpMatchResult(1, filter.then { _: Request -> Response(result.status) })
+        is Matched -> RoutingMatchResult(0, filter.then(handler))
+        is NotMatched -> RoutingMatchResult(1, filter.then { _: Request -> Response(result.status) })
     }
 
-    override fun withBasePath(prefix: String): RouteMatcher =
+    override fun withBasePath(prefix: String): RouteMatcher<Response> =
         TemplatedHttpRoute(UriTemplate.from(prefix), handler, router, filter)
 
-    override fun withRouter(other: Router): RouteMatcher = copy(router = router.and(other))
+    override fun withRouter(other: Router): RouteMatcher<Response> = copy(router = router.and(other))
 
-    override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
+    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(filter = new.then(filter))
 }
 
-data class HttpMatchResult(val priority: Int, val handler: HttpHandler)
+data class RoutingMatchResult<R>(val priority: Int, val handler: (Request) -> R)
 
 data class HttpPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) = when (handler) {
