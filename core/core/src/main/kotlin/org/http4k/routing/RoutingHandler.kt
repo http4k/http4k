@@ -24,7 +24,7 @@ abstract class RoutingHandler<R, F, Self>(
 
     fun withFilter(new: F) = copy(routes.map { it.withFilter(new) })
 
-    fun withRouter(router: Router): Self = copy(routes.map { it.withRouter(router) })
+    fun withRouter(router: Router) = copy(routes.map { it.withRouter(router) })
 
     override fun toString() = routes.sortedBy(RouteMatcher<R, F>::toString).joinToString("\n")
 }
