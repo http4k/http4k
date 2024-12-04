@@ -11,7 +11,7 @@ changes with their rationale when appropriate:
 - ws change packages
 - ws now logs transactions
 - ws debugging
-- KMS customerKeySpec removed
+- KMS CustomerKeySpec removed -> replaced with KeySpec
 - **http4k-contract** : [Breaking] withPostSecurityFilter() removed as is part of the contract DSL.  
 
 ### v5.38.0.0 (uncut)
