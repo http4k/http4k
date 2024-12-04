@@ -38,9 +38,6 @@ data class DefaultCacheTimings(
  */
 object CachingFilters {
 
-    @Deprecated("Renamed to CacheRequest", ReplaceWith("CacheRequest", "org.http4k.filter.CachingFilters"))
-    val Request = CacheRequest
-
     /**
      * These filters operate on Requests (pre-flight)
      */
@@ -56,9 +53,6 @@ object CachingFilters {
             }
         }
     }
-
-    @Deprecated("Renamed to CacheResponse", ReplaceWith("CacheResponse", "org.http4k.filter.CachingFilters"))
-    val Response = CacheResponse
 
     /**
      * These filters operate on Responses (post-flight)
