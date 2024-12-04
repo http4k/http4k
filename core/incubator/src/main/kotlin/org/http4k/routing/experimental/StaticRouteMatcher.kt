@@ -18,7 +18,7 @@ import org.http4k.routing.RoutingResult.NotMatched
 import org.http4k.routing.and
 
 fun static(
-    resourceLoader: RouteMatcher<Response>,
+    resourceLoader: RouteMatcher<Response, Filter>,
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ) = RoutingHttpHandler(
     listOf(StaticRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
@@ -26,19 +26,19 @@ fun static(
 
 data class StaticRouteMatcher(
     private val pathSegments: String,
-    private val resourceLoader: RouteMatcher<Response>,
+    private val resourceLoader: RouteMatcher<Response, Filter>,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
     private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher<Response>{
+) : RouteMatcher<Response, Filter>{
     override fun match(request: Request) = when (router(request)) {
         is Matched -> resourceLoader.match(request.uri(of(convertPath(request.uri.path))))
         is NotMatched -> RoutingMatchResult(2, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
-    override fun withBasePath(prefix: String): RouteMatcher<Response> = copy(pathSegments = prefix + pathSegments)
-    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(filter = new.then(filter))
-    override fun withRouter(other: Router): RouteMatcher<Response> = copy(router = router.and(other))
+    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
+    override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
     private fun convertPath(path: String) =
         if (pathSegments == "/" || pathSegments == "") path else path.replace(pathSegments, "")
