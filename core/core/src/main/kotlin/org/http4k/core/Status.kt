@@ -1,6 +1,6 @@
 package org.http4k.core
 
-class Status internal constructor(val code: Int, val description: String, private val clientGenerated: Boolean = false) {
+class Status internal constructor(val code: Int, val description: String, val clientGenerated: Boolean = false) {
 
     constructor(code: Int, description: String?) : this(code, description ?: "No description", false)
 
