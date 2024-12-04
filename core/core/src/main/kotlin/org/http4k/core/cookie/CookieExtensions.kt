@@ -39,4 +39,5 @@ fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull(
 
 fun Cookie.invalidate(): Cookie = copy(value = "").maxAge(0).expires(Instant.EPOCH)
 
-fun Response.invalidateCookie(name: String, domain: String? = null): Response = replaceCookie(Cookie(name, "", domain = domain).invalidate())
+fun Response.invalidateCookie(name: String, domain: String? = null, path: String? = null) =
+    replaceCookie(Cookie(name, "", domain = domain, path = path).invalidate())
