@@ -1,10 +1,10 @@
 package org.http4k.contract
 
+import org.http4k.contract.ContractRouterMatch.MatchedWithoutHandler
+import org.http4k.contract.ContractRouterMatch.MatchingHandler
+import org.http4k.contract.ContractRouterMatch.MethodNotMatched
+import org.http4k.contract.ContractRouterMatch.Unmatched
 import org.http4k.contract.PreFlightExtraction.Companion
-import org.http4k.contract.RouterMatch.MatchedWithoutHandler
-import org.http4k.contract.RouterMatch.MatchingHandler
-import org.http4k.contract.RouterMatch.MethodNotMatched
-import org.http4k.contract.RouterMatch.Unmatched
 import org.http4k.contract.openapi.operationId
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -37,13 +37,13 @@ class ContractRoute internal constructor(
 
     fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
-    fun toRouter(contractRoot: PathSegments) = object : Router {
+    fun toRouter(contractRoot: PathSegments) = object : ContractRouter {
 
         override fun toString() = description.description
 
         override val description = RouterDescription(spec.describe(contractRoot))
 
-        override fun match(request: Request): RouterMatch =
+        override fun match(request: Request): ContractRouterMatch =
             if ((request.method == OPTIONS || request.method == method) && request.pathSegments()
                     .startsWith(spec.pathFn(contractRoot))
             ) {

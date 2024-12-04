@@ -1,9 +1,9 @@
 package org.http4k.contract
 
-import org.http4k.contract.RouterMatch.MatchedWithoutHandler
-import org.http4k.contract.RouterMatch.MatchingHandler
-import org.http4k.contract.RouterMatch.MethodNotMatched
-import org.http4k.contract.RouterMatch.Unmatched
+import org.http4k.contract.ContractRouterMatch.MatchedWithoutHandler
+import org.http4k.contract.ContractRouterMatch.MatchingHandler
+import org.http4k.contract.ContractRouterMatch.MethodNotMatched
+import org.http4k.contract.ContractRouterMatch.Unmatched
 import org.http4k.contract.security.NoSecurity.filter
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
@@ -61,8 +61,8 @@ data class ContractRouteMatcher(
         )
     }
 
-    private fun internalMatch(request: Request): RouterMatch {
-        val unmatched: RouterMatch = Unmatched
+    private fun internalMatch(request: Request): ContractRouterMatch {
+        val unmatched: ContractRouterMatch = Unmatched
 
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
