@@ -19,7 +19,7 @@ import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.value
 import org.http4k.lens.webForm
-import org.http4k.routing.asPredicate
+import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.viewModel
@@ -29,7 +29,7 @@ private val source = FormField.value(EmailAddress).required("Source")
 private val sendForm = Body.webForm(Validator.Strict, source).toLens()
 
 fun SendEmail(messagesBySender: Storage<List<EmailMessage>>) = { r: Request -> r.form("Action") == "SendEmail" }
-    .asPredicate() bind {
+    .asRouter() bind {
 
     val webform = sendForm(it)
 

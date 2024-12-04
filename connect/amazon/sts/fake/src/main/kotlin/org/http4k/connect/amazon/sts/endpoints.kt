@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.body.form
 import org.http4k.core.with
-import org.http4k.routing.asPredicate
+import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.viewModel
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.UUID
 
 fun assumeRole(defaultSessionValidity: Duration, clock: Clock) = { r: Request -> r.form("Action") == "AssumeRole" }
-    .asPredicate() bind { req: Request ->
+    .asRouter() bind { req: Request ->
     val duration = req.form("DurationSeconds")
         ?.toLong()
         ?.let(Duration::ofSeconds)
@@ -38,7 +38,7 @@ fun assumeRole(defaultSessionValidity: Duration, clock: Clock) = { r: Request ->
 
 fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock) =
     { r: Request -> r.form("Action") == "AssumeRoleWithWebIdentity" }
-        .asPredicate() bind { req: Request ->
+        .asRouter() bind { req: Request ->
         val duration = req.form("DurationSeconds")
             ?.toLong()
             ?.let(Duration::ofSeconds)

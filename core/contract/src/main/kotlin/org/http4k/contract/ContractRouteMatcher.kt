@@ -17,10 +17,10 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.All
 import org.http4k.routing.HttpMatchResult
-import org.http4k.routing.Predicate
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription
 import org.http4k.routing.and
 
@@ -37,7 +37,7 @@ data class ContractRouteMatcher(
     private val postSecurityFilter: Filter = Filter.NoOp,
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
-    private val predicate: Predicate = All,
+    private val router: Router = All,
 ) : RouteMatcher {
     private val contractRoot = PathSegments(rootAsString)
 
@@ -79,7 +79,7 @@ data class ContractRouteMatcher(
 
     override fun withBasePath(prefix: String) = copy(rootAsString = prefix + rootAsString)
 
-    override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
+    override fun withRouter(other: Router): RouteMatcher = copy(router = router.and(other))
 
     override fun withFilter(new: Filter): RouteMatcher = copy(preSecurityFilter = new.then(preSecurityFilter))
 

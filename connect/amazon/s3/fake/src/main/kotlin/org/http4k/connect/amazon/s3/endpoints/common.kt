@@ -13,7 +13,7 @@ import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.with
 import org.http4k.lens.LastModified
-import org.http4k.routing.Predicate
+import org.http4k.routing.Router
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.viewModel
 import java.time.Clock
@@ -57,10 +57,10 @@ internal fun getHeadersWithoutXHttp4kPrefix(it: BucketKeyContent) =
     it.headers.map { it.first.removePrefix("x-http4k-") to it.second }
 
 // TODO may be overlooked that `queries` router only passes if the query has a value
-fun queryPresent(name: String) = Predicate("Query present: $name") { req: Request -> req.queries(name).isNotEmpty() }
+fun queryPresent(name: String) = Router("Query present: $name") { req: Request -> req.queries(name).isNotEmpty() }
 
 // TODO may want to consider adding to http4k-core routing.kt
-val otherwise = Predicate("Catch-all") { _: Request -> true }
+val otherwise = Router("Catch-all") { _: Request -> true }
 
 internal fun lastModified(headers: Headers, clock: Clock) = headers
     .firstOrNull { it.first == X_HTTP4K_LAST_MODIFIED }?.second?.let { LastModified.parse(it) }?.value?.toInstant()

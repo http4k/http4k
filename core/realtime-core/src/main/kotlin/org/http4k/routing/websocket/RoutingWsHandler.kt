@@ -1,7 +1,7 @@
 package org.http4k.routing.websocket
 
 import org.http4k.core.Request
-import org.http4k.routing.Predicate
+import org.http4k.routing.Router
 import org.http4k.websocket.NoOp
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
@@ -21,8 +21,8 @@ data class RoutingWsHandler(
 
     fun withFilter(new: WsFilter) = copy(filter = new.then(filter))
 
-    fun withPredicate(predicate: Predicate) =
-        copy(routes = routes.map { it.withPredicate(predicate) })
+    fun withPredicate(router: Router) =
+        copy(routes = routes.map { it.withPredicate(router) })
 
     override fun toString() = routes.sortedBy(TemplatedWsRoute::toString).joinToString("\n")
 }

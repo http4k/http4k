@@ -9,8 +9,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.routing.PredicateResult.Matched
-import org.http4k.routing.PredicateResult.NotMatched
+import org.http4k.routing.RoutingResult.Matched
+import org.http4k.routing.RoutingResult.NotMatched
 
 /**
  * Composite HttpHandler which can potentially service many different URL patterns. Should
@@ -32,8 +32,8 @@ data class RoutingHttpHandler(
 
     fun withFilter(new: Filter) = copy(routes = routes.map { it.withFilter(new) })
 
-    fun withPredicate(predicate: Predicate) =
-        copy(routes = routes.map { it.withPredicate(predicate) })
+    fun withRouter(router: Router) =
+        copy(routes = routes.map { it.withRouter(router) })
 
     override fun toString() = routes.sortedBy(RouteMatcher::toString).joinToString("\n")
 }
@@ -41,14 +41,14 @@ data class RoutingHttpHandler(
 interface RouteMatcher {
     fun match(request: Request): HttpMatchResult
     fun withBasePath(prefix: String): RouteMatcher
-    fun withPredicate(other: Predicate): RouteMatcher
+    fun withRouter(other: Router): RouteMatcher
     fun withFilter(new: Filter): RouteMatcher
 }
 
 data class TemplatedHttpRoute(
     private val uriTemplate: UriTemplate,
     private val handler: HttpHandler,
-    private val predicate: Predicate = All,
+    private val router: Router = All,
     private val filter: Filter = Filter.NoOp
 ) : RouteMatcher {
     init {
@@ -56,7 +56,7 @@ data class TemplatedHttpRoute(
     }
 
     override fun match(request: Request) = when {
-        uriTemplate.matches(request.uri.path) -> when (val result = predicate(request)) {
+        uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
             is Matched -> HttpMatchResult(0, AddUriTemplate(uriTemplate).then(filter).then(handler))
             is NotMatched -> HttpMatchResult(1, filter.then { _: Request -> Response(result.status) })
         }
@@ -66,11 +66,11 @@ data class TemplatedHttpRoute(
 
     override fun withBasePath(prefix: String) = copy(uriTemplate = UriTemplate.from("$prefix/${uriTemplate}"))
 
-    override fun withPredicate(other: Predicate) = copy(predicate = predicate.and(other))
+    override fun withRouter(other: Router) = copy(router = router.and(other))
 
     override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
 
-    override fun toString() = "template=$uriTemplate AND ${predicate.description}"
+    override fun toString() = "template=$uriTemplate AND ${router.description}"
 
     private fun AddUriTemplate(uriTemplate: UriTemplate) = Filter { next ->
         {
@@ -79,21 +79,21 @@ data class TemplatedHttpRoute(
     }
 }
 
-data class PredicateRouteMatcher(
+data class SimpleRouteMatcher(
     private val handler: HttpHandler,
-    private val predicate: Predicate,
+    private val router: Router,
     private val filter: Filter = Filter.NoOp
 ) : RouteMatcher {
 
-    override fun match(request: Request) = when (val result = predicate(request)) {
+    override fun match(request: Request) = when (val result = router(request)) {
         is Matched -> HttpMatchResult(0, filter.then(handler))
         is NotMatched -> HttpMatchResult(1, filter.then { _: Request -> Response(result.status) })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher =
-        TemplatedHttpRoute(UriTemplate.from(prefix), handler, predicate, filter)
+        TemplatedHttpRoute(UriTemplate.from(prefix), handler, router, filter)
 
-    override fun withPredicate(other: Predicate): RouteMatcher = copy(predicate = predicate.and(other))
+    override fun withRouter(other: Router): RouteMatcher = copy(router = router.and(other))
 
     override fun withFilter(new: Filter): RouteMatcher = copy(filter = new.then(filter))
 }
@@ -102,7 +102,7 @@ data class HttpMatchResult(val priority: Int, val handler: HttpHandler)
 
 data class HttpPathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) = when (handler) {
-        is RoutingHttpHandler -> handler.withPredicate(method.asPredicate()).withBasePath(path)
-        else -> RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(path), handler, method.asPredicate())))
+        is RoutingHttpHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
+        else -> RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(path), handler, method.asRouter())))
     }
 }

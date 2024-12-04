@@ -9,12 +9,12 @@ import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
-class PredicateTest {
+class RouterTest {
     @Test
     fun `orElse router catches everything`() {
-        val asPredicate = { _: Request -> false }.asPredicate()
+        val asRouter = { _: Request -> false }.asRouter()
         val app = routes(
-            asPredicate bind { _: Request -> Response(NOT_ACCEPTABLE) },
+            asRouter bind { _: Request -> Response(NOT_ACCEPTABLE) },
             orElse bind { _: Request -> Response(OK) }
         )
         assertThat(app(Request(GET, "FOOBAR")), equalTo(Response(OK)))
