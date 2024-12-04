@@ -36,8 +36,7 @@ sealed class ProtocolEvent(
         xUriTemplate: String,
         protocol: String
     ) : ProtocolEvent(uri, method, status, latency, xUriTemplate, protocol) {
-        override fun toString() =
-            "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol)"
+        override fun toString() = "Outgoing(uri=$uri, method=$method, status=$status, latency=$latency, xUriTemplate=$xUriTemplate, protocol=$protocol)"
     }
 
     override fun equals(other: Any?): Boolean {

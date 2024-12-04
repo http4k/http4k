@@ -72,6 +72,6 @@ class HttpEventTest {
     @Test
     fun `toString is working as expected`() {
         assertThat(Incoming(tx).toString(), equalTo("Incoming(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
-        assertThat(Outgoing(tx).toString(), equalTo("Outgoing(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)\""))
+        assertThat(Outgoing(tx).toString(), equalTo("Outgoing(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
     }
 }
