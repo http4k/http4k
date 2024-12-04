@@ -22,8 +22,7 @@ data class RoutingSseHandler(
 
     fun withFilter(new: SseFilter) = copy(routes = routes.map { it.withFilter(new) })
 
-    fun withRouter(router: Router) =
-        copy(routes = routes.map { it.withRouter(router) })
+    fun withRouter(router: Router) = copy(routes = routes.map { it.withRouter(router) })
 
     override fun toString() = routes.sortedBy(TemplatedSseRoute::toString).joinToString("\n")
 }
