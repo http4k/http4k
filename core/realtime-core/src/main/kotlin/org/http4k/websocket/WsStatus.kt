@@ -1,6 +1,8 @@
 package org.http4k.websocket
 
-data class WsStatus(val code: Int, val description: String) {
+import org.http4k.events.ProtocolStatus
+
+data class WsStatus(override val code: Int, override val description: String) : ProtocolStatus {
     companion object {
         val NORMAL = WsStatus(1000, "Normal")
         val GOING_AWAY = WsStatus(1001, "Going away")
