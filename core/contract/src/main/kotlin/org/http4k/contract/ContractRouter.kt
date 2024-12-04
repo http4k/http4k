@@ -3,13 +3,11 @@ package org.http4k.contract
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.routing.RouterDescription
-
 
 interface ContractRouter {
     fun match(request: Request): ContractRouterMatch
 
-    val description: RouterDescription get() = RouterDescription.unavailable
+    val description get() = "unavailable"
 }
 
 sealed class ContractRouterMatch(
