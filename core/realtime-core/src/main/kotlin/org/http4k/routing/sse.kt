@@ -1,7 +1,6 @@
 package org.http4k.routing
 
 import org.http4k.core.Method
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.sse.NoOp
 import org.http4k.sse.Sse
@@ -37,7 +36,6 @@ class RoutingSseHandler(
     routes: List<RouteMatcher<SseResponse, SseFilter>>
 ) : RoutingHandler<SseResponse, SseFilter, RoutingSseHandler>(
     routes,
-    SseResponse(NOT_FOUND, handled = false) { it.close() },
     ::RoutingSseHandler
 )
 
