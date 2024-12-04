@@ -218,6 +218,12 @@ class CookieTest {
     }
 
     @Test
+    fun `cookie with path can be invalidated at response level`() {
+        assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "baz.com", path = "/test").maxAge(10)).invalidateCookie("foo", "foo.com", "/other").cookies().first(),
+            equalTo(Cookie("foo", "", domain = "foo.com", path = "/other").invalidate()))
+    }
+
+    @Test
     fun `cookie with various expires date formats parsed`() {
         val expected = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
 
