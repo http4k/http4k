@@ -8,16 +8,16 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.RouteMatcher
 import org.junit.jupiter.api.Test
 
-abstract class ResourceLoaderContract(private val loader: RouteMatcher) {
+abstract class ResourceLoaderContract(private val loader: RouteMatcher<Response>) {
 
     @Test
     fun `loads existing file`() {
@@ -65,6 +65,4 @@ abstract class ResourceLoaderContract(private val loader: RouteMatcher) {
             assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirectives().toHeaderValue()))
         }
     }
-
-    private fun HttpMatchResult.matchOrExplode() = handler
 }

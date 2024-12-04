@@ -16,12 +16,12 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.All
-import org.http4k.routing.HttpMatchResult
 import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription
+import org.http4k.routing.RoutingMatchResult
 import org.http4k.routing.and
 
 data class ContractRouteMatcher(
@@ -38,7 +38,7 @@ data class ContractRouteMatcher(
     private val includeDescriptionRoute: Boolean = false,
     private val webhooks: Map<String, List<WebCallback>> = emptyMap(),
     private val router: Router = All,
-) : RouteMatcher {
+) : RouteMatcher<Response>{
     private val contractRoot = PathSegments(rootAsString)
 
     private val notFound = preSecurityFilter
@@ -46,9 +46,9 @@ data class ContractRouteMatcher(
         .then(postSecurityFilter)
         .then { renderer.notFound() }
 
-    override fun match(request: Request): HttpMatchResult {
+    override fun match(request: Request): RoutingMatchResult<Response> {
         val m = internalMatch(request)
-        return HttpMatchResult(
+        return RoutingMatchResult(
             m.priority,
             filter.then(
                 when (m) {
@@ -79,9 +79,9 @@ data class ContractRouteMatcher(
 
     override fun withBasePath(prefix: String) = copy(rootAsString = prefix + rootAsString)
 
-    override fun withRouter(other: Router): RouteMatcher = copy(router = router.and(other))
+    override fun withRouter(other: Router): RouteMatcher<Response> = copy(router = router.and(other))
 
-    override fun withFilter(new: Filter): RouteMatcher = copy(preSecurityFilter = new.then(preSecurityFilter))
+    override fun withFilter(new: Filter): RouteMatcher<Response> = copy(preSecurityFilter = new.then(preSecurityFilter))
 
     val description = RouterDescription(rootAsString,
         routes.map { it.toRouter(PathSegments("$it$descriptionPath")).description }
