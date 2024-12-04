@@ -20,7 +20,7 @@ import org.http4k.routing.RouteMatcher
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.Router
-import org.http4k.routing.RoutingMatchResult
+import org.http4k.routing.RoutingMatch
 import org.http4k.routing.and
 
 data class ContractRouteMatcher(
@@ -45,9 +45,9 @@ data class ContractRouteMatcher(
         .then(postSecurityFilter)
         .then { renderer.notFound() }
 
-    override fun match(request: Request): RoutingMatchResult<Response> {
+    override fun match(request: Request): RoutingMatch<Response> {
         val m = internalMatch(request)
-        return RoutingMatchResult(
+        return RoutingMatch(
             m.priority,
             filter.then(
                 when (m) {

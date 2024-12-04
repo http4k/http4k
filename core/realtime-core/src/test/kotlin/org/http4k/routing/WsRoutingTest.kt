@@ -25,7 +25,7 @@ class WsRoutingTest {
             "/path1" bind websockets(
                 "/{name}" bind { req ->
                     request.set(req)
-                    WsResponse { _ ->  }
+                    WsResponse { _ -> }
                 }
             ))
 
@@ -54,7 +54,9 @@ class WsRoutingTest {
 
     @Test
     fun `not found connection is refused`() {
-        val websockets = websockets()
+        val websockets = websockets(
+            "/foo" bind { _ -> WsResponse { it.close(WsStatus.REFUSE) } }
+        )
 
         val request = Request(GET, "/path1/index.html")
         websockets(request)(object : Websocket {
