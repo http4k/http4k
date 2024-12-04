@@ -6,15 +6,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 
-fun routes(vararg list: Pair<Method, HttpHandler>) =
-    routes(*list.map { "" bind it.first to it.second }.toTypedArray())
-
-fun routes(vararg list: RoutingHttpHandler) = routes(list.toList())
-
-fun routes(routers: List<RoutingHttpHandler>) = RoutingHttpHandler(routers.flatMap { it.routes })
-
-fun RoutingHttpHandler.and(router: Router) = withRouter(router)
-
 /**
  * Simple Reverse Proxy which will split and direct traffic to the appropriate
  * HttpHandler based on the content of the Host header

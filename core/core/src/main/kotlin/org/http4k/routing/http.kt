@@ -12,6 +12,13 @@ import org.http4k.core.then
 import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
 
+fun routes(vararg list: Pair<Method, HttpHandler>) =
+    routes(*list.map { "" bind it.first to it.second }.toTypedArray())
+
+fun routes(vararg list: RoutingHttpHandler) = routes(list.toList())
+
+fun routes(routers: List<RoutingHttpHandler>) = RoutingHttpHandler(routers.flatMap { it.routes })
+
 class RoutingHttpHandler(
     routes: List<RouteMatcher<Response, Filter>>
 ) : RoutingHandler<Response, Filter, RoutingHttpHandler>(routes, Response(NOT_FOUND), ::RoutingHttpHandler)

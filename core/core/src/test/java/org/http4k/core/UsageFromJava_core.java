@@ -6,7 +6,7 @@ import org.http4k.client.JavaHttpClient;
 import static org.http4k.core.Http4kKt.then;
 import static org.http4k.core.Status.ACCEPTED;
 import static org.http4k.routing.BindKt.bind;
-import static org.http4k.routing.RoutingKt.routes;
+import static org.http4k.routing.HttpKt.routes;
 
 
 public interface UsageFromJava_core {
