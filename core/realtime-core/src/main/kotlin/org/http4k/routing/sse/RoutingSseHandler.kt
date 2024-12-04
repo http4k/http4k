@@ -1,7 +1,7 @@
 package org.http4k.routing.sse
 
 import org.http4k.core.Request
-import org.http4k.routing.Predicate
+import org.http4k.routing.Router
 import org.http4k.sse.NoOp
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
@@ -20,8 +20,8 @@ data class RoutingSseHandler(
 
     fun withFilter(new: SseFilter) = copy(filter = new.then(filter))
 
-    fun withPredicate(predicate: Predicate) =
-        copy(routes = routes.map { it.withPredicate(predicate) })
+    fun withRouter(router: Router) =
+        copy(routes = routes.map { it.withRouter(router) })
 
     override fun toString() = routes.sortedBy(TemplatedSseRoute::toString).joinToString("\n")
 }

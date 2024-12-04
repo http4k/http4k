@@ -29,7 +29,7 @@ import org.http4k.connect.amazon.s3.model.BucketName
 import org.http4k.connect.storage.InMemory
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Request
-import org.http4k.routing.asPredicate
+import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Clock
@@ -43,8 +43,8 @@ class FakeS3(
     private val clock: Clock = Clock.systemUTC()
 ) : ChaoticHttpHandler() {
 
-    private val isS3 = { it: Request -> it.subdomain(buckets) == "s3" }.asPredicate("is s3")
-    private val isBucket = { it: Request -> it.subdomain(buckets) != "s3" }.asPredicate("is bucket")
+    private val isS3 = { it: Request -> it.subdomain(buckets) == "s3" }.asRouter("is s3")
+    private val isBucket = { it: Request -> it.subdomain(buckets) != "s3" }.asRouter("is bucket")
 
     override val app = routes(
         isS3 bind routes(
