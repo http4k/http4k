@@ -5,9 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.junit.jupiter.api.Disabled
 
-class ApacheServerTest : ServerContract({ port -> ApacheServer(port, canonicalHostname = "localhost") },
+class ApacheServerTest : ServerContract(
+    ::ApacheServer,
     ClientForServerTesting(),
-    Method.entries.filter { it != Method.PURGE }.toTypedArray()) {
+    Method.entries.filter { it != Method.PURGE }.toTypedArray()
+) {
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 
