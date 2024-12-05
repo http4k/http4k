@@ -12,7 +12,6 @@ import org.http4k.lens.TypedField.Defaulted
 import org.http4k.lens.TypedField.Optional
 import org.http4k.lens.TypedField.Path
 import org.http4k.lens.TypedField.Required
-import org.http4k.routing.RequestWithRoute
 import org.http4k.routing.RoutedRequest
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
@@ -35,22 +34,23 @@ abstract class TypedHttpMessage {
         Body<IN, OUT>(spec, example)
 }
 
-@Suppress("DEPRECATION")
-abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(
+abstract class TypedRequest(private val request: Request) : TypedHttpMessage(), Request by httpMessage<Request>(
     when {
-        request is RequestWithRoute -> request
+        request is RoutedRequest -> request
         else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
     }
 ) {
     protected constructor(method: Method, uri: Uri) : this(Request(method, uri))
 
     protected fun <OUT : Any> required(spec: PathLensSpec<OUT>): Path<OUT> = Path(spec)
+
+    override fun toString() = request.toMessage()
 }
 
-abstract class TypedResponse(response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
+abstract class TypedResponse(private val response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
     protected constructor(status: Status) : this(Response(status))
 
-    override fun toString() = super.toMessage()
+    override fun toString() = response.toMessage()
 }
 
 private inline fun <reified IN> httpMessage(initial: IN): IN = Proxy.newProxyInstance(

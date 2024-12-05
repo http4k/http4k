@@ -48,6 +48,7 @@ sealed interface TypedField<IN : HttpMessage, OUT : Any> {
 
     class Path<OUT: Any>(internal val spec: PathLensSpec<OUT>) : ReadOnlyProperty<Request, OUT>, TypedField<Request, OUT> {
         override fun getValue(thisRef: Request, property: KProperty<*>): OUT {
+            println(thisRef)
             return spec.of(property.name)(thisRef)
         }
     }
