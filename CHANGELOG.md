@@ -15,6 +15,7 @@ changes with their rationale when appropriate:
 - KMS CustomerKeySpec removed -> replaced with KeySpec
 - HttpEvent is now a subclass of ProtocolEvent
 - routing changes mean things are no longer data classes
+- All extraneous server configuration removed - we now support only simple examples of servers and people need to 
 
 - 
 ### v5.38.0.0
