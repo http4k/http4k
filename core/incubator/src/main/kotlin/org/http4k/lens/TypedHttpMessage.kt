@@ -12,6 +12,7 @@ import org.http4k.lens.TypedField.Defaulted
 import org.http4k.lens.TypedField.Optional
 import org.http4k.lens.TypedField.Path
 import org.http4k.lens.TypedField.Required
+import org.http4k.routing.RoutedMessage
 import org.http4k.routing.RoutedRequest
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
@@ -27,19 +28,22 @@ abstract class TypedHttpMessage {
     protected fun <IN : HttpMessage, OUT : Any> defaulted(
         spec: BiDiLensBuilder<IN, OUT>,
         default: (IN) -> OUT
-    ) =
-        Defaulted(spec, default)
+    ) = Defaulted(spec, default)
 
     protected fun <IN : HttpMessage, OUT : Any> body(spec: BiDiBodyLensSpec<OUT>, example: OUT? = null) =
         Body<IN, OUT>(spec, example)
 }
 
-abstract class TypedRequest(private val request: Request) : TypedHttpMessage(), Request by httpMessage<Request>(
-    when {
-        request is RoutedRequest -> request
-        else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
-    }
-) {
+abstract class TypedRequest private constructor(private val request: RoutedRequest) : TypedHttpMessage(),
+    Request by httpMessage<Request>(request), RoutedMessage by request {
+
+    protected constructor(request: Request) : this(
+        when {
+            request is RoutedRequest -> request
+            else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
+        }
+    )
+
     protected constructor(method: Method, uri: Uri) : this(Request(method, uri))
 
     protected fun <OUT : Any> required(spec: PathLensSpec<OUT>): Path<OUT> = Path(spec)
