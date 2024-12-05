@@ -4,6 +4,7 @@ import org.apache.http.config.SocketConfig
 import org.apache.http.impl.bootstrap.ServerBootstrap
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
+import org.http4k.server.ServerConfig.UnsupportedStopMode
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class Apache4Server(val port: Int = 8000, override val stopMode: StopMode) : ServerConfig {
@@ -11,7 +12,7 @@ class Apache4Server(val port: Int = 8000, override val stopMode: StopMode) : Ser
 
     init {
         if (stopMode != StopMode.Immediate) {
-            throw ServerConfig.UnsupportedStopMode(stopMode)
+            throw UnsupportedStopMode(stopMode)
         }
     }
 
