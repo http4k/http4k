@@ -17,6 +17,7 @@ dependencies {
     implementation("com.natpryce:hamkrest:_")
     api(project(":http4k-format-jackson-yaml"))
     implementation(project(":http4k-cloudevents"))
+    implementation(project(":http4k-web-datastar"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-core"))
