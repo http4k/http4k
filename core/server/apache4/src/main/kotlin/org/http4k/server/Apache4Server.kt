@@ -7,7 +7,12 @@ import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.UnsupportedStopMode
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-class Apache4Server(val port: Int = 8000, override val stopMode: StopMode) : ServerConfig {
+/**
+ * Stock version of an Apache4 Server. Not that if you want to configure your own server instance you
+ * can duplicate this code and modify it as required. We are purposefully trying to limit options
+ * here to keep the API simple for the 99% of use-cases.
+ */
+class Apache4Server(private val port: Int = 8000, override val stopMode: StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, StopMode.Immediate)
 
     init {

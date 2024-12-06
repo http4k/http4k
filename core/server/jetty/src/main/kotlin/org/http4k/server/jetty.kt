@@ -9,6 +9,11 @@ import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 
+/**
+ * Stock version of an Jetty Server. Not that if you want to configure your own server instance you
+ * can duplicate this code and modify it as required. We are purposefully trying to limit options
+ * here to keep the API simple for the 99% of use-cases.
+ */
 class Jetty(private val port: Int, override val stopMode: StopMode, private val server: Server) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, defaultStopMode)
     constructor(port: Int = 8000, stopMode: StopMode) : this(port, stopMode, http(port))
