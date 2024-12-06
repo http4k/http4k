@@ -89,9 +89,9 @@ class CookieTest {
     }
 
     @Test
-    fun `cookie values are quoted`() {
+    fun `cookie values are quoted by default, and do not have a trailing semicolon`() {
         assertThat(Cookie("my-cookie", "my \"quoted\" value").toString(),
-            equalTo("""my-cookie="my \"quoted\" value"; """))
+            equalTo("""my-cookie="my \"quoted\" value""""))
     }
 
     @Test
@@ -102,12 +102,21 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be added to the response`() {
+    fun `cookies can be added to the response, quoted by default`() {
         val cookie = Cookie("my-cookie", "my value")
 
         val response = Response(OK).cookie(cookie)
 
-        assertThat(response.headers, equalTo(listOf("Set-Cookie" to cookie.toString()) as Parameters))
+        assertThat(response.headers, equalTo(listOf("Set-Cookie" to "my-cookie=\"my value\"") as Parameters))
+    }
+
+    @Test
+    fun `cookies can be added to the response unquoted`() {
+        val cookie = Cookie("my-cookie", "value")
+
+        val response = Response(OK).cookie(cookie, true)
+
+        assertThat(response.headers, equalTo(listOf("Set-Cookie" to "my-cookie=value") as Parameters))
     }
 
     @Test
@@ -206,6 +215,12 @@ class CookieTest {
     fun `cookie with domain can be invalidated at response level`() {
         assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
             equalTo(Cookie("foo", "", domain = "foo.com").invalidate()))
+    }
+
+    @Test
+    fun `cookie with path can be invalidated at response level`() {
+        assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "baz.com", path = "/test").maxAge(10)).invalidateCookie("foo", "foo.com", "/other").cookies().first(),
+            equalTo(Cookie("foo", "", domain = "foo.com", path = "/other").invalidate()))
     }
 
     @Test
