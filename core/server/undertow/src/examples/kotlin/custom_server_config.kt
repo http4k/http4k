@@ -14,8 +14,8 @@ import org.http4k.websocket.WsHandler
  * Custom Undertow server configuration with http 2 support
  */
 class CustomUndertow(
-    val port: Int = 8000,
-    val enableHttp2: Boolean = false,
+    private val port: Int = 8000,
+    private val enableHttp2: Boolean = false,
     override val stopMode: StopMode = Immediate
 ) : PolyServerConfig {
 

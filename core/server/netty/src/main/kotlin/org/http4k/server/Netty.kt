@@ -21,7 +21,12 @@ import java.net.InetSocketAddress
 import java.time.Duration.ofSeconds
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-class Netty(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
+/**
+ * Stock version of an Netty Server. Not that if you want to configure your own server instance you
+ * can duplicate this code and modify it as required. We are purposefully trying to limit options
+ * here to keep the API simple for the 99% of use-cases.
+ */
+class Netty(private val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, Graceful(ofSeconds(5)))
 
     init {
