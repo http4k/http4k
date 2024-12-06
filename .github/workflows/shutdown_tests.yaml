@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
+      - name: Buildnote report
+        uses: buildnote/action@v0.2.7
+        if: always()
+        env:
+          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
       - uses: actions/setup-java@v4.5.0
         with:
           distribution: temurin
@@ -32,5 +37,14 @@ jobs:
           SERVER_HOST: localhost
           HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
           HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
+      - name: Buildnote
+        uses: buildnote/action@v0.2.7
+        if: always()
+        env:
+          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
+        with:
+          collectOnly: true
+          command: collect
+          params: test-results --include="**/build/test-results/**/TEST-*.xml"
 
 

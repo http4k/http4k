@@ -20,6 +20,11 @@ jobs:
           fetch-depth: 2
           # required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
+      - name: Buildnote report
+        uses: buildnote/action@v0.2.7
+        if: always()
+        env:
+          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
       - uses: actions/setup-java@v4.5.0
         with:
           distribution: temurin
