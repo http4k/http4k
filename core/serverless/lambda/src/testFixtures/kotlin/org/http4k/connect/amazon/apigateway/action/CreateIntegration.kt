@@ -3,8 +3,8 @@ package org.http4k.connect.amazon.apigateway.action
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.connect.amazon.apigateway.model.ApiId
-import org.http4k.connect.amazon.kClass
-import org.http4k.connect.amazon.lambda.model.Region
+import org.http4k.connect.amazon.core.model.Region
+import org.http4k.connect.kClass
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -32,5 +32,5 @@ class CreateIntegration(
     )
 
     private fun String.invocation(region: Region): String =
-        "arn:aws:apigateway:${region.name}:lambda:path/2015-03-31/functions/${this}/invocations"
+        "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${this}/invocations"
 }
