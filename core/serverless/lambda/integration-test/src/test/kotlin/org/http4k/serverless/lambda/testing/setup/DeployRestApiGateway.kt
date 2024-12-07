@@ -15,10 +15,10 @@ import org.http4k.connect.amazon.apigateway.action.listResources
 import org.http4k.connect.amazon.apigateway.model.ApiName
 import org.http4k.connect.amazon.apigateway.model.DeploymentName
 import org.http4k.connect.amazon.apigateway.model.Stage
-import org.http4k.connect.amazon.getOrThrow
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.lambda.action.list
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayRest
-import org.http4k.connect.amazon.lambda.model.Region
+import org.http4k.connect.orThrow
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
@@ -30,7 +30,7 @@ object DeployRestApiGateway {
 
     fun deploy() {
         val config = awsCliUserProfiles().profile("http4k-integration-test")
-        val region = Region(config.region)
+        val region = Region.of(config.region)
 
         val functionName = functionName(ApiGatewayRest)
 
@@ -54,7 +54,7 @@ object DeployRestApiGateway {
         apiGateway.createMethod(api.apiId, proxyResource)
         apiGateway.createIntegration(api.apiId, proxyResource, functionArn, region)
         apiGateway.createIntegrationResponse(api.apiId, proxyResource)
-        val deploymentId = apiGateway(CreateDeployment(api.apiId, DeploymentName(Stage.restDefault.stageName.value))).getOrThrow()
+        val deploymentId = apiGateway(CreateDeployment(api.apiId, DeploymentName(Stage.restDefault.stageName.value))).orThrow()
         apiGateway.createStage(api.apiId, Stage.restDefault, deploymentId)
 
         retryUntil(OK) {

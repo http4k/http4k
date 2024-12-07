@@ -4,8 +4,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.lambda.model.Function
-import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -37,7 +37,7 @@ class ApiGatewayV1LambdaClient(function: Function, region: Region) : LambdaHttpC
 }
 
 fun main() {
-    ApiGatewayV1LambdaClient(Function("hello"), Region("foo"))
+    ApiGatewayV1LambdaClient(Function("hello"), Region.of("foo"))
         .then(DebuggingFilters.PrintRequestAndResponse())
         .then { Response(Status.OK) }(Request(POST, "/helloworld")
         .query("q1", "qv1")
