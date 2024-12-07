@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.apigateway.action
 import org.http4k.connect.amazon.apigateway.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigateway.AwsApiGatewayAction
 import org.http4k.connect.amazon.apigateway.model.ApiId
-import org.http4k.connect.amazon.kClass
+import org.http4k.connect.kClass
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
