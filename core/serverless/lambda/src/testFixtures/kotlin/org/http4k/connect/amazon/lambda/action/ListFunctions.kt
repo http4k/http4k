@@ -3,12 +3,12 @@ package org.http4k.connect.amazon.lambda.action
 import com.fasterxml.jackson.annotation.JsonProperty
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
-import org.http4k.connect.amazon.RemoteFailure
-import org.http4k.connect.amazon.kClass
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.LambdaJackson
 import org.http4k.connect.amazon.lambda.model.FunctionDetails
 import org.http4k.connect.amazon.lambda.toActionResult
+import org.http4k.connect.kClass
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response

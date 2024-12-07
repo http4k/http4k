@@ -2,10 +2,10 @@ package org.http4k.connect.amazon.lambda.action
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.base64Encode
-import org.http4k.connect.amazon.kClass
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.LambdaJackson.auto
 import org.http4k.connect.amazon.lambda.model.FunctionPackage
+import org.http4k.connect.kClass
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
