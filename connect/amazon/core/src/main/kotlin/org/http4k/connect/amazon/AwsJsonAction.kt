@@ -24,7 +24,7 @@ abstract class AwsJsonAction<R : Any>(
     /**
      * Option to override the action name.
      */
-    protected val actionName by lazy { javaClass.simpleName }
+    protected open val actionName by lazy { javaClass.simpleName }
 
     override fun toRequest() = Request(POST, uri())
         .header("X-Amz-Target", "${service}.${actionName}")
