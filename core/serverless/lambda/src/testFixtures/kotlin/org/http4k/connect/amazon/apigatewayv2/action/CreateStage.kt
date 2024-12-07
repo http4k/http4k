@@ -4,7 +4,7 @@ import org.http4k.connect.amazon.apigatewayv2.ApiGatewayJackson.auto
 import org.http4k.connect.amazon.apigatewayv2.AwsApiGatewayV2Action
 import org.http4k.connect.amazon.apigatewayv2.model.ApiId
 import org.http4k.connect.amazon.apigatewayv2.model.Stage
-import org.http4k.connect.amazon.kClass
+import org.http4k.connect.kClass
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method

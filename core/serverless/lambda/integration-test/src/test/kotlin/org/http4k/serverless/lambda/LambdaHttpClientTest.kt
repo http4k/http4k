@@ -3,13 +3,13 @@ package org.http4k.serverless.lambda
 import org.http4k.aws.awsCliUserProfiles
 import org.http4k.aws.awsClientFor
 import org.http4k.client.HttpClientContract
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.lambda.model.Function
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV1
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApiGatewayV2
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.ApplicationLoadBalancer
 import org.http4k.connect.amazon.lambda.model.LambdaIntegrationType.Invocation
-import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.then
 import org.http4k.serverless.lambda.testing.NoOpServerConfig
 import org.http4k.serverless.lambda.testing.client.ApiGatewayV1LambdaClient
@@ -26,7 +26,7 @@ abstract class LambdaHttpClientTest(
     clientFn: (Function, Region) -> LambdaHttpClient
 ) : HttpClientContract(
     { NoOpServerConfig },
-    clientFn(functionName(type), Region(awsCliUserProfiles().profile("http4k-integration-test").region))
+    clientFn(functionName(type), Region.of(awsCliUserProfiles().profile("http4k-integration-test").region))
         .then(awsCliUserProfiles().profile("http4k-integration-test").awsClientFor("lambda"))
 ) {
     override fun `handles response with custom status message`() = unsupportedFeature()
