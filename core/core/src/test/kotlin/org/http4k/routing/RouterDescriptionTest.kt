@@ -2,7 +2,7 @@ package org.http4k.routing
 
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -22,8 +22,8 @@ class RouterDescriptionTest {
     @Test
     fun `complicated toString`(approver: Approver) {
         val routes = reverseProxyRouting(
-            "host" to routes("/foo" bind GET to { Response(Status.OK) }),
-            "anotherHost" to routes("/bar" bind GET to { Response(Status.OK) }
+            "host" to routes("/foo" bind GET to { Response(OK) }),
+            "anotherHost" to routes("/bar" bind GET to { Response(OK) }
             )
         )
 

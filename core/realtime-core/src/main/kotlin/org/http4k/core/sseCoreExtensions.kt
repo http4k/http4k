@@ -13,4 +13,3 @@ data class SseTransaction(
 ) : ProtocolTransaction<SseResponse> {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
 }
-

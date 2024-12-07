@@ -48,6 +48,7 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
 
     override fun getTagName(): String = delegate.getTagName()
 
+    @Deprecated("Use getAttribute(name) instead")
     override fun getAttribute(name: String): String? = delegate.getAttribute(name)
 
     override fun isSelected(): Boolean = delegate.isSelected()

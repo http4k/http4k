@@ -15,15 +15,8 @@ interface RoutedMessage {
     val xUriTemplate: UriTemplate
 }
 
-@Deprecated("Use RoutedMessage", ReplaceWith("RoutedMessage"))
-interface RequestWithRoute : Request, RoutedMessage
-
-@Deprecated("Use RoutedMessage", ReplaceWith("RoutedMessage"))
-interface ResponseWithRoute : Response, RoutedMessage
-
-@Suppress("DEPRECATION")
 data class RoutedRequest(private val delegate: Request, override val xUriTemplate: UriTemplate) : Request by delegate,
-    RequestWithRoute,  RoutedMessage {
+    RoutedMessage {
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()

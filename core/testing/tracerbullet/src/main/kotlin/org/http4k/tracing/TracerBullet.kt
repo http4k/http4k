@@ -1,9 +1,9 @@
 package org.http4k.tracing
 
 import org.http4k.events.Event
-import org.http4k.events.HttpEvent.Incoming
-import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.events.MetadataEvent
+import org.http4k.events.ProtocolEvent.Incoming
+import org.http4k.events.ProtocolEvent.Outgoing
 import org.http4k.events.plus
 import org.http4k.tracing.CollectEvents.Collect
 import org.http4k.tracing.CollectEvents.Drop

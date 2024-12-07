@@ -1,11 +1,2 @@
-or
-	and
-		Host or URI: 'host'
-		and
-			method == GET
-			template == 'foo'
-	and
-		Host or URI: 'anotherHost'
-		and
-			method == GET
-			template == 'bar'
+template=bar AND (method == GET AND host header or uri host = anotherHost)
+template=foo AND (method == GET AND host header or uri host = host)

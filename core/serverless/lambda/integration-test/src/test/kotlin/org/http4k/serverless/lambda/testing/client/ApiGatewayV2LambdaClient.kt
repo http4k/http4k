@@ -3,8 +3,8 @@ package org.http4k.serverless.lambda.testing.client
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.lambda.model.Function
-import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response

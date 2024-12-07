@@ -1,7 +1,7 @@
 package org.http4k
 
-import org.gradle.api.JavaVersion.VERSION_1_8
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+import org.gradle.api.JavaVersion.VERSION_21
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -58,13 +58,13 @@ tasks {
 
     withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
-            jvmTarget.set(JVM_1_8)
+            jvmTarget.set(JVM_21)
         }
     }
 
     java {
-        sourceCompatibility = VERSION_1_8
-        targetCompatibility = VERSION_1_8
+        sourceCompatibility = VERSION_21
+        targetCompatibility = VERSION_21
     }
 
     withType<Test> {
@@ -79,7 +79,7 @@ tasks {
     named<KotlinJvmCompile>("compileTestKotlin").configure {
         if (name == "compileTestKotlin") {
             compilerOptions {
-                jvmTarget.set(JVM_1_8)
+                jvmTarget.set(JVM_21)
                 freeCompilerArgs.add("-Xjvm-default=all")
             }
         }
