@@ -1,8 +1,8 @@
 package org.http4k.connect.amazon.lambda.action
 
-import org.http4k.connect.amazon.kClass
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.model.Function
+import org.http4k.connect.kClass
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
