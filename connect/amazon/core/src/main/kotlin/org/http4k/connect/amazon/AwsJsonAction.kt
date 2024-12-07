@@ -21,8 +21,13 @@ abstract class AwsJsonAction<R : Any>(
     private val autoMarshalling: AutoMarshalling,
     private val contentType: ContentType = ContentType("application/x-amz-json-1.1")
 ) : Action<Result<R, RemoteFailure>> {
+    /**
+     * Option to override the action name.
+     */
+    protected val actionName by lazy { javaClass.simpleName }
+
     override fun toRequest() = Request(POST, uri())
-        .header("X-Amz-Target", "${service}.${javaClass.simpleName}")
+        .header("X-Amz-Target", "${service}.${actionName}")
         .replaceHeader("Content-Type", contentType.value)
         .body(autoMarshalling.asFormatString(this))
 
