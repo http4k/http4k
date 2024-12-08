@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.39.0.0
 - **http4k-amazon-*-fake** : [Unlikely break] Rename `AmazonRestfulFake` to `AmazonRestJsonFake`
+- **http4k-amazon-evidently-fake** : Fixed Project status value to be a valid value instead of an empty string
 
 ### v5.38.0.0
 - **http4k-*** : Upgrade some dependency versions.

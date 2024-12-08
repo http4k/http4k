@@ -33,5 +33,5 @@ fun StoredProject.toProject(features: Storage<StoredFeature>) = Project(
     lastUpdatedTime = Timestamp.of(updated),
     experimentCount = null,
     launchCount = null,
-    status = ""
+    status = "AVAILABLE"
 )
