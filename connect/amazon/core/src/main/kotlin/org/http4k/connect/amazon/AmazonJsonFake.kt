@@ -19,7 +19,7 @@ class AmazonJsonFake(val autoMarshalling: AutoMarshalling, val awsService: AwsSe
         },
         crossinline fn: (Req) -> Any?
     ) =
-        header("X-Amz-Target", "${awsService}.${Req::class.simpleName!!.removeSuffix("Request")}") bind {
+        header("X-Amz-Target", "${awsService}.${Req::class.simpleName!!.calculateOperationName<Req>()}") bind {
             fn(autoMarshalling.asA(it.bodyString(), Req::class))
                 ?.let {
                     when (it) {
@@ -30,6 +30,12 @@ class AmazonJsonFake(val autoMarshalling: AutoMarshalling, val awsService: AwsSe
                 }
                 ?: JsonError("ResourceNotFoundException", "$awsService can't find the specified item.").let(errorFn)
         }
+
+    inline fun <reified Req : Any> String.calculateOperationName() = when {
+        endsWith("Request") -> removeSuffix("Request")
+        endsWith("Response") -> removeSuffix("Response")
+        else -> Req::class.simpleName
+    }
 }
 
 @JsonSerializable
