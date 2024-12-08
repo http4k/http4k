@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.evidently
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonRestfulFake
+import org.http4k.connect.amazon.AmazonRestJsonFake
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
@@ -22,7 +22,7 @@ class FakeEvidently(
 ) : ChaoticHttpHandler() {
 
     private val api =
-        AmazonRestfulFake(EvidentlyMoshi, AwsService.of("evidently"), region, account)
+        AmazonRestJsonFake(EvidentlyMoshi, AwsService.of("evidently"), region, account)
 
     override val app = routes(
         api.createProject(clock, projects, features),

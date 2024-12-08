@@ -6,7 +6,7 @@ import dev.forkhandles.result4k.asResultOr
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.peek
-import org.http4k.connect.amazon.AmazonRestfulFake
+import org.http4k.connect.amazon.AmazonRestJsonFake
 import org.http4k.connect.amazon.RestfulError
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.evidently.actions.BatchEvaluateFeatureRequestWrapper
@@ -34,10 +34,10 @@ import org.http4k.lens.value
 import org.http4k.routing.bind
 import java.time.Clock
 
-private fun AmazonRestfulFake.projectNotFound(name: ProjectName) =
+private fun AmazonRestJsonFake.projectNotFound(name: ProjectName) =
     RestfulError(NOT_FOUND, "Project does not exist with arn '${arn("project", name)}'", null, null)
 
-private fun AmazonRestfulFake.projectResourceNotFound(resourceType: String, resourcePath: String): RestfulError {
+private fun AmazonRestJsonFake.projectResourceNotFound(resourceType: String, resourcePath: String): RestfulError {
     val resourceArn = ARN.of(awsService, region, accountId, resourcePath)
     val message = "${resourceType.replaceFirstChar(Char::uppercaseChar)} with arn '$resourceArn' does not exist."
     return RestfulError(Status(404, ""), message, resourceArn, resourceType)
@@ -53,7 +53,7 @@ private operator fun Storage<StoredProject>.get(projectName: ProjectName) = get(
 private operator fun Storage<StoredFeature>.get(featureName: FeatureName) = get(featureName.value)
 
 
-fun AmazonRestfulFake.evaluateFeature(
+fun AmazonRestJsonFake.evaluateFeature(
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
 ) = "/projects/$projectLens/evaluations/$featureLens" bind POST to route<EvaluateFeatureRequest> { data ->
@@ -66,7 +66,7 @@ fun AmazonRestfulFake.evaluateFeature(
         .map { it[data.entityId] }
 }
 
-fun AmazonRestfulFake.batchEvaluateFeature(
+fun AmazonRestJsonFake.batchEvaluateFeature(
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
 ) = "/projects/$projectLens/evaluations" bind POST to route<BatchEvaluateFeatureRequestWrapper> { data ->
@@ -91,7 +91,7 @@ fun AmazonRestfulFake.batchEvaluateFeature(
     Success(BatchEvaluationResultWrapper(results))
 }
 
-fun AmazonRestfulFake.createProject(
+fun AmazonRestJsonFake.createProject(
     clock: Clock,
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
@@ -110,7 +110,7 @@ fun AmazonRestfulFake.createProject(
     Success(CreateProjectResponse(project.toProject(features)))
 }
 
-fun AmazonRestfulFake.createFeature(
+fun AmazonRestJsonFake.createFeature(
     clock: Clock,
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>,
@@ -134,7 +134,7 @@ fun AmazonRestfulFake.createFeature(
         .map { FeatureResponse(it.toFeature()) }
 }
 
-fun AmazonRestfulFake.updateFeature(
+fun AmazonRestJsonFake.updateFeature(
     clock: Clock,
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
@@ -169,7 +169,7 @@ fun AmazonRestfulFake.updateFeature(
         .map { FeatureResponse(it.toFeature()) }
 }
 
-fun AmazonRestfulFake.deleteFeature(
+fun AmazonRestJsonFake.deleteFeature(
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
 ) = "/projects/$projectLens/features/$featureLens" bind DELETE to route<Unit> {
@@ -191,7 +191,7 @@ fun AmazonRestfulFake.deleteFeature(
         .map { }
 }
 
-fun AmazonRestfulFake.deleteProject(
+fun AmazonRestJsonFake.deleteProject(
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
 ) = "/projects/$projectLens" bind DELETE to route<Unit> {

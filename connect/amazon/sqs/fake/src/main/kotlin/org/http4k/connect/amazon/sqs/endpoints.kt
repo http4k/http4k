@@ -5,7 +5,7 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.asResultOr
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.peek
-import org.http4k.connect.amazon.AmazonRestfulFake
+import org.http4k.connect.amazon.AmazonRestJsonFake
 import org.http4k.connect.amazon.RestfulError
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
@@ -45,7 +45,7 @@ private fun forAction(name: String) = { r: Request ->
     r.method == Method.POST && r.header("X-Amz-Target") == "AmazonSQS.$name"
 }.asRouter()
 
-fun AmazonRestfulFake.createQueue(queues: Storage<List<SQSMessage>>, awsAccount: AwsAccount) =
+fun AmazonRestJsonFake.createQueue(queues: Storage<List<SQSMessage>>, awsAccount: AwsAccount) =
     forAction("CreateQueue") bind route<CreateQueue> { data ->
         if (queues.keySet(data.QueueName.value).isEmpty()) {
             queues[data.QueueName.value] = listOf()
@@ -54,7 +54,7 @@ fun AmazonRestfulFake.createQueue(queues: Storage<List<SQSMessage>>, awsAccount:
         Success(CreatedQueue(uri.extend(Uri.of("/$awsAccount/${data.QueueName}"))))
     }
 
-fun AmazonRestfulFake.getQueueAttributes(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.getQueueAttributes(queues: Storage<List<SQSMessage>>) =
     forAction("GetQueueAttributes") bind route<GetQueueAttributes> { data ->
         val name = data.queueUrl.queueName()
 
@@ -76,7 +76,7 @@ fun AmazonRestfulFake.getQueueAttributes(queues: Storage<List<SQSMessage>>) =
             }
     }
 
-fun AmazonRestfulFake.listQueues(region: Region, account: AwsAccount, queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.listQueues(region: Region, account: AwsAccount, queues: Storage<List<SQSMessage>>) =
     forAction("ListQueues") bind route<ListQueues> {
         // TODO handle pagination
         Success(ListQueuesResponse(
@@ -85,7 +85,7 @@ fun AmazonRestfulFake.listQueues(region: Region, account: AwsAccount, queues: St
         ))
     }
 
-fun AmazonRestfulFake.deleteQueue(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.deleteQueue(queues: Storage<List<SQSMessage>>) =
     forAction("DeleteQueue") bind route<DeleteQueue> { data ->
         val queueName = data.QueueUrl.queueName()
         queues[queueName]
@@ -94,7 +94,7 @@ fun AmazonRestfulFake.deleteQueue(queues: Storage<List<SQSMessage>>) =
             .map {  }
     }
 
-fun AmazonRestfulFake.sendMessage(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.sendMessage(queues: Storage<List<SQSMessage>>) =
     forAction("SendMessage") bind route<SendMessage> { data ->
         val name = data.queueUrl.queueName()
 
@@ -114,7 +114,7 @@ fun AmazonRestfulFake.sendMessage(queues: Storage<List<SQSMessage>>) =
         }
     }
 
-fun AmazonRestfulFake.sendMessageBatch(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.sendMessageBatch(queues: Storage<List<SQSMessage>>) =
     forAction("SendMessageBatch") bind route<SendMessageBatch> fn@{ data ->
         val queueName = data.queueUrl.queueName()
         val queue = queues[queueName] ?: return@fn Failure(queueNotFound(queueName))
@@ -146,7 +146,7 @@ fun AmazonRestfulFake.sendMessageBatch(queues: Storage<List<SQSMessage>>) =
         ))
     }
 
-fun AmazonRestfulFake.receiveMessage(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.receiveMessage(queues: Storage<List<SQSMessage>>) =
     forAction("ReceiveMessage") bind route<ReceiveMessage> { data ->
         val name = data.queueUrl.queueName()
 
@@ -156,7 +156,7 @@ fun AmazonRestfulFake.receiveMessage(queues: Storage<List<SQSMessage>>) =
         }
     }
 
-fun AmazonRestfulFake.deleteMessage(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.deleteMessage(queues: Storage<List<SQSMessage>>) =
     forAction("DeleteMessage") bind route<DeleteMessageData> { data ->
         val name = data.QueueUrl.queueName()
         val receiptHandle = data.ReceiptHandle
@@ -167,7 +167,7 @@ fun AmazonRestfulFake.deleteMessage(queues: Storage<List<SQSMessage>>) =
             .map {  }
     }
 
-fun AmazonRestfulFake.deleteMessageBatch(queues: Storage<List<SQSMessage>>) =
+fun AmazonRestJsonFake.deleteMessageBatch(queues: Storage<List<SQSMessage>>) =
     forAction("DeleteMessageBatch") bind route<DeleteMessageBatch> fn@{ data ->
         val queueName = data.queueUrl.queueName()
         val queue = queues[queueName] ?: return@fn Failure(queueNotFound(queueName))
@@ -189,7 +189,7 @@ fun AmazonRestfulFake.deleteMessageBatch(queues: Storage<List<SQSMessage>>) =
 private fun Uri.queueName() = toString().queueName()
 private fun String.queueName() = substring(lastIndexOf('/') + 1)
 
-private fun AmazonRestfulFake.queueNotFound(name: String): RestfulError {
+private fun AmazonRestJsonFake.queueNotFound(name: String): RestfulError {
     val resourceArn = ARN.of(awsService, region, accountId, name)
     val message = "Queue $name not found"
     return RestfulError(Status(404, ""), message, resourceArn, "queue")

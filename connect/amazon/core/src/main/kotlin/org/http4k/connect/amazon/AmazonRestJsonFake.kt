@@ -7,14 +7,13 @@ import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
-import org.http4k.connect.amazon.core.model.ResourceId
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.format.AutoMarshalling
 
-class AmazonRestfulFake(
+class AmazonRestJsonFake(
     val autoMarshalling: AutoMarshalling,
     val awsService: AwsService,
     val region: Region,
@@ -32,9 +31,6 @@ class AmazonRestfulFake(
                 Response(err.status).body(message)
             }
     }
-
-    fun arn(resourceType: String, resourceId: ResourceId) =
-        ARN.of(awsService, region, accountId, resourceType, resourceId)
 }
 
 data class RestfulError(val status: Status, val message: String, val resourceId: ARN?, val resourceType: String?)
