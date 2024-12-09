@@ -15,11 +15,8 @@ import org.http4k.lens.Header
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.extension.RegisterExtension
 
-@DisabledOnOs(OS.LINUX)
 class LaunchPlaywrightBrowserTest {
 
     init {
