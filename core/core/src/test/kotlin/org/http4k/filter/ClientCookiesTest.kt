@@ -30,7 +30,7 @@ class ClientCookiesTest {
 
         (0..3).forEach {
             val response = client(Request(GET, "/"))
-            assertThat(response, hasHeader("Set-Cookie", """counter="${it + 1}"; """))
+            assertThat(response, hasHeader("Set-Cookie", """counter="${it + 1}""""))
         }
     }
 
