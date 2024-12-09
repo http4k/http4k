@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.39.0.0
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-amazon-*-fake** : [Unlikely break] Rename `AmazonRestfulFake` to `AmazonRestJsonFake`
 - **http4k-amazon-evidently-fake** : Fixed Project status value to be a valid value instead of an empty string
 
