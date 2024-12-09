@@ -19,9 +19,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 class LaunchPlaywrightBrowserTest {
 
-    init {
-        println(System.getProperty("os.name"))
-    }
     private val app = routes(
         "/foo" bind GET to { _: Request -> Response(OK).body("foo") },
         "/redirect" bind GET to { _: Request -> Response(FOUND).with(Header.LOCATION of Uri.of("https://example.com")) },
