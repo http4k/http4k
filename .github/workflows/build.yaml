@@ -40,7 +40,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build
-        timeout-minutes: 25
+        timeout-minutes: 45
         run: bin/build_ci.sh
         env:
           HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
