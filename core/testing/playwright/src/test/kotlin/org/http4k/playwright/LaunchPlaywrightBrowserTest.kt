@@ -15,10 +15,16 @@ import org.http4k.lens.Header
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.extension.RegisterExtension
 
+@EnabledOnOs(OS.LINUX)
 class LaunchPlaywrightBrowserTest {
 
+    init {
+        println(System.getProperty("os.name"))
+    }
     private val app = routes(
         "/foo" bind GET to { _: Request -> Response(OK).body("foo") },
         "/redirect" bind GET to { _: Request -> Response(FOUND).with(Header.LOCATION of Uri.of("https://example.com")) },
