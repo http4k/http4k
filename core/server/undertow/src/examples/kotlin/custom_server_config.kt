@@ -13,7 +13,7 @@ import org.http4k.websocket.WsHandler
 /**
  * Custom Undertow server configuration with http 2 support
  */
-class CustomUndertow(
+class CustomUndertowServer(
     private val port: Int = 8000,
     private val enableHttp2: Boolean = false,
     override val stopMode: StopMode = Immediate
@@ -24,8 +24,6 @@ class CustomUndertow(
 
         return defaultUndertowBuilder(port, multiProtocolHandler)
             .setServerOption(ENABLE_HTTP2, enableHttp2)
-            .buildHttp4kUndertowServer(
-            httpHandler, stopMode, port
-        )
+            .buildHttp4kUndertowServer(httpHandler, stopMode, port)
     }
 }
