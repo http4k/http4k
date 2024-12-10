@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'connect/src/**'
 permissions:
   contents: read
 
