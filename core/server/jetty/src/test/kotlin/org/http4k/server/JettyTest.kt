@@ -7,7 +7,7 @@ import org.http4k.core.Request
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class JettyTest : ServerContract({ Jetty(it, ServerConfig.StopMode.Immediate) }, ClientForServerTesting()) {
+class JettyTest : ServerContract(::Jetty, ClientForServerTesting()) {
     override fun requestScheme() = equalTo("http")
 
     @Disabled
