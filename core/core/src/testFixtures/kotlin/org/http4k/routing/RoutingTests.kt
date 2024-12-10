@@ -109,10 +109,6 @@ class RoutingTests {
     }
 
     @Test
-    fun `other request predicates`() {
-    }
-
-    @Test
     fun `with filter - applies to matching handler`() {
         val handler = "/foo" bind GET to routes("/bar" bind { Response(OK) })
         val filtered = handler.withFilter(filterAppending("bar"))
@@ -163,11 +159,6 @@ class RoutingTests {
     }
 
     @Test
-    fun `binding to static resources`() {
-
-    }
-
-    @Test
     fun `reverse proxy`() {
         val otherHandler = reverseProxyRouting(
             "host1" to routes("/foo" bind GET to { Response(OK).body("host1" + it.header("host")) }),
@@ -182,21 +173,6 @@ class RoutingTests {
     }
 
     private fun requestWithHost(host: String, path: String) = Request(GET, path).header("host", host)
-
-    @Test
-    fun `single page apps`() {
-
-    }
-
-    @Test
-    fun `works in contracts`() {
-
-    }
-
-    @Test
-    fun `binding to sse handlers`() {
-
-    }
 
     @Test
     fun `nice descriptions`() {
