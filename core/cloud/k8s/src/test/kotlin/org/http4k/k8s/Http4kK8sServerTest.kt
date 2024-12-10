@@ -1,4 +1,4 @@
-package org.http4k.cloudnative
+package org.http4k.k8s
 
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.JavaHttpClient

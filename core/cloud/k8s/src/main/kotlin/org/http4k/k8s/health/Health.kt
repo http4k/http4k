@@ -1,4 +1,4 @@
-package org.http4k.cloudnative.health
+package org.http4k.k8s.health
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

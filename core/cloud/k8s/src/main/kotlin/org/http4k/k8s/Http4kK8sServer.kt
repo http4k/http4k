@@ -1,4 +1,4 @@
-package org.http4k.cloudnative
+package org.http4k.k8s
 
 import org.http4k.cloudnative.health.Health
 import org.http4k.config.Environment

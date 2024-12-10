@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Machinery for running Http4k apps in cloud-native environments"
+description = "DEPRECATED: use http4k-cloud-k8s and http4k-config instead"
 
 val license by project.extra { Apache2 }
 
@@ -9,11 +9,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-core"))
-    api(project(":http4k-config"))
-    implementation(project(":http4k-format-core"))
-
-    testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation(project(":http4k-testing-hamkrest"))
-    testImplementation(project(":http4k-format-argo"))
+    api(project(":http4k-cloud-k8s"))
 }

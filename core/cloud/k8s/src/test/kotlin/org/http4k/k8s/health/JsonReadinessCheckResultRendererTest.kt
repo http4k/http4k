@@ -1,7 +1,11 @@
-package org.http4k.cloudnative.health
+package org.http4k.k8s.health
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.cloudnative.health.Completed
+import org.http4k.cloudnative.health.Composite
+import org.http4k.cloudnative.health.Failed
+import org.http4k.cloudnative.health.JsonReadinessCheckResultRenderer
 import org.http4k.format.Argo
 import org.junit.jupiter.api.Test
 
