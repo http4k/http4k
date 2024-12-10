@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k htmx support utilities"
+description = "DEPRECATED: Use http4k-web-htmx"
 
 val license by project.extra { Apache2 }
 

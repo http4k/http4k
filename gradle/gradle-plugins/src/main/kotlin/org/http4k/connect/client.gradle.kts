@@ -14,8 +14,8 @@ tasks {
 }
 
 dependencies {
-    api(project(":http4k-cloudnative"))
     api(project(":http4k-connect-core"))
+    api(project(":http4k-config"))
     ksp(project(":http4k-connect-ksp-generator"))
     ksp("se.ansman.kotshi:compiler:_")
 

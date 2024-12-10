@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k KotlinX DataFrame support"
+description = "http4k KotlinX DataFrame support"
 
 val license by project.extra { Apache2 }
 

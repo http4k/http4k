@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k HTTP Server built on top of Undertow"
+description = "http4k HTTP Server built on top of Undertow"
 
 val license by project.extra { Apache2 }
 

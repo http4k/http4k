@@ -1,7 +1,7 @@
 import org.http4k.internal.ModuleLicense.Apache2
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
-description = "Http4k Kotlinx Serialization JSON support"
+description = "http4k Kotlinx Serialization JSON support"
 
 val license by project.extra { Apache2 }
 

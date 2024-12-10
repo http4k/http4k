@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Datastar support utilities"
+description = "http4k Datastar support utilities"
 
 val license by project.extra { Apache2 }
 

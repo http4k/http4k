@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Serverless support for Alibaba Function Compute"
+description = "http4k Serverless support for Alibaba Function Compute"
 
 val license by project.extra { Apache2 }
 

@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Jackson JSON support"
+description = "DEPRECATED: use http4k-api-jsonschema instead"
 
 val license by project.extra { Apache2 }
 

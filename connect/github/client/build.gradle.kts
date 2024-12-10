@@ -10,7 +10,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-cloudnative"))
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }

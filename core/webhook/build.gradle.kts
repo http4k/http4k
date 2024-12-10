@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Standard webhooks support"
+description = "http4k Standard webhooks support"
 
 val license by project.extra { Apache2 }
 

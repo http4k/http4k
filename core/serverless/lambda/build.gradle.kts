@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Serverless support for AWS Lambda"
+description = "http4k Serverless support for AWS Lambda"
 
 val license by project.extra { Apache2 }
 
@@ -21,7 +21,8 @@ dependencies {
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
 
     testFixturesApi(project(":http4k-core"))
-    testFixturesApi(project(":http4k-cloudnative"))
+    testFixturesApi(project(":http4k-platform-core"))
+    testFixturesApi(project(":http4k-config"))
     testFixturesApi(project(":http4k-serverless-lambda"))
     testFixturesApi(project(":http4k-aws"))
     testFixturesApi(project(":http4k-format-jackson"))

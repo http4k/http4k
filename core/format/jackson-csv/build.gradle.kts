@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k CSV support using Jackson as an underlying engine"
+description = "http4k CSV support using Jackson as an underlying engine"
 
 val license by project.extra { Apache2 }
 

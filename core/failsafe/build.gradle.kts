@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Failsafe support"
+description = "DEPRECATED: Use http4k-ops-failsafe"
 
 val license by project.extra { Apache2 }
 

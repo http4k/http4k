@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Serverless core"
+description = "http4k Serverless core"
 
 val license by project.extra { Apache2 }
 

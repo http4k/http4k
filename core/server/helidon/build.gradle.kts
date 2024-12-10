@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k HTTP Server built on top of Helidon Nima"
+description = "http4k HTTP Server built on top of Helidon Nima"
 
 val license by project.extra { Apache2 }
 

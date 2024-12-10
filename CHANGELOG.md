@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-core** : Allow invalidation of cookie with a path. H/T @ollieabbey
 - **http4k-core** : Allow setting cookie value without quotes. H/T @ollieabbey
 - **http4k-core** : Fix cookie format for cookie with no attributes. H/T @ollieabbey
+- **http4k-cloudnative** : Deprecation of various functions and rehoming into http4k-platform-k8s module
 
 ### v5.39.0.0
 - **http4k-*** : Upgrade some dependency versions.

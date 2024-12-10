@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Format supporting code"
+description = "http4k Format supporting code"
 
 val license by project.extra { Apache2 }
 

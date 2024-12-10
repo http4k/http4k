@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k OpenTelemetry support"
+description = "DEPRECATED: Use http4k-ops-opentelemetry"
 
 val license by project.extra { Apache2 }
 

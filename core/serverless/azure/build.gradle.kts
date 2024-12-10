@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Serverless support for Azure Functions"
+description = "http4k Serverless support for Azure Functions"
 
 val license by project.extra { Apache2 }
 

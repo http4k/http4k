@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k JTE templating support"
+description = "http4k JTE templating support"
 
 val license by project.extra { Apache2 }
 

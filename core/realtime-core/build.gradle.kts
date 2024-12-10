@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Realtime core"
+description = "http4k Realtime core"
 
 val license by project.extra { Apache2 }
 
