@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k GCP integration tooling"
+description = "Http4k HTMX support utilities"
 
 val license by project.extra { Apache2 }
 
@@ -9,6 +9,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-gcp"))
+    api(project(":http4k-htmx"))
 }
-
