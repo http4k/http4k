@@ -1,11 +1,11 @@
 package org.http4k.k8s
 
-import org.http4k.cloudnative.health.Health
 import org.http4k.config.Environment
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey.k8s.HEALTH_PORT
 import org.http4k.config.EnvironmentKey.k8s.SERVICE_PORT
 import org.http4k.core.HttpHandler
+import org.http4k.k8s.health.Health
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer

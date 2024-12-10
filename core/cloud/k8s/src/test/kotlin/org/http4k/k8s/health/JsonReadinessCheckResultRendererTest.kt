@@ -2,10 +2,6 @@ package org.http4k.k8s.health
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.cloudnative.health.Completed
-import org.http4k.cloudnative.health.Composite
-import org.http4k.cloudnative.health.Failed
-import org.http4k.cloudnative.health.JsonReadinessCheckResultRenderer
 import org.http4k.format.Argo
 import org.junit.jupiter.api.Test
 
@@ -26,23 +22,26 @@ class JsonReadinessCheckResultRendererTest {
     @Test
     fun `calls toString() on composite result`() {
         val composite = Composite(listOf(Completed("first"), Failed("second", "foobar")))
-        assertThat(renderer(composite),
+        assertThat(
+            renderer(composite),
             equalTo(Argo {
                 pretty(
                     obj(
                         "name" to string("overall"),
                         "success" to boolean(false),
-                        "children" to array(listOf(
-                            obj(
-                                "name" to string("first"),
-                                "success" to boolean(true)
-                            ),
-                            obj(
-                                "name" to string("second"),
-                                "success" to boolean(false),
-                                "message" to string("foobar")
+                        "children" to array(
+                            listOf(
+                                obj(
+                                    "name" to string("first"),
+                                    "success" to boolean(true)
+                                ),
+                                obj(
+                                    "name" to string("second"),
+                                    "success" to boolean(false),
+                                    "message" to string("foobar")
+                                )
                             )
-                        ))
+                        )
                     )
                 )
             })
