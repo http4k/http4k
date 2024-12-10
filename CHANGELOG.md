@@ -13,24 +13,24 @@ changes with their rationale when appropriate:
 1. Upgrade to latest v5 release. Deal with deprecations and module changes.
 2. Upgrade to v6 when it is released. Deal with other breaking changes. We expect these to be mainly imports and will be detailed in the v6 release note when we have the chance. In the meantime, this is the list of modules that are being rehoused:
 
-|SOURCE MODULE|DESTINATION MODULE(S)|
-|---|---|
-|http4k-aws | http4k-platform-aws |
-|http4k-azure | http4k-platform-azure |
-|http4k-cloudevents | http4k-api-cloudevents |
-|http4k-cloudnative | Split into http4k-config, http4k-platform-core, http4k-platform-k8s |
-|http4k-contract | http4k-api-openapi |
-|http4k-contract-jsonschema | http4k-api-jsonschema |
-|http4k-contract-ui-redoc | http4k-api-ui-redoc |
-|http4k-contract-ui-swagger | http4k-api-ui-swagger |
-|http4k-failsafe | http4k-ops-failsafe |
-|http4k-gcp | http4k-platform-gcp |
-|http4k-graphql | http4k-api-graphql |
-|http4k-htmx | http4k-web-htmx |
-|http4k-jsonrpc | http4k-api-jsonrpc |
-|http4k-metrics-micrometer | http4k-ops-micrometer |
-|http4k-opentelemetry | http4k-ops-opentelemetry |
-|http4k-resilience4j | http4k-ops-resilience4j |
+| SOURCE MODULE - v5.X.X.X   | DESTINATION MODULE(S) - v6.X.X.X                                    |
+|----------------------------|---------------------------------------------------------------------|
+| http4k-aws                 | http4k-platform-aws                                                 |
+| http4k-azure               | http4k-platform-azure                                               |
+| http4k-cloudevents         | http4k-api-cloudevents                                              |
+| http4k-cloudnative         | Split into http4k-config, http4k-platform-core, http4k-platform-k8s |
+| http4k-contract            | http4k-api-openapi                                                  |
+| http4k-contract-jsonschema | http4k-api-jsonschema                                               |
+| http4k-contract-ui-redoc   | http4k-api-ui-redoc                                                 |
+| http4k-contract-ui-swagger | http4k-api-ui-swagger                                               |
+| http4k-failsafe            | http4k-ops-failsafe                                                 |
+| http4k-gcp                 | http4k-platform-gcp                                                 |
+| http4k-graphql             | http4k-api-graphql                                                  |
+| http4k-htmx                | http4k-web-htmx                                                     |
+| http4k-jsonrpc             | http4k-api-jsonrpc                                                  |
+| http4k-metrics-micrometer  | http4k-ops-micrometer                                               |
+| http4k-opentelemetry       | http4k-ops-opentelemetry                                            |
+| http4k-resilience4j        | http4k-ops-resilience4j                                             |
 
 ### v5.39.0.0
 - **http4k-*** : Upgrade some dependency versions.
