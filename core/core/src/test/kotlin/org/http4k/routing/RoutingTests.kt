@@ -17,8 +17,13 @@ import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
+import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(ApprovalTest::class)
 class RoutingTests {
 
     private val aValidHandler = { request: Request ->
@@ -175,7 +180,7 @@ class RoutingTests {
     private fun requestWithHost(host: String, path: String) = Request(GET, path).header("host", host)
 
     @Test
-    fun `nice descriptions`() {
+    fun `nice descriptions`(approver: Approver) {
         val routes = routes(
             "/a" bind GET to { Response(OK).body("matched a") },
             "/b/c" bind routes(
@@ -190,5 +195,7 @@ class RoutingTests {
                 "/" bind GET to { Response(OK).body("matched b/c") }
             )
         )
+
+        approver.assertApproved(routes.toString())
     }
 }
