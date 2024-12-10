@@ -29,6 +29,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,7 +38,7 @@ import java.net.InetAddress
 abstract class ServerContract(
     private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
     private val requiredMethods: Array<Method> = Method.entries.toTypedArray()
-) {
+) : PortBasedTest {
     private lateinit var server: Http4kServer
 
     protected val baseUrl by lazy { "http://localhost:${server.port()}" }

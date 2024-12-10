@@ -20,10 +20,11 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.traffic.ReadWriteCache
 import org.http4k.traffic.ReadWriteStream
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
-class TrafficFiltersTest {
+class TrafficFiltersTest : PortBasedTest {
     private val request = Request(GET, "/bob")
     private val response = Response(OK)
 

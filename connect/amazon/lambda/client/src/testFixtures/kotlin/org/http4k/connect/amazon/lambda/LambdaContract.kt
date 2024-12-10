@@ -11,7 +11,6 @@ import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.lambda.action.invokeFunction
 import org.http4k.connect.amazon.lambda.action.invokeStreamFunction
 import org.http4k.connect.amazon.lambda.model.FunctionName
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
@@ -19,9 +18,10 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
-interface LambdaContract : AwsContract {
+interface LambdaContract : AwsContract, PortBasedTest {
     private val lambda
         get() =
         Lambda.Http(aws.region, { aws.credentials }, http)

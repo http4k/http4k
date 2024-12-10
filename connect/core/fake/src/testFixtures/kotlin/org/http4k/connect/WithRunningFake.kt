@@ -8,10 +8,11 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.server.Http4kServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
-abstract class WithRunningFake(private val fn: () -> ChaoticHttpHandler) {
+abstract class WithRunningFake(private val fn: () -> ChaoticHttpHandler) : PortBasedTest {
 
     private lateinit var server: Http4kServer
 

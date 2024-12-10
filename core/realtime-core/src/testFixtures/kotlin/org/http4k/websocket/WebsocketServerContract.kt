@@ -25,6 +25,7 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -39,7 +40,7 @@ abstract class WebsocketServerContract(
     private val serverConfig: (Int) -> PolyServerConfig,
     private val client: HttpHandler,
     private val httpSupported: Boolean = true
-) {
+) : PortBasedTest {
     private lateinit var server: Http4kServer
 
     private val port by lazy { server.port() }

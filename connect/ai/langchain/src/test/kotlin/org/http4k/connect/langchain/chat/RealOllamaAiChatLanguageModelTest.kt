@@ -8,9 +8,10 @@ import org.http4k.connect.ollama.action.ModelOptions
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.filter.debug
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-class RealOllamaAiChatLanguageModelTest : ChatLanguageModelContract {
+class RealOllamaAiChatLanguageModelTest : ChatLanguageModelContract, PortBasedTest {
 
     init {
         assumeTrue(JavaHttpClient()(Request(GET, "http://localhost:11434/")).status.successful)

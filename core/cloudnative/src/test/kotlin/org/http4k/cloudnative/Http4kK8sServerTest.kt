@@ -14,11 +14,12 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.SunHttp
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class Http4kK8sServerTest {
+class Http4kK8sServerTest : PortBasedTest {
 
     private val app: HttpHandler = { Response(I_M_A_TEAPOT) }
     private val env = Environment.EMPTY.with(SERVICE_PORT of 0, HEALTH_PORT of 0)

@@ -7,6 +7,7 @@ import org.http4k.connect.assumeDockerDaemonRunning
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.util.PortBasedTest
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -14,7 +15,7 @@ import java.time.Duration
 import java.util.UUID
 
 @Testcontainers
-class LocalDynamoTest : DynamoDbContract {
+class LocalDynamoTest : DynamoDbContract, PortBasedTest {
     init {
         assumeDockerDaemonRunning()
     }

@@ -5,9 +5,10 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
-interface HttpClientWithMemoryModeContract {
+interface HttpClientWithMemoryModeContract : PortBasedTest {
     val client: HttpHandler
     val port: Int
 

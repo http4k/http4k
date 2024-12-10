@@ -23,6 +23,7 @@ import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Event
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,7 +32,7 @@ import org.http4k.routing.bind as hbind
 abstract class DatastarServerContract(
     private val serverConfig: (Int) -> PolyServerConfig,
     private val client: HttpHandler
-) {
+): PortBasedTest {
 
     private lateinit var server: Http4kServer
 

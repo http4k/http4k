@@ -5,10 +5,11 @@ import org.http4k.config.Environment
 import org.http4k.config.EnvironmentKey
 import org.http4k.filter.debug
 import org.http4k.lens.value
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Disabled
 
-class RealGitHubModelsTest : AzureAIContract {
+class RealGitHubModelsTest : AzureAIContract, PortBasedTest {
     val token = EnvironmentKey.value(GitHubToken).optional("GITHUB_TOKEN")
 
     init {

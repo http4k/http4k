@@ -9,10 +9,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
-class ServerlessConfigTest {
+class ServerlessConfigTest: PortBasedTest {
 
     @Test
     fun `can implement serverless config and respond to requests`() {

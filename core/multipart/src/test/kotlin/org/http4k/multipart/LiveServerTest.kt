@@ -13,10 +13,11 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 
-class LiveServerTest {
+class LiveServerTest : PortBasedTest {
 
     @Test
     fun `can send multipart over wire`() {

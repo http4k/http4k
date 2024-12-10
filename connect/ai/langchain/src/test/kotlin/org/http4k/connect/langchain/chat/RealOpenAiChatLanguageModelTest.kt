@@ -8,9 +8,10 @@ import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.OpenAIToken
 import org.http4k.filter.debug
 import org.http4k.lens.value
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-class RealOpenAiChatLanguageModelTest : ChatLanguageModelContract {
+class RealOpenAiChatLanguageModelTest : ChatLanguageModelContract, PortBasedTest {
 
     val apiKey = EnvironmentKey.value(OpenAIToken).optional("OPEN_AI_TOKEN")
 

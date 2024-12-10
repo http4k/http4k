@@ -21,11 +21,12 @@ import org.http4k.filter.ServerFilters
 import org.http4k.filter.ZipkinTraces
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.util.concurrent.ConcurrentHashMap
 
-class TracingFunctionalTest {
+class TracingFunctionalTest: PortBasedTest {
 
     enum class Service { ServiceA, ServiceB, ServiceC }
 

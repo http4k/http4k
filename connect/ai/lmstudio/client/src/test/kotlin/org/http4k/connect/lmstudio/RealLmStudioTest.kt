@@ -4,9 +4,10 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.filter.debug
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-class RealLmStudioTest : LmStudioContract {
+class RealLmStudioTest : LmStudioContract, PortBasedTest {
 
     init {
         assumeTrue(

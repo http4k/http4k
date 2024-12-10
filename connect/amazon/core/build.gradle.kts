@@ -20,4 +20,5 @@ dependencies {
     api(project(":http4k-format-core"))
 
     testFixturesApi(project(":http4k-testing-chaos"))
+    testFixturesApi(testFixtures(project(":http4k-core")))
 }
