@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "DEPRECATED: Use http4k-cloud-aws"
+description = "DEPRECATED: Use http4k-platform-aws"
 
 val license by project.extra { Apache2 }
 
@@ -16,7 +16,7 @@ dependencies {
     testImplementation(project(":http4k-testing-hamkrest"))
 
     testFixturesImplementation(testFixtures(project(":http4k-core")))
-    testFixturesImplementation(project(":http4k-cloud-core"))
+    testFixturesImplementation(project(":http4k-platform-core"))
     testFixturesImplementation(project(":http4k-config"))
     testFixturesImplementation(project(":http4k-client-okhttp"))
 }

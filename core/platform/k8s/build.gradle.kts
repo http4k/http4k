@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api(project(":http4k-cloud-core"))
+    api(project(":http4k-platform-core"))
     api(project(":http4k-config"))
     implementation(project(":http4k-format-core"))
 

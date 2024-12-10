@@ -7,7 +7,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api(project(":http4k-cloud-core"))
+    api(project(":http4k-platform-core"))
     api(project(":http4k-config"))
     api(project(":http4k-serverless-openwhisk"))
     api(project(":http4k-format-jackson"))

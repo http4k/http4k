@@ -12,7 +12,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api("org.junit.jupiter:junit-jupiter-api:_")
-    api(project(":http4k-cloud-core"))
+    api(project(":http4k-platform-core"))
     api(project(":http4k-format-moshi"))
     api(project(":http4k-client-apache"))
     testImplementation("org.apiguardian:apiguardian-api:_")
