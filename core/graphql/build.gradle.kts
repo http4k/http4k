@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k GraphQL support"
+description = "DEPRECATED: use http4k-api-graphql instead"
 
 val license by project.extra { Apache2 }
 

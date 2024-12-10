@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k templating core"
+description = "http4k templating core"
 
 val license by project.extra { Apache2 }
 

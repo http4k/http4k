@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k AWS integration and request signing"
+description = "http4k AWS integration and request signing"
 
 val license by project.extra { Apache2 }
 

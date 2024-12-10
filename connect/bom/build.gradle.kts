@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Connect Bill Of Materials (BOM)"
+description = "http4k Connect Bill Of Materials (BOM)"
 
 val license by project.extra { Apache2 }
 

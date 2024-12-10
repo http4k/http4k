@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k K8S integration tooling"
+description = "http4k K8S integration tooling"
 
 val license by project.extra { Apache2 }
 

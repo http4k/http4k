@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Moshi JSON support"
+description = "http4k Moshi JSON support"
 
 val license by project.extra { Apache2 }
 

@@ -2,7 +2,7 @@ import org.http4k.internal.ModuleLicense.Apache2
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
-description = "http4k typesafe HTTP contracts and OpenApi support"
+description = "DEPRECATED: use http4k-api-openapi instead"
 
 val license by project.extra { Apache2 }
 
@@ -24,7 +24,7 @@ buildscript {
 
 dependencies {
     api(project(":http4k-core"))
-    api(project(":http4k-contract-jsonschema"))
+    api(project(":http4k-api-jsonschema"))
 
     implementation("dev.forkhandles:values4k:_")
     implementation(project(":http4k-security-oauth"))

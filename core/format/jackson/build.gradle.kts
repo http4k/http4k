@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Jackson JSON support"
+description = "http4k Jackson JSON support"
 
 val license by project.extra { Apache2 }
 
@@ -20,7 +20,7 @@ dependencies {
     implementation("dev.forkhandles:data4k:_")
 
     testImplementation(project(":http4k-core"))
-    testImplementation(project(":http4k-contract"))
+    testImplementation(project(":http4k-api-openapi"))
     testImplementation(project(":http4k-jsonrpc"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))

@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Add a locally hosted Redoc UI to your server"
+description = "DEPRECATED: use http4k-api-ui-redoc instead"
 
 val license by project.extra { Apache2 }
 
@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-contract"))
+    api(project(":http4k-api-openapi"))
     api("org.webjars:redoc:_")
 
     testImplementation(testFixtures(project(":http4k-core")))

@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k multipart form support"
+description = "http4k multipart form support"
 
 val license by project.extra { Apache2 }
 

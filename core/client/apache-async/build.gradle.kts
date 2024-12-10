@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k HTTP Client built on top of async apache httpclient"
+description = "http4k HTTP Client built on top of async apache httpclient"
 
 val license by project.extra { Apache2 }
 

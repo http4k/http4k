@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k support for Approval Testing"
+description = "http4k support for Approval Testing"
 
 val license by project.extra { Apache2 }
 

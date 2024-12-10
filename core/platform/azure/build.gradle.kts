@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Azure integration tooling"
+description = "http4k Azure integration tooling"
 
 val license by project.extra { Apache2 }
 

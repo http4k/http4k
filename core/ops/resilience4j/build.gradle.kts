@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k Resilience4j support"
+description = "http4k Resilience4j support"
 
 val license by project.extra { Apache2 }
 

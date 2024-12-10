@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-contract"))
+    api(project(":http4k-api-openapi"))
     api(project(":http4k-format-jackson"))
     api(project(":http4k-security-oauth"))
     api(project(":http4k-connect-storage-core"))

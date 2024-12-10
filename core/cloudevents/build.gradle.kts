@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "http4k support for the CloudEvents format"
+description = "DEPRECATED: use http4k-api-cloudevents instead"
 
 val license by project.extra { Apache2 }
 
