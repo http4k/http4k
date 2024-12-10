@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.cloudwatchlogs
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.JsonError
 import org.http4k.connect.amazon.cloudwatchlogs.action.CreateLogGroup
 import org.http4k.connect.amazon.cloudwatchlogs.action.CreateLogStream
@@ -18,7 +18,7 @@ import java.lang.Integer.MAX_VALUE
 import java.util.UUID
 
 
-fun AmazonJsonFake.createLogGroup(logGroups: Storage<LogGroup>) = route<CreateLogGroup> {
+fun AwsJsonFake.createLogGroup(logGroups: Storage<LogGroup>) = route<CreateLogGroup> {
     when (logGroups[it.logGroupName.value]) {
         null -> logGroups[it.logGroupName.value] = LogGroup(mutableMapOf())
 
@@ -26,7 +26,7 @@ fun AmazonJsonFake.createLogGroup(logGroups: Storage<LogGroup>) = route<CreateLo
     }
 }
 
-fun AmazonJsonFake.createLogStream(logGroups: Storage<LogGroup>) = route<CreateLogStream> {
+fun AwsJsonFake.createLogStream(logGroups: Storage<LogGroup>) = route<CreateLogStream> {
     when (val existing: LogGroup? = logGroups[it.logGroupName.value]) {
         null -> JsonError("not found", "${it.logGroupName} not found")
         else -> {
@@ -35,21 +35,21 @@ fun AmazonJsonFake.createLogStream(logGroups: Storage<LogGroup>) = route<CreateL
     }
 }
 
-fun AmazonJsonFake.deletaLogStream(logGroups: Storage<LogGroup>) = route<DeleteLogStream> {
+fun AwsJsonFake.deletaLogStream(logGroups: Storage<LogGroup>) = route<DeleteLogStream> {
     when (val group = logGroups[it.logGroupName.value]) {
         null -> JsonError("not found", "${it.logGroupName} not found")
         else -> group.streams -= it.logStreamName
     }
 }
 
-fun AmazonJsonFake.deletaLogGroup(logGroups: Storage<LogGroup>) = route<DeleteLogGroup> {
+fun AwsJsonFake.deletaLogGroup(logGroups: Storage<LogGroup>) = route<DeleteLogGroup> {
     when (logGroups[it.logGroupName.value]) {
         null -> JsonError("not found", "${it.logGroupName} not found")
         else -> logGroups -= it.logGroupName.value
     }
 }
 
-fun AmazonJsonFake.putLogEvents(logGroups: Storage<LogGroup>) = route<PutLogEvents> { req ->
+fun AwsJsonFake.putLogEvents(logGroups: Storage<LogGroup>) = route<PutLogEvents> { req ->
     val totalEventCount = logGroups.keySet().sumOf { logGroups[it]!!.streams.values.flatten().size }
 
     when (val group = logGroups[req.logGroupName.value]) {
@@ -66,7 +66,7 @@ fun AmazonJsonFake.putLogEvents(logGroups: Storage<LogGroup>) = route<PutLogEven
     }
 }
 
-fun AmazonJsonFake.filterLogEvents(logGroups: Storage<LogGroup>) = route<FilterLogEvents> { req ->
+fun AwsJsonFake.filterLogEvents(logGroups: Storage<LogGroup>) = route<FilterLogEvents> { req ->
     val group = (req.logGroupName ?: req.logGroupIdentifier?.resourceId(LogGroupName::of))
         ?.let { logGroups[it.value] }
 

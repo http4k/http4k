@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.JsonError
 import org.http4k.connect.amazon.dynamodb.DynamoTable
 import org.http4k.connect.amazon.dynamodb.action.Scan
@@ -8,7 +8,7 @@ import org.http4k.connect.amazon.dynamodb.action.ScanResponse
 import org.http4k.connect.amazon.dynamodb.grammar.DynamoDbConditionError
 import org.http4k.connect.storage.Storage
 
-fun AmazonJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
+fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
     val table = tables[scan.TableName.value] ?: return@route null
     val schema = if (scan.IndexName != null) {
         table.table.keySchema(scan.IndexName) ?: return@route JsonError(

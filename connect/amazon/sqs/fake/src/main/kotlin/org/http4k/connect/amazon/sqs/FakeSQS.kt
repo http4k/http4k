@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.sqs
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonRestJsonFake
+import org.http4k.connect.amazon.AwsRestJsonFake
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
@@ -20,7 +20,7 @@ class FakeSQS(
     private val region: Region = Region.of("ldn-north-1")
 ) : ChaoticHttpHandler() {
 
-    private val api = AmazonRestJsonFake(SqsMoshi, AwsService.of("sqs"), region, awsAccount)
+    private val api = AwsRestJsonFake(SqsMoshi, AwsService.of("sqs"), region, awsAccount)
 
     override val app = routes(
         "/" bind POST to routes(

@@ -4,7 +4,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.storage.InMemory
@@ -15,7 +15,7 @@ import org.http4k.routing.routes
 
 class FakeKMS(val keys: Storage<StoredCMK> = Storage.InMemory()) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(KMSMoshi, AwsService.of("TrentService"))
+    private val api = AwsJsonFake(KMSMoshi, AwsService.of("TrentService"))
     private val crypto = BouncyCastleProvider()
 
     override val app = routes(

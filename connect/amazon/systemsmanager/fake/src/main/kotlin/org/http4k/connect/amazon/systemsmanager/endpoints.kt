@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.systemsmanager
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
@@ -14,7 +14,7 @@ import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
 
 
-fun AmazonJsonFake.deleteParameter(parameters: Storage<StoredParameter>) = route<DeleteParameter> { req ->
+fun AwsJsonFake.deleteParameter(parameters: Storage<StoredParameter>) = route<DeleteParameter> { req ->
     parameters[req.Name.value]?.let {
         parameters.remove(req.Name.value)
         Unit
@@ -22,7 +22,7 @@ fun AmazonJsonFake.deleteParameter(parameters: Storage<StoredParameter>) = route
 }
 
 
-fun AmazonJsonFake.getParameter(parameters: Storage<StoredParameter>) = route<GetParameter> { req ->
+fun AwsJsonFake.getParameter(parameters: Storage<StoredParameter>) = route<GetParameter> { req ->
     parameters[req.Name.value]?.let {
         ParameterValue(
             Parameter(
@@ -39,7 +39,7 @@ fun AmazonJsonFake.getParameter(parameters: Storage<StoredParameter>) = route<Ge
     }
 }
 
-fun AmazonJsonFake.putParameter(parameters: Storage<StoredParameter>) = route<PutParameter> { req ->
+fun AwsJsonFake.putParameter(parameters: Storage<StoredParameter>) = route<PutParameter> { req ->
     val current = parameters[req.Name.value]
     when {
         current == null -> {

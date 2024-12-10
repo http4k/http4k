@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.cloudwatchlogs
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.cloudwatchlogs.action.FilteredLogEvent
 import org.http4k.connect.amazon.cloudwatchlogs.model.LogStreamName
 import org.http4k.connect.amazon.core.model.AwsService
@@ -18,7 +18,7 @@ data class LogGroup(val streams: MutableMap<LogStreamName, MutableList<FilteredL
 
 class FakeCloudWatchLogs(val logGroup: Storage<LogGroup> = Storage.InMemory()) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(CloudWatchLogsMoshi, AwsService.of("Logs_20140328"))
+    private val api = AwsJsonFake(CloudWatchLogsMoshi, AwsService.of("Logs_20140328"))
 
     override val app = routes(
         "/" bind POST to routes(

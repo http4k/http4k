@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.eventbridge
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
@@ -19,7 +19,7 @@ import org.http4k.connect.amazon.model.EventId
 import org.http4k.connect.storage.Storage
 import java.util.UUID
 
-fun AmazonJsonFake.putEvents(events: Storage<List<Event>>) = route<PutEvents> {
+fun AwsJsonFake.putEvents(events: Storage<List<Event>>) = route<PutEvents> {
     val newEvents = it.Entries.groupBy {
         it.EventBusName
             ?.let { if (it.value.startsWith("arn")) ARN.of(it.value).resourceId(EventBusName::of) else it }
@@ -38,12 +38,12 @@ fun AmazonJsonFake.putEvents(events: Storage<List<Event>>) = route<PutEvents> {
     }, 0)
 }
 
-fun AmazonJsonFake.createEventBus(events: Storage<List<Event>>) = route<CreateEventBus> {
+fun AwsJsonFake.createEventBus(events: Storage<List<Event>>) = route<CreateEventBus> {
     events[it.Name.value] = listOf()
     CreatedEventBus(it.Name.toArn())
 }
 
-fun AmazonJsonFake.listEventBuses(events: Storage<List<Event>>) = route<ListEventBuses> {
+fun AwsJsonFake.listEventBuses(events: Storage<List<Event>>) = route<ListEventBuses> {
     EventBuses(events.keySet().map {
         EventBus(
             EventBusName.of(it).toArn(),
@@ -53,7 +53,7 @@ fun AmazonJsonFake.listEventBuses(events: Storage<List<Event>>) = route<ListEven
     }, null)
 }
 
-fun AmazonJsonFake.deleteEventBus(records: Storage<List<Event>>) = route<DeleteEventBus> {
+fun AwsJsonFake.deleteEventBus(records: Storage<List<Event>>) = route<DeleteEventBus> {
     records.remove(it.Name.value)
     Unit
 }

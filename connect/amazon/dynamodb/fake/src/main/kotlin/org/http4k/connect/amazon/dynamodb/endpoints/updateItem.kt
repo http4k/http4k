@@ -1,11 +1,11 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.dynamodb.DynamoTable
 import org.http4k.connect.amazon.dynamodb.action.UpdateItem
 import org.http4k.connect.storage.Storage
 
-fun AmazonJsonFake.updateItem(tables: Storage<DynamoTable>) = route<UpdateItem> { req ->
+fun AwsJsonFake.updateItem(tables: Storage<DynamoTable>) = route<UpdateItem> { req ->
     tables.runUpdate(req.TableName, req, tryModifyUpdate)
 }
 

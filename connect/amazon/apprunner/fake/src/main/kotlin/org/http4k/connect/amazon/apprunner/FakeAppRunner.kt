@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.apprunner
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.apprunner.action.Service
 import org.http4k.connect.amazon.apprunner.endpoints.createService
 import org.http4k.connect.amazon.apprunner.endpoints.deleteService
@@ -17,7 +17,7 @@ import java.time.Clock
 
 class FakeAppRunner(val records: Storage<Service> = Storage.InMemory()) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(AppRunnerMoshi, AwsService.of("AppRunner"))
+    private val api = AwsJsonFake(AppRunnerMoshi, AwsService.of("AppRunner"))
 
     override val app = routes(
         api.createService(records),

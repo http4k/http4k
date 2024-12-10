@@ -9,7 +9,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.header
 import se.ansman.kotshi.JsonSerializable
 
-class AmazonJsonFake(val autoMarshalling: AutoMarshalling, val awsService: AwsService) {
+class AwsJsonFake(val autoMarshalling: AutoMarshalling, val awsService: AwsService) {
     inline fun <reified Req : Any> route(
         crossinline responseFn: (Any) -> Response = {
             Response(OK).body(autoMarshalling.asFormatString(it))

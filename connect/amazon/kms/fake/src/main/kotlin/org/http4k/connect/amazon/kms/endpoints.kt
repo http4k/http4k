@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.kms
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
@@ -43,7 +43,7 @@ import java.security.Provider
 import java.util.UUID
 
 @Suppress("DEPRECATION")
-fun AmazonJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider) = route<CreateKey> {
+fun AwsJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider) = route<CreateKey> {
     val keyId = KMSKeyId.of(UUID.randomUUID().toString())
     val keySpec = it.KeySpec ?: it.CustomerMasterKeySpec ?: SYMMETRIC_DEFAULT
 
@@ -76,7 +76,7 @@ fun AmazonJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider) = route
     KeyCreated(KeyMetadata(storedCMK.keyId, storedCMK.arn, AwsAccount.of("0"), it.KeyUsage))
 }
 
-fun AmazonJsonFake.listKeys(keys: Storage<StoredCMK>) = route<ListKeys> {
+fun AwsJsonFake.listKeys(keys: Storage<StoredCMK>) = route<ListKeys> {
     KeyList(
         keys.keySet("")
             .mapNotNull { keys[it] }
@@ -84,20 +84,20 @@ fun AmazonJsonFake.listKeys(keys: Storage<StoredCMK>) = route<ListKeys> {
     )
 }
 
-fun AmazonJsonFake.describeKey(keys: Storage<StoredCMK>) = route<DescribeKey> { req ->
+fun AwsJsonFake.describeKey(keys: Storage<StoredCMK>) = route<DescribeKey> { req ->
     keys[req.KeyId.toArn().value]?.let {
         KeyDescription(KeyMetadata(it.keyId, it.arn, AwsAccount.of("0"), it.keyUsage))
     }
 }
 
-fun AmazonJsonFake.decrypt(keys: Storage<StoredCMK>) = route<Decrypt> { req ->
+fun AwsJsonFake.decrypt(keys: Storage<StoredCMK>) = route<Decrypt> { req ->
     keys[req.KeyId.toArn().value]?.let {
         val plainText = Base64Blob.encode(req.CiphertextBlob.decodedBytes().reversed().toByteArray())
         Decrypted(KMSKeyId.of(it.arn), plainText, req.EncryptionAlgorithm ?: EncryptionAlgorithm.SYMMETRIC_DEFAULT)
     }
 }
 
-fun AmazonJsonFake.encrypt(keys: Storage<StoredCMK>) = route<Encrypt> { req ->
+fun AwsJsonFake.encrypt(keys: Storage<StoredCMK>) = route<Encrypt> { req ->
     keys[req.KeyId.toArn().value]?.let {
         Encrypted(
             KMSKeyId.of(it.arn),
@@ -108,7 +108,7 @@ fun AmazonJsonFake.encrypt(keys: Storage<StoredCMK>) = route<Encrypt> { req ->
     }
 }
 
-fun AmazonJsonFake.getPublicKey(keys: Storage<StoredCMK>) = route<GetPublicKey> {
+fun AwsJsonFake.getPublicKey(keys: Storage<StoredCMK>) = route<GetPublicKey> {
     keys[it.KeyId.toArn().value]?.let { cmk ->
         PublicKey(
             KMSKeyId.of(cmk.arn), cmk.customerMasterKeySpec, cmk.customerMasterKeySpec, cmk.keyUsage,
@@ -118,14 +118,14 @@ fun AmazonJsonFake.getPublicKey(keys: Storage<StoredCMK>) = route<GetPublicKey> 
     }
 }
 
-fun AmazonJsonFake.scheduleKeyDeletion(keys: Storage<StoredCMK>) = route<ScheduleKeyDeletion> { req ->
+fun AwsJsonFake.scheduleKeyDeletion(keys: Storage<StoredCMK>) = route<ScheduleKeyDeletion> { req ->
     keys[req.KeyId.toArn().value]?.let {
         keys[req.KeyId.toArn().value] = it.copy(deletion = Timestamp.of(Long.MAX_VALUE))
         KeyDeletionSchedule(KMSKeyId.of(it.arn), Timestamp.of(Long.MAX_VALUE))
     }
 }
 
-fun AmazonJsonFake.sign(keys: Storage<StoredCMK>, crypto: Provider) = route<Sign> { req ->
+fun AwsJsonFake.sign(keys: Storage<StoredCMK>, crypto: Provider) = route<Sign> { req ->
     keys[req.KeyId.toArn().value]?.let {
         Signed(
             KMSKeyId.of(it.arn),
@@ -138,7 +138,7 @@ private fun signTheBytes(req: Sign, key: PrivateKey) =
     KMS_ALGORITHMS[req.SigningAlgorithm]?.sign(key, req.Message)
         ?: Base64Blob.encode(req.SigningAlgorithm.name + req.Message.decoded().take(50))
 
-fun AmazonJsonFake.verify(keys: Storage<StoredCMK>, crypto: Provider) =
+fun AwsJsonFake.verify(keys: Storage<StoredCMK>, crypto: Provider) =
     route<Verify>(
         {
             when ((it as? VerifyResult)?.SignatureValid) {

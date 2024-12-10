@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.JsonError
 import org.http4k.connect.amazon.dynamodb.DynamoDbAction
 import org.http4k.connect.amazon.dynamodb.DynamoDbMoshi.convert
@@ -14,7 +14,7 @@ import org.http4k.connect.amazon.dynamodb.action.UpdateItem
 import org.http4k.connect.amazon.dynamodb.endpoints.UpdateResult.UpdateOk
 import org.http4k.connect.storage.Storage
 
-fun AmazonJsonFake.transactWriteItems(tables: Storage<DynamoTable>) = route<TransactWriteItems> {
+fun AwsJsonFake.transactWriteItems(tables: Storage<DynamoTable>) = route<TransactWriteItems> {
     synchronized(tables) {
         val transactionItems = it.toTransactionItems()
         when {

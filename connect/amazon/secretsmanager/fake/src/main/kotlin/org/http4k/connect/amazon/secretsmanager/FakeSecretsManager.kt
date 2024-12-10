@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.secretsmanager
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.secretsmanager.model.VersionId
@@ -29,7 +29,7 @@ class FakeSecretsManager(
     private val clock: Clock = Clock.systemUTC()
 ) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(SecretsManagerMoshi, AwsService.of("secretsmanager"))
+    private val api = AwsJsonFake(SecretsManagerMoshi, AwsService.of("secretsmanager"))
 
     override val app = routes(
         "/" bind POST to routes(

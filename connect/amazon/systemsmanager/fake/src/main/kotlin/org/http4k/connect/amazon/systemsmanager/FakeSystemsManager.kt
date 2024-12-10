@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.systemsmanager
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.systemsmanager.model.ParameterType
@@ -18,7 +18,7 @@ class FakeSystemsManager(
     private val parameters: Storage<StoredParameter> = Storage.InMemory()
 ) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(SystemsManagerMoshi, AwsService.of("AmazonSSM"))
+    private val api = AwsJsonFake(SystemsManagerMoshi, AwsService.of("AmazonSSM"))
 
     override val app = routes(
         api.deleteParameter(parameters),

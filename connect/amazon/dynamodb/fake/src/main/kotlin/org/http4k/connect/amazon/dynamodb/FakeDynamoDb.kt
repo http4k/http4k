@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.dynamodb
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.dynamodb.endpoints.FakeS3BucketSource
@@ -44,7 +44,7 @@ class FakeDynamoDb(
     private val clock: Clock = systemUTC()
 ) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(DynamoDbMoshi, AwsService.of("DynamoDB_20120810"))
+    private val api = AwsJsonFake(DynamoDbMoshi, AwsService.of("DynamoDB_20120810"))
     private val tableImports = CopyOnWriteArrayList<ImportTableDescription>()
 
     override val app = routes(

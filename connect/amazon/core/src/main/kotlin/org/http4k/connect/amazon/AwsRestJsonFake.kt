@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.format.AutoMarshalling
 
-class AmazonRestJsonFake(
+class AwsRestJsonFake(
     val autoMarshalling: AutoMarshalling,
     val awsService: AwsService,
     val region: Region,

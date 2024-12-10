@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
@@ -19,7 +19,7 @@ import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
 import java.time.Clock
 
-fun AmazonJsonFake.importTable(
+fun AwsJsonFake.importTable(
     tables: Storage<DynamoTable>,
     addTableImport: (ImportTableDescription) -> Unit,
     availableS3Buckets: () -> List<FakeS3BucketSource>,

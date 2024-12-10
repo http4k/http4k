@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.firehose
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
@@ -19,13 +19,13 @@ import org.http4k.connect.amazon.model.RequestResponses
 import org.http4k.connect.storage.Storage
 import java.util.UUID
 
-fun AmazonJsonFake.putRecord(records: Storage<List<Record>>) = route<PutRecord> {
+fun AwsJsonFake.putRecord(records: Storage<List<Record>>) = route<PutRecord> {
     val final = records[it.DeliveryStreamName.value] ?: listOf()
     records[it.DeliveryStreamName.value] = final + it.Record
     RecordAdded(false, UUID.nameUUIDFromBytes(it.Record.Data.decodedBytes()).toString())
 }
 
-fun AmazonJsonFake.putRecordBatch(records: Storage<List<Record>>) = route<PutRecordBatch> {
+fun AwsJsonFake.putRecordBatch(records: Storage<List<Record>>) = route<PutRecordBatch> {
     val final = records[it.DeliveryStreamName.value] ?: listOf()
     records[it.DeliveryStreamName.value] = final + it.Records
     BatchResult(true, 0, it.Records.map {
@@ -33,16 +33,16 @@ fun AmazonJsonFake.putRecordBatch(records: Storage<List<Record>>) = route<PutRec
     })
 }
 
-fun AmazonJsonFake.createDeliveryStream(records: Storage<List<Record>>) = route<CreateDeliveryStream> {
+fun AwsJsonFake.createDeliveryStream(records: Storage<List<Record>>) = route<CreateDeliveryStream> {
     records[it.DeliveryStreamName.value] = listOf()
     CreatedDeliveryStream(it.DeliveryStreamName.toArn())
 }
 
-fun AmazonJsonFake.listDeliveryStreams(records: Storage<List<Record>>) = route<ListDeliveryStreams> {
+fun AwsJsonFake.listDeliveryStreams(records: Storage<List<Record>>) = route<ListDeliveryStreams> {
     DeliveryStreams(records.keySet().map { DeliveryStreamName.of(it) }, false)
 }
 
-fun AmazonJsonFake.deleteDeliveryStream(records: Storage<List<Record>>) = route<DeleteDeliveryStream> {
+fun AwsJsonFake.deleteDeliveryStream(records: Storage<List<Record>>) = route<DeleteDeliveryStream> {
     records.remove(it.DeliveryStreamName.value)
     Unit
 }

@@ -3,7 +3,7 @@ package org.http4k.connect.amazon.cognito
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.cognito.endpoints.createResourceServer
 import org.http4k.connect.amazon.cognito.endpoints.createUserPool
 import org.http4k.connect.amazon.cognito.endpoints.createUserPoolClient
@@ -26,7 +26,7 @@ class FakeCognito(
     expiry: Duration = Duration.ofHours(1)
 ) : ChaoticHttpHandler() {
 
-    private val api = AmazonJsonFake(CognitoMoshi, AwsService.of("AWSCognitoIdentityProviderService"))
+    private val api = AwsJsonFake(CognitoMoshi, AwsService.of("AWSCognitoIdentityProviderService"))
 
     override val app = routes(
         CognitoOAuth(pools, clock, expiry),

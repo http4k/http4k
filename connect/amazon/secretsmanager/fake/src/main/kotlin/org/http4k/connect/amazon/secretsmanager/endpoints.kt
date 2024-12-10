@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.secretsmanager
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
@@ -19,13 +19,13 @@ import org.http4k.connect.amazon.secretsmanager.action.UpdatedSecretValue
 import org.http4k.connect.amazon.secretsmanager.model.Secret
 import org.http4k.connect.amazon.secretsmanager.model.SecretId
 import org.http4k.connect.amazon.secretsmanager.model.VersionId
+import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
 import java.time.Clock
 import java.util.UUID
-import org.http4k.connect.model.Timestamp
 
 
-fun AmazonJsonFake.createSecret(
+fun AwsJsonFake.createSecret(
     secrets: Storage<StoredSecretValue>, clock: Clock
 ) = route<CreateSecret> { req ->
     val versionId = VersionId.of(UUID.randomUUID().toString())
@@ -38,7 +38,7 @@ fun AmazonJsonFake.createSecret(
     CreatedSecret(SecretId.of(req.Name).toArn(), req.Name, versionId)
 }
 
-fun AmazonJsonFake.deleteSecret(secrets: Storage<StoredSecretValue>) = route<DeleteSecret> { req ->
+fun AwsJsonFake.deleteSecret(secrets: Storage<StoredSecretValue>) = route<DeleteSecret> { req ->
     val secretId = req.SecretId.resourceId()
 
     secrets[secretId.value]
@@ -48,7 +48,7 @@ fun AmazonJsonFake.deleteSecret(secrets: Storage<StoredSecretValue>) = route<Del
         }
 }
 
-fun AmazonJsonFake.getSecret(secrets: Storage<StoredSecretValue>) = route<GetSecretValue> { req ->
+fun AwsJsonFake.getSecret(secrets: Storage<StoredSecretValue>) = route<GetSecretValue> { req ->
     val secretId = req.SecretId.resourceId()
 
     secrets.keySet(secretId.value).firstOrNull()
@@ -66,13 +66,13 @@ fun AmazonJsonFake.getSecret(secrets: Storage<StoredSecretValue>) = route<GetSec
         }
 }
 
-fun AmazonJsonFake.listSecrets(secrets: Storage<StoredSecretValue>) = route<ListSecrets> {
+fun AwsJsonFake.listSecrets(secrets: Storage<StoredSecretValue>) = route<ListSecrets> {
     Secrets(secrets.keySet("").map {
         Secret(SecretId.of(it).toArn(), it)
     })
 }
 
-fun AmazonJsonFake.putSecret(
+fun AwsJsonFake.putSecret(
     secrets: Storage<StoredSecretValue>, clock: Clock
 ) = route<PutSecretValue> { req ->
     val secretId = req.SecretId.resourceId()
@@ -90,7 +90,7 @@ fun AmazonJsonFake.putSecret(
         }
 }
 
-fun AmazonJsonFake.updateSecret(
+fun AwsJsonFake.updateSecret(
     secrets: Storage<StoredSecretValue>, clock: Clock
 ) = route<UpdateSecret> { req ->
     val secretId = req.SecretId.resourceId()

@@ -1,12 +1,12 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
-import org.http4k.connect.amazon.AmazonJsonFake
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.dynamodb.DynamoTable
 import org.http4k.connect.amazon.dynamodb.action.BatchWriteItem
 import org.http4k.connect.amazon.dynamodb.action.BatchWriteItems
 import org.http4k.connect.storage.Storage
 
-fun AmazonJsonFake.batchWriteItem(tables: Storage<DynamoTable>) = route<BatchWriteItem> {
+fun AwsJsonFake.batchWriteItem(tables: Storage<DynamoTable>) = route<BatchWriteItem> {
     it.RequestItems
         .forEach { (tableName, writeItems) ->
             tables[tableName.value]
