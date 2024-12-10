@@ -16,6 +16,7 @@ dependencies {
     }
 
     api("se.ansman.kotshi:api:_")
+    api("com.github.javadev:underscore:_")
     api(project(":http4k-format-core"))
 
     testFixturesApi(project(":http4k-testing-chaos"))

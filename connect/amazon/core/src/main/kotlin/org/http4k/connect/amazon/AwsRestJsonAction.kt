@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 abstract class AwsRestJsonAction<R : Any>(
     private val base: Request,
     private val clazz: KClass<R>,
-    private val autoMarshalling: AutoMarshalling,
+    private val autoMarshalling: AutoMarshalling
 ) : Action<Result4k<R, RemoteFailure>> {
     override fun toRequest() = base
         .with(Header.CONTENT_TYPE of APPLICATION_JSON)
