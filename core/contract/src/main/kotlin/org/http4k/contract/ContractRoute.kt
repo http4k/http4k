@@ -1,5 +1,9 @@
 package org.http4k.contract
 
+import org.http4k.contract.ContractRouterMatch.MatchedWithoutHandler
+import org.http4k.contract.ContractRouterMatch.MatchingHandler
+import org.http4k.contract.ContractRouterMatch.MethodNotMatched
+import org.http4k.contract.ContractRouterMatch.Unmatched
 import org.http4k.contract.PreFlightExtraction.Companion
 import org.http4k.contract.openapi.operationId
 import org.http4k.core.Filter
@@ -19,13 +23,7 @@ import org.http4k.core.toPathSegmentDecoded
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
-import org.http4k.routing.Router
-import org.http4k.routing.RouterDescription
-import org.http4k.routing.RouterMatch
-import org.http4k.routing.RouterMatch.MatchedWithoutHandler
-import org.http4k.routing.RouterMatch.MatchingHandler
-import org.http4k.routing.RouterMatch.MethodNotMatched
-import org.http4k.routing.RouterMatch.Unmatched
+import org.http4k.routing.RouterDescription.Companion.unavailable
 
 class ContractRoute internal constructor(
     val method: Method,
@@ -39,27 +37,30 @@ class ContractRoute internal constructor(
 
     fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
-    fun toRouter(contractRoot: PathSegments) = object : Router {
+    fun toRouter(contractRoot: PathSegments) = object : ContractRouter {
 
-        override fun toString() = description.description
+        override fun toString() = description
 
-        override val description = RouterDescription(spec.describe(contractRoot))
+        override val description = spec.describe(contractRoot)
 
-        override fun match(request: Request): RouterMatch =
-            if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
+        override fun match(request: Request): ContractRouterMatch =
+            if ((request.method == OPTIONS || request.method == method) && request.pathSegments()
+                    .startsWith(spec.pathFn(contractRoot))
+            ) {
                 try {
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
                         ?.let {
                             MatchingHandler(
+                                unavailable,
                                 if (request.method == OPTIONS) {
                                     { Response(OK) }
-                                } else toHandler(it), description)
-                        } ?: Unmatched(description)
+                                } else toHandler(it))
+                        } ?: Unmatched
                 } catch (e: LensFailure) {
-                    Unmatched(description)
+                    Unmatched
                 }
-            } else Unmatched(description)
+            } else Unmatched
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
@@ -77,6 +78,7 @@ class ContractRoute internal constructor(
                     .then(PreFlightExtractionFilter(meta, Companion.All))
                     .then(matchResult)(request)
             }
+
             is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
             is Unmatched -> Response(NOT_FOUND)
             is MatchedWithoutHandler -> Response(NOT_FOUND)
@@ -94,12 +96,14 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
 }
 
-private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
+private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? =
+    toList().let { if (it.size > index) fn(it[index]) else null }
 
 private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
     when (toList().size) {
         lenses.size -> ExtractedParts(
             lenses.mapIndexed { i, lens -> lens to this(i) { lens(it.toPathSegmentDecoded()) } }.toMap()
         )
+
         else -> null
     }

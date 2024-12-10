@@ -1,5 +1,1 @@
-and
-	and
-		method == GET
-		Headers [host]
-	Headers [host]
+((method == GET AND Headers [host]) AND Headers [host])

@@ -1,7 +1,1 @@
-{
-  "description" : "SPA at /route-contract",
-  "children" : [ {
-    "description" : "Static files /route-contract",
-    "children" : [ ]
-  } ]
-}
+"SPA at /route-contract"

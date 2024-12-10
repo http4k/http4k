@@ -3,12 +3,13 @@ package org.http4k.routing
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.OPTIONS
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.routing.RouterMatch.MatchingHandler
-import org.http4k.routing.RouterMatch.MethodNotMatched
+import org.http4k.core.then
+import org.http4k.routing.RoutingResult.Matched
+import org.http4k.routing.RoutingResult.NotMatched
 
 /**
  * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
@@ -18,44 +19,42 @@ fun singlePageApp(
     resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"),
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
 ): RoutingHttpHandler =
-    SinglePageAppRoutingHandler(
-        "",
-        StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+    RoutingHttpHandler(
+        listOf(SinglePageAppRouteMatcher("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
     )
 
-internal data class SinglePageAppRoutingHandler(
+internal data class SinglePageAppRouteMatcher(
     private val pathSegments: String,
-    private val staticHandler: StaticRoutingHttpHandler
-) : RoutingHttpHandler {
+    private val resourceLoader: ResourceLoader,
+    private val extraFileExtensionToContentTypes: Map<String, ContentType>,
+    private val router: Router = All,
+    private val filter: Filter = Filter.NoOp
+) : RouteMatcher<Response, Filter> {
 
-    override fun invoke(request: Request): Response {
-        val matchOnStatic = when (val matchResult = staticHandler.match(request)) {
-            is MatchingHandler -> matchResult(request)
-            else -> null
+    private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
+
+    override fun match(request: Request) = when (val m = router(request)) {
+        is Matched -> {
+            handler(request).let {
+                when {
+                    it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
+                    else -> handler(Request(GET, pathSegments)).let {
+                        when {
+                            it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
+                            else -> RoutingMatch(2, m.description,  filter.then { _: Request -> Response(NOT_FOUND) })
+                        }
+                    }
+                }
+            }
         }
 
-        val matchOnIndex = when (val matchResult = staticHandler.match(Request(GET, pathSegments))) {
-            is MatchingHandler -> matchResult
-            else -> null
-        }
-
-        val fallbackHandler = matchOnIndex ?: { Response(NOT_FOUND) }
-        return matchOnStatic ?: fallbackHandler(Request(GET, pathSegments))
+        is NotMatched -> RoutingMatch(2, m.description, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
-    override fun match(request: Request) = when (request.method) {
-        OPTIONS -> MethodNotMatched(RouterDescription("template == '$pathSegments'"))
-        else -> MatchingHandler(this, description)
-    }
+    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
+    override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
-    override fun withFilter(new: Filter) =
-        copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
-
-    override fun withBasePath(new: String) =
-        SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
-
-    override val description = RouterDescription("SPA at $pathSegments", listOf(staticHandler.description))
-
-    override fun toString() = description.friendlyToString()
+    override fun toString() = "SPA at $pathSegments"
 
 }
