@@ -29,14 +29,15 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.util.PortBasedTest
+import org.http4k.server.ServerConfig.StopMode
+import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
 
 abstract class ServerContract(
-    private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
+    private val serverConfig: (Int, StopMode) -> ServerConfig, protected val client: HttpHandler,
     private val requiredMethods: Array<Method> = Method.entries.toTypedArray()
 ) : PortBasedTest {
     private lateinit var server: Http4kServer
@@ -92,7 +93,7 @@ abstract class ServerContract(
 
     @BeforeEach
     fun before() {
-        server = routes(*routes.toTypedArray()).asServer(serverConfig(0)).start()
+        server = routes(*routes.toTypedArray()).asServer(serverConfig(0, Immediate)).start()
     }
 
     @Test
@@ -250,7 +251,7 @@ abstract class ServerContract(
 
     @Test
     open fun `can start on port zero and then get the port`() {
-        routes(*routes.toTypedArray()).asServer(serverConfig(0)).start().use {
+        routes(*routes.toTypedArray()).asServer(serverConfig(0, Immediate)).start().use {
             assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
         }
     }

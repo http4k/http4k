@@ -25,7 +25,7 @@ abstract class LambdaHttpClientTest(
     type: LambdaIntegrationType,
     clientFn: (Function, Region) -> LambdaHttpClient
 ) : HttpClientContract(
-    { NoOpServerConfig },
+    { _, _ -> NoOpServerConfig },
     clientFn(functionName(type), Region.of(awsCliUserProfiles().profile("http4k-integration-test").region))
         .then(awsCliUserProfiles().profile("http4k-integration-test").awsClientFor("lambda"))
 ) {
