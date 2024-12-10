@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k metrics support, integrating with micrometer.io"
+description = "DEPRECATED: Use http4k-ops-micrometer"
 
 val license by project.extra { Apache2 }
 
