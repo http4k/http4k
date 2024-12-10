@@ -1,0 +1,6 @@
+template=a AND method == GET
+template=b/c AND method == GET
+template=b/c/d AND method == GET
+template=b/c/e/f AND method == GET
+template=b/c/e/g AND method == GET
+template=b/c/e/g AND method == POST
