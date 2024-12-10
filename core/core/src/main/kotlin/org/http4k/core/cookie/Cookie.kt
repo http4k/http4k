@@ -41,7 +41,7 @@ data class Cookie(
         appendIfTrue(secure, "secure")
         appendIfTrue(httpOnly, "HttpOnly")
         appendIfPresent(sameSite, "SameSite=$sameSite")
-    }.joinToString("; ")
+    }.joinToString("") { "; $it" }
 
     companion object {
         fun parse(cookieValue: String): Cookie? {
@@ -93,7 +93,7 @@ data class Cookie(
         if (toCheck) add(toInclude)
     }
 
-    fun fullCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}; ${attributes()}"
+    fun fullCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}${attributes()}"
     fun keyValueCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}"
 }
 

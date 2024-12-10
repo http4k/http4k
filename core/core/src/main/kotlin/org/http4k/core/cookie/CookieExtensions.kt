@@ -5,7 +5,7 @@ import org.http4k.core.Response
 import org.http4k.unquoted
 import java.time.Instant
 
-fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.fullCookieString())
+fun Response.cookie(cookie: Cookie, unquotedValue: Boolean = false) = header("Set-Cookie", cookie.fullCookieString(unquotedValue))
 
 fun Request.removeCookie(name: String) =
     cookies().filterNot { it.name == name }.fold(removeHeader("Cookie")) { acc, c -> acc.cookie(c) }
@@ -39,4 +39,5 @@ fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull(
 
 fun Cookie.invalidate(): Cookie = copy(value = "").maxAge(0).expires(Instant.EPOCH)
 
-fun Response.invalidateCookie(name: String, domain: String? = null): Response = replaceCookie(Cookie(name, "", domain = domain).invalidate())
+fun Response.invalidateCookie(name: String, domain: String? = null, path: String? = null) =
+    replaceCookie(Cookie(name, "", domain = domain, path = path).invalidate())
