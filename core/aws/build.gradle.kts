@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k AWS integration and request signing"
+description = "DEPRECATED: Use http4k-cloud-aws"
 
 val license by project.extra { Apache2 }
 

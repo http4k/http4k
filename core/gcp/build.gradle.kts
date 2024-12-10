@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k GCP integration tooling"
+description = "DEPRECATED: Use http4k-cloud-gcp"
 
 val license by project.extra { Apache2 }
 
