@@ -29,7 +29,7 @@ private fun client(): (Request) -> Response {
 }
 
 abstract class ApiGatewayRestHttpClientTest :
-    HttpClientContract({ NoOpServerConfig }, client(), client()) {
+    HttpClientContract({ _, _ -> NoOpServerConfig }, client(), client()) {
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
