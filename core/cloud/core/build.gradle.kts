@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "Http4k K8S integration tooling"
+description = "Http4k Cloud core"
 
 val license by project.extra { Apache2 }
 
@@ -10,9 +10,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api(project(":http4k-cloud-core"))
-    api(project(":http4k-config"))
-    implementation(project(":http4k-format-core"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testFixturesImplementation(project(":http4k-config"))

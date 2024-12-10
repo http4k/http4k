@@ -16,6 +16,7 @@ dependencies {
     testImplementation(project(":http4k-testing-hamkrest"))
 
     testFixturesImplementation(testFixtures(project(":http4k-core")))
-    testFixturesImplementation(project(":http4k-cloudnative"))
+    testFixturesImplementation(project(":http4k-cloud-core"))
+    testFixturesImplementation(project(":http4k-config"))
     testFixturesImplementation(project(":http4k-client-okhttp"))
 }

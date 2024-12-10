@@ -21,7 +21,8 @@ dependencies {
     testImplementation("com.amazonaws:aws-lambda-java-events:_")
 
     testFixturesApi(project(":http4k-core"))
-    testFixturesApi(project(":http4k-cloudnative"))
+    testFixturesApi(project(":http4k-cloud-core"))
+    testFixturesApi(project(":http4k-config"))
     testFixturesApi(project(":http4k-serverless-lambda"))
     testFixturesApi(project(":http4k-aws"))
     testFixturesApi(project(":http4k-format-jackson"))

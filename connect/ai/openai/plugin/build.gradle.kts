@@ -22,7 +22,6 @@ dependencies {
     testApi(project(":http4k-connect-ai-openai-fake"))
     testApi("org.junit.jupiter:junit-jupiter-api")
     testApi(project(":http4k-serverless-lambda"))
-    testApi(project(":http4k-cloudnative"))
     testApi(project(":http4k-testing-approval"))
 
     testApi("com.nimbusds:nimbus-jose-jwt:_")

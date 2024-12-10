@@ -17,3 +17,24 @@ typealias Liveness = org.http4k.k8s.health.Liveness
 
 @Deprecated("Use org.http4k.k8s.health.Readiness instead", ReplaceWith("org.http4k.k8s.health.Readiness"))
 typealias Readiness = org.http4k.k8s.health.Readiness
+
+@Deprecated("Use org.http4k.k8s.health.ReadinessCheck instead", ReplaceWith("org.http4k.k8s.health.ReadinessCheck"))
+typealias ReadinessCheck = org.http4k.k8s.health.ReadinessCheck
+
+@Deprecated("Use org.http4k.k8s.health.check instead", ReplaceWith("org.http4k.k8s.health.check"))
+typealias ReadinessCheckResult = org.http4k.k8s.health.ReadinessCheckResult
+
+@Deprecated("Use org.http4k.k8s.health.check instead", ReplaceWith("org.http4k.k8s.health.check"))
+typealias Completed = org.http4k.k8s.health.Completed
+
+@Deprecated("Use org.http4k.k8s.health.check instead", ReplaceWith("org.http4k.k8s.health.check"))
+typealias Failed = org.http4k.k8s.health.Failed
+
+@Deprecated("Use org.http4k.k8s.health.check instead", ReplaceWith("org.http4k.k8s.health.check"))
+typealias Composite = org.http4k.k8s.health.Composite
+
+@Deprecated("Use org.http4k.k8s.health.plus instead", ReplaceWith("org.http4k.k8s.health.plus"))
+operator fun ReadinessCheckResult.plus(that: ReadinessCheckResult): Composite = when (this) {
+    is Composite -> Composite(parts = parts + listOf(that))
+    else -> Composite(listOf(this, that))
+}
