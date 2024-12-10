@@ -1,5 +1,6 @@
 package org.http4k.connect.amazon
 
+import com.github.underscore.Xml
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
