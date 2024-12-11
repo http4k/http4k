@@ -1,0 +1,5 @@
+all
+template=proxy/bar AND host header or uri host = hostA
+template=proxy/bar AND host header or uri host = hostB
+template=proxy/foo/{any:.*} AND (method == GET AND host header or uri host = hostA)
+template=proxy/foo/{any:.*} AND (method == GET AND host header or uri host = hostB)
