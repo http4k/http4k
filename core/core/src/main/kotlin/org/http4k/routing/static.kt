@@ -62,7 +62,7 @@ data class StaticRouteMatcher(
     override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
     override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
-    override fun toString() = "static files (served at $pathSegments)"
+    override fun toString() = "static files at $pathSegments"
 }
 
 internal class ResourceLoadingHandler(

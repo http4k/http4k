@@ -48,6 +48,12 @@ class RouterDescriptionTest {
             )
         )
 
+        val spa = routes(
+            "/spa" bind routes(
+                "/directory" bind singlePageApp(ResourceLoader.Directory("/tmp")),
+                "/classpath" bind singlePageApp(ResourceLoader.Classpath()),singlePageApp())
+        )
+
         val static = routes(
             "/static" bind routes(
                 "/directory" bind static(ResourceLoader.Directory("/tmp")),
@@ -58,6 +64,7 @@ class RouterDescriptionTest {
         val routes = routes(
             reverseProxy,
             static,
+            spa,
             orElse bind handler
         )
 
