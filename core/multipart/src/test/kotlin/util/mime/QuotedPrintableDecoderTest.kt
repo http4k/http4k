@@ -29,7 +29,7 @@ import java.io.UnsupportedEncodingException
 /**
  * @since 1.3
  */
-class QuotedPrintableDecoderTestCase {
+class QuotedPrintableDecoderTest {
 
     @Test
     @Throws(Exception::class)

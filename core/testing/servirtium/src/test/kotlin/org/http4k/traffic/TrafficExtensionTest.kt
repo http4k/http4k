@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
 @ExtendWith(ApprovalTest::class)
-class TrafficExtensionTests {
+class TrafficExtensionTest {
 
     @Test
     fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {

@@ -6,7 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
-class ExtensionTests {
+class ExtensionTest {
 
     @Test
     fun `alphabetise headers request`() {

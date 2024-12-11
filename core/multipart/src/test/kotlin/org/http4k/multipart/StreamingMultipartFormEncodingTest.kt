@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
-class StreamingMultipartFormEncodingTests {
+class StreamingMultipartFormEncodingTest {
 
     @Test
     fun uploadUTF8() {

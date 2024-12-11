@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException
 /**
  * @since 1.3
  */
-class Base64DecoderTestCase {
+class Base64DecoderTest {
 
     /**
      * Tests RFC 4648 section 10 test vectors.

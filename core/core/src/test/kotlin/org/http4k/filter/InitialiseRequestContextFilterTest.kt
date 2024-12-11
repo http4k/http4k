@@ -14,7 +14,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.lens.RequestContextKey
 import org.junit.jupiter.api.Test
 
-class InitialiseRequestContextFilterTests {
+class InitialiseRequestContextFilterTest {
 
     @Test
     fun `initialises request context for use further down the stack`() {

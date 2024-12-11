@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException
  *
  * @since 1.3
  */
-class MimeUtilityTestCase {
+class MimeUtilityTest {
 
     @Test
     @Throws(Exception::class)

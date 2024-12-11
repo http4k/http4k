@@ -14,7 +14,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.traffic.Replay.Companion.MemoryStream
 import org.junit.jupiter.api.Test
 
-class ReplayExtensionTests {
+class ReplayExtensionTest {
     private val request = Request(GET, "/")
     private val response = Response(OK)
     private val http = MemoryStream(mutableListOf(request.header("toBeAdded", "value") to response)).replayingMatchingContent {

@@ -23,7 +23,7 @@ class RouterBasedHttpHandlerReverseTest : RoutingHttpHandlerContract() {
     override val handler = headers("host") bind routes(validPath bind GET to { Response(OK) })
 }
 
-class RouterBasedHttpHandlerSpecialCaseTests {
+class RouterBasedHttpHandlerSpecialCaseTest {
     private val prefix = "/prefix"
 
     @Test

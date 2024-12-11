@@ -8,7 +8,7 @@ import org.jetbrains.kotlinx.dataframe.impl.DataFrameSize
 import org.jetbrains.kotlinx.dataframe.size
 import org.junit.jupiter.api.Test
 
-class DataFrameTests {
+class DataFrameTest {
 
     @Test
     fun `can extract a set of untyped records from an HTTP message`() {

@@ -7,7 +7,7 @@ import org.http4k.testing.RecordingEvents
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 
-class EventFiltersTests {
+class EventFiltersTest {
 
     private val recording = RecordingEvents()
 

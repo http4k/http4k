@@ -9,7 +9,7 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
-class StreamingMultipartFormHappyTests {
+class StreamingMultipartFormHappyTest {
 
     @Test
     fun `upload empty contents`() {

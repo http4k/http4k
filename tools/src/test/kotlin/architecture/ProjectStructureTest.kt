@@ -28,7 +28,21 @@ class ProjectStructureTest {
                 it.hasNameEndingWith("Test") &&
                     (it.name in portClassNames || it.hasParentWithName(portClassNames, indirectParents = true))
             }
-            .assertTrue { it.hasParentInterfaceWithName("PortBasedTest", indirectParents = true)
-                || it.hasParentInterfaceWithName("InMemoryTest", indirectParents = true) }
+            .assertTrue {
+                it.hasParentInterfaceWithName("PortBasedTest", indirectParents = true)
+                    || it.hasParentInterfaceWithName("InMemoryTest", indirectParents = true)
+            }
+    }
+
+    @Test
+    fun `tests class names end with Test or Contract`() {
+        Konsist.scopeFromTest()
+            .files
+            .classes()
+            .filter { klass ->
+                klass.hasFunction(true) { it.hasAnnotation { it.hasNameEndingWith("Test") } }
+                    && !klass.hasAnnotation { it.hasNameEndingWith("Nested") }
+            }
+            .assertTrue { it.hasNameEndingWith("Test") || it.hasNameEndingWith("Contract") }
     }
 }

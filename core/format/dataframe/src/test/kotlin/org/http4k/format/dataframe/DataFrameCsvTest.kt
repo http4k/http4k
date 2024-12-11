@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dataframe.impl.DataFrameSize
 import org.jetbrains.kotlinx.dataframe.size
 import org.junit.jupiter.api.Test
 
-class DataFrameCsvTests {
+class DataFrameCsvTest {
     @Test
     fun `can extract a set of typed CSV records from an HTTP message`() {
         val request = Request(GET, "").body(javaClass.getResourceAsStream("/repositories.csv")!!)

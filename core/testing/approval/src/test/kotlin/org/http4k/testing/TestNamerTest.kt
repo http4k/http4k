@@ -7,7 +7,7 @@ import org.http4k.testing.TestNamer.Companion.ClassDirAndMethod
 import org.http4k.testing.TestNamer.Companion.MethodOnly
 import org.junit.jupiter.api.Test
 
-class TestNamerTests {
+class TestNamerTest {
 
     @Test
     fun `method only`() {

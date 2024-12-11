@@ -9,7 +9,7 @@ import org.http4k.testing.ApprovalContent.Companion.HttpTextBody
 import org.http4k.testing.ApprovalContent.Companion.HttpTextMessage
 import org.junit.jupiter.api.Test
 
-class ApprovalContentTests {
+class ApprovalContentTest {
 
     private val input = Response(OK)
         .header("some-header", "some header value")

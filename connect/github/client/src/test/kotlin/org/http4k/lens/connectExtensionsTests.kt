@@ -9,7 +9,7 @@ import org.http4k.core.with
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class HeaderTests {
+class HeaderTest {
 
     @Test
     fun `roundtrip delivery`() {

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class OptionalFormParameterExtractionTests {
+class OptionalFormParameterExtractionTest {
 
     private val intLens: BiDiLens<WebForm, Int?> = FormField.int().optional("anInt")
     private val bodyLens = Body.webForm(Validator.Strict, intLens).toLens()
