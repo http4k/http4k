@@ -2,9 +2,12 @@ package org.http4k.routing
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.lens.BiDiPathLens
+import org.http4k.lens.Path
+import org.http4k.lens.int
+import org.http4k.lens.string
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -51,7 +54,8 @@ class RouterDescriptionTest {
         val spa = routes(
             "/spa" bind routes(
                 "/directory" bind singlePageApp(ResourceLoader.Directory("/tmp")),
-                "/classpath" bind singlePageApp(ResourceLoader.Classpath()),singlePageApp())
+                "/classpath" bind singlePageApp(ResourceLoader.Classpath()), singlePageApp()
+            )
         )
 
         val static = routes(
@@ -61,10 +65,21 @@ class RouterDescriptionTest {
             )
         )
 
+        // TODO include predicate description
+        @Suppress("UNUSED_VARIABLE")
+        val predicates = routes(
+            "/predicates" bind routes(
+                query("q", "foo")
+                    .or(headers("q").and(header("q", "foo")))
+                    .or(body({ b: String -> b == "foo" })) bind handler,
+            )
+        )
+
         val routes = routes(
             reverseProxy,
             static,
             spa,
+//            predicates,
             orElse bind handler
         )
 
