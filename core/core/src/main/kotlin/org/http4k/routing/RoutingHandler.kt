@@ -29,5 +29,8 @@ abstract class RoutingHandler<R, F, Self : RouteMatcher<R, F>>(
 
     override fun withRouter(other: Router) = copy(routes.map { it.withRouter(other) })
 
-    override fun toString() = routes.sortedBy(RouteMatcher<R, F>::toString).joinToString("\n")
+    override fun toString() = routes
+        .map(RouteMatcher<R, F>::toString)
+        .sortedWith(String.CASE_INSENSITIVE_ORDER)
+        .joinToString("\n")
 }
