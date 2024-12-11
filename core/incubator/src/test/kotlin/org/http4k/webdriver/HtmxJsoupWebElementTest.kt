@@ -64,7 +64,7 @@ class HtmxJsoupWebElementTest {
 
         val body = createTestElement(htmxVerb, htmxSwap, handler)
 
-        body.findElement(By.tagName("div"))!!.click()
+        body.findElement(By.tagName("div")).click()
 
         body.delegate.element.getElementsByTag("div").first()?.clearAttributes()
 
@@ -238,7 +238,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.id("actor"))!!.click()
+            element.findElement(By.id("actor")).click()
 
             assertThat(
                 body.toString(),
@@ -267,7 +267,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.id("foo"))!!.click()
+            element.findElement(By.id("foo")).click()
 
             assertThat(
                 body.toString(),
@@ -297,7 +297,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.id("foo"))!!.click()
+            element.findElement(By.id("foo")).click()
 
             assertThat(
                 body.toString(),
@@ -328,7 +328,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.id("foo"))!!.click()
+            element.findElement(By.id("foo")).click()
 
             assertThat(
                 body.toString(),
@@ -370,7 +370,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.tagName("input"))!!.sendKeys("keys")
+            element.findElement(By.tagName("input")).sendKeys("keys")
 
             assertThat(
                 body.toString(),
@@ -410,7 +410,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.tagName("form"))!!.submit()
+            element.findElement(By.tagName("form")).submit()
 
             assertThat(
                 body.toString(),
@@ -454,7 +454,7 @@ class HtmxJsoupWebElementTest {
 
             val body = element.findElement(By.tagName("body"))
 
-            element.findElement(By.id("a"))!!.click()
+            element.findElement(By.id("a")).click()
 
             assertThat(
                 body.toString(),

@@ -26,6 +26,14 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
         HtmxCommand.from(this)?.performOn(this)
     }
 
+    override fun getDomProperty(name: String): String? {
+        return delegate.getDomProperty(name)
+    }
+
+    override fun getDomAttribute(name: String): String? {
+        return delegate.getDomAttribute(name)
+    }
+
     override fun submit() {
         val hxCommand = HtmxCommand.from(this)
         when {

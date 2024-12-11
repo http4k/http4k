@@ -40,12 +40,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     @Deprecated("Deprecated in Java")
     override fun getAttribute(name: String) = getDomAttribute(name)
 
-    override fun getDomAttribute(name: String): String? {
-        return when {
-            booleanAttributes.contains(name) && element.hasAttr(name) -> "true"
-            booleanAttributes.contains(name) && !element.hasAttr(name) -> null
-            else -> element.attr(name)
-        }
+    override fun getDomAttribute(name: String) = when {
+        booleanAttributes.contains(name) && element.hasAttr(name) -> "true"
+        booleanAttributes.contains(name) && !element.hasAttr(name) -> null
+        else -> element.attr(name)
     }
 
     override fun getDomProperty(name: String): String? {
