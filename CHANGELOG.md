@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.40.0.0 (uncut)
+### v5.40.0.0
 - **http4k-core** : Allow invalidation of cookie with a path. H/T @ollieabbey
 - **http4k-core** : Allow setting cookie value without quotes. H/T @ollieabbey
 - **http4k-core** : Fix cookie format for cookie with no attributes. H/T @ollieabbey
