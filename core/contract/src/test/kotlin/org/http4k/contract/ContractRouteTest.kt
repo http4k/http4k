@@ -22,6 +22,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.auto
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.BiDiPathLens
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Path
 import org.http4k.lens.Query
@@ -34,7 +35,7 @@ class ContractRouteTest {
 
     @Test
     fun `can build a request from a route`() {
-        val path1 = Path.int().of("sue")
+        val path1: BiDiPathLens<Int> = Path.int().of("sue")
         val path2 = Path.string().of("bob")
         val pair = path1 / path2 meta {
             summary = ""
