@@ -2,13 +2,10 @@ package org.http4k.webdriver
 
 import org.http4k.core.HttpHandler
 import org.openqa.selenium.By
-import org.openqa.selenium.Dimension
 import org.openqa.selenium.OutputType
-import org.openqa.selenium.Point
-import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpHandler) : WebElement {
+data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpHandler) : WebElement by delegate {
     private fun toHtmx(element: WebElement): HtmxJsoupWebElement =
         HtmxJsoupWebElement(element as JSoupWebElement, handler)
 
@@ -20,8 +17,7 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
     override fun findElement(by: By): WebElement =
         delegate
             .findElement(by)
-            ?.let { toHtmx(it) }
-            ?: throw NoSuchElementException("No such element: $by")
+            .let(::toHtmx)
 
     override fun <X : Any> getScreenshotAs(target: OutputType<X>): X = delegate.getScreenshotAs(target)
 
@@ -42,29 +38,6 @@ data class HtmxJsoupWebElement(val delegate: JSoupWebElement, val handler: HttpH
         delegate.sendKeys(*keysToSend)
         HtmxCommand.from(this)?.performOn(this)
     }
-
-
-    override fun clear() = delegate.clear()
-
-    override fun getTagName(): String = delegate.getTagName()
-
-    override fun getAttribute(name: String): String? = delegate.getAttribute(name)
-
-    override fun isSelected(): Boolean = delegate.isSelected()
-
-    override fun isEnabled(): Boolean = delegate.isEnabled()
-
-    override fun getText(): String = delegate.getText()
-
-    override fun isDisplayed(): Boolean = delegate.isDisplayed()
-
-    override fun getLocation(): Point = delegate.getLocation()
-
-    override fun getSize(): Dimension = delegate.getSize()
-
-    override fun getRect(): Rectangle = delegate.getRect()
-
-    override fun getCssValue(propertyName: String): String = delegate.getCssValue(propertyName)
 
     override fun toString(): String = delegate.toString()
 }

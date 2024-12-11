@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-core** : Allow invalidation of cookie with a path. H/T @ollieabbey
 - **http4k-core** : Allow setting cookie value without quotes. H/T @ollieabbey
 - **http4k-core** : Fix cookie format for cookie with no attributes. H/T @ollieabbey
+- **http4k-testing-webdriver** : Remove usages of deprecated getAttribute API. Now use getDomAttribute instead.
 - **http4k-cloudnative** : Deprecation of various functions and re-homing into http4k-platform-k8s module. 
 - **http4k-*** : [PRE RELEASE PREPARATION] As a part of the upcoming V6, several modules are being rehoused to new Maven coordinates. In preparation, we have introduced these modules to give users the time to migrate without taking on-board other breaking changes from v6 - essentially allowing the upgrade cycle to be:
 

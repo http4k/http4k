@@ -37,12 +37,20 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun getText(): String = element.text()
 
-    override fun getAttribute(name: String): String? {
+    @Deprecated("Deprecated in Java")
+    override fun getAttribute(name: String) = getDomAttribute(name)
+
+    override fun getDomAttribute(name: String): String? {
         return when {
             booleanAttributes.contains(name) && element.hasAttr(name) -> "true"
             booleanAttributes.contains(name) && !element.hasAttr(name) -> null
             else -> element.attr(name)
         }
+    }
+
+    override fun getDomProperty(name: String): String? {
+        // TODO need to work out how to get the property from the element...
+        throw UnsupportedOperationException("Not implemented")
     }
 
     override fun isDisplayed(): Boolean = throw FeatureNotImplementedYet
@@ -57,44 +65,44 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun submit() {
         associatedForm()?.let { form ->
-            val enctype = form.getAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
+            val enctype = form.getDomAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
 
             val method =
                 runCatching { Method.valueOf(form.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
 
             val inputs = associatedFormElements(form, "input")
                 .asSequence()
-                .filter { it.getAttribute("name") != "" }
+                .filter { it.getDomAttribute("name") != "" }
                 .filter { it.isNotDisabled() }
                 .filterNot { it.isAFileInput() }
                 .filterNot { it.isAnInactiveSubmitInput() }
                 .filterNot(::isUncheckedInput)
-                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                .map { it.getDomAttribute("name") to listOf(it.getDomAttribute("value")) }
                 .toList()
 
             val fileInputs = associatedFormElements(form, "input")
-                .filter { it.getAttribute("name") != "" }
+                .filter { it.getDomAttribute("name") != "" }
                 .filter { it.isNotDisabled() }
                 .filter { it.isAFileInput() }
-                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                .map { it.getDomAttribute("name") to listOf(it.getDomAttribute("value")) }
 
             val textAreas = associatedFormElements(form, "textarea")
                 .filter { it.isNotDisabled() }
-                .filter { it.getAttribute("name") != "" }
-                .map { it.getAttribute("name") to listOf(it.text) }
+                .filter { it.getDomAttribute("name") != "" }
+                .map { it.getDomAttribute("name") to listOf(it.text) }
 
             val selects = associatedFormElements(form, "select")
                 .filter { it.isNotDisabled() }
-                .filter { it.getAttribute("name") != "" }
+                .filter { it.getDomAttribute("name") != "" }
                 .map {
-                    it.getAttribute("name") to it.findElements(By.tagName("option"))
+                    it.getDomAttribute("name") to it.findElements(By.tagName("option"))
                         .filter { it.isSelected }
-                        .map { it.getAttribute("value") }
+                        .map { it.getDomAttribute("value") }
                 }
 
             val buttons = associatedFormElements(form, "button")
-                .filter { it.getAttribute("name") != "" && it == this }
-                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                .filter { it.getDomAttribute("name") != "" && it == this }
+                .map { it.getDomAttribute("name") to listOf(it.getDomAttribute("value")) }
 
             val ordinaryInputs = inputs + textAreas + selects + buttons
             val addFormModifier = createForm(enctype, ordinaryInputs.toNotNullMap(),
@@ -118,8 +126,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             .mapKeys { it.key!! }
             .mapValues { it.value.filterNotNull() }
 
-    private fun WebElement.isAFileInput() = getAttribute("type") == "file"
-    private fun WebElement.isSubmitInput() = getAttribute("type") == "submit"
+    private fun WebElement.isAFileInput() = getDomAttribute("type") == "file"
+    private fun WebElement.isSubmitInput() = getDomAttribute("type") == "submit"
 
     private fun WebElement.isAnInactiveSubmitInput() =
         if (isSubmitInput()) {
@@ -128,9 +136,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             false
         }
 
-
     private fun isUncheckedInput(input: WebElement): Boolean =
-        (listOf("checkbox", "radio").contains(input.getAttribute("type") ?: null)) && input.getAttribute("checked") == null
+        (listOf("checkbox", "radio").contains(input.getDomAttribute("type") ?: null)) && input.getDomAttribute("checked") == null
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
@@ -146,7 +153,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             isA("input") && element.attr("type") == "radio" -> {
                 if (element.hasAttr("name")) {
                     current("form")?.findElements(By.tagName("input"))
-                        ?.filter { it.getAttribute("name") == element.attr("name") }?.forEach { it.clear() }
+                        ?.filter { it.getDomAttribute("name") == element.attr("name") }?.forEach { it.clear() }
                 }
                 element.attr("checked", "checked")
             }
@@ -208,7 +215,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: By): WebElement =
+    override fun findElement(by: By) =
         JSoupElementFinder(navigate, getURL, element).findElement(by)
 
     override fun findElements(by: By) =
@@ -217,7 +224,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 
     private fun associatedForm(): JSoupWebElement? {
-        val formId = getAttribute("form")
+        val formId = getDomAttribute("form")
         return if (formId?.isNotBlank() == true) {
             element.root().getElementById(formId)?.let { JSoupWebElement(navigate, getURL, it) }
         } else {
@@ -231,7 +238,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun associatedFormElements(form: JSoupWebElement, tagName: String): List<WebElement> {
         val root = JSoupWebElement(navigate, getURL, form.element.root())
-        val formId: String? = form.getAttribute("id")?.ifBlank { null }
+        val formId: String? = form.getDomAttribute("id")?.ifBlank { null }
 
         return form.findElements(By.tagName(tagName)) + (formId?.let { root.findElements(By.cssSelector("$tagName[form=$formId]")) }
             ?: emptyList())
@@ -283,7 +290,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     }
 }
 
-private fun WebElement.isNotDisabled(): Boolean = this.getAttribute("disabled") == null
+private fun WebElement.isNotDisabled(): Boolean = this.getDomAttribute("disabled") == null
 private fun WebElement.isDisabled() = !isNotDisabled()
 
 private fun createForm(
