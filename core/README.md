@@ -63,7 +63,7 @@ details on the over 65 different built in integrations. Here's a selection:
     - **HTTP**: 6 clients including Apache, Jetty and OkHttp
     - **WebSocket & SSE**: For realtime connectivity
 - **Observability**: Measure http4k with integrations including OpenTelemetry and Micrometer
-- **Metrics**: Protect your app with Resilience4k and Failsafe
+- **Safety**: Protect your app with Resilience4j and Failsafe
 - **Security**: Seamless OAuth and Digest integrations
 - **HTML Templating**: 7 serverside rendering engines including Handlebars, Pug4J and Rocker
 - **Testing styles**: Support for innovative testing techniques such as TracerBullet, Approval and Chaos testing
