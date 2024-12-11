@@ -13,7 +13,8 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
-abstract class AbstractHttpClientContract(private val serverConfig: (Int, ServerConfig.StopMode) -> ServerConfig) {
+abstract class AbstractHttpClientContract(private val serverConfig: (Int, ServerConfig.StopMode) -> ServerConfig) :
+    PortBasedTest {
 
     private lateinit var server: Http4kServer
 
