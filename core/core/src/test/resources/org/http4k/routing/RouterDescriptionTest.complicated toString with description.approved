@@ -1,6 +1,9 @@
 all
-static files (served at /static/classpath)
-static files (served at /static/directory)
+SPA at /spa
+SPA at /spa/classpath
+SPA at /spa/directory
+static files at /static/classpath
+static files at /static/directory
 template=proxy/bar AND host header or uri host = hostA
 template=proxy/bar AND host header or uri host = hostB
 template=proxy/foo/{any:.*} AND (method == GET AND host header or uri host = hostA)
