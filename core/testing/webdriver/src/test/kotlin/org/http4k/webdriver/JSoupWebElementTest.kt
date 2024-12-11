@@ -67,7 +67,7 @@ class JSoupWebElementTest {
     fun `tag name`() = assertThat(element().tagName, equalTo("a"))
 
     @Test
-    fun attribute() = assertThat(element().getAttribute("id"), equalTo("bob"))
+    fun attribute() = assertThat(element().getDomAttribute("id"), equalTo("bob"))
 
     @Test
     fun text() = assertThat(element().text, equalTo("hello disabled"))
@@ -167,7 +167,7 @@ class JSoupWebElementTest {
         fun assertKeysSetValue(type: String) {
             val input = input(type)
             input.sendKeys("hello")
-            assertThat(input.getAttribute("value"), equalTo("hello"))
+            assertThat(input.getDomAttribute("value"), equalTo("hello"))
         }
 
         assertKeysSetValue("text")

@@ -19,8 +19,8 @@ data class HtmxCommand(
         // TODO: re-use headers from http4k.http4k-htmx instead of repeating?
         val headers = listOfNotNull(
             "hx-request" to "true",
-            element.getAttribute("id")?.let { "hx-trigger" to it },
-            element.getAttribute("name")?.let { "hx-trigger-name" to it },
+            element.getDomAttribute("id")?.let { "hx-trigger" to it },
+            element.getDomAttribute("name")?.let { "hx-trigger-name" to it },
             if (target.hasAttr("id")) "hx-target" to target.attr("id") else null,
         )
 
