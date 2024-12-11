@@ -56,6 +56,8 @@ data class SimpleRouteMatcher(
     override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
     override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
+
+    override fun toString(): String = router.toString()
 }
 
 data class HttpPathMethod(val path: String, val method: Method) {

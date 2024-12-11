@@ -1,6 +1,8 @@
 package org.http4k.routing
 
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.ApprovalTest
@@ -25,6 +27,30 @@ class RouterDescriptionTest {
             "host" to routes("/foo" bind GET to { Response(OK) }),
             "anotherHost" to routes("/bar" bind GET to { Response(OK) }
             )
+        )
+
+        approver.assertApproved(routes.toString())
+    }
+
+    @Test
+    fun `complicated toString with description`(approver: Approver) {
+        val handler: HttpHandler = { Response(OK) }
+
+        val template = routes(
+            "/foo/{any:.*}" bind GET to handler,
+            "/bar" bind handler
+        )
+
+        val reverseProxy = routes(
+            "proxy" bind reverseProxyRouting(
+                "hostA" to template,
+                "hostB" to template
+            )
+        )
+
+        val routes = routes(
+            reverseProxy,
+            orElse bind handler
         )
 
         approver.assertApproved(routes.toString())
