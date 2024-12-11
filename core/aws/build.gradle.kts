@@ -11,6 +11,8 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     implementation("software.amazon.awssdk:http-client-spi:_")
+
+    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-client-okhttp"))
     testImplementation(project(":http4k-client-apache"))
     testImplementation(project(":http4k-testing-hamkrest"))

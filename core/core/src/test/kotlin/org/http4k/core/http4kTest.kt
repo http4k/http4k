@@ -5,10 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.withAsyncApi
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-class AsyncHttpHandlerTest {
+class AsyncHttpHandlerTest: PortBasedTest {
     @Test
     fun `can convert a synchronous HttpHandler to mimic the AsyncHttpClient API`() {
 

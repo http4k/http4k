@@ -13,13 +13,14 @@ import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.time.Clock.fixed
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-class AwsClientFilterTest {
+class AwsClientFilterTest: PortBasedTest {
 
     private val scope = AwsCredentialScope("us-east", "s3")
     private val credentials = AwsCredentials("access", "secret")

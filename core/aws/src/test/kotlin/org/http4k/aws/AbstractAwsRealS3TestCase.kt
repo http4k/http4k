@@ -8,11 +8,12 @@ import org.http4k.core.then
 import org.http4k.filter.Payload
 import org.http4k.filter.Payload.Mode.Signed
 import org.http4k.lens.LensFailure
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.opentest4j.TestAbortedException
 import kotlin.random.Random
 
-abstract class AbstractAwsRealS3TestCase {
+abstract class AbstractAwsRealS3TestCase: PortBasedTest {
     val bucketName = randomString()
     val key = randomString()
     val bucketUrl = Uri.of("https://$bucketName.s3.amazonaws.com/")

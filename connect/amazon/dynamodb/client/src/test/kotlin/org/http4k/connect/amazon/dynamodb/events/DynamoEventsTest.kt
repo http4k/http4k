@@ -16,11 +16,12 @@ import org.http4k.serverless.FnLoader
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApprovalTest::class)
-class DynamoEventsTest {
+class DynamoEventsTest: PortBasedTest {
 
     private val event = DynamoDbEvent(
         listOf(

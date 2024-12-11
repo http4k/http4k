@@ -7,10 +7,11 @@ import org.http4k.routing.ws.bind
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
-abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerConfig) {
+abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerConfig): PortBasedTest {
 
     private lateinit var server: Http4kServer
 

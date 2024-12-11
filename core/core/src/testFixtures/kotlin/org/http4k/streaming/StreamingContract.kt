@@ -12,6 +12,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +26,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
-abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
+abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) :
+    PortBasedTest {
     private val runningInIdea = getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
 
     private fun baseUrl() = "http://localhost:${server.port()}"

@@ -22,12 +22,12 @@ import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.server.ServerConfig.UnsupportedStopMode
 import org.http4k.testing.ServerBackend
 import org.http4k.testing.ServerInDocker
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.assertTimeout
 import org.opentest4j.TestAbortedException
-import java.io.IOException
 import java.time.Duration.ofMillis
 import java.time.Duration.ofSeconds
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -39,7 +39,7 @@ abstract class ServerStopContract(
     private val backend: ServerBackend,
     protected val client: HttpHandler,
     enableStopModes: ConfigureServerStopContract.() -> Unit
-) {
+): PortBasedTest {
 
     private val defaultGracefulStopMode = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
