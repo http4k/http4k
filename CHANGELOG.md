@@ -9,7 +9,7 @@ changes with their rationale when appropriate:
 - **http4k-core** : Fix cookie format for cookie with no attributes. H/T @ollieabbey
 - **http4k-testing-webdriver** : Remove usages of deprecated getAttribute API. Now use getDomAttribute instead.
 - **http4k-cloudnative** : Deprecation of various functions and re-homing into http4k-platform-k8s module. 
-- **http4k-*** : [PRE RELEASE PREPARATION] As a part of the upcoming V6, several modules are being rehoused to new Maven coordinates. In preparation, we have introduced these modules to give users the time to migrate without taking on-board other breaking changes from v6 - essentially allowing the upgrade cycle to be:
+- **http4k-*** : [PRE RELEASE PREPARATION] As a part of the upcoming V6, several modules are being rehoused to new Maven coordinates within http4k Community edition (and retaining the Apache2 license). In preparation, we have introduced these modules to give users the time to migrate without taking on-board other breaking changes from v6 - essentially allowing the upgrade cycle to be:
 
 1. Upgrade to latest v5 release. Deal with deprecations and module changes.
 2. Upgrade to v6 when it is released. Deal with other breaking changes. We expect these to be mainly imports and will be detailed in the v6 release note when we have the chance. In the meantime, this is the list of modules that are being rehoused:
