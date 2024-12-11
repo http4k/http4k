@@ -21,7 +21,7 @@ class TestNamerTest {
     fun `class and method`() {
         assertThat(
             ClassAndMethod.nameFor(javaClass, javaClass.getMethod("class and method")),
-            equalTo("org/http4k/testing/TestNamerTests.class and method")
+            equalTo("org/http4k/testing/TestNamerTest.class and method")
         )
     }
 
@@ -29,7 +29,7 @@ class TestNamerTest {
     fun `class dir and method`() {
         assertThat(
             ClassDirAndMethod.nameFor(javaClass, javaClass.getMethod("class dir and method")),
-            equalTo("org/http4k/testing/TestNamerTests/class dir and method")
+            equalTo("org/http4k/testing/TestNamerTest/class dir and method")
         )
     }
 }
