@@ -46,6 +46,6 @@ dependencies {
 
 ## About the docs
 
-The main documentation has moved to the main http4k site [site](https://www.http4k.org/ecosystem/connect/)
+The main documentation has moved to the main http4k [site](https://http4k.org/ecosystem/connect/)
 The content for the documentation is now hosted alongside the main site in the repo [http4k/www](https://github.com/http4k/www)
 </div>
