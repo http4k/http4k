@@ -43,6 +43,7 @@ dependencies {
 ```
 
 <div class="github">
+
 ## About the docs
 
 The main documentation has moved to the main http4k site [site](https://www.http4k.org/ecosystem/connect/)
