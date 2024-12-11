@@ -48,8 +48,16 @@ class RouterDescriptionTest {
             )
         )
 
+        val static = routes(
+            "/static" bind routes(
+                "/directory" bind static(ResourceLoader.Directory("/tmp")),
+                "/classpath" bind static(ResourceLoader.Classpath()),
+            )
+        )
+
         val routes = routes(
             reverseProxy,
+            static,
             orElse bind handler
         )
 
