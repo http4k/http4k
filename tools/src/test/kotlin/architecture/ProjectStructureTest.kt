@@ -15,19 +15,20 @@ class ProjectStructureTest {
             .filter { file ->
                 file.hasImport {
                     it.hasNameStartingWith("org.http4k.server.") || it.hasNameStartingWith("org.http4k.client.")
-                }
+                } || file.hasPackage("org.http4k.server") || file.hasPackage("org.http4k.client")
             }
-            .filter { it.packagee?.name != "tools" }
             .classes()
 
-        portRequiredClasses
-            .fold(listOf<KoClassDeclaration>(), { acc, next ->
-                when {
-                    next.hasNameEndingWith("Test") -> acc + next
-                    next.hasParentWithName(portRequiredClasses.map(KoClassDeclaration::name)) -> acc + next
-                    else -> acc
-                }
-            })
-            .assertTrue { it.hasParentInterfaceWithName("PortBasedTest", indirectParents = true) }
+        val portClassNames = portRequiredClasses.map(KoClassDeclaration::name)
+
+        Konsist.scopeFromTest()
+            .files
+            .classes()
+            .filter {
+                it.hasNameEndingWith("Test") &&
+                    (it.name in portClassNames || it.hasParentWithName(portClassNames, indirectParents = true))
+            }
+            .assertTrue { it.hasParentInterfaceWithName("PortBasedTest", indirectParents = true)
+                || it.hasParentInterfaceWithName("InMemoryTest", indirectParents = true) }
     }
 }

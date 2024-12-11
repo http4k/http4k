@@ -4,10 +4,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.testingStopMode
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.io.File
 
-class Jetty11Http2Test {
+class Jetty11Http2Test: PortBasedTest {
 
     @Test
     fun `can configure http2`() {

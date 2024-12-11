@@ -5,10 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HeaderMap
 import io.undertow.util.HttpString
+import org.http4k.util.InMemoryTest
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class Http4kUndertowWebSocketCallbackKtTest {
+class Http4kUndertowWebSocketCallbackKtTest: InMemoryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["upgrade", "Upgrade", "keep-alive, Upgrade"])

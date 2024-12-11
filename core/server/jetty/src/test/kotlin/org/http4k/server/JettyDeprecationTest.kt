@@ -1,9 +1,10 @@
 package org.http4k.server
 
 import org.eclipse.jetty.http.HttpCompliance.RFC7230_LEGACY
+import org.http4k.util.InMemoryTest
 import org.junit.jupiter.api.Test
 
-class JettyDeprecationTest {
+class JettyDeprecationTest: InMemoryTest {
 
     @Test
     fun `deprecated things exist in jetty library`() {
