@@ -24,7 +24,7 @@ import org.http4k.format.MoshiString
 import org.http4k.lens.Header
 import kotlin.reflect.KClass
 
-abstract class AwsQueryAction<Req, Rsp : Any>(
+abstract class AwsQueryAction<Rsp : Any>(
     private val base: Request,
     private val clazz: KClass<Rsp>,
     private val autoMarshalling: AutoMarshallingJson<MoshiNode>,
@@ -38,7 +38,12 @@ abstract class AwsQueryAction<Req, Rsp : Any>(
             "Action" to actionName,
             "Version" to version
         ) + toQueryParams().toList())
-            .fold(base.with(Header.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)) { acc, it -> acc.form(it.first, it.second) }
+            .fold(base.with(Header.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)) { acc, it ->
+                acc.form(
+                    it.first,
+                    it.second
+                )
+            }
 
     @Suppress("UNCHECKED_CAST")
     override fun toResult(response: Response) = with(response) {
@@ -80,6 +85,7 @@ private fun transformMemberNodes(map: Map<String, Any>): Map<String, Any> = map.
                     is Map<*, *> -> listOf(transformMemberNodes(members as Map<String, Any>))
                     else -> emptyList<Any>()
                 }
+
                 else -> transformMemberNodes(valueMap)
             }
         }
