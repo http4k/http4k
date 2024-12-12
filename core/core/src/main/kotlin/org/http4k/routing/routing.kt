@@ -4,7 +4,9 @@ import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.core.queries
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler =
     routes(*list.map { "" bind it.first to it.second }.toTypedArray())
@@ -54,10 +56,21 @@ fun query(name: String, fn: (String) -> Boolean) =
 fun query(name: String, value: String) = query(name) { it == value }
 
 /**
- * Ensure all queries are present
+ * Ensure all queries are present and not null
  */
 fun queries(vararg names: String) =
     { req: Request -> names.all { req.query(it) != null } }.asRouter("Queries ${names.toList()}")
+
+/**
+ * Ensure query is present - even with no value
+ */
+fun query(name: String) =
+    { req: Request -> req.queries(name).isNotEmpty() }.asRouter()
+
+/**
+ * Ensure all queries are present and match what is in the Uri
+ */
+fun queriesFrom(uri: Uri) = { req: Request -> uri.queries().all { (name, value) -> req.queries(name).contains(value) } }.asRouter()
 
 /**
  * Apply routing predicate to a header

@@ -9,6 +9,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
@@ -70,12 +71,27 @@ class RouterMatchingTest {
     }
 
     @Test
+    fun `query present router`() {
+        val router: Router = query("foo")
+        assertThat(router.match(Request(GET, "").query("foo", null)), isA<MatchedWithoutHandler>())
+        assertThat(router.match(Request(GET, "")), isA<Unmatched>())
+    }
+
+    @Test
     fun `queries router`() {
         val router: Router = queries("foo", "bar")
         assertThat(router.match(Request(GET, "").query("foo", "1").query("bar", "2")), isA<MatchedWithoutHandler>())
         assertThat(router.match(Request(GET, "").query("foo", "1")), isA<Unmatched>())
         assertThat(router.match(Request(GET, "").query("bar", "2")), isA<Unmatched>())
         assertThat(router.match(Request(GET, "").query("foo2", "5")), isA<Unmatched>())
+    }
+
+    @Test
+    fun `queriesFrom router`() {
+        val router: Router = queriesFrom(Uri.of("http://localhost:8080?foo=boo&bar"))
+
+        assertThat(router.match(Request(GET, "http://localhost:8080?foo=bar")), isA<Unmatched>())
+        assertThat(router.match(Request(GET, "http://localhost:8080?foo=boo&bar")), isA<MatchedWithoutHandler>())
     }
 
     @Test
