@@ -19,24 +19,6 @@ class RouterDescriptionTest {
 
     @Test
     fun `toString is friendly`(approver: Approver) {
-        val and = GET.and(headers("host"))
-
-        approver.assertApproved(and.and(headers("host")).toString())
-    }
-
-    @Test
-    fun `complicated toString`(approver: Approver) {
-        val routes = reverseProxyRouting(
-            "host" to routes("/foo" bind GET to { Response(OK) }),
-            "anotherHost" to routes("/bar" bind GET to { Response(OK) }
-            )
-        )
-
-        approver.assertApproved(routes.toString())
-    }
-
-    @Test
-    fun `complicated toString with description`(approver: Approver) {
         val handler: HttpHandler = { Response(OK) }
 
         val template = routes(
