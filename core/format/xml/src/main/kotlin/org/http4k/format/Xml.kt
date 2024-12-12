@@ -19,6 +19,7 @@ import org.w3c.dom.Document
 import java.io.InputStream
 import java.io.StringWriter
 import java.nio.ByteBuffer
+import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
@@ -39,9 +40,10 @@ object Xml : AutoMarshallingXml() {
     @JvmName("stringAsXmlToJsonElement")
     fun asXmlToJsonElement(input: String): JsonElement = input.asXmlToJsonElement()
 
-    fun String.asXmlDocument(): Document =
+    fun String.asXmlDocument(config: XmlParsingConfig = defaultXmlParsingConfig): Document =
         DocumentBuilderFactory
             .newInstance()
+            .apply(config)
             .newDocumentBuilder()
             .parse(byteInputStream())
 
@@ -63,14 +65,15 @@ object Xml : AutoMarshallingXml() {
     /**
      * Convenience function to write the object as XML to the message body and set the content type.
      */
-    fun <IN : Any> BiDiLensSpec<IN, String>.xml() = map({ it.asXmlDocument() }, { it.asXmlString() })
+    fun <IN : Any> BiDiLensSpec<IN, String>.xml(config: XmlParsingConfig = defaultXmlParsingConfig) = map({ it.asXmlDocument(config) }, { it.asXmlString() })
 
-    fun asBiDiMapping() =
-        BiDiMapping<String, Document>({ it.asXmlDocument() }, { it.asXmlString() })
+    fun asBiDiMapping(config: XmlParsingConfig = defaultXmlParsingConfig) =
+        BiDiMapping<String, Document>({ it.asXmlDocument(config) }, { it.asXmlString() })
 
     fun Body.Companion.xml(
         description: String? = null,
-        contentNegotiation: ContentNegotiation = ContentNegotiation.None
+        contentNegotiation: ContentNegotiation = ContentNegotiation.None,
+        config: XmlParsingConfig = defaultXmlParsingConfig
     ): BiDiBodyLensSpec<Document> =
         httpBodyRoot(
             listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
@@ -79,5 +82,13 @@ object Xml : AutoMarshallingXml() {
         )
             .map(Body::payload) { Body(it) }
             .map(ByteBuffer::asString, String::asByteBuffer)
-            .map({ it.asXmlDocument() }, { it.asXmlString() })
+            .map({ it.asXmlDocument(config) }, { it.asXmlString() })
+}
+
+typealias XmlParsingConfig = DocumentBuilderFactory.() -> Unit
+
+val defaultXmlParsingConfig: XmlParsingConfig = {
+    isExpandEntityReferences = false
+    setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+    setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
 }
