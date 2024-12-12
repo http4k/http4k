@@ -9,6 +9,10 @@ changes with their rationale when appropriate:
   replacing &entity; references with their defined content), it will need to be updated to provide the correct configuration when deserialising the XML body.
   Entity references will now remain as unexpanded text in the document.
 
+Full details at: https://www.http4k.org/security/cve-2024-12345/
+
+H/T to @@JAckLosingHeart for the report.
+
 ### v5.40.0.0
 - **http4k-core** : Allow invalidation of cookie with a path. H/T @ollieabbey
 - **http4k-core** : Allow setting cookie value without quotes. H/T @ollieabbey
