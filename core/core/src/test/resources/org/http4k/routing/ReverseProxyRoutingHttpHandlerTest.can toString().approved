@@ -1,11 +1,2 @@
-or
-	and
-		Host or URI: 'host'
-		and
-			method == GET
-			template == 'route-contract'
-	and
-		Host or URI: 'anotherHost'
-		and
-			method == GET
-			template == 'route-contract'
+template=route-contract AND (method == GET AND host header or uri host = anotherHost)
+template=route-contract AND (method == GET AND host header or uri host = host)

@@ -6,7 +6,7 @@ import org.http4k.connect.amazon.apigatewayv2.model.ApiId
 import org.http4k.connect.amazon.apigatewayv2.model.ApiIntegrationVersion
 import org.http4k.connect.amazon.apigatewayv2.model.Integration
 import org.http4k.connect.amazon.apigatewayv2.model.IntegrationInfo
-import org.http4k.connect.amazon.kClass
+import org.http4k.connect.kClass
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
-import org.http4k.connect.amazon.Action
-import org.http4k.connect.amazon.RemoteFailure
+import org.http4k.connect.Action
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.apigatewayv2.model.ApiId
 import org.http4k.connect.amazon.apigatewayv2.model.ApiName
 import org.http4k.connect.amazon.apigatewayv2.model.IntegrationId

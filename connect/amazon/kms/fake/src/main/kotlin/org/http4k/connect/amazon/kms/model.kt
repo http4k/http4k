@@ -16,7 +16,7 @@ data class StoredCMK(
     val keyId: KMSKeyId,
     val arn: ARN,
     val keyUsage: KeyUsage,
-    val customerMasterKeySpec: CustomerMasterKeySpec,
+    val keySpec: CustomerMasterKeySpec,
     val privateKeyContent: EncryptionKeyContent?,
     val publicKeyContent: EncryptionKeyContent?,
     val deletion: Timestamp? = null
@@ -35,7 +35,7 @@ val EncryptionKeyContent.keySpec
     }
 
 val StoredCMK.signingAlgorithms
-    get() = when (customerMasterKeySpec) {
+    get() = when (keySpec) {
         CustomerMasterKeySpec.RSA_2048, CustomerMasterKeySpec.RSA_3072, CustomerMasterKeySpec.RSA_4096 -> listOf(
             SigningAlgorithm.RSASSA_PKCS1_V1_5_SHA_256,
             SigningAlgorithm.RSASSA_PKCS1_V1_5_SHA_384,
@@ -55,7 +55,7 @@ val StoredCMK.signingAlgorithms
         CustomerMasterKeySpec.SYMMETRIC_DEFAULT -> emptyList()
     }
 
-private fun StoredCMK.keyFactory(crypto: Provider) = when (customerMasterKeySpec) {
+private fun StoredCMK.keyFactory(crypto: Provider) = when (keySpec) {
     CustomerMasterKeySpec.RSA_2048, CustomerMasterKeySpec.RSA_3072, CustomerMasterKeySpec.RSA_4096 -> KeyFactory.getInstance(
         "RSA",
         crypto

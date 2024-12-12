@@ -2,8 +2,8 @@ package org.http4k.websocket
 
 import org.http4k.core.Request
 import org.http4k.routing.path
+import org.http4k.routing.websocket.bind
 import org.http4k.routing.websockets
-import org.http4k.routing.ws.bind
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer

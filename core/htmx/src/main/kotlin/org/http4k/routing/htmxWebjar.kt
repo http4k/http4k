@@ -25,9 +25,6 @@ fun htmxWebjars() = routes(
     static(Classpath("/META-INF/resources/webjars/hyperscript.org/$HYPERSCRIPT_VERSION/dist")),
 )
 
-@Deprecated("renamed to htmxWebjars()")
-fun htmxWebjar() = htmxWebjars()
-
 private object Versions {
     const val HTMX_VERSION = "2.0.3"
     const val HYPERSCRIPT_VERSION = "0.9.13"

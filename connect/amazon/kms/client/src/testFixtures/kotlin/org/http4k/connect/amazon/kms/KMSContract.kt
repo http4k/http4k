@@ -9,7 +9,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.core.model.KMSKeyId
 import org.http4k.connect.amazon.core.model.toARN
-import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec
 import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec.ECC_NIST_P521
 import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec.RSA_2048
 import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec.RSA_3072
@@ -21,7 +20,6 @@ import org.http4k.connect.amazon.kms.model.SigningAlgorithm.RSASSA_PKCS1_V1_5_SH
 import org.http4k.connect.amazon.kms.model.SigningAlgorithm.RSASSA_PSS_SHA_256
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.junit.jupiter.api.Test
 import java.security.KeyFactory
@@ -228,10 +226,7 @@ interface KMSContract : AwsContract {
         val keyId = kms.createKey(KeyUsage = SIGN_VERIFY, KeySpec = RSA_3072).successValue().KeyMetadata.KeyId
 
         try {
-            val publicKey = kms.getPublicKey(keyId).successValue()
-            @Suppress("DEPRECATION")
-            assertThat(publicKey.CustomerMasterKeySpec, equalTo(RSA_3072))
-            assertThat(publicKey.KeySpec, equalTo(RSA_3072))
+            assertThat(kms.getPublicKey(keyId).successValue().KeySpec, equalTo(RSA_3072))
         } finally {
             kms.scheduleKeyDeletion(keyId, 7).successValue()
         }

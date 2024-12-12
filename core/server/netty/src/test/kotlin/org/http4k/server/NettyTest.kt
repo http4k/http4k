@@ -13,7 +13,7 @@ import java.time.Duration.ofMillis
 
 val defaultStopMode = Graceful(ofMillis(1))
 
-class NettyTest : ServerContract({ Netty(it, defaultStopMode) }, ClientForServerTesting()) {
+class NettyTest : ServerContract({ port, _ -> Netty(port, defaultStopMode) }, ClientForServerTesting()) {
 
     @Test
     fun `sets keep-alive for non-streaming response`() {

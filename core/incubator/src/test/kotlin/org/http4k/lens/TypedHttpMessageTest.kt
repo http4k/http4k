@@ -27,7 +27,7 @@ data class MyType(val value: String)
 
 class TypedHttpMessageTest {
 
-    class MyRequest(request: Request) : TypedRequest(request) {
+    data class MyRequest(val request: Request) : TypedRequest(request) {
         val path by required(Path.value(MyValue))
         var query by required(Query.int())
         var header by optional(Header)

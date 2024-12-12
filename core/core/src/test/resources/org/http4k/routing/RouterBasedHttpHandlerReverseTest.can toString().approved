@@ -1,5 +1,1 @@
-and
-	Headers [host]
-	and
-		method == GET
-		template == 'route-contract'
+template=route-contract AND (method == GET AND Headers [host])
