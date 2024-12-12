@@ -1,2 +1,0 @@
-template=bar AND (method == GET AND host header or uri host = anotherHost)
-template=foo AND (method == GET AND host header or uri host = host)
