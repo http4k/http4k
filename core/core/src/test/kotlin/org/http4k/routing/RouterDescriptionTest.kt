@@ -47,13 +47,11 @@ class RouterDescriptionTest {
             )
         )
 
-        // TODO include predicate description
-        @Suppress("UNUSED_VARIABLE")
         val predicates = routes(
             "/predicates" bind routes(
                 query("q", "foo")
                     .or(headers("q").and(header("q", "foo")))
-                    .or(body({ b: String -> b == "foo" })) bind handler,
+                    .or(body(Matcher.equalTo("foo"))) bind handler,
             )
         )
 
@@ -61,7 +59,7 @@ class RouterDescriptionTest {
             reverseProxy,
             static,
             spa,
-//            predicates,
+            predicates,
             orElse bind handler
         )
 
