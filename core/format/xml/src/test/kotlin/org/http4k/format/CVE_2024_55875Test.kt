@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
 import java.util.concurrent.atomic.AtomicBoolean
 
-class XmlSecurityTest : PortBasedTest {
+class CVE_2024_55875Test : PortBasedTest {
 
     @Test
     fun `does not expand external entity`() {

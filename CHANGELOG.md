@@ -3,6 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.41.0.0
+- **http4k-format-xml** : [Fix CVE-2024-55875: Possible Break] Fixed XML processing by disabling entity expansion in DocumentBuilderFactory configuration.
+  **Note:** This change affects how XML entity references are handled. If your code relies on XML entity expansion (like
+  replacing &entity; references with their defined content), it will need to be updated to provide the correct configuration when deserialising the XML body.
+  Entity references will now remain as unexpanded text in the document.
+
 ### v5.40.0.0
 - **http4k-core** : Allow invalidation of cookie with a path. H/T @ollieabbey
 - **http4k-core** : Allow setting cookie value without quotes. H/T @ollieabbey
