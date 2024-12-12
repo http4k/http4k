@@ -1,5 +1,4 @@
 all
-SPA at /spa
 SPA at /spa/classpath
 SPA at /spa/directory
 static files at /static/classpath

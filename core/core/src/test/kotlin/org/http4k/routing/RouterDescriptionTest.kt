@@ -36,7 +36,7 @@ class RouterDescriptionTest {
         val spa = routes(
             "/spa" bind routes(
                 "/directory" bind singlePageApp(ResourceLoader.Directory("/tmp")),
-                "/classpath" bind singlePageApp(ResourceLoader.Classpath()), singlePageApp()
+                "/classpath" bind singlePageApp(ResourceLoader.Classpath())
             )
         )
 
