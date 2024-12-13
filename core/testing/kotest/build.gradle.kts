@@ -1,8 +1,8 @@
-import org.http4k.internal.ModuleLicense.Apache2
+import org.http4k.internal.ModuleLicense.Http4kCommunity
 
 description = "A set of kotest matchers for common http4k types"
 
-val license by project.extra { Apache2 }
+val license by project.extra { Http4kCommunity }
 
 plugins {
     id("org.http4k.community")

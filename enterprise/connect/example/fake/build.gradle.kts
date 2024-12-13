@@ -1,8 +1,8 @@
-import org.http4k.internal.ModuleLicense.Http4kEnterprise
+import org.http4k.internal.ModuleLicense.Http4kCommercial
 
 description = "Example enterprise fake module"
 
-val license by project.extra { Http4kEnterprise }
+val license by project.extra { Http4kCommercial }
 
 plugins {
     id("org.http4k.enterprise")
