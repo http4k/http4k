@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Http4kCommercial
 
-description = "Test module"
+description = "Test Pro module"
 
 val license by project.extra { Http4kCommercial }
 
