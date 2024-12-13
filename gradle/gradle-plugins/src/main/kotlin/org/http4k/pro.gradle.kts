@@ -5,4 +5,4 @@ plugins {
     id("org.http4k.api-docs")
 }
 
-group = "org.http4k.enterprise"
+group = "org.http4k.pro"

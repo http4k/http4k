@@ -5,7 +5,7 @@ description = "Test Pro module"
 val license by project.extra { Http4kCommercial }
 
 plugins {
-    id("org.http4k.enterprise")
+    id("org.http4k.pro")
 }
 
 dependencies {
