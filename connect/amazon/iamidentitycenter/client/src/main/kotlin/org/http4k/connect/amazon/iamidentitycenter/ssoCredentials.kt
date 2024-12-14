@@ -35,7 +35,7 @@ fun CredentialsProvider.Companion.SSO(
 
     override fun invoke() = with(
         ref.get()
-            ?.takeIf { it.expiration.toInstant().isBefore(clock.instant()) }
+            ?.takeIf { it.expiration.toInstant().isAfter(clock.instant()) }
             ?: retrieveDeviceToken().getAwsCredentials()
                 .peek(ref::set)
                 .onFailure { it.reason.throwIt() }

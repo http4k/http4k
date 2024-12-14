@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.41.0.1 (uncut)
+- **http4k-connect-amazon-iamidentitycenter*** :[Fix 1239] CredentialsProvider.SSO - Credentials caching issue.
+
 ### v5.41.0.0
 - **http4k-format-xml** : [Fix CVE-2024-55875: Possible Break] Fixed XML processing by disabling entity expansion in DocumentBuilderFactory configuration.
   **Note:** This change affects how XML entity references are handled. If your code relies on XML entity expansion (like
