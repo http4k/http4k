@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.41.0.1 (uncut)
+### v5.41.1.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-connect-amazon-iamidentitycenter*** :[Fix 1239] CredentialsProvider.SSO - Credentials caching issue.
 
 ### v5.41.0.0
