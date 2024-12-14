@@ -9,7 +9,6 @@ import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.iamidentitycenter.model.RoleName
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
-import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 
