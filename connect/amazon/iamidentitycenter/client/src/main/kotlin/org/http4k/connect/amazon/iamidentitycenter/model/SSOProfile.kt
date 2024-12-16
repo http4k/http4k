@@ -53,7 +53,7 @@ fun SSOProfile.cachedRegistrationPath(dir: Path): Path {
     val sessionName = ssoSession?.value
     val startUrl = startUri.toString()
     val input =
-        "{\"region\": \"$region\", \"scopes\": null, \"$sessionName\": null, \"startUrl\": \"$startUrl\", \"tool\": \"botocore\"}"
+        "{\"region\": \"$region\", \"scopes\": null, \"session_name\": \"$sessionName\", \"startUrl\": \"$startUrl\", \"tool\": \"botocore\"}"
 
     return dir.resolve("${sha1hex(input)}.json")
 }
