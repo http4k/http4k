@@ -66,7 +66,7 @@ class SSOProfileLoadingTest {
 
 
     @Test
-    fun `load and merse SSO profile`() {
+    fun `load and merge SSO profile`() {
 
         val profile = SSOProfile.loadProfiles(configPath)[ProfileName.of("prod")]
 

@@ -9,6 +9,7 @@ import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.iamidentitycenter.model.RoleName
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
+import org.http4k.connect.amazon.iamidentitycenter.model.cachedRegistrationPath
 import org.http4k.connect.amazon.iamidentitycenter.model.cachedTokenPath
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -173,16 +174,12 @@ class SSOCredentialsProviderTest {
             "oidc" to oidc,
         )
 
-        ssoProfile.cachedTokenPath(cachedTokenDirectory).toFile().writeText(
+        ssoProfile.cachedRegistrationPath(cachedTokenDirectory).toFile().writeText(
             """
                 {
-                  "startUrl": "http://foobar",
-                  "region": "us-east-1",
-                  "accessToken": "AccessToken-http4k-connect-client",
-                  "expiresAt": "2024-01-15T10:59:59Z",
                   "clientId": "http4k-connect-client",
                   "clientSecret": "http4k-connect-client",
-                  "registrationExpiresAt": "2025-01-15T10:59:59Z"
+                  "expiresAt": "2025-01-15T10:59:59Z"
                 }
                 """.trimIndent()
         )

@@ -39,10 +39,21 @@ fun Map<String, String>.toSSOProfile(): SSOProfile? {
 }
 
 fun SSOProfile.cachedTokenPath(dir: Path): Path {
-    val md: MessageDigest = MessageDigest.getInstance("SHA-1").apply {
-        update((ssoSession?.toString() ?: startUri.toString()).toByteArray(Charsets.UTF_8))
-    }
-    val key = md.digest().encodeToString(Base16 { encodeToLowercase = true })
+    val input = ssoSession?.toString() ?: startUri.toString()
 
-    return dir.resolve("$key.json")
+    return dir.resolve("${sha1hex(input)}.json")
+}
+
+private fun sha1hex(input: String): String = MessageDigest.getInstance("SHA-1").apply {
+    update(input.toByteArray(Charsets.UTF_8))
+}.digest().encodeToString(Base16 { encodeToLowercase = true })
+
+fun SSOProfile.cachedRegistrationPath(dir: Path): Path {
+    val region = region.value
+    val sessionName = ssoSession?.value
+    val startUrl = startUri.toString()
+    val input =
+        "{\"region\": \"$region\", \"scopes\": null, \"$sessionName\": null, \"startUrl\": \"$startUrl\", \"tool\": \"botocore\"}"
+
+    return dir.resolve("${sha1hex(input)}.json")
 }

@@ -9,7 +9,6 @@ import org.http4k.connect.amazon.AWS_CONFIG_FILE
 import org.http4k.connect.amazon.AWS_PROFILE
 import org.http4k.connect.amazon.CredentialsChain
 import org.http4k.connect.amazon.core.model.ProfileName
-import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.routing.reverseProxy
 import org.junit.jupiter.api.AfterEach

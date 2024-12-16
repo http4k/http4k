@@ -10,7 +10,6 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.connect.amazon.CredentialsProvider
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
-import org.http4k.connect.amazon.iamidentitycenter.model.cachedTokenPath
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.RoleCredentials
@@ -34,6 +33,8 @@ fun CredentialsProvider.Companion.SSO(
     waitFor: (Long) -> Unit = { Thread.sleep(it) },
     cachedTokenDirectory: Path = Path(System.getProperty("user.home")).resolve(".aws/sso/cache")
 ) = object : CredentialsProvider {
+
+    private val ssoCacheManager = SSOCacheManager(cachedTokenDirectory)
     private val ref = AtomicReference<RoleCredentials>(null)
 
     override fun invoke() = with(
@@ -50,8 +51,7 @@ fun CredentialsProvider.Companion.SSO(
             .map { it.roleCredentials }
 
     private fun retrieveDeviceToken(): DeviceToken {
-        val cachedTokenPath = ssoProfile.cachedTokenPath(cachedTokenDirectory)
-        return retrieveSSOCachedCredentials(cachedTokenPath)
+        return ssoCacheManager.retrieveSSOCachedToken(ssoProfile)
             ?.takeIf { it.expiresAt.isAfter(clock.instant()) }
             ?.toDeviceToken()
             ?: oidcRetrieveDeviceToken()
@@ -59,10 +59,14 @@ fun CredentialsProvider.Companion.SSO(
 
 
     private fun OIDC.retrieveRegisteredClient(): RegisteredClient =
-        retrieveSSOCachedCredentials(ssoProfile.cachedTokenPath(cachedTokenDirectory))
-            ?.takeIf { it.registrationExpiresAt.isAfter(clock.instant()) }
+        ssoCacheManager.retrieveSSOCachedRegistration(ssoProfile)
+            ?.takeIf { it.expiresAt.isAfter(clock.instant()) }
             ?.toRegisteredClient(clock)
-            ?: registerClient(clientName).onFailure { it.reason.throwIt() }
+            ?: registerClient(clientName)
+                .peek {
+                    ssoCacheManager.storeSSOCachedRegistration(ssoProfile, it.toSSOCachedRegistration())
+                }
+                .onFailure { it.reason.throwIt() }
 
     private fun oidcRetrieveDeviceToken() =
         with(OIDC.Http(ssoProfile.region, http)) {
@@ -88,9 +92,8 @@ fun CredentialsProvider.Companion.SSO(
                         tokenResult = createToken(client.clientId, client.clientSecret, auth.deviceCode)
                     }
                     tokenResult.peek {
-                        storeSSOCachedCredentials(
-                            ssoProfile.cachedTokenPath(cachedTokenDirectory),
-                            SSOCachedCredentials.of(ssoProfile, it, client)
+                        ssoCacheManager.storeSSOCachedToken(
+                            ssoProfile, SSOCachedToken.of(ssoProfile, it, client)
                         )
                     }
                 }
