@@ -56,9 +56,11 @@ class SSOCredentialsChainTest {
         val credentials = CredentialsChain.SSO(
             env,
             http = http,
-            openBrowser = {},
-            waitFor = {},
-            cachedTokenDirectory = cachedTokenDirectory
+            cachedTokenDirectory = cachedTokenDirectory,
+            login = SSOLogin.enabled(
+                openBrowser = {},
+                waitFor = {}
+            )
         )()
 
 
@@ -75,9 +77,11 @@ class SSOCredentialsChainTest {
         val credentials = CredentialsChain.SSO(
             env.with(AWS_PROFILE of ProfileName.of("dev")),
             http = http,
-            openBrowser = {},
-            waitFor = {},
-            cachedTokenDirectory = cachedTokenDirectory
+            cachedTokenDirectory = cachedTokenDirectory,
+            login = SSOLogin.enabled(
+                openBrowser = {},
+                waitFor = {}
+            )
         )()
 
 

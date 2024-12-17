@@ -23,10 +23,12 @@ interface IAMIdentityCenterContract : AwsContract {
                 Uri.of("http://foobar"),
             ),
             http,
-            openBrowser = {
-                assertThat(it, equalTo(Uri.of("https://device.sso.ldn-north-1.amazonaws.com/?user_code=HTTP-4KOK")))
-            },
-            waitFor = {}
+            login = SSOLogin.enabled(
+                openBrowser = {
+                    assertThat(it, equalTo(Uri.of("https://device.sso.ldn-north-1.amazonaws.com/?user_code=HTTP-4KOK")))
+                },
+                waitFor = {}
+            )
         )()
 
         assertThat(

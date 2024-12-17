@@ -1,10 +1,14 @@
 import org.http4k.connect.amazon.CredentialsChain
 import org.http4k.connect.amazon.iamidentitycenter.SSO
+import org.http4k.connect.amazon.iamidentitycenter.SSOLogin
 
 // example of using SSO credentials provider
 fun main() {
-    val provider = CredentialsChain.SSO()
+    val providerLoginEnabled = CredentialsChain.SSO()
+    val credentials1 = providerLoginEnabled()
+    println(credentials1)
 
-    val credentials = provider()
-    println(credentials)
+    val providerLoginDisabled = CredentialsChain.SSO(login = SSOLogin.disabled)
+    val credentials2 = providerLoginDisabled()
+    println(credentials2)
 }

@@ -3,7 +3,9 @@ package org.http4k.connect.amazon.iamidentitycenter.oidc.action
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.amazon.iamidentitycenter.IAMIdentityCenterMoshi
 import org.http4k.connect.amazon.iamidentitycenter.OIDCAction
+import org.http4k.connect.amazon.iamidentitycenter.model.PKCECodeVerifier
 import org.http4k.connect.amazon.iamidentitycenter.model.AccessToken
+import org.http4k.connect.amazon.iamidentitycenter.model.AuthCode
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
 import org.http4k.connect.amazon.iamidentitycenter.model.DeviceCode
@@ -13,6 +15,7 @@ import org.http4k.connect.amazon.iamidentitycenter.model.SessionId
 import org.http4k.connect.kClass
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.with
 import se.ansman.kotshi.JsonSerializable
 
@@ -21,15 +24,22 @@ import se.ansman.kotshi.JsonSerializable
 data class CreateToken(
     val clientId: ClientId,
     val clientSecret: ClientSecret,
-    val deviceCode: DeviceCode,
+    val grantType: String,
+    val deviceCode: DeviceCode?,
+    val redirectUri: Uri?,
+    val codeVerifier: PKCECodeVerifier?,
+    val code: AuthCode?,
 ) : OIDCAction<DeviceToken>(kClass()) {
     override fun toRequest() = Request(Method.POST, "token")
         .with(
             IAMIdentityCenterMoshi.autoBody<Any>().toLens() of mapOf(
                 "clientId" to clientId,
                 "clientSecret" to clientSecret,
+                "grantType" to grantType,
                 "deviceCode" to deviceCode,
-                "grantType" to "urn:ietf:params:oauth:grant-type:device_code"
+                "redirectUri" to redirectUri,
+                "codeVerifier" to codeVerifier,
+                "code" to code
             )
         )
 }

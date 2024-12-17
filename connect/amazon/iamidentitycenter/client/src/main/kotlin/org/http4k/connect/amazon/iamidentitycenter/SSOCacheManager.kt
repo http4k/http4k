@@ -2,6 +2,7 @@ package org.http4k.connect.amazon.iamidentitycenter
 
 import org.http4k.connect.amazon.iamidentitycenter.model.AccessToken
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
+import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
 import org.http4k.connect.amazon.iamidentitycenter.model.cachedRegistrationPath
@@ -15,10 +16,10 @@ import java.nio.file.Path
 import java.time.Clock
 import java.time.Instant
 
-class SSOCacheManager(val cachedTokenDirectory: Path) {
+class SSOCacheManager(val cachedTokenDirectory: Path, val clientName: ClientName) {
 
     private fun SSOProfile.cachedTokenPath() = cachedTokenPath(cachedTokenDirectory)
-    private fun SSOProfile.cachedRegistrationPath() = cachedRegistrationPath(cachedTokenDirectory)
+    private fun SSOProfile.cachedRegistrationPath() = cachedRegistrationPath(cachedTokenDirectory, clientName)
 
     fun retrieveSSOCachedToken(ssoProfile: SSOProfile): SSOCachedToken? {
         val file = ssoProfile.cachedTokenPath().toFile()
@@ -48,7 +49,8 @@ data class SSOCachedToken(
     val expiresAt: Instant,
     val clientId: String,
     val clientSecret: String,
-    val registrationExpiresAt: Instant
+    val registrationExpiresAt: Instant,
+    val refreshToken: String? = null,
 ) {
     companion object
 }
@@ -76,12 +78,13 @@ fun SSOCachedRegistration.toRegisteredClient(clock: Clock) = RegisteredClient(
 fun SSOCachedToken.Companion.of(
     ssoProfile: SSOProfile,
     deviceToken: DeviceToken,
-    client: RegisteredClient
+    client: RegisteredClient,
+    clock: Clock
 ) = SSOCachedToken(
     ssoProfile.startUri.toString(),
     ssoProfile.region.value,
     deviceToken.accessToken.value,
-    expiresAt = Instant.ofEpochSecond(deviceToken.expiresIn),
+    expiresAt = Instant.now(clock).plusSeconds(deviceToken.expiresIn),
     clientId = client.clientId.value,
     clientSecret = client.clientSecret.value,
     registrationExpiresAt = client.clientSecretExpiresAt.toInstant()
@@ -92,13 +95,23 @@ fun SSOCachedToken.Companion.of(
 data class SSOCachedRegistration(
     val clientId: String,
     val clientSecret: String,
-    val expiresAt: Instant
+    val expiresAt: Instant,
+    val scopes: List<String>? = null,
+    val grantTypes: List<String>? = null
 ) {
     companion object
 }
 
-fun RegisteredClient.toSSOCachedRegistration() = SSOCachedRegistration(
-    clientId = clientId.value,
-    clientSecret = clientSecret.value,
-    expiresAt = clientSecretExpiresAt.toInstant()
-)
+fun SSOCachedRegistration.Companion.of(
+    registeredClient: RegisteredClient,
+    scopes: List<String>?,
+    grantTypes: List<String>?
+) =
+    SSOCachedRegistration(
+        clientId = registeredClient.clientId.value,
+        clientSecret = registeredClient.clientSecret.value,
+        expiresAt = registeredClient.clientSecretExpiresAt.toInstant(),
+        scopes = scopes,
+        grantTypes = grantTypes
+    )
+
