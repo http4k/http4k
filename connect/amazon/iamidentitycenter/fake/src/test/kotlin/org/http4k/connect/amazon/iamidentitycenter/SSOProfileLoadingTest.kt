@@ -83,4 +83,42 @@ class SSOProfileLoadingTest {
             )
         )
     }
+
+    @Test
+    fun `load default profile and merge SSO profile`() {
+
+        configPath.toFile().writeText(
+            """
+                [default]
+                sso_session = my-sso
+                sso_account_id = 01234567891
+                sso_role_name = hello
+                
+                [profile dev]
+                sso_account_id = 01234567890
+                sso_role_name = hello
+                sso_region = us-east-1
+                sso_start_url = http://foobar
+                
+                [sso-session my-sso]
+                sso_region = us-east-1
+                sso_start_url = http://bizbaz
+            """.trimIndent()
+        )
+
+        val profile = SSOProfile.loadProfiles(configPath)[ProfileName.of("default")]
+
+        assertThat(
+            profile,
+            equalTo(
+                SSOProfile(
+                    AwsAccount.Companion.of("01234567891"),
+                    RoleName.Companion.of("hello"),
+                    Region.Companion.US_EAST_1,
+                    Uri.Companion.of("http://bizbaz"),
+                    SSOSession.of("my-sso")
+                )
+            )
+        )
+    }
 }

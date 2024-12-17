@@ -59,16 +59,16 @@ class ConfigSectionName private constructor(value: String) : StringValue(value) 
 
 fun Map<ConfigSectionName, Map<String, String>>.profileSections(): List<Pair<ProfileName, Map<String, String>>> {
     val defaultSection = get(ConfigSectionName.default) ?: emptyMap()
-
     return filter { it.key.type == ConfigSectionType.profile }.mapNotNull { (sectionName, section) ->
+        sectionName.name?.let { it to mergeWithSSOSession(section) }
 
-        val ssoSection = section["sso_session"]?.let {
-            get(ConfigSectionName.of(ConfigSectionType.ssoSession, ProfileName.of(it)))
-        } ?: emptyMap()
+    } + (ProfileName.of("default") to mergeWithSSOSession(defaultSection))
+}
 
-        val mergedSection = ssoSection + section
+private fun Map<ConfigSectionName, Map<String, String>>.mergeWithSSOSession(section: Map<String, String>): Map<String, String> {
+    val ssoSection = section["sso_session"]?.let {
+        get(ConfigSectionName.of(ConfigSectionType.ssoSession, ProfileName.of(it)))
+    } ?: emptyMap()
 
-        sectionName.name?.let { it to mergedSection }
-
-    } + (ProfileName.of("default") to defaultSection)
+    return ssoSection + section
 }
