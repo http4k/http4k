@@ -2,11 +2,13 @@ package org.http4k.connect.amazon.iamidentitycenter
 
 import com.squareup.moshi.JsonAdapter
 import org.http4k.connect.amazon.iamidentitycenter.model.AccessToken
+import org.http4k.connect.amazon.iamidentitycenter.model.AuthCode
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
 import org.http4k.connect.amazon.iamidentitycenter.model.DeviceCode
 import org.http4k.connect.amazon.iamidentitycenter.model.IdToken
+import org.http4k.connect.amazon.iamidentitycenter.model.PKCECodeVerifier
 import org.http4k.connect.amazon.iamidentitycenter.model.RefreshToken
 import org.http4k.connect.amazon.iamidentitycenter.model.RoleName
 import org.http4k.connect.amazon.iamidentitycenter.model.SessionId
@@ -28,6 +30,8 @@ object IAMIdentityCenterMoshi : ConfigurableMoshi(
         .value(SessionId)
         .value(RoleName)
         .value(UserCode)
+        .value(AuthCode)
+        .value(PKCECodeVerifier)
         .done()
 )
 

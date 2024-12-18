@@ -18,7 +18,10 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class RegisterClient(
     val clientName: ClientName,
-    val scopes: List<String>? = null
+    val scopes: List<String>? = null,
+    val grantTypes: List<String>? = null,
+    val redirectUris: List<Uri>? = null,
+    val issuerUrl: Uri? = null
 ) : OIDCAction<RegisteredClient>(kClass()) {
 
     override fun toRequest() = Request(Method.POST, "/client/register")
@@ -26,6 +29,9 @@ data class RegisterClient(
             IAMIdentityCenterMoshi.autoBody<Any>().toLens() of mapOf(
                 "clientName" to clientName,
                 "scopes" to scopes,
+                "grantTypes" to grantTypes,
+                "redirectUris" to redirectUris,
+                "issuerUrl" to issuerUrl,
                 "clientType" to "public"
             )
         )
