@@ -14,6 +14,7 @@ import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.PKCECodeVerifier
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
 import org.http4k.connect.amazon.iamidentitycenter.model.sessionName
+import org.http4k.connect.amazon.iamidentitycenter.oidc.action.AuthorizationStarted
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.RoleCredentials
@@ -77,12 +78,8 @@ fun CredentialsProvider.Companion.SSO(
     cachedTokenDirectory: Path = Path(System.getProperty("user.home")).resolve(".aws/sso/cache"),
     login: SSOLogin = SSOLogin.enabled(),
 ) = object : CredentialsProvider {
-    private val ssoCacheManager = SSOCacheManager(cachedTokenDirectory, clientName)
+    private val ssoCacheManager = SSOCacheManager(ssoProfile, cachedTokenDirectory, clientName)
     private val ref = AtomicReference<RoleCredentials>(null)
-    private val grantTypes = if (ssoProfile.ssoSession != null) listOf("authorization_code", "refresh_token") else null
-    private val redirectUris = if (ssoProfile.ssoSession != null) listOf(redirectUri) else null
-    private val issuerUrl = if (ssoProfile.ssoSession != null) ssoProfile.startUri else null
-    private val scopes: List<String>? = if (ssoProfile.ssoSession != null) ssoProfile.ssoSessionScopes() else null
 
     override fun invoke() = with(ref.get()?.takeIf { it.expiration.toInstant().isAfter(clock.instant()) }
         ?: retrieveDeviceToken().getAwsCredentials().peek(ref::set).onFailure { it.reason.throwIt() }) {
@@ -97,7 +94,7 @@ fun CredentialsProvider.Companion.SSO(
         .getFederatedCredentials(ssoProfile.accountId, ssoProfile.roleName, this.accessToken).map { it.roleCredentials }
 
     private fun retrieveValidCachedDeviceToken(forceRefresh: Boolean = false): DeviceToken? =
-        (if (!forceRefresh) ssoCacheManager.retrieveSSOCachedToken(ssoProfile) else null)
+        (if (!forceRefresh) ssoCacheManager.retrieveSSOCachedToken() else null)
             ?.takeIf { it.expiresAt.isAfter(clock.instant()) }
             ?.toDeviceToken()
 
@@ -110,60 +107,41 @@ fun CredentialsProvider.Companion.SSO(
     }
 
 
-    private fun OIDC.retrieveRegisteredClient(): RegisteredClient = registerClient(
-        clientName,
-        scopes,
-        grantTypes,
-        redirectUris,
-        issuerUrl
-    ).peek {
-        ssoCacheManager.storeSSOCachedRegistration(
-            ssoProfile, SSOCachedRegistration.of(it, scopes, grantTypes)
-        )
-    }.onFailure { it.reason.throwIt() }
-
     private fun SSOLoginEnabled.oidcRetrieveDeviceToken(): DeviceToken = with(OIDC.Http(ssoProfile.region, http)) {
 
-        val client = ssoCacheManager.retrieveSSOCachedRegistration(ssoProfile)
+        val scopes: List<String>? = if (ssoProfile.ssoSession != null) ssoProfile.ssoSessionScopes() else null
+        val grantTypes = if (ssoProfile.ssoSession != null) listOf("authorization_code", "refresh_token") else null
+        val redirectUris = if (ssoProfile.ssoSession != null) listOf(redirectUri) else null
+        val issuerUrl = if (ssoProfile.ssoSession != null) ssoProfile.startUri else null
+
+        val client = ssoCacheManager.retrieveSSOCachedRegistration()
             ?.takeIf { it.expiresAt.isAfter(clock.instant()) }
             ?.toRegisteredClient(clock)
-            ?: retrieveRegisteredClient()
+            ?: registerClient(clientName, scopes, grantTypes, redirectUris, issuerUrl)
+                .peek {
+                    ssoCacheManager.storeSSOCachedRegistration(SSOCachedRegistration.of(it, scopes, grantTypes))
+                }.onFailure { it.reason.throwIt() }
 
         (if (ssoProfile.ssoSession == null) {
             startDeviceAuthorization(client.clientId, client.clientSecret, ssoProfile.startUri)
                 .flatMap { auth ->
                     openBrowser(auth.verificationUriComplete)
-                    var tokenResult = createToken(
-                        client.clientId,
-                        client.clientSecret,
-                        "urn:ietf:params:oauth:grant-type:device_code",
-                        auth.deviceCode
-                    )
+                    var tokenResult = createDeviceCodeToken(client, auth)
 
                     while (tokenResult !is Success<DeviceToken> && clock.instant()
                             .isBefore(clock.instant().plusSeconds(auth.expiresIn))
                     ) {
                         waitFor(auth.interval * 1000)
-                        tokenResult = createToken(
-                            client.clientId,
-                            client.clientSecret,
-                            "urn:ietf:params:oauth:grant-type:device_code",
-                            auth.deviceCode
-                        )
+                        tokenResult = createDeviceCodeToken(client, auth)
                     }
 
                     tokenResult
 
                 }
         } else {
-            val (codeVerifier, code, redirectUri) = startPkceAuthorization(client)
-            createToken(
-                client.clientId, client.clientSecret, "authorization_code", null, redirectUri, codeVerifier, code
-            )
+            createAuthCodeToken(client, startPkceAuthorization(client))
         }).peek {
-            ssoCacheManager.storeSSOCachedToken(
-                ssoProfile, SSOCachedToken.of(ssoProfile, it, client, clock)
-            )
+            ssoCacheManager.storeSSOCachedToken(SSOCachedToken.of(ssoProfile, it, client, clock))
         }.onFailure { it.reason.throwIt() }
     }
 
@@ -177,16 +155,18 @@ fun CredentialsProvider.Companion.SSO(
                 .use { server ->
                     server.start()
                     val redirectUriWithPort = redirectUri.port(server.port())
-                    val authorizationUri = OIDC.extractBaseUri(region = ssoProfile.region)
-                        .path("authorize")
-                        .query("response_type", "code")
-                        .query("client_id", registeredClient.clientId.value)
-                        .query("redirect_uri", redirectUriWithPort.toString())
-                        .query("state", expectedState.toString())
-                        .query("code_challenge_method", "S256")
-                        .query("scope", ssoProfile.ssoSessionScopes().joinToString(" "))
-                        .query("code_challenge", challenge.value)
-                    openBrowser(authorizationUri)
+                    openBrowser(
+                        OIDC.extractBaseUri(region = ssoProfile.region)
+                            .path("authorize")
+                            .query("response_type", "code")
+                            .query("client_id", registeredClient.clientId.value)
+                            .query("redirect_uri", redirectUriWithPort.toString())
+                            .query("state", expectedState)
+                            .query("code_challenge_method", "S256")
+                            .query("scope", ssoProfile.ssoSessionScopes().joinToString(" "))
+                            .query("code_challenge", challenge.value)
+                    )
+
                     check(sem.tryAcquire(60L, TimeUnit.SECONDS)) {
                         "Failed to retrieve an authorization code."
                     }
@@ -200,7 +180,7 @@ fun CredentialsProvider.Companion.SSO(
         }
 
         checkNotNull(auth.code) {
-            "Code parameter is not present: ${auth.error}"
+            "Request denied: ${auth.error}"
         }
 
         return PkceAuth(codeVerifier, auth.code, redirectUriWithPort)
@@ -208,6 +188,25 @@ fun CredentialsProvider.Companion.SSO(
     }
 
 }
+
+private fun OIDC.createAuthCodeToken(
+    client: RegisteredClient,
+    auth: PkceAuth
+) = createToken(
+    client.clientId,
+    client.clientSecret,
+    "authorization_code",
+    redirectUri = auth.redirectUri,
+    codeVerifier = auth.codeVerifier,
+    code = auth.code
+)
+
+private fun OIDC.createDeviceCodeToken(
+    client: RegisteredClient,
+    auth: AuthorizationStarted
+) = createToken(
+    client.clientId, client.clientSecret, "urn:ietf:params:oauth:grant-type:device_code", auth.deviceCode
+)
 
 private fun SSOProfile.ssoSessionScopes(): List<String> = ssoRegistrationScopes ?: listOf("sso:account:access")
 

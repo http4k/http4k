@@ -16,26 +16,26 @@ import java.nio.file.Path
 import java.time.Clock
 import java.time.Instant
 
-class SSOCacheManager(val cachedTokenDirectory: Path, val clientName: ClientName) {
+class SSOCacheManager(val ssoProfile: SSOProfile, val cachedTokenDirectory: Path, val clientName: ClientName) {
 
     private fun SSOProfile.cachedTokenPath() = cachedTokenPath(cachedTokenDirectory)
     private fun SSOProfile.cachedRegistrationPath() = cachedRegistrationPath(cachedTokenDirectory, clientName)
 
-    fun retrieveSSOCachedToken(ssoProfile: SSOProfile): SSOCachedToken? {
+    fun retrieveSSOCachedToken(): SSOCachedToken? {
         val file = ssoProfile.cachedTokenPath().toFile()
         return if (!file.exists() || !file.isFile) null else AwsCoreMoshi.asA<SSOCachedToken>(file.readText())
     }
 
-    fun storeSSOCachedToken(ssoProfile: SSOProfile, cachedToken: SSOCachedToken) {
+    fun storeSSOCachedToken(cachedToken: SSOCachedToken) {
         ssoProfile.cachedTokenPath().toFile().writeText(AwsCoreMoshi.asFormatString(cachedToken))
     }
 
-    fun retrieveSSOCachedRegistration(ssoProfile: SSOProfile): SSOCachedRegistration? {
+    fun retrieveSSOCachedRegistration(): SSOCachedRegistration? {
         val file = ssoProfile.cachedRegistrationPath().toFile()
         return if (!file.exists() || !file.isFile) null else AwsCoreMoshi.asA<SSOCachedRegistration>(file.readText())
     }
 
-    fun storeSSOCachedRegistration(ssoProfile: SSOProfile, cachedRegistration: SSOCachedRegistration) {
+    fun storeSSOCachedRegistration(cachedRegistration: SSOCachedRegistration) {
         ssoProfile.cachedRegistrationPath().toFile().writeText(AwsCoreMoshi.asFormatString(cachedRegistration))
     }
 }
