@@ -2,7 +2,7 @@ name: "Security - Dependency Analysis (dependabot)"
 on:
   push:
     branches:
-      - 'master'
+      - 'v6'
     paths-ignore:
       - '**/*.md'
   schedule:
