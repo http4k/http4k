@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>AWS Authentication</title>
+  <title>AWS SSO Authentication</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     html {
@@ -170,12 +170,8 @@
     }
 
     const productName = 'http4k Connect'
-    document.getElementById(
-        'approvalMessage'
-    ).innerText = `${productName} has been given requested permissions`
-    document.getElementById(
-        'footerText'
-    ).innerText = `You can close this window and start using the ${productName}.`
+    document.getElementById('approvalMessage').innerText = `${productName} has been given requested permissions`
+    document.getElementById('footerText').innerText = `You can close this window and start using ${productName}.`
 
     function showErrorMessage(errorText) {
       document.getElementById('approved-auth').classList.add('hidden')
