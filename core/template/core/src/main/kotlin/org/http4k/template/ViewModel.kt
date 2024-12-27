@@ -4,13 +4,14 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import java.io.File
 
 interface ViewModel {
     /**
      * This is the path of the template file - which matches the fully qualified classname. The templating suffix
      * is added by the template implementation (eg. java.lang.String -> java/lang/String.hbs)
      */
-    fun template(): String = javaClass.name.replace('.', '/')
+    fun template(): String = javaClass.name.replace('.', File.separatorChar)
 }
 
 fun Body.Companion.viewModel(renderer: TemplateRenderer, contentType: ContentType) =

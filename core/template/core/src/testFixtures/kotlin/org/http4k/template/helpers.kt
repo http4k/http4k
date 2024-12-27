@@ -1,11 +1,13 @@
 package org.http4k.template
 
+import java.io.File
+
 object NonExistent : ViewModel {
     override fun template() = "bibble"
 }
 
 data class OnClasspath(val items: List<Item>) : ViewModel {
-    override fun template() = javaClass.name.replace('.', '/')
+    override fun template() = javaClass.name.replace('.', File.separatorChar)
 }
 
 data class OnClasspathNotAtRoot(val items: List<Item>) : ViewModel {

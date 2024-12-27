@@ -16,7 +16,7 @@ class JTETemplates(private val contentType: ContentType = Html) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): (ViewModel) -> String {
 
         val templateEngine = TemplateEngine.create(
-            ResourceCodeResolver(if (baseClasspathPackage.isEmpty()) "." else baseClasspathPackage.replace('.', '/')),
+            ResourceCodeResolver(if (baseClasspathPackage.isEmpty()) "." else baseClasspathPackage.replace('.', File.separatorChar)),
             contentType
         )
 

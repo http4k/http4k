@@ -4,6 +4,7 @@ import io.pebbletemplates.pebble.PebbleEngine
 import io.pebbletemplates.pebble.error.LoaderException
 import io.pebbletemplates.pebble.loader.ClasspathLoader
 import io.pebbletemplates.pebble.loader.FileLoader
+import java.io.File
 import java.io.StringWriter
 
 class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEngine.Builder = { it },
@@ -21,7 +22,7 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
 
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
         val loader = ClasspathLoader(classLoader)
-        loader.prefix = if (baseClasspathPackage.isEmpty()) null else baseClasspathPackage.replace('.', '/')
+        loader.prefix = if (baseClasspathPackage.isEmpty()) null else baseClasspathPackage.replace('.', File.separatorChar)
         return PebbleTemplateRenderer(configure(PebbleEngine.Builder().loader(loader)).build())
     }
 

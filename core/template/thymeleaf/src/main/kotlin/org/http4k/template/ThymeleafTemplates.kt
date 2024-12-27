@@ -8,6 +8,7 @@ import org.thymeleaf.exceptions.TemplateInputException
 import org.thymeleaf.templatemode.TemplateMode
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import org.thymeleaf.templateresolver.FileTemplateResolver
+import java.io.File
 import java.io.FileNotFoundException
 
 class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngine = { it },
@@ -16,7 +17,7 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
         ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
             setTemplateResolver(ClassLoaderTemplateResolver(classLoader).apply {
                 templateMode = TemplateMode.HTML
-                prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
+                prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', File.separatorChar) + File.separatorChar
                 suffix = ".html"
             })
         }))

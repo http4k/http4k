@@ -28,7 +28,7 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
             override fun getBase() = "."
         }
         val basePath = if (baseClasspathPackage.isEmpty()) ""
-        else baseClasspathPackage.replace('.', '/') + "/"
+        else baseClasspathPackage.replace('.', File.separatorChar) + File.separatorChar
 
         return fun(viewModel: ViewModel): String {
             try {
