@@ -16,6 +16,9 @@ import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
 import org.http4k.connect.amazon.iamidentitycenter.model.sessionName
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.AuthorizationStarted
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
+import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType.AuthorizationCode
+import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType.DeviceCode
+import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType.RefreshToken
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.RoleCredentials
 import org.http4k.connect.util.WebBrowser
@@ -30,13 +33,13 @@ import org.http4k.lens.Query
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.static
 import org.http4k.server.ServerConfig
-import org.http4k.server.ServerConfig.StopMode
+import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import java.nio.file.Path
 import java.time.Clock
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -51,8 +54,8 @@ sealed interface SSOLogin {
     companion object {
         fun enabled(
             openBrowser: (Uri) -> Any = WebBrowser()::navigateTo,
-            waitFor: (Long) -> Unit = { Thread.sleep(it) },
-            serverConfig: ServerConfig = SunHttp(0, stopMode = StopMode.Graceful(Duration.ofSeconds(2))),
+            waitFor: (Long) -> Unit = Thread::sleep,
+            serverConfig: ServerConfig = SunHttp(0, stopMode = Graceful(Duration.ofSeconds(2))),
             forceRefresh: Boolean = true
         ) = SSOLoginEnabled(openBrowser, waitFor, serverConfig, forceRefresh)
 
@@ -67,7 +70,7 @@ class SSOLoginEnabled(
     val forceRefresh: Boolean
 ) : SSOLogin
 
-object SSOLoginDisabled : SSOLogin
+data object SSOLoginDisabled : SSOLogin
 
 
 fun CredentialsProvider.Companion.SSO(
@@ -110,7 +113,7 @@ fun CredentialsProvider.Companion.SSO(
     private fun SSOLoginEnabled.oidcRetrieveDeviceToken(): DeviceToken = with(OIDC.Http(ssoProfile.region, http)) {
 
         val scopes: List<String>? = if (ssoProfile.ssoSession != null) ssoProfile.ssoSessionScopes() else null
-        val grantTypes = if (ssoProfile.ssoSession != null) listOf("authorization_code", "refresh_token") else null
+        val grantTypes = if (ssoProfile.ssoSession != null) listOf(AuthorizationCode, RefreshToken) else null
         val redirectUris = if (ssoProfile.ssoSession != null) listOf(redirectUri) else null
         val issuerUrl = if (ssoProfile.ssoSession != null) ssoProfile.startUri else null
 
@@ -174,17 +177,15 @@ fun CredentialsProvider.Companion.SSO(
                     redirectUriWithPort
                 }
 
-        val auth: Auth? = authRef.get()
-        check(auth?.state == expectedState) {
-            "State parameter does not match expected value."
-        }
+        val auth = authRef.get()
 
-        checkNotNull(auth.code) {
-            "Request denied: ${auth.error}"
-        }
+        requireNotNull(auth) { "Auth was not set" }
+
+        check(auth.state == expectedState) { "State parameter does not match expected value." }
+
+        checkNotNull(auth.code) { "Request denied: ${auth.error}" }
 
         return PkceAuth(codeVerifier, auth.code, redirectUriWithPort)
-
     }
 
 }
@@ -195,7 +196,7 @@ private fun OIDC.createAuthCodeToken(
 ) = createToken(
     client.clientId,
     client.clientSecret,
-    "authorization_code",
+    AuthorizationCode,
     redirectUri = auth.redirectUri,
     codeVerifier = auth.codeVerifier,
     code = auth.code
@@ -205,7 +206,7 @@ private fun OIDC.createDeviceCodeToken(
     client: RegisteredClient,
     auth: AuthorizationStarted
 ) = createToken(
-    client.clientId, client.clientSecret, "urn:ietf:params:oauth:grant-type:device_code", auth.deviceCode
+    client.clientId, client.clientSecret, DeviceCode, auth.deviceCode
 )
 
 private fun SSOProfile.ssoSessionScopes(): List<String> = ssoRegistrationScopes ?: listOf("sso:account:access")

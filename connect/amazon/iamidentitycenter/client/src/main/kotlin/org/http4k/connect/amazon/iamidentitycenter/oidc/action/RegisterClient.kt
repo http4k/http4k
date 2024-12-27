@@ -19,7 +19,7 @@ import se.ansman.kotshi.JsonSerializable
 data class RegisterClient(
     val clientName: ClientName,
     val scopes: List<String>? = null,
-    val grantTypes: List<String>? = null,
+    val grantTypes: List<GrantType>? = null,
     val redirectUris: List<Uri>? = null,
     val issuerUrl: Uri? = null
 ) : OIDCAction<RegisteredClient>(kClass()) {
@@ -29,7 +29,7 @@ data class RegisterClient(
             IAMIdentityCenterMoshi.autoBody<Any>().toLens() of mapOf(
                 "clientName" to clientName,
                 "scopes" to scopes,
-                "grantTypes" to grantTypes,
+                "grantTypes" to grantTypes?.map(GrantType::wireValue),
                 "redirectUris" to redirectUris,
                 "issuerUrl" to issuerUrl,
                 "clientType" to "public"

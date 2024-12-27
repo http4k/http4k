@@ -13,9 +13,11 @@ import org.http4k.connect.amazon.iamidentitycenter.model.RefreshToken
 import org.http4k.connect.amazon.iamidentitycenter.model.RoleName
 import org.http4k.connect.amazon.iamidentitycenter.model.SessionId
 import org.http4k.connect.amazon.iamidentitycenter.model.UserCode
+import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType
 import org.http4k.format.AwsMoshiBuilder
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.value
+import org.http4k.lens.BiDiMapping
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object IAMIdentityCenterMoshi : ConfigurableMoshi(
@@ -32,6 +34,8 @@ object IAMIdentityCenterMoshi : ConfigurableMoshi(
         .value(UserCode)
         .value(AuthCode)
         .value(PKCECodeVerifier)
+        .value(PKCECodeVerifier)
+        .text(BiDiMapping(GrantType::class.java, GrantType::fromWire, GrantType::wireValue))
         .done()
 )
 

@@ -8,6 +8,7 @@ import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
 import org.http4k.connect.amazon.iamidentitycenter.model.cachedRegistrationPath
 import org.http4k.connect.amazon.iamidentitycenter.model.cachedTokenPath
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
+import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.model.Timestamp
 import org.http4k.format.AwsCoreMoshi
@@ -97,7 +98,7 @@ data class SSOCachedRegistration(
     val clientSecret: String,
     val expiresAt: Instant,
     val scopes: List<String>? = null,
-    val grantTypes: List<String>? = null
+    val grantTypes: List<GrantType>? = null
 ) {
     companion object
 }
@@ -105,7 +106,7 @@ data class SSOCachedRegistration(
 fun SSOCachedRegistration.Companion.of(
     registeredClient: RegisteredClient,
     scopes: List<String>?,
-    grantTypes: List<String>?
+    grantTypes: List<GrantType>?
 ) =
     SSOCachedRegistration(
         clientId = registeredClient.clientId.value,

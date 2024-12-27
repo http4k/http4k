@@ -17,6 +17,7 @@ import org.http4k.core.query
 import org.http4k.routing.reverseProxy
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
@@ -25,7 +26,7 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.listDirectoryEntries
 
-class SSOCredentialsProviderPkceTest {
+class SSOCredentialsProviderPkceTest : PortBasedTest {
 
     private val ssoProfile =
         SSOProfile(
@@ -36,7 +37,7 @@ class SSOCredentialsProviderPkceTest {
             startUri = Uri.of("http://foobar")
         )
 
-    val cachedTokenDirectory: Path = Files.createTempDirectory("cache")
+    private val cachedTokenDirectory: Path = Files.createTempDirectory("cache")
 
     @AfterEach
     fun cleanup() {
@@ -45,7 +46,6 @@ class SSOCredentialsProviderPkceTest {
 
         cachedTokenDirectory.deleteIfExists()
     }
-
 
     @Test
     fun `support pkce flow`() {
