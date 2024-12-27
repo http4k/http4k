@@ -8,6 +8,7 @@ import org.http4k.connect.amazon.iamidentitycenter.model.AuthCode
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
 import org.http4k.connect.amazon.iamidentitycenter.model.DeviceCode
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType
 import org.http4k.connect.amazon.iamidentitycenter.model.IdToken
 import org.http4k.connect.amazon.iamidentitycenter.model.PKCECodeVerifier
 import org.http4k.connect.amazon.iamidentitycenter.model.RefreshToken

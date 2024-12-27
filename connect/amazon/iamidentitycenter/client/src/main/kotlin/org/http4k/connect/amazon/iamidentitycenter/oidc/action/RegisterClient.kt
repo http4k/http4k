@@ -6,6 +6,7 @@ import org.http4k.connect.amazon.iamidentitycenter.OIDCAction
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType
 import org.http4k.connect.kClass
 import org.http4k.connect.model.Timestamp
 import org.http4k.core.Method

@@ -1,4 +1,4 @@
-package org.http4k.connect.amazon.iamidentitycenter.oidc.action
+package org.http4k.connect.amazon.iamidentitycenter.model
 
 enum class GrantType(val wireValue: String) {
     AuthorizationCode("authorization_code"),

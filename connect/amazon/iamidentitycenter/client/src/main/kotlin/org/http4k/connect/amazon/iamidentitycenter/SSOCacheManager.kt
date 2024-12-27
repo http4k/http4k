@@ -4,11 +4,11 @@ import org.http4k.connect.amazon.iamidentitycenter.model.AccessToken
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
 import org.http4k.connect.amazon.iamidentitycenter.model.cachedRegistrationPath
 import org.http4k.connect.amazon.iamidentitycenter.model.cachedTokenPath
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
-import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.model.Timestamp
 import org.http4k.format.AwsCoreMoshi

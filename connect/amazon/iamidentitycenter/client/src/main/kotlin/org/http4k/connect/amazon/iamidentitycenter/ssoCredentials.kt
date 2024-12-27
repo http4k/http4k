@@ -11,14 +11,14 @@ import org.http4k.connect.amazon.CredentialsProvider
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.iamidentitycenter.model.AuthCode
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType.AuthorizationCode
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType.DeviceCode
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType.RefreshToken
 import org.http4k.connect.amazon.iamidentitycenter.model.PKCECodeVerifier
 import org.http4k.connect.amazon.iamidentitycenter.model.SSOProfile
 import org.http4k.connect.amazon.iamidentitycenter.model.sessionName
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.AuthorizationStarted
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
-import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType.AuthorizationCode
-import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType.DeviceCode
-import org.http4k.connect.amazon.iamidentitycenter.oidc.action.GrantType.RefreshToken
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.RoleCredentials
 import org.http4k.connect.util.WebBrowser
@@ -72,7 +72,6 @@ class SSOLoginEnabled(
 
 data object SSOLoginDisabled : SSOLogin
 
-
 fun CredentialsProvider.Companion.SSO(
     ssoProfile: SSOProfile,
     http: HttpHandler = JavaHttpClient(),
@@ -111,8 +110,7 @@ fun CredentialsProvider.Companion.SSO(
 
 
     private fun SSOLoginEnabled.oidcRetrieveDeviceToken(): DeviceToken = with(OIDC.Http(ssoProfile.region, http)) {
-
-        val scopes: List<String>? = if (ssoProfile.ssoSession != null) ssoProfile.ssoSessionScopes() else null
+        val scopes = if (ssoProfile.ssoSession != null) ssoProfile.ssoSessionScopes() else null
         val grantTypes = if (ssoProfile.ssoSession != null) listOf(AuthorizationCode, RefreshToken) else null
         val redirectUris = if (ssoProfile.ssoSession != null) listOf(redirectUri) else null
         val issuerUrl = if (ssoProfile.ssoSession != null) ssoProfile.startUri else null
@@ -190,10 +188,7 @@ fun CredentialsProvider.Companion.SSO(
 
 }
 
-private fun OIDC.createAuthCodeToken(
-    client: RegisteredClient,
-    auth: PkceAuth
-) = createToken(
+private fun OIDC.createAuthCodeToken(client: RegisteredClient, auth: PkceAuth) = createToken(
     client.clientId,
     client.clientSecret,
     AuthorizationCode,
@@ -202,10 +197,7 @@ private fun OIDC.createAuthCodeToken(
     code = auth.code
 )
 
-private fun OIDC.createDeviceCodeToken(
-    client: RegisteredClient,
-    auth: AuthorizationStarted
-) = createToken(
+private fun OIDC.createDeviceCodeToken(client: RegisteredClient, auth: AuthorizationStarted) = createToken(
     client.clientId, client.clientSecret, DeviceCode, auth.deviceCode
 )
 
