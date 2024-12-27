@@ -21,24 +21,20 @@ import org.http4k.connect.amazon.iamidentitycenter.oidc.action.AuthorizationStar
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.RoleCredentials
-import org.http4k.connect.util.WebBrowser
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.lens.Query
+import org.http4k.lens.value
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.static
-import org.http4k.server.ServerConfig
-import org.http4k.server.ServerConfig.StopMode.Graceful
-import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import java.nio.file.Path
 import java.time.Clock
-import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -49,28 +45,6 @@ import kotlin.io.path.Path
  * Use SSO to log into the AWS command line using a browser interaction
  */
 val redirectUri = Uri.of("http://127.0.0.1/oauth/callback")
-
-sealed interface SSOLogin {
-    companion object {
-        fun enabled(
-            openBrowser: (Uri) -> Any = WebBrowser()::navigateTo,
-            waitFor: (Long) -> Unit = Thread::sleep,
-            serverConfig: ServerConfig = SunHttp(0, stopMode = Graceful(Duration.ofSeconds(2))),
-            forceRefresh: Boolean = true
-        ) = SSOLoginEnabled(openBrowser, waitFor, serverConfig, forceRefresh)
-
-        val disabled = SSOLoginDisabled
-    }
-}
-
-class SSOLoginEnabled(
-    val openBrowser: (Uri) -> Any,
-    val waitFor: (Long) -> Unit,
-    val serverConfig: ServerConfig,
-    val forceRefresh: Boolean
-) : SSOLogin
-
-data object SSOLoginDisabled : SSOLogin
 
 fun CredentialsProvider.Companion.SSO(
     ssoProfile: SSOProfile,
@@ -85,11 +59,7 @@ fun CredentialsProvider.Companion.SSO(
 
     override fun invoke() = with(ref.get()?.takeIf { it.expiration.toInstant().isAfter(clock.instant()) }
         ?: retrieveDeviceToken().getAwsCredentials().peek(ref::set).onFailure { it.reason.throwIt() }) {
-        AwsCredentials(
-            accessKeyId.value,
-            secretAccessKey.value,
-            sessionToken.value
-        )
+        AwsCredentials(accessKeyId.value, secretAccessKey.value, sessionToken.value)
     }
 
     private fun DeviceToken.getAwsCredentials() = SSO.Http(ssoProfile.region, http)
@@ -108,7 +78,6 @@ fun CredentialsProvider.Companion.SSO(
             ?: login.oidcRetrieveDeviceToken()
     }
 
-
     private fun SSOLoginEnabled.oidcRetrieveDeviceToken(): DeviceToken = with(OIDC.Http(ssoProfile.region, http)) {
         val scopes = if (ssoProfile.ssoSession != null) ssoProfile.ssoSessionScopes() else null
         val grantTypes = if (ssoProfile.ssoSession != null) listOf(AuthorizationCode, RefreshToken) else null
@@ -119,12 +88,11 @@ fun CredentialsProvider.Companion.SSO(
             ?.takeIf { it.expiresAt.isAfter(clock.instant()) }
             ?.toRegisteredClient(clock)
             ?: registerClient(clientName, scopes, grantTypes, redirectUris, issuerUrl)
-                .peek {
-                    ssoCacheManager.storeSSOCachedRegistration(SSOCachedRegistration.of(it, scopes, grantTypes))
-                }.onFailure { it.reason.throwIt() }
+                .peek { ssoCacheManager.storeSSOCachedRegistration(SSOCachedRegistration.of(it, scopes, grantTypes)) }
+                .onFailure { it.reason.throwIt() }
 
-        (if (ssoProfile.ssoSession == null) {
-            startDeviceAuthorization(client.clientId, client.clientSecret, ssoProfile.startUri)
+        when (ssoProfile.ssoSession) {
+            null -> startDeviceAuthorization(client.clientId, client.clientSecret, ssoProfile.startUri)
                 .flatMap { auth ->
                     openBrowser(auth.verificationUriComplete)
                     var tokenResult = createDeviceCodeToken(client, auth)
@@ -137,13 +105,12 @@ fun CredentialsProvider.Companion.SSO(
                     }
 
                     tokenResult
-
                 }
-        } else {
-            createAuthCodeToken(client, startPkceAuthorization(client))
-        }).peek {
-            ssoCacheManager.storeSSOCachedToken(SSOCachedToken.of(ssoProfile, it, client, clock))
-        }.onFailure { it.reason.throwIt() }
+
+            else -> createAuthCodeToken(client, startPkceAuthorization(client))
+        }
+            .peek { ssoCacheManager.storeSSOCachedToken(SSOCachedToken.of(ssoProfile, it, client, clock)) }
+            .onFailure { it.reason.throwIt() }
     }
 
     private fun SSOLoginEnabled.startPkceAuthorization(registeredClient: RegisteredClient): PkceAuth {
@@ -151,29 +118,26 @@ fun CredentialsProvider.Companion.SSO(
         val (challenge, codeVerifier) = PKCES256Generator.generate()
         val authRef = AtomicReference<Auth>(null)
         val sem = Semaphore(0)
-        val redirectUriWithPort =
-            authCodeCatcher(authRef, sem).asServer(serverConfig)
-                .use { server ->
-                    server.start()
-                    val redirectUriWithPort = redirectUri.port(server.port())
-                    openBrowser(
-                        OIDC.extractBaseUri(region = ssoProfile.region)
-                            .path("authorize")
-                            .query("response_type", "code")
-                            .query("client_id", registeredClient.clientId.value)
-                            .query("redirect_uri", redirectUriWithPort.toString())
-                            .query("state", expectedState)
-                            .query("code_challenge_method", "S256")
-                            .query("scope", ssoProfile.ssoSessionScopes().joinToString(" "))
-                            .query("code_challenge", challenge.value)
-                    )
+        val redirectUriWithPort = authCodeCatcher(authRef, sem).asServer(serverConfig)
+            .use { server ->
+                server.start()
+                val redirectUriWithPort = redirectUri.port(server.port())
+                openBrowser(
+                    OIDC.extractBaseUri(region = ssoProfile.region)
+                        .path("authorize")
+                        .query("response_type", "code")
+                        .query("client_id", registeredClient.clientId.value)
+                        .query("redirect_uri", redirectUriWithPort.toString())
+                        .query("state", expectedState)
+                        .query("code_challenge_method", "S256")
+                        .query("scope", ssoProfile.ssoSessionScopes().joinToString(" "))
+                        .query("code_challenge", challenge.value)
+                )
 
-                    check(sem.tryAcquire(60L, TimeUnit.SECONDS)) {
-                        "Failed to retrieve an authorization code."
-                    }
+                check(sem.tryAcquire(60L, TimeUnit.SECONDS)) { "Failed to retrieve an authorization code." }
 
-                    redirectUriWithPort
-                }
+                redirectUriWithPort
+            }
 
         val auth = authRef.get()
 
@@ -185,7 +149,6 @@ fun CredentialsProvider.Companion.SSO(
 
         return PkceAuth(codeVerifier, auth.code, redirectUriWithPort)
     }
-
 }
 
 private fun OIDC.createAuthCodeToken(client: RegisteredClient, auth: PkceAuth) = createToken(
@@ -206,9 +169,9 @@ private fun SSOProfile.ssoSessionScopes(): List<String> = ssoRegistrationScopes 
 fun OIDC.Companion.extractBaseUri(region: Region): Uri {
     var uri: Uri? = null
 
-    Http(region, { r: Request -> uri = r.uri; Response(Status.NOT_IMPLEMENTED) }).invoke(object :
+    Http(region) { r: Request -> uri = r.uri; Response(NOT_IMPLEMENTED) }.invoke(object :
         OIDCAction<String>(String::class) {
-        override fun toRequest(): Request = Request(Method.GET, "/ping")
+        override fun toRequest(): Request = Request(GET, "/ping")
     })
 
     return checkNotNull(uri)
@@ -216,7 +179,7 @@ fun OIDC.Companion.extractBaseUri(region: Region): Uri {
 
 private val authCodeCatcher: (AtomicReference<Auth>, Semaphore) -> HttpHandler = { authRef, s ->
     { r: Request ->
-        val code = Query.optional("code")(r)?.let { AuthCode.of(it) }
+        val code = Query.value(AuthCode).optional("code")(r)
         val state = Query.optional("state")(r)
         val error = Query.optional("error")(r)
         val errorDescription = Query.optional("error_description")(r)
@@ -226,8 +189,6 @@ private val authCodeCatcher: (AtomicReference<Auth>, Semaphore) -> HttpHandler =
     }
 }
 
-
 data class PkceAuth(val codeVerifier: PKCECodeVerifier, val code: AuthCode, val redirectUri: Uri)
 
 data class Auth(val code: AuthCode?, val state: String?, val error: String?, val errorDescription: String?)
-
