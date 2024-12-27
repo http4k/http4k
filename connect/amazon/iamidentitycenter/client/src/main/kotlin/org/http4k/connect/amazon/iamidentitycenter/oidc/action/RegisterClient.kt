@@ -6,6 +6,7 @@ import org.http4k.connect.amazon.iamidentitycenter.OIDCAction
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientName
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
+import org.http4k.connect.amazon.iamidentitycenter.model.GrantType
 import org.http4k.connect.kClass
 import org.http4k.connect.model.Timestamp
 import org.http4k.core.Method
@@ -18,7 +19,10 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class RegisterClient(
     val clientName: ClientName,
-    val scopes: List<String>? = null
+    val scopes: List<String>? = null,
+    val grantTypes: List<GrantType>? = null,
+    val redirectUris: List<Uri>? = null,
+    val issuerUrl: Uri? = null
 ) : OIDCAction<RegisteredClient>(kClass()) {
 
     override fun toRequest() = Request(Method.POST, "/client/register")
@@ -26,6 +30,9 @@ data class RegisterClient(
             IAMIdentityCenterMoshi.autoBody<Any>().toLens() of mapOf(
                 "clientName" to clientName,
                 "scopes" to scopes,
+                "grantTypes" to grantTypes?.map(GrantType::wireValue),
+                "redirectUris" to redirectUris,
+                "issuerUrl" to issuerUrl,
                 "clientType" to "public"
             )
         )

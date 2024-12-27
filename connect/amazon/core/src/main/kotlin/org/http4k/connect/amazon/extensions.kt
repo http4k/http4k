@@ -61,3 +61,10 @@ val AWS_CREDENTIAL_PROFILES_FILE = EnvironmentKey.string()
         name = "AWS_CREDENTIAL_PROFILES_FILE",
         default = Path(System.getProperty("user.home")).resolve(".aws/credentials")
     )
+
+val AWS_CONFIG_FILE = EnvironmentKey.string()
+    .map({ Path(it) }, { it.toString() })
+    .defaulted(
+        name = "AWS_CONFIG_FILE",
+        default = Path(System.getProperty("user.home")).resolve(".aws/config")
+    )
