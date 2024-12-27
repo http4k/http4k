@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.42.0.0 (uncut)
+### v5.42.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-connect-amazon-iamidentitycenter*** :[Fix 1239] CredentialsProvider.SSO - Credentials caching issue.
 - **http4k-connect-amazon-iamidentitycenter*** : [Unlikely break] PKCE-based Authorization for AWS SSO. Tweaks should be easy to remedy in previous SSO implementation. H/T @aharin
