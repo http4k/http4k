@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.41.1.0 (uncut)
+### v5.42.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-connect-amazon-iamidentitycenter*** :[Fix 1239] CredentialsProvider.SSO - Credentials caching issue.
+- **http4k-connect-amazon-iamidentitycenter*** : [Unlikely break] PKCE-based Authorization for AWS SSO. Tweaks should be easy to remedy in previous SSO implementation. H/T @aharin
 
 ### v5.41.0.0
 - **http4k-format-xml** : [Fix CVE-2024-55875: Possible Break] Fixed XML processing by disabling entity expansion in DocumentBuilderFactory configuration.
