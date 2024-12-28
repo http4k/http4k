@@ -3,32 +3,11 @@ package org.http4k.routing
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Uri
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
-import org.http4k.core.UriTemplate
+import org.http4k.core.Uri
 import org.http4k.core.queries
 
-fun routes(vararg list: Pair<Method, HttpHandler>) =
-    routes(*list.map { "" bind it.first to it.second }.toTypedArray())
-
-fun routes(vararg list: RoutingHttpHandler) = routes(list.toList())
-
-fun routes(routers: List<RoutingHttpHandler>) = RoutingHttpHandler(routers.flatMap { it.routes })
-
-infix fun String.bind(method: Method) = HttpPathMethod(this, method)
-infix fun String.bind(httpHandler: RoutingHttpHandler) = httpHandler.withBasePath(this)
-infix fun String.bind(action: HttpHandler) =
-    RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(this), action)))
-
-infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler =
-    RoutingHttpHandler(listOf(SimpleRouteMatcher(this, handler)))
-
-infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = handler.withRouter(this)
-
-fun Method.bind(handler: HttpHandler): RoutingHttpHandler = asRouter().bind(handler)
-
 fun RoutingHttpHandler.and(router: Router) = withRouter(router)
-
 
 fun Method.asRouter() = Router("method == $this", notMatchedStatus = METHOD_NOT_ALLOWED) { it.method == this }
 
