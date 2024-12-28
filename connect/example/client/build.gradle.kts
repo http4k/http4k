@@ -1,6 +1,6 @@
-import org.http4k.internal.ModuleLicense.Http4kCommunity
+import org.http4k.internal.ModuleLicense.Apache2
 
-val license by project.extra { Http4kCommunity }
+val license by project.extra { Apache2 }
 
 plugins {
     // uncomment this for a real published module

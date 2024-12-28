@@ -1,9 +1,9 @@
-import org.http4k.internal.ModuleLicense.Http4kCommunity
+import org.http4k.internal.ModuleLicense.Apache2
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 description = "http4k Servirtium module"
 
-val license by project.extra { Http4kCommunity }
+val license by project.extra { Apache2 }
 
 plugins {
     id("org.http4k.community")
