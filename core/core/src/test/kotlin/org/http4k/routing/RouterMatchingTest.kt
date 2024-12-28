@@ -8,9 +8,8 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
+import org.http4k.core.Uri
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.matches
@@ -71,9 +70,9 @@ class RouterMatchingTest {
 
     @Test
     fun `query present router`() {
-        val router: Router = query("foo")
-        assertThat(router.match(Request(GET, "").query("foo", null)), isA<MatchedWithoutHandler>())
-        assertThat(router.match(Request(GET, "")), isA<Unmatched>())
+        val router = query("foo")
+        assertThat(router(Request(GET, "").query("foo", null)), isA<Matched>())
+        assertThat(router(Request(GET, "")), isA<NotMatched>())
     }
 
     @Test
@@ -87,10 +86,10 @@ class RouterMatchingTest {
 
     @Test
     fun `queriesFrom router`() {
-        val router: Router = queriesFrom(Uri.of("http://localhost:8080?foo=boo&bar"))
+        val router = queriesFrom(Uri.of("http://localhost:8080?foo=boo&bar"))
 
-        assertThat(router.match(Request(GET, "http://localhost:8080?foo=bar")), isA<Unmatched>())
-        assertThat(router.match(Request(GET, "http://localhost:8080?foo=boo&bar")), isA<MatchedWithoutHandler>())
+        assertThat(router(Request(GET, "http://localhost:8080?foo=bar")), isA<NotMatched>())
+        assertThat(router(Request(GET, "http://localhost:8080?foo=boo&bar")), isA<Matched>())
     }
 
     @Test
