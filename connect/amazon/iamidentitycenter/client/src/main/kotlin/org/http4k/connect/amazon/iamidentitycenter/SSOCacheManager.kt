@@ -16,6 +16,7 @@ import se.ansman.kotshi.JsonSerializable
 import java.nio.file.Path
 import java.time.Clock
 import java.time.Instant
+import kotlin.io.path.writeText
 
 class SSOCacheManager(val ssoProfile: SSOProfile, val cachedTokenDirectory: Path, val clientName: ClientName) {
 
@@ -28,7 +29,8 @@ class SSOCacheManager(val ssoProfile: SSOProfile, val cachedTokenDirectory: Path
     }
 
     fun storeSSOCachedToken(cachedToken: SSOCachedToken) {
-        ssoProfile.cachedTokenPath().toFile().writeText(AwsCoreMoshi.asFormatString(cachedToken))
+        ssoProfile.cachedTokenPath().touch(restrictToOwner = true)
+            .writeText(AwsCoreMoshi.asFormatString(cachedToken))
     }
 
     fun retrieveSSOCachedRegistration(): SSOCachedRegistration? {
@@ -37,10 +39,10 @@ class SSOCacheManager(val ssoProfile: SSOProfile, val cachedTokenDirectory: Path
     }
 
     fun storeSSOCachedRegistration(cachedRegistration: SSOCachedRegistration) {
-        ssoProfile.cachedRegistrationPath().toFile().writeText(AwsCoreMoshi.asFormatString(cachedRegistration))
+        ssoProfile.cachedRegistrationPath().touch(restrictToOwner = true)
+            .writeText(AwsCoreMoshi.asFormatString(cachedRegistration))
     }
 }
-
 
 @JsonSerializable
 data class SSOCachedToken(
@@ -115,4 +117,6 @@ fun SSOCachedRegistration.Companion.of(
         scopes = scopes,
         grantTypes = grantTypes
     )
+
+
 
