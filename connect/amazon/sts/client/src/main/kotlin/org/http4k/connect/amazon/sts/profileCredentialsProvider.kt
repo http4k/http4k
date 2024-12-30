@@ -3,6 +3,7 @@ package org.http4k.connect.amazon.sts
 import dev.forkhandles.result4k.onFailure
 import org.http4k.aws.AwsCredentials
 import org.http4k.config.Environment
+import org.http4k.connect.amazon.AWS_CONFIG_FILE
 import org.http4k.connect.amazon.AWS_CREDENTIAL_PROFILES_FILE
 import org.http4k.connect.amazon.AWS_PROFILE
 import org.http4k.connect.amazon.CredentialsChain
@@ -62,9 +63,26 @@ fun CredentialsChain.Companion.Profile(env: Environment = Environment.ENV): Cred
 @Deprecated("Renamed", ReplaceWith("StsProfile(env)"))
 fun CredentialsProvider.Companion.Profile(env: Environment = Environment.ENV): CredentialsProvider = StsProfile(env)
 
+@Deprecated("Added configPath parameter", ReplaceWith("StsProfile(credentialsPath, configPath, ...)"))
+fun CredentialsChain.Companion.StsProfile(
+    credentialsPath: Path,
+    profileName: ProfileName,
+    getStsClient: (AwsCredentials) -> STS,
+    clock: Clock = Clock.systemUTC(),
+    gracePeriod: Duration = Duration.ofSeconds(300),
+) = CredentialsChain.Companion.StsProfile(
+    credentialsPath,
+    credentialsPath.resolveSibling("config"),
+    profileName,
+    getStsClient,
+    clock,
+    gracePeriod
+)
+
 // TODO support web identity
 fun CredentialsChain.Companion.StsProfile(
     credentialsPath: Path,
+    configPath: Path,
     profileName: ProfileName,
     getStsClient: (AwsCredentials) -> STS,
     clock: Clock = Clock.systemUTC(),
@@ -88,7 +106,7 @@ fun CredentialsChain.Companion.StsProfile(
     }
 
     private fun getCredentials(): ExpiringCredentials? {
-        val profiles = AwsProfile.loadProfiles(credentialsPath)
+        val profiles = AwsProfile.loadProfiles(credentialsPath, configPath)
         return profiles[profileName]?.let {
             it.getCredentials()
                 ?.let { ExpiringCredentials(it, null) }
@@ -101,6 +119,7 @@ fun CredentialsChain.Companion.StsProfile(
 
 fun CredentialsChain.Companion.StsProfile(env: Environment = Environment.ENV) = CredentialsChain.StsProfile(
     credentialsPath = AWS_CREDENTIAL_PROFILES_FILE(env),
+    configPath = AWS_CONFIG_FILE(env),
     profileName = AWS_PROFILE(env),
     getStsClient = { credentials -> STS.Http(env, credentialsProvider = { credentials }) }
 )

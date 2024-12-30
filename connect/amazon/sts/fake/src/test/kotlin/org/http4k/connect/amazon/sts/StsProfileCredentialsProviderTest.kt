@@ -18,7 +18,7 @@ class StsProfileCredentialsProviderTest {
 
     private val clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
 
-    private val profileFile = Files.createTempFile("credentials", "ini").also {
+    private val credentialsFile = Files.createTempFile("credentials", "ini").also {
         it.toFile().writeText(
             """
             [default]
@@ -43,9 +43,22 @@ class StsProfileCredentialsProviderTest {
         )
     }
 
+    private val configFile = Files.createTempFile("config", "ini").also {
+        it.toFile().writeText(
+            """
+            [default]
+            
+            [profile prod]
+            role_arn = arn:aws:iam::987654321:role/special-role
+            source_profile = default
+        """
+        )
+    }
+
     private fun getCredentials(name: ProfileName): AwsCredentials? {
         return CredentialsChain.StsProfile(
-            credentialsPath = profileFile,
+            credentialsPath = credentialsFile,
+            configPath = configFile,
             profileName = name,
             getStsClient = { FakeSTS(clock).client() }
         ).invoke()
@@ -53,7 +66,8 @@ class StsProfileCredentialsProviderTest {
 
     @AfterEach
     fun cleanup() {
-        profileFile.toFile().delete()
+        credentialsFile.toFile().delete()
+        configFile.toFile().delete()
     }
 
     @Test
@@ -104,5 +118,14 @@ class StsProfileCredentialsProviderTest {
             getCredentials(ProfileName.of("invalidSource")),
             absent()
         )
+    }
+
+    @Test
+    fun `load profile from config - assume with credentials`() {
+        val credentials = getCredentials(ProfileName.of("prod"))
+        assertThat(credentials, present())
+        assertThat(credentials!!.accessKey, equalTo("accessKeyId"))
+        assertThat(credentials.secretKey, equalTo("secretAccessKey"))
+        assertThat(credentials.sessionToken, present())
     }
 }

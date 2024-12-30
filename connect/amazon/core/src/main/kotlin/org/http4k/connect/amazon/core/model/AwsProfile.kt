@@ -22,17 +22,18 @@ data class AwsProfile(
     }
 
     companion object {
-        fun loadProfiles(path: Path) = loadProfiles(path) { map, name ->
-            AwsProfile(
-                name = name,
-                accessKeyId = map["aws_access_key_id"]?.let(AccessKeyId::of),
-                secretAccessKey = map["aws_secret_access_key"]?.let(SecretAccessKey::of),
-                sessionToken = map["aws_session_token"]?.let(SessionToken::of),
-                roleArn = map["role_arn"]?.let(ARN::of),
-                sourceProfileName = map["source_profile"]?.let(ProfileName::of),
-                roleSessionName = map["role_session_name"]?.let(RoleSessionName::of),
-                region = map["region"]?.let(Region::of)
-            )
-        }
+        fun loadProfiles(credentialsPath: Path, configPath: Path? = null) =
+            loadProfiles(credentialsPath, configPath) { map, name ->
+                AwsProfile(
+                    name = name,
+                    accessKeyId = map["aws_access_key_id"]?.let(AccessKeyId::of),
+                    secretAccessKey = map["aws_secret_access_key"]?.let(SecretAccessKey::of),
+                    sessionToken = map["aws_session_token"]?.let(SessionToken::of),
+                    roleArn = map["role_arn"]?.let(ARN::of),
+                    sourceProfileName = map["source_profile"]?.let(ProfileName::of),
+                    roleSessionName = map["role_session_name"]?.let(RoleSessionName::of),
+                    region = map["region"]?.let(Region::of)
+                )
+            }
     }
 }
