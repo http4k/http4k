@@ -21,11 +21,11 @@ jobs:
           # required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
       - name: Buildnote report
-        uses: buildnote/action@v0.2.7
+        uses: buildnote/action@v0.2.10
         if: always()
         env:
           BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
-      - uses: actions/setup-java@v4.5.0
+      - uses: actions/setup-java@v4.6.0
         with:
           distribution: temurin
           java-version: 21
@@ -52,7 +52,7 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Buildnote
-        uses: buildnote/action@v0.2.7
+        uses: buildnote/action@v0.2.10
         if: always()
         env:
           BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
@@ -61,7 +61,7 @@ jobs:
           command: collect
           params: test-results --include="**/build/test-results/**/TEST-*.xml"
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v5.1.0
+        uses: mikepenz/action-junit-report@v5.2.0
         if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
