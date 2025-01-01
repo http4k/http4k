@@ -14,7 +14,7 @@ fun loadConfigFile(path: Path) =
             val parts = k.split(' ', limit = 2).map(String::trim)
             if (parts.size != 2) return@mapNotNull null
 
-            ConfigSectionType.of(parts[0]) to (ProfileName.of(parts[1]) to v)
+            ConfigSectionType.parse(parts[0]) to (ProfileName.parse(parts[1]) to v)
         }
     }.groupBy { it.first }.mapValues { (_, v) -> v.associate { it.second } }
 
@@ -42,7 +42,7 @@ private fun parseIniFile(path: Path): Map<String, Map<String, String>> =
                 if (next.startsWith("[")) {
                     val key = next.trim('[', ']')
                     emptyMap<String, String>() to (done + (key to running))
-                } else if ("=" in next) {
+                } else if (!next.startsWith("#") && "=" in next) {
                     val (key, value) = next.split("=", limit = 2).map(String::trim)
                     (running + (key to value)) to done
                 } else running to done
