@@ -7,7 +7,7 @@ import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class SlackMessage(
-    val text: String,
+    val text: String? = null,
     val blocks: List<Block> = emptyList(),
     val attachments: List<Attachment> = emptyList(),
     val channel: ChannelId? = null,
