@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Buildnote report
-        uses: buildnote/action@v0.2.7
+        uses: buildnote/action@v0.2.10
         if: always()
         env:
           BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
@@ -38,7 +38,7 @@ jobs:
           HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
           HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
       - name: Buildnote
-        uses: buildnote/action@v0.2.7
+        uses: buildnote/action@v0.2.10
         if: always()
         env:
           BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
