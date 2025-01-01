@@ -24,7 +24,7 @@ data class SlackMessage(
     val username: String? = null
 ) {
     companion object {
-        val slackMessageBody = SlackMoshi.autoBody<SlackMessage>().toLens()
+        val lens = SlackMoshi.autoBody<SlackMessage>().toLens()
     }
 }
 
@@ -43,4 +43,4 @@ enum class BlockType {
 data class Attachment(val text: String, val fallback: String, val color: String)
 
 @JsonSerializable
-data class Block(val text: Text?, val type: BlockType = header, val expand: Boolean? = null)
+data class Block(val text: Text? = null, val type: BlockType = header, val expand: Boolean? = null)

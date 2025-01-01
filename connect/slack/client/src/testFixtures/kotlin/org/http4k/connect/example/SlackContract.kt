@@ -35,10 +35,10 @@ interface SlackContract {
     fun `can post message to webhook`() {
         val webhooks = SlackWebhook.Http(Uri.of("services/a/b/c"), http.debug())
 
-        val message = SlackMessage("message", channel = channelId)
+        val message = SlackMessage("message")
         assertThat(webhooks.webhookPostMessage(message).successValue(), equalTo(Unit))
 
-        checkMessageSentTo(message, channelId)
+        checkMessageSentTo(message, ChannelId.of("a/b/c"))
     }
 
     fun checkMessageSentTo(message: SlackMessage, channelId: ChannelId)
