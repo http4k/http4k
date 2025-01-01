@@ -14,7 +14,7 @@ import org.http4k.core.with
 
 @Http4kConnectAction
 data class WebhookPostMessage(val request: SlackMessage) : SlackWebhookAction<Unit> {
-    override fun toRequest() = Request(POST, "/").with(slackMessageBody of request)
+    override fun toRequest() = Request(POST, "").with(slackMessageBody of request)
 
     override fun toResult(response: Response) = with(response) {
         when {
