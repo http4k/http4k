@@ -28,7 +28,7 @@ jobs:
           branch: dependency-update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: gradle/actions/setup-gradle@v4.2.1
+      - uses: gradle/actions/setup-gradle@v4.2.2
       - name: Run Gradle
         run: ./gradlew refreshVersions
       - name: Commit
