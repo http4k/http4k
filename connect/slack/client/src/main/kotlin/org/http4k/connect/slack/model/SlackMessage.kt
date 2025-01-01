@@ -28,7 +28,6 @@ data class SlackMessage(
     }
 }
 
-
 enum class TextType {
     mrkdwn, plain_text
 }
@@ -44,4 +43,4 @@ enum class BlockType {
 data class Attachment(val text: String, val fallback: String, val color: String)
 
 @JsonSerializable
-data class Block(val text: Text?, val type: BlockType = header)
+data class Block(val text: Text?, val type: BlockType = header, val expand: Boolean? = null)
