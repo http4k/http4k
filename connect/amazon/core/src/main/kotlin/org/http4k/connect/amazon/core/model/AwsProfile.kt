@@ -22,7 +22,7 @@ data class AwsProfile(
     }
 
     companion object {
-        fun loadProfiles(credentialsPath: Path, configPath: Path? = null) =
+        fun loadProfiles(credentialsPath: Path, configPath: Path) =
             loadProfiles(credentialsPath, configPath) { map, name ->
                 AwsProfile(
                     name = name,

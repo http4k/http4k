@@ -7,16 +7,23 @@ import org.http4k.connect.amazon.core.model.ProfileName
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicReference
 
+@Deprecated("Added configPath parameter", ReplaceWith("Profile(profileName, credentialsPath, configPath, ...)"))
+fun CredentialsChain.Companion.Profile(
+    profileName: ProfileName,
+    credentialsPath: Path
+): CredentialsChain =
+    CredentialsChain.Companion.Profile(profileName, credentialsPath, credentialsPath.resolveSibling("config"))
 
 fun CredentialsChain.Companion.Profile(
     profileName: ProfileName,
     credentialsPath: Path,
+    configPath: Path
 ): CredentialsChain {
     val cached = AtomicReference<AwsCredentials>(null)
 
     return CredentialsChain {
         cached.get() ?: synchronized(cached) {
-            val profiles = AwsProfile.loadProfiles(credentialsPath)
+            val profiles = AwsProfile.loadProfiles(credentialsPath, configPath)
             val profile = profiles[profileName] ?: return@synchronized null
             val credentials = profile.getCredentials()
             cached.set(credentials)
@@ -28,11 +35,13 @@ fun CredentialsChain.Companion.Profile(
 fun CredentialsChain.Companion.Profile(
     env: Environment = Environment.ENV,
     profileName: ProfileName = AWS_PROFILE(env),
-    credentialsPath: Path = AWS_CREDENTIAL_PROFILES_FILE(env)
-) = CredentialsChain.Profile(profileName, credentialsPath)
+    credentialsPath: Path = AWS_CREDENTIAL_PROFILES_FILE(env),
+    configPath: Path = AWS_CONFIG_FILE(env)
+) = CredentialsChain.Profile(profileName, credentialsPath, configPath)
 
 fun CredentialsProvider.Companion.Profile(
     env: Environment = Environment.ENV,
     profileName: ProfileName = AWS_PROFILE(env),
-    credentialsPath: Path = AWS_CREDENTIAL_PROFILES_FILE(env)
-) = CredentialsChain.Profile(env, profileName, credentialsPath).provider()
+    credentialsPath: Path = AWS_CREDENTIAL_PROFILES_FILE(env),
+    configPath: Path = AWS_CONFIG_FILE(env)
+) = CredentialsChain.Profile(env, profileName, credentialsPath, configPath).provider()
