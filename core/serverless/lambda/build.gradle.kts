@@ -27,6 +27,7 @@ dependencies {
     testFixturesApi(project(":http4k-aws"))
     testFixturesApi(project(":http4k-format-jackson"))
     testFixturesApi(project(":http4k-client-okhttp"))
+    testFixturesApi(project(":http4k-connect-amazon-core"))
 
     testFixturesApi("com.amazonaws:aws-lambda-java-events:_")
     testFixturesApi("dev.forkhandles:result4k:_")

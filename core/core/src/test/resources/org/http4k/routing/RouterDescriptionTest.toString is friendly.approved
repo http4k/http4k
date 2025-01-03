@@ -1,5 +1,10 @@
-and
-	and
-		method == GET
-		Headers [host]
-	Headers [host]
+all
+SPA at /spa/classpath
+SPA at /spa/directory
+static files at /static/classpath
+static files at /static/directory
+template=predicates AND ((Query q matching foo OR (Headers [q] AND Header q matching foo)) OR Body matching foo)
+template=proxy/bar AND host header or uri host = hostA
+template=proxy/bar AND host header or uri host = hostB
+template=proxy/foo/{any:.*} AND (method == GET AND host header or uri host = hostA)
+template=proxy/foo/{any:.*} AND (method == GET AND host header or uri host = hostB)

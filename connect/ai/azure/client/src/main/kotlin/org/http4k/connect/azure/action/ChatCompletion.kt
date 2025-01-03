@@ -92,15 +92,6 @@ data class Message(
     val name: User? = null,
     val tool_calls: List<ToolCall>? = null
 ) {
-    @Deprecated("Use companion functions")
-    constructor(
-        role: Role,
-        text: String,
-        name: User? = null,
-        tool_calls: List<ToolCall>? = null
-    ) :
-        this(role, listOf(MessageContent(ContentType.text, text)), name, tool_calls)
-
     companion object {
         fun User(content: String, name: User? = null) = User(listOf(MessageContent(ContentType.text, content)), name)
         fun User(content: List<MessageContent>, name: User? = null) = Message(Role.User, content, name, null)

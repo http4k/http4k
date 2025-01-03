@@ -31,7 +31,7 @@ private fun client(version: ApiIntegrationVersion): (Request) -> Response {
 }
 
 abstract class ApiGatewayHttpClientTest(version: ApiIntegrationVersion) :
-    HttpClientContract({ NoOpServerConfig }, client(version), client(version)) {
+    HttpClientContract({ _, _ -> NoOpServerConfig }, client(version), client(version)) {
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")

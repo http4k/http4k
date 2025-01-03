@@ -6,8 +6,8 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
-import org.http4k.connect.amazon.Action
-import org.http4k.connect.amazon.RemoteFailure
+import org.http4k.connect.Action
+import org.http4k.connect.RemoteFailure
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.format.ConfigurableJackson

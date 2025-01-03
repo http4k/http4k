@@ -42,6 +42,7 @@ object HotReloadServer {
         watchedDirs: Set<String> = STANDARD_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
+        watchDebounceInterval: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
     ) = invoke<T>(
         projectDir,
@@ -49,6 +50,7 @@ object HotReloadServer {
         watchedDirs,
         compileProject,
         runner,
+        watchDebounceInterval,
         log,
         { (it as HttpHandler).asServer(serverConfig) })
 
@@ -62,6 +64,7 @@ object HotReloadServer {
         watchedDirs: Set<String> = STANDARD_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
+        watchDebounceInterval: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
     ) = invoke<T>(
         projectDir,
@@ -69,6 +72,7 @@ object HotReloadServer {
         watchedDirs,
         compileProject,
         runner,
+        watchDebounceInterval,
         log,
         { (it as PolyHandler).asServer(serverConfig) })
 
@@ -78,6 +82,7 @@ object HotReloadServer {
         watchedDirs: Set<String>,
         compileProject: CompileProject,
         runner: TaskRunner,
+        watchDebounceInterval: Duration,
         crossinline log: (String) -> Unit,
         crossinline toServer: (Any) -> Http4kServer
     ) = object : Http4kServer {
@@ -138,12 +143,12 @@ object HotReloadServer {
 
                             when (val result = compileProject()) {
                                 Ok -> startServer()
-                                is Failed ->  {
+                                is Failed -> {
                                     result.errorStream.copyTo(System.err)
                                     log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
                                 }
                             }
-                            Thread.sleep(1000)
+                            Thread.sleep(watchDebounceInterval)
                         } finally {
                             isRebuilding = false
                         }
