@@ -197,6 +197,6 @@ fun Body.Companion.regex(
     description: String? = null,
     contentNegotiation: ContentNegotiation = None
 ) =
-    StringBiDiMappings.regex(pattern, group).let { string(contentType, description, contentNegotiation).map(it) }
+    StringBiDiMappings.regexGroup(pattern, group).let { string(contentType, description, contentNegotiation).map(it) }
 
 internal fun <IN, NEXT> BiDiBodyLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)

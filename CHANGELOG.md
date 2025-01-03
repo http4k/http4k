@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.43.1.0 (uncut)
+- **http4k-core** : Deprecate lens' `regex()` in favour of `regexGroup`. In v6 `regex()` will match fully, changing its current behaviour.
+ 
 ### v5.43.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-connect-amazon-iamidentitycenter*** : Files containing tokens should only be readable by owner. H/T @aharin
