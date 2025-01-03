@@ -178,6 +178,20 @@ abstract class ServerContract(
     }
 
     @Test
+    fun `should not manipulate request headers`() {
+        val response = client(
+            Request(GET, "$baseUrl/request-headers")
+                .header("foo", """Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36""")
+        )
+        assertThat(response.status, equalTo(OK))
+        assertThat(
+            response.bodyString(), equalTo(
+                """foo: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"""
+            )
+        )
+    }
+
+    @Test
     fun `length is set on body if it is sent`() {
         val response = client(
             Request(POST, "$baseUrl/length")
