@@ -24,7 +24,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.Duration
 import kotlin.concurrent.thread
 
-val STANDARD_WATCH_SET = setOf("src/main", "build/classes")
+val STANDARD_WATCH_SET = setOf("src/main", "src/test", "build/classes")
 
 object HotReloadServer {
 
@@ -100,7 +100,10 @@ object HotReloadServer {
 
             Files.walkFileTree(projectDir.resolve(rootDir), object : SimpleFileVisitor<Path>() {
                 override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    if (shouldWatchDirectory(dir)) dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
+                    if (shouldWatchDirectory(dir)) {
+                        println("Watching $dir")
+                        dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
+                    }
                     return CONTINUE
                 }
             })

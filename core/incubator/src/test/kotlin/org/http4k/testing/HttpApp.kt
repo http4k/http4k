@@ -5,6 +5,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 
 class HttpApp : HttpAppProvider {
-    override fun invoke() = { req: Request -> Response(Status.OK).body("sss") }
+    override fun invoke() = { req: Request -> Response(Status.OK).body("ssssssss") }
 }
 
