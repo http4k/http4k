@@ -17,14 +17,11 @@ data class SSOProfile(
     val ssoRegistrationScopes: List<String>? = null
 ) {
     companion object {
-        fun loadProfiles(path: Path) = loadConfigFile(path)
-            .profileSections()
-            .mapNotNull { (n, s) -> s.toSSOProfile()?.let { n to it } }
-            .toMap()
+        fun loadProfiles(path: Path) = loadSSOProfiles(path) { it.toSSOProfile() }
     }
 }
 
-fun Map<String, String>.toSSOProfile(): SSOProfile? {
+private fun Map<String, String>.toSSOProfile(): SSOProfile? {
     val ssoAccountId = this["sso_account_id"] ?: return null
     val ssoRoleName = this["sso_role_name"] ?: return null
     val ssoRegion = this["sso_region"] ?: return null

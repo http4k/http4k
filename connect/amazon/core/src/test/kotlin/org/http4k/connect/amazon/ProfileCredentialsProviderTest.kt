@@ -15,7 +15,7 @@ import kotlin.io.path.Path
 
 class ProfileCredentialsProviderTest {
 
-    private val profileFile = Files.createTempFile("credentials", "ini").also {
+    private val credentialsFile = Files.createTempFile("credentials", "ini").also {
         it.toFile().writeText(
             """
             [default]
@@ -29,16 +29,29 @@ class ProfileCredentialsProviderTest {
         )
     }
 
-    private val env = Environment.EMPTY.with(AWS_CREDENTIAL_PROFILES_FILE of profileFile)
+    private val configFile = Files.createTempFile("config", "ini").also {
+        it.toFile().writeText(
+            """
+            [profile dev1]
+            aws_access_key_id = key789
+            aws_secret_access_key = secret789
+        """
+        )
+    }
+
+    private val env =
+        Environment.EMPTY.with(AWS_CREDENTIAL_PROFILES_FILE of credentialsFile, AWS_CONFIG_FILE of configFile)
 
     @AfterEach
     fun cleanup() {
-        profileFile.toFile().delete()
+        credentialsFile.toFile().delete()
+        configFile.toFile().delete()
     }
 
     private fun getCredentials(name: ProfileName): AwsCredentials? = CredentialsChain.Profile(
         profileName = name,
-        credentialsPath = profileFile
+        credentialsPath = credentialsFile,
+        configPath = configFile
     ).invoke()
 
     @Test
@@ -78,12 +91,13 @@ class ProfileCredentialsProviderTest {
         val expected = AwsCredentials("key123", "secret123")
         val chain = CredentialsChain.Profile(
             profileName = ProfileName.of("default"),
-            credentialsPath = profileFile
+            credentialsPath = credentialsFile,
+            configPath = configFile
         )
 
         assertThat(chain.invoke(), equalTo(expected))
 
-        profileFile.toFile().writeText(
+        credentialsFile.toFile().writeText(
             """
             [default]
             aws_access_key_id = key1456
@@ -111,11 +125,19 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
+    fun `CredentialsProvider provides custom config credentials from env`() {
+        assertThat(
+            CredentialsProvider.Profile(env, profileName = ProfileName.of("dev1")).invoke(),
+            equalTo(AwsCredentials("key789", "secret789"))
+        )
+    }
+
+    @Test
     fun `CredentialsProvider provides custom credentials from custom file`() {
         assertThat(
             CredentialsProvider.Profile(
                 profileName = ProfileName.of("dev"),
-                credentialsPath = profileFile
+                credentialsPath = credentialsFile
             ).invoke(),
             equalTo(AwsCredentials("key456", "secret456"))
         )
@@ -124,7 +146,7 @@ class ProfileCredentialsProviderTest {
     @Test
     fun `CredentialsProvider provides default credentials from custom file`() {
         assertThat(
-            CredentialsProvider.Profile(credentialsPath = profileFile).invoke(),
+            CredentialsProvider.Profile(credentialsPath = credentialsFile).invoke(),
             equalTo(AwsCredentials("key123", "secret123"))
         )
     }
