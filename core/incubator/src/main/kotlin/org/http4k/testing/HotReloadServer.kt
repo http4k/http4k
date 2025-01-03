@@ -1,8 +1,6 @@
 package org.http4k.testing
 
 import HotReloadClassLoader
-import org.gradle.tooling.BuildException
-import org.gradle.tooling.GradleConnector
 import org.http4k.core.HttpHandler
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
@@ -10,6 +8,9 @@ import org.http4k.server.PolyServerConfig
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.testing.CompileProject.Companion.Gradle
+import org.http4k.testing.CompileProject.Companion.Result.Failed
+import org.http4k.testing.CompileProject.Companion.Result.Ok
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitResult.CONTINUE
@@ -36,9 +37,17 @@ object HotReloadServer {
         projectDir: Path = Paths.get("."),
         rootDir: String = "src",
         watchedDirs: Set<String> = STANDARD_WATCH_SET,
+        compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(projectDir, rootDir, watchedDirs, runner, log, { (it as HttpHandler).asServer(serverConfig) })
+    ) = invoke<T>(
+        projectDir,
+        rootDir,
+        watchedDirs,
+        compileProject,
+        runner,
+        log,
+        { (it as HttpHandler).asServer(serverConfig) })
 
     /**
      * Create a hot-reloading Multi-protocol server.
@@ -48,16 +57,25 @@ object HotReloadServer {
         projectDir: Path = Paths.get("."),
         rootDir: String = "src",
         watchedDirs: Set<String> = STANDARD_WATCH_SET,
+        compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(projectDir, rootDir, watchedDirs, runner, log, { (it as PolyHandler).asServer(serverConfig) })
+    ) = invoke<T>(
+        projectDir,
+        rootDir,
+        watchedDirs,
+        compileProject,
+        runner,
+        log,
+        { (it as PolyHandler).asServer(serverConfig) })
 
     inline operator fun <reified T> invoke(
-        projectDir: Path = Paths.get("."),
-        rootDir: String = "src",
-        watchedDirs: Set<String> = STANDARD_WATCH_SET,
-        runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
-        crossinline log: (String) -> Unit = ::println,
+        projectDir: Path,
+        rootDir: String,
+        watchedDirs: Set<String>,
+        compileProject: CompileProject,
+        runner: TaskRunner,
+        crossinline log: (String) -> Unit,
         crossinline toServer: (Any) -> Http4kServer
     ) = object : Http4kServer {
         override fun port() = currentServer?.port() ?: error("not started!")
@@ -100,10 +118,7 @@ object HotReloadServer {
 
             Files.walkFileTree(projectDir.resolve(rootDir), object : SimpleFileVisitor<Path>() {
                 override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    if (shouldWatchDirectory(dir)) {
-                        println("Watching $dir")
-                        dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
-                    }
+                    if (shouldWatchDirectory(dir)) dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
                     return CONTINUE
                 }
             })
@@ -117,13 +132,15 @@ object HotReloadServer {
                         isRebuilding = true
                         try {
                             log("\uD83D\uDEA7 Rebuilding... \uD83D\uDEA7")
-                            GradleConnector.newConnector()
-                                .forProjectDirectory(projectDir.toFile())
-                                .connect().use { it.newBuild().forTasks("compileKotlin").run() }
-                            startServer()
+
+                            when (val result = compileProject()) {
+                                Ok -> startServer()
+                                is Failed ->  {
+                                    result.errorStream.copyTo(System.err)
+                                    log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
+                                }
+                            }
                             Thread.sleep(1000)
-                        } catch (e: BuildException) {
-                            log("\uD83D\uDEAB Rebuilding failed \uD83D\uDEAB")
                         } finally {
                             isRebuilding = false
                         }
