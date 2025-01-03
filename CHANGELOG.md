@@ -6,8 +6,10 @@ changes with their rationale when appropriate:
 ### v5.44.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : [Possible Break] `HtmlApprovalTest` formatter improved handling of HTML attributes which may require re-approving files.
+- **http4k-connect-amazon-iamidentitycenter*** : Read AWS profile configuration both from credentials and config files. H/T @aharin
 - **http4k-core** : Deprecate lens' `regex()` in favour of `regexGroup`. In v6 `regex()` will match fully, changing its current behaviour.
- 
+
+
 ### v5.43.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-connect-amazon-iamidentitycenter*** : Files containing tokens should only be readable by owner. H/T @aharin

@@ -5,11 +5,7 @@ import org.http4k.connect.amazon.core.model.AwsProfile
 import org.http4k.connect.amazon.core.model.ProfileName
 import java.nio.file.Path
 
-@Deprecated("Added configPath parameter", ReplaceWith("Profile(profileName, credentialsPath, configPath, ...)"))
-fun RegionProvider.Companion.Profile(profileName: ProfileName, credentialsPath: Path) =
-    RegionProvider { AwsProfile.loadProfiles(credentialsPath, credentialsPath.resolveSibling("config"))[profileName]?.region }
-
-fun RegionProvider.Companion.Profile(profileName: ProfileName, credentialsPath: Path, configPath: Path) =
+fun RegionProvider.Companion.Profile(profileName: ProfileName, credentialsPath: Path, configPath: Path = credentialsPath.resolveSibling("config")) =
     RegionProvider { AwsProfile.loadProfiles(credentialsPath, configPath)[profileName]?.region }
 
 fun RegionProvider.Companion.Profile(env: Environment) =

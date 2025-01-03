@@ -63,30 +63,14 @@ fun CredentialsChain.Companion.Profile(env: Environment = Environment.ENV): Cred
 @Deprecated("Renamed", ReplaceWith("StsProfile(env)"))
 fun CredentialsProvider.Companion.Profile(env: Environment = Environment.ENV): CredentialsProvider = StsProfile(env)
 
-@Deprecated("Added configPath parameter", ReplaceWith("StsProfile(credentialsPath, configPath, ...)"))
-fun CredentialsChain.Companion.StsProfile(
-    credentialsPath: Path,
-    profileName: ProfileName,
-    getStsClient: (AwsCredentials) -> STS,
-    clock: Clock = Clock.systemUTC(),
-    gracePeriod: Duration = Duration.ofSeconds(300),
-) = CredentialsChain.Companion.StsProfile(
-    credentialsPath,
-    credentialsPath.resolveSibling("config"),
-    profileName,
-    getStsClient,
-    clock,
-    gracePeriod
-)
-
 // TODO support web identity
 fun CredentialsChain.Companion.StsProfile(
     credentialsPath: Path,
-    configPath: Path,
     profileName: ProfileName,
     getStsClient: (AwsCredentials) -> STS,
     clock: Clock = Clock.systemUTC(),
     gracePeriod: Duration = Duration.ofSeconds(300),
+    configPath: Path = credentialsPath.resolveSibling("config"),
 ) = object : CredentialsChain {
     private val credentials = AtomicReference<ExpiringCredentials>(null)
 

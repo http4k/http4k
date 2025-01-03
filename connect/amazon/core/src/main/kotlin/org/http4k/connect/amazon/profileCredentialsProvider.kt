@@ -7,17 +7,10 @@ import org.http4k.connect.amazon.core.model.ProfileName
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicReference
 
-@Deprecated("Added configPath parameter", ReplaceWith("Profile(profileName, credentialsPath, configPath, ...)"))
-fun CredentialsChain.Companion.Profile(
-    profileName: ProfileName,
-    credentialsPath: Path
-): CredentialsChain =
-    CredentialsChain.Companion.Profile(profileName, credentialsPath, credentialsPath.resolveSibling("config"))
-
 fun CredentialsChain.Companion.Profile(
     profileName: ProfileName,
     credentialsPath: Path,
-    configPath: Path
+    configPath: Path = credentialsPath.resolveSibling("config")
 ): CredentialsChain {
     val cached = AtomicReference<AwsCredentials>(null)
 
