@@ -5,12 +5,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import java.nio.file.Paths
 
-class HttpApp : HttpAppProvider {
+class ExampleHttpApp : HttpAppProvider {
     override fun invoke() = { req: Request -> Response(Status.OK).body("asdsassd") }
 }
 
 fun main() {
-    HotReloadServer.http<HttpApp>(
+    HotReloadServer.http<ExampleHttpApp>(
         projectDir = Paths.get("core/incubator"),
         compileProject = CompileProject.Gradle(":http4k-incubator:compileTestKotlin")
     ).start()

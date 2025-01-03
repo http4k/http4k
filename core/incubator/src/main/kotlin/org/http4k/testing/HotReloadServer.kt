@@ -27,6 +27,9 @@ import kotlin.concurrent.thread
 
 val STANDARD_WATCH_SET = setOf("src/main", "src/test", "build/classes")
 
+/**
+ * Extreme Spike hot-reloading server. Probably only works on simple projects right now
+ */
 object HotReloadServer {
 
     /**
