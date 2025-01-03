@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.43.1.0 (uncut)
+### v5.44.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-testing-approval** : [Possible Break] `HtmlApprovalTest` formatter improved handling of HTML attributes which may require re-approving files.
 - **http4k-core** : Deprecate lens' `regex()` in favour of `regexGroup`. In v6 `regex()` will match fully, changing its current behaviour.
  
 ### v5.43.0.0
