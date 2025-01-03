@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v5.44.0.0 (uncut)
+### v5.44.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : [Possible Break] `HtmlApprovalTest` formatter improved handling of HTML attributes which may require re-approving files.
 - **http4k-connect-amazon-iamidentitycenter*** : Read AWS profile configuration both from credentials and config files. H/T @aharin
