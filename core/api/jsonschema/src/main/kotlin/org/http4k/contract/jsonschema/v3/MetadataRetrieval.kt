@@ -1,6 +1,5 @@
 package org.http4k.contract.jsonschema.v3
 
-import java.lang.IllegalArgumentException
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
