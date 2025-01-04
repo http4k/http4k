@@ -7,7 +7,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.filter.CanonicalPayload
-import org.http4k.routing.path
 import org.http4k.security.HmacSha256
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
