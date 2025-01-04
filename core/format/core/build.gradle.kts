@@ -20,6 +20,6 @@ dependencies {
 
     testFixturesImplementation("dev.forkhandles:values4k:_")
     testFixturesImplementation(testFixtures(project(":http4k-core")))
-    testFixturesImplementation(testFixtures(project(":http4k-contract")))
+    testFixturesImplementation(testFixtures(project(":http4k-api-openapi")))
     testFixturesImplementation(testFixtures(project(":http4k-api-jsonrpc")))
 }

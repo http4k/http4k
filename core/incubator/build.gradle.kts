@@ -26,5 +26,5 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-helidon"))
     testImplementation(project(":http4k-testing-approval"))
-    testImplementation(testFixtures(project(":http4k-contract")))
+    testImplementation(testFixtures(project(":http4k-api-openapi")))
 }
