@@ -72,9 +72,6 @@ object StringBiDiMappings {
     fun boolean() = BiDiMapping(String::asSafeBoolean, Boolean::toString)
     fun nonEmpty() = BiDiMapping({ s: String -> s.ifEmpty { throw IllegalArgumentException("String cannot be empty") } }, { it })
     fun nonBlank() = BiDiMapping({ s: String -> s.ifBlank { throw IllegalArgumentException("String cannot be blank") } }, { it })
-    @Deprecated("Use regexGroup. In future versions this function will perform a full regex match instead",
-        ReplaceWith("regexGroup(pattern, group)")
-    )
     fun regex(pattern: String, group: Int = 1) = regexGroup(pattern, group)
     fun regexGroup(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
