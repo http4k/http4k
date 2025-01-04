@@ -45,7 +45,11 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
 
     private class ThymeleafTemplateRenderer(private val engine: ITemplateEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {
-            engine.process(viewModel.template(), Context().apply {
+            val templateSpec = viewModel.template()
+            val separatorPos = templateSpec.indexOf("::")
+            val template = if (separatorPos > 0) templateSpec.substring(0, separatorPos) else templateSpec
+            val templateSelector = if (separatorPos > 0) setOf(templateSpec.substring(separatorPos + 2)) else null
+            engine.process(template, templateSelector, Context().apply {
                 setVariable("model", viewModel)
             })
         } catch (e: TemplateInputException) {
