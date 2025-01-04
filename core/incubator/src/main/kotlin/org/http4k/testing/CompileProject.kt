@@ -5,6 +5,9 @@ import org.http4k.testing.CompileProject.Companion.Result.Ok
 import java.io.File
 import java.io.InputStream
 
+/**
+ * Represents the process to compile the project for hot reload.
+ */
 fun interface CompileProject {
 
     operator fun invoke(): Result
@@ -15,6 +18,9 @@ fun interface CompileProject {
             data class Failed(val errorStream: InputStream) : Result
         }
 
+        /**
+         * Compile the project using Gradle.
+         */
         fun Gradle(task: String = "compileKotlin") = CompileProject {
             val process = ProcessBuilder().command("./gradlew", task)
                 .directory(File(".").absoluteFile)
