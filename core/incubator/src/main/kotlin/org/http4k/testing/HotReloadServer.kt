@@ -2,6 +2,9 @@ package org.http4k.testing
 
 import HotReloadClassLoader
 import org.http4k.core.HttpHandler
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
@@ -24,43 +27,57 @@ import java.nio.file.StandardWatchEventKinds.ENTRY_DELETE
 import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.Duration
+import java.time.Duration.ofMillis
 import kotlin.concurrent.thread
 import kotlin.io.path.exists
 
 /**
- * Extreme Spike hot-reloading server. Probably only works on simple projects right now
+ * Hot reloading server. Watches for changes on the classpath source and rebuilds the project when changes are detected.
+ * Uses an event source connection script injected into the HTML pages to trigger a reload when the project is rebuilt.
  */
 object HotReloadServer {
+
+    // This is the default set of directories to watch for changes
+    val DEFAULT_WATCH_SET = setOf("src/main", "src/test", "build/classes")
+
+    const val DEFAULT_PORT = 8000
 
     /**
      * Create a hot-reloading HTTP server. Defaults to SunHttp on port 8000.
      */
     @Suppress("UNCHECKED_CAST")
     inline fun <reified T : HttpAppProvider> http(
-        serverConfig: ServerConfig = SunHttp(8000),
-        watchedDirs: Set<String> = STANDARD_WATCH_SET,
+        serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
+        watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
-        runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
+        runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
+        rebuildPause: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(watchedDirs, compileProject, runner, log) { (it as HttpHandler).asServer(serverConfig) }
+    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildPause, log) {
+        ReloadProxy().then(it as HttpHandler).asServer(serverConfig)
+    }
 
     /**
      * Create a hot-reloading Multi-protocol server.
      */
     inline fun <reified T : PolyAppProvider> poly(
         serverConfig: PolyServerConfig,
-        watchedDirs: Set<String> = STANDARD_WATCH_SET,
+        watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
-        runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
+        runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
+        rebuildPause: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(watchedDirs, compileProject, runner, log) { (it as PolyHandler).asServer(serverConfig) }
-
-    val STANDARD_WATCH_SET = setOf("src/main", "src/test", "build/classes")
+    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildPause, log) {
+        (it as PolyHandler)
+            .run { PolyHandler(ReloadProxy().then(http ?: { Response(OK) }), ws, sse) }
+            .asServer(serverConfig)
+    }
 
     inline operator fun <reified T> invoke(
         watchedDirs: Set<String>,
         compileProject: CompileProject,
         runner: TaskRunner,
+        rebuildPause: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit,
         crossinline toServer: (Any) -> Http4kServer
     ) = object : Http4kServer {
@@ -134,7 +151,7 @@ object HotReloadServer {
                                     log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
                                 }
                             }
-                            Thread.sleep(1000)
+                            Thread.sleep(rebuildPause)
                         } finally {
                             isRebuilding = false
                         }
