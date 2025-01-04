@@ -21,7 +21,8 @@ data class MetricsDefaults(
                 labels = mapOf(
                     "method" to it.request.method.toString(),
                     "status" to it.response.status.code.toString(),
-                    "path" to it.routingGroup.replace('/', '_').replaceRegexes().replace('.', '_').replace(notAlphaNumUnderscore, "")
+                    "path" to it.routingGroup.replace('/', '_').replaceRegexes().replace('.', '_')
+                        .replace(notAlphaNumUnderscore, "")
                 )
             )
         }
@@ -35,10 +36,10 @@ data class MetricsDefaults(
                     "method" to it.request.method.toString(),
                     "status" to it.response.status.code.toString(),
                     "host" to it.request.uri.host.replace('.', '_'),
-                    "path" to it.routingGroup.replace('/', '_').replaceRegexes().replace('.', '_').replace(notAlphaNumUnderscore, "")
+                    "path" to it.routingGroup.replace('/', '_').replaceRegexes().replace('.', '_')
+                        .replace(notAlphaNumUnderscore, "")
                 )
             )
         }
     }
 }
-

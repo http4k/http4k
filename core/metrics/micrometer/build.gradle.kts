@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-ops-core"))
     api("io.micrometer:micrometer-core:_")
     testImplementation(testFixtures(project(":http4k-core")))
 }
