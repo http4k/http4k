@@ -3,7 +3,6 @@ package org.http4k.hotreload
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
 import org.http4k.hotreload.CompileProject.Companion.Gradle
 import org.http4k.hotreload.CompileProject.Companion.Result.Failed
 import org.http4k.hotreload.CompileProject.Companion.Result.Ok
@@ -46,10 +45,10 @@ object HotReloadServer {
      * Create a hot-reloading HTTP server. Defaults to SunHttp on port 8000.
      *
      *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
-     *  We suggest using SunHttp wherever possible.
+     *  We suggest using SunHttp (the default) for speed.
      */
     @Suppress("UNCHECKED_CAST")
-    inline fun <reified T : HotReloadHttpHandler> http(
+    inline fun <reified T : HttpHandler> http(
         serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
@@ -57,14 +56,14 @@ object HotReloadServer {
         rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
     ) = invoke<T>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
-        HotReloadStack().then(it as HttpHandler).asServer(serverConfig)
+        HotReloadableApp(it as HttpHandler).asServer(serverConfig)
     }
 
     /**
      * Create a hot-reloading Multi-protocol server.
      *
      *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
-     *  We suggest using Undertow wherever possible.
+     *  We suggest using Jetty as a default when WS or SSE is required.
      */
     inline fun <reified T : HotReloadPolyHandler> poly(
         serverConfig: PolyServerConfig,
@@ -75,7 +74,7 @@ object HotReloadServer {
         crossinline log: (String) -> Unit = ::println
     ) = invoke<T>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
         (it as PolyHandler)
-            .run { PolyHandler(HotReloadStack().then(http ?: { Response(OK) }), ws, sse) }
+            .run { PolyHandler(HotReloadableApp(http ?: { Response(OK) }), ws, sse) }
             .asServer(serverConfig)
     }
 
