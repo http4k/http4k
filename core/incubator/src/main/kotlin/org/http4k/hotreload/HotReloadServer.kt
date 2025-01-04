@@ -27,6 +27,7 @@ import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.Duration
 import java.time.Duration.ofMillis
+import java.time.Duration.ofSeconds
 import kotlin.concurrent.thread
 import kotlin.io.path.exists
 
@@ -50,10 +51,10 @@ object HotReloadServer {
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
-        rebuildPause: Duration = Duration.ofSeconds(1),
+        rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildPause, log) {
-        ReloadProxy().then(it as HttpHandler).asServer(serverConfig)
+    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
+        HotReloadStack().then(it as HttpHandler).asServer(serverConfig)
     }
 
     /**
@@ -64,11 +65,11 @@ object HotReloadServer {
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
-        rebuildPause: Duration = Duration.ofSeconds(1),
+        rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildPause, log) {
+    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
         (it as PolyHandler)
-            .run { PolyHandler(ReloadProxy().then(http ?: { Response(OK) }), ws, sse) }
+            .run { PolyHandler(HotReloadStack().then(http ?: { Response(OK) }), ws, sse) }
             .asServer(serverConfig)
     }
 
@@ -76,7 +77,7 @@ object HotReloadServer {
         watchedDirs: Set<String>,
         compileProject: CompileProject,
         runner: TaskRunner,
-        rebuildPause: Duration = Duration.ofSeconds(1),
+        rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit,
         crossinline toServer: (Any) -> Http4kServer
     ) = object : Http4kServer {
@@ -150,7 +151,7 @@ object HotReloadServer {
                                     log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
                                 }
                             }
-                            Thread.sleep(rebuildPause)
+                            Thread.sleep(rebuildBackoff)
                         } finally {
                             isRebuilding = false
                         }

@@ -1,6 +1,6 @@
 package org.http4k.hotreload
 
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
 import org.http4k.lens.contentType
 
@@ -30,6 +30,13 @@ fun InsertHotReloadScript(path: String): Filter {
                 connect();
             }, 500);
         };
+        
+        es.onclose = function(error) {
+            setTimeout(function() {
+                window.location.reload();
+                connect();
+            }, 500);
+        };
     }
 
     // Start initial connection attempt
@@ -41,7 +48,7 @@ fun InsertHotReloadScript(path: String): Filter {
     return Filter { next ->
         {
             next(it).run {
-                when (ContentType.TEXT_HTML) {
+                when (TEXT_HTML) {
                     contentType() -> {
                         val newBody = bodyString().replace("</body>", "</body>${reloadScript(path)}")
                         body(newBody)
