@@ -109,7 +109,7 @@ object HotReloadServer {
 
             runner {
                 currentServer = toServer(
-                    appClass.getDeclaredMethod("create").invoke(appClass.getDeclaredConstructor().newInstance())
+                        appClass.getDeclaredMethod("create").invoke(appClass.getDeclaredConstructor().newInstance())
                     as H
                 ).start()
             }
