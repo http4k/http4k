@@ -8,6 +8,10 @@ data class CssFeature(val color: String) : ViewModel {
     override fun template() = super.template() + ".css"
 }
 
+data object WithFragment : ViewModel {
+    override fun template() = super.template() + "::the-fragment"
+}
+
 class ThymeleafTemplatesTest : TemplatesContract<ThymeleafTemplates>(ThymeleafTemplates())
 
 class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
@@ -19,5 +23,12 @@ class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
         assertThat(renderer(CssFeature("blue")), equalTo("body {\n" +
                 "  background-color: blue;\n" +
                 "}\n"))
+    }
+
+    @Test
+    fun `can specify template fragment`() {
+        val renderer = ThymeleafTemplates().CachingClasspath()
+
+        assertThat(renderer(WithFragment), equalTo("<span>inside</span>"))
     }
 }
