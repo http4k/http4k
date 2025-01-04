@@ -48,7 +48,7 @@ object HotReloadServer {
      *  We suggest using SunHttp (the default) for speed.
      */
     @Suppress("UNCHECKED_CAST")
-    inline fun <reified T : HttpHandler> http(
+    inline fun <reified T : HotReloadable.Http> http(
         serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
@@ -65,7 +65,7 @@ object HotReloadServer {
      *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
      *  We suggest using Jetty as a default when WS or SSE is required.
      */
-    inline fun <reified T : HotReloadPolyHandler> poly(
+    inline fun <reified T : HotReloadable.Poly> poly(
         serverConfig: PolyServerConfig,
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
