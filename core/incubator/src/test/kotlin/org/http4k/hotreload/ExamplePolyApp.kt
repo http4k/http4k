@@ -5,6 +5,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.server.PolyHandler
 
-class ExamplePolyApp : HotReloadable.Poly {
+class ExamplePolyApp : HotReloadable<PolyHandler> {
     override fun create() = PolyHandler({ req: Request -> Response(Status.OK).body("ss") })
 }

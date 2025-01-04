@@ -48,15 +48,15 @@ object HotReloadServer {
      *  We suggest using SunHttp (the default) for speed.
      */
     @Suppress("UNCHECKED_CAST")
-    inline fun <reified T : HotReloadable.Http> http(
+    inline fun <reified H : HotReloadable<HttpHandler>> http(
         serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
         rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
-        HotReloadableApp(it as HttpHandler).asServer(serverConfig)
+    ) = invoke<H, HttpHandler>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
+        HotReloadableApp(it).asServer(serverConfig)
     }
 
     /**
@@ -65,26 +65,25 @@ object HotReloadServer {
      *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
      *  We suggest using Jetty as a default when WS or SSE is required.
      */
-    inline fun <reified T : HotReloadable.Poly> poly(
+    inline fun <reified H : HotReloadable<PolyHandler>> poly(
         serverConfig: PolyServerConfig,
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
         rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
-        (it as PolyHandler)
-            .run { PolyHandler(HotReloadableApp(http ?: { Response(OK) }), ws, sse) }
+    ) = invoke<H, PolyHandler>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
+        it.run { PolyHandler(HotReloadableApp(http ?: { Response(OK) }), ws, sse) }
             .asServer(serverConfig)
     }
 
-    inline operator fun <reified T> invoke(
+    inline operator fun <reified T : HotReloadable<H>, H> invoke(
         watchedDirs: Set<String>,
         compileProject: CompileProject,
         runner: TaskRunner,
         rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit,
-        crossinline toServer: (Any) -> Http4kServer
+        crossinline toServer: (H) -> Http4kServer
     ) = object : Http4kServer {
         override fun port() = currentServer?.port() ?: error("Server is not started!")
 
@@ -113,7 +112,8 @@ object HotReloadServer {
 
             runner {
                 currentServer = toServer(
-                    appClass.getDeclaredMethod("invoke").invoke(appClass.getDeclaredConstructor().newInstance())
+                    appClass.getDeclaredMethod("create").invoke(appClass.getDeclaredConstructor().newInstance())
+                    as H
                 ).start()
             }
 
