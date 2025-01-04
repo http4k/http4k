@@ -24,7 +24,7 @@ dependencies {
     testFixturesApi(project(":http4k-platform-core"))
     testFixturesApi(project(":http4k-config"))
     testFixturesApi(project(":http4k-serverless-lambda"))
-    testFixturesApi(project(":http4k-aws"))
+    testFixturesApi(project(":http4k-platform-aws"))
     testFixturesApi(project(":http4k-format-jackson"))
     testFixturesApi(project(":http4k-client-okhttp"))
     testFixturesApi(project(":http4k-connect-amazon-core"))
@@ -33,5 +33,5 @@ dependencies {
     testFixturesApi("dev.forkhandles:result4k:_")
     testFixturesApi(testFixtures(project(":http4k-core")))
     testFixturesApi(testFixtures(project(":http4k-serverless-core")))
-    testFixturesImplementation(testFixtures(project(":http4k-aws")))
+    testFixturesImplementation(testFixtures(project(":http4k-platform-aws")))
 }
