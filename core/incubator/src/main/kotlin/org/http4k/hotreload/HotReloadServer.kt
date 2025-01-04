@@ -95,7 +95,7 @@ object HotReloadServer {
         override fun stop() = apply { currentServer?.stop() }
 
         fun startServer(): Http4kServer {
-            currentServer?.stop()
+            runCatching { currentServer?.stop() }
 
             val classpathUrls = allProjectClasspathRoots()
                 .map { get(it).toUri().toURL() }
