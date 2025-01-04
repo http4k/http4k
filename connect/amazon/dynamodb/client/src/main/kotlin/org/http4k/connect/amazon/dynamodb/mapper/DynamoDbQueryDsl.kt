@@ -49,9 +49,6 @@ class KeyConditionBuilder<HashKey : Any, SortKey : Any> internal constructor(
         override val attributeValues = attrValues
     }
 
-    private fun Attribute<SortKey>.sortKeyOperator(op: String, value: SortKey) =
-        SortKeySubstitute(this).sortKeyOperator(op, value)
-
     private fun SortKeySubstitute.sortKeyOperator(op: String, value: SortKey): SortKeyCondition<HashKey, SortKey>? =
         attribute?.let {
             sortKeyCondition(
@@ -61,7 +58,6 @@ class KeyConditionBuilder<HashKey : Any, SortKey : Any> internal constructor(
             )
         }
 
-    infix fun Attribute<SortKey>.ge(value: SortKey) = sortKeyOperator(">=", value)
     infix fun SortKeySubstitute.eq(value: SortKey) = sortKeyOperator("=", value)
     infix fun SortKeySubstitute.lt(value: SortKey) = sortKeyOperator("<", value)
     infix fun SortKeySubstitute.le(value: SortKey) = sortKeyOperator("<=", value)
