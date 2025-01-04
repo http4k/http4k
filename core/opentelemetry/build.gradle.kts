@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-ops-core"))
     api(platform("io.opentelemetry:opentelemetry-bom:_"))
     api("io.opentelemetry:opentelemetry-sdk")
     api("io.opentelemetry:opentelemetry-sdk-metrics")
