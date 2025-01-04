@@ -1,7 +1,6 @@
 package org.http4k.contract
 
 import org.http4k.core.Request
-import org.http4k.lens.BodyLens
 import org.http4k.lens.LensExtractor
 
 /**
