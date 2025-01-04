@@ -22,13 +22,16 @@ fun interface CompileProject {
          * Compile the project using Gradle.
          */
         fun Gradle(task: String = "compileKotlin") = CompileProject {
-            val process = ProcessBuilder().command("./gradlew", task)
+            val process = ProcessBuilder()
+                .command("./gradlew", task)
                 .directory(File(".").absoluteFile)
                 .start()
 
-            when (process.waitFor()) {
-                0 -> Ok
-                else -> Failed(process.errorStream)
+            try {
+                if (process.waitFor() == 0) Ok else Failed(process.errorStream)
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                Failed(process.errorStream)
             }
         }
     }
