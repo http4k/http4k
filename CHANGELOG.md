@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v5.44.1.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
 - **http4k-template-thymeleaf** : Support template fragments. H/T @mikaelstaldal
 
 ### v5.44.0.0
