@@ -1,7 +1,7 @@
-package org.http4k.testing
+package org.http4k.hotreload
 
-import org.http4k.testing.CompileProject.Companion.Result.Failed
-import org.http4k.testing.CompileProject.Companion.Result.Ok
+import org.http4k.hotreload.CompileProject.Companion.Result.Failed
+import org.http4k.hotreload.CompileProject.Companion.Result.Ok
 import java.io.File
 import java.io.InputStream
 

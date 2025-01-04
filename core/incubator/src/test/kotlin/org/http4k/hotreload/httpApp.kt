@@ -1,4 +1,4 @@
-package org.http4k.testing
+package org.http4k.hotreload
 
 import org.http4k.core.Request
 import org.http4k.core.Response

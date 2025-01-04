@@ -1,19 +1,18 @@
-package org.http4k.testing
+package org.http4k.hotreload
 
-import HotReloadClassLoader
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.hotreload.CompileProject.Companion.Gradle
+import org.http4k.hotreload.CompileProject.Companion.Result.Failed
+import org.http4k.hotreload.CompileProject.Companion.Result.Ok
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.testing.CompileProject.Companion.Gradle
-import org.http4k.testing.CompileProject.Companion.Result.Failed
-import org.http4k.testing.CompileProject.Companion.Result.Ok
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult

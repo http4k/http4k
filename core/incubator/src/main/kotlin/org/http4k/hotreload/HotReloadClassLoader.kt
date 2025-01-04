@@ -1,3 +1,5 @@
+package org.http4k.hotreload
+
 import java.net.URL
 import java.net.URLClassLoader
 
