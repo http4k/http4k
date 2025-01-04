@@ -14,36 +14,50 @@ fun InsertHotReloadScript(path: String): Filter {
      */
     fun reloadScript(path: String) =
         """
-<script>
-(function() {
-    function connect() {
-        const es = new EventSource('$path');
-        
-        es.onmessage = function(event) {
-            window.location.reload();
-        };
+            <script>
+            (function() {
+                async function pingServer() {
+                    try {
+                        return (await fetch('/http4k/ping')).ok;
+                    } catch (e) {
+                        return false;
+                    }
+                }
 
-        es.onerror = function(error) {
-            es.close();
-            setTimeout(function() {
-                window.location.reload();
-                connect();
-            }, 500);
-        };
-        
-        es.onclose = function(error) {
-            setTimeout(function() {
-                window.location.reload();
-                connect();
-            }, 500);
-        };
-    }
+                async function waitForServer() {
+                    while (!(await pingServer())) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
 
-    // Start initial connection attempt
-    connect();
-})();
-</script>
-"""
+                function connect() {
+                    const es = new EventSource('$path');
+                    
+                    es.onmessage = function(event) {
+                        es.close();
+                        handleReconnect();
+                    };
+
+                    es.onerror = function(error) {
+                        es.close();
+                        handleReconnect();
+                    };
+                    
+                    es.onclose = function(error) {
+                        handleReconnect();
+                    };
+                }
+
+                async function handleReconnect() {
+                    await waitForServer();
+                    connect();
+                    window.location.reload();
+                }
+
+                connect();
+            })();
+            </script>
+        """.trimIndent()
 
     return Filter { next ->
         {
@@ -51,8 +65,7 @@ fun InsertHotReloadScript(path: String): Filter {
                 when (TEXT_HTML) {
                     contentType() -> {
                         val newBody = bodyString().replace("</body>", "</body>${reloadScript(path)}")
-                        body(newBody)
-                            .replaceHeader("Content-Length", newBody.length.toString())
+                        body(newBody).replaceHeader("Content-Length", newBody.length.toString())
                     }
 
                     else -> this

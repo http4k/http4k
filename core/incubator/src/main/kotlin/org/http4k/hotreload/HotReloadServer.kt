@@ -44,9 +44,12 @@ object HotReloadServer {
 
     /**
      * Create a hot-reloading HTTP server. Defaults to SunHttp on port 8000.
+     *
+     *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
+     *  We suggest using SunHttp wherever possible.
      */
     @Suppress("UNCHECKED_CAST")
-    inline fun <reified T : HttpAppProvider> http(
+    inline fun <reified T : HotReloadHttpHandler> http(
         serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
@@ -59,8 +62,11 @@ object HotReloadServer {
 
     /**
      * Create a hot-reloading Multi-protocol server.
+     *
+     *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
+     *  We suggest using Undertow wherever possible.
      */
-    inline fun <reified T : PolyAppProvider> poly(
+    inline fun <reified T : HotReloadPolyHandler> poly(
         serverConfig: PolyServerConfig,
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
         compileProject: CompileProject = Gradle(),
