@@ -11,12 +11,13 @@ import org.http4k.server.asServer
 import org.http4k.testing.CompileProject.Companion.Gradle
 import org.http4k.testing.CompileProject.Companion.Result.Failed
 import org.http4k.testing.CompileProject.Companion.Result.Ok
+import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitResult.CONTINUE
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
+import java.nio.file.Paths.get
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardWatchEventKinds.ENTRY_CREATE
 import java.nio.file.StandardWatchEventKinds.ENTRY_DELETE
@@ -24,8 +25,7 @@ import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.Duration
 import kotlin.concurrent.thread
-
-val STANDARD_WATCH_SET = setOf("src/main", "src/test", "build/classes")
+import kotlin.io.path.exists
 
 /**
  * Extreme Spike hot-reloading server. Probably only works on simple projects right now
@@ -35,54 +35,32 @@ object HotReloadServer {
     /**
      * Create a hot-reloading HTTP server. Defaults to SunHttp on port 8000.
      */
+    @Suppress("UNCHECKED_CAST")
     inline fun <reified T : HttpAppProvider> http(
         serverConfig: ServerConfig = SunHttp(8000),
-        projectDir: Path = Paths.get("."),
-        rootDir: String = "src",
         watchedDirs: Set<String> = STANDARD_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
-        watchDebounceInterval: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(
-        projectDir,
-        rootDir,
-        watchedDirs,
-        compileProject,
-        runner,
-        watchDebounceInterval,
-        log,
-        { (it as HttpHandler).asServer(serverConfig) })
+    ) = invoke<T>(watchedDirs, compileProject, runner, log) { (it as HttpHandler).asServer(serverConfig) }
 
     /**
      * Create a hot-reloading Multi-protocol server.
      */
     inline fun <reified T : PolyAppProvider> poly(
         serverConfig: PolyServerConfig,
-        projectDir: Path = Paths.get("."),
-        rootDir: String = "src",
         watchedDirs: Set<String> = STANDARD_WATCH_SET,
         compileProject: CompileProject = Gradle(),
         runner: TaskRunner = TaskRunner.retry(5, Duration.ofMillis(100)),
-        watchDebounceInterval: Duration = Duration.ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
-    ) = invoke<T>(
-        projectDir,
-        rootDir,
-        watchedDirs,
-        compileProject,
-        runner,
-        watchDebounceInterval,
-        log,
-        { (it as PolyHandler).asServer(serverConfig) })
+    ) = invoke<T>(watchedDirs, compileProject, runner, log) { (it as PolyHandler).asServer(serverConfig) }
+
+    val STANDARD_WATCH_SET = setOf("src/main", "src/test", "build/classes")
 
     inline operator fun <reified T> invoke(
-        projectDir: Path,
-        rootDir: String,
         watchedDirs: Set<String>,
         compileProject: CompileProject,
         runner: TaskRunner,
-        watchDebounceInterval: Duration,
         crossinline log: (String) -> Unit,
         crossinline toServer: (Any) -> Http4kServer
     ) = object : Http4kServer {
@@ -97,15 +75,16 @@ object HotReloadServer {
             return startServer()
         }
 
-        override fun stop() = apply {
-            currentServer?.stop()
-        }
+        override fun stop() = apply { currentServer?.stop() }
 
         fun startServer(): Http4kServer {
             currentServer?.stop()
 
-            val buildDir = projectDir.resolve("build/classes/kotlin/main")
-            val classLoader = HotReloadClassLoader(arrayOf(buildDir.toUri().toURL()))
+            val classpathUrls = allProjectClasspathRoots()
+                .map { get(it).toUri().toURL() }
+                .toTypedArray()
+
+            val classLoader = HotReloadClassLoader(classpathUrls)
             Thread.currentThread().contextClassLoader = classLoader
 
             val appClass = Class.forName(T::class.qualifiedName, true, classLoader)
@@ -124,12 +103,19 @@ object HotReloadServer {
         private fun watchFiles() {
             val watchService = FileSystems.getDefault().newWatchService()
 
-            Files.walkFileTree(projectDir.resolve(rootDir), object : SimpleFileVisitor<Path>() {
-                override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    if (shouldWatchDirectory(dir)) dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
-                    return CONTINUE
+            allProjectClasspathRoots()
+                .map { get(it.substringBefore("build/classes")).resolve("src") }
+                .filter { it.exists() }
+                .forEach {
+                    Files.walkFileTree(it, object : SimpleFileVisitor<Path>() {
+                        override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
+                            if (shouldWatchDirectory(dir)) {
+                                dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
+                            }
+                            return CONTINUE
+                        }
+                    })
                 }
-            })
 
             watchThread = thread {
                 while (true) {
@@ -148,7 +134,7 @@ object HotReloadServer {
                                     log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
                                 }
                             }
-                            Thread.sleep(watchDebounceInterval)
+                            Thread.sleep(1000)
                         } finally {
                             isRebuilding = false
                         }
@@ -157,6 +143,10 @@ object HotReloadServer {
                 }
             }
         }
+
+        private fun allProjectClasspathRoots() = System.getProperty("java.class.path")
+            .split(File.pathSeparator)
+            .filter { it.contains("build/classes") }
 
         private fun shouldWatchDirectory(dir: Path) = watchedDirs.any { dir.toString().contains(it) }
     }
