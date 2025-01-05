@@ -29,7 +29,7 @@ rootDir.walkTopDown()
     .forEach {
         val moduleName = it.relativeTo(rootDir).path
             .removePrefix("core/") // remove core ecosystem modules as they have no prefix to add
-            .removePrefix("enterprise/") // remove enterprise ecosystem modules as they have no prefix to add
+            .removePrefix("pro/") // remove pro ecosystem modules as they have no prefix to add
             .replace('/', '-')
             .removeSuffix("-client") // replace http4k-connect client module names as they have no suffixx
 
