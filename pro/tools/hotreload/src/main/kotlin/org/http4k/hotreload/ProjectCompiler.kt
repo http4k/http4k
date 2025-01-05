@@ -2,7 +2,9 @@ package org.http4k.hotreload
 
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.PrintStream
 
 /**
  * Represents the process to compile the project for hot reload.
@@ -29,8 +31,9 @@ fun interface ProjectCompiler {
             try {
                 if (process.waitFor() == 0) Ok else Failed(process.errorStream.reader().readText())
             } catch (e: Throwable) {
-                e.printStackTrace()
-                Failed(process.errorStream)
+                val bytes = ByteArrayOutputStream()
+                e.printStackTrace(PrintStream(bytes))
+                Failed(String(bytes.toByteArray()))
             }
         }
     }

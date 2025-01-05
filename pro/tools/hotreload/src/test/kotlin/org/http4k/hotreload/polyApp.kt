@@ -6,6 +6,6 @@ import org.http4k.server.Helidon
 fun main() {
     HotReloadServer.poly<ExamplePolyApp>(
         serverConfig = Helidon(8000),
-        watcher = PathWatcher(Gradle(":http4k-incubator:compileTestKotlin"))
+        watcher = ProjectCompilingPathWatcher(Gradle(":http4k-incubator:compileTestKotlin"))
     ).start()
 }

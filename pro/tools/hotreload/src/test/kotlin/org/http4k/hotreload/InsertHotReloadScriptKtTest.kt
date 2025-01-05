@@ -19,7 +19,6 @@ class InsertHotReloadScriptKtTest {
 
     @Test
     fun `inserts script into HTML`(approver: Approver) {
-
         val app = InsertHotReloadScript("/foo").then { req: Request ->
             Response(Status.OK).contentType(TEXT_HTML)
                 .body("<html><head></head><body></body></html>")
