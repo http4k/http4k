@@ -45,7 +45,6 @@ object HotReloadServer {
      *  Note that some servers do not support hot-reloading correctly due to quirks around reloading.
      *  We suggest using SunHttp (the default) for speed.
      */
-    @Suppress("UNCHECKED_CAST")
     inline fun <reified H : HotReloadable<HttpHandler>> http(
         serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
         watchedDirs: Set<String> = DEFAULT_WATCH_SET,
@@ -74,6 +73,7 @@ object HotReloadServer {
         it.asServer(serverConfig)
     }
 
+    @Suppress("UNCHECKED_CAST")
     inline operator fun <reified T : HotReloadable<H>, H> invoke(
         watchedDirs: Set<String>,
         compileProject: CompileProject,
