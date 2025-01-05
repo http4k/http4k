@@ -9,7 +9,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-connect-ai-openai-plugin"))
     api(project(":http4k-template-pebble"))
     api(project(":http4k-api-ui-swagger"))
     api("de.sven-jacobs:loremipsum:_")
