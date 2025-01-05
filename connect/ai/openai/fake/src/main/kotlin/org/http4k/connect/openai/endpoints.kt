@@ -21,11 +21,8 @@ import org.http4k.connect.openai.action.ImageResponseFormat.url
 import org.http4k.connect.openai.action.Model
 import org.http4k.connect.openai.action.Models
 import org.http4k.connect.openai.action.Usage
-import org.http4k.connect.openai.auth.OpenAIPluginId
 import org.http4k.connect.storage.Storage
-import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
-import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -37,12 +34,8 @@ import org.http4k.core.extend
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.static
-import org.http4k.template.PebbleTemplates
-import org.http4k.template.ViewModel
-import org.http4k.template.viewModel
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -154,11 +147,3 @@ private fun completionResponse(
 )
 
 fun serveGeneratedContent() = static(Classpath("public"))
-
-fun index(plugins: List<OpenAIPluginId>): RoutingHttpHandler {
-    val lens = Body.viewModel(PebbleTemplates().CachingClasspath(), TEXT_HTML).toLens()
-
-    return "/" bind GET to { Response(OK).with(lens of Index(plugins)) }
-}
-
-data class Index(val plugins: List<OpenAIPluginId>) : ViewModel
