@@ -3,9 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.44.2.0 (uncut)
+- **http4k-server-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately. 
+
 ### v5.44.2.0
-- **http4k-*** : Upgrade some dependency versions.
-- **http4k-serverless-tencent** : Tweaks to support new version of Tencent SDK. 
+- **http4k-template-thymeleaf** : Support template fragments. H/T @mikaelstaldal
 
 ### v5.44.1.0
 - **http4k-*** : Upgrade some dependency versions.
@@ -16,7 +18,6 @@ changes with their rationale when appropriate:
 - **http4k-testing-approval** : [Possible Break] `HtmlApprovalTest` formatter improved handling of HTML attributes which may require re-approving files.
 - **http4k-connect-amazon-iamidentitycenter*** : Read AWS profile configuration both from credentials and config files. H/T @aharin
 - **http4k-core** : Deprecate lens' `regex()` in favour of `regexGroup`. In v6 `regex()` will match fully, changing its current behaviour.
-
 
 ### v5.43.0.0
 - **http4k-*** : Upgrade some dependency versions.
