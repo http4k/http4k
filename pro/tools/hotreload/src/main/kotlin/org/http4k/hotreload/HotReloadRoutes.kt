@@ -15,13 +15,13 @@ import java.time.Duration.ofMinutes
 /**
  * Filter which injects a script into HTML responses using an event source to detect changes and reload the page.
  */
-fun HotReloadRoutes(app: HttpHandler, sleeper: (Duration) -> Unit = Thread::sleep) = NoCache()
+fun HotReloadRoutes(app: HttpHandler, duration: Duration = ofMinutes(10) , sleeper: (Duration) -> Unit = Thread::sleep) = NoCache()
     .then(InsertHotReloadScript("/http4k/hot-reload"))
     .then(routes(
         "http4k" bind routes(
             "/ping" bind { Response(OK).body("pong") },
             "/hot-reload" bind {
-                runCatching { sleeper(ofMinutes(10)) }
+                runCatching { sleeper(duration) }
                     .map { Response(OK) }
                     .getOrDefault(Response(I_M_A_TEAPOT))
             }
