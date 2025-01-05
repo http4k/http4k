@@ -6,10 +6,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.server.PolyHandler
-import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
-class PolyRoutingTest : PortBasedTest {
+class PolyRoutingTest {
 
     @Test
     fun `can use DSL to construct polyhandler`() {
