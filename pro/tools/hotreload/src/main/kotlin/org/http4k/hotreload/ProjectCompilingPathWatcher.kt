@@ -1,12 +1,12 @@
 package org.http4k.hotreload
 
-import org.http4k.hotreload.CompileProject.Companion.Gradle
-import org.http4k.hotreload.CompileProject.Companion.Result.Failed
-import org.http4k.hotreload.CompileProject.Companion.Result.Ok
+import org.http4k.hotreload.ProjectCompiler.Companion.Gradle
+import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
+import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitResult.CONTINUE
-import java.nio.file.Files.walkFileTree
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardWatchEventKinds.ENTRY_CREATE
@@ -17,36 +17,36 @@ import java.time.Duration
 import kotlin.concurrent.thread
 import kotlin.io.path.exists
 
-// This is the default set of directories to watch for changes
-val DEFAULT_WATCH_PATTERNS = setOf("src/main", "src/test", "build/classes")
-
 /**
  * Watches for changes on the classpath source and rebuilds the project when changes are detected.
  */
-class ProjectSourceWatcher(
-    private val compileProject: CompileProject = Gradle(),
-    private val watchedDirs: Set<String> = DEFAULT_WATCH_PATTERNS,
-    private val rebuildBackoff: Duration = Duration.ofSeconds(1)
-) {
+class ProjectCompilingPathWatcher(
+    private val projectCompiler: ProjectCompiler = Gradle(),
+    // This is the default set of directories to watch for changes
+    private val watchedDirs: Set<String> = setOf("src/main", "src/test", "build/classes"),
+    private val downtimeSleep: () -> Unit = { Thread.sleep(Duration.ofSeconds(1)) }
+) : PathWatcher {
+    private val watchService = FileSystems.getDefault().newWatchService()
+
+    private val pathsToWatch = mutableSetOf<Path>()
     private val changeListeners = mutableListOf<(List<Path>) -> Unit>()
-
-    fun onChange(fn: (List<Path>) -> Unit) = apply { changeListeners.add(fn) }
-
     private val successListeners = mutableListOf<() -> Unit>()
-
-    fun onSuccess(fn: () -> Unit) = apply { successListeners.add(fn) }
-
     private val failureListeners = mutableListOf<(String) -> Unit>()
 
-    fun onFailure(fn: (String) -> Unit) = apply { failureListeners.add(fn) }
+    override fun onChange(fn: (List<Path>) -> Unit) = apply { changeListeners.add(fn) }
 
-    fun watch(sourcePaths: List<Path>) {
-        val watchService = FileSystems.getDefault().newWatchService()
+    override fun onSuccess(fn: () -> Unit) = apply { successListeners.add(fn) }
 
-        sourcePaths
-            .filter { it.exists() }
+    override fun onFailure(fn: (String) -> Unit) = apply { failureListeners.add(fn) }
+
+    override fun watch(newPaths: List<Path>) {
+        pathsToWatch += newPaths.filter { it.exists() }
+    }
+
+    override fun start() {
+        pathsToWatch
             .forEach {
-                walkFileTree(it, object : SimpleFileVisitor<Path>() {
+                Files.walkFileTree(it, object : SimpleFileVisitor<Path>() {
                     override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
                         if (shouldWatchDirectory(dir)) {
                             dir.register(watchService, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE)
@@ -68,12 +68,13 @@ class ProjectSourceWatcher(
                     try {
                         changeListeners.forEach { it(fileChanges) }
 
-                        when (val result = compileProject()) {
+                        when (val result = projectCompiler()) {
                             Ok -> successListeners.forEach { it() }
                             is Failed -> result.errorStream.reader().readText()
                                 .also { stream -> failureListeners.forEach { it(stream) } }
                         }
-                        Thread.sleep(rebuildBackoff)
+
+                        downtimeSleep()
                     } finally {
                         isRebuilding = false
                     }
@@ -81,6 +82,10 @@ class ProjectSourceWatcher(
                 key.reset()
             }
         }
+    }
+
+    override fun close() {
+        watchService.close()
     }
 
     private fun shouldWatchDirectory(dir: Path) = watchedDirs.any { dir.toString().contains(it) }
