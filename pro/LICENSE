@@ -1,0 +1,68 @@
+# The http4k Commercial License (the "Commercial License")
+Copyright (c) 2025-present http4k Ltd.
+
+## 1. Definitions
+
+"Software" means the http4k software and associated documentation files.
+"Commercial Terms" means the http4k Commercial Subscription Terms of Service available at https://http4k.org/commercial-terms.
+"Subscription Tier" means the specific commercial subscription offering as defined in the Commercial Terms.
+
+## 2. License Grant and Restrictions
+
+This Software may only be used in production if you (and any entity that you represent) have:
+a) Agreed to and are in compliance with the Commercial Terms, or other agreement governing the use of the Software as agreed by you and http4k Ltd, AND
+b) Maintain a valid http4k Commercial Subscription for the correct number of User Seats (as defined in the Commercial Terms).
+
+Subject to the foregoing conditions, you are permitted to:
+- Modify the Software and publish patches to the Software
+- Copy and modify the Software for development and testing purposes without requiring a subscription
+- Access security patches, bug fixes, and updates through private repositories as per your subscription tier
+
+All modifications, patches, and derivatives remain the property of http4k Ltd and/or its licensors. Such modifications may only be used, copied, modified, displayed, distributed, or otherwise exploited with a valid http4k Commercial Subscription.
+
+## 3. Term and Termination
+
+3.1. This license is effective until terminated.
+
+3.2. Your rights under this license will terminate automatically if you fail to comply with its terms.
+
+3.3. Upon termination:
+- All rights granted under this license cease immediately
+- You must cease all use of the Software
+- You must destroy all copies of the Software in your possession
+
+## 4. Support and Updates
+
+Support and updates are provided according to your Subscription Tier as specified in the Commercial Terms.
+
+## 5. Compliance and Auditing
+
+5.1. You agree to maintain accurate records regarding your use of the Software.
+
+5.2. http4k Ltd reserves the right to audit your use of the Software upon reasonable notice.
+
+5.3. You agree to cooperate with http4k Ltd in such audits and provide reasonable access to records relating to Software use.
+
+## 6. Payment Terms
+
+6.1. License fees shall be paid in accordance with the Commercial Terms.
+
+6.2. Failure to pay required fees constitutes grounds for license termination.
+
+## 7. Export Compliance
+
+Use and distribution of the Software may be subject to export and import laws. You agree to comply with all applicable export and import laws and regulations.
+
+## 8. Community Edition Exclusion
+
+This Commercial License applies only to the part of this Software that is not distributed as part of http4k Community Edition (CE). Any part of this Software distributed as part of http4k CE or is served client-side as an image, font, cascading stylesheet (CSS), file which produces or is compiled, arranged, augmented, or combined into client-side JavaScript, in whole or in part, is copyrighted under the Apache2 license.
+
+## 9. Warranty Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## 10. Third Party Components
+
+For all third party components incorporated into the http4k Software, those components are licensed under the original license provided by the owner of the applicable component.
+
+All copies or substantial portions of the Software shall include a reference to this Commercial License and the Commercial Terms.
