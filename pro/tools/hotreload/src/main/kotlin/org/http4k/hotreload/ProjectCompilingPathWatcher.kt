@@ -70,8 +70,7 @@ class ProjectCompilingPathWatcher(
 
                         when (val result = projectCompiler()) {
                             Ok -> successListeners.forEach { it() }
-                            is Failed -> result.errorStream.reader().readText()
-                                .also { stream -> failureListeners.forEach { it(stream) } }
+                            is Failed -> failureListeners.forEach { it(result.error) }
                         }
 
                         downtimeSleep()
@@ -84,7 +83,7 @@ class ProjectCompilingPathWatcher(
         }
     }
 
-    override fun close() {
+    override fun stop() {
         watchService.close()
     }
 

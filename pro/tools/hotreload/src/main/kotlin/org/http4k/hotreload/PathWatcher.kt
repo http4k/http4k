@@ -11,5 +11,6 @@ interface PathWatcher : AutoCloseable {
     fun onFailure(fn: (String) -> Unit): PathWatcher
     fun watch(newPaths: List<Path>)
     fun start()
-    fun stop() = close()
+    fun stop()
+    override fun close() = stop()
 }
