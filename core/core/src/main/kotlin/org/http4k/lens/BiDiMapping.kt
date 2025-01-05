@@ -72,7 +72,7 @@ object StringBiDiMappings {
     fun boolean() = BiDiMapping(String::asSafeBoolean, Boolean::toString)
     fun nonEmpty() = BiDiMapping({ s: String -> s.ifEmpty { throw IllegalArgumentException("String cannot be empty") } }, { it })
     fun nonBlank() = BiDiMapping({ s: String -> s.ifBlank { throw IllegalArgumentException("String cannot be blank") } }, { it })
-    fun regex(pattern: String, group: Int = 1) = regexGroup(pattern, group)
+    fun regex(pattern: String) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.value!! }, { it }) }
     fun regexGroup(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
     fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)

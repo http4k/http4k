@@ -169,10 +169,20 @@ class BiDiLensSpecTest {
     )
 
     @Test
-    fun regex() {
+    fun regexGroup() {
         val requiredLens = spec.regexGroup("v(\\d+)", 1).required("hello")
         assertThat(requiredLens("v123"), equalTo("123"))
         assertThat((spec.regexGroup("v(\\d+)", 1).map(String::toInt).required("hello"))("v123"), equalTo(123))
+        assertThat(
+            { requiredLens("hello") },
+            throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid))
+        )
+    }
+
+    @Test
+    fun regex() {
+        val requiredLens = spec.regex("foo\\d+").required("hello")
+        assertThat(requiredLens("foo123"), equalTo("foo123"))
         assertThat(
             { requiredLens("hello") },
             throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid))
