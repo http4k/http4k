@@ -1,14 +1,14 @@
 package org.http4k.hotreload
 
-import org.http4k.hotreload.CompileProject.Companion.Result.Failed
-import org.http4k.hotreload.CompileProject.Companion.Result.Ok
+import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
+import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
 import java.io.File
 import java.io.InputStream
 
 /**
  * Represents the process to compile the project for hot reload.
  */
-fun interface CompileProject {
+fun interface ProjectCompiler {
 
     operator fun invoke(): Result
 
@@ -21,7 +21,7 @@ fun interface CompileProject {
         /**
          * Compile the project using Gradle.
          */
-        fun Gradle(task: String = "compileKotlin") = CompileProject {
+        fun Gradle(task: String = "compileKotlin") = ProjectCompiler {
             val process = ProcessBuilder()
                 .command("./gradlew", task)
                 .directory(File(".").absoluteFile)

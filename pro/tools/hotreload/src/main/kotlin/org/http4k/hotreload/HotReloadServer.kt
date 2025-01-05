@@ -3,7 +3,8 @@ package org.http4k.hotreload
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.hotreload.CompileProject.Companion.Gradle
+import org.http4k.hotreload.ProjectCompiler.Companion.Gradle
+import org.http4k.hotreload.TaskRunner.Companion.retry
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
@@ -22,12 +23,6 @@ import java.time.Duration.ofMillis
  * Uses an event source connection script injected into the HTML pages to trigger a reload when the project is rebuilt.
  */
 object HotReloadServer {
-
-    // This is the default set of directories to watch for changes
-    val DEFAULT_WATCH_SET = setOf("src/main", "src/test", "build/classes")
-
-    const val DEFAULT_PORT = 8000
-
     /**
      * Create a hot-reloading HTTP server. Defaults to SunHttp on port 8000.
      *
@@ -35,12 +30,12 @@ object HotReloadServer {
      *  We suggest using SunHttp (the default) for speed.
      */
     inline fun <reified H : HotReloadable<HttpHandler>> http(
-        serverConfig: ServerConfig = SunHttp(DEFAULT_PORT),
-        watcher: ProjectSourceWatcher = ProjectSourceWatcher(Gradle()),
-        runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
+        serverConfig: ServerConfig = SunHttp(8000),
+        watcher: PathWatcher = ProjectCompilingPathWatcher(Gradle()),
+        taskRunner: TaskRunner = retry(5, ofMillis(100)),
         noinline log: (String) -> Unit = ::println,
         noinline error: (String) -> Unit = System.err::println
-    ) = invoke<H, HttpHandler>(watcher, runner, log, error) {
+    ) = hotReload<H, HttpHandler>(watcher, taskRunner, log, error) {
         HotReloadRoutes(it).asServer(serverConfig)
     }
 
@@ -52,18 +47,17 @@ object HotReloadServer {
      */
     inline fun <reified H : HotReloadable<PolyHandler>> poly(
         serverConfig: PolyServerConfig,
-        watcher: ProjectSourceWatcher = ProjectSourceWatcher(Gradle()),
-        runner: TaskRunner = TaskRunner.retry(5, ofMillis(100)),
+        watcher: PathWatcher = ProjectCompilingPathWatcher(Gradle()),
+        taskRunner: TaskRunner = retry(5, ofMillis(100)),
         noinline log: (String) -> Unit = ::println,
         noinline error: (String) -> Unit = System.err::println
-    ) = invoke<H, PolyHandler>(watcher, runner, log, error) {
-        it.run { PolyHandler(HotReloadRoutes(http ?: { Response(OK) }), ws, sse) }
-            .asServer(serverConfig)
+    ) = hotReload<H, PolyHandler>(watcher, taskRunner, log, error) {
+        it.run { PolyHandler(HotReloadRoutes(http ?: { Response(OK) }), ws, sse) }.asServer(serverConfig)
     }
 
     @Suppress("UNCHECKED_CAST")
-    inline operator fun <reified T : HotReloadable<H>, H> invoke(
-        projectSourceWatcher: ProjectSourceWatcher,
+    inline fun <reified T : HotReloadable<H>, H> hotReload(
+        watcher: PathWatcher,
         runner: TaskRunner,
         noinline log: (String) -> Unit,
         noinline err: (String) -> Unit,
@@ -73,27 +67,31 @@ object HotReloadServer {
 
         private var currentServer: Http4kServer? = null
 
+        private val classpathRoots = System.getProperty("java.class.path")
+            .split(File.pathSeparator)
+            .filter { it.contains("build/classes") }
+
         init {
-            projectSourceWatcher
+            watcher
                 .onChange { log("\uD83D\uDEA7 Rebuilding... \uD83D\uDEA7") }
                 .onSuccess { startServer() }
                 .onFailure {
                     err(it)
                     log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
                 }
+                .watch(classpathRoots
+                    .map { get(it.substringBefore("build/classes")).resolve("src") })
         }
 
-        private val classpathRoots = System.getProperty("java.class.path")
-            .split(File.pathSeparator)
-            .filter { it.contains("build/classes") }
-
         override fun start(): Http4kServer = apply {
-            projectSourceWatcher.watch(classpathRoots
-                .map { get(it.substringBefore("build/classes")).resolve("src") })
+            watcher.start()
             startServer()
         }
 
-        override fun stop() = apply { currentServer?.stop() }
+        override fun stop() = apply {
+            watcher.stop()
+            currentServer?.stop()
+        }
 
         fun startServer(): Http4kServer {
             runCatching { currentServer?.stop() }
