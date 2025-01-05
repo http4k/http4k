@@ -353,6 +353,7 @@ fun <IN : Any> BiDiLensSpec<IN, String>.bigDecimal() = mapWithNewMeta(StringBiDi
 fun <IN : Any> BiDiLensSpec<IN, String>.uuid() = map(StringBiDiMappings.uuid())
 fun <IN : Any> BiDiLensSpec<IN, String>.uri() = map(StringBiDiMappings.uri())
 fun <IN : Any> BiDiLensSpec<IN, String>.bytes() = map { s: String -> s.toByteArray() }
+fun <IN : Any> BiDiLensSpec<IN, String>.regex(pattern: String) = map(StringBiDiMappings.regex(pattern))
 fun <IN : Any> BiDiLensSpec<IN, String>.regexGroup(pattern: String, group: Int = 1) =
     map(StringBiDiMappings.regexGroup(pattern, group))
 fun <IN : Any> BiDiLensSpec<IN, String>.urlEncoded() = map(StringBiDiMappings.urlEncoded())
