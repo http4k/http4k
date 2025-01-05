@@ -4,7 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Sink
 import org.http4k.traffic.Source
@@ -49,10 +49,10 @@ object TrafficFilters {
                 val responder = { received: Request ->
                     try {
                         val (req, resp) = pairs.drop(count).first()
-                        if (matchFn(received, req)) Response(BAD_REQUEST)
+                        if (matchFn(received, req)) Response(Status.BAD_REQUEST)
                         else resp.also { count++ }
                     } catch (e: NoSuchElementException) {
-                        Response(BAD_REQUEST)
+                        Response(Status.BAD_REQUEST)
                     }
                 }
                 responder
