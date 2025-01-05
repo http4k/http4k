@@ -4,6 +4,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hotreload.ProjectCompiler.Companion.Gradle
+import org.http4k.hotreload.Reload.Companion.Classpath
 import org.http4k.hotreload.TaskRunner.Companion.retry
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyHandler
@@ -12,8 +13,6 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import java.io.File
-import java.net.URL
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.Paths.get
 import java.time.Duration.ofMillis
@@ -35,7 +34,7 @@ object HotReloadServer {
         taskRunner: TaskRunner = retry(5, ofMillis(100)),
         noinline log: (String) -> Unit = ::println,
         noinline error: (String) -> Unit = System.err::println
-    ) = hotReload<H, HttpHandler>(watcher, taskRunner, log, error) {
+    ) = hotReload<H, HttpHandler>(watcher, taskRunner, Classpath(), log, error) {
         HotReloadRoutes(it).asServer(serverConfig)
     }
 
@@ -51,18 +50,20 @@ object HotReloadServer {
         taskRunner: TaskRunner = retry(5, ofMillis(100)),
         noinline log: (String) -> Unit = ::println,
         noinline error: (String) -> Unit = System.err::println
-    ) = hotReload<H, PolyHandler>(watcher, taskRunner, log, error) {
+    ) = hotReload<H, PolyHandler>(watcher, taskRunner, Classpath(), log, error) {
         it.run { PolyHandler(HotReloadRoutes(http ?: { Response(OK) }), ws, sse) }.asServer(serverConfig)
     }
 
     @Suppress("UNCHECKED_CAST")
     inline fun <reified T : HotReloadable<H>, H> hotReload(
         watcher: PathWatcher,
-        runner: TaskRunner,
+        taskRunner: TaskRunner,
+        reload: Reload<H>,
         noinline log: (String) -> Unit,
         noinline err: (String) -> Unit,
         crossinline toServer: (H) -> Http4kServer
     ) = object : Http4kServer {
+
         override fun port() = currentServer?.port() ?: error("Server is not started!")
 
         private var currentServer: Http4kServer? = null
@@ -96,22 +97,14 @@ object HotReloadServer {
         fun startServer(): Http4kServer {
             runCatching { currentServer?.stop() }
 
-            runner { currentServer = toServer(reloadAppFrom(classpathRoots.map(Paths::get))).start() }
+            taskRunner {
+                currentServer = toServer(reload(T::class.qualifiedName!!, classpathRoots.map(Paths::get))).start()
+            }
 
             log("\uD83D\uDE80 http4k started at http://localhost:${port()} \uD83D\uDE80")
 
             return currentServer as Http4kServer
         }
-
-        private fun reloadAppFrom(paths: List<Path>): H {
-            val classLoader = HotReloadClassLoader(paths.map { it.toUri().toURL() }.toTypedArray<URL>())
-                .also { Thread.currentThread().contextClassLoader = it }
-
-            val appClass = Class.forName(T::class.qualifiedName, true, classLoader)
-
-            return Class.forName(T::class.qualifiedName, true, classLoader)
-                .getDeclaredMethod("create")
-                .invoke(appClass.getDeclaredConstructor().newInstance()) as H
-        }
     }
 }
+
