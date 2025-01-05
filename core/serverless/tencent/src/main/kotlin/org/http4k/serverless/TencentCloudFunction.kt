@@ -2,6 +2,7 @@
 
 package org.http4k.serverless
 
+import com.alibaba.fastjson.JSONObject
 import com.qcloud.scf.runtime.Context
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyResponseEvent
@@ -36,18 +37,20 @@ abstract class TencentCloudFunction(appLoader: AppLoaderWithContexts) {
             .asTencent()
 }
 
-private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?, contexts: RequestContexts) = Filter { next ->
-    {
-        ctx?.apply { contexts[it][TENCENT_CONTEXT_KEY] = this }
-        contexts[it][TENCENT_REQUEST_KEY] = request
-        next(it)
+private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?, contexts: RequestContexts) =
+    Filter { next ->
+        {
+            ctx?.apply { contexts[it][TENCENT_CONTEXT_KEY] = this }
+            contexts[it][TENCENT_REQUEST_KEY] = request
+            next(it)
+        }
     }
-}
 
 private fun APIGatewayProxyRequestEvent.asHttp4kRequest(): Request {
     val withHeaders = (headers ?: emptyMap()).toList().fold(
         Request(Method.valueOf(httpMethod), buildUri())
-            .body(body?.let(::MemoryBody) ?: Body.EMPTY)) { memo, (first, second) ->
+            .body(body?.let(::MemoryBody) ?: Body.EMPTY)
+    ) { memo, (first, second) ->
         memo.header(first, second)
     }
 
@@ -59,6 +62,6 @@ private fun APIGatewayProxyRequestEvent.buildUri() =
 
 private fun Response.asTencent() = APIGatewayProxyResponseEvent().also {
     it.statusCode = status.code
-    it.headers = headers.toMap()
+    it.headers = JSONObject(headers.toMap())
     it.body = bodyString()
 }

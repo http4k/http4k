@@ -1,8 +1,6 @@
 package org.http4k.hotreload
 
 import org.http4k.core.HttpHandler
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
 import org.http4k.hotreload.CompileProject.Companion.Gradle
 import org.http4k.hotreload.CompileProject.Companion.Result.Failed
 import org.http4k.hotreload.CompileProject.Companion.Result.Ok
@@ -56,7 +54,7 @@ object HotReloadServer {
         rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
     ) = invoke<H, HttpHandler>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
-        HotReloadableApp(it).asServer(serverConfig)
+        it.asServer(serverConfig)
     }
 
     /**
@@ -73,8 +71,7 @@ object HotReloadServer {
         rebuildBackoff: Duration = ofSeconds(1),
         crossinline log: (String) -> Unit = ::println
     ) = invoke<H, PolyHandler>(watchedDirs, compileProject, runner, rebuildBackoff, log) {
-        it.run { PolyHandler(HotReloadableApp(http ?: { Response(OK) }), ws, sse) }
-            .asServer(serverConfig)
+        it.asServer(serverConfig)
     }
 
     inline operator fun <reified T : HotReloadable<H>, H> invoke(
