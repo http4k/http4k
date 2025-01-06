@@ -1,6 +1,7 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.createApplicationPlugin
@@ -21,10 +22,9 @@ import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.server.supportedOrNull
 import java.io.InputStream
 import java.io.OutputStream
-
-import io.ktor.http.Headers as KHeaders
 
 fun KtorToHttp4kPlugin(http: HttpHandler) = createApplicationPlugin(name = "http4k") {
     onCall {
@@ -49,10 +49,6 @@ suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     ) { response.body.stream.copyFlushingTo(this) }
 }
 
-private fun KHeaders.toHttp4kHeaders() = names().flatMap { name ->
-    (getAll(name) ?: emptyList()).map { name to it }
-}
-
 private fun InputStream.copyFlushingTo(outputStream: OutputStream) {
     var bytesCopied: Long = 0
     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
@@ -63,4 +59,8 @@ private fun InputStream.copyFlushingTo(outputStream: OutputStream) {
         bytesCopied += bytes
         bytes = read(buffer)
     }
+}
+
+private fun Headers.toHttp4kHeaders() = names().flatMap { name ->
+    (getAll(name) ?: emptyList()).map { name to it }
 }
