@@ -11,34 +11,32 @@ import ratpack.handling.Context
 import ratpack.handling.Handler
 import ratpack.http.TypedData
 
-class RatpackToHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
-    override fun handle(context: Context) {
-        context.request.body.then { data ->
-            (context.toHttp4kRequest(data)?.let(httpHandler) ?: Response(NOT_IMPLEMENTED)).pushTo(context)
-        }
+fun RatpackToHttp4kHandler(httpHandler: HttpHandler) = Handler { context ->
+    context.request.body.then { data ->
+        (context.toHttp4kRequest(data)?.let(httpHandler) ?: Response(NOT_IMPLEMENTED)).pushTo(context)
     }
+}
 
-    private fun Context.toHttp4kRequest(data: TypedData) = Method.supportedOrNull(request.method.name)
-        ?.let {
-            Request(it, request.rawUri, request.protocol)
-                .let {
-                    request.headers.names.fold(it) { acc, nextHeaderName ->
-                        request.headers.getAll(nextHeaderName)
-                            .fold(acc) { vAcc, nextHeaderValue ->
-                                vAcc.header(nextHeaderName, nextHeaderValue)
-                            }
-                    }
+private fun Context.toHttp4kRequest(data: TypedData) = Method.supportedOrNull(request.method.name)
+    ?.let {
+        Request(it, request.rawUri, request.protocol)
+            .let {
+                request.headers.names.fold(it) { acc, nextHeaderName ->
+                    request.headers.getAll(nextHeaderName)
+                        .fold(acc) { vAcc, nextHeaderValue ->
+                            vAcc.header(nextHeaderName, nextHeaderValue)
+                        }
                 }
-                .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
-                .source(RequestSource(request.remoteAddress.host, request.remoteAddress.port))
-        }
-
-    private fun Response.pushTo(context: Context) {
-        headers.groupBy { it.first }
-            .forEach { (name, values) ->
-                context.response.headers.set(name, values.mapNotNull { it.second })
             }
-        context.response.status(status.code)
-        context.response.send(body.payload.array())
+            .body(data.inputStream, request.headers.get("content-length")?.toLongOrNull())
+            .source(RequestSource(request.remoteAddress.host, request.remoteAddress.port))
     }
+
+private fun Response.pushTo(context: Context) {
+    headers.groupBy { it.first }
+        .forEach { (name, values) ->
+            context.response.headers.set(name, values.mapNotNull { it.second })
+        }
+    context.response.status(status.code)
+    context.response.send(body.payload.array())
 }

@@ -69,7 +69,7 @@ interface MicronautToHttp4kFallbackController {
     @Trace("/{+path}")
     fun trace(path: String, request: HttpRequest<InputStream>) = request.handle()
 
-    private fun HttpRequest<InputStream>.handle() = this@MicronautToHttp4kFallbackController.http4k(asHttp4k()).fromHttp4k()
+    private fun HttpRequest<InputStream>.handle() = http4k(asHttp4k()).fromHttp4k()
 }
 
 fun HttpRequest<InputStream>.asHttp4k() = headers

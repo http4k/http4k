@@ -13,9 +13,9 @@ import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
 import org.junit.jupiter.api.Test
 
-class Http4kFallbackControllerTest {
+class SpringToHttp4kFallbackControllerTest {
 
-    class TestController : Http4kFallbackController({ Response(Status.OK).body(it.body).headers(it.headers) })
+    class TestController : SpringToHttp4kFallbackController({ Response(Status.OK).body(it.body).headers(it.headers) })
 
     @Test
     fun `passes requests through and adapts to servlet`() {
