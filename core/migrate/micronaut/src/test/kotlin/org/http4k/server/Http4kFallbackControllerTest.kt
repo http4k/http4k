@@ -8,10 +8,11 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
-class Http4kFallbackControllerTest {
+class Http4kFallbackControllerTest : PortBasedTest {
 
     @Controller("/")
     class TestController(override val http4k: HttpHandler) : Http4kFallbackController

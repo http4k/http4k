@@ -12,8 +12,8 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-server-servlet"))
 
-    implementation("org.springframework:spring-web:6.2.1")
-    implementation("org.springframework:spring-context:6.2.1")
+    implementation("org.springframework:spring-web:_")
+    implementation("org.springframework:spring-context:_")
 
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("jakarta.servlet:jakarta.servlet-api:_")
