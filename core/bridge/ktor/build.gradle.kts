@@ -12,5 +12,6 @@ dependencies {
     api(project(":http4k-core"))
     api("io.ktor:ktor-server-core-jvm:_")
 
+    api(Ktor.server.netty)
     testFixturesApi(testFixtures(project(":http4k-core")))
 }
