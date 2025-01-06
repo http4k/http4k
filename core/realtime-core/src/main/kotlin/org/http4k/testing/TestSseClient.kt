@@ -1,7 +1,7 @@
 package org.http4k.testing
 
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
-import org.http4k.server.PolyHandler
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseClient
 import org.http4k.sse.SseHandler
