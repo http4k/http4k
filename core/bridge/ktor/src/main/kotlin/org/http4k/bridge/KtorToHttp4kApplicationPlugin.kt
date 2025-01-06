@@ -26,7 +26,7 @@ import org.http4k.server.supportedOrNull
 import java.io.InputStream
 import java.io.OutputStream
 
-fun KtorToHttp4kPlugin(http: HttpHandler) = createApplicationPlugin(name = "http4k") {
+fun KtorToHttp4kApplicationPlugin(http: HttpHandler) = createApplicationPlugin(name = "http4k") {
     onCall {
         it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(Status.NOT_IMPLEMENTED))
     }
