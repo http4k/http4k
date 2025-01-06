@@ -18,10 +18,8 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 @RequestMapping("/")
 abstract class Http4kFallbackController(http4k: HttpHandler) {
-    private val asServlet = http4k.asServlet()
+    private val http4kServlet = http4k.asServlet()
 
     @RequestMapping(value = ["**"], method = [GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE])
-    fun fallback(request: HttpServletRequest, response: HttpServletResponse) {
-        asServlet.service(request, response)
-    }
+    fun fallback(request: HttpServletRequest, response: HttpServletResponse) = http4kServlet.service(request, response)
 }
