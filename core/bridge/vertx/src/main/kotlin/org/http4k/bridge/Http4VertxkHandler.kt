@@ -11,7 +11,7 @@ import org.http4k.core.Response
 import java.io.ByteArrayInputStream
 
 
-fun Http4VertxHandler(http: HttpHandler): (RoutingContext) -> Unit = { ctx ->
+fun VertxToHttp4kHandler(http: HttpHandler): (RoutingContext) -> Unit = { ctx ->
     ctx.request().asHttp4k()
         .map(http)
         .map { it.into(ctx.response()) }

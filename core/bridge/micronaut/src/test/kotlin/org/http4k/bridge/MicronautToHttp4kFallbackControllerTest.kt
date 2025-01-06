@@ -11,10 +11,10 @@ import org.http4k.core.Status
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
-class Http4kFallbackControllerTest {
+class MicronautToHttp4kFallbackControllerTest {
 
     @Controller("/")
-    class TestController(override val http4k: HttpHandler) : Http4kFallbackController
+    class TestController(override val http4k: HttpHandler) : MicronautToHttp4kFallbackController
 
     @Test
     fun `passes requests through and adapts to servlet`() {
