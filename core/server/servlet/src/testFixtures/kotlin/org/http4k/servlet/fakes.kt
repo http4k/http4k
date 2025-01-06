@@ -48,6 +48,10 @@ class FakeHttpServletResponse : HttpServletResponse by mock() {
         http4k = http4k.status(Status(sc, sm))
     }
 
+    override fun addHeader(p0: String, p1: String?) {
+        http4k = http4k.header(p0, p1!!)
+    }
+
     override fun getOutputStream() = object : ServletOutputStream() {
         override fun write(b: Int) {
             http4k = http4k.body(String(http4k.bodyString().toByteArray() + b.toByte()))
