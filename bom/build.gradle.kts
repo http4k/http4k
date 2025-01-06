@@ -13,6 +13,7 @@ dependencies {
         rootProject.subprojects
             .filter { it.name != project.name }
             .filter { shouldBePublished(it) }
+            .filterNot { it.name == "http4k-tools" }
             .sortedBy { it.name }
             .forEach { api(it) }
     }
@@ -23,5 +24,4 @@ fun shouldBePublished(p: Project) = setOf(
     "example",
     "test-function",
     "integration-test",
-    "tools"
 ).none { p.name.contains(it) }
