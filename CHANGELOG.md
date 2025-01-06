@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.45.0.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-bridge-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately.
+- **http4k-server-servlet** : [Breaking] Renamed as above.
+
 ### v5.44.3.0
 - **http4k-server-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately. 
 - **http4k-tools-traffic-capture** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Traffic Capture functionality from http4k-core in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately. 
