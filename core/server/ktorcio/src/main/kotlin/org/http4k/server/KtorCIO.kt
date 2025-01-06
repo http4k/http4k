@@ -3,7 +3,7 @@ package org.http4k.server
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import org.http4k.bridge.KtorToHttp4kPlugin
+import org.http4k.bridge.KtorToHttp4kApplicationPlugin
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -21,7 +21,7 @@ class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine = embeddedServer(CIO, port) {
-            install(KtorToHttp4kPlugin(http))
+            install(KtorToHttp4kApplicationPlugin(http))
         }
 
         override fun start() = apply {
