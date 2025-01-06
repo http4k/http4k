@@ -11,12 +11,10 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-server-servlet"))
+    api("javax.servlet:javax.servlet-api:_")
 
     implementation("org.springframework:spring-web:_")
     implementation("org.springframework:spring-context:_")
-
-    implementation("javax.servlet:javax.servlet-api:_")
-    implementation("jakarta.servlet:jakarta.servlet-api:_")
 
     testFixturesApi(testFixtures(project(":http4k-server-servlet")))
 }
