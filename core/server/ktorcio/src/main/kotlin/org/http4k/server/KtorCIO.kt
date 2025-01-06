@@ -3,6 +3,7 @@ package org.http4k.server
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
+import org.http4k.bridge.KtorToHttp4kPlugin
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.MILLISECONDS
