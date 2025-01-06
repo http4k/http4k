@@ -11,7 +11,7 @@ import ratpack.handling.Context
 import ratpack.handling.Handler
 import ratpack.http.TypedData
 
-class RatpackHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
+class RatpackToHttp4kHandler(private val httpHandler: HttpHandler) : Handler {
     override fun handle(context: Context) {
         context.request.body.then { data ->
             (context.toHttp4kRequest(data)?.let(httpHandler) ?: Response(NOT_IMPLEMENTED)).pushTo(context)

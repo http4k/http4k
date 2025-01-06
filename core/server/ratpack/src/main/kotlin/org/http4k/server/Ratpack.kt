@@ -1,6 +1,6 @@
 package org.http4k.server
 
-import org.http4k.bridge.RatpackHttp4kHandler
+import org.http4k.bridge.RatpackToHttp4kHandler
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Graceful
@@ -26,7 +26,7 @@ class Ratpack(port: Int = 8000, stopMode: StopMode) : ServerConfig {
     override fun toServer(http: HttpHandler) = object : Http4kServer {
         val server = RatpackServer.of { server: RatpackServerSpec ->
             server.serverConfig(serverConfig)
-                .handler { RatpackHttp4kHandler(http) }
+                .handler { RatpackToHttp4kHandler(http) }
         }
 
         override fun start() = apply { server.start() }
