@@ -1,6 +1,6 @@
 package org.http4k.filter
 
-import org.http4k.server.PolyHandler
+import org.http4k.core.PolyHandler
 
 fun PolyHandler.debug() = PolyHandler(
     http = http?.debug(),

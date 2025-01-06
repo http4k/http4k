@@ -1,13 +1,13 @@
 package org.http4k.hotreload
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hotreload.ProjectCompiler.Companion.Gradle
 import org.http4k.hotreload.Reload.Companion.Classpath
 import org.http4k.hotreload.TaskRunner.Companion.retry
 import org.http4k.server.Http4kServer
-import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
