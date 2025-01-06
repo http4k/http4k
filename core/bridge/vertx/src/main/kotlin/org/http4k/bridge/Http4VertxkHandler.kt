@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.http.HttpServerRequest
