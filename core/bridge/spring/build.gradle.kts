@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "http4k Migrate: from Spring to http4k"
+description = "http4k Bridge: from Spring to http4k"
 
 val license by project.extra { Apache2 }
 
