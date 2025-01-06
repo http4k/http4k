@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
@@ -12,10 +12,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
-class Http4kVertxHandlerTest : PortBasedTest {
+class Http4kVertxHandlerTest {
 
     @Test
     fun `passes requests through and adapts`() {
@@ -23,9 +22,11 @@ class Http4kVertxHandlerTest : PortBasedTest {
 
         val router = Router.router(vertx)
             .apply {
-                route("/*").blockingHandler(Http4VertxHandler { req: Request -> Response(OK)
-                .headers(req.headers)
-                .body(req.body) })
+                route("/*").blockingHandler(Http4VertxHandler { req: Request ->
+                    Response(OK)
+                        .headers(req.headers)
+                        .body(req.body)
+                })
             }
 
         val requestHandler = vertx.createHttpServer().requestHandler(router)

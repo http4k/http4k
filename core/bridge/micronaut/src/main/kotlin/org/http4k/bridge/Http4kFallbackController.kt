@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
