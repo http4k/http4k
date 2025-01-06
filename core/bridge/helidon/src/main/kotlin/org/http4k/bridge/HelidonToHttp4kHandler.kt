@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import io.helidon.http.Status.create
 import io.helidon.http.sse.SseEvent.builder
@@ -15,6 +15,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
+import org.http4k.server.supportedOrNull
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
@@ -24,7 +25,7 @@ import org.http4k.sse.SseMessage.Retry
 import org.http4k.sse.SseResponse
 import java.util.concurrent.CountDownLatch
 
-fun HelidonHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
+fun HelidonToHttp4kHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
     val httpToUse = http ?: { Response(NOT_FOUND) }
     req.toHttp4k()
         ?.let {
