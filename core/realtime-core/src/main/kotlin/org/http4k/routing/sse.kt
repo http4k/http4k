@@ -39,11 +39,9 @@ class RoutingSseHandler(
     ::RoutingSseHandler
 )
 
-data class SsePathMethod(val path: String, val method: Method) {
-    infix fun to(handler: SseHandler) = when (handler) {
-        is RoutingSseHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
-        else -> RoutingSseHandler(listOf(TemplatedSseRoute(UriTemplate.from(path), handler, method.asRouter())))
-    }
+infix fun PathMethod.to(handler: SseHandler) = when (handler) {
+    is RoutingSseHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
+    else -> RoutingSseHandler(listOf(TemplatedSseRoute(UriTemplate.from(path), handler, method.asRouter())))
 }
 
 class TemplatedSseRoute(
