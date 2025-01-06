@@ -23,7 +23,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
@@ -37,12 +36,9 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
     constructor(port: Int = 8000) : this(port, Immediate)
 
     override fun toServer(http: HttpHandler): Http4kServer = object : Http4kServer {
+        private val handler = Http4kKtorHandler(http)
         private val engine = embeddedServer(Netty, port) {
-            install(createApplicationPlugin(name = "http4k") {
-                onCall {
-                    it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(NOT_IMPLEMENTED))
-                }
-            })
+            install(createApplicationPlugin(name = "http4k") { onCall { handler(it) } })
         }
 
         override fun start() = apply {
