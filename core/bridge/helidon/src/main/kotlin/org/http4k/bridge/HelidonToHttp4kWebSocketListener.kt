@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import io.helidon.common.buffers.BufferData
 import io.helidon.common.uri.UriPath
@@ -14,7 +14,7 @@ import org.http4k.websocket.WsMessage.Mode.Binary
 import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsStatus
 
-class HelidonWebSockerListener(private val ws: WsHandler) : WsListener {
+class HelidonToHttp4kWebSocketListener(private val ws: WsHandler) : WsListener {
 
     private val sessions = mutableMapOf<WsSession, PushPullAdaptingWebSocket>()
 
