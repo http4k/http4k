@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
-import org.http4k.bridge.VertxToHttp4kHandler
+import org.http4k.bridge.fallbackToHttp4k
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -24,14 +24,15 @@ class VertxToHttp4kHandlerTest : PortBasedTest {
 
         val router = Router.router(vertx)
             .apply {
-                route("/*").blockingHandler(VertxToHttp4kHandler { req: Request ->
+                fallbackToHttp4k { req: Request ->
                     Response(OK)
                         .headers(req.headers)
                         .body(req.body)
-                })
+                }
             }
 
-        val requestHandler = vertx.createHttpServer().requestHandler(router)
+        val requestHandler = vertx.createHttpServer()
+            .requestHandler(router)
             .apply { listen(0) }
 
         val request = Request(POST, "http://localhost:${requestHandler.actualPort()}")
