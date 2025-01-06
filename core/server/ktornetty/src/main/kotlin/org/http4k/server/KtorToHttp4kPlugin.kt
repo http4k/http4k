@@ -36,7 +36,7 @@ fun ApplicationRequest.asHttp4k() = Method.supportedOrNull(httpMethod.value)?.le
     Request(it, uri, httpVersion)
         .headers(headers.toHttp4kHeaders())
         .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
-        .source(RequestSource(origin.remoteHost)) // origin.remotePort does not exist for Ktor
+        .source(RequestSource(origin.remoteHost, scheme = origin.scheme)) // origin.remotePort does not exist for Ktor
 }
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
