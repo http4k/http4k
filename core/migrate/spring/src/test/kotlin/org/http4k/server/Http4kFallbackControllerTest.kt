@@ -11,9 +11,10 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.servlet.FakeHttpServletRequest
 import org.http4k.servlet.FakeHttpServletResponse
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
-class Http4kFallbackControllerTest {
+class Http4kFallbackControllerTest : PortBasedTest {
 
     class TestController : Http4kFallbackController({ Response(OK).body(it.body).headers(it.headers) })
 
