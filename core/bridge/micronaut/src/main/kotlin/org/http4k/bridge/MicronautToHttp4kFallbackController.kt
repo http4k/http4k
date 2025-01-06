@@ -18,7 +18,7 @@ import org.http4k.core.Response
 import java.io.InputStream
 import kotlin.jvm.optionals.getOrNull
 
-interface Http4kFallbackController {
+interface MicronautToHttp4kFallbackController {
     val http4k: HttpHandler
 
     @Delete("/")
@@ -69,7 +69,7 @@ interface Http4kFallbackController {
     @Trace("/{+path}")
     fun trace(path: String, request: HttpRequest<InputStream>) = request.handle()
 
-    private fun HttpRequest<InputStream>.handle() = this@Http4kFallbackController.http4k(asHttp4k()).fromHttp4k()
+    private fun HttpRequest<InputStream>.handle() = this@MicronautToHttp4kFallbackController.http4k(asHttp4k()).fromHttp4k()
 }
 
 fun HttpRequest<InputStream>.asHttp4k() = headers
