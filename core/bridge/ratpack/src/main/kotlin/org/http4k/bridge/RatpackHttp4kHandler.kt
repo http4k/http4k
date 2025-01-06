@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.bridge
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -6,6 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
+import org.http4k.server.supportedOrNull
 import ratpack.handling.Context
 import ratpack.handling.Handler
 import ratpack.http.TypedData

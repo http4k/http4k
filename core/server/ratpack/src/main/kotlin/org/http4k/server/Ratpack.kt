@@ -1,5 +1,6 @@
 package org.http4k.server
 
+import org.http4k.bridge.RatpackHttp4kHandler
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Graceful
