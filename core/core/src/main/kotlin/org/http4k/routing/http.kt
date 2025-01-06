@@ -60,7 +60,7 @@ data class SimpleRouteMatcher(
     override fun toString(): String = router.toString()
 }
 
-data class HttpPathMethod(val path: String, val method: Method) {
+data class PathMethod(val path: String, val method: Method) {
     infix fun to(handler: HttpHandler) = when (handler) {
         is RoutingHttpHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
         else -> RoutingHttpHandler(listOf(TemplatedHttpRoute(UriTemplate.from(path), handler, method.asRouter())))

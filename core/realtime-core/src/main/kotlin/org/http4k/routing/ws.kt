@@ -1,6 +1,5 @@
 package org.http4k.routing
 
-import org.http4k.core.Method
 import org.http4k.core.UriTemplate
 import org.http4k.websocket.NoOp
 import org.http4k.websocket.WsConsumer
@@ -56,9 +55,7 @@ class TemplatedWsRoute(
     override fun withRouter(other: Router) = TemplatedWsRoute(uriTemplate, handler, router.and(other), filter)
 }
 
-data class WsPathMethod(val path: String, val method: Method) {
-    infix fun to(handler: WsHandler) = when (handler) {
-        is RoutingWsHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
-        else -> RoutingWsHandler(listOf(TemplatedWsRoute(UriTemplate.from(path), handler, method.asRouter())))
-    }
+infix fun PathMethod.to(handler: WsHandler) = when (handler) {
+    is RoutingWsHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
+    else -> RoutingWsHandler(listOf(TemplatedWsRoute(UriTemplate.from(path), handler, method.asRouter())))
 }
