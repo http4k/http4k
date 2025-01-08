@@ -33,10 +33,9 @@ class VertxToHttp4kHandlerTest : PortBasedTest {
 
         val requestHandler = vertx.createHttpServer()
             .requestHandler(router)
-            .apply { listen(0) }
+            .apply { listen(44521) }
 
         try {
-
             val request = Request(POST, "http://localhost:${requestHandler.actualPort()}")
                 .header("foo", "bar")
                 .body("hello")
