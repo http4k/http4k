@@ -16,6 +16,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.ApprovalContent.Companion.HttpBinaryBody
 import org.http4k.testing.ApprovalContent.Companion.HttpTextBody
 import org.http4k.testing.TestNamer.Companion.ClassAndMethod
+import org.jsoup.Jsoup
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -160,9 +161,19 @@ class YamlApprovalTest(
 }
 
 /**
+ * Approval JUnit5 extension configured to compare prettified HTML5 bodies.
+ */
+class Html5ApprovalTest(
+    testNamer: TestNamer = ClassAndMethod,
+    approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : ContentTypeAwareApprovalTest(TEXT_HTML, testNamer, approvalSource) {
+    override fun format(input: String): String = Jsoup.parse(input).toString()
+}
+
+/**
  * Approval JUnit5 extension configured to compare binary messages
  */
-open class BinaryApprovalTest(private val contentType: ContentType? = null) : BaseApprovalTest {
+class BinaryApprovalTest(private val contentType: ContentType? = null) : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext): Approver {
         val approver = NamedResourceApprover(
             ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
