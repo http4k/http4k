@@ -11,10 +11,13 @@ plugins {
 dependencies {
     constraints {
         rootProject.subprojects
+            .asSequence()
             .filter { it.name != project.name }
             .filter { shouldBePublished(it) }
             .filterNot { it.name == "http4k-tools" }
+            .filterNot { it.name == "http4k-tools-hotreload" }
             .sortedBy { it.name }
+            .toList()
             .forEach { api(it) }
     }
 }
