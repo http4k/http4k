@@ -16,5 +16,6 @@ dependencies {
     implementation("org.springframework:spring-web:_")
     implementation("org.springframework:spring-context:_")
 
+    testImplementation(project(":http4k-testing-hamkrest"))
     testFixturesApi(testFixtures(project(":http4k-bridge-servlet")))
 }
