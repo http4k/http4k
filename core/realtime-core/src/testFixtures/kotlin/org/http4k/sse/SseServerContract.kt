@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -23,6 +23,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.contentType
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.sse
@@ -59,6 +60,7 @@ abstract class SseServerContract(
     private val http = routes(
         "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) },
         "/fallback" hbind GET to { Response(I_M_A_TEAPOT).body("fallback") },
+        "/postBody" hbind POST to { Response(OK).body(it.body) },
     )
 
     private val sse = sse(
@@ -139,6 +141,23 @@ abstract class SseServerContract(
     }
 
     @Test
+    fun `sse does not eat body when falling back to http handler`() {
+        assertThat(client(
+            Request(POST, "http://localhost:${server.port()}/postBody")
+                .contentType(TEXT_EVENT_STREAM)
+                .body("bob")
+        ), hasBody("bob"))
+    }
+
+    @Test
+    fun `sse does not eat body when standard request is sent to the http handler`() {
+        assertThat(client(
+            Request(POST, "http://localhost:${server.port()}/postBody")
+                .body("bob")
+        ), hasBody("bob"))
+    }
+
+    @Test
     fun `does not error when we do not call close`() {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/noclose"))
         assertThat(
@@ -172,7 +191,7 @@ abstract class SseServerContract(
         setOf(GET, PUT, DELETE, PATCH, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/method")
-                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                    .header("Accept", TEXT_EVENT_STREAM.value)
             )
             assertThat(response.header("method"), equalTo(it.name))
         }
@@ -182,7 +201,7 @@ abstract class SseServerContract(
     fun `supports bodies`() {
         val response = JavaHttpClient()(
             Request(POST, "http://localhost:${server.port()}/body")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
                 .body("hello")
         )
         assertThat(response.header("body"), equalTo("hello"))
@@ -193,7 +212,7 @@ abstract class SseServerContract(
         setOf(GET, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/routeMethod")
-                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                    .header("Accept", TEXT_EVENT_STREAM.value)
             )
             assertThat(response.header("METHOD"), equalTo(it.name))
         }
@@ -203,7 +222,7 @@ abstract class SseServerContract(
     fun `can fallback to HTTP when SSE doesn't find anything`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/fallback")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.status, equalTo(I_M_A_TEAPOT))
         assertThat(response.bodyString(), equalTo("fallback"))
@@ -213,7 +232,7 @@ abstract class SseServerContract(
     fun `returns 404 when route is not found in SSE or HTTP`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/notfound")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.status, equalTo(NOT_FOUND))
     }
@@ -222,7 +241,7 @@ abstract class SseServerContract(
     fun `returns 404 when route is not found in SSE`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${serverOnlySse.port()}/notfound")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.status, equalTo(NOT_FOUND))
     }
@@ -231,7 +250,7 @@ abstract class SseServerContract(
     fun `can handle multiple messages`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/hello/leia")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.header("foo"), equalTo("bar"))
         assertThat(response.bodyString(), containsSubstring("""id:123"""))
@@ -247,7 +266,7 @@ abstract class SseServerContract(
     open fun `can handle newlines`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/newline")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.bodyString(), containsSubstring("""id:456"""))
         assertThat(response.bodyString(), containsSubstring("""data:hello"""))
@@ -259,7 +278,7 @@ abstract class SseServerContract(
     open fun `can modify status`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/modify")
-                .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.status, equalTo(ACCEPTED))
     }
@@ -269,7 +288,7 @@ abstract class SseServerContract(
         setOf(GET, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/routeMethod")
-                    .header("Accept", ContentType.TEXT_EVENT_STREAM.value)
+                    .header("Accept", TEXT_EVENT_STREAM.value)
             )
             assertThat(response.status, equalTo(OK))
             assertThat(response.header("METHOD"), equalTo(it.name))

@@ -15,10 +15,10 @@ import org.http4k.sse.SseHandler
 class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val fallback: HttpHandler) : HttpHandler {
 
     override fun handleRequest(exchange: HttpServerExchange) {
-        val request = exchange.asRequest() ?: error("Cannot create request from exchange")
 
         when {
             exchange.hasEventStreamContentType() -> {
+                val request = exchange.asRequest() ?: error("Cannot create request from exchange")
                 val (status, headers, handled, consumer) = sse(request)
 
                 if (handled) {
@@ -42,7 +42,7 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
                 .headers(requestHeaders
                     .flatMap { header -> header.map { header.headerName.toString() to it } })
                 .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
-                .body(startBlocking().inputStream, requestHeaders.getFirst("Content-Length").safeLong())
+                .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
         }
 }
 

@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.45.1.0
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-server-undertow*** : [Fix #1216] Add fallback from SSE to HTTP if event stream request cannot be matched in SSE
+
 ### v5.45.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-bridge-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately.
