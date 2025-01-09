@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.45.1.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-undertow*** : [Fix #1216] Add fallback from SSE to HTTP if event stream request cannot be matched in SSE
+- **http4k-server-undertow*** : [Fix #1259] POST requests have empty body with Undertow if an SSE handler is registered
 
 ### v5.45.0.0
 - **http4k-*** : Upgrade some dependency versions.

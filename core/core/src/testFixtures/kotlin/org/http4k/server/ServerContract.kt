@@ -7,8 +7,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -22,7 +24,11 @@ import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.StreamBody
+import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -46,6 +52,8 @@ abstract class ServerContract(
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
 
+    private val proxiedServer = { req: Request -> Response(OK).body(req.body) }.asServer(SunHttp(0))
+
     private val routes =
         requiredMethods.map { m ->
             "/" + m.name bind m to { Response(OK).body(m.name) }
@@ -53,6 +61,17 @@ abstract class ServerContract(
             "/headers" bind GET to {
                 Response(ACCEPTED).header("content-type", "text/plain")
             },
+            "/proxy" bind
+                Filter { next ->
+                    {
+
+                        next(it)
+                            .also { println("returning"  + it.status) }
+                    }
+                }.then(
+                SetBaseUriFrom(Uri.of("http://localhost:${proxiedServer.port()}")).then(JavaHttpClient()).debug()
+                ),
+            "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/stream" bind GET to { Response(OK).with(Body.binary(TEXT_PLAIN).toLens() of "hello".byteInputStream()) },
@@ -92,6 +111,7 @@ abstract class ServerContract(
 
     @BeforeEach
     fun before() {
+        proxiedServer.start()
         server = routes(*routes.toTypedArray()).asServer(serverConfig(0)).start()
     }
 
@@ -301,6 +321,16 @@ abstract class ServerContract(
         assertThat(client(Request(GET, "$baseUrl/no-content")).status, equalTo(NO_CONTENT))
     }
 
+    @Test
+    open fun `can act as a simple proxy`() {
+        val body = "hello mum"
+
+        val response = client(Request(POST, "$baseUrl/proxy").body(body))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo(body))
+    }
+
     open fun clientAddress() = anyOf(
         equalTo(InetAddress.getLoopbackAddress().hostAddress),
         equalTo(InetAddress.getLocalHost().hostAddress),
@@ -311,5 +341,6 @@ abstract class ServerContract(
     @AfterEach
     fun after() {
         server.stop()
+        proxiedServer.stop()
     }
 }
