@@ -11,7 +11,7 @@ class ApacheServerTest : ServerContract({ port -> ApacheServer(port, canonicalHo
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
 
-    @Disabled("Currently fails")
+    @Disabled("Currently returns a 400")
     override fun `can act as a simple proxy`() {
         super.`can act as a simple proxy`()
     }
