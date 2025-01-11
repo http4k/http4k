@@ -4,21 +4,82 @@ Copyright (c) 2025-present http4k Ltd.
 ## 1. Definitions
 
 "Software" means the http4k software and associated documentation files.
+
 "Commercial Terms" means the http4k Commercial Subscription Terms of Service available at https://http4k.org/commercial-terms.
+
 "Subscription Tier" means the specific commercial subscription offering as defined in the Commercial Terms.
+
+"Host" means each individual machine (real or virtual, including servers, containers, workstations, smartphones, POS, industrial controls, gateways, sensors, IoT endpoints, or any other physical or simulated computing interface or machine) of Customer and/or its Affiliates (including, without limitation, employees, agents or consultants thereof) with access to Licensed Materials hereunder; provided that, for development purposes only, a Host license shall operate as a floating developer license that permits installation of the Licensed Materials on any number of Developer Workstations, provided that the Licensed Materials may only be accessed and used by one unnamed developer at a time per license.
+
+"Proprietary Components" means all portions of the Software not released under Apache 2 license.
+
+"License Term" means the period of time for which a subscription is valid.
+
+"Derivative Works" means any software that incorporates, extends, or modifies the Software.
 
 ## 2. License Grant and Restrictions
 
-This Software may only be used in production if you (and any entity that you represent) have:
-a) Agreed to and are in compliance with the Commercial Terms, or other agreement governing the use of the Software as agreed by you and http4k Ltd, AND
-b) Maintain a valid http4k Commercial Subscription for the correct number of User Seats (as defined in the Commercial Terms).
+2.1 License Types and Conditions
+This Software is governed by this Commercial License. Usage is permitted under one of the following conditions:
+
+a) Commercial Usage:
+- Have agreed to and are in compliance with the Commercial Terms, AND
+- Maintain a valid http4k Commercial subscription with the correct number of Host licenses
+
+b) Non-Commercial Usage:
+- Use is strictly for non-commercial purposes (including personal projects, academic research, education, and non-profit organizations)
+- Attribution is provided to http4k Ltd in any resulting work or publication
+
+c) Startup Usage:
+- Organization has annual revenue less than USD $1,000,000 gross revenue
+- Upon exceeding the annual revenue threshold you must transition to a Commercial subscription within 90 days
 
 Subject to the foregoing conditions, you are permitted to:
+- Use the Software's development tools and tooling modules
 - Modify the Software and publish patches to the Software
-- Copy and modify the Software for development and testing purposes without requiring a subscription
-- Access security patches, bug fixes, and updates through private repositories as per your subscription tier
+- Copy and modify the Software for development and testing purposes
+- Access security patches, bug fixes, and updates through private repositories as per your subscription tier or license type
 
-All modifications, patches, and derivatives remain the property of http4k Ltd and/or its licensors. Such modifications may only be used, copied, modified, displayed, distributed, or otherwise exploited with a valid http4k Commercial Subscription.
+All modifications, patches, and derivatives remain the property of http4k Ltd and/or its licensors. Such modifications may only be used, copied, modified, displayed, distributed, or otherwise exploited in accordance with your applicable license type.
+
+2.2 Development and Testing
+For development purposes only, a Host license shall operate as a floating developer license that permits installation of the Software on any number of Developer Workstations, provided that the Software may only be accessed and used by one unnamed developer at a time per license.
+
+2.3 Copying and Modification
+You may:
+- Copy and modify the Software for your own use in accordance with your license type
+- Create derivative works based on the Software
+- Distribute such modifications or derivative works, provided that:
+  a) They are distributed only to users who have a valid license
+  b) They clearly indicate they are modified versions of http4k Software
+  c) You include a copy of this license and attribution to http4k Ltd
+  d) The modifications are made available under the same terms as this license
+
+You may not:
+- Remove or modify any copyright, trademark or attribution notices
+- Use http4k trademarks without written permission
+- Redistribute the original Software or modifications thereof as standalone products competing with http4k
+
+2.4 Technical Protection
+- The Software may include technical protection measures that control access
+- You may not circumvent, remove, or tamper with any technical protection measures
+- You are responsible for keeping any license keys, access credentials, or tokens secure
+- You may not share, publish, or distribute license keys to unauthorized users
+
+2.5 Prohibited Activities
+You may not, with respect to the Proprietary Components:
+- Reverse engineer, decompile, disassemble, or attempt to derive the source code
+- Create products that compete with http4k Pro or Enterprise editions
+- Publish benchmarks or comparative analysis without written permission
+- Automate access to, or create automated variants of, the Software
+
+The above restrictions do not apply to components released under the Apache 2 license as part of http4k Community Edition.
+
+2.6 Access and Distribution
+- Access to proprietary source code and/or binary distributions is provided through designated private repositories
+- Your rights to access these repositories are determined by your license type
+- You may not redistribute the proprietary source code or binaries except as explicitly permitted
+- You must maintain the confidentiality of any private repository access credentials
 
 ## 3. Term and Termination
 
@@ -64,5 +125,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ## 10. Third Party Components
 
 For all third party components incorporated into the http4k Software, those components are licensed under the original license provided by the owner of the applicable component.
+
+## 11. Assignment
+
+You may not assign or transfer your rights and obligations under this License without prior written consent from http4k Ltd. http4k Ltd may assign its rights to any successor in interest to the Software.
+
+## 12. Severability
+
+If any provision of this License is held to be unenforceable or invalid, that provision will be enforced to the maximum extent possible and the other provisions will remain in full force and effect.
 
 All copies or substantial portions of the Software shall include a reference to this Commercial License and the Commercial Terms.
