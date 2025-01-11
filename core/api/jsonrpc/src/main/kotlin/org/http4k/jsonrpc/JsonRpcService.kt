@@ -35,7 +35,7 @@ data class JsonRpcService<NODE : Any>(
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
     private val methods = bindings.map { it.name to it.handler }.toMap()
 
-    private val handler = CatchLensFailure { _ -> Response(OK).with(jsonLens of renderError(ParseError)) }
+    private val handler = CatchLensFailure { _ -> Response(OK).with(jsonLens of json.renderError(ParseError)) }
         .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
         .then {
             when (val responseJson = process(jsonLens(it))) {
@@ -49,16 +49,16 @@ data class JsonRpcService<NODE : Any>(
     private fun process(requestJson: NODE): NODE? = when (json.typeOf(requestJson)) {
         Object -> processSingleRequest(json.fields(requestJson).toMap())
         Array -> processBatchRequest(json.elements(requestJson).toList())
-        else -> renderError(InvalidRequest)
+        else -> json.renderError(InvalidRequest)
     }
 
     private fun processSingleRequest(fields: Map<String, NODE>) =
         JsonRpcRequest(json, fields).mapIfValid { request ->
             try {
                 when (val method = methods[request.method]) {
-                    null -> renderError(MethodNotFound, request.id)
+                    null -> json.renderError(MethodNotFound, request.id)
                     else -> with(method(request.params ?: json.nullNode())) {
-                        request.id?.let { renderResult(this, it) }
+                        request.id?.let { json.renderResult(this, it) }
                     }
                 }
             } catch (e: Exception) {
@@ -66,20 +66,20 @@ data class JsonRpcService<NODE : Any>(
                     is LensFailure -> {
                         val errorMessage = errorHandler(e.cause ?: e)
                             ?: if (e.overall() == Invalid) InvalidParams else InternalError
-                        renderError(errorMessage, request.id)
+                        json.renderError(errorMessage, request.id)
                     }
-                    else -> renderError(errorHandler(e) ?: InternalError, request.id)
+                    else -> json.renderError(errorHandler(e) ?: InternalError, request.id)
                 }
             }
         }
 
     private fun JsonRpcRequest<NODE>.mapIfValid(block: (JsonRpcRequest<NODE>) -> NODE?) = when {
         valid() -> block(this)
-        else -> renderError(InvalidRequest, id)
+        else -> json.renderError(InvalidRequest, id)
     }
 
     private fun processBatchRequest(elements: List<NODE>) = with(elements) {
-        if (isNotEmpty()) processEachAsSingleRequest() else renderError(InvalidRequest)
+        if (isNotEmpty()) processEachAsSingleRequest() else json.renderError(InvalidRequest)
     }
 
     private fun List<NODE>.processEachAsSingleRequest() = json {
@@ -88,23 +88,23 @@ data class JsonRpcService<NODE : Any>(
         }.takeIf { it.isNotEmpty() }?.let { array(it) }
     }
 
-    private fun renderResult(result: NODE, id: NODE): NODE = json {
-        obj(
-            "jsonrpc" to string(jsonRpcVersion),
-            "result" to result,
-            "id" to id
-        )
-    }
-
-    private fun renderError(errorMessage: ErrorMessage, id: NODE? = null) = json {
-        obj(
-            "jsonrpc" to string(jsonRpcVersion),
-            "error" to errorMessage(this),
-            "id" to (id ?: nullNode())
-        )
-    }
 }
 
+private fun <NODE> Json<NODE>.renderResult(result: NODE, id: NODE): NODE = this {
+    obj(
+        "jsonrpc" to string(jsonRpcVersion),
+        "result" to result,
+        "id" to id
+    )
+}
+
+private fun <NODE> Json<NODE>.renderError(errorMessage: ErrorMessage, id: NODE? = null) = this {
+    obj(
+        "jsonrpc" to string(jsonRpcVersion),
+        "error" to errorMessage(this),
+        "id" to (id ?: nullNode())
+    )
+}
 data class JsonRpcMethodBinding<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
 
 typealias ErrorHandler = (Throwable) -> ErrorMessage?
