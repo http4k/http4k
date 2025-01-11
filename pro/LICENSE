@@ -17,30 +17,34 @@ Copyright (c) 2025-present http4k Ltd.
 
 "Derivative Works" means any software that incorporates, extends, or modifies the Software.
 
+"Pro Edition" means the standard commercial offering of the Software available through http4k.org.
+
+"Enterprise Edition" means the enhanced offering of the Software that includes Long Term Support and additional support services.
+
 ## 2. License Grant and Restrictions
 
 2.1 License Types and Conditions
-This Software is governed by this Commercial License. Usage is permitted under one of the following conditions:
+This Software is governed by this Commercial License. The Software is available in Pro Edition and Enterprise Edition.
+Pro Edition modules are available through http4k.org and may be used under one of the following conditions:
 
-a) Commercial Usage:
-- Have agreed to and are in compliance with the Commercial Terms, AND
-- Maintain a valid http4k Commercial subscription with the correct number of Host licenses
+a) Free Usage:
+- Non-Commercial Use: For personal projects, academic research, education, and non-profit organizations
+- Startup Commercial Use: For organizations with annual revenue less than USD $1,000,000 gross revenue
+- Attribution is required in any resulting work or publication
 
-b) Non-Commercial Usage:
-- Use is strictly for non-commercial purposes (including personal projects, academic research, education, and non-profit organizations)
-- Attribution is provided to http4k Ltd in any resulting work or publication
+b) Pro Edition Commercial Usage:
+- Required for commercial use when annual revenue exceeds USD $1,000,000
+- Must maintain a valid Pro Edition subscription with the correct number of Host licenses
+- Must comply with the Commercial Terms
+- Organizations exceeding the startup revenue threshold must transition to a Pro Edition subscription within 90 days
 
-c) Startup Usage:
-- Organization has annual revenue less than USD $1,000,000 gross revenue
-- Upon exceeding the annual revenue threshold you must transition to a Commercial subscription within 90 days
+c) Enterprise Edition Usage:
+- Includes all Pro Edition rights plus Long Term Support (LTS) and enhanced support options
+- Must maintain a valid Enterprise subscription as specified in Quote
+- Includes access to dedicated support channels and procedures
+- Subject to additional terms specified in Quote and Commercial Terms
 
-Subject to the foregoing conditions, you are permitted to:
-- Use the Software's development tools and tooling modules
-- Modify the Software and publish patches to the Software
-- Copy and modify the Software for development and testing purposes
-- Access security patches, bug fixes, and updates through private repositories as per your subscription tier or license type
-
-All modifications, patches, and derivatives remain the property of http4k Ltd and/or its licensors. Such modifications may only be used, copied, modified, displayed, distributed, or otherwise exploited in accordance with your applicable license type.
+All modifications, patches, and derivatives remain subject to the terms of this license regardless of usage type. Upon exceeding the startup revenue threshold, organizations must transition to either a Pro Edition or Enterprise Edition subscription within 90 days.
 
 2.2 Development and Testing
 For development purposes only, a Host license shall operate as a floating developer license that permits installation of the Software on any number of Developer Workstations, provided that the Software may only be accessed and used by one unnamed developer at a time per license.
