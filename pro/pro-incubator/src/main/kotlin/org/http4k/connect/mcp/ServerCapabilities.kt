@@ -8,9 +8,7 @@ data class ServerCapabilities(
     val logging: Unit? = null,
     val sampling: Unit? = null,
 ) {
-    companion object {
-        data class Tools(val listChanged: Boolean? = false)
-        data class Prompts(val listChanged: Boolean = false)
-        data class Resources(val subscribe: Boolean? = false, val listChanged: Boolean? = false)
-    }
+    data class Tools(val listChanged: Boolean? = false)
+    data class Prompts(val listChanged: Boolean = false)
+    data class Resources(val subscribe: Boolean? = false, val listChanged: Boolean? = false)
 }

@@ -3,7 +3,7 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.HasMeta.Companion.default
 
 object Complete : HasMethod {
-    override val method = McpRpcMethod.of("completion/complete")
+    override val Method = McpRpcMethod.of("completion/complete")
 
     data class Request(
         val ref: Reference,

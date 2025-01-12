@@ -9,41 +9,19 @@ object Notification {
         override val _meta: Meta = default
     ) : ServerResponse, HasMeta {
         companion object : HasMethod {
-            override val method = McpRpcMethod.of("notifications/cancelled")
+            override val Method = McpRpcMethod.of("notifications/cancelled")
         }
     }
 
     data class LoggingMessage(
-        val level: LoggingLevel,
+        val level: Logging.Level,
         val logger: String? = null,
         val data: Map<String, Any> = emptyMap(),
         override val _meta: Meta = default
     ) : ServerResponse, HasMeta {
         companion object : HasMethod {
-            override val method = McpRpcMethod.of("notifications/message")
+            override val Method = McpRpcMethod.of("notifications/message")
         }
     }
 }
 
-object Logging {
-
-    enum class Level {
-        debug,
-        info,
-        notice,
-        warning,
-        error,
-        critical,
-        alert,
-        emergency,
-        ;
-    }
-
-    object SetLevel {
-        data class Request(val level: LoggingLevel, override val _meta: Meta = default) : ClientRequest, HasMeta {
-            companion object : HasMethod {
-                override val method = McpRpcMethod.of("logging/set_level")
-            }
-        }
-    }
-}

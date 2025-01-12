@@ -40,7 +40,7 @@ data class Prompt(
     )
 
     object Get : HasMethod {
-        override val method = of("prompts/get")
+        override val Method = of("prompts/get")
 
         data class Request(
             val name: String,
@@ -56,7 +56,7 @@ data class Prompt(
     }
 
     object List : HasMethod {
-        override val method = of("prompts/list")
+        override val Method = of("prompts/list")
 
         data class Request(override val _meta: Meta = default) : ClientRequest, HasMeta
 
