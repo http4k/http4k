@@ -37,16 +37,16 @@ sealed interface SseMessage {
         fun parse(message: String): SseMessage {
             val parts = message.split("\n")
             return when {
-                parts.first().startsWith("data: ") -> Data(parts.first().removePrefix("data: "))
-                parts.first().startsWith("event: ") -> Event(
-                    parts.first().removePrefix("event: "),
-                    parts.filter { it.startsWith("data: ") }.joinToString("\n") { it.removePrefix("data: ") },
-                    parts.find { it.startsWith("id: ") }?.removePrefix("id: ")
+                parts.first().startsWith("data:") -> Data(parts.first().removePrefix("data:").trim())
+                parts.first().startsWith("event:") -> Event(
+                    parts.first().removePrefix("event:").trim(),
+                    parts.filter { it.startsWith("data:") }.joinToString("\n") { it.removePrefix("data:").trim() },
+                    parts.find { it.startsWith("id:") }?.removePrefix("id:")?.trim()
                 )
 
-                parts.first().startsWith("retry: ") -> Retry(
+                parts.first().startsWith("retry:") -> Retry(
                     Duration.ofMillis(
-                        parts.first().removePrefix("retry: ").toLong()
+                        parts.first().removePrefix("retry:").trim().toLong()
                     )
                 )
 
