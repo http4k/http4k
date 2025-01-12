@@ -12,5 +12,6 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-core"))
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(project(":http4k-format-moshi"))
 }
 

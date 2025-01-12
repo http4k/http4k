@@ -10,8 +10,13 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-server-helidon"))
     api(project(":http4k-realtime-core"))
+    api(project(":http4k-format-jackson"))
     api(project(":http4k-api-jsonrpc"))
+    api(project(":http4k-api-jsonschema"))
+    api("dev.forkhandles:values4k:_")
+
+    testImplementation(project(":http4k-server-helidon"))
+
     testImplementation(project(":http4k-format-moshi"))
 }
