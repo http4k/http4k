@@ -1,6 +1,6 @@
 package org.http4k.sse
 
-interface SseClient {
+interface SseClient : AutoCloseable {
     fun received(): Sequence<SseMessage>
-    fun close()
+    override fun close()
 }
