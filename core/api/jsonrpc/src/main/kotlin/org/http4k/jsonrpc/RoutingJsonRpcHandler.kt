@@ -4,6 +4,8 @@ import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.format.JsonType.Array
 import org.http4k.format.JsonType.Object
+import org.http4k.format.renderError
+import org.http4k.format.renderResult
 import org.http4k.lens.Failure
 import org.http4k.lens.LensFailure
 

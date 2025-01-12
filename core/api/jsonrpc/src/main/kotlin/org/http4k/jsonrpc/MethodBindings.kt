@@ -2,6 +2,7 @@ package org.http4k.jsonrpc
 
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Json
+import org.http4k.lens.JsonRpcMapping
 
 interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
     fun method(name: String, handler: JsonRpcHandler<NODE, NODE>)
@@ -19,21 +20,21 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
             }
 
             fun <IN, OUT : Any> handler(
-                paramsLens: Mapping<NODE, IN>,
-                resultLens: Mapping<OUT, NODE>,
+                paramsLens: JsonRpcMapping<NODE, IN>,
+                resultLens: JsonRpcMapping<OUT, NODE>,
                 fn: (IN) -> OUT
             ): JsonRpcHandler<NODE, NODE> =
                 handler(emptySet(), paramsLens, resultLens, fn)
 
             fun <IN, OUT : Any> handler(
                 paramsFieldNames: Set<String>,
-                paramsLens: Mapping<NODE, IN>,
-                resultLens: Mapping<OUT, NODE>,
+                paramsLens: JsonRpcMapping<NODE, IN>,
+                resultLens: JsonRpcMapping<OUT, NODE>,
                 fn: (IN) -> OUT
             ): JsonRpcHandler<NODE, NODE> =
                 ParamMappingJsonRequestHandler(json, paramsFieldNames, paramsLens, fn, resultLens)
 
-            fun <OUT : Any> handler(resultLens: Mapping<OUT, NODE>, block: () -> OUT): JsonRpcHandler<NODE, NODE> =
+            fun <OUT : Any> handler(resultLens: JsonRpcMapping<OUT, NODE>, block: () -> OUT): JsonRpcHandler<NODE, NODE> =
                 NoParamsJsonRequestHandler(block, resultLens)
         }
 
@@ -44,13 +45,18 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
                 paramsFieldNames: Set<String>,
                 noinline fn: (IN) -> OUT
             ): JsonRpcHandler<NODE, NODE> =
-                handler(paramsFieldNames, Mapping { json.asA(it, IN::class) }, Mapping { json.asJsonObject(it) }, fn)
+                handler(
+                    paramsFieldNames,
+                    JsonRpcMapping { json.asA(it, IN::class) },
+                    JsonRpcMapping { json.asJsonObject(it) },
+                    fn
+                )
 
             inline fun <reified IN : Any, OUT : Any> handler(noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
                 handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), fn)
 
             fun <OUT : Any> handler(fn: () -> OUT): JsonRpcHandler<NODE, NODE> =
-                handler(Mapping { json.asJsonObject(it) }, fn)
+                handler(JsonRpcMapping { json.asJsonObject(it) }, fn)
         }
     }
 }
