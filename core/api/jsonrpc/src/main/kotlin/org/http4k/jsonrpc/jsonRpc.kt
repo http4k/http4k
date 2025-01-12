@@ -23,4 +23,6 @@ object JsonRpc {
 
 typealias JsonRpcHandler<IN, OUT> = (IN) -> OUT
 
+typealias ErrorHandler = (Throwable) -> ErrorMessage?
+
 private val defaultErrorHandler: ErrorHandler = { null }

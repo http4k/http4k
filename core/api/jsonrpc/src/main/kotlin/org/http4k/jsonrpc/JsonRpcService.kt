@@ -13,11 +13,12 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.format.Json
+import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.Header.CONTENT_TYPE
 
-data class JsonRpcService<NODE : Any>(
+data class JsonRpcService<NODE>(
     private val processor: RoutingJsonRpcHandler<NODE>,
     private val json: Json<NODE>,
 ) : HttpHandler {
@@ -41,9 +42,5 @@ data class JsonRpcService<NODE : Any>(
 
     override fun invoke(request: Request): Response = handler(request)
 }
-
-data class JsonRpcMethodBinding<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
-
-typealias ErrorHandler = (Throwable) -> ErrorMessage?
 
 const val jsonRpcVersion: String = "2.0"

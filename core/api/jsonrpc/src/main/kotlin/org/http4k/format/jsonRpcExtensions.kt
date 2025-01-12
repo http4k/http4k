@@ -1,7 +1,7 @@
-package org.http4k.jsonrpc
+package org.http4k.format
 
-import org.http4k.format.Json
-
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.jsonRpcVersion
 
 fun <NODE> Json<NODE>.renderResult(result: NODE, id: NODE): NODE = this {
     obj(
