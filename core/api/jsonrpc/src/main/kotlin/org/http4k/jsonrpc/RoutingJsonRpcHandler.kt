@@ -1,12 +1,14 @@
 package org.http4k.jsonrpc
 
 import org.http4k.format.Json
-import org.http4k.format.JsonType
 import org.http4k.format.JsonType.Array
 import org.http4k.format.JsonType.Object
 import org.http4k.format.renderError
 import org.http4k.format.renderResult
-import org.http4k.lens.Failure
+import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.lens.Failure.Type.Invalid
 import org.http4k.lens.LensFailure
 
 class RoutingJsonRpcHandler<NODE>(
@@ -20,7 +22,7 @@ class RoutingJsonRpcHandler<NODE>(
     override operator fun invoke(requestJson: NODE): NODE? = when (json.typeOf(requestJson)) {
         Object -> processSingleRequest(json.fields(requestJson).toMap())
         Array -> processBatchRequest(json.elements(requestJson).toList())
-        else -> json.renderError(ErrorMessage.InvalidRequest)
+        else -> json.renderError(InvalidRequest)
     }
 
     private fun processSingleRequest(fields: Map<String, NODE>) =
@@ -36,22 +38,22 @@ class RoutingJsonRpcHandler<NODE>(
                 when (e) {
                     is LensFailure -> {
                         val errorMessage = errorHandler(e.cause ?: e)
-                            ?: if (e.overall() == Failure.Type.Invalid) ErrorMessage.InvalidParams else ErrorMessage.InternalError
+                            ?: if (e.overall() == Invalid) InvalidParams else InternalError
                         json.renderError(errorMessage, request.id)
                     }
 
-                    else -> json.renderError(errorHandler(e) ?: ErrorMessage.InternalError, request.id)
+                    else -> json.renderError(errorHandler(e) ?: InternalError, request.id)
                 }
             }
         }
 
     private fun JsonRpcRequest<NODE>.mapIfValid(block: (JsonRpcRequest<NODE>) -> NODE?) = when {
         valid() -> block(this)
-        else -> json.renderError(ErrorMessage.InvalidRequest, id)
+        else -> json.renderError(InvalidRequest, id)
     }
 
     private fun processBatchRequest(elements: List<NODE>) = with(elements) {
-        if (isNotEmpty()) processEachAsSingleRequest() else json.renderError(ErrorMessage.InvalidRequest)
+        if (isNotEmpty()) processEachAsSingleRequest() else json.renderError(InvalidRequest)
     }
 
     private fun List<NODE>.processEachAsSingleRequest() = json {
@@ -59,31 +61,4 @@ class RoutingJsonRpcHandler<NODE>(
             processSingleRequest(if (typeOf(it) == Object) fields(it).toMap() else emptyMap())
         }.takeIf { it.isNotEmpty() }?.let { array(it) }
     }
-}
-
-private class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
-    private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
-        json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
-    }
-
-    val method: String = (fields["method"] ?: json.nullNode()).let {
-        if (json.typeOf(it) == JsonType.String) {
-            json.text(it)
-        } else {
-            valid = false
-            ""
-        }
-    }
-    val params: NODE? = fields["params"]?.also {
-        if (!setOf(Object, Array).contains(json.typeOf(it))) valid = false
-    }
-
-    val id: NODE? = fields["id"]?.let {
-        if (!setOf(JsonType.String, JsonType.Number, JsonType.Integer, JsonType.Null).contains(json.typeOf(it))) {
-            valid = false
-            json.nullNode()
-        } else it
-    }
-
-    fun valid() = valid
 }
