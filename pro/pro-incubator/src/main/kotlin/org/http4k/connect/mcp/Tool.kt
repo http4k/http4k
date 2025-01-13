@@ -13,6 +13,12 @@ data class Tool(val name: String, val description: String, val schema: JsonNode)
             override val _meta: Meta = default
         ) : ClientRequest, HasMeta, PaginatedRequest
 
+        data class Response(
+            val tools: kotlin.collections.List<Tool>,
+            override val nextCursor: Cursor?,
+            override val _meta: Meta = default
+        ) : ServerResponse, PaginatedResponse, HasMeta
+
         data object Notification : ServerNotification {
             override val method = of("notifications/tools/list_changed")
         }
@@ -21,9 +27,9 @@ data class Tool(val name: String, val description: String, val schema: JsonNode)
     object Call : HasMethod {
         override val Method = of("tools/call")
 
-        data class Request<T>(
+        data class Request(
             val name: String,
-            val arguments: T,
+            val arguments: Map<String, Any>,
             val _meta: Unit? = null,
         ) : ClientRequest
 

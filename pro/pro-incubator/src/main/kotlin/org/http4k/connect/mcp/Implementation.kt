@@ -1,3 +1,5 @@
 package org.http4k.connect.mcp
 
-data class Implementation(val name: String, val version: ProtocolVersion)
+import org.http4k.connect.mcp.ProtocolVersion.Companion.LATEST_VERSION
+
+data class Implementation(val name: String, val version: ProtocolVersion = LATEST_VERSION)

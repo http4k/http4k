@@ -3,6 +3,8 @@ package org.http4k.connect.mcp
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.mcp.ToolBinding
+import org.http4k.routing.mcp
 import org.http4k.routing.sse
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -11,6 +13,9 @@ import org.http4k.sse.pipeSseTraffic
 
 fun main(args: Array<String>) {
 
+
+    val sse = mcp(Implementation("foo")
+        , ToolBinding())
 //    if (args.isEmpty()) {
 //        println("Please provide the server URL as an argument")
 //        return
