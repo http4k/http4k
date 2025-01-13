@@ -12,12 +12,11 @@ data class Root(val uri: Uri, val name: String?) {
 
         data class Response(val roots: kotlin.collections.List<Root>, override val _meta: Meta = default) :
             ServerResponse, HasMeta
+    }
 
-        object Notification : HasMethod {
-            override val Method = of("notifications/roots/list_changed")
+    object Notification : HasMethod {
+        override val Method = of("notifications/roots/list_changed")
 
-            data object Request : ClientRequest
-        }
+        data object Request : ClientRequest
     }
 }
-
