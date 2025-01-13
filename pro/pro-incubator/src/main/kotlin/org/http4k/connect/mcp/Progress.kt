@@ -3,8 +3,11 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
 
 object Progress {
-    data class Notification(val progress: Int, val total: Double?) : ServerNotification {
-        override val method = of("notifications/progress")
+    object Notification : HasMethod {
+        override val Method = of("notifications/progress")
+
+        data class Request(val progress: Int, val total: Double?) : ClientRequest
+        data class Response(val progress: Int, val total: Double?) : ServerResponse
     }
 }
 
