@@ -1,25 +1,24 @@
 package org.http4k.connect.mcp
 
-import org.http4k.connect.mcp.util.McpJson
-import org.http4k.core.Body
-import org.http4k.filter.debug
-import org.http4k.format.jsonRpcRequest
-import org.http4k.routing.sse
-import org.http4k.server.Helidon
-import org.http4k.server.asServer
-import org.http4k.sse.SseMessage.Event
+import org.http4k.client.JavaSseClient
+import org.http4k.core.ContentType
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.lens.accept
 
 fun main() {
-    val sse = sse {
-        val request = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)
-
-        val jsonNode = request.params ?: McpJson.nullNode()
-
-        McpRpcMethod.of(request.method)
-
-        it.send(Event("endpoint", "/message?sessionId=f9f60485-697e-4564-8c23-5a86dd174a92\t\n"))
-        println(it.connectRequest.bodyString())
+    JavaSseClient()(
+        Request(Method.GET, "http://localhost:4001/sse")
+            .accept(ContentType.APPLICATION_JSON).body(
+                """
+            {"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"sampling":{},"roots":{"listChanged":true}},"clientInfo":{"name":"mcp-inspector","version":"0.0.1"}},"jsonrpc":"2.0","id":0}
+        """.trimIndent()
+            )
+    ).use {
+        it.received().forEach {
+            println(it)
+        }
     }
-
-    sse.debug(debugStream = true).asServer(Helidon(4001)).start()
 }
+
+
