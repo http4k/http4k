@@ -17,7 +17,7 @@ dependencies {
     api(project(":http4k-connect-core"))
     api("dev.forkhandles:values4k:_")
 
-    testImplementation(project(":http4k-server-helidon"))
+    testImplementation(project(":http4k-server-undertow"))
 
     testImplementation(project(":http4k-format-moshi"))
 }

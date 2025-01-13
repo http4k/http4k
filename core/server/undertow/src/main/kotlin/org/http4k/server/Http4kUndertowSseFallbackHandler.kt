@@ -16,7 +16,7 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
 
     override fun handleRequest(exchange: HttpServerExchange) {
         when {
-            exchange.hasEventStreamContentType() -> {
+            true -> {
                 val request = exchange.asRequest() ?: error("Cannot create request from exchange")
                 with(sse(request)) {
                     if (handled) {

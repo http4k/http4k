@@ -20,6 +20,7 @@ import org.http4k.connect.mcp.ServerResponse.Empty
 import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.format.jsonRpcRequest
@@ -32,6 +33,7 @@ import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.SseResponse
 
 fun McpHandler(
     implementation: Implementation,
@@ -64,44 +66,51 @@ fun McpHandler(
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
             it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion)))
         },
-        "/message" bind sse {
-            val rpcRequest = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)
+        "/message" bind {
+            SseResponse(Status.ACCEPTED) {
+                val rpcRequest = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)
 
-            when (McpRpcMethod.of(rpcRequest.method)) {
-                Initialize.Method -> it.respondTo(serDe, rpcRequest, ::initialize)
-                Initialize.Notification.Method -> it.respondTo(
-                    serDe,
-                    rpcRequest,
-                    { _: Initialize.Notification.Request -> Empty })
+                println(rpcRequest)
 
-                Ping.Method -> it.respondTo(serDe, rpcRequest, ::ping)
-                Cancelled.Notification.Method -> it.respondTo(
-                    serDe,
-                    rpcRequest,
-                    { _: Cancelled.Notification.Request -> Empty })
+                when (McpRpcMethod.of(rpcRequest.method)) {
+                    Initialize.Method -> it.respondTo(serDe, rpcRequest, ::initialize)
+                    Initialize.Notification.Method -> it.respondTo(
+                        serDe,
+                        rpcRequest,
+                        { _: Initialize.Notification.Request -> Empty })
 
-                Completetion.Method -> it.respondTo(serDe, rpcRequest, ::complete)
-                Logging.SetLevel.Method -> it.respondTo(serDe, rpcRequest, resources::list)
-                Progress.Notification.Method -> it.respondTo(
-                    serDe,
-                    rpcRequest,
-                    { _: Progress.Notification.Request -> Empty })
+                    Ping.Method -> it.respondTo(serDe, rpcRequest, ::ping)
+                    Cancelled.Notification.Method -> it.respondTo(
+                        serDe,
+                        rpcRequest,
+                        { _: Cancelled.Notification.Request -> Empty })
 
-                Prompt.Get.Method -> it.respondTo(serDe, rpcRequest, prompts::get)
-                Prompt.List.Method -> it.respondTo(serDe, rpcRequest, prompts::list)
+                    Completetion.Method -> it.respondTo(serDe, rpcRequest, ::complete)
+                    Logging.SetLevel.Method -> it.respondTo(serDe, rpcRequest, resources::list)
+                    Progress.Notification.Method -> it.respondTo(
+                        serDe,
+                        rpcRequest,
+                        { _: Progress.Notification.Request -> Empty })
 
-                Resource.List.Method -> it.respondTo(serDe, rpcRequest, resources::list)
-                Resource.Read.Method -> it.respondTo(serDe, rpcRequest, resources::read)
-                Resource.Subscribe.Method -> it.respondTo(serDe, rpcRequest, resources::subscribe)
-                Resource.Unsubscribe.Method -> it.respondTo(serDe, rpcRequest, resources::unsubscribe)
+                    Prompt.Get.Method -> it.respondTo(serDe, rpcRequest, prompts::get)
+                    Prompt.List.Method -> it.respondTo(serDe, rpcRequest, prompts::list)
 
-                Root.List.Method -> it.respondTo(serDe, rpcRequest, roots::list)
-                Root.Notification.Method -> it.respondTo(serDe, rpcRequest, { _: Root.Notification.Request -> Empty })
+                    Resource.List.Method -> it.respondTo(serDe, rpcRequest, resources::list)
+                    Resource.Read.Method -> it.respondTo(serDe, rpcRequest, resources::read)
+                    Resource.Subscribe.Method -> it.respondTo(serDe, rpcRequest, resources::subscribe)
+                    Resource.Unsubscribe.Method -> it.respondTo(serDe, rpcRequest, resources::unsubscribe)
 
-                Tool.Call.Method -> it.respondTo(serDe, rpcRequest, tools::call)
-                Tool.List.Method -> it.respondTo(serDe, rpcRequest, tools::list)
+                    Root.List.Method -> it.respondTo(serDe, rpcRequest, roots::list)
+                    Root.Notification.Method -> it.respondTo(
+                        serDe,
+                        rpcRequest,
+                        { _: Root.Notification.Request -> Empty })
 
-                else -> it.send(serDe(MethodNotFound))
+                    Tool.Call.Method -> it.respondTo(serDe, rpcRequest, tools::call)
+                    Tool.List.Method -> it.respondTo(serDe, rpcRequest, tools::list)
+
+                    else -> it.send(serDe(MethodNotFound))
+                }
             }
         }
     )

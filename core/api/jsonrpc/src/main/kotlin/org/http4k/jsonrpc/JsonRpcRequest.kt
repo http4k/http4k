@@ -30,4 +30,6 @@ class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
     }
 
     fun valid() = valid
+
+    override fun toString() = "JsonRpcRequest(jsonrpc=$jsonRpcVersion, method=$method, params=$params, id=$id)"
 }
