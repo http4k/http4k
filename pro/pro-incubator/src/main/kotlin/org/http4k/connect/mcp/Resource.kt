@@ -60,7 +60,7 @@ data class Resource(
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+        ) : ClientRequest, HasMeta
     }
 
     object Unsubscribe : HasMethod {
@@ -69,7 +69,7 @@ data class Resource(
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+        ) : ClientRequest, HasMeta
     }
 
     data class Template(

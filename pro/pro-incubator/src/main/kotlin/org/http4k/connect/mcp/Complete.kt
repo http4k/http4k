@@ -9,7 +9,7 @@ object Complete : HasMethod {
         val ref: Reference,
         val argument: Argument,
         override val _meta: Meta = default
-    ) : ServerResponse, HasMeta {
+    ) : ClientRequest, HasMeta {
         companion object {
             data class Argument(val name: String, val value: String)
         }
