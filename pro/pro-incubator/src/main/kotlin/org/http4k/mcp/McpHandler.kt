@@ -62,6 +62,7 @@ fun McpHandler(
             sessions[newSessionId] = Unit
 
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
+            it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion)))
         },
         "/message" bind sse {
             val rpcRequest = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)

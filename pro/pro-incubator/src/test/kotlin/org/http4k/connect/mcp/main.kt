@@ -9,7 +9,7 @@ import org.http4k.server.asServer
 fun main() {
 
     val sse = mcp(
-        Implementation("foo", Version.of("bar")),
+        Implementation("mcp-kotlin test server", Version.of("bar")),
         LATEST_VERSION,
     )
 
