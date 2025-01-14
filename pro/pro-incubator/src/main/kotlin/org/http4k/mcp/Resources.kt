@@ -20,7 +20,8 @@ class Resources(list: List<ResourceBinding>) : ObservableList<ResourceBinding>(l
     fun unsubscribe(req: Resource.Unsubscribe.Request) {
         return TODO()
     }
-    fun listTemplates(req: Resource.Template.List.Request) =
-        Resource.Template.List.Response(items.flatMap(ResourceBinding::toTemplates))
 
+    fun listTemplates(req: Resource.Template.List.Request): Resource.Template.List.Response {
+        return TODO()
+    }
 }
