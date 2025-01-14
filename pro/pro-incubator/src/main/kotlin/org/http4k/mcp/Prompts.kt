@@ -5,7 +5,7 @@ import org.http4k.connect.mcp.Prompt.Get
 import org.http4k.util.ObservableList
 
 class Prompts(bindings: List<PromptBinding>) : ObservableList<PromptBinding>(bindings) {
-    fun get(req: Get.Request): Get.Response = items
+    fun get(req: Get.Request) = items
         .find { it.name == req.name }
         ?.let { Get.Response(it.toMessages(req.arguments)) }
         ?: error("no prompt")
