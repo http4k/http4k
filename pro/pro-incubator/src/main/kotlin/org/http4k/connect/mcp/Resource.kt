@@ -30,7 +30,7 @@ data class Resource(
 
         data class Unknown(
             override val uri: Uri,
-            override val mimeType: MimeType?,
+            override val mimeType: MimeType? = null,
         ) : Content
     }
 
@@ -94,7 +94,7 @@ data class Resource(
     }
 
     data class Template(
-        val uriTemplate: String,
+        val uriTemplate: Uri,
         val name: String,
         val description: String? = null,
         val mimeType: MimeType? = null,
