@@ -65,12 +65,14 @@ fun McpHandler(
                 sessions[newSessionId] = Unit
 
                 it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
-                it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion), null))
+                it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion), McpJson.number(0)))
             }
         },
         "/message" bind {
             SseResponse(ACCEPTED) {
                 val rpcRequest = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)
+
+                System.err.println(rpcRequest)
 
                 when (McpRpcMethod.of(rpcRequest.method)) {
                     Initialize.Method -> it.respondTo(serDe, rpcRequest, ::initialize)
@@ -111,6 +113,8 @@ fun McpHandler(
 
                     else -> it.send(serDe(MethodNotFound, rpcRequest.id))
                 }
+
+                it.close()
             }
         }
     )
@@ -124,4 +128,5 @@ private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any
         .onSuccess { send(serDe(it, req.id)) }
         .onFailure { send(serDe(InternalError, req.id)) }
 }
+
 
