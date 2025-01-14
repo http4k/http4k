@@ -20,8 +20,7 @@ fun main() {
         ResourceBinding(Uri.of("https://http4k.org")),
         ToolBinding("name1", "description"),
         ToolBinding("name2", "description"),
-        ResourceTemplateBinding(Uri.of("https://http4k.org/{+path}/here")),
-        ResourceTemplateBinding(Uri.of("http://google.com"))
+        ResourceTemplateBinding(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 
     mcpServer.debug().asServer(Helidon(3001)).start()
