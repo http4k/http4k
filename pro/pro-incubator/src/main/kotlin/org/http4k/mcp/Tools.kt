@@ -1,23 +1,14 @@
 package org.http4k.mcp
 
 import org.http4k.connect.mcp.Tool
-import org.http4k.connect.mcp.util.McpJson
+import org.http4k.util.ObservableList
 
-class Tools(list: List<ToolBinding>) {
-    fun list(req: Tool.List.Request): Tool.List.Response {
-        return Tool.List.Response(
-            listOf(
-                Tool(
-                    "name", "description", McpJson.obj(
-                        "type" to McpJson.string("object"),
-                        "properties" to McpJson.obj()
-                    )
-                )
-            )
-        )
-    }
+class Tools(list: List<ToolBinding>) : ObservableList<ToolBinding>(list) {
+    fun list(req: Tool.List.Request): Tool.List.Response =
+        Tool.List.Response(items.map { it.toTool() })
 
     fun call(req: Tool.Call.Request): Tool.Call.Response {
-        TODO("Not yet implemented")
+       return  items.find { it.name == req.name }?.call(req.arguments)
+            ?: error("no tool")
     }
 }
