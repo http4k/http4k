@@ -34,7 +34,7 @@ data class Tool(val name: String, val description: String, val inputSchema: Json
         ) : ClientMessage.Request, HasMeta
 
         class Response(
-            val content: kotlin.collections.List<Prompt.Content>,
+            val content: kotlin.collections.List<Content>,
             val isError: Boolean? = false,
             override val _meta: Meta = default,
         ) : ServerMessage.Response, HasMeta

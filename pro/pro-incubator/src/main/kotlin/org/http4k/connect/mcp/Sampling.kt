@@ -1,7 +1,7 @@
 package org.http4k.connect.mcp
 
 object Sampling {
-    data class Message(val role: Role, val content: Prompt.Content) {
+    data class Message(val role: Role, val content: Content) {
         object Create : HasMethod {
             override val Method = McpRpcMethod.of("sampling/create_message")
 

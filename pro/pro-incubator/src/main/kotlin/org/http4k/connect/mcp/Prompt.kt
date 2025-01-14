@@ -2,8 +2,6 @@ package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
-import org.http4k.connect.model.Base64Blob
-import org.http4k.mcp.MimeType
 
 data class Prompt(
     val name: String,
@@ -11,24 +9,6 @@ data class Prompt(
     val arguments: kotlin.collections.List<Argument> = emptyList(),
 ) {
     data class Message(val role: Role, val content: Content)
-
-    sealed interface Content {
-        val type: String
-
-        data class Text(val text: String) : Content {
-            override val type = "text"
-        }
-
-        data class Image(val data: Base64Blob, val mimeType: MimeType) : Content {
-            override val type = "image"
-        }
-
-        data class EmbeddedResource(val resource: Resource.Content) : Content {
-            override val type = "resource"
-        }
-
-        data class Unknown(override val type: String) : Content
-    }
 
     data class Argument(
         val name: String,

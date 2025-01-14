@@ -18,10 +18,13 @@ fun main() {
         PromptBinding("prompt1", "description1"),
         PromptBinding("prompt2", "description1"),
         ResourceBinding(Uri.of("https://http4k.org")),
-        ToolBinding("name1", "description"),
-        ToolBinding("name2", "description"),
+        ToolBinding("reverse", "description", Reverse("name")) { listOf() },
+        ToolBinding("count", "description", Multiply(1, 2)) { listOf() },
         ResourceTemplateBinding(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 
-    mcpServer.debug().asServer(Helidon(3001)).start()
+    mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
 }
+
+data class Reverse(val input: String)
+data class Multiply(val first: Int, val second: Int)

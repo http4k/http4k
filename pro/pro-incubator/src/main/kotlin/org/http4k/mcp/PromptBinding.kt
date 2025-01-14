@@ -1,5 +1,6 @@
 package org.http4k.mcp
 
+import org.http4k.connect.mcp.Content
 import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.Role
 
@@ -14,7 +15,7 @@ class PromptBinding(val name: String, private val description: String?) : McpBin
     fun toMessages(arguments: Map<String, String>) = listOf(
         Prompt.Message(
             Role.assistant,
-            Prompt.Content.Text(arguments.toString())
+            Content.Text(arguments.toString())
         )
     )
 }
