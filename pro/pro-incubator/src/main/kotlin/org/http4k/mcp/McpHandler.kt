@@ -56,7 +56,9 @@ fun McpHandler(
     completions: Completions,
     newSessionId: () -> SessionId = { SessionId.random() }
 ): PolyHandler {
-    val serDe = Serde(McpJson)
+    val json = McpJson
+
+    val serDe = Serde(json)
 
     fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
 
@@ -71,7 +73,7 @@ fun McpHandler(
             it.onClose { sessions.remove(sessionId) }
 
 //            thread {
-//                val id = McpJson.number(1)
+//                val id = json.number(1)
 //
 //                it.send(
 //                    serDe(
@@ -88,7 +90,7 @@ fun McpHandler(
 
                 System.err.println(req.bodyString())
 
-                val request = Body.jsonRpcRequest(McpJson).toLens()(req)
+                val request = Body.jsonRpcRequest(json).toLens()(req)
 
                 if (request.valid()) {
                     when (McpRpcMethod.of(request.method)) {
@@ -119,12 +121,7 @@ fun McpHandler(
                         Root.Notification.Method -> {
                             val messageId = MessageId.random()
                             calls[messageId] = { roots.update(serDe(it)) }
-                            sessions[sId].request(
-                                serDe,
-                                Root.List,
-                                Root.List.Request(),
-                                McpJson.asJsonObject(messageId)
-                            )
+                            sessions[sId].request(serDe, Root.List, Root.List.Request(), json.asJsonObject(messageId))
                         }
 
                         Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
@@ -133,7 +130,7 @@ fun McpHandler(
                         else -> Response(NOT_IMPLEMENTED)
                     }
                 } else {
-                    val result = Body.jsonRpcResult(McpJson).toLens()(req)
+                    val result = Body.jsonRpcResult(json).toLens()(req)
 
                     with(McpJson) {
                         val messageId = asA<MessageId>(asFormatString(result.id ?: nullNode()))
