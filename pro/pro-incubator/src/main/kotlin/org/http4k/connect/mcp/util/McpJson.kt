@@ -9,14 +9,18 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
+import org.http4k.mcp.MimeType
+import org.http4k.mcp.SessionId
 
 object McpJson : ConfigurableJackson(
     KotlinModule.Builder().build()
         .asConfigurable()
         .withStandardMappings()
         .value(McpRpcMethod)
-        .value(Version)
+        .value(MimeType)
         .value(ProtocolVersion)
+        .value(SessionId)
+        .value(Version)
         .done()
         .setSerializationInclusion(NON_NULL)
 )
