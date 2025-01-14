@@ -2,7 +2,7 @@ package org.http4k.connect.mcp
 
 typealias Cursor = String
 
-interface PaginatedRequest: ClientRequest {
+interface PaginatedRequest: ClientMessage.Request {
     val cursor: Cursor?
 }
 

@@ -11,16 +11,16 @@ object Initialize : HasMethod {
         val clientInfo: Implementation,
         val capabilities: ClientCapabilites = ClientCapabilites(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION
-    ) : ClientRequest
+    ) : ClientMessage.Request
 
     data class Response(
         val capabilities: ServerCapabilities = ServerCapabilities(),
         val serverInfo: Implementation,
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
         override val _meta: Map<String, Any> = default,
-    ) : HasMeta, ServerResponse
+    ) : HasMeta, ServerMessage.Response
 
-    object Notification : ClientRequest, HasMethod {
+    object Notification : ClientMessage.Request, HasMethod {
         override val Method = of("notifications/initialized")
     }
 }

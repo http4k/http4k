@@ -8,13 +8,13 @@ data class Root(val uri: Uri, val name: String?) {
     object List : HasMethod {
         override val Method = of("roots/list")
 
-        data class Request(override val _meta: Meta = default) : ServerRequest, HasMeta
+        data class Request(override val _meta: Meta = default) : ServerMessage.Request, HasMeta
 
         data class Response(val roots: kotlin.collections.List<Root>, override val _meta: Meta = default) :
-            ServerResponse, HasMeta
+            ClientMessage.Response, HasMeta
     }
 
-    object Notification : HasMethod, ClientRequest {
+    object Notification : ClientMessage.Notification, HasMethod {
         override val Method = of("notifications/roots/list_changed")
     }
 }

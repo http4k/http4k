@@ -10,7 +10,8 @@ object Logging {
     object SetLevel : HasMethod {
         override val Method = McpRpcMethod.of("logging/set_level")
 
-        data class Request(val level: Level, override val _meta: Meta = HasMeta.default) : ClientRequest,
+        data class Request(val level: Level, override val _meta: Meta = default) :
+            ClientMessage.Request,
             HasMeta
     }
 
@@ -22,7 +23,7 @@ object Logging {
             val logger: String? = null,
             val data: Map<String, Any> = emptyMap(),
             override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+        ) : ServerMessage.Response, HasMeta
     }
 
 }

@@ -7,7 +7,7 @@ object Cancelled {
         val requestId: String,
         val reason: String?,
         override val _meta: Meta = default
-    ) : ClientRequest, ServerNotification, HasMeta {
+    ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta {
         override val method = Method
 
         companion object : HasMethod {

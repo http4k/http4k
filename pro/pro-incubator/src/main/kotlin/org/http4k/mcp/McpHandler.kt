@@ -2,8 +2,9 @@ package org.http4k.mcp
 
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.Cancelled
-import org.http4k.connect.mcp.ClientRequest
+import org.http4k.connect.mcp.ClientMessage
 import org.http4k.connect.mcp.Completion
+import org.http4k.connect.mcp.HasMethod
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpRpcMethod
@@ -13,8 +14,8 @@ import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.Resource
 import org.http4k.connect.mcp.Root
 import org.http4k.connect.mcp.ServerCapabilities
-import org.http4k.connect.mcp.ServerResponse
-import org.http4k.connect.mcp.ServerResponse.Empty
+import org.http4k.connect.mcp.ServerMessage
+import org.http4k.connect.mcp.ServerMessage.Response.Empty
 import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
@@ -39,6 +40,7 @@ import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
+import java.util.UUID
 import org.http4k.routing.bind as httpBind
 
 fun McpHandler(
@@ -48,13 +50,11 @@ fun McpHandler(
     tools: Tools,
     resources: Resources,
     prompts: Prompts,
+    roots: Roots,
+    completions: Completions,
     newSessionId: () -> SessionId = { SessionId.random() }
 ): PolyHandler {
     val serDe = Serde(McpJson)
-
-    val roots = Roots(emptyList())
-
-    val completions = Completions()
 
     fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
 
@@ -78,7 +78,7 @@ fun McpHandler(
 //                    )
 //                )
 //            }
-        },
+        }.debug(),
         routes(
             "/message" httpBind POST to { req: Request ->
                 val request = Body.jsonRpcRequest(McpJson).toLens()(req)
@@ -87,9 +87,7 @@ fun McpHandler(
 
                 when (McpRpcMethod.of(request.method)) {
                     Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
-                    Initialize.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
 
-                    Cancelled.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
                     Completion.Method -> sessions[sId].respondTo(serDe, request, completions::complete)
 
                     Ping.Method -> sessions[sId].notify(serDe, Empty, request.id)
@@ -98,11 +96,32 @@ fun McpHandler(
 
                     Resource.List.Method -> sessions[sId].respondTo(serDe, request, resources::list)
                     Resource.Read.Method -> sessions[sId].respondTo(serDe, request, resources::read)
-                    Resource.Subscribe.Method -> sessions[sId].respondTo(serDe, request, resources::subscribe)
-                    Resource.Unsubscribe.Method -> sessions[sId].respondTo(serDe, request, resources::unsubscribe)
 
-                    Root.List.Method -> sessions[sId].respondTo(serDe, request, roots::list)
-                    Root.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
+                    Resource.Subscribe.Method -> {
+                        resources.subscribe(serDe(request))
+                        Response(ACCEPTED)
+                    }
+
+                    Resource.Unsubscribe.Method -> {
+                        resources.unsubscribe(serDe(request))
+                        Response(ACCEPTED)
+                    }
+
+                    Root.List.Method -> {
+                        roots.update(serDe(request))
+                        Response(ACCEPTED)
+                    }
+
+                    Initialize.Notification.Method -> Response(ACCEPTED)
+                    Cancelled.Notification.Method -> Response(ACCEPTED)
+
+                    Root.Notification.Method -> sessions[sId].request(
+                        serDe,
+                        Root.List,
+                        Root.List.Request(),
+                        McpJson.string(UUID.randomUUID().toString())
+                    )
+
                     Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
                     Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
 
@@ -110,10 +129,14 @@ fun McpHandler(
                 }
             }
         )
-    ).debug()
+    )
 }
 
-private fun <NODE : Any> Sse?.notify(serDe: Serde<NODE>, resp: ServerResponse, id: NODE? = null): Response {
+private fun <NODE : Any> Sse?.notify(
+    serDe: Serde<NODE>,
+    resp: ServerMessage.Response,
+    id: NODE? = null
+): Response {
     when (this) {
         null -> Unit
         else -> send(serDe(resp, id))
@@ -121,7 +144,20 @@ private fun <NODE : Any> Sse?.notify(serDe: Serde<NODE>, resp: ServerResponse, i
     return Response(ACCEPTED)
 }
 
-private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any>
+private fun <NODE : Any> Sse?.request(
+    serDe: Serde<NODE>,
+    hasMethod: HasMethod,
+    resp: ServerMessage.Request,
+    id: NODE
+): Response {
+    when (this) {
+        null -> Unit
+        else -> send(serDe(hasMethod.Method, resp, id))
+    }
+    return Response(ACCEPTED)
+}
+
+private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
     Sse?.respondTo(serDe: Serde<NODE>, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
     when (this) {
         null -> Response(BAD_REQUEST)

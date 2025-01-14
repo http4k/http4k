@@ -41,12 +41,12 @@ data class Resource(
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
-        ) : ClientRequest, HasMeta
+        ) : ClientMessage.Request, HasMeta
 
         class Response(
             val contents: kotlin.collections.List<Content>,
             override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+        ) : ServerMessage.Response, HasMeta
     }
 
     object List : HasMethod {
@@ -61,20 +61,18 @@ data class Resource(
             val resources: kotlin.collections.List<Resource>,
             override val nextCursor: Cursor? = null,
             override val _meta: Meta = default
-        ) : ServerResponse, PaginatedResponse, HasMeta
+        ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        data object Notification : ServerNotification {
+        data object Notification : ServerMessage.Notification {
             override val method = of("notifications/resources/list_changed")
         }
     }
 
-    object Updated : HasMethod {
-        override val Method = of("resources/updated")
-
-        data class Notification(
-            val uri: Uri,
-            override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+    object Updated {
+        data class Notification(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
+            HasMeta {
+            override val method = of("notifications/resources/updated")
+        }
     }
 
     object Subscribe : HasMethod {
@@ -83,7 +81,7 @@ data class Resource(
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
-        ) : ClientRequest, HasMeta
+        ) : ClientMessage.Request, HasMeta
     }
 
     object Unsubscribe : HasMethod {
@@ -92,7 +90,7 @@ data class Resource(
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
-        ) : ClientRequest, HasMeta
+        ) : ClientMessage.Request, HasMeta
     }
 
     data class Template(
@@ -107,13 +105,13 @@ data class Resource(
             data class Request(
                 override val cursor: Cursor?,
                 override val _meta: Meta = default
-            ) : ClientRequest, PaginatedRequest, HasMeta {}
+            ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 
             class Response(
                 val resourceTemplates: kotlin.collections.List<Template>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = default
-            ) : ServerResponse, PaginatedResponse, HasMeta
+            ) : ServerMessage.Response, PaginatedResponse, HasMeta
         }
     }
 }

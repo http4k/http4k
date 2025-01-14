@@ -43,26 +43,26 @@ data class Prompt(
             val name: String,
             val arguments: Map<String, String> = emptyMap(),
             override val _meta: Meta = default
-        ) : ClientRequest, HasMeta
+        ) : ClientMessage.Request, HasMeta
 
         class Response(
             val messages: kotlin.collections.List<Message>,
             val description: String? = null,
             override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+        ) : ServerMessage.Response, HasMeta
     }
 
     object List : HasMethod {
         override val Method = of("prompts/list")
 
-        data class Request(override val _meta: Meta = default) : ClientRequest, HasMeta
+        data class Request(override val _meta: Meta = default) : ClientMessage.Request, HasMeta
 
         data class Response(
             val prompts: kotlin.collections.List<Prompt>,
             override val _meta: Meta = default
-        ) : ServerResponse, HasMeta
+        ) : ServerMessage.Response, HasMeta
 
-        data object Notification : ServerNotification {
+        data object Notification : ServerMessage.Notification {
             override val method = of("notifications/prompts/list_changed")
         }
     }
