@@ -28,8 +28,6 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
-import org.http4k.core.Uri
-import org.http4k.core.query
 import org.http4k.filter.debug
 import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
@@ -42,7 +40,6 @@ import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
-import org.http4k.sse.SseMessage.Event
 import org.http4k.routing.bind as httpBind
 
 fun McpHandler(
@@ -62,21 +59,12 @@ fun McpHandler(
 
     fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
 
-    val sessions = mutableMapOf<SessionId, Sse>()
+    val sessions = Sessions(serDe, tools, resources, prompts)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
         "/sse" bind sse {
-            val sessionId = newSessionId()
-            sessions[sessionId] = it
-            it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
-            it.onClose {
-                tools.remove(sessionId)
-                resources.remove(sessionId)
-                prompts.remove(sessionId)
-                roots.remove(sessionId)
-                sessions.remove(sessionId)
-            }
+            sessions.add(newSessionId(), it)
         }.debug(),
         routes(
             "/message" httpBind POST to { req: Request ->
