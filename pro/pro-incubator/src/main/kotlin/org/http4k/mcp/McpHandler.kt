@@ -25,14 +25,12 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.GONE
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.mcp.ProcessResult.Fail
-import org.http4k.mcp.ProcessResult.Ok
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
@@ -128,16 +126,16 @@ fun McpHandler(
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
     Session<NODE>?.respondTo(hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
     when (this) {
-        null -> Response(BAD_REQUEST)
-        else -> when (val result = process(hasMethod, req, fn)) {
-            is Ok -> Response(ACCEPTED)
-            is Fail -> Response(result.status)
+        null -> Response(GONE)
+        else -> {
+            process(hasMethod, req, fn)
+            Response(ACCEPTED)
         }
     }
 
 private fun <NODE : Any> Session<NODE>?.send(hasMethod: HasMethod, resp: ServerMessage, id: NODE? = null) =
     when (this) {
-        null -> Response(BAD_REQUEST)
+        null -> Response(GONE)
         else -> {
             send(hasMethod, resp, id)
             Response(ACCEPTED)
