@@ -1,6 +1,6 @@
 package org.http4k.mcp
 
-import org.http4k.connect.mcp.McpRpcMethod
+import org.http4k.connect.mcp.HasMethod
 import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Notification
 import org.http4k.connect.mcp.ServerMessage.Request
@@ -23,13 +23,13 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
         asA<OUT>(compact(input.result ?: json.nullNode()))
     }
 
-    operator fun invoke(method: McpRpcMethod, input: ServerMessage, id: NODE?) = with(json) {
+    operator fun invoke(method: HasMethod, input: ServerMessage, id: NODE?) = with(json) {
         Event(
             "message",
             when(input) {
-                is Request -> compact(renderRequest(method.value, asJsonObject(input), id ?: json.nullNode()))
+                is Request -> compact(renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode()))
                 is Response -> compact(renderResult(asJsonObject(input), id ?: json.nullNode()))
-                is Notification -> compact(renderRequest(method.value, asJsonObject(input), id ?: json.nullNode()))
+                is Notification -> compact(renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode()))
             }
         )
     }

@@ -21,10 +21,10 @@ class Session<NODE : Any>(
     ) = sse.send(
         runCatching { serDe<IN>(req) }
             .mapCatching(fn)
-            .map { serDe(op.Method, it, req.id) }
+            .map { serDe(op, it, req.id) }
             .recover { serDe(InternalError, req.id) }
             .getOrElse { serDe(InvalidRequest, req.id) }
     )
 
-    fun send(hasMethod: HasMethod, resp: ServerMessage, id: NODE? = null) = sse.send(serDe(hasMethod.Method, resp, id))
+    fun send(hasMethod: HasMethod, resp: ServerMessage, id: NODE? = null) = sse.send(serDe(hasMethod, resp, id))
 }
