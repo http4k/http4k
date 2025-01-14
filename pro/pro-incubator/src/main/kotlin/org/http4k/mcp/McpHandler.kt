@@ -23,7 +23,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Uri
@@ -39,7 +38,7 @@ import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
-import org.http4k.routing.bind as hbind
+import org.http4k.routing.bind as httpBind
 
 fun McpHandler(
     implementation: Implementation,
@@ -47,51 +46,45 @@ fun McpHandler(
     capabilities: ServerCapabilities,
     tools: Tools,
     resources: Resources,
-    prompts: Prompts
+    prompts: Prompts,
+    newSessionId: () -> SessionId  ={ SessionId.random() }
 ): PolyHandler {
     val serDe = Serde(McpJson)
 
     val roots = Roots(emptyList())
 
     val sessions = mutableMapOf<SessionId, Sse>()
-
-
-    val initial = Initialize.Response(capabilities, implementation, protocolVersion)
+    val init = Initialize.Response(capabilities, implementation, protocolVersion)
     return poly(
         "/sse" bind sse {
-            val newSessionId = SessionId.random()
-
-            sessions[newSessionId] = it
-            it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
-            it.send(serDe(initial, McpJson.number(0)))
+            val sessionId = newSessionId()
+            sessions[sessionId] = it
+            it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
+            it.send(serDe(init, McpJson.number(0)))
         },
         routes(
-            "/message" hbind POST to { req: Request ->
+            "/message" httpBind POST to { req: Request ->
                 val request = Body.jsonRpcRequest(McpJson).toLens()(req)
-                val sessionId = SessionId.parse(req.query("sessionId")!!)
+                val sId = SessionId.parse(req.query("sessionId")!!)
                 System.err.println(request)
 
                 when (McpRpcMethod.of(request.method)) {
-                    Initialize.Method -> serDe.message(request, { _: Initialize.Request -> initial })
-                    Initialize.Notification.Method -> serDe.message(request, { _: Initialize.Notification.Request -> Empty })
-                    Cancelled.Notification.Method -> serDe.message(request, { _: Cancelled.Notification.Request -> Empty })
+                    Initialize.Method -> sessions[sId].respondTo(serDe, request, { _: Initialize.Request -> init })
+                    Initialize.Notification.Method -> Response(ACCEPTED)
+                    Cancelled.Notification.Method -> Response(ACCEPTED)
+                    Ping.Method -> sessions[sId].respondTo(serDe, request) { _: Ping.Request -> Empty }
+                    Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
+                    Prompt.List.Method -> sessions[sId].respondTo(serDe, request, prompts::list)
 
-                    Ping.Method -> serDe.message(request, { _: Ping.Request -> Empty })
-                    Prompt.Get.Method -> serDe.message(request, prompts::get)
-                    Prompt.List.Method -> {
-                        sessions[sessionId]?.send(serDe(prompts.list(serDe<Prompt.List.Request>(request)), request.id))
-                        Response(ACCEPTED)
-                    }
+                    Resource.List.Method -> sessions[sId].respondTo(serDe, request, resources::list)
+                    Resource.Read.Method -> sessions[sId].respondTo(serDe, request, resources::read)
+                    Resource.Subscribe.Method -> sessions[sId].respondTo(serDe, request, resources::subscribe)
+                    Resource.Unsubscribe.Method -> sessions[sId].respondTo(serDe, request, resources::unsubscribe)
 
-                    Resource.List.Method -> serDe.message(request, resources::list)
-                    Resource.Read.Method -> serDe.message(request, resources::read)
-                    Resource.Subscribe.Method -> serDe.message(request, resources::subscribe)
-                    Resource.Unsubscribe.Method -> serDe.message(request, resources::unsubscribe)
-
-                    Root.List.Method -> serDe.message(request, roots::list)
-                    Root.Notification.Method -> serDe.message(request, { _: Root.Notification.Request -> Empty })
-                    Tool.Call.Method -> serDe.message(request, tools::call)
-                    Tool.List.Method -> serDe.message(request, tools::list)
+                    Root.List.Method -> sessions[sId].respondTo(serDe, request, roots::list)
+                    Root.Notification.Method -> Response(ACCEPTED)
+                    Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
+                    Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
 
                     else -> Response(NOT_IMPLEMENTED)
                 }
@@ -101,11 +94,24 @@ fun McpHandler(
 }
 
 private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any>
-    Serde<NODE>.message(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
-    runCatching { this<IN>(req) }
-        .onFailure { return Response(BAD_REQUEST).body(this(InvalidRequest, req.id).toMessage()) }
-        .map { fn(it) }
-        .map { return Response(ACCEPTED).body(this(it, req.id).toMessage()) }
-        .recover { return Response(SERVICE_UNAVAILABLE).body(this(InternalError, req.id).toMessage()) }
-    return Response(INTERNAL_SERVER_ERROR)
+    Sse?.respondTo(serDe: Serde<NODE>, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
+    when (this) {
+        null -> Response(BAD_REQUEST)
+        else ->
+            runCatching { serDe<IN>(req) }
+                .onFailure {
+                    send(serDe(InvalidRequest, req.id))
+                    return Response(BAD_REQUEST)
+                }
+                .map(fn)
+                .map {
+                    send(serDe(it, req.id))
+                    return Response(ACCEPTED)
+                }
+                .recover {
+                    send(serDe(InternalError, req.id))
+                    return Response(SERVICE_UNAVAILABLE)
+                }
+    }
+    return Response(NOT_IMPLEMENTED)
 }

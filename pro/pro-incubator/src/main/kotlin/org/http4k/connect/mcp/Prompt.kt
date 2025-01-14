@@ -8,7 +8,7 @@ import org.http4k.core.ContentType
 data class Prompt(
     val name: String,
     val description: String? = null,
-    val arguments: kotlin.collections.List<Argument>? = null,
+    val arguments: kotlin.collections.List<Argument> = emptyList(),
 ) {
     data class Message(val role: Role, val content: Content)
 
@@ -44,7 +44,7 @@ data class Prompt(
 
         data class Request(
             val name: String,
-            val arguments: Map<String, String>? = null,
+            val arguments: Map<String, String> = emptyMap(),
             override val _meta: Meta = default
         ) : ClientRequest, HasMeta
 
