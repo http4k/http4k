@@ -9,7 +9,7 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.sse.SseMessage
 
 class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
-    inline operator fun <reified OUT : Any> invoke(input: JsonRpcRequest<NODE>) = with(json) {
+    inline operator fun <reified OUT : Any> invoke(input: JsonRpcRequest<NODE>): OUT = with(json) {
         asA<OUT>(compact(input.params ?: obj()))
     }
 

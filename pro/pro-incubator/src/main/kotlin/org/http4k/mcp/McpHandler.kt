@@ -1,6 +1,7 @@
 package org.http4k.mcp
 
 import dev.forkhandles.values.random
+import org.http4k.connect.mcp.Cancelled
 import org.http4k.connect.mcp.ClientRequest
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
@@ -27,6 +28,7 @@ import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Uri
 import org.http4k.core.query
+import org.http4k.filter.debug
 import org.http4k.format.jsonRpcRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
@@ -35,6 +37,7 @@ import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
+import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
 import org.http4k.routing.bind as hbind
 
@@ -50,32 +53,35 @@ fun McpHandler(
 
     val roots = Roots(emptyList())
 
-    val sessions = mutableMapOf<SessionId, Unit>()
+    val sessions = mutableMapOf<SessionId, Sse>()
 
-    fun initialize() =
-        Initialize.Response(capabilities, implementation, protocolVersion)
 
+    val initial = Initialize.Response(capabilities, implementation, protocolVersion)
     return poly(
         "/sse" bind sse {
             val newSessionId = SessionId.random()
 
-            sessions[newSessionId] = Unit
-
+            sessions[newSessionId] = it
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
-            it.send(serDe(initialize(), McpJson.number(0)))
+            it.send(serDe(initial, McpJson.number(0)))
         },
         routes(
             "/message" hbind POST to { req: Request ->
                 val request = Body.jsonRpcRequest(McpJson).toLens()(req)
                 val sessionId = SessionId.parse(req.query("sessionId")!!)
                 System.err.println(request)
-                when (McpRpcMethod.of(request.method)) {
-                    Initialize.Method -> serDe.message(request, { _: Any -> initialize() })
-                    Initialize.Notification.Method -> serDe.message(request, { _: Any -> Empty })
 
-                    Ping.Method -> serDe.message(request, { _: Any -> Empty })
+                when (McpRpcMethod.of(request.method)) {
+                    Initialize.Method -> serDe.message(request, { _: Initialize.Request -> initial })
+                    Initialize.Notification.Method -> serDe.message(request, { _: Initialize.Notification.Request -> Empty })
+                    Cancelled.Notification.Method -> serDe.message(request, { _: Cancelled.Notification.Request -> Empty })
+
+                    Ping.Method -> serDe.message(request, { _: Ping.Request -> Empty })
                     Prompt.Get.Method -> serDe.message(request, prompts::get)
-                    Prompt.List.Method -> serDe.message(request, prompts::list)
+                    Prompt.List.Method -> {
+                        sessions[sessionId]?.send(serDe(prompts.list(serDe<Prompt.List.Request>(request)), request.id))
+                        Response(ACCEPTED)
+                    }
 
                     Resource.List.Method -> serDe.message(request, resources::list)
                     Resource.Read.Method -> serDe.message(request, resources::read)
@@ -83,14 +89,14 @@ fun McpHandler(
                     Resource.Unsubscribe.Method -> serDe.message(request, resources::unsubscribe)
 
                     Root.List.Method -> serDe.message(request, roots::list)
-                    Root.Notification.Method -> serDe.message(request, { _: Any -> Empty })
+                    Root.Notification.Method -> serDe.message(request, { _: Root.Notification.Request -> Empty })
                     Tool.Call.Method -> serDe.message(request, tools::call)
                     Tool.List.Method -> serDe.message(request, tools::list)
 
                     else -> Response(NOT_IMPLEMENTED)
                 }
             }
-        )
+        ).debug()
     )
 }
 
