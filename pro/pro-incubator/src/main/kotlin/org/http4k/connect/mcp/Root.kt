@@ -14,9 +14,7 @@ data class Root(val uri: Uri, val name: String?) {
             ServerResponse, HasMeta
     }
 
-    object Notification : HasMethod {
+    object Notification : HasMethod, ClientRequest {
         override val Method = of("notifications/roots/list_changed")
-
-        data object Request : ClientRequest
     }
 }

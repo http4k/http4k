@@ -11,7 +11,6 @@ import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.Resource
 import org.http4k.connect.mcp.Root
-import org.http4k.connect.mcp.Sampling
 import org.http4k.connect.mcp.ServerCapabilities
 import org.http4k.connect.mcp.ServerResponse
 import org.http4k.connect.mcp.ServerResponse.Empty
@@ -72,8 +71,16 @@ fun McpHandler(
 
                 when (McpRpcMethod.of(request.method)) {
                     Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
-                    Initialize.Notification.Method -> Response(ACCEPTED)
-                    Cancelled.Notification.Method -> Response(ACCEPTED)
+                    Initialize.Notification.Method -> sessions[sId].respondTo(
+                        serDe,
+                        request,
+                        { _: Initialize.Notification -> Empty })
+
+                    Cancelled.Notification.Method -> sessions[sId].respondTo(
+                        serDe,
+                        request,
+                        { _: Cancelled.Notification -> Empty })
+
                     Ping.Method -> sessions[sId].respondTo(serDe, request) { _: Ping.Request -> Empty }
                     Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
                     Prompt.List.Method -> sessions[sId].respondTo(serDe, request, prompts::list)
@@ -84,8 +91,10 @@ fun McpHandler(
                     Resource.Unsubscribe.Method -> sessions[sId].respondTo(serDe, request, resources::unsubscribe)
 
                     Root.List.Method -> sessions[sId].respondTo(serDe, request, roots::list)
-                    Root.Notification.Method -> Response(ACCEPTED)
-                    Sampling.Message.Create.Method -> Response(ACCEPTED)
+                    Root.Notification.Method -> sessions[sId].respondTo(
+                        serDe,
+                        request,
+                        { _: Root.Notification -> Empty })
 
                     Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
                     Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
