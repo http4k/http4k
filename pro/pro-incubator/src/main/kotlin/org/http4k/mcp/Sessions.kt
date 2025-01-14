@@ -82,6 +82,5 @@ class Sessions<NODE : Any>(
         }
         return Response(ACCEPTED)
     }
-
     operator fun get(sessionId: SessionId) = sessions[sessionId]
 }
