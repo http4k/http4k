@@ -53,14 +53,15 @@ fun McpHandler(
 
     val roots = Roots(emptyList())
 
+    fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
+
     val sessions = mutableMapOf<SessionId, Sse>()
-    val init = Initialize.Response(capabilities, implementation, protocolVersion)
+
     return poly(
         "/sse" bind sse {
             val sessionId = newSessionId()
             sessions[sessionId] = it
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
-            it.send(serDe(init, McpJson.number(0)))
         },
         routes(
             "/message" httpBind POST to { req: Request ->
@@ -69,7 +70,7 @@ fun McpHandler(
                 System.err.println(request)
 
                 when (McpRpcMethod.of(request.method)) {
-                    Initialize.Method -> sessions[sId].respondTo(serDe, request, { _: Initialize.Request -> init })
+                    Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
                     Initialize.Notification.Method -> Response(ACCEPTED)
                     Cancelled.Notification.Method -> Response(ACCEPTED)
                     Ping.Method -> sessions[sId].respondTo(serDe, request) { _: Ping.Request -> Empty }
@@ -91,6 +92,7 @@ fun McpHandler(
             }
         ).debug()
     )
+
 }
 
 private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any>
