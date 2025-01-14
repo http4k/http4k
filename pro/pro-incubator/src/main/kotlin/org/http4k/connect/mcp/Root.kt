@@ -8,7 +8,7 @@ data class Root(val uri: Uri, val name: String?) {
     object List : HasMethod {
         override val Method = of("roots/list")
 
-        data class Request(override val _meta: Meta = default) : ClientRequest, HasMeta
+        data class Request(override val _meta: Meta = default) : ServerRequest, HasMeta
 
         data class Response(val roots: kotlin.collections.List<Root>, override val _meta: Meta = default) :
             ServerResponse, HasMeta

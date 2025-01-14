@@ -6,6 +6,15 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.jsonRpcVersion
 import org.http4k.lens.ContentNegotiation.Companion.None
 
+fun <NODE> Json<NODE>.renderRequest(method: String, params: NODE?, id: NODE): NODE = this {
+    obj(
+        "jsonrpc" to string(jsonRpcVersion),
+        "method" to string(method),
+        "params" to (params ?: nullNode()),
+        "id" to id
+    )
+}
+
 fun <NODE> Json<NODE>.renderResult(result: NODE, id: NODE): NODE = this {
     obj(
         "jsonrpc" to string(jsonRpcVersion),

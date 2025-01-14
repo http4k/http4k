@@ -1,4 +1,3 @@
 package org.http4k.connect.mcp
 
-interface ClientRequest
-
+interface ServerRequest

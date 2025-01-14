@@ -3,6 +3,7 @@ package org.http4k.mcp
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.Cancelled
 import org.http4k.connect.mcp.ClientRequest
+import org.http4k.connect.mcp.Completion
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpRpcMethod
@@ -53,6 +54,8 @@ fun McpHandler(
 
     val roots = Roots(emptyList())
 
+    val completions = Completions()
+
     fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
 
     val sessions = mutableMapOf<SessionId, Sse>()
@@ -62,18 +65,32 @@ fun McpHandler(
             val sessionId = newSessionId()
             sessions[sessionId] = it
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
+            it.onClose { sessions.remove(sessionId) }
+
+//            thread {
+//                val id = McpJson.number(1)
+//
+//                it.send(
+//                    serDe(
+//                        Sampling.Message.Create.Method,
+//                        Sampling.Message.Create.Request(listOf(), MaxTokens.of(1000)),
+//                        id
+//                    )
+//                )
+//            }
         },
         routes(
             "/message" httpBind POST to { req: Request ->
                 val request = Body.jsonRpcRequest(McpJson).toLens()(req)
                 val sId = SessionId.parse(req.query("sessionId")!!)
-                System.err.println(request)
+                System.err.println(req.bodyString())
 
                 when (McpRpcMethod.of(request.method)) {
                     Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
                     Initialize.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
 
                     Cancelled.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
+                    Completion.Method -> sessions[sId].respondTo(serDe, request, completions::complete)
 
                     Ping.Method -> sessions[sId].notify(serDe, Empty, request.id)
                     Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
@@ -92,11 +109,11 @@ fun McpHandler(
                     else -> Response(NOT_IMPLEMENTED)
                 }
             }
-        ).debug()
-    )
+        )
+    ).debug()
 }
 
-private fun <NODE : Any> Sse?.notify(serDe: Serde<NODE>, resp: ServerResponse, id: NODE?= null): Response {
+private fun <NODE : Any> Sse?.notify(serDe: Serde<NODE>, resp: ServerResponse, id: NODE? = null): Response {
     when (this) {
         null -> Unit
         else -> send(serDe(resp, id))

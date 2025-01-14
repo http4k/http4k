@@ -2,8 +2,7 @@ package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
 
-object Completetion : HasMethod {
-    override val Method = McpRpcMethod.of("completion/complete")
+data class Completion(val values: List<String>, val total: Int? = null, val hasMore: Boolean? = null) {
 
     data class Request(
         val ref: Reference,
@@ -18,11 +17,9 @@ object Completetion : HasMethod {
     data class Response(
         val completion: Completion,
         override val _meta: Meta = default
-    ) : ServerResponse, HasMeta {
-        data class Completion(
-            val values: List<String>,
-            val total: Int? = null,
-            val hasMore: Boolean? = null,
-        )
+    ) : ServerResponse, HasMeta
+
+    companion object : HasMethod {
+        override val Method = McpRpcMethod.of("completion/complete")
     }
 }

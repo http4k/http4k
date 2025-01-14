@@ -15,7 +15,7 @@ object Sampling {
                 val modelPreferences: ModelPreferences? = null,
                 val metadata: Map<String, Any> = emptyMap(),
                 override val _meta: Meta = HasMeta.default
-            ) : ServerResponse, HasMeta {
+            ) : ServerRequest, HasMeta {
                 enum class IncludeContext { none, thisServer, allServers }
             }
         }
