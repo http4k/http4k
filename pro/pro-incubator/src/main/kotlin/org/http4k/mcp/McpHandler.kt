@@ -3,7 +3,9 @@ package org.http4k.mcp
 import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.Cancelled
+import org.http4k.connect.mcp.ClientMessage
 import org.http4k.connect.mcp.Completion
+import org.http4k.connect.mcp.HasMethod
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpRpcMethod
@@ -13,6 +15,7 @@ import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.Resource
 import org.http4k.connect.mcp.Root
 import org.http4k.connect.mcp.ServerCapabilities
+import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Response.Empty
 import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
@@ -22,10 +25,14 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
+import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.ProcessResult.Fail
+import org.http4k.mcp.ProcessResult.Ok
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
@@ -65,16 +72,16 @@ fun McpHandler(
 
                 if (request.valid()) {
                     when (McpRpcMethod.of(request.method)) {
-                        Initialize.Method -> sessions.respondTo(sId, Initialize, request, ::initialise)
+                        Initialize.Method -> sessions[sId].respondTo(Initialize, request, ::initialise)
 
-                        Completion.Method -> sessions.respondTo(sId, Completion, request, completions::complete)
+                        Completion.Method -> sessions[sId].respondTo(Completion, request, completions::complete)
 
-                        Ping.Method -> sessions.send(sId, Ping, Empty, request.id)
-                        Prompt.Get.Method -> sessions.respondTo(sId, Prompt.Get, request, prompts::get)
-                        Prompt.List.Method -> sessions.respondTo(sId, Prompt.List, request, prompts::list)
+                        Ping.Method -> sessions[sId].send(Ping, Empty, request.id)
+                        Prompt.Get.Method -> sessions[sId].respondTo(Prompt.Get, request, prompts::get)
+                        Prompt.List.Method -> sessions[sId].respondTo(Prompt.List, request, prompts::list)
 
-                        Resource.List.Method -> sessions.respondTo(sId, Resource.List, request, resources::list)
-                        Resource.Read.Method -> sessions.respondTo(sId, Resource.Read, request, resources::read)
+                        Resource.List.Method -> sessions[sId].respondTo(Resource.List, request, resources::list)
+                        Resource.Read.Method -> sessions[sId].respondTo(Resource.Read, request, resources::read)
 
                         Resource.Subscribe.Method -> {
                             resources.subscribe(serDe(request))
@@ -92,11 +99,11 @@ fun McpHandler(
                         Root.Notification.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }
-                            sessions.send(sId, Root.List, Root.List.Request(), json.asJsonObject(messageId))
+                            sessions[sId].send(Root.List, Root.List.Request(), json.asJsonObject(messageId))
                         }
 
-                        Tool.Call.Method -> sessions.respondTo(sId, Tool.Call, request, tools::call)
-                        Tool.List.Method -> sessions.respondTo(sId, Tool.List, request, tools::list)
+                        Tool.Call.Method -> sessions[sId].respondTo(Tool.Call, request, tools::call)
+                        Tool.List.Method -> sessions[sId].respondTo(Tool.List, request, tools::list)
 
                         else -> Response(NOT_IMPLEMENTED)
                     }
@@ -117,3 +124,23 @@ fun McpHandler(
         )
     )
 }
+
+private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
+    Session<NODE>?.respondTo(hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
+    when (this) {
+        null -> Response(BAD_REQUEST)
+        else -> when (val result = process(hasMethod, req, fn)) {
+            is Ok -> Response(ACCEPTED)
+            is Fail -> Response(result.status)
+        }
+    }
+
+private fun <NODE : Any> Session<NODE>?.send(hasMethod: HasMethod, resp: ServerMessage, id: NODE? = null) =
+    when (this) {
+        null -> Response(BAD_REQUEST)
+        else -> {
+            send(hasMethod, resp, id)
+            Response(ACCEPTED)
+        }
+    }
+
