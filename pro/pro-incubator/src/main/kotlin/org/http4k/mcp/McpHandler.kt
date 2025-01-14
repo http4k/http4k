@@ -70,40 +70,32 @@ fun McpHandler(
             val sessionId = newSessionId()
             sessions[sessionId] = it
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
-            it.onClose { sessions.remove(sessionId) }
-
-//            thread {
-//                val id = json.number(1)
-//
-//                it.send(
-//                    serDe(
-//                        Sampling.Message.Create.Method,
-//                        Sampling.Message.Create.Request(listOf(), MaxTokens.of(1000)),
-//                        id
-//                    )
-//                )
-//            }
+            it.onClose {
+                tools.remove(sessionId)
+                resources.remove(sessionId)
+                prompts.remove(sessionId)
+                roots.remove(sessionId)
+                sessions.remove(sessionId)
+            }
         }.debug(),
         routes(
             "/message" httpBind POST to { req: Request ->
                 val sId = SessionId.parse(req.query("sessionId")!!)
 
-                System.err.println(req.bodyString())
-
                 val request = Body.jsonRpcRequest(json).toLens()(req)
 
                 if (request.valid()) {
                     when (McpRpcMethod.of(request.method)) {
-                        Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
+                        Initialize.Method -> sessions[sId].respondTo(serDe, Initialize, request, ::initialise)
 
-                        Completion.Method -> sessions[sId].respondTo(serDe, request, completions::complete)
+                        Completion.Method -> sessions[sId].respondTo(serDe, Completion, request, completions::complete)
 
-                        Ping.Method -> sessions[sId].notify(serDe, Empty, request.id)
-                        Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
-                        Prompt.List.Method -> sessions[sId].respondTo(serDe, request, prompts::list)
+                        Ping.Method -> sessions[sId].send(serDe, Ping, Empty, request.id)
+                        Prompt.Get.Method -> sessions[sId].respondTo(serDe, Prompt.Get, request, prompts::get)
+                        Prompt.List.Method -> sessions[sId].respondTo(serDe, Prompt.List, request, prompts::list)
 
-                        Resource.List.Method -> sessions[sId].respondTo(serDe, request, resources::list)
-                        Resource.Read.Method -> sessions[sId].respondTo(serDe, request, resources::read)
+                        Resource.List.Method -> sessions[sId].respondTo(serDe, Resource.List, request, resources::list)
+                        Resource.Read.Method -> sessions[sId].respondTo(serDe, Resource.Read, request, resources::read)
 
                         Resource.Subscribe.Method -> {
                             resources.subscribe(serDe(request))
@@ -121,11 +113,11 @@ fun McpHandler(
                         Root.Notification.Method -> {
                             val messageId = MessageId.random()
                             calls[messageId] = { roots.update(serDe(it)) }
-                            sessions[sId].request(serDe, Root.List, Root.List.Request(), json.asJsonObject(messageId))
+                            sessions[sId].send(serDe, Root.List, Root.List.Request(), json.asJsonObject(messageId))
                         }
 
-                        Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
-                        Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
+                        Tool.Call.Method -> sessions[sId].respondTo(serDe, Tool.Call, request, tools::call)
+                        Tool.List.Method -> sessions[sId].respondTo(serDe, Tool.List, request, tools::list)
 
                         else -> Response(NOT_IMPLEMENTED)
                     }
@@ -148,23 +140,11 @@ fun McpHandler(
     )
 }
 
-private fun <NODE : Any> Sse?.notify(
-    serDe: Serde<NODE>,
-    resp: ServerMessage.Response,
-    id: NODE? = null
-): Response {
-    when (this) {
-        null -> Unit
-        else -> send(serDe(resp, id))
-    }
-    return Response(ACCEPTED)
-}
-
-private fun <NODE : Any> Sse?.request(
+fun <NODE : Any> Sse?.send(
     serDe: Serde<NODE>,
     hasMethod: HasMethod,
-    resp: ServerMessage.Request,
-    id: NODE
+    resp: ServerMessage,
+    id: NODE? = null
 ): Response {
     when (this) {
         null -> Unit
@@ -174,7 +154,7 @@ private fun <NODE : Any> Sse?.request(
 }
 
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-    Sse?.respondTo(serDe: Serde<NODE>, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
+    Sse?.respondTo(serDe: Serde<NODE>, hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
     when (this) {
         null -> Response(BAD_REQUEST)
         else -> runCatching { serDe<IN>(req) }
@@ -184,7 +164,7 @@ private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Resp
             }
             .map(fn)
             .map {
-                send(serDe(it, req.id))
+                send(serDe(hasMethod.Method, it, req.id))
                 return Response(ACCEPTED)
             }
             .recover {

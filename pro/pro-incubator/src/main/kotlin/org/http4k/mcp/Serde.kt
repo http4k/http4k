@@ -2,6 +2,9 @@ package org.http4k.mcp
 
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.ServerMessage
+import org.http4k.connect.mcp.ServerMessage.Notification
+import org.http4k.connect.mcp.ServerMessage.Request
+import org.http4k.connect.mcp.ServerMessage.Response
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.renderError
 import org.http4k.format.renderRequest
@@ -20,19 +23,14 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
         asA<OUT>(compact(input.result ?: json.nullNode()))
     }
 
-    operator fun invoke(method: McpRpcMethod, input: ServerMessage.Request, id: NODE) = with(json) {
+    operator fun invoke(method: McpRpcMethod, input: ServerMessage, id: NODE?) = with(json) {
         Event(
             "message",
-            compact(renderRequest(method.value, asJsonObject(input), id)),
-            asFormatString(id)
-        )
-    }
-
-    operator fun invoke(response: ServerMessage.Response, id: NODE?) = with(json) {
-        Event(
-            "message",
-            compact(renderResult(asJsonObject(response), id ?: nullNode())),
-            asFormatString(id ?: nullNode())
+            when(input) {
+                is Request -> compact(renderRequest(method.value, asJsonObject(input), id ?: json.nullNode()))
+                is Response -> compact(renderResult(asJsonObject(input), id ?: json.nullNode()))
+                is Notification -> compact(renderRequest(method.value, asJsonObject(input), id ?: json.nullNode()))
+            }
         )
     }
 
