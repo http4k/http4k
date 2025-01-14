@@ -7,10 +7,10 @@ object Sampling {
 
             data class Request(
                 val messages: List<Message>,
-                val maxTokens: Int,
+                val maxTokens: MaxTokens,
                 val systemPrompt: String? = null,
                 val includeContext: IncludeContext? = null,
-                val temperature: Double? = null,
+                val temperature: Temperature? = null,
                 val stopSequences: List<String>? = null,
                 val modelPreferences: ModelPreferences? = null,
                 val metadata: Map<String, Any> = emptyMap(),

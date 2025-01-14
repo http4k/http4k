@@ -11,6 +11,7 @@ import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.Resource
 import org.http4k.connect.mcp.Root
+import org.http4k.connect.mcp.Sampling
 import org.http4k.connect.mcp.ServerCapabilities
 import org.http4k.connect.mcp.ServerResponse
 import org.http4k.connect.mcp.ServerResponse.Empty
@@ -47,7 +48,7 @@ fun McpHandler(
     tools: Tools,
     resources: Resources,
     prompts: Prompts,
-    newSessionId: () -> SessionId  ={ SessionId.random() }
+    newSessionId: () -> SessionId = { SessionId.random() }
 ): PolyHandler {
     val serDe = Serde(McpJson)
 
@@ -84,6 +85,8 @@ fun McpHandler(
 
                     Root.List.Method -> sessions[sId].respondTo(serDe, request, roots::list)
                     Root.Notification.Method -> Response(ACCEPTED)
+                    Sampling.Message.Create.Method -> Response(ACCEPTED)
+
                     Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
                     Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
 
@@ -99,21 +102,20 @@ private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any
     Sse?.respondTo(serDe: Serde<NODE>, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
     when (this) {
         null -> Response(BAD_REQUEST)
-        else ->
-            runCatching { serDe<IN>(req) }
-                .onFailure {
-                    send(serDe(InvalidRequest, req.id))
-                    return Response(BAD_REQUEST)
-                }
-                .map(fn)
-                .map {
-                    send(serDe(it, req.id))
-                    return Response(ACCEPTED)
-                }
-                .recover {
-                    send(serDe(InternalError, req.id))
-                    return Response(SERVICE_UNAVAILABLE)
-                }
+        else -> runCatching { serDe<IN>(req) }
+            .onFailure {
+                send(serDe(InvalidRequest, req.id))
+                return Response(BAD_REQUEST)
+            }
+            .map(fn)
+            .map {
+                send(serDe(it, req.id))
+                return Response(ACCEPTED)
+            }
+            .recover {
+                send(serDe(InternalError, req.id))
+                return Response(SERVICE_UNAVAILABLE)
+            }
     }
     return Response(NOT_IMPLEMENTED)
 }
