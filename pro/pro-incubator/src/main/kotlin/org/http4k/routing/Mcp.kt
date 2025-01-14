@@ -9,8 +9,6 @@ import org.http4k.mcp.McpHandler
 import org.http4k.mcp.PromptBinding
 import org.http4k.mcp.Prompts
 import org.http4k.mcp.ResourceBinding
-import org.http4k.mcp.ResourceTemplateBinding
-import org.http4k.mcp.ResourceTemplates
 import org.http4k.mcp.Resources
 import org.http4k.mcp.Roots
 import org.http4k.mcp.ToolBinding
@@ -22,7 +20,6 @@ fun mcp(implementation: Implementation, protocolVersion: ProtocolVersion, vararg
     ServerCapabilities(),
     Tools(bindings.filterIsInstance<ToolBinding>()),
     Resources(bindings.filterIsInstance<ResourceBinding>()),
-    ResourceTemplates(bindings.filterIsInstance<ResourceTemplateBinding>()),
     Prompts(bindings.filterIsInstance<PromptBinding>()),
     Roots(),
     Completions()

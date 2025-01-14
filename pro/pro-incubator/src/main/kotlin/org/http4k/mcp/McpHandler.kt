@@ -44,7 +44,6 @@ fun McpHandler(
     capabilities: ServerCapabilities,
     tools: Tools,
     resources: Resources,
-    resourceTemplates: ResourceTemplates,
     prompts: Prompts,
     roots: Roots,
     completions: Completions,
@@ -79,7 +78,12 @@ fun McpHandler(
                         Prompt.Get.Method -> sessions[sId].respondTo(Prompt.Get, request, prompts::get)
                         Prompt.List.Method -> sessions[sId].respondTo(Prompt.List, request, prompts::list)
 
-                        Resource.Template.List.Method -> sessions[sId].respondTo(Resource.Template.List, request, resourceTemplates::list)
+                        Resource.Template.List.Method -> sessions[sId].respondTo(
+                            Resource.Template.List,
+                            request,
+                            resources::listTemplates
+                        )
+
                         Resource.List.Method -> sessions[sId].respondTo(Resource.List, request, resources::list)
                         Resource.Read.Method -> sessions[sId].respondTo(Resource.Read, request, resources::read)
 
