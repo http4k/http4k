@@ -1,15 +1,11 @@
 package org.http4k.mcp
 
 import dev.forkhandles.values.random
-import org.http4k.connect.mcp.Cancelled
 import org.http4k.connect.mcp.ClientRequest
-import org.http4k.connect.mcp.Completetion
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
-import org.http4k.connect.mcp.Logging
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.Ping
-import org.http4k.connect.mcp.Progress
 import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.Resource
@@ -20,20 +16,27 @@ import org.http4k.connect.mcp.ServerResponse.Empty
 import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
+import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.format.jsonRpcRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.routing.RoutingSseHandler
+import org.http4k.routing.poly
+import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
-import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
-import org.http4k.sse.SseResponse
+import org.http4k.routing.bind as hbind
 
 fun McpHandler(
     implementation: Implementation,
@@ -42,91 +45,61 @@ fun McpHandler(
     tools: Tools,
     resources: Resources,
     prompts: Prompts
-): RoutingSseHandler {
+): PolyHandler {
     val serDe = Serde(McpJson)
 
     val roots = Roots(emptyList())
 
     val sessions = mutableMapOf<SessionId, Unit>()
-    fun complete(req: Completetion.Request): Completetion.Response {
-        TODO()
-    }
 
-    fun ping(input: Ping.Request) = Empty
-
-    fun initialize(req: Initialize.Request) =
+    fun initialize() =
         Initialize.Response(capabilities, implementation, protocolVersion)
 
-    return sse(
-        "/sse" bind {
-            SseResponse {
-                val newSessionId = SessionId.random()
+    return poly(
+        "/sse" bind sse {
+            val newSessionId = SessionId.random()
 
-                sessions[newSessionId] = Unit
+            sessions[newSessionId] = Unit
 
-                it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
-                it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion), McpJson.number(0)))
-            }
+            it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
+            it.send(serDe(initialize(), McpJson.number(0)))
         },
-        "/message" bind {
-            SseResponse(ACCEPTED) {
-                val rpcRequest = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)
+        routes(
+            "/message" hbind POST to { req: Request ->
+                val request = Body.jsonRpcRequest(McpJson).toLens()(req)
+                val sessionId = SessionId.parse(req.query("sessionId")!!)
+                System.err.println(request)
+                when (McpRpcMethod.of(request.method)) {
+                    Initialize.Method -> serDe.message(request, { _: Any -> initialize() })
+                    Initialize.Notification.Method -> serDe.message(request, { _: Any -> Empty })
 
-                System.err.println(rpcRequest)
+                    Ping.Method -> serDe.message(request, { _: Any -> Empty })
+                    Prompt.Get.Method -> serDe.message(request, prompts::get)
+                    Prompt.List.Method -> serDe.message(request, prompts::list)
 
-                when (McpRpcMethod.of(rpcRequest.method)) {
-                    Initialize.Method -> it.respondTo(serDe, rpcRequest, ::initialize)
-                    Initialize.Notification.Method -> it.respondTo(
-                        serDe,
-                        rpcRequest,
-                        { _: Initialize.Notification.Request -> Empty })
+                    Resource.List.Method -> serDe.message(request, resources::list)
+                    Resource.Read.Method -> serDe.message(request, resources::read)
+                    Resource.Subscribe.Method -> serDe.message(request, resources::subscribe)
+                    Resource.Unsubscribe.Method -> serDe.message(request, resources::unsubscribe)
 
-                    Ping.Method -> it.respondTo(serDe, rpcRequest, ::ping)
-                    Cancelled.Notification.Method -> it.respondTo(
-                        serDe,
-                        rpcRequest,
-                        { _: Cancelled.Notification.Request -> Empty })
+                    Root.List.Method -> serDe.message(request, roots::list)
+                    Root.Notification.Method -> serDe.message(request, { _: Any -> Empty })
+                    Tool.Call.Method -> serDe.message(request, tools::call)
+                    Tool.List.Method -> serDe.message(request, tools::list)
 
-                    Completetion.Method -> it.respondTo(serDe, rpcRequest, ::complete)
-                    Logging.SetLevel.Method -> it.respondTo(serDe, rpcRequest, resources::list)
-                    Progress.Notification.Method -> it.respondTo(
-                        serDe,
-                        rpcRequest,
-                        { _: Progress.Notification.Request -> Empty })
-
-                    Prompt.Get.Method -> it.respondTo(serDe, rpcRequest, prompts::get)
-                    Prompt.List.Method -> it.respondTo(serDe, rpcRequest, prompts::list)
-
-                    Resource.List.Method -> it.respondTo(serDe, rpcRequest, resources::list)
-                    Resource.Read.Method -> it.respondTo(serDe, rpcRequest, resources::read)
-                    Resource.Subscribe.Method -> it.respondTo(serDe, rpcRequest, resources::subscribe)
-                    Resource.Unsubscribe.Method -> it.respondTo(serDe, rpcRequest, resources::unsubscribe)
-
-                    Root.List.Method -> it.respondTo(serDe, rpcRequest, roots::list)
-                    Root.Notification.Method -> it.respondTo(
-                        serDe,
-                        rpcRequest,
-                        { _: Root.Notification.Request -> Empty })
-
-                    Tool.Call.Method -> it.respondTo(serDe, rpcRequest, tools::call)
-                    Tool.List.Method -> it.respondTo(serDe, rpcRequest, tools::list)
-
-                    else -> it.send(serDe(MethodNotFound, rpcRequest.id))
+                    else -> Response(NOT_IMPLEMENTED)
                 }
-
-                it.close()
             }
-        }
+        )
     )
 }
 
 private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any>
-    Sse.respondTo(serDe: Serde<NODE>, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) {
-    runCatching { serDe<IN>(req) }
-        .onFailure { send(serDe(InvalidRequest, req.id)) }
+    Serde<NODE>.message(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT): Response {
+    runCatching { this<IN>(req) }
+        .onFailure { return Response(BAD_REQUEST).body(this(InvalidRequest, req.id).toMessage()) }
         .map { fn(it) }
-        .onSuccess { send(serDe(it, req.id)) }
-        .onFailure { send(serDe(InternalError, req.id)) }
+        .map { return Response(ACCEPTED).body(this(it, req.id).toMessage()) }
+        .recover { return Response(SERVICE_UNAVAILABLE).body(this(InternalError, req.id).toMessage()) }
+    return Response(INTERNAL_SERVER_ERROR)
 }
-
-
