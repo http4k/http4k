@@ -1,29 +1,22 @@
 package org.http4k.mcp
 
 import org.http4k.connect.mcp.Prompt
-import org.http4k.connect.mcp.Role
+import org.http4k.connect.mcp.Prompt.Get
 
-class Prompts(private val bindings: List<PromptBinding>) {
-    fun get(req: Prompt.Get.Request): Prompt.Get.Response {
-        return Prompt.Get.Response(
-            listOf(
-                Prompt.Message(
-                    Role.assistant,
-                    Prompt.Content.Text("hello" + req.name + req.arguments.toString())
-                )
-            )
-        )
+class Prompts(bindings: List<PromptBinding>) {
+    private val prompts = bindings.toMutableList()
+
+    fun add(binding: PromptBinding) {
+        prompts += binding
     }
 
-    fun list(req: Prompt.List.Request) =
-        Prompt.List.Response(
-            listOf(
-                Prompt("1", "2"),
-                Prompt("12", "222", listOf(
-                    Prompt.Argument("p1", "d1", true),
-                    Prompt.Argument("p2", "d2", false)
-                )),
-            )
-        )
+    fun get(req: Get.Request): Get.Response = prompts
+        .find { it.name == req.name }
+        ?.let { Get.Response(it.toMessages(req.arguments)) }
+        ?: error("no prompt")
+
+    fun list(req: Prompt.List.Request) = Prompt.List.Response(
+        prompts.map(PromptBinding::toPrompt)
+    )
 }
 
