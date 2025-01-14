@@ -20,7 +20,7 @@ import org.http4k.connect.mcp.ServerResponse.Empty
 import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.format.jsonRpcRequest
@@ -58,19 +58,19 @@ fun McpHandler(
         Initialize.Response(capabilities, implementation, protocolVersion)
 
     return sse(
-        "/sse" bind sse {
-            val newSessionId = SessionId.random()
+        "/sse" bind {
+            SseResponse {
+                val newSessionId = SessionId.random()
 
-            sessions[newSessionId] = Unit
+                sessions[newSessionId] = Unit
 
-            it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
-            it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion)))
+                it.send(Event("endpoint", Uri.of("/message").query("sessionId", newSessionId.toString()).toString()))
+                it.send(serDe(Initialize.Response(capabilities, implementation, protocolVersion), null))
+            }
         },
         "/message" bind {
-            SseResponse(Status.ACCEPTED) {
+            SseResponse(ACCEPTED) {
                 val rpcRequest = Body.jsonRpcRequest(McpJson).toLens()(it.connectRequest)
-
-                println(rpcRequest)
 
                 when (McpRpcMethod.of(rpcRequest.method)) {
                     Initialize.Method -> it.respondTo(serDe, rpcRequest, ::initialize)
@@ -109,7 +109,7 @@ fun McpHandler(
                     Tool.Call.Method -> it.respondTo(serDe, rpcRequest, tools::call)
                     Tool.List.Method -> it.respondTo(serDe, rpcRequest, tools::list)
 
-                    else -> it.send(serDe(MethodNotFound))
+                    else -> it.send(serDe(MethodNotFound, rpcRequest.id))
                 }
             }
         }
@@ -119,8 +119,9 @@ fun McpHandler(
 private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any>
     Sse.respondTo(serDe: Serde<NODE>, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) {
     runCatching { serDe<IN>(req) }
-        .onFailure { send(serDe(InvalidRequest)) }
+        .onFailure { send(serDe(InvalidRequest, req.id)) }
         .map { fn(it) }
-        .onSuccess { send(serDe(it)) }
-        .onFailure { send(serDe(InternalError)) }
+        .onSuccess { send(serDe(it, req.id)) }
+        .onFailure { send(serDe(InternalError, req.id)) }
 }
+
