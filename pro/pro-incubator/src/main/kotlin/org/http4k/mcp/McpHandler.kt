@@ -1,5 +1,6 @@
 package org.http4k.mcp
 
+import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.Cancelled
 import org.http4k.connect.mcp.ClientMessage
@@ -31,16 +32,17 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.filter.debug
 import org.http4k.format.jsonRpcRequest
+import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
-import java.util.UUID
 import org.http4k.routing.bind as httpBind
 
 fun McpHandler(
@@ -59,6 +61,7 @@ fun McpHandler(
     fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
 
     val sessions = mutableMapOf<SessionId, Sse>()
+    val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
         "/sse" bind sse {
@@ -81,52 +84,68 @@ fun McpHandler(
         }.debug(),
         routes(
             "/message" httpBind POST to { req: Request ->
-                val request = Body.jsonRpcRequest(McpJson).toLens()(req)
                 val sId = SessionId.parse(req.query("sessionId")!!)
+
                 System.err.println(req.bodyString())
 
-                when (McpRpcMethod.of(request.method)) {
-                    Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
+                val request = Body.jsonRpcRequest(McpJson).toLens()(req)
 
-                    Completion.Method -> sessions[sId].respondTo(serDe, request, completions::complete)
+                if (request.valid()) {
+                    when (McpRpcMethod.of(request.method)) {
+                        Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
 
-                    Ping.Method -> sessions[sId].notify(serDe, Empty, request.id)
-                    Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
-                    Prompt.List.Method -> sessions[sId].respondTo(serDe, request, prompts::list)
+                        Completion.Method -> sessions[sId].respondTo(serDe, request, completions::complete)
 
-                    Resource.List.Method -> sessions[sId].respondTo(serDe, request, resources::list)
-                    Resource.Read.Method -> sessions[sId].respondTo(serDe, request, resources::read)
+                        Ping.Method -> sessions[sId].notify(serDe, Empty, request.id)
+                        Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
+                        Prompt.List.Method -> sessions[sId].respondTo(serDe, request, prompts::list)
 
-                    Resource.Subscribe.Method -> {
-                        resources.subscribe(serDe(request))
-                        Response(ACCEPTED)
+                        Resource.List.Method -> sessions[sId].respondTo(serDe, request, resources::list)
+                        Resource.Read.Method -> sessions[sId].respondTo(serDe, request, resources::read)
+
+                        Resource.Subscribe.Method -> {
+                            resources.subscribe(serDe(request))
+                            Response(ACCEPTED)
+                        }
+
+                        Resource.Unsubscribe.Method -> {
+                            resources.unsubscribe(serDe(request))
+                            Response(ACCEPTED)
+                        }
+
+                        Initialize.Notification.Method -> Response(ACCEPTED)
+                        Cancelled.Notification.Method -> Response(ACCEPTED)
+
+                        Root.Notification.Method -> {
+                            val messageId = MessageId.random()
+                            calls[messageId] = { roots.update(serDe(it)) }
+                            sessions[sId].request(
+                                serDe,
+                                Root.List,
+                                Root.List.Request(),
+                                McpJson.asJsonObject(messageId)
+                            )
+                        }
+
+                        Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
+                        Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
+
+                        else -> Response(NOT_IMPLEMENTED)
                     }
+                } else {
+                    val result = Body.jsonRpcResult(McpJson).toLens()(req)
 
-                    Resource.Unsubscribe.Method -> {
-                        resources.unsubscribe(serDe(request))
-                        Response(ACCEPTED)
+                    with(McpJson) {
+                        val messageId = asA<MessageId>(asFormatString(result.id ?: nullNode()))
+                        try {
+                            calls[messageId]?.invoke(result)
+                        } finally {
+                            calls -= messageId
+                        }
                     }
-
-                    Root.List.Method -> {
-                        roots.update(serDe(request))
-                        Response(ACCEPTED)
-                    }
-
-                    Initialize.Notification.Method -> Response(ACCEPTED)
-                    Cancelled.Notification.Method -> Response(ACCEPTED)
-
-                    Root.Notification.Method -> sessions[sId].request(
-                        serDe,
-                        Root.List,
-                        Root.List.Request(),
-                        McpJson.string(UUID.randomUUID().toString())
-                    )
-
-                    Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
-                    Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
-
-                    else -> Response(NOT_IMPLEMENTED)
+                    Response(ACCEPTED)
                 }
+
             }
         )
     )

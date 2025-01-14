@@ -14,6 +14,7 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
+import org.http4k.mcp.MessageId
 import org.http4k.mcp.MimeType
 import org.http4k.mcp.SessionId
 
@@ -25,6 +26,7 @@ object McpJson : ConfigurableJackson(
         .value(IntelligencePriority)
         .value(MaxTokens)
         .value(McpRpcMethod)
+        .value(MessageId)
         .value(MimeType)
         .value(ProtocolVersion)
         .value(SessionId)
