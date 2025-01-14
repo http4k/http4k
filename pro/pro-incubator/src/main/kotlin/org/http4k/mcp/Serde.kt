@@ -22,6 +22,6 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
     }
 
     operator fun invoke(errorMessage: ErrorMessage, id: NODE?) = with(json) {
-        SseMessage.Event("message", compact(renderError(errorMessage, id)), asFormatString(id ?: nullNode()))
+        SseMessage.Event("message", compact(renderError(errorMessage, id)), id?.let(::asFormatString))
     }
 }

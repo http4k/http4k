@@ -71,17 +71,11 @@ fun McpHandler(
 
                 when (McpRpcMethod.of(request.method)) {
                     Initialize.Method -> sessions[sId].respondTo(serDe, request, ::initialise)
-                    Initialize.Notification.Method -> sessions[sId].respondTo(
-                        serDe,
-                        request,
-                        { _: Initialize.Notification -> Empty })
+                    Initialize.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
 
-                    Cancelled.Notification.Method -> sessions[sId].respondTo(
-                        serDe,
-                        request,
-                        { _: Cancelled.Notification -> Empty })
+                    Cancelled.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
 
-                    Ping.Method -> sessions[sId].respondTo(serDe, request) { _: Ping.Request -> Empty }
+                    Ping.Method -> sessions[sId].notify(serDe, Empty, request.id)
                     Prompt.Get.Method -> sessions[sId].respondTo(serDe, request, prompts::get)
                     Prompt.List.Method -> sessions[sId].respondTo(serDe, request, prompts::list)
 
@@ -91,11 +85,7 @@ fun McpHandler(
                     Resource.Unsubscribe.Method -> sessions[sId].respondTo(serDe, request, resources::unsubscribe)
 
                     Root.List.Method -> sessions[sId].respondTo(serDe, request, roots::list)
-                    Root.Notification.Method -> sessions[sId].respondTo(
-                        serDe,
-                        request,
-                        { _: Root.Notification -> Empty })
-
+                    Root.Notification.Method -> sessions[sId].notify(serDe, Empty, request.id)
                     Tool.Call.Method -> sessions[sId].respondTo(serDe, request, tools::call)
                     Tool.List.Method -> sessions[sId].respondTo(serDe, request, tools::list)
 
@@ -104,7 +94,14 @@ fun McpHandler(
             }
         ).debug()
     )
+}
 
+private fun <NODE : Any> Sse?.notify(serDe: Serde<NODE>, resp: ServerResponse, id: NODE?= null): Response {
+    when (this) {
+        null -> Unit
+        else -> send(serDe(resp, id))
+    }
+    return Response(ACCEPTED)
 }
 
 private inline fun <reified IN : ClientRequest, OUT : ServerResponse, NODE : Any>
