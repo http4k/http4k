@@ -26,11 +26,13 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
     operator fun invoke(method: HasMethod, input: ServerMessage, id: NODE?) = with(json) {
         Event(
             "message",
-            when(input) {
-                is Request -> compact(renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode()))
-                is Response -> compact(renderResult(asJsonObject(input), id ?: json.nullNode()))
-                is Notification -> compact(renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode()))
-            }
+            compact(
+                when (input) {
+                    is Request -> renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode())
+                    is Response -> renderResult(asJsonObject(input), id ?: json.nullNode())
+                    is Notification -> renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode())
+                }
+            )
         )
     }
 
