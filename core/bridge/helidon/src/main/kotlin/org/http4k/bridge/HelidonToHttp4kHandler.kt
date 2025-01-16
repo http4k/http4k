@@ -30,7 +30,7 @@ fun HelidonToHttp4kHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req
     req.toHttp4k()
         ?.let {
             when {
-                sse != null -> {
+                sse != null && it.isEventStream() -> {
                     val http4kResponse = sse(it)
                     when {
                         http4kResponse.handled -> http4kResponse.writeInto(it, res)
