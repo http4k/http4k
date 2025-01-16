@@ -18,8 +18,8 @@ fun main() {
         PromptBinding("prompt1", "description1"),
         PromptBinding("prompt2", "description1"),
         ResourceBinding(Uri.of("https://http4k.org")),
-        ToolBinding("reverse", "description", Reverse("name")) { listOf() },
-        ToolBinding("count", "description", Multiply(1, 2)) { listOf() },
+        ToolBinding("reverse", "description", Reverse("name")) { listOf(Content.Text(it.input.reversed())) },
+        ToolBinding("count", "description", Multiply(1, 2)) { listOf(Content.Text(it.first + it.second)) },
         ResourceTemplateBinding(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 

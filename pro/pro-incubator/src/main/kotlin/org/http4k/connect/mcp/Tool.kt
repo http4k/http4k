@@ -1,10 +1,9 @@
 package org.http4k.connect.mcp
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
 
-data class Tool(val name: String, val description: String, val inputSchema: JsonNode) {
+data class Tool(val name: String, val description: String, val inputSchema: Map<String, Any>) {
     object List : HasMethod {
         override val Method = of("tools/list")
 

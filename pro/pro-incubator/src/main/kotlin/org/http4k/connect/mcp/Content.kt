@@ -7,6 +7,7 @@ sealed interface Content {
     val type: String
 
     data class Text(val text: String) : Content {
+        constructor(value: Any) : this(value.toString())
         override val type = "text"
     }
 
