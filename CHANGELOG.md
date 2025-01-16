@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v5.45.2.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+
 ### v5.45.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-server-undertow*** : [Fix #1259] POST requests have empty body with Undertow if an SSE handler is registered
