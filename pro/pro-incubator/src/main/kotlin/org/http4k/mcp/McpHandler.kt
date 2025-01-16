@@ -42,12 +42,12 @@ fun McpHandler(
     implementation: Implementation,
     protocolVersion: ProtocolVersion,
     capabilities: ServerCapabilities,
+    completions: Completions,
+    roots: Roots,
     tools: Tools,
     resources: Resources,
     resourceTemplates: ResourceTemplates,
     prompts: Prompts,
-    roots: Roots,
-    completions: Completions,
     random: Random = Random
 ): PolyHandler {
     val json = McpJson

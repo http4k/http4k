@@ -16,18 +16,14 @@ import org.http4k.mcp.Roots
 import org.http4k.mcp.ToolBinding
 import org.http4k.mcp.Tools
 
-fun mcp(
-    implementation: Implementation,
-    protocolVersion: ProtocolVersion,
-    vararg bindings: McpBinding
-) = McpHandler(
+fun mcp(implementation: Implementation, protocolVersion: ProtocolVersion, vararg bindings: McpBinding) = McpHandler(
     implementation,
     protocolVersion,
     ServerCapabilities(),
+    Completions(),
+    Roots(),
     Tools(bindings.filterIsInstance<ToolBinding<*>>()),
     Resources(bindings.filterIsInstance<ResourceBinding>()),
     ResourceTemplates(bindings.filterIsInstance<ResourceTemplateBinding>()),
-    Prompts(bindings.filterIsInstance<PromptBinding>()),
-    Roots(),
-    Completions()
+    Prompts(bindings.filterIsInstance<PromptBinding>())
 )
