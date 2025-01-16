@@ -7,6 +7,7 @@ import org.http4k.connect.mcp.ServerMessage.Request
 import org.http4k.connect.mcp.ServerMessage.Response
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.renderError
+import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
@@ -30,7 +31,7 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
                 when (input) {
                     is Request -> renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode())
                     is Response -> renderResult(asJsonObject(input), id ?: json.nullNode())
-                    is Notification -> renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode())
+                    is Notification -> renderNotification(input.method.value)
                 }
             )
         )

@@ -24,7 +24,12 @@ class Sessions<NODE : Any>(
 
         val session = Session(sessionId, serDe, sse)
         sessions[sessionId] = session
-        prompts.onChange(sessionId) { session.send(Prompt.List, Prompt.List.Notification) }
+        prompts.onChange(sessionId) {
+            session.send(
+                Prompt.List,
+                Prompt.List.Notification
+            )
+        }
         resources.onChange(sessionId) { session.send(Resource.List, Resource.List.Notification) }
         tools.onChange(sessionId) { session.send(Tool.List, Tool.List.Notification) }
 

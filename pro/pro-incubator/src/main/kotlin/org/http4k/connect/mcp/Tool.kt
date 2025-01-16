@@ -3,7 +3,7 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
 
-data class Tool(val name: String, val description: String, val inputSchema: Map<String, Any>) {
+data class Tool(val name: String, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
     object List : HasMethod {
         override val Method = of("tools/list")
 
