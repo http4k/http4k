@@ -28,6 +28,7 @@ rootDir.walkTopDown()
     .filterNot { dir -> dir == rootDir || exclusions.any { dir.absolutePath.contains(it) } }
     .forEach {
         val moduleName = it.relativeTo(rootDir).path
+            .replace(File.separatorChar, '/')
             .removePrefix("core/") // remove core ecosystem modules as they have no prefix to add
             .removePrefix("enterprise/") // remove enterprise ecosystem modules as they have no prefix to add
             .replace('/', '-')
