@@ -1,10 +1,10 @@
 package org.http4k.routing
 
-import org.http4k.connect.mcp.protocol.McpPrompt
 import org.http4k.core.Request
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.protocol.McpPrompt
 
 class RoutedPrompt(val prompt: Prompt, val handler: PromptHandler) : McpRouting {
     fun toPrompt() = McpPrompt(

@@ -1,8 +1,8 @@
 package org.http4k.mcp.server
 
-import org.http4k.connect.mcp.protocol.McpPrompt
-import org.http4k.connect.mcp.protocol.McpPrompt.Get
 import org.http4k.core.Request
+import org.http4k.mcp.protocol.McpPrompt
+import org.http4k.mcp.protocol.McpPrompt.Get
 import org.http4k.routing.RoutedPrompt
 import org.http4k.util.ObservableList
 

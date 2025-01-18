@@ -1,10 +1,10 @@
 package org.http4k.mcp
 
-import org.http4k.connect.mcp.protocol.HasMeta.Companion.default
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.protocol.HasMeta.Companion.default
 
 typealias ToolHandler<Input> = (ToolRequest<Input>) -> ToolResponse
 

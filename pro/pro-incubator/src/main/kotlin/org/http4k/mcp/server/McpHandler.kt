@@ -2,22 +2,6 @@ package org.http4k.mcp.server
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
-import org.http4k.connect.mcp.protocol.Cancelled
-import org.http4k.connect.mcp.protocol.ClientMessage
-import org.http4k.connect.mcp.protocol.Implementation
-import org.http4k.connect.mcp.protocol.McpCompletion
-import org.http4k.connect.mcp.protocol.McpInitialize
-import org.http4k.connect.mcp.protocol.McpPing
-import org.http4k.connect.mcp.protocol.McpPrompt
-import org.http4k.connect.mcp.protocol.McpResource
-import org.http4k.connect.mcp.protocol.McpRoot
-import org.http4k.connect.mcp.protocol.McpRpcMethod
-import org.http4k.connect.mcp.protocol.McpTool
-import org.http4k.connect.mcp.protocol.ProtocolVersion
-import org.http4k.connect.mcp.protocol.ServerCapabilities
-import org.http4k.connect.mcp.protocol.ServerMessage
-import org.http4k.connect.mcp.protocol.ServerMessage.Response.Empty
-import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -30,9 +14,24 @@ import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.mcp.MessageId
 import org.http4k.mcp.Serde
 import org.http4k.mcp.SessionId
+import org.http4k.mcp.protocol.Cancelled
+import org.http4k.mcp.protocol.ClientMessage
+import org.http4k.mcp.protocol.Implementation
+import org.http4k.mcp.protocol.McpInitialize
+import org.http4k.mcp.protocol.McpPing
+import org.http4k.mcp.protocol.McpPrompt
+import org.http4k.mcp.protocol.McpResource
+import org.http4k.mcp.protocol.McpRoot
+import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.protocol.MessageId
+import org.http4k.mcp.protocol.ProtocolVersion
+import org.http4k.mcp.protocol.ServerCapabilities
+import org.http4k.mcp.protocol.ServerMessage
+import org.http4k.mcp.protocol.ServerMessage.Response.Empty
+import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
@@ -75,7 +74,7 @@ fun McpHandler(
                     when (McpRpcMethod.of(jsonReq.method)) {
                         McpInitialize.Method -> sessions[sId].respondTo(jsonReq, ::initialise)
 
-                        McpCompletion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
+                        _root_ide_package_.org.http4k.mcp.protocol.McpCompletion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
 
                         McpPing.Method -> sessions[sId].respondTo(jsonReq) { _: McpPing.Request -> Empty }
                         McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq) { call: McpPrompt.Get.Request ->

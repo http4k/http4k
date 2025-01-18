@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.protocol
 
 import dev.forkhandles.values.UUIDValue
 import dev.forkhandles.values.UUIDValueFactory

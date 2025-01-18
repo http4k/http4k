@@ -1,9 +1,5 @@
 package org.http4k.mcp
 
-import org.http4k.connect.mcp.protocol.HasMethod
-import org.http4k.connect.mcp.protocol.ServerMessage.Notification
-import org.http4k.connect.mcp.protocol.ServerMessage.Request
-import org.http4k.connect.mcp.protocol.ServerMessage.Response
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.renderError
 import org.http4k.format.renderNotification
@@ -12,6 +8,10 @@ import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.protocol.HasMethod
+import org.http4k.mcp.protocol.ServerMessage.Notification
+import org.http4k.mcp.protocol.ServerMessage.Request
+import org.http4k.mcp.protocol.ServerMessage.Response
 import org.http4k.sse.SseMessage.Event
 
 class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {

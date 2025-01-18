@@ -1,10 +1,10 @@
-package org.http4k.connect.mcp.protocol
+package org.http4k.mcp.protocol
 
-import org.http4k.connect.mcp.protocol.HasMeta.Companion.default
-import org.http4k.connect.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.protocol.HasMeta.Companion.default
+import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 
 data class McpTool(val name: String, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
     object List : HasMethod {

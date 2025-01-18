@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp
+package org.http4k.mcp.model
 
 import dev.forkhandles.values.Validation
 import dev.forkhandles.values.and

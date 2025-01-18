@@ -1,7 +1,6 @@
 package org.http4k.mcp.model
 
 import org.http4k.connect.model.Base64Blob
-import org.http4k.mcp.MimeType
 
 sealed interface Content {
     val type: String

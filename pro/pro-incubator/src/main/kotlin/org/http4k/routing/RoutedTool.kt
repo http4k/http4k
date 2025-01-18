@@ -5,8 +5,6 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
-import org.http4k.connect.mcp.protocol.McpTool
-import org.http4k.connect.mcp.util.McpJson
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
@@ -17,6 +15,8 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.util.McpJson
 
 class RoutedTool<IN : Any>(
     val tool: Tool<IN>,

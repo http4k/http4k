@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.model
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue

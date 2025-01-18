@@ -1,8 +1,8 @@
 package org.http4k.mcp.server
 
-import org.http4k.connect.mcp.protocol.McpResource
 import org.http4k.core.Uri
 import org.http4k.mcp.SessionId
+import org.http4k.mcp.protocol.McpResource
 import org.http4k.routing.RoutedResource
 import org.http4k.util.ObservableList
 

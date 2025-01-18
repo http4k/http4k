@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp.protocol
+package org.http4k.mcp.protocol
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue

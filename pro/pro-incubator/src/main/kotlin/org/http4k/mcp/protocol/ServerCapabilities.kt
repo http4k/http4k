@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp.protocol
+package org.http4k.mcp.protocol
 
 data class ServerCapabilities(
     val tools: Tools = Tools(),

@@ -1,7 +1,7 @@
 package org.http4k.mcp.server
 
-import org.http4k.connect.mcp.protocol.McpTool
 import org.http4k.core.Request
+import org.http4k.mcp.protocol.McpTool
 import org.http4k.routing.RoutedTool
 import org.http4k.util.ObservableList
 

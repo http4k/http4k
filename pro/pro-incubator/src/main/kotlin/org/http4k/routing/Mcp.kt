@@ -1,12 +1,12 @@
 package org.http4k.routing
 
-import org.http4k.connect.mcp.protocol.Implementation
-import org.http4k.connect.mcp.protocol.ProtocolVersion
-import org.http4k.connect.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.protocol.Implementation
+import org.http4k.mcp.protocol.ProtocolVersion
+import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.server.McpCompletions
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.McpPrompts

@@ -2,7 +2,7 @@ package org.http4k.routing
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Uri
-import org.http4k.mcp.MimeType
+import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
 
 class RoutedResource(val uri: Uri) : McpRouting {

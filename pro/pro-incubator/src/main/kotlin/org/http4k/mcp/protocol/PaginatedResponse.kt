@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp.protocol
+package org.http4k.mcp.protocol
 
 import org.http4k.mcp.model.Cursor
 

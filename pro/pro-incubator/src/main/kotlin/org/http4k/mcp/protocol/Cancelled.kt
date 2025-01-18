@@ -1,7 +1,7 @@
-package org.http4k.connect.mcp.protocol
+package org.http4k.mcp.protocol
 
-import org.http4k.connect.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.protocol.HasMeta.Companion.default
 
 data class Cancelled(
     val requestId: String,
