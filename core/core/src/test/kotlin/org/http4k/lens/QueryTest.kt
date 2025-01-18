@@ -106,7 +106,7 @@ class QueryTest {
     }
 
     @Test
-    fun `required custom type with null value`() {
+    fun `required string lens with null value`() {
         val nonMapped = Query.required("bob")
 
         val request = Request(GET, "/foo")
@@ -116,6 +116,20 @@ class QueryTest {
 
         assertThat({ nonMapped(request) }, throws<LensFailure>())
         assertThat(nonMapped(requestWithNullQueryValue), present(equalTo("")))
+    }
+
+    @Test
+    fun `required lens with no value`() {
+        val noValue = Query.noValue().required("bob")
+        val multiNoValue = Query.noValue().multi.required("bob")
+
+        assertThat({ noValue(Request(GET, "/foo")) }, throws<LensFailure>())
+        assertThat(noValue(Request(GET, "/foo?bob")), equalTo(Unit))
+
+        assertThat(Request(GET, "/foo?bob").with(noValue of Unit).uri.toString(), equalTo("/foo?bob"))
+
+        assertThat(Request(GET, "/foo?bob").with(multiNoValue of listOf(Unit, Unit)).uri.toString(), equalTo("/foo?bob&bob"))
+        assertThat(multiNoValue(Request(GET, "/foo?bob&bob")), equalTo(listOf(Unit, Unit)))
     }
 
     @Test
