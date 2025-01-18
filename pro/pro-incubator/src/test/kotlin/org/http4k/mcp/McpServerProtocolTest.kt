@@ -28,6 +28,7 @@ import org.http4k.mcp.model.Root
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
+import org.http4k.mcp.protocol.McpNotification
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpRequest
 import org.http4k.mcp.protocol.McpResource
@@ -121,14 +122,10 @@ class McpServerProtocolTest {
     @Test
     fun `deal with static resources`() {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description")
-        val element = Resource.Content.Blob(Base64Blob.encode("image"), Uri.of("asd"))
-        val mcp = McpHandler(metadata, resources = Resources(
-            listOf(
-                resource bind {
-                    ResourceResponse(listOf(element))
-                }
-            )
-        ), random = Random(0)).debug()
+        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
+
+        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val mcp = McpHandler(metadata, resources = resources, random = Random(0)).debug()
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -139,7 +136,15 @@ class McpServerProtocolTest {
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
 
-            assertNextMessage(McpResource.Read.Response(listOf(element)))
+            assertNextMessage(McpResource.Read.Response(listOf(content)))
+
+            mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
+
+            resources.triggerUpdated(resource.uri)
+
+            assertNextMessage(McpResource.Updated(resource.uri))
+
+
         }
     }
 
@@ -167,6 +172,10 @@ class McpServerProtocolTest {
 
     private fun TestSseClient.assertNextMessage(input: McpResponse) {
         assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
+    }
+
+    private fun TestSseClient.assertNextMessage(notification: McpNotification) {
+        assertNextMessage(with(McpJson) { renderNotification(notification) })
     }
 
     private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest, id: Any) {
@@ -198,9 +207,9 @@ class McpServerProtocolTest {
         })
     }
 
-    private fun PolyHandler.sendToMcp(hasMethod: HasMethod) {
+    private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Notification) {
         sendToMcp(with(McpJson) {
-            compact(renderNotification(hasMethod.Method.value))
+            compact(renderNotification(hasMethod))
         })
     }
 

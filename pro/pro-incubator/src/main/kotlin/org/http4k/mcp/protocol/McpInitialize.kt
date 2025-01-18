@@ -23,7 +23,7 @@ object McpInitialize : HasMethod {
         override val _meta: Map<String, Any> = default,
     ) : HasMeta, ServerMessage.Response
 
-    object Initialized : ClientMessage.Request, HasMethod {
+    object Initialized : ClientMessage.Notification, HasMethod {
         override val Method = of("notifications/initialized")
     }
 }

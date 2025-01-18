@@ -32,7 +32,7 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
     }
 
     operator fun invoke(input: Notification) = with(json) {
-        Event("message", compact(renderNotification(input.method.value)))
+        Event("message", compact(renderNotification(input)))
     }
 
     operator fun invoke(errorMessage: ErrorMessage, id: NODE?) = with(json) {
