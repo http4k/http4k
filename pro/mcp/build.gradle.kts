@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Http4kCommercial
 
-description = "http4k Pro Incubator code"
+description = "http4k MCP server support"
 
 val license by project.extra { Http4kCommercial }
 
