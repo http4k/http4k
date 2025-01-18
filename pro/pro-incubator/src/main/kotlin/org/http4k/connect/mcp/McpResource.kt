@@ -1,6 +1,8 @@
 package org.http4k.connect.mcp
 
+import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
+import org.http4k.connect.mcp.model.Cursor
 import org.http4k.connect.mcp.model.Meta
 import org.http4k.core.Uri
 import org.http4k.mcp.MimeType
@@ -13,12 +15,12 @@ object McpResource {
 
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = HasMeta.default
+            override val _meta: Meta = default
         ) : ClientMessage.Request, HasMeta
 
         class Response(
             val contents: kotlin.collections.List<Resource.Content>,
-            override val _meta: Meta = HasMeta.default
+            override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
     }
 
@@ -27,13 +29,13 @@ object McpResource {
 
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = HasMeta.default
+            override val _meta: Meta = default
         ) : PaginatedRequest, HasMeta
 
         class Response(
             val resources: kotlin.collections.List<Resource>,
             override val nextCursor: Cursor? = null,
-            override val _meta: Meta = HasMeta.default
+            override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
         data object Changed : ServerMessage.Notification {
@@ -41,7 +43,7 @@ object McpResource {
         }
     }
 
-    data class Updated(val uri: Uri, override val _meta: Meta = HasMeta.default) : ServerMessage.Notification,
+    data class Updated(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
         HasMeta {
         override val method = Method
 
@@ -55,7 +57,7 @@ object McpResource {
 
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = HasMeta.default
+            override val _meta: Meta = default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -64,7 +66,7 @@ object McpResource {
 
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = HasMeta.default
+            override val _meta: Meta = default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -79,13 +81,13 @@ object McpResource {
 
             data class Request(
                 override val cursor: Cursor?,
-                override val _meta: Meta = HasMeta.default
+                override val _meta: Meta = default
             ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 
             class Response(
                 val resourceTemplates: kotlin.collections.List<Template>,
                 override val nextCursor: Cursor? = null,
-                override val _meta: Meta = HasMeta.default
+                override val _meta: Meta = default
             ) : ServerMessage.Response, PaginatedResponse, HasMeta
         }
     }
