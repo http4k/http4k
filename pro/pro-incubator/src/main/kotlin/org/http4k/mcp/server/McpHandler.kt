@@ -18,6 +18,7 @@ import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
+import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.protocol.Cancelled
 import org.http4k.mcp.protocol.ClientMessage
@@ -28,6 +29,7 @@ import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ServerMessage
@@ -49,6 +51,7 @@ fun McpHandler(
     tools: Tools,
     resources: Resources,
     completions: Completions,
+    sampling: Sampling,
     roots: Roots,
     random: Random = Random
 ): PolyHandler {
@@ -109,7 +112,7 @@ fun McpHandler(
                         McpInitialize.Initialized.Method -> Response(ACCEPTED)
                         Cancelled.Method -> Response(ACCEPTED)
 
-//                        McpSampling.Method -> sessions[sId].respondTo(jsonReq, req, samples::create)
+                        McpSampling.Method -> sessions[sId].respondTo(jsonReq, req, sampling::sample)
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }

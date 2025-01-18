@@ -15,6 +15,6 @@ class Tools(list: List<ToolFeatureBinding<*>>) : ObservableList<ToolFeatureBindi
     fun call(req: McpTool.Call.Request, http: Request) =
         items
             .find { it.toTool().name == req.name }
-            ?.invoke(req.arguments, http)
+            ?.call(req, http)
             ?: error("no tool")
 }

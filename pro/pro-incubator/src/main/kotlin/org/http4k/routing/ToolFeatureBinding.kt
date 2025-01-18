@@ -25,8 +25,8 @@ class ToolFeatureBinding<IN : Any>(
 
     fun toTool() = McpTool(tool.name, tool.description, McpJson.convert(schema.asSchema(tool.example)))
 
-    operator fun invoke(arguments: Map<String, Any>, connectRequest: Request) = resultFrom {
-        with(McpJson) { ToolRequest(asA(asFormatString(arguments), tool.example::class), connectRequest) }
+    fun call(mcp: McpTool.Call.Request, http: Request) = resultFrom {
+        with(McpJson) { ToolRequest(asA(asFormatString(mcp.arguments), tool.example::class), http) }
     }
         .mapFailure { Error(InvalidParams) }
         .flatMap { resultFrom { handler(it) }.mapFailure { Error(InternalError) } }

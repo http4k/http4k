@@ -37,7 +37,7 @@ class Resources(list: List<ResourceFeatureBinding>) : ObservableList<ResourceFea
 
     fun read(req: McpResource.Read.Request, http: Request) = items
         .find { it.toResource().matches(req.uri) }
-        ?.read(req.uri, http)
+        ?.read(req, http)
         ?: error("no resource")
 
     fun subscribe(sessionId: SessionId, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit) {

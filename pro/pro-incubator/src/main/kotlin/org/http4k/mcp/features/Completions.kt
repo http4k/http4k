@@ -5,8 +5,8 @@ import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.routing.CompletionFeatureBinding
 
 class Completions(private val bindings: List<CompletionFeatureBinding>) : McpFeature {
-    fun complete(req: McpCompletion.Request, http: Request) =
-        bindings.find { it.ref == req.ref }
-            ?.complete(req.ref, req.argument, http)
+    fun complete(mcp: McpCompletion.Request, http: Request) =
+        bindings.find { it.toReference() == mcp.ref }
+            ?.complete(mcp, http)
             ?: error("no completion")
 }

@@ -4,8 +4,11 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.ModelName
 import org.http4k.mcp.model.ModelPreferences
 import org.http4k.mcp.model.Role
+import org.http4k.mcp.model.SamplingIncludeContext
+import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
 
 object McpSampling : HasMethod {
@@ -15,20 +18,19 @@ object McpSampling : HasMethod {
         val messages: List<Message>,
         val maxTokens: MaxTokens,
         val systemPrompt: String? = null,
-        val includeContext: IncludeContext? = null,
+        val includeContext: SamplingIncludeContext? = null,
         val temperature: Temperature? = null,
         val stopSequences: List<String>? = null,
         val modelPreferences: ModelPreferences? = null,
         val metadata: Map<String, Any> = emptyMap(),
         override val _meta: Meta = HasMeta.default
-    ) : ServerMessage.Request, HasMeta {
-        enum class IncludeContext { none, thisServer, allServers }
-    }
+    ) : ServerMessage.Request, ClientMessage.Request, HasMeta
 
     data class Response(
-        val model: String,
-        val stopReason: String,
+        val model: ModelName,
+        val stopReason: StopReason,
         val role: Role,
         val content: Content
-    ) : ClientMessage.Response
+    ) : ServerMessage.Response, ClientMessage.Response
 }
+
