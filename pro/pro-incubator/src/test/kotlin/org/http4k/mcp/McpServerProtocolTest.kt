@@ -15,11 +15,17 @@ import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Roots
+import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
+import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpRequest
 import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
@@ -30,6 +36,7 @@ import org.http4k.mcp.server.McpEntity
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
 import org.http4k.mcp.util.McpJson
+import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.TestSseClient
@@ -53,7 +60,7 @@ class McpServerProtocolTest {
     }
 
     @Test
-    fun `performs update roots`() {
+    fun `update roots`() {
         val roots = Roots()
 
         val mcp = McpHandler(metadata, roots = roots, random = Random(0)).debug()
@@ -70,6 +77,40 @@ class McpServerProtocolTest {
             mcp.sendToMcp(McpRoot.List.Response(newRoots), "a8baf924-2fcc-7be7-020b-7f533060e8ef")
 
             assertThat(roots.toList(), equalTo(newRoots))
+        }
+    }
+
+    @Test
+    fun `deal with prompts`() {
+        val prompt = Prompt("prompt", "description", listOf(Prompt.Argument("name", "description", true)))
+        val mcp = McpHandler(metadata, prompts = Prompts(
+            listOf(
+                prompt bind {
+                    PromptResponse(
+                        "description",
+                        listOf(
+                            Message(Role.assistant, Content.Text(it.input["name"]!!.reversed()))
+                        )
+                    )
+                }
+            )
+        ), random = Random(0)).debug()
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpPrompt.List, McpPrompt.List.Request())
+
+            assertNextMessage(McpPrompt.List.Response(listOf(prompt)))
+
+            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(prompt.name, mapOf("name" to "value")))
+
+            assertNextMessage(
+                McpPrompt.Get.Response(
+                    listOf(Message(Role.assistant, Content.Text("eulav"))),
+                    "description"
+                )
+            )
         }
     }
 
