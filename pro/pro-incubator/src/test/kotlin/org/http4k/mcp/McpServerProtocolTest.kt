@@ -3,9 +3,19 @@ package org.http4k.mcp
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
+import org.http4k.filter.debug
+import org.http4k.format.renderRequest
+import org.http4k.hamkrest.hasStatus
+import org.http4k.mcp.protocol.McpInitialize
+import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.ClientCapabilities
 import org.http4k.mcp.server.McpEntity
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
@@ -24,8 +34,8 @@ class McpServerProtocolTest {
     private val metadata = ServerMetaData(McpEntity("server", Version.of("1")))
 
     @Test
-    fun `reports endpoint on startup`() {
-        val mcp = McpHandler(metadata, random = Random(0))
+    fun `performs init loop on startup`() {
+        val mcp = McpHandler(metadata, random = Random(0)).debug()
 
         val client = mcp.testSseClient(Request(GET, "/sse"))
         assertThat(client.status, equalTo(OK))
@@ -33,8 +43,34 @@ class McpServerProtocolTest {
         val events = client.received()
 
         assertThat(
-            events.first(),
+            events.take(1).first(),
             equalTo(SseMessage.Event("endpoint", "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e"))
+        )
+
+        mcp.sendToMcp(
+            McpInitialize.Method, McpInitialize.Request(
+                McpEntity("server", Version.of("1")),
+                ClientCapabilities(), `2024-10-07`
+            )
+        )
+
+//        assertThat(
+//            events.take(1).first(),
+//            equalTo(SseMessage.Event("endpoint", "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e"))
+//        )
+    }
+
+    private fun PolyHandler.sendToMcp(method: McpRpcMethod, input: McpInitialize.Request) {
+        assertThat(
+            http!!(
+                Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
+                    .body(
+                        with(McpJson) {
+                            compact(renderRequest(method.value, asJsonObject(input), number(1)))
+                        }
+                    )
+
+            ), hasStatus(ACCEPTED)
         )
     }
 
