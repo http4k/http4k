@@ -7,13 +7,14 @@ import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.server.SessionId
 import org.http4k.routing.ResourceFeatureBinding
 import org.http4k.util.ObservableList
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Handles protocol traffic for resources features and subscriptions.
  */
 class Resources(list: List<ResourceFeatureBinding>) : ObservableList<ResourceFeatureBinding>(list), McpFeature {
 
-    private val subscriptions = mutableMapOf<Pair<Uri, SessionId>, Set<(Uri) -> Unit>>()
+    private val subscriptions = ConcurrentHashMap<Pair<Uri, SessionId>, Set<(Uri) -> Unit>>()
 
     /**
      * Trigger all subscriptions for the given URI as it has been updated.
@@ -44,6 +45,11 @@ class Resources(list: List<ResourceFeatureBinding>) : ObservableList<ResourceFea
         subscriptions.getOrPut(req.uri to sessionId, ::emptySet).let {
             subscriptions[req.uri to sessionId] = it + fn
         }
+    }
+
+    override fun remove(sessionId: SessionId) {
+        super.remove(sessionId)
+        subscriptions.keys.removeIf { it.second == sessionId }
     }
 
     fun unsubscribe(sessionId: SessionId, req: McpResource.Unsubscribe.Request) {

@@ -15,6 +15,7 @@ import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.features.Completions
+import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
@@ -24,6 +25,7 @@ import org.http4k.mcp.protocol.Cancelled
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.mcp.protocol.McpInitialize
+import org.http4k.mcp.protocol.McpLogging
 import org.http4k.mcp.protocol.McpPing
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpResource
@@ -53,6 +55,7 @@ fun McpHandler(
     completions: Completions,
     sampling: Sampling,
     roots: Roots,
+    logger: Logger,
     random: Random = Random
 ): PolyHandler {
     val json = McpJson
@@ -62,7 +65,7 @@ fun McpHandler(
     fun initialise(req: McpInitialize.Request, http: Request) =
         McpInitialize.Response(metaData.capabilities, metaData.entity, metaData.protocolVersion)
 
-    val sessions = ClientSessions(serDe, tools, resources, prompts, random)
+    val sessions = ClientSessions(serDe, tools, resources, prompts, logger, random)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
@@ -101,6 +104,11 @@ fun McpHandler(
                             resources.subscribe(sId, subscribeRequest) {
                                 sessions[sId]?.send(McpResource.Updated(subscribeRequest.uri))
                             }
+                            Response(ACCEPTED)
+                        }
+
+                        McpLogging.SetLevel.Method -> {
+                            logger.setLevel(sId, serDe<McpLogging.SetLevel.Request>(jsonReq).level)
                             Response(ACCEPTED)
                         }
 

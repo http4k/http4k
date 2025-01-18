@@ -3,9 +3,12 @@ package org.http4k.mcp.server
 import dev.forkhandles.values.random
 import org.http4k.core.Uri
 import org.http4k.core.query
+import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.model.LogLevel.error
+import org.http4k.mcp.protocol.McpLogging
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.McpTool
@@ -19,6 +22,7 @@ class ClientSessions<NODE : Any>(
     private val tools: Tools,
     private val resources: Resources,
     private val prompts: Prompts,
+    private val logger: Logger,
     private val random: Random
 ) {
     private val sessions = ConcurrentHashMap<SessionId, ClientSession<NODE>>()
@@ -28,6 +32,9 @@ class ClientSessions<NODE : Any>(
 
         val session = ClientSession(sessionId, serDe, sse)
         sessions[sessionId] = session
+        logger.subscribe(sessionId, error) { level, logger, data ->
+            session.send(McpLogging.LoggingMessage(level, logger, data))
+        }
         prompts.onChange(sessionId) { session.send(McpPrompt.List.Changed) }
         resources.onChange(sessionId) { session.send(McpResource.List.Changed) }
         tools.onChange(sessionId) { session.send(McpTool.List.Changed) }
@@ -36,8 +43,9 @@ class ClientSessions<NODE : Any>(
             prompts.remove(sessionId)
             resources.remove(sessionId)
             tools.remove(sessionId)
-
             sessions.remove(sessionId)
+
+            logger.unsubscribe(sessionId)
         }
         sse.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
     }

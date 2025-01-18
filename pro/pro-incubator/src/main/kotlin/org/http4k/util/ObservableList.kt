@@ -12,7 +12,7 @@ abstract class ObservableList<T>(initial: List<T>) : Iterable<T> {
         callbacks[sessionId] = handler
     }
 
-    fun remove(sessionId: SessionId) {
+    open fun remove(sessionId: SessionId) {
         callbacks.remove(sessionId)
     }
 

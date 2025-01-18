@@ -1,30 +1,28 @@
 package org.http4k.mcp.protocol
 
+import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 
 object McpLogging {
-    enum class Level {
-        debug, info, notice, warning, error, critical, alert, emergency;
-    }
-
     object SetLevel : HasMethod {
         override val Method = McpRpcMethod.of("logging/set_level")
 
-        data class Request(val level: Level, override val _meta: Meta = default) :
+        data class Request(val level: LogLevel, override val _meta: Meta = default) :
             ClientMessage.Request,
             HasMeta
     }
 
-    object LoggingMessage : HasMethod {
-        override val Method = McpRpcMethod.of("notifications/message")
+    data class LoggingMessage(
+        val level: LogLevel,
+        val logger: String? = null,
+        val data: Map<String, Any> = emptyMap(),
+        override val _meta: Meta = default
+    ) : ServerMessage.Notification, HasMeta {
+        override val method = Method
 
-        data class Response(
-            val level: Level,
-            val logger: String? = null,
-            val data: Map<String, Any> = emptyMap(),
-            override val _meta: Meta = default
-        ) : ServerMessage.Response, HasMeta
+        companion object : HasMethod {
+            override val Method = McpRpcMethod.of("notifications/message")
+        }
     }
-
 }
