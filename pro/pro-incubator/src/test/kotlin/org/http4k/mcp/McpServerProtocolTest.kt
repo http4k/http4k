@@ -169,55 +169,55 @@ class McpServerProtocolTest {
 
         mcp.sendToMcp(McpInitialize.Initialized)
     }
+}
 
-    private fun TestSseClient.assertNextMessage(input: McpResponse) {
-        assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
-    }
+private fun TestSseClient.assertNextMessage(input: McpResponse) {
+    assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
+}
 
-    private fun TestSseClient.assertNextMessage(notification: McpNotification) {
-        assertNextMessage(with(McpJson) { renderNotification(notification) })
-    }
+private fun TestSseClient.assertNextMessage(notification: McpNotification) {
+    assertNextMessage(with(McpJson) { renderNotification(notification) })
+}
 
-    private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest, id: Any) {
-        assertNextMessage(with(McpJson) {
-            renderRequest(
-                hasMethod.Method.value,
-                asJsonObject(input),
-                asJsonObject(id)
-            )
-        })
-    }
-
-    private fun TestSseClient.assertNextMessage(node: JsonNode) {
-        assertThat(
-            received().first(),
-            equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))
+private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest, id: Any) {
+    assertNextMessage(with(McpJson) {
+        renderRequest(
+            hasMethod.Method.value,
+            asJsonObject(input),
+            asJsonObject(id)
         )
-    }
+    })
+}
 
-    private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Request) {
-        sendToMcp(with(McpJson) {
-            compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
-        })
-    }
+private fun TestSseClient.assertNextMessage(node: JsonNode) {
+    assertThat(
+        received().first(),
+        equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))
+    )
+}
 
-    private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
-        sendToMcp(with(McpJson) {
-            compact(renderResult(asJsonObject(hasMethod), asJsonObject(id)))
-        })
-    }
+private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Request) {
+    sendToMcp(with(McpJson) {
+        compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
+    })
+}
 
-    private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Notification) {
-        sendToMcp(with(McpJson) {
-            compact(renderNotification(hasMethod))
-        })
-    }
+private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
+    sendToMcp(with(McpJson) {
+        compact(renderResult(asJsonObject(hasMethod), asJsonObject(id)))
+    })
+}
 
-    private fun PolyHandler.sendToMcp(body: String) {
-        assertThat(
-            http!!(
-                Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e").body(body)
-            ), hasStatus(ACCEPTED)
-        )
-    }
+private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Notification) {
+    sendToMcp(with(McpJson) {
+        compact(renderNotification(hasMethod))
+    })
+}
+
+private fun PolyHandler.sendToMcp(body: String) {
+    assertThat(
+        http!!(
+            Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e").body(body)
+        ), hasStatus(ACCEPTED)
+    )
 }
