@@ -2,7 +2,7 @@ package org.http4k.mcp.features
 
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.protocol.McpRoot
-import org.http4k.util.ObservableList
+import org.http4k.mcp.util.ObservableList
 
 /**
  * Handles protocol traffic for client provided roots.

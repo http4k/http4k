@@ -10,7 +10,7 @@ import org.http4k.mcp.model.CostPriority
 import org.http4k.mcp.model.IntelligencePriority
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.MimeType
-import org.http4k.mcp.model.ModelName
+import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
@@ -30,7 +30,7 @@ object McpJson : ConfigurableJackson(
         .value(McpRpcMethod)
         .value(MessageId)
         .value(MimeType)
-        .value(ModelName)
+        .value(ModelIdentifier)
         .value(ProtocolVersion)
         .value(SessionId)
         .value(SpeedPriority)

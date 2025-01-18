@@ -4,7 +4,7 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.ModelName
+import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelPreferences
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
@@ -27,7 +27,7 @@ object McpSampling : HasMethod {
     ) : ServerMessage.Request, ClientMessage.Request, HasMeta
 
     data class Response(
-        val model: ModelName,
+        val model: ModelIdentifier,
         val stopReason: StopReason,
         val role: Role,
         val content: Content

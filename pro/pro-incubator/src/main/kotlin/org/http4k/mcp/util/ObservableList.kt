@@ -1,4 +1,4 @@
-package org.http4k.util
+package org.http4k.mcp.util
 
 import org.http4k.mcp.server.SessionId
 import kotlin.properties.Delegates

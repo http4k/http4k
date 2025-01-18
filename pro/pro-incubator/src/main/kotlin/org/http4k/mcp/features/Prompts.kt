@@ -3,8 +3,8 @@ package org.http4k.mcp.features
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpPrompt.Get
+import org.http4k.mcp.util.ObservableList
 import org.http4k.routing.PromptFeatureBinding
-import org.http4k.util.ObservableList
 
 /**
  * Handles protocol traffic for prompts features.

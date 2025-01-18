@@ -4,7 +4,7 @@ import org.http4k.core.Request
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
-import org.http4k.mcp.model.ModelName
+import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelPreferences
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
@@ -29,7 +29,7 @@ data class SampleRequest(
 )
 
 data class SampleResponse(
-    val model: ModelName,
+    val model: ModelIdentifier,
     val stopReason: StopReason,
     val role: Role,
     val content: Content

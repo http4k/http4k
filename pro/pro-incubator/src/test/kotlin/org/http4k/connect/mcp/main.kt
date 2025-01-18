@@ -8,7 +8,7 @@ import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
-import org.http4k.mcp.model.ModelName
+import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
@@ -38,8 +38,8 @@ fun main() {
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
 }
 
-private fun llm() = ModelSelector(ModelName.of("my model")) { 1 } bind {
-    SampleResponse(ModelName.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
+private fun llm() = ModelSelector(ModelIdentifier.of("my model")) { 1 } bind {
+    SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
 }
 
 private fun countingTool() = Tool("count", "description", Multiply(1, 2)) bind {

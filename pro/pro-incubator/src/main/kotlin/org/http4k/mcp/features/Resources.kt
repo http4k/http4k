@@ -5,8 +5,8 @@ import org.http4k.core.Uri
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.server.SessionId
+import org.http4k.mcp.util.ObservableList
 import org.http4k.routing.ResourceFeatureBinding
-import org.http4k.util.ObservableList
 import java.util.concurrent.ConcurrentHashMap
 
 /**

@@ -2,8 +2,8 @@ package org.http4k.mcp.features
 
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.util.ObservableList
 import org.http4k.routing.ToolFeatureBinding
-import org.http4k.util.ObservableList
 
 /**
  * Handles protocol traffic for server provided tools.
