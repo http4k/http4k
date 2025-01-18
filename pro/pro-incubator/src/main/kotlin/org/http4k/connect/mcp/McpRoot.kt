@@ -1,6 +1,7 @@
 package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.model.Meta
+import org.http4k.connect.mcp.model.Root
 
 object McpRoot {
     object List : HasMethod {

@@ -2,6 +2,7 @@ package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.model.Meta
+import org.http4k.connect.mcp.model.Reference
 
 data class Completion(val values: List<String>, val total: Int? = null, val hasMore: Boolean? = null) {
 
