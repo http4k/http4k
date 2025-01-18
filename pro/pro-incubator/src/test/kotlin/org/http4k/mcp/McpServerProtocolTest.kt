@@ -3,6 +3,7 @@ package org.http4k.mcp
 import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.connect.model.Base64Blob
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -16,10 +17,12 @@ import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
 import org.http4k.mcp.features.Prompts
+import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.protocol.ClientMessage
@@ -27,6 +30,7 @@ import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpRequest
+import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
@@ -111,6 +115,31 @@ class McpServerProtocolTest {
                     "description"
                 )
             )
+        }
+    }
+
+    @Test
+    fun `deal with static resources`() {
+        val resource = Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description")
+        val element = Resource.Content.Blob(Base64Blob.encode("image"), Uri.of("asd"))
+        val mcp = McpHandler(metadata, resources = Resources(
+            listOf(
+                resource bind {
+                    ResourceResponse(listOf(element))
+                }
+            )
+        ), random = Random(0)).debug()
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
+
+            assertNextMessage(McpResource.List.Response(listOf(resource)))
+
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
+
+            assertNextMessage(McpResource.Read.Response(listOf(element)))
         }
     }
 
