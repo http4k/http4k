@@ -74,7 +74,7 @@ object McpResource {
             override val Method = of("resources/templates/list")
 
             data class Request(
-                override val cursor: Cursor?,
+                override val cursor: Cursor? = null,
                 override val _meta: Meta = default
             ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 

@@ -47,6 +47,7 @@ import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.random.Random
 
@@ -144,7 +145,36 @@ class McpServerProtocolTest {
 
             assertNextMessage(McpResource.Updated(resource.uri))
 
+            mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
 
+            resources.triggerUpdated(resource.uri)
+
+            assertThrows<NoSuchElementException> { received().first() }
+        }
+    }
+
+    @Test
+    fun `deal with templated resources`() {
+        val resource = Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), "HTTP4K", "description")
+        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
+
+        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val mcp = McpHandler(metadata, resources = resources, random = Random(0)).debug()
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
+
+            assertNextMessage(McpResource.List.Response(listOf()))
+
+            mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
+
+            assertNextMessage(McpResource.Template.List.Response(listOf(resource)))
+
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
+
+            assertNextMessage(McpResource.Read.Response(listOf(content)))
         }
     }
 
