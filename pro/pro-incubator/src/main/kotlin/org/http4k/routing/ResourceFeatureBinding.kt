@@ -7,7 +7,7 @@ import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.McpResource
 
-class RoutedResource(private val resource: Resource, val handler: ResourceHandler) : McpRouting {
+class ResourceFeatureBinding(private val resource: Resource, val handler: ResourceHandler) : FeatureBinding {
     fun toResource() = resource
 
     fun read(uri: Uri, http: Request) = handler(ResourceRequest(uri, http)).let {

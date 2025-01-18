@@ -6,6 +6,9 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 
+/**
+ * A tool handler invokes a tool with an input and returns a response
+ */
 typealias ToolHandler<Input> = (ToolRequest<Input>) -> ToolResponse
 
 data class ToolRequest<Input>(val input: Input, val connectRequest: Request)

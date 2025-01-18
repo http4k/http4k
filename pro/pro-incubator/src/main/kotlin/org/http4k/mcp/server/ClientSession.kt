@@ -10,7 +10,7 @@ import org.http4k.mcp.protocol.ServerMessage.Notification
 import org.http4k.mcp.protocol.ServerMessage.Response
 import org.http4k.sse.Sse
 
-class Session<NODE : Any>(
+class ClientSession<NODE : Any>(
     val id: SessionId,
     val serDe: Serde<NODE>,
     val sse: Sse

@@ -1,11 +1,14 @@
-package org.http4k.mcp.server
+package org.http4k.mcp.features
 
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.McpTool
-import org.http4k.routing.RoutedTool
+import org.http4k.routing.ToolFeatureBinding
 import org.http4k.util.ObservableList
 
-class McpTools(list: List<RoutedTool<*>>) : ObservableList<RoutedTool<*>>(list) {
+/**
+ * Handles protocol traffic for server provided tools.
+ */
+class Tools(list: List<ToolFeatureBinding<*>>) : ObservableList<ToolFeatureBinding<*>>(list), McpFeature {
 
     fun list(req: McpTool.List.Request, http: Request) = McpTool.List.Response(items.map { it.toTool() })
 

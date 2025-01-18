@@ -1,14 +1,14 @@
 package org.http4k.mcp.protocol
 
 data class ServerCapabilities(
-    val tools: Tools = Tools(),
-    val prompts: Prompts = Prompts(),
-    val resources: Resources = Resources(),
-    val experimental: Unit = Unit,
-    val logging: Unit = Unit,
-    val sampling: Unit = Unit,
+    val tools: ToolCapabilities = ToolCapabilities(),
+    val prompts: PromptCapabilities = PromptCapabilities(),
+    val resources: ResourceCapabilities = ResourceCapabilities(),
+    val experimental: Unit? = null,
+    val logging: Unit? = null,
+    val sampling: Unit? = null,
 ) {
-    data class Tools(val listChanged: Boolean? = true)
-    data class Prompts(val listChanged: Boolean = true)
-    data class Resources(val subscribe: Boolean? = true, val listChanged: Boolean? = true)
+    data class ToolCapabilities(val listChanged: Boolean? = true)
+    data class PromptCapabilities(val listChanged: Boolean = true)
+    data class ResourceCapabilities(val subscribe: Boolean? = true, val listChanged: Boolean? = true)
 }

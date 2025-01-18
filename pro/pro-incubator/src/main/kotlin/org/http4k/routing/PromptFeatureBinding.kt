@@ -6,7 +6,7 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.McpPrompt
 
-class RoutedPrompt(val prompt: Prompt, val handler: PromptHandler) : McpRouting {
+class PromptFeatureBinding(val prompt: Prompt, val handler: PromptHandler) : FeatureBinding {
     fun toPrompt() = prompt
 
     operator fun invoke(arguments: Map<String, String>, connectRequest: Request) =

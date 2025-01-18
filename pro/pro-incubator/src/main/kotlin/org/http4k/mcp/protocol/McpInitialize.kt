@@ -8,14 +8,14 @@ object McpInitialize : HasMethod {
     override val Method = McpRpcMethod.of("initialize")
 
     data class Request(
-        val clientInfo: Implementation,
-        val capabilities: org.http4k.mcp.protocol.ClientCapabilites = org.http4k.mcp.protocol.ClientCapabilites(),
+        val clientInfo: McpEntity,
+        val capabilities: org.http4k.mcp.protocol.ClientCapabilities = org.http4k.mcp.protocol.ClientCapabilities(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION
     ) : ClientMessage.Request
 
     data class Response(
         val capabilities: ServerCapabilities = ServerCapabilities(),
-        val serverInfo: Implementation,
+        val serverInfo: McpEntity,
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
         override val _meta: Map<String, Any> = default,
     ) : HasMeta, ServerMessage.Response

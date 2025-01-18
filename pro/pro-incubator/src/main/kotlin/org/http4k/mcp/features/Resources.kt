@@ -1,16 +1,23 @@
-package org.http4k.mcp.server
+package org.http4k.mcp.features
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.McpResource
-import org.http4k.routing.RoutedResource
+import org.http4k.mcp.server.SessionId
+import org.http4k.routing.ResourceFeatureBinding
 import org.http4k.util.ObservableList
 
-class McpResources(list: List<RoutedResource>) : ObservableList<RoutedResource>(list) {
+/**
+ * Handles protocol traffic for resources features and subscriptions.
+ */
+class Resources(list: List<ResourceFeatureBinding>) : ObservableList<ResourceFeatureBinding>(list), McpFeature {
 
     private val subscriptions = mutableMapOf<Pair<Uri, SessionId>, Set<(Uri) -> Unit>>()
 
+    /**
+     * Trigger all subscriptions for the given URI as it has been updated.
+     */
     fun triggerUpdated(uri: Uri) {
         subscriptions.filterKeys { it.first == uri }.forEach { (uri, _), callbacks ->
             callbacks.forEach { it(uri) }
@@ -24,7 +31,7 @@ class McpResources(list: List<RoutedResource>) : ObservableList<RoutedResource>(
     )
 
     fun listTemplates(req: McpResource.Template.List.Request, http: Request) = McpResource.Template.List.Response(
-        items.map(RoutedResource::toResource)
+        items.map(ResourceFeatureBinding::toResource)
             .filterIsInstance<Resource.Templated>()
     )
 

@@ -18,10 +18,10 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.util.McpJson
 
-class RoutedTool<IN : Any>(
+class ToolFeatureBinding<IN : Any>(
     private val tool: Tool<IN>,
     private val handler: ToolHandler<IN>,
-) : McpRouting {
+) : FeatureBinding {
 
     fun toTool() = McpTool(tool.name, tool.description, McpJson.convert(schema.asSchema(tool.example)))
 

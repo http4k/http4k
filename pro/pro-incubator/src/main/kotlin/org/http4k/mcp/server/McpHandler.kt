@@ -14,9 +14,12 @@ import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.features.Prompts
+import org.http4k.mcp.features.Resources
+import org.http4k.mcp.features.Roots
+import org.http4k.mcp.features.Tools
 import org.http4k.mcp.protocol.Cancelled
 import org.http4k.mcp.protocol.ClientMessage
-import org.http4k.mcp.protocol.Implementation
 import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.mcp.protocol.McpInitialize
 import org.http4k.mcp.protocol.McpPing
@@ -26,8 +29,6 @@ import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.protocol.MessageId
-import org.http4k.mcp.protocol.ProtocolVersion
-import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
@@ -38,24 +39,26 @@ import org.http4k.routing.sse.bind
 import kotlin.random.Random
 import org.http4k.routing.bind as httpBind
 
+/**
+ * This is the main entry point for the MCP server. It handles the various MCP messages on both HTTP and SSE.
+ */
 fun McpHandler(
-    implementation: Implementation,
-    protocolVersion: ProtocolVersion,
-    capabilities: ServerCapabilities,
+    metaData: ServerMetaData,
+    prompts: Prompts,
+    tools: Tools,
+    resources: Resources,
+    roots: Roots,
     completions: McpCompletions,
-    roots: McpRoots,
-    tools: McpTools,
-    resources: McpResources,
-    prompts: McpPrompts,
     random: Random = Random
 ): PolyHandler {
     val json = McpJson
 
     val serDe = Serde(json)
 
-    fun initialise(req: McpInitialize.Request, http: Request) = McpInitialize.Response(capabilities, implementation, protocolVersion)
+    fun initialise(req: McpInitialize.Request, http: Request) =
+        McpInitialize.Response(metaData.capabilities, metaData.entity, metaData.protocolVersion)
 
-    val sessions = Sessions(serDe, tools, resources, prompts, random)
+    val sessions = ClientSessions(serDe, tools, resources, prompts, random)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
@@ -70,16 +73,24 @@ fun McpHandler(
 
                 if (jsonReq.valid()) {
                     when (McpRpcMethod.of(jsonReq.method)) {
-                        McpInitialize.Method -> sessions[sId].respondTo(jsonReq, req,  ::initialise)
+                        McpInitialize.Method -> sessions[sId].respondTo(jsonReq, req, ::initialise)
 
                         McpCompletion.Method -> sessions[sId].respondTo(jsonReq, req, completions::complete)
 
-                        McpPing.Method -> sessions[sId].respondTo(jsonReq, req) { _: McpPing.Request, _: Request -> Empty }
+                        McpPing.Method -> sessions[sId].respondTo(
+                            jsonReq,
+                            req
+                        ) { _: McpPing.Request, _: Request -> Empty }
+
                         McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq, req, prompts::get)
 
                         McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, req, prompts::list)
 
-                        McpResource.Template.List.Method -> sessions[sId].respondTo(jsonReq, req, resources::listTemplates)
+                        McpResource.Template.List.Method -> sessions[sId].respondTo(
+                            jsonReq,
+                            req,
+                            resources::listTemplates
+                        )
 
                         McpResource.List.Method -> sessions[sId].respondTo(jsonReq, req, resources::listResources)
                         McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, req, resources::read)
@@ -132,7 +143,7 @@ fun McpHandler(
 }
 
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-    Session<NODE>?.respondTo(req: JsonRpcRequest<NODE>, http: Request, fn: (IN, Request) -> OUT) =
+    ClientSession<NODE>?.respondTo(req: JsonRpcRequest<NODE>, http: Request, fn: (IN, Request) -> OUT) =
     when (this) {
         null -> Response(GONE)
         else -> {
