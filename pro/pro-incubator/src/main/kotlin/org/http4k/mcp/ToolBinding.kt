@@ -6,28 +6,16 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.connect.mcp.Content
-import org.http4k.connect.mcp.HasMeta.Companion.default
-import org.http4k.connect.mcp.Meta
 import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
-import org.http4k.mcp.ToolResponse.Error
-import org.http4k.mcp.ToolResponse.Ok
-
-typealias ToolHandler<Input> = (ToolRequest<Input>) -> ToolResponse
-
-data class ToolRequest<Input>(val input: Input, val connectRequest: Request)
-
-sealed interface ToolResponse {
-    val meta: Meta
-
-    data class Ok(val content: List<Content>, override val meta: Meta = default) : ToolResponse
-    data class Error(val error: ErrorMessage, override val meta: Meta = default) : ToolResponse
-}
+import org.http4k.mcp.tools.ToolHandler
+import org.http4k.mcp.tools.ToolRequest
+import org.http4k.mcp.tools.ToolResponse.Error
+import org.http4k.mcp.tools.ToolResponse.Ok
 
 class ToolBinding<IN : Any>(
     val name: String,

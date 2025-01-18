@@ -7,7 +7,7 @@ import org.http4k.mcp.PromptBinding
 import org.http4k.mcp.ResourceBinding
 import org.http4k.mcp.ResourceTemplateBinding
 import org.http4k.mcp.ToolBinding
-import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.tools.ToolResponse
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
