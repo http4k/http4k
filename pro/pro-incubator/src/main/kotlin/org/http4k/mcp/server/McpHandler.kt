@@ -82,7 +82,9 @@ fun McpHandler(
                     when (McpRpcMethod.of(jsonReq.method)) {
                         McpInitialize.Method -> sessions[sId].respondTo(jsonReq, req, ::initialise)
 
-                        McpCompletion.Method -> sessions[sId].respondTo(jsonReq, req, completions::complete)
+                        McpCompletion.Method -> {
+                            sessions[sId].respondTo(jsonReq, req, completions::complete)
+                        }
 
                         McpPing.Method -> sessions[sId].respondTo(jsonReq, req) { _: McpPing.Request, _: Request -> Empty }
 
