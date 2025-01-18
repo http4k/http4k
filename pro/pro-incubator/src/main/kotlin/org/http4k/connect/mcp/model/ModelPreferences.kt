@@ -1,4 +1,6 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.model
+
+import org.http4k.connect.mcp.SpeedPriority
 
 data class ModelPreferences(
     val hints: List<ModelHint>? = null,

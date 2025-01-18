@@ -5,7 +5,6 @@ import dev.forkhandles.values.random
 import org.http4k.connect.mcp.Cancelled
 import org.http4k.connect.mcp.ClientMessage
 import org.http4k.connect.mcp.Completion
-import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpPrompt
 import org.http4k.connect.mcp.McpResource
@@ -17,6 +16,7 @@ import org.http4k.connect.mcp.Root
 import org.http4k.connect.mcp.ServerCapabilities
 import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Response.Empty
+import org.http4k.connect.mcp.protocol.Implementation
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
 import org.http4k.core.Method.POST

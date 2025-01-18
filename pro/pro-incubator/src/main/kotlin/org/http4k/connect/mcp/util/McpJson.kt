@@ -2,14 +2,14 @@ package org.http4k.connect.mcp.util
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.http4k.connect.mcp.CostPriority
-import org.http4k.connect.mcp.IntelligencePriority
-import org.http4k.connect.mcp.MaxTokens
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.SpeedPriority
 import org.http4k.connect.mcp.Temperature
 import org.http4k.connect.mcp.Version
+import org.http4k.connect.mcp.model.CostPriority
+import org.http4k.connect.mcp.model.IntelligencePriority
+import org.http4k.connect.mcp.model.MaxTokens
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
