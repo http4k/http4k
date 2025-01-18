@@ -215,6 +215,10 @@ class McpServerProtocolTest {
             mcp.sendToMcp(McpTool.Call, McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar")))
 
             assertNextMessage(McpTool.Call.Response(listOf(content)))
+
+            tools.items = emptyList()
+
+            assertNextMessage(McpTool.List.Changed)
         }
     }
 
