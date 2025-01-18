@@ -8,6 +8,7 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 class Sessions<NODE : Any>(
@@ -17,7 +18,7 @@ class Sessions<NODE : Any>(
     private val prompts: Prompts,
     private val random: Random
 ) {
-    private val sessions = mutableMapOf<SessionId, Session<NODE>>()
+    private val sessions = ConcurrentHashMap<SessionId, Session<NODE>>()
 
     fun add(sse: Sse) {
         val sessionId = SessionId.random(random)
