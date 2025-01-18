@@ -2,6 +2,6 @@ package org.http4k.mcp
 
 import org.http4k.connect.mcp.Completion
 
-class Completions {
+class McpCompletions {
     fun complete(req: Completion.Request) = Completion.Response(Completion(listOf()))
 }

@@ -1,10 +1,11 @@
-package org.http4k.mcp
+package org.http4k.routing
 
 import org.http4k.connect.mcp.Resource
 import org.http4k.core.ContentType
 import org.http4k.core.Uri
+import org.http4k.mcp.MimeType
 
-class ResourceTemplateBinding(val uri: Uri) : McpBinding {
+class RoutedResourceTemplate(val uri: Uri) : McpRouting {
     fun toTemplate() = Resource.Template(
         uri,
         uri.host,

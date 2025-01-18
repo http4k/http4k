@@ -2,9 +2,10 @@ package org.http4k.mcp
 
 import org.http4k.connect.mcp.McpTool
 import org.http4k.core.Request
+import org.http4k.routing.RoutedTool
 import org.http4k.util.ObservableList
 
-class McpTools(list: List<RoutedToolBinding<*>>) : ObservableList<RoutedToolBinding<*>>(list) {
+class McpTools(list: List<RoutedTool<*>>) : ObservableList<RoutedTool<*>>(list) {
 
     fun list(req: McpTool.List.Request) = McpTool.List.Response(items.map { it.toTool() })
 

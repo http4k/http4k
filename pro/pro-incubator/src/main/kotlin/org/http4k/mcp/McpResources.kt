@@ -2,9 +2,10 @@ package org.http4k.mcp
 
 import org.http4k.connect.mcp.Resource
 import org.http4k.core.Uri
+import org.http4k.routing.RoutedResource
 import org.http4k.util.ObservableList
 
-class Resources(list: List<ResourceBinding>) : ObservableList<ResourceBinding>(list) {
+class McpResources(list: List<RoutedResource>) : ObservableList<RoutedResource>(list) {
 
     private val subscriptions = mutableMapOf<Pair<Uri, SessionId>, Set<(Uri) -> Unit>>()
 
@@ -15,7 +16,7 @@ class Resources(list: List<ResourceBinding>) : ObservableList<ResourceBinding>(l
     }
 
     fun list(req: Resource.List.Request) = Resource.List.Response(
-        items.map(ResourceBinding::toResource)
+        items.map(RoutedResource::toResource)
     )
 
     fun read(req: Resource.Read.Request) = items.find { it.uri == req.uri }

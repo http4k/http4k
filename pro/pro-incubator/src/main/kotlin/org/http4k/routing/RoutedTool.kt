@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.routing
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.result4k.flatMap
@@ -18,10 +18,10 @@ import org.http4k.mcp.tools.ToolRequest
 import org.http4k.mcp.tools.ToolResponse.Error
 import org.http4k.mcp.tools.ToolResponse.Ok
 
-class RoutedToolBinding<IN : Any>(
+class RoutedTool<IN : Any>(
     val tool: Tool<IN>,
     private val handler: ToolHandler<IN>,
-) : McpBinding {
+) : McpRouting {
 
     fun toTool() = McpTool(tool.name, tool.description, McpJson.convert(schema.asSchema(tool.example)))
 

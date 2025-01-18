@@ -1,10 +1,11 @@
-package org.http4k.mcp
+package org.http4k.routing
 
 import org.http4k.connect.mcp.Resource
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Uri
+import org.http4k.mcp.MimeType
 
-class ResourceBinding(val uri: Uri) : McpBinding {
+class RoutedResource(val uri: Uri) : McpRouting {
     fun toResource() = Resource(
         uri,
         uri.host,

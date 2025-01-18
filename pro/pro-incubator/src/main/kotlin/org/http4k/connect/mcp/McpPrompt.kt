@@ -3,7 +3,7 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
 
-data class Prompt(
+data class McpPrompt(
     val name: String,
     val description: String? = null,
     val arguments: kotlin.collections.List<Argument> = emptyList(),
@@ -38,7 +38,7 @@ data class Prompt(
         data class Request(override val _meta: Meta = default) : ClientMessage.Request, HasMeta
 
         data class Response(
-            val prompts: kotlin.collections.List<Prompt>,
+            val prompts: kotlin.collections.List<McpPrompt>,
             override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
 

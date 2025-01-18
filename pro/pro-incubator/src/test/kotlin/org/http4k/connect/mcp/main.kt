@@ -3,11 +3,11 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.core.Uri
 import org.http4k.filter.debug
-import org.http4k.mcp.PromptBinding
-import org.http4k.mcp.ResourceBinding
-import org.http4k.mcp.ResourceTemplateBinding
 import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolResponse
+import org.http4k.routing.RoutedPrompt
+import org.http4k.routing.RoutedResource
+import org.http4k.routing.RoutedResourceTemplate
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon
@@ -18,16 +18,16 @@ fun main() {
     val mcpServer = mcp(
         Implementation("mcp-kotlin test server", Version.of("0.1.0")),
         LATEST_VERSION,
-        PromptBinding("prompt1", "description1"),
-        PromptBinding("prompt2", "description1"),
-        ResourceBinding(Uri.of("https://http4k.org")),
+        RoutedPrompt("prompt1", "description1"),
+        RoutedPrompt("prompt2", "description1"),
+        RoutedResource(Uri.of("https://http4k.org")),
         Tool("reverse", "description", Reverse("name")) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))
         },
         Tool("count", "description", Multiply(1, 2)) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second)))
         },
-        ResourceTemplateBinding(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
+        RoutedResourceTemplate(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()

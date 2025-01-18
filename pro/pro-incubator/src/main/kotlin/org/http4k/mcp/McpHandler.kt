@@ -8,10 +8,10 @@ import org.http4k.connect.mcp.Completion
 import org.http4k.connect.mcp.HasMethod
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
+import org.http4k.connect.mcp.McpPrompt
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.McpTool
 import org.http4k.connect.mcp.Ping
-import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.ProtocolVersion
 import org.http4k.connect.mcp.Resource
 import org.http4k.connect.mcp.Root
@@ -42,12 +42,12 @@ fun McpHandler(
     implementation: Implementation,
     protocolVersion: ProtocolVersion,
     capabilities: ServerCapabilities,
-    completions: Completions,
-    roots: Roots,
+    completions: McpCompletions,
+    roots: McpRoots,
     tools: McpTools,
-    resources: Resources,
-    resourceTemplates: ResourceTemplates,
-    prompts: Prompts,
+    resources: McpResources,
+    resourceTemplates: McpResourceTemplates,
+    prompts: McpPrompts,
     random: Random = Random
 ): PolyHandler {
     val json = McpJson
@@ -76,8 +76,8 @@ fun McpHandler(
                         Completion.Method -> sessions[sId].respondTo(Completion, jsonReq, completions::complete)
 
                         Ping.Method -> sessions[sId].respondTo(Ping, jsonReq, { _: Ping.Request -> Empty })
-                        Prompt.Get.Method -> sessions[sId].respondTo(Prompt.Get, jsonReq, prompts::get)
-                        Prompt.List.Method -> sessions[sId].respondTo(Prompt.List, jsonReq, prompts::list)
+                        McpPrompt.Get.Method -> sessions[sId].respondTo(McpPrompt.Get, jsonReq, prompts::get)
+                        McpPrompt.List.Method -> sessions[sId].respondTo(McpPrompt.List, jsonReq, prompts::list)
 
                         Resource.Template.List.Method -> sessions[sId].respondTo(
                             Resource.Template.List,
