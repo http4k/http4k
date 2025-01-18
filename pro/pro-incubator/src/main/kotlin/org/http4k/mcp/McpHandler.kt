@@ -9,6 +9,7 @@ import org.http4k.connect.mcp.HasMethod
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpRpcMethod
+import org.http4k.connect.mcp.McpTool
 import org.http4k.connect.mcp.Ping
 import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.ProtocolVersion
@@ -17,7 +18,6 @@ import org.http4k.connect.mcp.Root
 import org.http4k.connect.mcp.ServerCapabilities
 import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Response.Empty
-import org.http4k.connect.mcp.Tool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
@@ -44,7 +44,7 @@ fun McpHandler(
     capabilities: ServerCapabilities,
     completions: Completions,
     roots: Roots,
-    tools: Tools,
+    tools: McpTools,
     resources: Resources,
     resourceTemplates: ResourceTemplates,
     prompts: Prompts,
@@ -109,11 +109,11 @@ fun McpHandler(
                             Response(ACCEPTED)
                         }
 
-                        Tool.Call.Method -> sessions[sId].respondTo(Tool.Call, jsonReq) { call: Tool.Call.Request ->
+                        McpTool.Call.Method -> sessions[sId].respondTo(McpTool.Call, jsonReq) { call: McpTool.Call.Request ->
                             tools.call(call, req)
                         }
 
-                        Tool.List.Method -> sessions[sId].respondTo(Tool.List, jsonReq, tools::list)
+                        McpTool.List.Method -> sessions[sId].respondTo(McpTool.List, jsonReq, tools::list)
 
                         else -> Response(NOT_IMPLEMENTED)
                     }

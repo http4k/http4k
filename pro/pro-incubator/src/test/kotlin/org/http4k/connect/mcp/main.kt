@@ -6,11 +6,13 @@ import org.http4k.filter.debug
 import org.http4k.mcp.PromptBinding
 import org.http4k.mcp.ResourceBinding
 import org.http4k.mcp.ResourceTemplateBinding
-import org.http4k.mcp.ToolBinding
+import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolResponse
+import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
+
 
 fun main() {
     val mcpServer = mcp(
@@ -19,16 +21,12 @@ fun main() {
         PromptBinding("prompt1", "description1"),
         PromptBinding("prompt2", "description1"),
         ResourceBinding(Uri.of("https://http4k.org")),
-        ToolBinding(
-            "reverse",
-            "description",
-            Reverse("name")
-        ) { ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed()))) },
-        ToolBinding(
-            "count",
-            "description",
-            Multiply(1, 2)
-        ) { ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second))) },
+        Tool("reverse", "description", Reverse("name")) bind {
+            ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))
+        },
+        Tool("count", "description", Multiply(1, 2)) bind {
+            ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second)))
+        },
         ResourceTemplateBinding(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 

@@ -1,9 +1,9 @@
 package org.http4k.mcp
 
 import dev.forkhandles.values.random
+import org.http4k.connect.mcp.McpTool
 import org.http4k.connect.mcp.Prompt
 import org.http4k.connect.mcp.Resource
-import org.http4k.connect.mcp.Tool
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.sse.Sse
@@ -13,7 +13,7 @@ import kotlin.random.Random
 
 class Sessions<NODE : Any>(
     private val serDe: Serde<NODE>,
-    private val tools: Tools,
+    private val tools: McpTools,
     private val resources: Resources,
     private val prompts: Prompts,
     private val random: Random
@@ -27,7 +27,7 @@ class Sessions<NODE : Any>(
         sessions[sessionId] = session
         prompts.onChange(sessionId) { session.send(Prompt.List.Changed) }
         resources.onChange(sessionId) { session.send(Resource.List.Changed) }
-        tools.onChange(sessionId) { session.send(Tool.List.Changed) }
+        tools.onChange(sessionId) { session.send(McpTool.List.Changed) }
 
         sse.onClose {
             prompts.remove(sessionId)

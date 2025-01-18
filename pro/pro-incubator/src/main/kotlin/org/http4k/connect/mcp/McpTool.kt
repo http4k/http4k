@@ -3,7 +3,7 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
 
-data class Tool(val name: String, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
+data class McpTool(val name: String, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
     object List : HasMethod {
         override val Method = of("tools/list")
 
@@ -13,7 +13,7 @@ data class Tool(val name: String, val description: String, val inputSchema: Map<
         ) : ClientMessage.Request, HasMeta, PaginatedRequest
 
         data class Response(
-            val tools: kotlin.collections.List<Tool>,
+            val tools: kotlin.collections.List<McpTool>,
             override val nextCursor: Cursor? = null,
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta

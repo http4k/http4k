@@ -1,0 +1,16 @@
+package org.http4k.mcp
+
+import org.http4k.connect.mcp.McpTool
+import org.http4k.core.Request
+import org.http4k.util.ObservableList
+
+class McpTools(list: List<RoutedToolBinding<*>>) : ObservableList<RoutedToolBinding<*>>(list) {
+
+    fun list(req: McpTool.List.Request) = McpTool.List.Response(items.map { it.toTool() })
+
+    fun call(req: McpTool.Call.Request, http: Request) =
+        items
+            .find { it.tool.name == req.name }
+            ?.invoke(req.arguments, http)
+            ?: error("no tool")
+}
