@@ -31,9 +31,7 @@ fun main() {
         },
         Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient()),
         Resource.Templated(Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"), "HTTP4K ecosystem page", "view ecosystem") bind LinksOnPage(JavaHttpClient()),
-        Tool("reverse", "description", Reverse("name")) bind {
-            ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))
-        },
+        Tool("reverse", "description", Reverse("name")) bind { ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed()))) },
         Tool("count", "description", Multiply(1, 2)) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second)))
         },
