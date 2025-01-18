@@ -46,7 +46,6 @@ fun McpHandler(
     roots: McpRoots,
     tools: McpTools,
     resources: McpResources,
-    resourceTemplates: McpResourceTemplates,
     prompts: McpPrompts,
     random: Random = Random
 ): PolyHandler {
@@ -80,12 +79,9 @@ fun McpHandler(
 
                         McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, prompts::list)
 
-                        McpResource.Template.List.Method -> sessions[sId].respondTo(
-                            jsonReq,
-                            resourceTemplates::list
-                        )
+                        McpResource.Template.List.Method -> sessions[sId].respondTo(jsonReq, resources::listTemplates)
 
-                        McpResource.List.Method -> sessions[sId].respondTo(jsonReq, resources::list)
+                        McpResource.List.Method -> sessions[sId].respondTo(jsonReq, resources::listResources)
                         McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, req, resources::read)
 
                         McpResource.Subscribe.Method -> {

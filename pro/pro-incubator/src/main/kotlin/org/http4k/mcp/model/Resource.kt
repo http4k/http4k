@@ -3,12 +3,32 @@ package org.http4k.mcp.model
 import org.http4k.connect.model.Base64Blob
 import org.http4k.core.Uri
 
-data class Resource(
-    val uri: Uri,
-    val name: String,
-    val description: String? = null,
-    val mimeType: MimeType? = null
-) {
+sealed interface Resource {
+    fun matches(uri: Uri): Boolean
+
+    val name: String
+    val description: String?
+    val mimeType: MimeType?
+
+    data class Static(
+        val uri: Uri,
+        override val name: String,
+        override val description: String? = null,
+        override val mimeType: MimeType? = null
+    ) : Resource {
+        override fun matches(uri: Uri) = this.uri == uri
+    }
+
+    data class Templated(
+        val uriTemplate: Uri,
+        override val name: String,
+        override val description: String? = null,
+        override val mimeType: MimeType? = null,
+        private val matchFn: (Uri) -> Boolean = { uriTemplate.authority == it.authority }
+    ) : Resource {
+        override fun matches(uri: Uri) = matchFn(uri)
+    }
+
     sealed interface Content {
         val uri: Uri
         val mimeType: MimeType?

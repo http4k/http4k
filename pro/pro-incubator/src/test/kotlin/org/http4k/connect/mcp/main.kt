@@ -14,7 +14,6 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.Implementation
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.Version
-import org.http4k.routing.RoutedResourceTemplate
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon
@@ -30,14 +29,14 @@ fun main() {
         Prompt("prompt1", "description1") bind {
             PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
         },
-        Resource(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient().debug()),
+        Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient()),
+        Resource.Templated(Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"), "HTTP4K ecosystem page", "view ecosystem") bind LinksOnPage(JavaHttpClient()),
         Tool("reverse", "description", Reverse("name")) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))
         },
         Tool("count", "description", Multiply(1, 2)) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second)))
         },
-        RoutedResourceTemplate(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()

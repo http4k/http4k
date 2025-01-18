@@ -19,7 +19,7 @@ import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.util.McpJson
 
 class RoutedTool<IN : Any>(
-    val tool: Tool<IN>,
+    private val tool: Tool<IN>,
     private val handler: ToolHandler<IN>,
 ) : McpRouting {
 

@@ -3,7 +3,6 @@ package org.http4k.mcp.protocol
 import org.http4k.core.Uri
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
@@ -70,12 +69,7 @@ object McpResource {
         ) : ClientMessage.Request, HasMeta
     }
 
-    data class Template(
-        val uriTemplate: Uri,
-        val name: String,
-        val description: String? = null,
-        val mimeType: MimeType? = null,
-    ) {
+    object Template {
         object List : HasMethod {
             override val Method = of("resources/templates/list")
 
@@ -85,7 +79,7 @@ object McpResource {
             ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 
             class Response(
-                val resourceTemplates: kotlin.collections.List<Template>,
+                val resourceTemplates: kotlin.collections.List<Resource.Templated>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = default
             ) : ServerMessage.Response, PaginatedResponse, HasMeta

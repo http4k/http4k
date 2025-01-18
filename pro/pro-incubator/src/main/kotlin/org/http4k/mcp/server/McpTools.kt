@@ -11,7 +11,7 @@ class McpTools(list: List<RoutedTool<*>>) : ObservableList<RoutedTool<*>>(list) 
 
     fun call(req: McpTool.Call.Request, http: Request) =
         items
-            .find { it.tool.name == req.name }
+            .find { it.toTool().name == req.name }
             ?.invoke(req.arguments, http)
             ?: error("no tool")
 }
