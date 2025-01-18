@@ -9,7 +9,7 @@ class Logger : McpFeature {
     private val subscriptions = ConcurrentHashMap<SessionId, Pair<LogLevel, LogFunction>>()
 
     fun subscribe(sessionId: SessionId, level: LogLevel, onLog: LogFunction) {
-        subscriptions.getOrDefault(sessionId, level to onLog)
+        subscriptions[sessionId] = level to onLog
     }
 
     fun unsubscribe(sessionId: SessionId) {
@@ -20,6 +20,7 @@ class Logger : McpFeature {
         subscriptions[sessionId]?.also { (_, logFunction) ->
             subscriptions[sessionId] = newLevel to logFunction
         }
+
     }
 
     fun log(sessionId: SessionId, level: LogLevel, logger: String, data: Map<String, Any>) {

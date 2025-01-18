@@ -13,17 +13,18 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
@@ -38,6 +39,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
+import org.http4k.mcp.protocol.McpLogging
 import org.http4k.mcp.protocol.McpNotification
 import org.http4k.mcp.protocol.McpPing
 import org.http4k.mcp.protocol.McpPrompt
@@ -54,6 +56,7 @@ import org.http4k.mcp.server.ClientCapabilities
 import org.http4k.mcp.server.McpEntity
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
+import org.http4k.mcp.server.SessionId
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.asSchema
 import org.http4k.routing.bind
@@ -73,7 +76,7 @@ class McpServerProtocolTest {
 
     @Test
     fun `performs init loop on startup`() {
-        val mcp = McpHandler(metadata, random = Random(0)).debug()
+        val mcp = McpHandler(metadata, random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -88,7 +91,7 @@ class McpServerProtocolTest {
     fun `update roots`() {
         val roots = Roots()
 
-        val mcp = McpHandler(metadata, roots = roots, random = Random(0)).debug()
+        val mcp = McpHandler(metadata, roots = roots, random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -119,7 +122,7 @@ class McpServerProtocolTest {
                     )
                 }
             )
-        ), random = Random(0)).debug()
+        ), random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -145,7 +148,7 @@ class McpServerProtocolTest {
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
-        val mcp = McpHandler(metadata, resources = resources, random = Random(0)).debug()
+        val mcp = McpHandler(metadata, resources = resources, random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -181,7 +184,7 @@ class McpServerProtocolTest {
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
-        val mcp = McpHandler(metadata, resources = resources, random = Random(0)).debug()
+        val mcp = McpHandler(metadata, resources = resources, random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -209,7 +212,7 @@ class McpServerProtocolTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val tools = Tools(listOf(tool bind { ToolResponse.Ok(listOf(content)) }))
-        val mcp = McpHandler(metadata, tools = tools, random = Random(0)).debug()
+        val mcp = McpHandler(metadata, tools = tools, random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -238,14 +241,40 @@ class McpServerProtocolTest {
     }
 
     @Test
+    fun `deal with logger`() {
+        val logger = Logger()
+        val mcp = McpHandler(metadata, logger = logger, random = Random(0))
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+            logger.log(sessionId, LogLevel.info, "message", emptyMap())
+
+            assertNoResponse()
+
+            mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
+
+            logger.log(sessionId, LogLevel.info, "message", emptyMap())
+
+            assertNextMessage(McpLogging.LoggingMessage(LogLevel.info, "message", emptyMap()))
+        }
+    }
+
+    @Test
     fun `deal with sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
         val sampling = Sampling(listOf(
-            ModelSelector(model, { 1 }) bind { SampleResponse(model, StopReason.of("bored"), Role.assistant, content) }
+            ModelSelector(model, { 1 }) bind {
+                SampleResponse(
+                    model,
+                    StopReason.of("bored"),
+                    Role.assistant,
+                    content
+                )
+            }
         ))
-        val mcp = McpHandler(metadata, sampling = sampling, random = Random(0)).debug()
+        val mcp = McpHandler(metadata, sampling = sampling, random = Random(0))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -263,7 +292,7 @@ class McpServerProtocolTest {
 
         assertThat(
             received().first(),
-            equalTo(SseMessage.Event("endpoint", "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e"))
+            equalTo(SseMessage.Event("endpoint", "/message?sessionId=$sessionId"))
         )
 
         mcp.sendToMcp(
@@ -327,7 +356,8 @@ private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Notification) {
 private fun PolyHandler.sendToMcp(body: String) {
     assertThat(
         http!!(
-            Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e").body(body)
+            Request(POST, "/message?sessionId=$sessionId").body(body)
         ), hasStatus(ACCEPTED)
     )
 }
+val sessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
