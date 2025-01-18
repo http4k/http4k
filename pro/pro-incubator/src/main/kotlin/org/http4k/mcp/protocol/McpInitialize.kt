@@ -17,8 +17,8 @@ object McpInitialize : HasMethod {
     ) : ClientMessage.Request
 
     data class Response(
-        val capabilities: ServerCapabilities = ServerCapabilities(),
         val serverInfo: McpEntity,
+        val capabilities: ServerCapabilities = ServerCapabilities(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
         override val _meta: Map<String, Any> = default,
     ) : HasMeta, ServerMessage.Response

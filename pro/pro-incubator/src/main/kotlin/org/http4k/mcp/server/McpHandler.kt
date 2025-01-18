@@ -63,7 +63,7 @@ fun McpHandler(
     val serDe = Serde(json)
 
     fun initialise(req: McpInitialize.Request, http: Request) =
-        McpInitialize.Response(metaData.capabilities, metaData.entity, metaData.protocolVersion)
+        McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
 
     val sessions = ClientSessions(serDe, tools, resources, prompts, logger, random)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
