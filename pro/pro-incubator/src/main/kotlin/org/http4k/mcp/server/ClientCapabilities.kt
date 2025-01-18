@@ -1,4 +1,4 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.server
 
 /**
  * Determines what features the client supports.
