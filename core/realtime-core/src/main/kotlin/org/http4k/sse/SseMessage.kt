@@ -35,19 +35,18 @@ sealed interface SseMessage {
 
     companion object {
         fun parse(message: String): SseMessage {
-            val parts = message.split("\n")
+            val parts = message.split("\n").sortedBy { if (it.startsWith("event:")) -1 else 1 }
             return when {
-                parts.first().startsWith("data:") -> Data(parts.first().removePrefix("data:").trim())
-                parts.first().startsWith("event:") -> Event(
-                    parts.first().removePrefix("event:").trim(),
+                parts.any { it.startsWith("event:") } -> Event(
+                    parts.first { it.startsWith("event:") }.removePrefix("event:").trim(),
                     parts.filter { it.startsWith("data:") }.joinToString("\n") { it.removePrefix("data:").trim() },
                     parts.find { it.startsWith("id:") }?.removePrefix("id:")?.trim()
                 )
 
+                parts.first().startsWith("data:") -> Data(parts.first().removePrefix("data:").trim())
+
                 parts.first().startsWith("retry:") -> Retry(
-                    Duration.ofMillis(
-                        parts.first().removePrefix("retry:").trim().toLong()
-                    )
+                    Duration.ofMillis(parts.first().removePrefix("retry:").trim().toLong())
                 )
 
                 else -> throw IllegalArgumentException("Unrecognised message format: $message")
