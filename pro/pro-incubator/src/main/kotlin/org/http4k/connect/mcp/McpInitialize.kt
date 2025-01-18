@@ -8,7 +8,7 @@ import org.http4k.connect.mcp.protocol.ProtocolVersion
 import org.http4k.connect.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.connect.mcp.protocol.ServerCapabilities
 
-object Initialize : HasMethod {
+object McpInitialize : HasMethod {
     override val Method = McpRpcMethod.of("initialize")
 
     data class Request(

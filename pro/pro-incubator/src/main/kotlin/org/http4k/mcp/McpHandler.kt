@@ -4,14 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.Cancelled
 import org.http4k.connect.mcp.ClientMessage
-import org.http4k.connect.mcp.Completion
-import org.http4k.connect.mcp.Initialize
+import org.http4k.connect.mcp.McpCompletion
+import org.http4k.connect.mcp.McpInitialize
+import org.http4k.connect.mcp.McpPing
 import org.http4k.connect.mcp.McpPrompt
 import org.http4k.connect.mcp.McpResource
 import org.http4k.connect.mcp.McpRoot
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.McpTool
-import org.http4k.connect.mcp.Ping
 import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Response.Empty
 import org.http4k.connect.mcp.protocol.Implementation
@@ -53,7 +53,7 @@ fun McpHandler(
 
     val serDe = Serde(json)
 
-    fun initialise(req: Initialize.Request) = Initialize.Response(capabilities, implementation, protocolVersion)
+    fun initialise(req: McpInitialize.Request) = McpInitialize.Response(capabilities, implementation, protocolVersion)
 
     val sessions = Sessions(serDe, tools, resources, prompts, random)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
@@ -70,11 +70,11 @@ fun McpHandler(
 
                 if (jsonReq.valid()) {
                     when (McpRpcMethod.of(jsonReq.method)) {
-                        Initialize.Method -> sessions[sId].respondTo(jsonReq, ::initialise)
+                        McpInitialize.Method -> sessions[sId].respondTo(jsonReq, ::initialise)
 
-                        Completion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
+                        McpCompletion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
 
-                        Ping.Method -> sessions[sId].respondTo(jsonReq) { _: Ping.Request -> Empty }
+                        McpPing.Method -> sessions[sId].respondTo(jsonReq) { _: McpPing.Request -> Empty }
                         McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq) { call: McpPrompt.Get.Request ->
                             prompts.get(call, req)
                         }
@@ -100,7 +100,7 @@ fun McpHandler(
                             Response(ACCEPTED)
                         }
 
-                        Initialize.Initialized.Method -> Response(ACCEPTED)
+                        McpInitialize.Initialized.Method -> Response(ACCEPTED)
                         Cancelled.Method -> Response(ACCEPTED)
 
                         McpRoot.Changed.Method -> {
