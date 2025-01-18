@@ -1,5 +1,6 @@
 package org.http4k.mcp
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
@@ -9,14 +10,17 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.debug
+import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
 import org.http4k.mcp.protocol.ClientMessage
+import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
-import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.McpRequest
+import org.http4k.mcp.protocol.McpResponse
+import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
-import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.ClientCapabilities
 import org.http4k.mcp.server.McpEntity
@@ -52,6 +56,10 @@ class McpServerProtocolTest {
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpRoot.Changed)
+
+//            assertNextMessage(McpRoot.List, McpRoot.List.Request())
         }
     }
 
@@ -64,7 +72,7 @@ class McpServerProtocolTest {
         )
 
         mcp.sendToMcp(
-            McpInitialize.Method, McpInitialize.Request(
+            McpInitialize, McpInitialize.Request(
                 McpEntity("client", Version.of("1")),
                 ClientCapabilities(), `2024-10-07`
             )
@@ -74,34 +82,52 @@ class McpServerProtocolTest {
             McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
-        mcp.sendToMcp(McpInitialize.Method, McpInitialize.Initialized)
+        mcp.sendToMcp(McpInitialize, McpInitialize.Initialized)
     }
 
-    private fun TestSseClient.assertNextMessage(input: ServerMessage.Response) {
+    private fun TestSseClient.assertNextMessage(input: McpResponse) {
+        assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
+    }
+
+    private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest) {
+        assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)) })
+    }
+
+    private fun TestSseClient.assertNextMessage(node: JsonNode) {
         assertThat(
             received().first(),
             equalTo(
                 SseMessage.Event("message",
                     with(McpJson) {
                         compact(
-                            renderResult(
-                                asJsonObject(
-                                    input
-                                ), number(1)
-                            )
+                            node
                         )
                     })
             )
         )
     }
 
-    private fun PolyHandler.sendToMcp(method: McpRpcMethod, input: ClientMessage.Request) {
+    private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Request) {
         assertThat(
             http!!(
                 Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
                     .body(
                         with(McpJson) {
-                            compact(renderRequest(method.value, asJsonObject(input), number(1)))
+                            compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
+                        }
+                    )
+
+            ), hasStatus(ACCEPTED)
+        )
+    }
+
+    private fun PolyHandler.sendToMcp(hasMethod: HasMethod) {
+        assertThat(
+            http!!(
+                Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
+                    .body(
+                        with(McpJson) {
+                            compact(renderNotification(hasMethod.Method.value))
                         }
                     )
 
