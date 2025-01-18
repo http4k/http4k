@@ -2,7 +2,7 @@ package org.http4k.connect.mcp.util
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.http4k.connect.mcp.McpRpcMethod
+import org.http4k.connect.mcp.protocol.McpRpcMethod
 import org.http4k.connect.mcp.protocol.ProtocolVersion
 import org.http4k.connect.mcp.protocol.Version
 import org.http4k.format.ConfigurableJackson

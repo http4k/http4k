@@ -1,9 +1,9 @@
 package org.http4k.mcp.server
 
 import dev.forkhandles.values.random
-import org.http4k.connect.mcp.McpPrompt
-import org.http4k.connect.mcp.McpResource
-import org.http4k.connect.mcp.McpTool
+import org.http4k.connect.mcp.protocol.McpPrompt
+import org.http4k.connect.mcp.protocol.McpResource
+import org.http4k.connect.mcp.protocol.McpTool
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.mcp.Serde

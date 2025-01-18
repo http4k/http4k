@@ -1,6 +1,6 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.protocol
 
-import org.http4k.connect.mcp.McpRpcMethod.Companion.of
+import org.http4k.connect.mcp.protocol.McpRpcMethod.Companion.of
 
 object Progress {
     data class Request(val progress: Int, val total: Double?) : ClientMessage.Request

@@ -1,6 +1,6 @@
 package org.http4k.mcp
 
-import org.http4k.connect.mcp.HasMeta.Companion.default
+import org.http4k.connect.mcp.protocol.HasMeta.Companion.default
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.model.Content

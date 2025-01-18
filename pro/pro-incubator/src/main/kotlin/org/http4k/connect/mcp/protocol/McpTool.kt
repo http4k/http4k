@@ -1,7 +1,7 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.protocol
 
-import org.http4k.connect.mcp.HasMeta.Companion.default
-import org.http4k.connect.mcp.McpRpcMethod.Companion.of
+import org.http4k.connect.mcp.protocol.HasMeta.Companion.default
+import org.http4k.connect.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta

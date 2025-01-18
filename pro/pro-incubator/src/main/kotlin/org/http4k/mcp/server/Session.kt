@@ -1,10 +1,10 @@
 package org.http4k.mcp.server
 
-import org.http4k.connect.mcp.ClientMessage.Request
-import org.http4k.connect.mcp.HasMethod
-import org.http4k.connect.mcp.ServerMessage
-import org.http4k.connect.mcp.ServerMessage.Notification
-import org.http4k.connect.mcp.ServerMessage.Response
+import org.http4k.connect.mcp.protocol.ClientMessage.Request
+import org.http4k.connect.mcp.protocol.HasMethod
+import org.http4k.connect.mcp.protocol.ServerMessage
+import org.http4k.connect.mcp.protocol.ServerMessage.Notification
+import org.http4k.connect.mcp.protocol.ServerMessage.Response
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest

@@ -1,6 +1,6 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.protocol
 
-import org.http4k.connect.mcp.HasMeta.Companion.default
+import org.http4k.connect.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Reference

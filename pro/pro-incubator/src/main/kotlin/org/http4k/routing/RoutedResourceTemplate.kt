@@ -1,6 +1,6 @@
 package org.http4k.routing
 
-import org.http4k.connect.mcp.McpResource
+import org.http4k.connect.mcp.protocol.McpResource
 import org.http4k.core.ContentType
 import org.http4k.core.Uri
 import org.http4k.mcp.MimeType

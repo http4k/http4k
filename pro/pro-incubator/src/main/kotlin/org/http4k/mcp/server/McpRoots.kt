@@ -1,6 +1,6 @@
 package org.http4k.mcp.server
 
-import org.http4k.connect.mcp.McpRoot
+import org.http4k.connect.mcp.protocol.McpRoot
 import org.http4k.mcp.model.Root
 import org.http4k.util.ObservableList
 

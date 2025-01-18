@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.protocol
 
 import org.http4k.mcp.model.Meta
 

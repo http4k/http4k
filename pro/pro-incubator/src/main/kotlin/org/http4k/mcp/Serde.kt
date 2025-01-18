@@ -1,9 +1,9 @@
 package org.http4k.mcp
 
-import org.http4k.connect.mcp.HasMethod
-import org.http4k.connect.mcp.ServerMessage.Notification
-import org.http4k.connect.mcp.ServerMessage.Request
-import org.http4k.connect.mcp.ServerMessage.Response
+import org.http4k.connect.mcp.protocol.HasMethod
+import org.http4k.connect.mcp.protocol.ServerMessage.Notification
+import org.http4k.connect.mcp.protocol.ServerMessage.Request
+import org.http4k.connect.mcp.protocol.ServerMessage.Response
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.renderError
 import org.http4k.format.renderNotification

@@ -5,7 +5,7 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
-import org.http4k.connect.mcp.McpTool
+import org.http4k.connect.mcp.protocol.McpTool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Request

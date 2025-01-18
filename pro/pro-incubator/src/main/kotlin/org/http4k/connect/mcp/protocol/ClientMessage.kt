@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.protocol
 
 sealed interface ClientMessage {
     interface Request : ClientMessage
