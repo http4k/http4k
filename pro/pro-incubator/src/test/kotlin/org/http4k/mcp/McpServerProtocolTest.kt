@@ -41,12 +41,17 @@ class McpServerProtocolTest {
     fun `performs init loop on startup`() {
         val mcp = McpHandler(metadata, random = Random(0)).debug()
 
-        val client = mcp.testSseClient(Request(GET, "/sse"))
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+            assertNextMessage(ServerMessage.Response.Empty)
+        }
+    }
 
-        assertThat(client.status, equalTo(OK))
+    private fun TestSseClient.assertInitializeLoop(mcp: PolyHandler) {
+        assertThat(status, equalTo(OK))
 
         assertThat(
-            client.received().first(),
+            received().first(),
             equalTo(SseMessage.Event("endpoint", "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e"))
         )
 
@@ -57,13 +62,11 @@ class McpServerProtocolTest {
             )
         )
 
-        client.assertNextMessage(
+        assertNextMessage(
             McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
         mcp.sendToMcp(McpInitialize.Method, McpInitialize.Initialized)
-
-//        client.assertNextMessage(ServerMessage.Response.Empty)
     }
 
     private fun TestSseClient.assertNextMessage(input: ServerMessage.Response) {
