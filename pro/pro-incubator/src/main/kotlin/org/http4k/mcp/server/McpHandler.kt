@@ -53,7 +53,7 @@ fun McpHandler(
 
     val serDe = Serde(json)
 
-    fun initialise(req: McpInitialize.Request) = McpInitialize.Response(capabilities, implementation, protocolVersion)
+    fun initialise(req: McpInitialize.Request, http: Request) = McpInitialize.Response(capabilities, implementation, protocolVersion)
 
     val sessions = Sessions(serDe, tools, resources, prompts, random)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
@@ -70,23 +70,25 @@ fun McpHandler(
 
                 if (jsonReq.valid()) {
                     when (McpRpcMethod.of(jsonReq.method)) {
-                        McpInitialize.Method -> sessions[sId].respondTo(jsonReq, ::initialise)
+                        McpInitialize.Method -> sessions[sId].respondTo(jsonReq, req,  ::initialise)
 
-                        McpCompletion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
+                        McpCompletion.Method -> sessions[sId].respondTo(jsonReq, req, completions::complete)
 
-                        McpPing.Method -> sessions[sId].respondTo(jsonReq) { _: McpPing.Request -> Empty }
+                        McpPing.Method -> sessions[sId].respondTo(jsonReq, req) { _: McpPing.Request, _: Request -> Empty }
                         McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq, req, prompts::get)
 
-                        McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, prompts::list)
+                        McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, req, prompts::list)
 
-                        McpResource.Template.List.Method -> sessions[sId].respondTo(jsonReq, resources::listTemplates)
+                        McpResource.Template.List.Method -> sessions[sId].respondTo(jsonReq, req, resources::listTemplates)
 
-                        McpResource.List.Method -> sessions[sId].respondTo(jsonReq, resources::listResources)
+                        McpResource.List.Method -> sessions[sId].respondTo(jsonReq, req, resources::listResources)
                         McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, req, resources::read)
 
                         McpResource.Subscribe.Method -> {
-                            val req1 = serDe<McpResource.Subscribe.Request>(jsonReq)
-                            resources.subscribe(sId, req1) { sessions[sId]?.send(McpResource.Updated(req1.uri)) }
+                            val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
+                            resources.subscribe(sId, subscribeRequest) {
+                                sessions[sId]?.send(McpResource.Updated(subscribeRequest.uri))
+                            }
                             Response(ACCEPTED)
                         }
 
@@ -107,7 +109,7 @@ fun McpHandler(
 
                         McpTool.Call.Method -> sessions[sId].respondTo(jsonReq, req, tools::call)
 
-                        McpTool.List.Method -> sessions[sId].respondTo(jsonReq, tools::list)
+                        McpTool.List.Method -> sessions[sId].respondTo(jsonReq, req, tools::list)
 
                         else -> Response(NOT_IMPLEMENTED)
                     }
@@ -134,17 +136,7 @@ private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Resp
     when (this) {
         null -> Response(GONE)
         else -> {
-            process(req, { it: IN -> fn(it, http) })
-            Response(ACCEPTED)
-        }
-    }
-
-private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-    Session<NODE>?.respondTo(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
-    when (this) {
-        null -> Response(GONE)
-        else -> {
-            process(req, fn)
+            process(req) { it: IN -> fn(it, http) }
             Response(ACCEPTED)
         }
     }

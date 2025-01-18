@@ -12,6 +12,6 @@ class McpPrompts(bindings: List<RoutedPrompt>) : ObservableList<RoutedPrompt>(bi
         ?.let { it(req.arguments, http) }
         ?: error("no prompt")
 
-    fun list(req: McpPrompt.List.Request) = McpPrompt.List.Response(items.map(RoutedPrompt::toPrompt))
+    fun list(req: McpPrompt.List.Request, http: Request) = McpPrompt.List.Response(items.map(RoutedPrompt::toPrompt))
 }
 

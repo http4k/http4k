@@ -17,13 +17,13 @@ class McpResources(list: List<RoutedResource>) : ObservableList<RoutedResource>(
         }
     }
 
-    fun listResources(req: McpResource.List.Request) = McpResource.List.Response(
+    fun listResources(req: McpResource.List.Request, http: Request) = McpResource.List.Response(
         items
             .map { it.toResource() }
             .filterIsInstance<Resource.Static>()
     )
 
-    fun listTemplates(req: McpResource.Template.List.Request) = McpResource.Template.List.Response(
+    fun listTemplates(req: McpResource.Template.List.Request, http: Request) = McpResource.Template.List.Response(
         items.map(RoutedResource::toResource)
             .filterIsInstance<Resource.Templated>()
     )
