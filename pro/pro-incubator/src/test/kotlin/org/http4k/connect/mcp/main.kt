@@ -15,7 +15,6 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.McpEntity
 import org.http4k.mcp.server.ServerMetaData
@@ -26,10 +25,7 @@ import org.http4k.server.asServer
 
 fun main() {
     val mcpServer = mcp(
-        ServerMetaData(
-            McpEntity("mcp-kotlin test server", Version.of("0.1.0")),
-            LATEST_VERSION,
-        ),
+        ServerMetaData(McpEntity("http4k mcp server", Version.of("0.1.0"))),
         prompt1(),
         prompt2(),
         staticResource(),
