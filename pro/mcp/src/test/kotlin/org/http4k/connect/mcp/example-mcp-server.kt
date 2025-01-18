@@ -1,9 +1,13 @@
 package org.http4k.connect.mcp
 
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
 import org.http4k.core.Uri
 import org.http4k.filter.debug
 import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.ResourceHandler
+import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
@@ -22,6 +26,23 @@ import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
+import org.jsoup.Jsoup
+
+fun LinksOnPage(http: HttpHandler): ResourceHandler = {
+    val htmlPage = http(org.http4k.core.Request(GET, it.uri))
+
+    val links = Jsoup.parse(htmlPage.bodyString())
+        .allElements.toList()
+        .filter { it.tagName() == "a" }
+        .filter { it.hasAttr("href") }
+        .map {
+            Resource.Content.Text(
+                it.text(),
+                Uri.of(it.attr("href"))
+            )
+        }
+    ResourceResponse(links)
+}
 
 fun main() {
     val mcpServer = mcp(
