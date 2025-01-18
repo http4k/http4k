@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
+import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -19,12 +21,15 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
+import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
+import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
@@ -34,6 +39,7 @@ import org.http4k.mcp.protocol.McpRequest
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
+import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.ClientCapabilities
@@ -41,6 +47,7 @@ import org.http4k.mcp.server.McpEntity
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
 import org.http4k.mcp.util.McpJson
+import org.http4k.routing.asSchema
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
 import org.http4k.testing.JsonApprovalTest
@@ -175,6 +182,39 @@ class McpServerProtocolTest {
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
 
             assertNextMessage(McpResource.Read.Response(listOf(content)))
+        }
+    }
+
+    data class FooBar(val foo: String, val bar: String)
+
+    @Test
+    fun `deal with tools `() {
+        val tool = Tool("name", "description", FooBar("foo", "bar"))
+
+        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+
+        val tools = Tools(listOf(tool bind { ToolResponse.Ok(listOf(content)) }))
+        val mcp = McpHandler(metadata, tools = tools, random = Random(0)).debug()
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpTool.List, McpTool.List.Request())
+
+            assertNextMessage(
+                McpTool.List.Response(
+                    listOf(
+                        McpTool(
+                            "name", "description",
+                            McpJson.convert(AutoJsonToJsonSchema(McpJson).asSchema(tool.example))
+                        )
+                    )
+                )
+            )
+
+            mcp.sendToMcp(McpTool.Call, McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar")))
+
+            assertNextMessage(McpTool.Call.Response(listOf(content)))
         }
     }
 

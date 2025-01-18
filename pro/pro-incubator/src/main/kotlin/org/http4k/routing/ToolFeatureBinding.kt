@@ -43,7 +43,7 @@ class ToolFeatureBinding<IN : Any>(
         }
 
     private val schema = AutoJsonToJsonSchema(McpJson)
-
-    private fun <IN : Any> AutoJsonToJsonSchema<JsonNode>.asSchema(input: IN) =
-        toSchema(input).definitions.first { it.first == input::class.simpleName!! }.second
 }
+
+fun <IN : Any> AutoJsonToJsonSchema<JsonNode>.asSchema(input: IN) =
+    toSchema(input).definitions.first { it.first == input::class.simpleName!! }.second
