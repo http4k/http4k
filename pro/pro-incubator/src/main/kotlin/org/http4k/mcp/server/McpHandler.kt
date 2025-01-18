@@ -47,8 +47,8 @@ fun McpHandler(
     prompts: Prompts,
     tools: Tools,
     resources: Resources,
-    roots: Roots,
     completions: McpCompletions,
+    roots: Roots,
     random: Random = Random
 ): PolyHandler {
     val json = McpJson

@@ -22,8 +22,8 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
     Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
     Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
     Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
-    Roots(),
-    McpCompletions()
+    McpCompletions(),
+    Roots()
 )
 
 infix fun <INPUT : Any> Tool<INPUT>.bind(other: ToolHandler<INPUT>) = ToolFeatureBinding(this, other)
