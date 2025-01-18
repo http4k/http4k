@@ -7,6 +7,7 @@ import org.http4k.mcp.PromptBinding
 import org.http4k.mcp.ResourceBinding
 import org.http4k.mcp.ResourceTemplateBinding
 import org.http4k.mcp.ToolBinding
+import org.http4k.mcp.ToolResponse
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -18,8 +19,16 @@ fun main() {
         PromptBinding("prompt1", "description1"),
         PromptBinding("prompt2", "description1"),
         ResourceBinding(Uri.of("https://http4k.org")),
-        ToolBinding("reverse", "description", Reverse("name")) { listOf(Content.Text(it.input.reversed())) },
-        ToolBinding("count", "description", Multiply(1, 2)) { listOf(Content.Text(it.first + it.second)) },
+        ToolBinding(
+            "reverse",
+            "description",
+            Reverse("name")
+        ) { ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed()))) },
+        ToolBinding(
+            "count",
+            "description",
+            Multiply(1, 2)
+        ) { ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second))) },
         ResourceTemplateBinding(Uri.of("https://{+subdomain}.http4k.org/{+path}")),
     )
 

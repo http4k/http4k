@@ -15,7 +15,8 @@ dependencies {
     api(project(":http4k-api-jsonrpc"))
     api(project(":http4k-api-jsonschema"))
     api(project(":http4k-connect-core"))
-    api("dev.forkhandles:values4k:_")
+    api("dev.forkhandles:values4k")
+    api("dev.forkhandles:result4k")
 
     testImplementation(project(":http4k-server-helidon"))
 

@@ -67,35 +67,35 @@ fun McpHandler(
             "/message" httpBind POST to { req: Request ->
                 val sId = SessionId.parse(req.query("sessionId")!!)
 
-                val request = Body.jsonRpcRequest(json).toLens()(req)
+                val jsonReq = Body.jsonRpcRequest(json).toLens()(req)
 
-                if (request.valid()) {
-                    when (McpRpcMethod.of(request.method)) {
-                        Initialize.Method -> sessions[sId].respondTo(Initialize, request, ::initialise)
+                if (jsonReq.valid()) {
+                    when (McpRpcMethod.of(jsonReq.method)) {
+                        Initialize.Method -> sessions[sId].respondTo(Initialize, jsonReq, ::initialise)
 
-                        Completion.Method -> sessions[sId].respondTo(Completion, request, completions::complete)
+                        Completion.Method -> sessions[sId].respondTo(Completion, jsonReq, completions::complete)
 
-                        Ping.Method -> sessions[sId].respondTo(Ping, request, { _: Ping.Request -> Empty })
-                        Prompt.Get.Method -> sessions[sId].respondTo(Prompt.Get, request, prompts::get)
-                        Prompt.List.Method -> sessions[sId].respondTo(Prompt.List, request, prompts::list)
+                        Ping.Method -> sessions[sId].respondTo(Ping, jsonReq, { _: Ping.Request -> Empty })
+                        Prompt.Get.Method -> sessions[sId].respondTo(Prompt.Get, jsonReq, prompts::get)
+                        Prompt.List.Method -> sessions[sId].respondTo(Prompt.List, jsonReq, prompts::list)
 
                         Resource.Template.List.Method -> sessions[sId].respondTo(
                             Resource.Template.List,
-                            request,
+                            jsonReq,
                             resourceTemplates::list
                         )
 
-                        Resource.List.Method -> sessions[sId].respondTo(Resource.List, request, resources::list)
-                        Resource.Read.Method -> sessions[sId].respondTo(Resource.Read, request, resources::read)
+                        Resource.List.Method -> sessions[sId].respondTo(Resource.List, jsonReq, resources::list)
+                        Resource.Read.Method -> sessions[sId].respondTo(Resource.Read, jsonReq, resources::read)
 
                         Resource.Subscribe.Method -> {
-                            val req1 = serDe<Resource.Subscribe.Request>(request)
+                            val req1 = serDe<Resource.Subscribe.Request>(jsonReq)
                             resources.subscribe(sId, req1) { sessions[sId]?.send(Resource.Updated(req1.uri)) }
                             Response(ACCEPTED)
                         }
 
                         Resource.Unsubscribe.Method -> {
-                            resources.unsubscribe(sId, serDe(request))
+                            resources.unsubscribe(sId, serDe(jsonReq))
                             Response(ACCEPTED)
                         }
 
@@ -109,8 +109,11 @@ fun McpHandler(
                             Response(ACCEPTED)
                         }
 
-                        Tool.Call.Method -> sessions[sId].respondTo(Tool.Call, request, tools::call)
-                        Tool.List.Method -> sessions[sId].respondTo(Tool.List, request, tools::list)
+                        Tool.Call.Method -> sessions[sId].respondTo(Tool.Call, jsonReq) { call: Tool.Call.Request ->
+                            tools.call(call, req)
+                        }
+
+                        Tool.List.Method -> sessions[sId].respondTo(Tool.List, jsonReq, tools::list)
 
                         else -> Response(NOT_IMPLEMENTED)
                     }
@@ -133,7 +136,7 @@ fun McpHandler(
 }
 
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-        Session<NODE>?.respondTo(hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
+    Session<NODE>?.respondTo(hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
     when (this) {
         null -> Response(GONE)
         else -> {
