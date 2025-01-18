@@ -239,8 +239,6 @@ class McpServerProtocolTest {
 
     @Test
     fun `deal with sampling`() {
-        val tool = Tool("name", "description", FooBar("foo", "bar"))
-
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
