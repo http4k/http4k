@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.server
 
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.McpPrompt
@@ -6,6 +6,8 @@ import org.http4k.connect.mcp.McpResource
 import org.http4k.connect.mcp.McpTool
 import org.http4k.core.Uri
 import org.http4k.core.query
+import org.http4k.mcp.Serde
+import org.http4k.mcp.SessionId
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
 import java.util.concurrent.ConcurrentHashMap

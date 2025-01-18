@@ -3,17 +3,17 @@ package org.http4k.routing
 import org.http4k.connect.mcp.protocol.Implementation
 import org.http4k.connect.mcp.protocol.ProtocolVersion
 import org.http4k.connect.mcp.protocol.ServerCapabilities
-import org.http4k.mcp.McpCompletions
-import org.http4k.mcp.McpHandler
-import org.http4k.mcp.McpPrompts
-import org.http4k.mcp.McpResourceTemplates
-import org.http4k.mcp.McpResources
-import org.http4k.mcp.McpRoots
-import org.http4k.mcp.McpTools
+import org.http4k.mcp.PromptHandler
+import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.prompts.PromptHandler
-import org.http4k.mcp.tools.ToolHandler
+import org.http4k.mcp.server.McpCompletions
+import org.http4k.mcp.server.McpHandler
+import org.http4k.mcp.server.McpPrompts
+import org.http4k.mcp.server.McpResourceTemplates
+import org.http4k.mcp.server.McpResources
+import org.http4k.mcp.server.McpRoots
+import org.http4k.mcp.server.McpTools
 
 fun mcp(implementation: Implementation, protocolVersion: ProtocolVersion, vararg bindings: McpRouting) = McpHandler(
     implementation,

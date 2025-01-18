@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.server
 
 import org.http4k.connect.mcp.McpCompletion
 import org.http4k.mcp.model.Completion

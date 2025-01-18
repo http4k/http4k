@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.server
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
@@ -30,6 +30,9 @@ import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.MessageId
+import org.http4k.mcp.Serde
+import org.http4k.mcp.SessionId
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse

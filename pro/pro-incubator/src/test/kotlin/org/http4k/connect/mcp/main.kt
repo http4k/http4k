@@ -5,12 +5,12 @@ import org.http4k.connect.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.connect.mcp.protocol.Version
 import org.http4k.core.Uri
 import org.http4k.filter.debug
+import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.prompts.PromptResponse
-import org.http4k.mcp.tools.ToolResponse
 import org.http4k.routing.RoutedResource
 import org.http4k.routing.RoutedResourceTemplate
 import org.http4k.routing.bind

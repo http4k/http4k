@@ -1,4 +1,4 @@
-package org.http4k.mcp.prompts
+package org.http4k.mcp
 
 import org.http4k.core.Request
 import org.http4k.mcp.model.Content

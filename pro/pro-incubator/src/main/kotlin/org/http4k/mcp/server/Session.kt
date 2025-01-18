@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.server
 
 import org.http4k.connect.mcp.ClientMessage.Request
 import org.http4k.connect.mcp.HasMethod
@@ -8,6 +8,8 @@ import org.http4k.connect.mcp.ServerMessage.Response
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.mcp.Serde
+import org.http4k.mcp.SessionId
 import org.http4k.sse.Sse
 
 class Session<NODE : Any>(
