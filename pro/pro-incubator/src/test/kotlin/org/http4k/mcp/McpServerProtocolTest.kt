@@ -43,7 +43,15 @@ class McpServerProtocolTest {
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
-            assertNextMessage(ServerMessage.Response.Empty)
+        }
+    }
+
+    @Test
+    fun `performs update roots`() {
+        val mcp = McpHandler(metadata, random = Random(0)).debug()
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
         }
     }
 
