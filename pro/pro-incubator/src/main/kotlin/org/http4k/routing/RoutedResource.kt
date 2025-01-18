@@ -1,19 +1,15 @@
 package org.http4k.routing
 
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Uri
-import org.http4k.mcp.model.MimeType
+import org.http4k.core.Request
+import org.http4k.mcp.ResourceHandler
+import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
+import org.http4k.mcp.protocol.McpResource
 
-class RoutedResource(val uri: Uri) : McpRouting {
-    fun toResource() = Resource(
-        uri,
-        uri.host,
-        "description",
-        MimeType.of(APPLICATION_JSON)
-    )
+class RoutedResource(val resource: Resource, val handler: ResourceHandler) : McpRouting {
+    fun toResource() = resource
 
-    fun read() = listOf(
-        Resource.Content.Text("asd", uri, MimeType.of(APPLICATION_JSON))
-    )
+    fun read(http: Request) = handler(ResourceRequest(resource.uri, http)).let {
+        McpResource.Read.Response(it.list, it.meta)
+    }
 }

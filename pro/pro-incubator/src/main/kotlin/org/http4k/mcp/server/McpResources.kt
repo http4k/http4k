@@ -1,5 +1,6 @@
 package org.http4k.mcp.server
 
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.routing.RoutedResource
@@ -19,10 +20,8 @@ class McpResources(list: List<RoutedResource>) : ObservableList<RoutedResource>(
         items.map(RoutedResource::toResource)
     )
 
-    fun read(req: McpResource.Read.Request) = items.find { it.uri == req.uri }
-        ?.read()
-        ?.let { McpResource.Read.Response(
-            it) }
+    fun read(req: McpResource.Read.Request, http: Request) = items.find { it.resource.uri == req.uri }
+        ?.read(http)
         ?: error("no resource")
 
     fun subscribe(sessionId: SessionId, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit) {

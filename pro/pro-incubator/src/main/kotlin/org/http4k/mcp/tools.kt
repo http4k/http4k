@@ -16,3 +16,4 @@ sealed interface ToolResponse {
     data class Ok(val content: List<Content>, override val meta: Meta = default) : ToolResponse
     data class Error(val error: ErrorMessage, override val meta: Meta = default) : ToolResponse
 }
+

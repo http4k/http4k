@@ -1,8 +1,10 @@
 package org.http4k.routing
 
 import org.http4k.mcp.PromptHandler
+import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.Implementation
 import org.http4k.mcp.protocol.ProtocolVersion
@@ -29,3 +31,4 @@ fun mcp(implementation: Implementation, protocolVersion: ProtocolVersion, vararg
 
 infix fun <INPUT : Any> Tool<INPUT>.bind(other: ToolHandler<INPUT>) = RoutedTool(this, other)
 infix fun Prompt.bind(other: PromptHandler) = RoutedPrompt(this, other)
+infix fun Resource.bind(other: ResourceHandler) = RoutedResource(this, other)

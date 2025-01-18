@@ -17,6 +17,7 @@ import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.protocol.Cancelled
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.Implementation
+import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.mcp.protocol.McpInitialize
 import org.http4k.mcp.protocol.McpPing
 import org.http4k.mcp.protocol.McpPrompt
@@ -72,12 +73,10 @@ fun McpHandler(
                     when (McpRpcMethod.of(jsonReq.method)) {
                         McpInitialize.Method -> sessions[sId].respondTo(jsonReq, ::initialise)
 
-                        _root_ide_package_.org.http4k.mcp.protocol.McpCompletion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
+                        McpCompletion.Method -> sessions[sId].respondTo(jsonReq, completions::complete)
 
                         McpPing.Method -> sessions[sId].respondTo(jsonReq) { _: McpPing.Request -> Empty }
-                        McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq) { call: McpPrompt.Get.Request ->
-                            prompts.get(call, req)
-                        }
+                        McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq, req, prompts::get)
 
                         McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, prompts::list)
 
@@ -87,7 +86,7 @@ fun McpHandler(
                         )
 
                         McpResource.List.Method -> sessions[sId].respondTo(jsonReq, resources::list)
-                        McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, resources::read)
+                        McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, req, resources::read)
 
                         McpResource.Subscribe.Method -> {
                             val req1 = serDe<McpResource.Subscribe.Request>(jsonReq)
@@ -110,9 +109,7 @@ fun McpHandler(
                             Response(ACCEPTED)
                         }
 
-                        McpTool.Call.Method -> sessions[sId].respondTo(jsonReq) { call: McpTool.Call.Request ->
-                            tools.call(call, req)
-                        }
+                        McpTool.Call.Method -> sessions[sId].respondTo(jsonReq, req, tools::call)
 
                         McpTool.List.Method -> sessions[sId].respondTo(jsonReq, tools::list)
 
@@ -135,6 +132,16 @@ fun McpHandler(
         )
     )
 }
+
+private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
+    Session<NODE>?.respondTo(req: JsonRpcRequest<NODE>, http: Request, fn: (IN, Request) -> OUT) =
+    when (this) {
+        null -> Response(GONE)
+        else -> {
+            process(req, { it: IN -> fn(it, http) })
+            Response(ACCEPTED)
+        }
+    }
 
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
     Session<NODE>?.respondTo(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =

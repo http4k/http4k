@@ -1,18 +1,12 @@
 package org.http4k.mcp.protocol
 
-import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.Role
+import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 
-data class McpPrompt(
-    val name: String,
-    val description: String? = null,
-    val arguments: kotlin.collections.List<Argument> = emptyList(),
-) {
-    data class Message(val role: Role, val content: Content)
-
+object McpPrompt {
     data class Argument(
         val name: String,
         val description: String? = null,
@@ -41,7 +35,7 @@ data class McpPrompt(
         data class Request(override val _meta: Meta = default) : ClientMessage.Request, HasMeta
 
         data class Response(
-            val prompts: kotlin.collections.List<McpPrompt>,
+            val prompts: kotlin.collections.List<Prompt>,
             override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
 
