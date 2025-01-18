@@ -18,7 +18,7 @@ data class Tool(val name: String, val description: String, val inputSchema: Map<
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        data object Notification : ServerMessage.Notification {
+        data object Changed : ServerMessage.Notification {
             override val method = of("notifications/tools/list_changed")
         }
     }

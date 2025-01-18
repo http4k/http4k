@@ -1,7 +1,6 @@
 package org.http4k.mcp
 
 import org.http4k.connect.mcp.HasMethod
-import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Notification
 import org.http4k.connect.mcp.ServerMessage.Request
 import org.http4k.connect.mcp.ServerMessage.Response
@@ -24,17 +23,16 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
         asA<OUT>(compact(input.result ?: json.nullNode()))
     }
 
-    operator fun invoke(method: HasMethod, input: ServerMessage, id: NODE?) = with(json) {
-        Event(
-            "message",
-            compact(
-                when (input) {
-                    is Request -> renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode())
-                    is Response -> renderResult(asJsonObject(input), id ?: json.nullNode())
-                    is Notification -> renderNotification(input.method.value)
-                }
-            )
-        )
+    operator fun invoke(method: HasMethod, input: Request, id: NODE?) = with(json) {
+        Event("message", compact(renderRequest(method.Method.value, asJsonObject(input), id ?: json.nullNode())))
+    }
+
+    operator fun invoke(input: Response, id: NODE?) = with(json) {
+        Event("message", compact(renderResult(asJsonObject(input), id ?: json.nullNode())))
+    }
+
+    operator fun invoke(input: Notification) = with(json) {
+        Event("message", compact(renderNotification(input.method.value)))
     }
 
     operator fun invoke(errorMessage: ErrorMessage, id: NODE?) = with(json) {

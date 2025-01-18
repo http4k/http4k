@@ -20,7 +20,7 @@ object Initialize : HasMethod {
         override val _meta: Map<String, Any> = default,
     ) : HasMeta, ServerMessage.Response
 
-    object Notification : ClientMessage.Request, HasMethod {
+    object Initialized : ClientMessage.Request, HasMethod {
         override val Method = of("notifications/initialized")
     }
 }

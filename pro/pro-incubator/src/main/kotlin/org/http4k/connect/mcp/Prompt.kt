@@ -42,7 +42,7 @@ data class Prompt(
             override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
 
-        data object Notification : ServerMessage.Notification {
+        data object Changed : ServerMessage.Notification {
             override val method = of("notifications/prompts/list_changed")
         }
     }

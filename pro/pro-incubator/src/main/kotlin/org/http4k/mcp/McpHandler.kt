@@ -75,7 +75,7 @@ fun McpHandler(
 
                         Completion.Method -> sessions[sId].respondTo(Completion, request, completions::complete)
 
-                        Ping.Method -> sessions[sId].send(Ping, Empty, request.id)
+                        Ping.Method -> sessions[sId].respondTo(Ping, request, { _: Ping.Request -> Empty })
                         Prompt.Get.Method -> sessions[sId].respondTo(Prompt.Get, request, prompts::get)
                         Prompt.List.Method -> sessions[sId].respondTo(Prompt.List, request, prompts::list)
 
@@ -89,22 +89,24 @@ fun McpHandler(
                         Resource.Read.Method -> sessions[sId].respondTo(Resource.Read, request, resources::read)
 
                         Resource.Subscribe.Method -> {
-                            resources.subscribe(serDe(request))
+                            val req1 = serDe<Resource.Subscribe.Request>(request)
+                            resources.subscribe(sId, req1) { sessions[sId]?.send(Resource.Updated(req1.uri)) }
                             Response(ACCEPTED)
                         }
 
                         Resource.Unsubscribe.Method -> {
-                            resources.unsubscribe(serDe(request))
+                            resources.unsubscribe(sId, serDe(request))
                             Response(ACCEPTED)
                         }
 
-                        Initialize.Notification.Method -> Response(ACCEPTED)
-                        Cancelled.Notification.Method -> Response(ACCEPTED)
+                        Initialize.Initialized.Method -> Response(ACCEPTED)
+                        Cancelled.Method -> Response(ACCEPTED)
 
-                        Root.Notification.Method -> {
+                        Root.Changed.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }
-                            sessions[sId].send(Root.List, Root.List.Request(), json.asJsonObject(messageId))
+                            sessions[sId]?.send(Root.List, Root.List.Request(), json.asJsonObject(messageId))
+                            Response(ACCEPTED)
                         }
 
                         Tool.Call.Method -> sessions[sId].respondTo(Tool.Call, request, tools::call)
@@ -131,21 +133,11 @@ fun McpHandler(
 }
 
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-    Session<NODE>?.respondTo(hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
+        Session<NODE>?.respondTo(hasMethod: HasMethod, req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
     when (this) {
         null -> Response(GONE)
         else -> {
-            process(hasMethod, req, fn)
+            process(req, fn)
             Response(ACCEPTED)
         }
     }
-
-private fun <NODE : Any> Session<NODE>?.send(hasMethod: HasMethod, resp: ServerMessage, id: NODE? = null) =
-    when (this) {
-        null -> Response(GONE)
-        else -> {
-            send(hasMethod, resp, id)
-            Response(ACCEPTED)
-        }
-    }
-

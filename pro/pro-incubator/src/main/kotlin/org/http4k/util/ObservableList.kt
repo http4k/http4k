@@ -4,16 +4,16 @@ import org.http4k.mcp.SessionId
 import kotlin.properties.Delegates
 
 abstract class ObservableList<T>(initial: List<T>) : Iterable<T> {
-    private val handlers = mutableMapOf<SessionId, () -> Any>()
+    private val callbacks = mutableMapOf<SessionId, () -> Any>()
 
-    var items by Delegates.observable(initial) { _, _, _ -> handlers.values.forEach { it() } }
+    var items by Delegates.observable(initial) { _, _, _ -> callbacks.values.forEach { it() } }
 
     fun onChange(sessionId: SessionId, handler: () -> Any) {
-        handlers[sessionId]= handler
+        callbacks[sessionId] = handler
     }
 
     fun remove(sessionId: SessionId) {
-        handlers.remove(sessionId)
+        callbacks.remove(sessionId)
     }
 
     override fun iterator() = items.iterator()

@@ -63,15 +63,17 @@ data class Resource(
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        data object Notification : ServerMessage.Notification {
+        data object Changed : ServerMessage.Notification {
             override val method = of("notifications/resources/list_changed")
         }
     }
 
-    object Updated {
-        data class Notification(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
-            HasMeta {
-            override val method = of("notifications/resources/updated")
+    data class Updated(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
+        HasMeta {
+        override val method = Method
+
+        companion object : HasMethod {
+            override val Method = McpRpcMethod.of("notifications/resources/updated")
         }
     }
 
