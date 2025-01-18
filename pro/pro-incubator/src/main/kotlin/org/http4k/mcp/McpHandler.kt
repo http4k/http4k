@@ -8,15 +8,15 @@ import org.http4k.connect.mcp.Completion
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpPrompt
 import org.http4k.connect.mcp.McpResource
+import org.http4k.connect.mcp.McpRoot
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.McpTool
 import org.http4k.connect.mcp.Ping
-import org.http4k.connect.mcp.ProtocolVersion
-import org.http4k.connect.mcp.Root
-import org.http4k.connect.mcp.ServerCapabilities
 import org.http4k.connect.mcp.ServerMessage
 import org.http4k.connect.mcp.ServerMessage.Response.Empty
 import org.http4k.connect.mcp.protocol.Implementation
+import org.http4k.connect.mcp.protocol.ProtocolVersion
+import org.http4k.connect.mcp.protocol.ServerCapabilities
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
@@ -103,10 +103,10 @@ fun McpHandler(
                         Initialize.Initialized.Method -> Response(ACCEPTED)
                         Cancelled.Method -> Response(ACCEPTED)
 
-                        Root.Changed.Method -> {
+                        McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }
-                            sessions[sId]?.send(Root.List, Root.List.Request(), json.asJsonObject(messageId))
+                            sessions[sId]?.send(McpRoot.List, McpRoot.List.Request(), json.asJsonObject(messageId))
                             Response(ACCEPTED)
                         }
 

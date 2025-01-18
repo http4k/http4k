@@ -1,6 +1,7 @@
 package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
+import org.http4k.connect.mcp.model.Meta
 import org.http4k.core.Uri
 import org.http4k.mcp.MimeType
 import org.http4k.mcp.resources.Resource

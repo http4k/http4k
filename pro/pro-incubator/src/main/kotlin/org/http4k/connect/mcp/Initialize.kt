@@ -2,9 +2,11 @@ package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
-import org.http4k.connect.mcp.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.connect.mcp.protocol.ClientCapabilites
 import org.http4k.connect.mcp.protocol.Implementation
+import org.http4k.connect.mcp.protocol.ProtocolVersion
+import org.http4k.connect.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.connect.mcp.protocol.ServerCapabilities
 
 object Initialize : HasMethod {
     override val Method = McpRpcMethod.of("initialize")

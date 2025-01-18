@@ -1,7 +1,8 @@
-package org.http4k.connect.mcp
+package org.http4k.connect.mcp.model
 
 import dev.forkhandles.values.DoubleValue
 import dev.forkhandles.values.DoubleValueFactory
+import org.http4k.connect.mcp._0_to_1
 
 class SpeedPriority private constructor(value: Double) : DoubleValue(value) {
     companion object : DoubleValueFactory<SpeedPriority>(::SpeedPriority, _0_to_1)

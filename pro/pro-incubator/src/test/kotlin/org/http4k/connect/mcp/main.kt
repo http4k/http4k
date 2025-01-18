@@ -1,7 +1,9 @@
 package org.http4k.connect.mcp
 
-import org.http4k.connect.mcp.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.connect.mcp.model.Role
 import org.http4k.connect.mcp.protocol.Implementation
+import org.http4k.connect.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.connect.mcp.protocol.Version
 import org.http4k.core.Uri
 import org.http4k.filter.debug
 import org.http4k.mcp.prompts.Content

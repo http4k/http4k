@@ -1,7 +1,10 @@
 package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.model.MaxTokens
+import org.http4k.connect.mcp.model.Meta
 import org.http4k.connect.mcp.model.ModelPreferences
+import org.http4k.connect.mcp.model.Role
+import org.http4k.connect.mcp.model.Temperature
 import org.http4k.mcp.prompts.Content
 
 object McpSampling {

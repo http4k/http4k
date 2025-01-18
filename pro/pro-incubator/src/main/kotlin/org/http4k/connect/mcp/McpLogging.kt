@@ -1,8 +1,9 @@
 package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
+import org.http4k.connect.mcp.model.Meta
 
-object Logging {
+object McpLogging {
     enum class Level {
         debug, info, notice, warning, error, critical, alert, emergency;
     }
