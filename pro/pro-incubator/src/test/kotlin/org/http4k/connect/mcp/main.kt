@@ -3,9 +3,10 @@ package org.http4k.connect.mcp
 import org.http4k.connect.mcp.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.core.Uri
 import org.http4k.filter.debug
+import org.http4k.mcp.prompts.PromptResponse
 import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolResponse
-import org.http4k.routing.RoutedPrompt
+import org.http4k.routing.Prompt
 import org.http4k.routing.RoutedResource
 import org.http4k.routing.RoutedResourceTemplate
 import org.http4k.routing.bind
@@ -18,8 +19,12 @@ fun main() {
     val mcpServer = mcp(
         Implementation("mcp-kotlin test server", Version.of("0.1.0")),
         LATEST_VERSION,
-        RoutedPrompt("prompt1", "description1"),
-        RoutedPrompt("prompt2", "description1"),
+        Prompt("prompt1", "description1") bind {
+            PromptResponse(Role.assistant to Content.Text(it.input.toString()))
+        },
+        Prompt("prompt1", "description1") bind {
+            PromptResponse(Role.assistant to Content.Text(it.input.toString()))
+        },
         RoutedResource(Uri.of("https://http4k.org")),
         Tool("reverse", "description", Reverse("name")) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))

@@ -10,6 +10,7 @@ import org.http4k.mcp.McpResourceTemplates
 import org.http4k.mcp.McpResources
 import org.http4k.mcp.McpRoots
 import org.http4k.mcp.McpTools
+import org.http4k.mcp.prompts.PromptHandler
 import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolHandler
 
@@ -25,4 +26,5 @@ fun mcp(implementation: Implementation, protocolVersion: ProtocolVersion, vararg
     McpPrompts(bindings.filterIsInstance<RoutedPrompt>())
 )
 
-infix fun <INPUT: Any> Tool<INPUT>.bind(other: ToolHandler<INPUT>) = RoutedTool(this, other)
+infix fun <INPUT : Any> Tool<INPUT>.bind(other: ToolHandler<INPUT>) = RoutedTool(this, other)
+infix fun Prompt.bind(other: PromptHandler) = RoutedPrompt(this, other)
