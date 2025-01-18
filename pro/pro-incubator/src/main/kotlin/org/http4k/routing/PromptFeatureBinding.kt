@@ -9,6 +9,7 @@ import org.http4k.mcp.protocol.McpPrompt
 class PromptFeatureBinding(val prompt: Prompt, val handler: PromptHandler) : FeatureBinding {
     fun toPrompt() = prompt
 
-    operator fun invoke(arguments: Map<String, String>, connectRequest: Request) =
+    fun get(arguments: Map<String, String>, connectRequest: Request) =
         handler(PromptRequest(arguments, connectRequest)).let { McpPrompt.Get.Response(it.messages, it.description) }
 }
+

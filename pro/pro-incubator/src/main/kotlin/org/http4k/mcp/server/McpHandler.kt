@@ -14,6 +14,7 @@ import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
@@ -77,10 +78,7 @@ fun McpHandler(
 
                         McpCompletion.Method -> sessions[sId].respondTo(jsonReq, req, completions::complete)
 
-                        McpPing.Method -> sessions[sId].respondTo(
-                            jsonReq,
-                            req
-                        ) { _: McpPing.Request, _: Request -> Empty }
+                        McpPing.Method -> sessions[sId].respondTo(jsonReq, req) { _: McpPing.Request, _: Request -> Empty }
 
                         McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq, req, prompts::get)
 
@@ -111,6 +109,7 @@ fun McpHandler(
                         McpInitialize.Initialized.Method -> Response(ACCEPTED)
                         Cancelled.Method -> Response(ACCEPTED)
 
+//                        McpSampling.Method -> sessions[sId].respondTo(jsonReq, req, samples::create)
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }

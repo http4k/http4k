@@ -12,9 +12,10 @@ import org.http4k.util.ObservableList
 class Prompts(bindings: List<PromptFeatureBinding>) : ObservableList<PromptFeatureBinding>(bindings), McpFeature {
     fun get(req: Get.Request, http: Request) = items
         .find { it.prompt.name == req.name }
-        ?.let { it(req.arguments, http) }
+        ?.get(req.arguments, http)
         ?: error("no prompt")
 
-    fun list(req: McpPrompt.List.Request, http: Request) = McpPrompt.List.Response(items.map(PromptFeatureBinding::toPrompt))
+    fun list(req: McpPrompt.List.Request, http: Request) =
+        McpPrompt.List.Response(items.map(PromptFeatureBinding::toPrompt))
 }
 

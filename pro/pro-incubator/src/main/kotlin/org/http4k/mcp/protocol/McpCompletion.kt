@@ -1,6 +1,7 @@
 package org.http4k.mcp.protocol
 
 import org.http4k.mcp.model.Completion
+import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.HasMeta.Companion.default
@@ -10,13 +11,9 @@ object McpCompletion : HasMethod {
 
     data class Request(
         val ref: Reference,
-        val argument: Argument,
+        val argument: CompletionArgument,
         override val _meta: Meta = default
-    ) : ClientMessage.Request, HasMeta {
-        companion object {
-            data class Argument(val name: String, val value: String)
-        }
-    }
+    ) : ClientMessage.Request, HasMeta
 
     data class Response(
         val completion: Completion,
