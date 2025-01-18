@@ -21,5 +21,7 @@ dependencies {
     testImplementation(project(":http4k-server-helidon"))
 
     testImplementation("org.jsoup:jsoup:_")
-    testImplementation(project(":http4k-format-moshi"))
+
+    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(project(":http4k-testing-approval"))
 }

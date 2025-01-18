@@ -49,13 +49,13 @@ import org.http4k.routing.bind as httpBind
  */
 fun McpHandler(
     metaData: ServerMetaData,
-    prompts: Prompts,
-    tools: Tools,
-    resources: Resources,
-    completions: Completions,
-    sampling: Sampling,
-    roots: Roots,
-    logger: Logger,
+    prompts: Prompts = Prompts(emptyList()),
+    tools: Tools = Tools(emptyList()),
+    resources: Resources = Resources(emptyList()),
+    completions: Completions = Completions(emptyList()),
+    sampling: Sampling = Sampling(emptyList()),
+    roots: Roots = Roots(),
+    logger: Logger = Logger(),
     random: Random = Random
 ): PolyHandler {
     val json = McpJson
