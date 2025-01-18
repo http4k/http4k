@@ -4,12 +4,16 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Uri
 import org.http4k.filter.debug
 import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.ModelName
+import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
+import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.Version
@@ -33,11 +37,22 @@ fun main() {
             PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
         },
         Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient()),
-        Resource.Templated(Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"), "HTTP4K ecosystem page", "view ecosystem") bind LinksOnPage(JavaHttpClient()),
-        Tool("reverse", "description", Reverse("name")) bind { ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed()))) },
+        Resource.Templated(
+            Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"),
+            "HTTP4K ecosystem page",
+            "view ecosystem"
+        ) bind LinksOnPage(JavaHttpClient()),
+        Tool(
+            "reverse",
+            "description",
+            Reverse("name")
+        ) bind { ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed()))) },
         Tool("count", "description", Multiply(1, 2)) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second)))
         },
+        ModelSelector(ModelName.of("my model")) { 1 } bind {
+            SampleResponse(ModelName.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
+        }
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()

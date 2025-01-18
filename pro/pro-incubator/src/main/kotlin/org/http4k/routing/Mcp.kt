@@ -10,9 +10,9 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
-import org.http4k.mcp.model.SamplingModel
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
@@ -33,4 +33,4 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
 infix fun <INPUT : Any> Tool<INPUT>.bind(handler: ToolHandler<INPUT>) = ToolFeatureBinding(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
-infix fun SamplingModel.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)
+infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)
