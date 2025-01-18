@@ -11,3 +11,6 @@ data class PolyHandler @JvmOverloads constructor(
     val ws: WsHandler? = null,
     val sse: SseHandler? = null
 )
+
+fun Filter.then(poly: PolyHandler): PolyHandler = poly.copy(http = poly.http?.let { then(it) })
+

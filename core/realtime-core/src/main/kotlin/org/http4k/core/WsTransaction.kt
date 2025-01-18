@@ -1,7 +1,9 @@
 package org.http4k.core
 
+import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus
+import org.http4k.websocket.then
 import java.time.Duration
 import java.time.Instant
 
@@ -15,3 +17,6 @@ data class WsTransaction(
 ) : ProtocolTransaction<WsResponse> {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
 }
+
+fun WsFilter.then(poly: PolyHandler): PolyHandler = poly.copy(ws = poly.ws?.let { then(it) })
+
