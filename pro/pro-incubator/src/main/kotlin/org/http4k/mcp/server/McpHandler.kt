@@ -47,7 +47,7 @@ fun McpHandler(
     prompts: Prompts,
     tools: Tools,
     resources: Resources,
-    completions: McpCompletions,
+    completions: Completions,
     roots: Roots,
     random: Random = Random
 ): PolyHandler {

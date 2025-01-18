@@ -10,7 +10,7 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.server.McpCompletions
+import org.http4k.mcp.server.Completions
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
 
@@ -22,7 +22,7 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
     Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
     Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
     Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
-    McpCompletions(),
+    Completions(),
     Roots()
 )
 
