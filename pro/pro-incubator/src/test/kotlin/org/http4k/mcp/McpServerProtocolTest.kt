@@ -9,11 +9,14 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.filter.debug
 import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.mcp.features.Roots
+import org.http4k.mcp.model.Root
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
@@ -26,7 +29,6 @@ import org.http4k.mcp.server.ClientCapabilities
 import org.http4k.mcp.server.McpEntity
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
-import org.http4k.mcp.testing.jsonRpcResult
 import org.http4k.mcp.util.McpJson
 import org.http4k.sse.SseMessage
 import org.http4k.testing.JsonApprovalTest
@@ -52,14 +54,22 @@ class McpServerProtocolTest {
 
     @Test
     fun `performs update roots`() {
-        val mcp = McpHandler(metadata, random = Random(0)).debug()
+        val roots = Roots()
+
+        val mcp = McpHandler(metadata, roots = roots, random = Random(0)).debug()
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
             mcp.sendToMcp(McpRoot.Changed)
 
-//            assertNextMessage(McpRoot.List, McpRoot.List.Request())
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), "a8baf924-2fcc-7be7-020b-7f533060e8ef")
+
+            val newRoots = listOf(Root(Uri.of("asd"), "name"))
+
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), "a8baf924-2fcc-7be7-020b-7f533060e8ef")
+
+            assertThat(roots.toList(), equalTo(newRoots))
         }
     }
 
@@ -82,60 +92,53 @@ class McpServerProtocolTest {
             McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
-        mcp.sendToMcp(McpInitialize, McpInitialize.Initialized)
+        mcp.sendToMcp(McpInitialize.Initialized)
     }
 
     private fun TestSseClient.assertNextMessage(input: McpResponse) {
         assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
     }
 
-    private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest) {
-        assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)) })
+    private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest, id: Any) {
+        assertNextMessage(with(McpJson) {
+            renderRequest(
+                hasMethod.Method.value,
+                asJsonObject(input),
+                asJsonObject(id)
+            )
+        })
     }
 
     private fun TestSseClient.assertNextMessage(node: JsonNode) {
         assertThat(
             received().first(),
-            equalTo(
-                SseMessage.Event("message",
-                    with(McpJson) {
-                        compact(
-                            node
-                        )
-                    })
-            )
+            equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))
         )
     }
 
     private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Request) {
-        assertThat(
-            http!!(
-                Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
-                    .body(
-                        with(McpJson) {
-                            compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
-                        }
-                    )
+        sendToMcp(with(McpJson) {
+            compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
+        })
+    }
 
-            ), hasStatus(ACCEPTED)
-        )
+    private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
+        sendToMcp(with(McpJson) {
+            compact(renderResult(asJsonObject(hasMethod), asJsonObject(id)))
+        })
     }
 
     private fun PolyHandler.sendToMcp(hasMethod: HasMethod) {
+        sendToMcp(with(McpJson) {
+            compact(renderNotification(hasMethod.Method.value))
+        })
+    }
+
+    private fun PolyHandler.sendToMcp(body: String) {
         assertThat(
             http!!(
-                Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
-                    .body(
-                        with(McpJson) {
-                            compact(renderNotification(hasMethod.Method.value))
-                        }
-                    )
-
+                Request(POST, "/message?sessionId=8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e").body(body)
             ), hasStatus(ACCEPTED)
         )
     }
-
-    private fun Sequence<SseMessage>.takeNextResult() =
-        McpJson.jsonRpcResult(first() as SseMessage.Event)
-
 }

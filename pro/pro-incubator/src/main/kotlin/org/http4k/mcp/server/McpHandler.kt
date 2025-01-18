@@ -121,6 +121,7 @@ fun McpHandler(
                         Cancelled.Method -> Response(ACCEPTED)
 
                         McpSampling.Method -> sessions[sId].respondTo(jsonReq, req, sampling::sample)
+
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }
