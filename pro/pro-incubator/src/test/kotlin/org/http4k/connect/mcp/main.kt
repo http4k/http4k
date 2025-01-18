@@ -30,7 +30,7 @@ fun main() {
         Prompt("prompt1", "description1") bind {
             PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
         },
-        Resource(Uri.of("https://http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient()),
+        Resource(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient().debug()),
         Tool("reverse", "description", Reverse("name")) bind {
             ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))
         },
