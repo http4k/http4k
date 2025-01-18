@@ -1,6 +1,6 @@
 package org.http4k.util
 
-import org.http4k.mcp.SessionId
+import org.http4k.mcp.server.SessionId
 import kotlin.properties.Delegates
 
 abstract class ObservableList<T>(initial: List<T>) : Iterable<T> {

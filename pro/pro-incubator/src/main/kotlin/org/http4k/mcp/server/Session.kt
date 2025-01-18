@@ -3,8 +3,6 @@ package org.http4k.mcp.server
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.mcp.Serde
-import org.http4k.mcp.SessionId
 import org.http4k.mcp.protocol.ClientMessage.Request
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.ServerMessage

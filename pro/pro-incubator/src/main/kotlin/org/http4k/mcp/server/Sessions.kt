@@ -3,8 +3,6 @@ package org.http4k.mcp.server
 import dev.forkhandles.values.random
 import org.http4k.core.Uri
 import org.http4k.core.query
-import org.http4k.mcp.Serde
-import org.http4k.mcp.SessionId
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.McpTool

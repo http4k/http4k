@@ -6,7 +6,6 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
-import org.http4k.mcp.SessionId
 import org.http4k.mcp.model.CostPriority
 import org.http4k.mcp.model.IntelligencePriority
 import org.http4k.mcp.model.MaxTokens
@@ -17,6 +16,7 @@ import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.SessionId
 
 object McpJson : ConfigurableJackson(
     KotlinModule.Builder().build()
