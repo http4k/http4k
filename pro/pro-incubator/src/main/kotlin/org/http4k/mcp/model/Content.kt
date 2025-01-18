@@ -1,8 +1,7 @@
-package org.http4k.mcp.prompts
+package org.http4k.mcp.model
 
 import org.http4k.connect.model.Base64Blob
 import org.http4k.mcp.MimeType
-import org.http4k.mcp.resources.Resource
 
 sealed interface Content {
     val type: String

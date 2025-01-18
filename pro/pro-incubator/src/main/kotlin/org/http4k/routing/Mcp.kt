@@ -10,9 +10,9 @@ import org.http4k.mcp.McpResourceTemplates
 import org.http4k.mcp.McpResources
 import org.http4k.mcp.McpRoots
 import org.http4k.mcp.McpTools
-import org.http4k.mcp.prompts.Prompt
+import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Tool
 import org.http4k.mcp.prompts.PromptHandler
-import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolHandler
 
 fun mcp(implementation: Implementation, protocolVersion: ProtocolVersion, vararg bindings: McpRouting) = McpHandler(

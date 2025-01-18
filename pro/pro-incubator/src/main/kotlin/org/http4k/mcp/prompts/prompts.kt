@@ -1,6 +1,7 @@
 package org.http4k.mcp.prompts
 
 import org.http4k.core.Request
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Role
 
 typealias PromptHandler = (PromptRequest) -> PromptResponse

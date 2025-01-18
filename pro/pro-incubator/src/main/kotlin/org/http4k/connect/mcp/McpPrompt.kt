@@ -2,9 +2,9 @@ package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Role
-import org.http4k.mcp.prompts.Content
 
 data class McpPrompt(
     val name: String,

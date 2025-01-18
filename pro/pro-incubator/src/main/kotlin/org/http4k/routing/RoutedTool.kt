@@ -11,8 +11,8 @@ import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
-import org.http4k.mcp.prompts.Content
-import org.http4k.mcp.tools.Tool
+import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.Tool
 import org.http4k.mcp.tools.ToolHandler
 import org.http4k.mcp.tools.ToolRequest
 import org.http4k.mcp.tools.ToolResponse.Error

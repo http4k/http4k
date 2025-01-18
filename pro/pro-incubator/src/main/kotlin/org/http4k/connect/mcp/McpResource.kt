@@ -6,7 +6,7 @@ import org.http4k.core.Uri
 import org.http4k.mcp.MimeType
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.resources.Resource
+import org.http4k.mcp.model.Resource
 
 object McpResource {
 

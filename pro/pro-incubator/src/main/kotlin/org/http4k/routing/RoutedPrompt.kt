@@ -2,7 +2,7 @@ package org.http4k.routing
 
 import org.http4k.connect.mcp.McpPrompt
 import org.http4k.core.Request
-import org.http4k.mcp.prompts.Prompt
+import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.prompts.PromptHandler
 import org.http4k.mcp.prompts.PromptRequest
 

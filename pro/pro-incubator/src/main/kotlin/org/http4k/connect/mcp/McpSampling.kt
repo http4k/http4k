@@ -1,11 +1,11 @@
 package org.http4k.connect.mcp
 
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.ModelPreferences
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Temperature
-import org.http4k.mcp.prompts.Content
 
 object McpSampling {
     data class Message(val role: Role, val content: Content) {
