@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v5.45.2.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4-core** : Support `Query.noValue()` lenses for query parameters.
 
 ### v5.45.1.0
 - **http4k-*** : Upgrade some dependency versions.
