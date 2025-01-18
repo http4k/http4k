@@ -6,10 +6,10 @@ import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.protocol.McpSampling
 
-class SamplingFeatureBinding(private val samplingModel: ModelSelector, private val handler: SamplingHandler) :
+class SamplingFeatureBinding(private val modelSelector: ModelSelector, private val handler: SamplingHandler) :
     FeatureBinding {
 
-    fun toSamplingModel() = samplingModel
+    fun toModelSelector() = modelSelector
 
     fun sample(req: McpSampling.Request, connectRequest: Request) =
         handler(

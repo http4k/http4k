@@ -21,14 +21,19 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
+import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
+import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
+import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
@@ -40,6 +45,7 @@ import org.http4k.mcp.protocol.McpRequest
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
+import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.ServerMessage
@@ -228,6 +234,29 @@ class McpServerProtocolTest {
             tools.items = emptyList()
 
             assertNextMessage(McpTool.List.Changed)
+        }
+    }
+
+    @Test
+    fun `deal with sampling`() {
+        val tool = Tool("name", "description", FooBar("foo", "bar"))
+
+        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+
+        val model = ModelIdentifier.of("name")
+        val sampling = Sampling(listOf(
+            ModelSelector(model, { 1 }) bind { SampleResponse(model, StopReason.of("bored"), Role.assistant, content) }
+        ))
+        val mcp = McpHandler(metadata, sampling = sampling, random = Random(0)).debug()
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpSampling, McpSampling.Request(listOf(), MaxTokens.of(1)))
+
+            assertNextMessage(
+                McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content)
+            )
         }
     }
 

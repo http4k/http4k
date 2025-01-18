@@ -14,10 +14,10 @@ class Sampling(private val list: List<SamplingFeatureBinding>) : McpFeature {
         mcp.selectModel()?.sample(mcp, http) ?: error("No model to serve request")
 
     private fun McpSampling.Request.selectModel() =
-        samplingFeatureBinding(this.modelPreferences)
+        samplingFeatureBinding(modelPreferences)
 
     private fun samplingFeatureBinding(modelPreferences: ModelPreferences?) = when {
         modelPreferences == null -> list.firstOrNull()
-        else -> list.maxByOrNull { it.toSamplingModel().score(modelPreferences) }
+        else -> list.maxByOrNull { it.toModelSelector().score(modelPreferences) }
     }
 }
