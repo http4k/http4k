@@ -1,9 +1,9 @@
 package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
-import org.http4k.connect.mcp.model.Completion
-import org.http4k.connect.mcp.model.Meta
-import org.http4k.connect.mcp.model.Reference
+import org.http4k.mcp.model.Completion
+import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.Reference
 
 object McpCompletion : HasMethod {
     override val Method = McpRpcMethod.of("completion/complete")

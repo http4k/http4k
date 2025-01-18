@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp.model
+package org.http4k.mcp.model
 
 data class ModelPreferences(
     val hints: List<ModelHint>? = null,

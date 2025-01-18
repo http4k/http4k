@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp.model
+package org.http4k.mcp.model
 
 import dev.forkhandles.values.DoubleValue
 import dev.forkhandles.values.DoubleValueFactory

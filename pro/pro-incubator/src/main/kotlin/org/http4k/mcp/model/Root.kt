@@ -1,4 +1,4 @@
-package org.http4k.connect.mcp.model
+package org.http4k.mcp.model
 
 import org.http4k.core.Uri
 

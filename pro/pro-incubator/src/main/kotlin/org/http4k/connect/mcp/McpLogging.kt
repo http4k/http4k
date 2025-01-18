@@ -1,7 +1,7 @@
 package org.http4k.connect.mcp
 
 import org.http4k.connect.mcp.HasMeta.Companion.default
-import org.http4k.connect.mcp.model.Meta
+import org.http4k.mcp.model.Meta
 
 object McpLogging {
     enum class Level {

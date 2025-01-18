@@ -1,6 +1,6 @@
 package org.http4k.connect.mcp
 
-import org.http4k.connect.mcp.model.Meta
+import org.http4k.mcp.model.Meta
 
 sealed interface HasMeta {
     val _meta: Meta get() = default

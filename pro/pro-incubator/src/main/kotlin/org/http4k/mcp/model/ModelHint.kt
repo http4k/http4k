@@ -1,3 +1,3 @@
-package org.http4k.connect.mcp.model
+package org.http4k.mcp.model
 
 data class ModelHint(val name: String?)
