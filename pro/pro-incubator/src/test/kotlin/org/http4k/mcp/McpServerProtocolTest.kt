@@ -34,6 +34,7 @@ import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.McpInitialize
 import org.http4k.mcp.protocol.McpNotification
+import org.http4k.mcp.protocol.McpPing
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpRequest
 import org.http4k.mcp.protocol.McpResource
@@ -41,6 +42,7 @@ import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
+import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.ClientCapabilities
 import org.http4k.mcp.server.McpEntity
@@ -69,6 +71,10 @@ class McpServerProtocolTest {
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpPing, McpPing.Request)
+
+            assertNextMessage(ServerMessage.Response.Empty)
         }
     }
 
@@ -156,9 +162,12 @@ class McpServerProtocolTest {
 
             resources.triggerUpdated(resource.uri)
 
-            assertThrows<NoSuchElementException> { received().first() }
+            assertNoResponse()
         }
     }
+
+    private fun TestSseClient.assertNoResponse() =
+        assertThrows<NoSuchElementException> { received().first() }
 
     @Test
     fun `deal with templated resources`() {
