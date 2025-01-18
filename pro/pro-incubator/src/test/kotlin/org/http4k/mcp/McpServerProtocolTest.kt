@@ -17,12 +17,15 @@ import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.model.Completion
+import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.MaxTokens
@@ -31,6 +34,7 @@ import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
@@ -38,6 +42,7 @@ import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
+import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.mcp.protocol.McpInitialize
 import org.http4k.mcp.protocol.McpLogging
 import org.http4k.mcp.protocol.McpNotification
@@ -259,6 +264,24 @@ class McpServerProtocolTest {
         }
     }
 
+
+    @Test
+    fun `deal with completions`() {
+        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val completions = Completions(
+            listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
+        )
+        val mcp = McpHandler(metadata, completions = completions, random = Random(0))
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value")))
+
+            assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
+        }
+    }
+
     @Test
     fun `deal with sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -360,4 +383,5 @@ private fun PolyHandler.sendToMcp(body: String) {
         ), hasStatus(ACCEPTED)
     )
 }
+
 val sessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
