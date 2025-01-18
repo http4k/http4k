@@ -2,8 +2,8 @@ package org.http4k.mcp
 
 import dev.forkhandles.values.random
 import org.http4k.connect.mcp.McpPrompt
+import org.http4k.connect.mcp.McpResource
 import org.http4k.connect.mcp.McpTool
-import org.http4k.connect.mcp.Resource
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.sse.Sse
@@ -26,7 +26,7 @@ class Sessions<NODE : Any>(
         val session = Session(sessionId, serDe, sse)
         sessions[sessionId] = session
         prompts.onChange(sessionId) { session.send(McpPrompt.List.Changed) }
-        resources.onChange(sessionId) { session.send(Resource.List.Changed) }
+        resources.onChange(sessionId) { session.send(McpResource.List.Changed) }
         tools.onChange(sessionId) { session.send(McpTool.List.Changed) }
 
         sse.onClose {

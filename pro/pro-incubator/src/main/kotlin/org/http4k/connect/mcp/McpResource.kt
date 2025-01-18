@@ -1,51 +1,23 @@
 package org.http4k.connect.mcp
 
-import org.http4k.connect.mcp.HasMeta.Companion.default
 import org.http4k.connect.mcp.McpRpcMethod.Companion.of
-import org.http4k.connect.model.Base64Blob
 import org.http4k.core.Uri
 import org.http4k.mcp.MimeType
+import org.http4k.mcp.resources.Resource
 
-data class Resource(
-    val uri: Uri,
-    val name: String,
-    val description: String? = null,
-    val mimeType: MimeType? = null
-) {
-    sealed interface Content {
-        val uri: Uri
-        val mimeType: MimeType?
-
-        data class Text(
-            val text: String,
-            override val uri: Uri,
-            override val mimeType: MimeType? = null
-        ) : Content
-
-        data class Blob(
-            val blob: Base64Blob,
-            override val uri: Uri,
-            override val mimeType: MimeType? = null,
-        ) : Content
-
-        data class Unknown(
-            override val uri: Uri,
-            override val mimeType: MimeType? = null,
-        ) : Content
-    }
-
+object McpResource {
 
     object Read : HasMethod {
         override val Method = of("resources/read")
 
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = default
+            override val _meta: Meta = HasMeta.default
         ) : ClientMessage.Request, HasMeta
 
         class Response(
-            val contents: kotlin.collections.List<Content>,
-            override val _meta: Meta = default
+            val contents: kotlin.collections.List<Resource.Content>,
+            override val _meta: Meta = HasMeta.default
         ) : ServerMessage.Response, HasMeta
     }
 
@@ -54,13 +26,13 @@ data class Resource(
 
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = default
+            override val _meta: Meta = HasMeta.default
         ) : PaginatedRequest, HasMeta
 
         class Response(
             val resources: kotlin.collections.List<Resource>,
             override val nextCursor: Cursor? = null,
-            override val _meta: Meta = default
+            override val _meta: Meta = HasMeta.default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
         data object Changed : ServerMessage.Notification {
@@ -68,12 +40,12 @@ data class Resource(
         }
     }
 
-    data class Updated(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
+    data class Updated(val uri: Uri, override val _meta: Meta = HasMeta.default) : ServerMessage.Notification,
         HasMeta {
         override val method = Method
 
         companion object : HasMethod {
-            override val Method = McpRpcMethod.of("notifications/resources/updated")
+            override val Method = of("notifications/resources/updated")
         }
     }
 
@@ -82,7 +54,7 @@ data class Resource(
 
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = default
+            override val _meta: Meta = HasMeta.default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -91,7 +63,7 @@ data class Resource(
 
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = default
+            override val _meta: Meta = HasMeta.default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -102,17 +74,17 @@ data class Resource(
         val mimeType: MimeType? = null,
     ) {
         object List : HasMethod {
-            override val Method = McpRpcMethod.of("resources/templates/list")
+            override val Method = of("resources/templates/list")
 
             data class Request(
                 override val cursor: Cursor?,
-                override val _meta: Meta = default
+                override val _meta: Meta = HasMeta.default
             ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 
             class Response(
                 val resourceTemplates: kotlin.collections.List<Template>,
                 override val nextCursor: Cursor? = null,
-                override val _meta: Meta = default
+                override val _meta: Meta = HasMeta.default
             ) : ServerMessage.Response, PaginatedResponse, HasMeta
         }
     }

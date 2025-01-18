@@ -5,13 +5,13 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
-import org.http4k.connect.mcp.Content
 import org.http4k.connect.mcp.McpTool
 import org.http4k.connect.mcp.util.McpJson
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.mcp.prompts.Content
 import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolHandler
 import org.http4k.mcp.tools.ToolRequest

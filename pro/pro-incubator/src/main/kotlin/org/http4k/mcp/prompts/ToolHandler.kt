@@ -1,6 +1,5 @@
 package org.http4k.mcp.prompts
 
-import org.http4k.connect.mcp.Content
 import org.http4k.connect.mcp.Role
 import org.http4k.core.Request
 

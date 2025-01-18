@@ -1,6 +1,6 @@
 package org.http4k.mcp
 
-import org.http4k.connect.mcp.Resource
+import org.http4k.connect.mcp.McpResource
 import org.http4k.core.Uri
 import org.http4k.routing.RoutedResource
 import org.http4k.util.ObservableList
@@ -15,22 +15,23 @@ class McpResources(list: List<RoutedResource>) : ObservableList<RoutedResource>(
         }
     }
 
-    fun list(req: Resource.List.Request) = Resource.List.Response(
+    fun list(req: McpResource.List.Request) = McpResource.List.Response(
         items.map(RoutedResource::toResource)
     )
 
-    fun read(req: Resource.Read.Request) = items.find { it.uri == req.uri }
+    fun read(req: McpResource.Read.Request) = items.find { it.uri == req.uri }
         ?.read()
-        ?.let { Resource.Read.Response(it) }
+        ?.let { McpResource.Read.Response(
+            it) }
         ?: error("no resource")
 
-    fun subscribe(sessionId: SessionId, req: Resource.Subscribe.Request, fn: (Uri) -> Unit) {
+    fun subscribe(sessionId: SessionId, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit) {
         subscriptions.getOrPut(req.uri to sessionId, ::emptySet).let {
             subscriptions[req.uri to sessionId] = it + fn
         }
     }
 
-    fun unsubscribe(sessionId: SessionId, req: Resource.Unsubscribe.Request) {
+    fun unsubscribe(sessionId: SessionId, req: McpResource.Unsubscribe.Request) {
         subscriptions.remove(req.uri to sessionId)
     }
 }

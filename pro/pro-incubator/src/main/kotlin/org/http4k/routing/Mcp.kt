@@ -10,6 +10,7 @@ import org.http4k.mcp.McpResourceTemplates
 import org.http4k.mcp.McpResources
 import org.http4k.mcp.McpRoots
 import org.http4k.mcp.McpTools
+import org.http4k.mcp.prompts.Prompt
 import org.http4k.mcp.prompts.PromptHandler
 import org.http4k.mcp.tools.Tool
 import org.http4k.mcp.tools.ToolHandler

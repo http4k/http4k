@@ -8,11 +8,11 @@ import org.http4k.connect.mcp.Completion
 import org.http4k.connect.mcp.Implementation
 import org.http4k.connect.mcp.Initialize
 import org.http4k.connect.mcp.McpPrompt
+import org.http4k.connect.mcp.McpResource
 import org.http4k.connect.mcp.McpRpcMethod
 import org.http4k.connect.mcp.McpTool
 import org.http4k.connect.mcp.Ping
 import org.http4k.connect.mcp.ProtocolVersion
-import org.http4k.connect.mcp.Resource
 import org.http4k.connect.mcp.Root
 import org.http4k.connect.mcp.ServerCapabilities
 import org.http4k.connect.mcp.ServerMessage
@@ -81,21 +81,21 @@ fun McpHandler(
 
                         McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, prompts::list)
 
-                        Resource.Template.List.Method -> sessions[sId].respondTo(
+                        McpResource.Template.List.Method -> sessions[sId].respondTo(
                             jsonReq,
                             resourceTemplates::list
                         )
 
-                        Resource.List.Method -> sessions[sId].respondTo(jsonReq, resources::list)
-                        Resource.Read.Method -> sessions[sId].respondTo(jsonReq, resources::read)
+                        McpResource.List.Method -> sessions[sId].respondTo(jsonReq, resources::list)
+                        McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, resources::read)
 
-                        Resource.Subscribe.Method -> {
-                            val req1 = serDe<Resource.Subscribe.Request>(jsonReq)
-                            resources.subscribe(sId, req1) { sessions[sId]?.send(Resource.Updated(req1.uri)) }
+                        McpResource.Subscribe.Method -> {
+                            val req1 = serDe<McpResource.Subscribe.Request>(jsonReq)
+                            resources.subscribe(sId, req1) { sessions[sId]?.send(McpResource.Updated(req1.uri)) }
                             Response(ACCEPTED)
                         }
 
-                        Resource.Unsubscribe.Method -> {
+                        McpResource.Unsubscribe.Method -> {
                             resources.unsubscribe(sId, serDe(jsonReq))
                             Response(ACCEPTED)
                         }
