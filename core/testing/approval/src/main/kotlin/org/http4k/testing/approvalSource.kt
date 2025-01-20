@@ -40,9 +40,23 @@ internal class FileReadWriteResource(private val target: File) : ReadWriteResour
             if (exists() && !delete()) throw IllegalAccessException("Could not delete $absolutePath")
 
             object : OutputStream() {
-                private val output by lazy { outputStream() }
+                private val delegate = lazy { outputStream() }
+                private val output by delegate
+
                 override fun write(b: Int) {
                     output.write(b)
+                }
+
+                override fun flush() {
+                    if (delegate.isInitialized()) {
+                        output.flush()
+                    }
+                }
+
+                override fun close() {
+                    if (delegate.isInitialized()) {
+                        output.close()
+                    }
                 }
             }
         }
