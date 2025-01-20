@@ -58,19 +58,19 @@ You may not:
 - Use http4k trademarks without written permission
 - Redistribute the original Software or modifications thereof as standalone products competing with http4k
 
-2.4 Technical Protection
-- The Software may include technical protection measures that control access
-- You may not circumvent, remove, or tamper with any technical protection measures
-- You are responsible for keeping any license keys, access credentials, or tokens secure
-- You may not share, publish, or distribute license keys to unauthorized users
+2.4 License Validation and Access Control
+- The commercially licensed components include protected source code and technical measures that control access
+- You are responsible for maintaining valid license keys or access tokens provided by http4k Ltd
+- You may not share, publish, distribute, or expose license keys or protected source code to unauthorized users
+- You must ensure your usage complies with the license grant for your subscription tier
 
 2.5 Prohibited Activities
 
 You may not, with respect to the Proprietary Components, directly or indirectly:
 - Create commercial products that:
-  a) Replicate or repackage any functionality of http4k's commercially licensed components
-  b) Are designed to circumvent the need for http4k commercial licensing
-  c) Provide commercial alternatives to http4k's commercial features
+  a) Replicate or repackage any functionality of the Proprietary Components
+  b) Are designed to circumvent the need for commercial licensing
+  c) Provide commercial alternatives to licensed features
 - Resell, relicense, or redistribute commercially licensed components except as explicitly permitted
 - Use commercially licensed components in a way that exceeds your license grant
 - Publish benchmarks or comparative analysis without written permission of http4k Ltd
@@ -78,11 +78,11 @@ You may not, with respect to the Proprietary Components, directly or indirectly:
 
 The above restrictions do not apply to http4k components released under the Apache 2 license.
 
-2.6 Access and Distribution
-- Access to proprietary source code and/or binary distributions is provided through designated private repositories
-- Your rights to access these repositories are determined by your license type
-- You may not redistribute the proprietary source code or binaries except as explicitly permitted
-- You must maintain the confidentiality of any private repository access credentials
+2.6 Access to Protected Components
+- Access to protected source code and binary distributions is provided through designated private repositories
+- Your rights to access these repositories are determined by your subscription tier
+- You may not redistribute protected source code or binaries except as explicitly permitted
+- You must maintain the confidentiality of protected source code and repository access credentials
 
 ## 3. Term and Termination
 
@@ -117,9 +117,9 @@ Support and updates are provided according to your Subscription Tier as specifie
 
 Use and distribution of the Software may be subject to export and import laws. You agree to comply with all applicable export and import laws and regulations.
 
-## 8. Community Edition Exclusion
+## 8. Apache License Exclusion
 
-This Commercial License applies only to the part of this Software that is not distributed as part of http4k Community Edition (CE). Any part of this Software distributed as part of http4k CE or is served client-side as an image, font, cascading stylesheet (CSS), file which produces or is compiled, arranged, augmented, or combined into client-side JavaScript, in whole or in part, is copyrighted under the Apache2 license.
+This Commercial License applies only to the part of this Software that is not distributed under the Apache2 license.
 
 ## 9. Warranty Disclaimer
 
