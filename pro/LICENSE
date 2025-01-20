@@ -66,20 +66,15 @@ You may not:
 
 2.5 Prohibited Activities
 
-You may not, with respect to the Proprietary Components:
-
-- Create products or implementations that:
-a) Compete with or replicate any part of http4k Commercially licensed components
-b) Are designed to reduce or eliminate the need for http4k commercial licensing
-c) Enable users to access similar functionality to http4k commercial features without appropriate licensing
-- Reverse engineer, decompile, disassemble, or attempt to derive the source code
+You may not, with respect to the Proprietary Components, directly or indirectly:
+- Create commercial products that:
+  a) Replicate or repackage any functionality of http4k's commercially licensed components
+  b) Are designed to circumvent the need for http4k commercial licensing
+  c) Provide commercial alternatives to http4k's commercial features
+- Resell, relicense, or redistribute commercially licensed components except as explicitly permitted
+- Use commercially licensed components in a way that exceeds your license grant
 - Publish benchmarks or comparative analysis without written permission of http4k Ltd
 - Automate access to, or create automated variants of, the Software
-
-- During the subscription term and for 2 years after:
-  a) Use knowledge gained from access to source code or documentation to create competing implementations
-  b) Advise or assist others in creating implementations that replicate commercial features
-  c) Employ or engage any http4k employee or contractor who had access to source code
 
 The above restrictions do not apply to http4k components released under the Apache 2 license.
 
