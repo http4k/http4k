@@ -65,13 +65,17 @@ You may not:
 - You may not share, publish, or distribute license keys to unauthorized users
 
 2.5 Prohibited Activities
+
 You may not, with respect to the Proprietary Components:
+- Create products or implementations that:
+  a) Compete with or replicate any part of http4k Commercially licensed components
+  b) Are designed to reduce or eliminate the need for http4k commercial licensing
+  c) Enable users to access similar functionality to http4k commercial features without appropriate licensing
 - Reverse engineer, decompile, disassemble, or attempt to derive the source code
-- Create products that compete with http4k Pro or Enterprise editions
-- Publish benchmarks or comparative analysis without written permission
+- Publish benchmarks or comparative analysis without written permission of http4k Ltd
 - Automate access to, or create automated variants of, the Software
 
-The above restrictions do not apply to components released under the Apache 2 license as part of http4k Community Edition.
+The above restrictions do not apply to http4k components released under the Apache 2 license.
 
 2.6 Access and Distribution
 - Access to proprietary source code and/or binary distributions is provided through designated private repositories
