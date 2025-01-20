@@ -136,6 +136,7 @@ fun Path.regexGroup(pattern: String, group: Int = 1) = map(StringBiDiMappings.re
 fun Path.regexObject() = map(StringBiDiMappings.regexObject())
 fun Path.urlEncoded() = map(StringBiDiMappings.urlEncoded())
 fun Path.duration() = map(StringBiDiMappings.duration())
+fun Path.kduration() = map(StringBiDiMappings.kduration())
 fun Path.yearMonth() = map(StringBiDiMappings.yearMonth())
 fun Path.instant() = map(StringBiDiMappings.instant())
 fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(StringBiDiMappings.localDateTime(formatter))

@@ -24,6 +24,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.Locale
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 class BiDiLensSpecTest {
 
@@ -223,6 +224,10 @@ class BiDiLensSpecTest {
     @Test
     fun duration() =
         checkContract(spec.duration(), Duration.ofSeconds(35), "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
+
+    @Test
+    fun kduration() =
+        checkContract(spec.kduration(), 35.seconds, "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
 
     @Test
     fun zoneId() = checkContract(

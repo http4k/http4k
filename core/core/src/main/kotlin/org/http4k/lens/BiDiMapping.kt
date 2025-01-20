@@ -79,6 +79,7 @@ object StringBiDiMappings {
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
     fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
     fun duration() = BiDiMapping(Duration::parse, Duration::toString)
+    fun kduration() = BiDiMapping(kotlin.time.Duration::parseIsoString, kotlin.time.Duration::toIsoString)
     fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
     fun url() = BiDiMapping({ URI(it).toURL() }, URL::toExternalForm)
     fun uuid() = BiDiMapping(UUID::fromString, UUID::toString)
