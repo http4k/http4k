@@ -1,4 +1,4 @@
-package org.http4k.sse
+package org.http4k.mcp
 
 import org.http4k.core.Request
 
