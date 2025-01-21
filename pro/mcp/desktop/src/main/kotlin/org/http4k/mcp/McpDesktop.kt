@@ -22,7 +22,7 @@ object McpDesktop {
                 if (debug) DebuggingWriter(System.out.writer()) else System.out.writer(),
                 SimpleSchedulerService(1),
                 Request(GET, Uri.of(url).extend(Uri.of("sse"))),
-                if (debug) JavaHttpClient().debug() else JavaHttpClient(),
+                if (debug) JavaHttpClient().debug(System.err) else JavaHttpClient(),
                 JavaSseClient()
             )
         }
