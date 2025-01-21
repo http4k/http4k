@@ -26,6 +26,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
+import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -40,6 +41,8 @@ data class ArbObject(val string: String, val child: ArbObject?, val numbers: Lis
 
 @Serializable
 data class CommonJdkPrimitives(
+    @Contextual
+    val period: Period,
     @Contextual
     val duration: Duration,
     @Contextual
@@ -112,6 +115,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
         val obj = CommonJdkPrimitives(
+            Period.of(1, 2, 3),
             Duration.ofMillis(1000),
             localDate,
             localTime,

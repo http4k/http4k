@@ -16,6 +16,7 @@ import java.math.BigInteger
 import java.net.URI
 import java.net.URL
 import java.time.Duration
+import java.time.Period
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -78,6 +79,7 @@ object StringBiDiMappings {
     fun regexGroup(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
     fun urlEncoded() = BiDiMapping(String::urlDecoded, String::urlEncoded)
+    fun period() = BiDiMapping(Period::parse, Period::toString)
     fun duration() = BiDiMapping(Duration::parse, Duration::toString)
     fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
     fun url() = BiDiMapping({ URI(it).toURL() }, URL::toExternalForm)

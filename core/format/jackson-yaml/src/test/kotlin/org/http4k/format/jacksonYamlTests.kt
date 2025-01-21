@@ -102,7 +102,8 @@ child:
 numbers: []
 bool: false
 """
-    override val expectedAutoMarshallingResultPrimitives: String = """duration: "PT1S"
+    override val expectedAutoMarshallingResultPrimitives: String = """period: "P1Y2M3D"
+duration: "PT1S"
 localDate: "2000-01-01"
 localTime: "01:01:01"
 localDateTime: "2000-01-01T01:01:01"

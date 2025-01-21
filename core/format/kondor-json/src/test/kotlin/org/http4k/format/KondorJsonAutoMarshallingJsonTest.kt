@@ -34,6 +34,7 @@ import org.http4k.lens.StringBiDiMappings.localTime
 import org.http4k.lens.StringBiDiMappings.locale
 import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
+import org.http4k.lens.StringBiDiMappings.period
 import org.http4k.lens.StringBiDiMappings.throwable
 import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
@@ -263,6 +264,7 @@ private object JMyValueHolder : JAny<MyValueHolder>() {
 }
 
 private object JCommonJdkPrimitives : JAny<CommonJdkPrimitives>() {
+    val period by str(period().asJConverter(), CommonJdkPrimitives::period)
     val duration by str(duration().asJConverter(), CommonJdkPrimitives::duration)
     val localDate by str(localDate().asJConverter(), CommonJdkPrimitives::localDate)
     val localTime by str(localTime().asJConverter(), CommonJdkPrimitives::localTime)
@@ -278,6 +280,7 @@ private object JCommonJdkPrimitives : JAny<CommonJdkPrimitives>() {
 
     override fun JsonNodeObject.deserializeOrThrow() =
         CommonJdkPrimitives(
+            period = +period,
             duration = +duration,
             localDate = +localDate,
             localTime = +localTime,

@@ -12,6 +12,7 @@ import org.http4k.lens.StringBiDiMappings.localTime
 import org.http4k.lens.StringBiDiMappings.locale
 import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
+import org.http4k.lens.StringBiDiMappings.period
 import org.http4k.lens.StringBiDiMappings.regexObject
 import org.http4k.lens.StringBiDiMappings.samplingDecision
 import org.http4k.lens.StringBiDiMappings.throwable
@@ -67,6 +68,7 @@ interface AutoMappingConfiguration<BUILDER> {
  * This is the set of (additional) standardised string <-> type mappings which http4k supports out of the box.
  */
 fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
+    text(period())
     text(duration())
     text(uri())
     text(url())

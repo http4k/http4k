@@ -18,6 +18,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
+import java.time.Period
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -219,6 +220,10 @@ class BiDiLensSpecTest {
         "o1970-01-01T00:00:00Z[UTC]",
         "o1970-01-01T00:00:00Z[UTC]1970-01-01T00:00:00Z[UTC]"
     )
+
+    @Test
+    fun period() =
+        checkContract(spec.period(), Period.of(1, 2, 3), "P1Y2M3D", "", "notathing", "o", "oP1Y2M3D", "oP1Y2M3DP1Y2M3D")
 
     @Test
     fun duration() =

@@ -360,6 +360,7 @@ fun <IN : Any> BiDiLensSpec<IN, String>.regexGroup(pattern: String, group: Int =
     map(StringBiDiMappings.regexGroup(pattern, group))
 fun <IN : Any> BiDiLensSpec<IN, String>.urlEncoded() = map(StringBiDiMappings.urlEncoded())
 fun <IN : Any> BiDiLensSpec<IN, String>.regexObject() = map(StringBiDiMappings.regexObject())
+fun <IN : Any> BiDiLensSpec<IN, String>.period() = map(StringBiDiMappings.period())
 fun <IN : Any> BiDiLensSpec<IN, String>.duration() = map(StringBiDiMappings.duration())
 fun <IN : Any> BiDiLensSpec<IN, String>.base64() = map(StringBiDiMappings.base64())
 fun <IN : Any> BiDiLensSpec<IN, String>.instant() = map(StringBiDiMappings.instant())
