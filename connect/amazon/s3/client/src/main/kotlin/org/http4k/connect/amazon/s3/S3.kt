@@ -4,9 +4,11 @@ import dev.forkhandles.result4k.Result
 import org.http4k.connect.Http4kConnectApiClient
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.AwsServiceCompanion
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.s3.action.GetObject
 import org.http4k.connect.amazon.s3.action.PutObject
 import org.http4k.connect.amazon.s3.model.BucketKey
+import org.http4k.connect.amazon.s3.model.BucketName
 import java.io.InputStream
 
 /**
@@ -24,6 +26,9 @@ interface S3 {
  */
 @Http4kConnectApiClient
 interface S3Bucket {
+    val bucketName: BucketName
+    val bucketRegion: Region
+
     operator fun <R> invoke(action: S3BucketAction<R>): Result<R, RemoteFailure>
 
     operator fun get(key: BucketKey): Result<InputStream?, RemoteFailure> = this(GetObject(key))
