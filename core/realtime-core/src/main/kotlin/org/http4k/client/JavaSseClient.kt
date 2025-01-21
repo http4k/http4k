@@ -23,47 +23,47 @@ class JavaSseClient(
 
     private val queue = LinkedBlockingQueue<() -> SseMessage?>()
 
-    override fun invoke(p1: Request) =
-        object : SseClient {
-            private var subscription: Subscription? = null
-            private val buffer = StringBuilder()
+    override fun invoke(p1: Request) = object : SseClient {
+        private var subscription: Subscription? = null
+        private val buffer = StringBuilder()
 
-            val future = httpClient.sendAsync(
-                p1.fromHttp4k(Memory, requestModifier),
-                fromLineSubscriber(object : Subscriber<String> {
-                    override fun onSubscribe(newSub: Subscription) {
-                        subscription = newSub
-                        newSub.request(MAX_VALUE)
-                    }
+        val future = httpClient.sendAsync(
+            p1.fromHttp4k(Memory, requestModifier),
+            fromLineSubscriber(object : Subscriber<String> {
+                override fun onSubscribe(newSub: Subscription) {
+                    subscription = newSub
+                    newSub.request(MAX_VALUE)
+                }
 
-                    override fun onError(e: Throwable) {
-                        subscription?.cancel()
-                        queue.add { throw e }
-                    }
+                override fun onError(e: Throwable) {
+                    subscription?.cancel()
+                    queue.add { throw e }
+                }
 
-                    override fun onComplete() {
-                        subscription?.cancel()
-                        queue.add { null }
-                    }
+                override fun onComplete() {
+                    subscription?.cancel()
+                    queue.add { null }
+                }
 
-                    override fun onNext(item: String) {
-                        when {
-                            item.isEmpty() -> if (buffer.isNotEmpty()) {
-                                val message = buffer.toString().trim()
-                                queue.add { SseMessage.parse(message) }
-                                buffer.clear()
-                            }
-                            else -> buffer.append(item).append("\n")
+                override fun onNext(item: String) {
+                    when {
+                        item.isEmpty() -> if (buffer.isNotEmpty()) {
+                            val message = buffer.toString().trim()
+                            queue.add { SseMessage.parse(message) }
+                            buffer.clear()
                         }
+
+                        else -> buffer.append(item).append("\n")
                     }
-                })
-            )
+                }
+            })
+        )
 
-            override fun received() = generateSequence { queue.take()() }
+        override fun received() = generateSequence { queue.take()() }
 
-            override fun close() {
-                subscription?.cancel()
-                future.cancel(true)
-            }
+        override fun close() {
+            subscription?.cancel()
+            future.cancel(true)
         }
+    }
 }
