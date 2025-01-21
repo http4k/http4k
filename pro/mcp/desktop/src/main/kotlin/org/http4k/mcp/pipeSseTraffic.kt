@@ -1,4 +1,4 @@
-package org.http4k.sse
+package org.http4k.mcp
 
 import org.http4k.client.JavaSseClient
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
@@ -6,6 +6,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.lens.accept
+import org.http4k.sse.SseClient
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import java.io.InputStreamReader
