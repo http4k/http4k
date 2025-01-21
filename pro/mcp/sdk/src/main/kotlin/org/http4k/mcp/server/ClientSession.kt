@@ -24,6 +24,7 @@ class ClientSession<NODE : Any>(
             .map { serDe(it, req.id) }
             .recover { serDe(InternalError, req.id) }
             .getOrElse { serDe(InvalidRequest, req.id) }
+            .also { println(it) }
     )
 
     fun send(hasMethod: HasMethod, req: ServerMessage.Request, id: NODE? = null) = sse.send(serDe(hasMethod, req, id))

@@ -12,6 +12,10 @@ class JsonRpcResult<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
         if (!setOf(JsonType.Object, JsonType.Array).contains(json.typeOf(it))) valid = false
     }
 
+    val error: NODE? = fields["error"]
+
+    fun isError() = error!= null
+
     val id: NODE? = fields["id"]?.let {
         if (!setOf(JsonType.String, JsonType.Number, JsonType.Integer, JsonType.Null).contains(json.typeOf(it))) {
             valid = false

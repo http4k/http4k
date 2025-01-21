@@ -9,7 +9,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
-import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
@@ -76,6 +75,7 @@ fun McpHandler(
             "/message" httpBind POST to { req: Request ->
                 val sId = SessionId.parse(req.query("sessionId")!!)
 
+                println(req.bodyString())
                 val jsonReq = Body.jsonRpcRequest(json).toLens()(req)
 
                 if (jsonReq.valid()) {
@@ -86,7 +86,10 @@ fun McpHandler(
                             sessions[sId].respondTo(jsonReq, req, completions::complete)
                         }
 
-                        McpPing.Method -> sessions[sId].respondTo(jsonReq, req) { _: McpPing.Request, _: Request -> Empty }
+                        McpPing.Method -> sessions[sId].respondTo(
+                            jsonReq,
+                            req
+                        ) { _: McpPing.Request, _: Request -> Empty }
 
                         McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq, req, prompts::get)
 
@@ -135,20 +138,22 @@ fun McpHandler(
 
                         McpTool.List.Method -> sessions[sId].respondTo(jsonReq, req, tools::list)
 
-                        else -> Response(NOT_IMPLEMENTED)
+                        else -> Response(GONE)
                     }
                 } else {
                     val result = Body.jsonRpcResult(json).toLens()(req)
 
-                    with(McpJson) {
-                        val messageId = asA<MessageId>(asFormatString(result.id ?: nullNode()))
-                        try {
-                            calls[messageId]?.invoke(result)
-                        } finally {
-                            calls -= messageId
+                    when {
+                        result.isError() -> Response(GONE)
+                        else -> with(McpJson) {
+                            val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
+                            try {
+                                calls[messageId]?.invoke(result)?.let { Response(ACCEPTED) } ?: Response(GONE)
+                            } finally {
+                                calls -= messageId
+                            }
                         }
                     }
-                    Response(ACCEPTED)
                 }
             }
         )
