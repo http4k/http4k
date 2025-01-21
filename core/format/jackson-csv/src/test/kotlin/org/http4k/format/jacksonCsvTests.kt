@@ -20,6 +20,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
+import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -89,6 +90,7 @@ class JacksonCsvBodyTest {
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
         val obj = CommonJdkPrimitives(
+            Period.of(1, 2, 3),
             Duration.ofMillis(1000),
             localDate,
             localTime,
@@ -104,8 +106,8 @@ class JacksonCsvBodyTest {
         )
 
         val csv =
-            """duration,instant,localDate,localDateTime,localTime,offsetDateTime,offsetTime,status,uri,url,uuid,zonedDateTime
-PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:01:01Z,01:01:01Z,200,http://uri:8000,http://url:9000,"1a448854-1687-4f90-9562-7d527d64383c","2000-01-01T01:01:01Z[UTC]"
+            """duration,instant,localDate,localDateTime,localTime,offsetDateTime,offsetTime,period,status,uri,url,uuid,zonedDateTime
+PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:01:01Z,01:01:01Z,P1Y2M3D,200,http://uri:8000,http://url:9000,"1a448854-1687-4f90-9562-7d527d64383c","2000-01-01T01:01:01Z[UTC]"
 """
 
         val lens = Body.auto<CommonJdkPrimitives>().toLens()

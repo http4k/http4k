@@ -20,7 +20,8 @@ class MoshiYamlAutoTest : AutoMarshallingContract(MoshiYaml) {
         "  ]\n" +
         "bool:false\n"
 
-    override val expectedAutoMarshallingResultPrimitives: String = "duration:PT1S\n" +
+    override val expectedAutoMarshallingResultPrimitives: String = "period:P1Y2M3D\n" +
+        "duration:PT1S\n" +
         "localDate:'2000-01-01'\n" +
         "localTime:01:01:01\n" +
         "localDateTime:'2000-01-01T01:01:01'\n" +

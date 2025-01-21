@@ -28,6 +28,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
+import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -35,6 +36,7 @@ import java.util.Locale
 import java.util.UUID
 
 data class CommonJdkPrimitives(
+    val period: Period,
     val duration: Duration,
     val localDate: LocalDate,
     val localTime: LocalTime,
@@ -145,6 +147,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
         val obj = CommonJdkPrimitives(
+            Period.of(1, 2, 3),
             Duration.ofMillis(1000),
             localDate,
             localTime,
