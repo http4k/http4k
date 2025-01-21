@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.internal
 
 import org.http4k.core.Request
 
