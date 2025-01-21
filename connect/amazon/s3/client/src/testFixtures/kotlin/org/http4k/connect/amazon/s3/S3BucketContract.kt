@@ -73,6 +73,12 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
+    fun `bucket properties`() {
+        assertThat(s3Bucket.bucketRegion, equalTo(aws.region))
+        assertThat(s3Bucket.bucketName, equalTo(bucket))
+    }
+
+    @Test
     fun `bucket key lifecycle`() {
         waitForBucketCreation()
         try {

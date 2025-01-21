@@ -44,6 +44,8 @@ fun S3Bucket.Companion.Http(
             )
             .then(http)
 
+    override val bucketName = bucketName
+    override val bucketRegion = bucketRegion
     override fun <R> invoke(action: S3BucketAction<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
