@@ -1,4 +1,4 @@
-package org.http4k.mcp.server
+package org.http4k.mcp.protocol
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
@@ -17,24 +17,13 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.LogLevel.error
 import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.processing.Serde
-import org.http4k.mcp.protocol.Cancelled
-import org.http4k.mcp.protocol.McpCompletion
-import org.http4k.mcp.protocol.McpInitialize
-import org.http4k.mcp.protocol.McpLogging
-import org.http4k.mcp.protocol.McpPing
-import org.http4k.mcp.protocol.McpPrompt
-import org.http4k.mcp.protocol.McpResource
-import org.http4k.mcp.protocol.McpRoot
-import org.http4k.mcp.protocol.McpRpcMethod
-import org.http4k.mcp.protocol.McpSampling
-import org.http4k.mcp.protocol.McpTool
-import org.http4k.mcp.protocol.MessageId
-import org.http4k.mcp.protocol.ServerMessage
+import org.http4k.mcp.server.ServerMetaData
+import org.http4k.mcp.server.SessionId
 import org.http4k.mcp.util.McpJson
 import org.http4k.sse.SseMessage
 import kotlin.random.Random
 
-abstract class McpProtocolLogic<RSP : Any>(
+abstract class McpProtocol<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools,
     private val completions: Completions,

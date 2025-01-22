@@ -19,19 +19,27 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
+import org.http4k.mcp.server.SseMcpProtocol
+import org.http4k.mcp.util.McpJson
+import kotlin.random.Random
 
 /**
  * Create a simple MCP server from a set of feature bindings.
  */
 fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHandler(
-    metaData = serverMetaData,
-    prompts = Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
-    tools = Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
-    resources = Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
-    completions = Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
-    sampling = Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
-    roots = Roots(),
-    logger = Logger()
+    SseMcpProtocol(
+        serverMetaData,
+        Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
+        Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
+        Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
+        Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
+        Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
+        Roots(),
+        Logger(),
+        Random,
+        McpJson
+    ),
+    McpJson
 )
 
 infix fun <INPUT : Any> Tool<INPUT>.bind(handler: ToolHandler<INPUT>) = ToolFeatureBinding(this, handler)
@@ -39,3 +47,4 @@ infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handl
 infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
 infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionFeatureBinding(this, handler)
+
