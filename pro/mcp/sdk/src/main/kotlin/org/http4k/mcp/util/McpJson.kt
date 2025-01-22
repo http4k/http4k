@@ -17,8 +17,8 @@ import org.http4k.mcp.model.Temperature
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion
+import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.SessionId
 
 object McpJson : ConfigurableJackson(
     KotlinModule.Builder().build()

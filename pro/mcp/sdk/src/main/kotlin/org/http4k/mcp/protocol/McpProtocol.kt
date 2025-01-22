@@ -16,8 +16,6 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.LogLevel.error
 import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.processing.Serde
-import org.http4k.mcp.server.ServerMetaData
-import org.http4k.mcp.server.SessionId
 import org.http4k.mcp.util.McpJson
 import org.http4k.sse.SseMessage
 import kotlin.Long.Companion.MAX_VALUE

@@ -1,6 +1,4 @@
-package org.http4k.mcp.server
-
-import org.http4k.mcp.protocol.Version
+package org.http4k.mcp.protocol
 
 /**
  * A description of an entity taking part in the MCP protocol - can be a client or a server.
