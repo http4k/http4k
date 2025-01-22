@@ -30,7 +30,7 @@ class ClientSessions<NODE : Any>(
     fun add(sse: Sse) {
         val sessionId = SessionId.random(random)
 
-        val session = ClientSession(sessionId, serDe, sse)
+        val session = ClientSession(serDe, sse)
         sessions[sessionId] = session
         logger.subscribe(sessionId, error) { level, logger, data ->
             session.send(McpLogging.LoggingMessage(level, logger, data))
