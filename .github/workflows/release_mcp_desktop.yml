@@ -35,13 +35,17 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - macos-latest-xlarge
+          - windows-latest
         include:
-          - os: ubuntu-latest
-            label: linux
-          - os: macos-12-large
+          - os: macos-latest
             label: macos-x86_64
-          - os: macos-12-xlarge
+            suffix: ""
+          - os: macos-latest-xlarge
             label: macos-arm64
+            suffix: ""
+          - os: windows-latest
+            label: windows
+            suffix: ".exe"
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout
@@ -69,6 +73,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.RELEASE_TOKEN}}
         with:
           upload_url: ${{env.UPLOAD_URL}}
-          asset_name: http4k-mcp-desktop-${{ github.event.client_payload.VERSION }}-${{matrix.label}}
-          asset_path: pro/mcp/desktop/build/native/nativeCompile/http4k-mcp-client
+          asset_name: mcp-desktop-${{ github.event.client_payload.VERSION }}-${{matrix.label}}
+          asset_path: pro/mcp/desktop/build/native/nativeCompile/mcp-desktop
           asset_content_type: application/octet-stream
