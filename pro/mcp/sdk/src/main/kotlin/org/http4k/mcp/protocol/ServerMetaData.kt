@@ -1,6 +1,5 @@
-package org.http4k.mcp.server
+package org.http4k.mcp.protocol
 
-import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 
 /**

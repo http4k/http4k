@@ -1,7 +1,7 @@
 package org.http4k.mcp.features
 
 import org.http4k.mcp.model.LogLevel
-import org.http4k.mcp.server.SessionId
+import org.http4k.mcp.protocol.SessionId
 import java.util.concurrent.ConcurrentHashMap
 
 class Logger : McpFeature {

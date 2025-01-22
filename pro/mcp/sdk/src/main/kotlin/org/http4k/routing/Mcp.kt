@@ -15,9 +15,9 @@ import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.McpHandler
-import org.http4k.mcp.server.ServerMetaData
-import org.http4k.mcp.server.SseMcpProtocol
+import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
 
 /**
