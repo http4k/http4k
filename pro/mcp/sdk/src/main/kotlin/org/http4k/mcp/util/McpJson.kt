@@ -1,6 +1,7 @@
 package org.http4k.mcp.util
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
@@ -19,6 +20,8 @@ import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
+
+typealias McpNodeType = JsonNode
 
 object McpJson : ConfigurableJackson(
     KotlinModule.Builder().build()
