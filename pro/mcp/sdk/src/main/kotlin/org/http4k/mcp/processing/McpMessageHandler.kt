@@ -14,8 +14,8 @@ class McpMessageHandler<NODE : Any>(json: AutoMarshallingJson<NODE>) {
 
     val serDe = Serde(json)
 
-    inline operator fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response>
-        invoke(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
+    inline operator fun <reified IN : ClientMessage.Request>
+        invoke(req: JsonRpcRequest<NODE>, fn: (IN) -> ServerMessage.Response) =
         runCatching { serDe<IN>(req) }
             .mapCatching(fn)
             .map { serDe(it, req.id) }
