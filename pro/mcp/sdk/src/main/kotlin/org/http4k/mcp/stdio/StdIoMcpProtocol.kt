@@ -13,7 +13,7 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
-import org.http4k.mcp.protocol.McpProtocol
+import org.http4k.mcp.protocol.AbstractMcpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.util.McpJson
@@ -36,7 +36,7 @@ class StdIoMcpProtocol(
     reader: Reader = System.`in`.reader(),
     private val writer: Writer = System.out.writer(),
     scheduler: SimpleScheduler = SimpleSchedulerService(1),
-) : McpProtocol<Unit>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
+) : AbstractMcpProtocol<Unit>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
 
     init {
         scheduler.readLines(reader) {
