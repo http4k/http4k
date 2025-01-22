@@ -1,56 +1,35 @@
 package org.http4k.mcp.server
 
+import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.query
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.jsonRpcRequest
-import org.http4k.mcp.features.Completions
-import org.http4k.mcp.features.Logger
-import org.http4k.mcp.features.Prompts
-import org.http4k.mcp.features.Resources
-import org.http4k.mcp.features.Roots
-import org.http4k.mcp.features.Sampling
-import org.http4k.mcp.features.Tools
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.SseMessage.Event
-import kotlin.random.Random
 import org.http4k.routing.bind as httpBind
 
 /**
  * This is the main entry point for the MCP server. It handles the various MCP messages on both HTTP and SSE.
  */
-fun McpHandler(
-    metaData: ServerMetaData,
-    prompts: Prompts = Prompts(emptyList()),
-    tools: Tools = Tools(emptyList()),
-    resources: Resources = Resources(emptyList()),
-    completions: Completions = Completions(emptyList()),
-    sampling: Sampling = Sampling(emptyList()),
-    roots: Roots = Roots(),
-    logger: Logger = Logger(),
-    random: Random = Random
-): PolyHandler {
-    val json = McpJson
-
-    val protocol = SseProtocolLogic(
-        metaData, tools, completions, resources, roots, sampling, prompts, logger, random, json
-    )
+fun McpHandler(mcpProtocol: SseMcpProtocol, json: AutoMarshallingJson<JsonNode> = McpJson): PolyHandler {
 
     return poly(
         "/sse" bind sse {
-            val sessionId = protocol.newSession(it)
+            val sessionId = mcpProtocol.newSession(it)
             it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
         },
         routes(
             "/message" httpBind POST to { req: Request ->
-                protocol(SessionId.parse(req.query("sessionId")!!), Body.jsonRpcRequest(json).toLens()(req), req)
+                mcpProtocol(SessionId.parse(req.query("sessionId")!!), Body.jsonRpcRequest(json).toLens()(req), req)
             }
         )
     )

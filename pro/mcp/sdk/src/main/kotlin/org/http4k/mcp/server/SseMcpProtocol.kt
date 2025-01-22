@@ -11,24 +11,25 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class SseProtocolLogic(
+class SseMcpProtocol(
     metaData: ServerMetaData,
-    tools: Tools,
-    completions: Completions,
-    resources: Resources,
-    roots: Roots,
-    sampling: Sampling,
-    prompts: Prompts,
-    logger: Logger,
-    private val random: Random,
-    json: McpJson
-) : McpProtocolLogic<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random, json) {
+    prompts: Prompts = Prompts(emptyList()),
+    tools: Tools = Tools(emptyList()),
+    resources: Resources = Resources(emptyList()),
+    completions: Completions = Completions(emptyList()),
+    sampling: Sampling = Sampling(emptyList()),
+    roots: Roots = Roots(),
+    logger: Logger = Logger(),
+    private val random: Random = Random,
+    json: McpJson = McpJson
+) : McpProtocol<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random, json) {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
