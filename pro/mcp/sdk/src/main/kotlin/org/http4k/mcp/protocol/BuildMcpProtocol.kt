@@ -18,5 +18,5 @@ fun interface BuildMcpProtocol<RESP : Any> {
         sampling: Sampling,
         roots: Roots,
         logger: Logger,
-    ): McpProtocol<RESP>
+    ): AbstractMcpProtocol<RESP>
 }
