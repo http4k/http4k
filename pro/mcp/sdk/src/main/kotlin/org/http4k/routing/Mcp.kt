@@ -21,7 +21,6 @@ import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.server.ServerMetaData
 import org.http4k.mcp.server.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
-import kotlin.random.Random
 
 /**
  * Create a simple MCP server from a set of feature bindings.
@@ -35,9 +34,7 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
         Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
         Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
         Roots(),
-        Logger(),
-        Random,
-        McpJson
+        Logger()
     ),
     McpJson
 )

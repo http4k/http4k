@@ -82,7 +82,7 @@ class McpServerProtocolTest {
 
     @Test
     fun `performs init loop on startup`() {
-        val mcp = McpHandler(SseMcpProtocol(metadata, random = Random(0), json = McpJson), McpJson)
+        val mcp = McpHandler(SseMcpProtocol(metadata, random = Random(0)), McpJson)
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -97,7 +97,7 @@ class McpServerProtocolTest {
     fun `update roots`() {
         val roots = Roots()
 
-        val mcp = McpHandler(SseMcpProtocol(metadata, roots = roots, random = Random(0), json = McpJson), McpJson)
+        val mcp = McpHandler(SseMcpProtocol(metadata, roots = roots, random = Random(0)), McpJson)
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -129,7 +129,7 @@ class McpServerProtocolTest {
                     )
                 }
             )
-        ), random = Random(0), json = McpJson), McpJson)
+        ), random = Random(0)), McpJson)
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
