@@ -14,7 +14,6 @@ graalvmNative {
     toolchainDetection.set(true)
     binaries {
         named("main") {
-
             imageName.set("mcp-desktop")
             mainClass.set("org.http4k.mcp.McpDesktop")
             useFatJar.set(true)
