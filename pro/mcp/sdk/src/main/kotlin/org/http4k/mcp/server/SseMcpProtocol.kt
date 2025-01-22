@@ -12,7 +12,6 @@ import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.protocol.McpProtocol
-import org.http4k.mcp.util.McpJson
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.util.concurrent.ConcurrentHashMap
@@ -28,12 +27,11 @@ class SseMcpProtocol(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     private val random: Random = Random,
-    json: McpJson = McpJson
-) : McpProtocol<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random, json) {
+) : McpProtocol<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
-    override fun unit(unit: Unit) = Response(ACCEPTED)
+    override fun ok() = Response(ACCEPTED)
 
     override fun send(message: SseMessage, sessionId: SessionId) = when (val session = sessions[sessionId]) {
         null -> Response(GONE)
