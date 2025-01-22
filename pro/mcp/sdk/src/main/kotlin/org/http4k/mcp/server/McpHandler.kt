@@ -27,10 +27,7 @@ import org.http4k.routing.bind as httpBind
 fun McpHandler(mcpProtocol: SseMcpProtocol, json: AutoMarshallingJson<JsonNode> = McpJson) = poly(
     "/sse" bind sse {
         it.send(
-            Event(
-                "endpoint",
-                Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString()
-            )
+            Event("endpoint", Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString())
         )
     },
     CatchLensFailure()
