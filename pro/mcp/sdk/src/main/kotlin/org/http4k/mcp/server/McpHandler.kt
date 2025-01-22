@@ -77,66 +77,66 @@ fun McpHandler(
             "/message" httpBind POST to { req: Request ->
                 val sId = SessionId.parse(req.query("sessionId")!!)
 
+                val errorBlock: () -> Response = { Response(GONE) }
+                val unitBlock: (Unit) -> Response = { Response(ACCEPTED) }
+                val block: (SseMessage) -> Response = sessions[sId]::send
+
                 val jsonReq = Body.jsonRpcRequest(json).toLens()(req)
 
                 if (jsonReq.valid()) {
                     when (McpRpcMethod.of(jsonReq.method)) {
                         McpInitialize.Method ->
                             handler<McpInitialize.Request>(jsonReq) { initialise(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpCompletion.Method ->
                             handler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpPing.Method ->
                             handler<McpPing.Request>(jsonReq) { Empty }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpPrompt.Get.Method ->
                             handler<McpPrompt.Get.Request>(jsonReq) { prompts.get(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpPrompt.List.Method ->
                             handler<McpPrompt.List.Request>(jsonReq) { prompts.list(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpResource.Template.List.Method ->
                             handler<McpResource.Template.List.Request>(jsonReq) { resources.listTemplates(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpResource.List.Method ->
                             handler<McpResource.List.Request>(jsonReq) { resources.listResources(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpResource.Read.Method ->
                             handler<McpResource.Read.Request>(jsonReq) { resources.read(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpResource.Subscribe.Method -> {
                             val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
                             resources.subscribe(sId, subscribeRequest) {
                                 sessions[sId]?.send(handler(McpResource.Updated(subscribeRequest.uri)))
-                            }
-                            Response(ACCEPTED)
+                            }.let(unitBlock)
                         }
 
-                        McpLogging.SetLevel.Method -> {
+                        McpLogging.SetLevel.Method ->
                             logger.setLevel(sId, serDe<McpLogging.SetLevel.Request>(jsonReq).level)
-                            Response(ACCEPTED)
-                        }
+                                .let(unitBlock)
 
-                        McpResource.Unsubscribe.Method -> {
-                            resources.unsubscribe(sId, serDe(jsonReq))
-                            Response(ACCEPTED)
-                        }
+                        McpResource.Unsubscribe.Method ->
+                            resources.unsubscribe(sId, serDe(jsonReq)).let(unitBlock)
 
-                        McpInitialize.Initialized.Method -> Response(ACCEPTED)
-                        Cancelled.Method -> Response(ACCEPTED)
+                        McpInitialize.Initialized.Method -> unitBlock(Unit)
 
-                        McpSampling.Method ->
-                            handler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) }
-                                .let(sessions[sId]::send)
+                        Cancelled.Method -> unitBlock(Unit)
+
+                        McpSampling.Method -> handler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) }
+                            .let(block)
 
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
@@ -144,28 +144,28 @@ fun McpHandler(
                             sessions[sId]?.send(
                                 handler(McpRoot.List, McpRoot.List.Request(), json.asJsonObject(messageId))
                             )
-                            Response(ACCEPTED)
+                            unitBlock(Unit)
                         }
 
                         McpTool.Call.Method ->
                             handler<McpTool.Call.Request>(jsonReq) { tools.call(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
                         McpTool.List.Method ->
                             handler<McpTool.List.Request>(jsonReq) { tools.list(it, req) }
-                                .let(sessions[sId]::send)
+                                .let(block)
 
-                        else -> Response(GONE)
+                        else -> errorBlock()
                     }
                 } else {
                     val result = Body.jsonRpcResult(json).toLens()(req)
 
                     when {
-                        result.isError() -> Response(GONE)
+                        result.isError() -> errorBlock()
                         else -> with(McpJson) {
                             val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
                             try {
-                                calls[messageId]?.invoke(result)?.let { Response(ACCEPTED) } ?: Response(GONE)
+                                calls[messageId]?.invoke(result)?.let { unitBlock(Unit) } ?: errorBlock()
                             } finally {
                                 calls -= messageId
                             }
