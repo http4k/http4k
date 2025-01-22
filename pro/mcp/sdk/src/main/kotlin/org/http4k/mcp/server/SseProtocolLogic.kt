@@ -29,19 +29,7 @@ class SseProtocolLogic(
     logger: Logger,
     random: Random,
     json: McpJson
-) : McpProtocolLogic(
-    metaData,
-    tools,
-    completions,
-    resources,
-    roots,
-    sampling,
-    handler,
-    prompts,
-    logger,
-    random,
-    json,
-) {
+) : McpProtocolLogic(metaData, tools, completions, resources, roots, sampling, handler, prompts, logger, random, json) {
     override fun unit(unit: Unit) = Response(ACCEPTED)
 
     override fun send(message: SseMessage, sessionId: SessionId) = when (val session = sessions[sessionId]) {
