@@ -42,8 +42,6 @@ class SseProtocolLogic(
     random,
     json,
 ) {
-    val handler = McpMessageHandler(json)
-
     override fun unit(unit: Unit) = Response(ACCEPTED)
 
     override fun send(message: SseMessage, sessionId: SessionId) = when (val session = sessions[sessionId]) {
