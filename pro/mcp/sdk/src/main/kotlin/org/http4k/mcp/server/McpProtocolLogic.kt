@@ -15,6 +15,7 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.model.LogLevel.error
 import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.processing.Serde
 import org.http4k.mcp.protocol.Cancelled
@@ -60,6 +61,22 @@ abstract class McpProtocolLogic(
             when (McpRpcMethod.of(jsonReq.method)) {
                 McpInitialize.Method ->
                     handler<McpInitialize.Request>(jsonReq) {
+
+                        logger.subscribe(sId, error) { level, logger, data ->
+                            send(handler(McpLogging.LoggingMessage(level, logger, data)), sId)
+                        }
+                        prompts.onChange(sId) { send(handler(McpPrompt.List.Changed), sId) }
+                        resources.onChange(sId) { send(handler(McpResource.List.Changed), sId) }
+                        tools.onChange(sId) { send(handler(McpTool.List.Changed), sId) }
+
+                        onClose(sId) {
+                            prompts.remove(sId)
+                            resources.remove(sId)
+                            tools.remove(sId)
+
+                            logger.unsubscribe(sId)
+                        }
+
                         McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
                     }
                         .let { send(it, sId) }
@@ -135,4 +152,6 @@ abstract class McpProtocolLogic(
                 }
             }
         }
+
+    abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
 }
