@@ -1,6 +1,7 @@
 package org.http4k.mcp.internal
 
 import dev.forkhandles.time.executors.SimpleScheduler
+import dev.forkhandles.time.executors.readLines
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -15,7 +16,6 @@ import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import java.io.Reader
 import java.io.Writer
-import java.time.Duration.ZERO
 
 /**
  * Connect to the SSE, constructing the request using the passed function
@@ -35,23 +35,17 @@ fun pipeSseTraffic(
                 .forEach { msg ->
                     with(output) {
                         when (msg) {
-                            is Event ->
-                                when (msg.event) {
-                                    "endpoint" -> scheduler.schedule({
-                                        input
-                                            .buffered()
-                                            .lineSequence()
-                                            .forEach {
-                                                httpWithHost(
-                                                    Request(POST, msg.data)
-                                                        .contentType(APPLICATION_JSON)
-                                                        .body(it)
-                                                )
-                                            }
-                                    }, ZERO)
-
-                                    else -> write("${msg.data}\n")
+                            is Event -> when (msg.event) {
+                                "endpoint" -> scheduler.readLines(input) {
+                                    httpWithHost(
+                                        Request(POST, msg.data)
+                                            .contentType(APPLICATION_JSON)
+                                            .body(it)
+                                    )
                                 }
+
+                                else -> write("${msg.data}\n")
+                            }
 
                             is Data -> write("${msg.data}\n")
                             else -> {}

@@ -17,6 +17,7 @@ dependencies {
     api(project(":http4k-connect-core"))
     api("dev.forkhandles:values4k")
     api("dev.forkhandles:result4k")
+    api("dev.forkhandles:time4k")
 
     testImplementation(project(":http4k-server-helidon"))
 

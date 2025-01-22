@@ -18,7 +18,6 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.sse.SseMcpProtocol
-import org.http4k.mcp.util.McpJson
 
 /**
  * Create a simple MCP server from a set of feature bindings.
@@ -31,8 +30,7 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
         Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
         Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
         Sampling(bindings.filterIsInstance<SamplingFeatureBinding>())
-    ),
-    McpJson
+    )
 )
 
 infix fun <INPUT : Any> Tool<INPUT>.bind(handler: ToolHandler<INPUT>) = ToolFeatureBinding(this, handler)
