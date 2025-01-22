@@ -1,9 +1,12 @@
 package org.http4k.mcp.server
 
+import dev.forkhandles.values.random
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.query
 import org.http4k.format.jsonRpcRequest
 import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Logger
@@ -18,6 +21,7 @@ import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
+import org.http4k.sse.SseMessage.Event
 import kotlin.random.Random
 import org.http4k.routing.bind as httpBind
 
@@ -38,7 +42,7 @@ fun McpHandler(
     val json = McpJson
 
     val handler = McpMessageHandler(json)
-    val sessions = ClientSessions(tools, resources, prompts, logger, random, handler)
+    val sessions = ClientSessions(tools, resources, prompts, logger, handler)
 
     val protocolLogic = SseProtocolLogic(
         sessions,
@@ -47,7 +51,12 @@ fun McpHandler(
     )
 
     return poly(
-        "/sse" bind sse { sessions.add(it) },
+        "/sse" bind sse {
+            val sessionId = SessionId.random(random)
+
+            sessions.add(it, sessionId)
+            it.send(Event("endpoint", Uri.of("/message").query("sessionId", sessionId.value.toString()).toString()))
+        },
         routes(
             "/message" httpBind POST to { req: Request ->
                 protocolLogic(SessionId.parse(req.query("sessionId")!!), Body.jsonRpcRequest(json).toLens()(req), req)
