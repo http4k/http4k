@@ -11,7 +11,6 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
 import org.http4k.format.jsonRpcRequest
 import org.http4k.format.jsonRpcResult
-import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Logger
@@ -23,7 +22,6 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.processing.Serde
 import org.http4k.mcp.protocol.Cancelled
-import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.mcp.protocol.McpInitialize
 import org.http4k.mcp.protocol.McpLogging
@@ -35,7 +33,6 @@ import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.McpTool
 import org.http4k.mcp.protocol.MessageId
-import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
@@ -43,6 +40,7 @@ import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
 import kotlin.random.Random
 import org.http4k.routing.bind as httpBind
 
@@ -84,46 +82,36 @@ fun McpHandler(
                 if (jsonReq.valid()) {
                     when (McpRpcMethod.of(jsonReq.method)) {
                         McpInitialize.Method ->
-                            sessions[sId].respond<McpInitialize.Request, JsonNode>(handler, jsonReq) {
-                                initialise(it, req)
-                            }
+                            handler<McpInitialize.Request>(jsonReq) { initialise(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpCompletion.Method ->
-                            sessions[sId].respond<McpCompletion.Request, JsonNode>(
-                                handler,
-                                jsonReq
-                            ) { completions.complete(it, req) }
+                            handler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpPing.Method ->
-                            sessions[sId].respond<McpPing.Request, JsonNode>(handler, jsonReq) { Empty }
+                            handler<McpPing.Request>(jsonReq) { Empty }
+                                .let(sessions[sId]::send)
 
                         McpPrompt.Get.Method ->
-                            sessions[sId].respond<McpPrompt.Get.Request, JsonNode>(handler, jsonReq) {
-                                prompts.get(it, req)
-                            }
+                            handler<McpPrompt.Get.Request>(jsonReq) { prompts.get(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpPrompt.List.Method ->
-                            sessions[sId].respond<McpPrompt.List.Request, JsonNode>(handler, jsonReq) {
-                                prompts.list(it, req)
-                            }
+                            handler<McpPrompt.List.Request>(jsonReq) { prompts.list(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpResource.Template.List.Method ->
-                            sessions[sId].respond<McpResource.Template.List.Request, JsonNode>(
-                                handler,
-                                jsonReq
-                            ) { resources.listTemplates(it, req) }
+                            handler<McpResource.Template.List.Request>(jsonReq) { resources.listTemplates(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpResource.List.Method ->
-                            sessions[sId].respond<McpResource.List.Request, JsonNode>(
-                                handler,
-                                jsonReq
-                            ) { resources.listResources(it, req) }
+                            handler<McpResource.List.Request>(jsonReq) { resources.listResources(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpResource.Read.Method ->
-                            sessions[sId].respond<McpResource.Read.Request, JsonNode>(
-                                handler,
-                                jsonReq
-                            ) { resources.read(it, req) }
+                            handler<McpResource.Read.Request>(jsonReq) { resources.read(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpResource.Subscribe.Method -> {
                             val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
@@ -147,12 +135,8 @@ fun McpHandler(
                         Cancelled.Method -> Response(ACCEPTED)
 
                         McpSampling.Method ->
-                            sessions[sId].respond<McpSampling.Request, JsonNode>(handler, jsonReq) {
-                                sampling.sample(
-                                    it,
-                                    req
-                                )
-                            }
+                            handler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
@@ -164,20 +148,12 @@ fun McpHandler(
                         }
 
                         McpTool.Call.Method ->
-                            sessions[sId].respond<McpTool.Call.Request, JsonNode>(handler, jsonReq) {
-                                tools.call(
-                                    it,
-                                    req
-                                )
-                            }
+                            handler<McpTool.Call.Request>(jsonReq) { tools.call(it, req) }
+                                .let(sessions[sId]::send)
 
                         McpTool.List.Method ->
-                            sessions[sId].respond<McpTool.List.Request, JsonNode>(handler, jsonReq) {
-                                tools.list(
-                                    it,
-                                    req
-                                )
-                            }
+                            handler<McpTool.List.Request>(jsonReq) { tools.list(it, req) }
+                                .let(sessions[sId]::send)
 
                         else -> Response(GONE)
                     }
@@ -201,9 +177,7 @@ fun McpHandler(
     )
 }
 
-private inline fun <reified Req : ClientMessage.Request, NODE : Any> Sse?.respond(
-    handler: McpMessageHandler<NODE>, jsonReq: JsonRpcRequest<NODE>, fn: (Req) -> ServerMessage.Response
-) = when (this) {
+private fun Sse?.send(message: SseMessage) = when (this) {
     null -> Response(GONE)
-    else -> Response(ACCEPTED).also { send(handler<Req>(jsonReq, fn)) }
+    else -> Response(ACCEPTED).also { send(message) }
 }
