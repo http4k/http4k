@@ -52,4 +52,8 @@ class SseProtocolLogic(
     }
 
     override fun error() = Response(GONE)
+
+    override fun onClose(sessionId: SessionId, fn: () -> Unit) {
+        sessions[sessionId]?.onClose(fn)
+    }
 }
