@@ -5,21 +5,24 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.ServerMessage
+import org.http4k.mcp.util.McpNodeType
 
 /**
  * Handles MCP processing and transforming from and ro JSON RPC messages
  */
-class McpMessageHandler<NODE : Any>(val serDe: Serde<NODE>) {
+object McpMessageHandler {
 
     inline operator fun <reified IN : ClientMessage.Request>
-            invoke(req: JsonRpcRequest<NODE>, fn: (IN) -> ServerMessage.Response) =
-        runCatching { serDe<IN>(req) }
+        invoke(req: JsonRpcRequest<McpNodeType>, fn: (IN) -> ServerMessage.Response) =
+        runCatching { Serde<IN>(req) }
             .mapCatching(fn)
-            .map { serDe(it, req.id) }
-            .recover { serDe(ErrorMessage.InternalError, req.id) }
-            .getOrElse { serDe(ErrorMessage.InvalidRequest, req.id) }
+            .map { Serde(it, req.id) }
+            .recover { Serde(ErrorMessage.InternalError, req.id) }
+            .getOrElse { Serde(ErrorMessage.InvalidRequest, req.id) }
 
-    operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: NODE? = null) = serDe(hasMethod, req, id)
-    operator fun invoke(resp: ServerMessage.Response, id: NODE? = null) = serDe(resp, id)
-    operator fun invoke(notification: ServerMessage.Notification) = serDe(notification)
+    operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: McpNodeType? = null) =
+        Serde(hasMethod, req, id)
+
+    operator fun invoke(resp: ServerMessage.Response, id: McpNodeType? = null) = Serde(resp, id)
+    operator fun invoke(notification: ServerMessage.Notification) = Serde(notification)
 }
