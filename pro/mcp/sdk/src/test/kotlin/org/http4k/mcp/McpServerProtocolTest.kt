@@ -104,11 +104,11 @@ class McpServerProtocolTest {
 
             mcp.sendToMcp(McpRoot.Changed)
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), "a8baf924-2fcc-7be7-020b-7f533060e8ef")
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), 6079152038928072179)
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), "a8baf924-2fcc-7be7-020b-7f533060e8ef")
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), 6079152038928072179)
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
