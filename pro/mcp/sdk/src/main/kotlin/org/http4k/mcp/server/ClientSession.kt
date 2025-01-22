@@ -10,11 +10,7 @@ import org.http4k.mcp.protocol.ServerMessage.Notification
 import org.http4k.mcp.protocol.ServerMessage.Response
 import org.http4k.sse.Sse
 
-class ClientSession<NODE : Any>(
-    val id: SessionId,
-    val serDe: Serde<NODE>,
-    val sse: Sse
-) {
+class ClientSession<NODE : Any>(val serDe: Serde<NODE>, val sse: Sse) {
     inline fun <reified IN : Request, OUT : Response> process(
         req: JsonRpcRequest<NODE>,
         fn: (IN) -> OUT
