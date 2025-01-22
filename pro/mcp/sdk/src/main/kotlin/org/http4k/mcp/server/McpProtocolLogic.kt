@@ -43,12 +43,14 @@ abstract class McpProtocolLogic(
     private val sampling: Sampling,
     private val handler: McpMessageHandler<JsonNode>,
     private val prompts: Prompts,
-    private val serDe: Serde<JsonNode>,
     private val logger: Logger,
     private val random: Random,
-    private val calls: MutableMap<MessageId, (JsonRpcResult<JsonNode>) -> Unit>,
     private val json: McpJson
 ) {
+    private val serDe = Serde(json)
+
+    private val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
+
     protected abstract fun unit(unit: Unit): Response
     protected abstract fun send(message: SseMessage, sessionId: SessionId): Response
     protected abstract fun error(): Response
@@ -60,7 +62,7 @@ abstract class McpProtocolLogic(
                     handler<McpInitialize.Request>(jsonReq) {
                         McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
                     }
-                        .let { send(it, sId)}
+                        .let { send(it, sId) }
 
                 McpCompletion.Method ->
                     send(handler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }, sId)
@@ -126,7 +128,7 @@ abstract class McpProtocolLogic(
                 else -> with(McpJson) {
                     val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
                     try {
-                        calls[messageId]?.invoke(result)?.let { unit(Unit)  } ?: error()
+                        calls[messageId]?.invoke(result)?.let { unit(Unit) } ?: error()
                     } finally {
                         calls -= messageId
                     }

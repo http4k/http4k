@@ -1,12 +1,10 @@
 package org.http4k.mcp.server
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.format.jsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
@@ -15,8 +13,6 @@ import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.processing.McpMessageHandler
-import org.http4k.mcp.processing.Serde
-import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.routing.routes
@@ -41,21 +37,20 @@ fun McpHandler(
 ): PolyHandler {
     val json = McpJson
 
-    val serDe = Serde(json)
-
     val handler = McpMessageHandler(json)
     val sessions = ClientSessions(tools, resources, prompts, logger, random, handler)
-    val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
-    val sseProtocolLogic = SseProtocolLogic(
-        metaData, tools, completions, resources, roots, sampling,
-        handler, prompts, serDe, logger, sessions, random, calls, json
+
+    val protocolLogic = SseProtocolLogic(
+        sessions,
+        handler, metaData, tools, completions, resources, roots,
+        sampling, prompts, logger, random, json
     )
 
     return poly(
         "/sse" bind sse { sessions.add(it) },
         routes(
             "/message" httpBind POST to { req: Request ->
-                sseProtocolLogic(SessionId.parse(req.query("sessionId")!!), Body.jsonRpcRequest(json).toLens()(req), req)
+                protocolLogic(SessionId.parse(req.query("sessionId")!!), Body.jsonRpcRequest(json).toLens()(req), req)
             }
         )
     )
