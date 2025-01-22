@@ -1,6 +1,6 @@
 package org.http4k.mcp.server
 
-import com.fasterxml.jackson.databind.JsonNode
+import dev.forkhandles.values.random
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
@@ -11,14 +11,13 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
-import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.util.McpJson
+import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 class SseProtocolLogic(
-    private val sessions: ClientSessions<JsonNode>,
-    handler: McpMessageHandler<JsonNode>,
     metaData: ServerMetaData,
     tools: Tools,
     completions: Completions,
@@ -27,9 +26,12 @@ class SseProtocolLogic(
     sampling: Sampling,
     prompts: Prompts,
     logger: Logger,
-    random: Random,
+    private val random: Random,
     json: McpJson
-) : McpProtocolLogic(metaData, tools, completions, resources, roots, sampling, handler, prompts, logger, random, json) {
+) : McpProtocolLogic<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random, json) {
+
+    private val sessions = ConcurrentHashMap<SessionId, Sse>()
+
     override fun unit(unit: Unit) = Response(ACCEPTED)
 
     override fun send(message: SseMessage, sessionId: SessionId) = when (val session = sessions[sessionId]) {
@@ -41,5 +43,11 @@ class SseProtocolLogic(
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
         sessions[sessionId]?.onClose(fn)
+    }
+
+    fun newSession(sse: Sse): SessionId {
+        val sessionId = SessionId.random(random)
+        sessions[sessionId] = sse
+        return sessionId
     }
 }

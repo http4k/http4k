@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import dev.forkhandles.values.random
 import org.http4k.core.Body
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
@@ -35,14 +34,13 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.sse.SseMessage
 import kotlin.random.Random
 
-abstract class McpProtocolLogic(
+abstract class McpProtocolLogic<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools,
     private val completions: Completions,
     private val resources: Resources,
     private val roots: Roots,
     private val sampling: Sampling,
-    private val handler: McpMessageHandler<JsonNode>,
     private val prompts: Prompts,
     private val logger: Logger,
     private val random: Random,
@@ -50,18 +48,19 @@ abstract class McpProtocolLogic(
 ) {
     private val serDe = Serde(json)
 
+    private val handler = McpMessageHandler(serDe)
+
     private val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
-    protected abstract fun unit(unit: Unit): Response
-    protected abstract fun send(message: SseMessage, sessionId: SessionId): Response
-    protected abstract fun error(): Response
+    protected abstract fun unit(unit: Unit): RSP
+    protected abstract fun send(message: SseMessage, sessionId: SessionId): RSP
+    protected abstract fun error(): RSP
 
-    operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<JsonNode>, req: Request): Response =
+    operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<JsonNode>, req: Request) =
         if (jsonReq.valid()) {
             when (McpRpcMethod.of(jsonReq.method)) {
                 McpInitialize.Method ->
                     handler<McpInitialize.Request>(jsonReq) {
-
                         logger.subscribe(sId, error) { level, logger, data ->
                             send(handler(McpLogging.LoggingMessage(level, logger, data)), sId)
                         }

@@ -1,6 +1,5 @@
 package org.http4k.mcp.processing
 
-import org.http4k.format.AutoMarshallingJson
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.mcp.protocol.ClientMessage
@@ -10,12 +9,10 @@ import org.http4k.mcp.protocol.ServerMessage
 /**
  * Handles MCP processing and transforming from and ro JSON RPC messages
  */
-class McpMessageHandler<NODE : Any>(json: AutoMarshallingJson<NODE>) {
-
-    val serDe = Serde(json)
+class McpMessageHandler<NODE : Any>(val serDe: Serde<NODE>) {
 
     inline operator fun <reified IN : ClientMessage.Request>
-        invoke(req: JsonRpcRequest<NODE>, fn: (IN) -> ServerMessage.Response) =
+            invoke(req: JsonRpcRequest<NODE>, fn: (IN) -> ServerMessage.Response) =
         runCatching { serDe<IN>(req) }
             .mapCatching(fn)
             .map { serDe(it, req.id) }
