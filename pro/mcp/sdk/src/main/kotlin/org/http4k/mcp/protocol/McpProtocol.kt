@@ -1,7 +1,6 @@
 package org.http4k.mcp.protocol
 
 import com.fasterxml.jackson.databind.JsonNode
-import dev.forkhandles.values.random
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.format.jsonRpcResult
@@ -21,6 +20,7 @@ import org.http4k.mcp.server.ServerMetaData
 import org.http4k.mcp.server.SessionId
 import org.http4k.mcp.util.McpJson
 import org.http4k.sse.SseMessage
+import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 abstract class McpProtocol<RSP : Any>(
@@ -115,7 +115,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpSampling.Method -> send(handler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) }, sId)
 
                 McpRoot.Changed.Method -> {
-                    val messageId = MessageId.random(random)
+                    val messageId = MessageId.of(random.nextLong(0, MAX_VALUE))
                     calls[messageId] = { roots.update(serDe(it)) }
                     send(handler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(messageId)), sId)
                     ok()
