@@ -66,7 +66,8 @@ fun McpHandler(
     fun initialise(req: McpInitialize.Request, http: Request) =
         McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
 
-    val sessions = ClientSessions(tools, resources, prompts, logger, random, McpMessageHandler(json))
+    val handler = McpMessageHandler(json)
+    val sessions = ClientSessions(tools, resources, prompts, logger, random, handler)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
@@ -81,29 +82,47 @@ fun McpHandler(
 
                 if (jsonReq.valid()) {
                     when (McpRpcMethod.of(jsonReq.method)) {
-                        McpInitialize.Method -> sessions[sId].respondTo(jsonReq, req, ::initialise)
+                        McpInitialize.Method ->
+                            sessions[sId].respond<McpInitialize.Request, JsonNode>(handler, jsonReq) {
+                                initialise(it, req)
+                            }
 
-                        McpCompletion.Method -> {
-                            sessions[sId].respondTo(jsonReq, req, completions::complete)
-                        }
+                        McpCompletion.Method ->
+                            sessions[sId].respond<McpCompletion.Request, JsonNode>(
+                                handler,
+                                jsonReq
+                            ) { completions.complete(it, req) }
 
-                        McpPing.Method -> sessions[sId].respondTo(
-                            jsonReq,
-                            req
-                        ) { _: McpPing.Request, _: Request -> Empty }
+                        McpPing.Method ->
+                            sessions[sId].respond<McpPing.Request, JsonNode>(handler, jsonReq) { Empty }
 
-                        McpPrompt.Get.Method -> sessions[sId].respondTo(jsonReq, req, prompts::get)
+                        McpPrompt.Get.Method ->
+                            sessions[sId].respond<McpPrompt.Get.Request, JsonNode>(handler, jsonReq) {
+                                prompts.get(it, req)
+                            }
 
-                        McpPrompt.List.Method -> sessions[sId].respondTo(jsonReq, req, prompts::list)
+                        McpPrompt.List.Method ->
+                            sessions[sId].respond<McpPrompt.List.Request, JsonNode>(handler, jsonReq) {
+                                prompts.list(it, req)
+                            }
 
-                        McpResource.Template.List.Method -> sessions[sId].respondTo(
-                            jsonReq,
-                            req,
-                            resources::listTemplates
-                        )
+                        McpResource.Template.List.Method ->
+                            sessions[sId].respond<McpResource.Template.List.Request, JsonNode>(
+                                handler,
+                                jsonReq
+                            ) { resources.listTemplates(it, req) }
 
-                        McpResource.List.Method -> sessions[sId].respondTo(jsonReq, req, resources::listResources)
-                        McpResource.Read.Method -> sessions[sId].respondTo(jsonReq, req, resources::read)
+                        McpResource.List.Method ->
+                            sessions[sId].respond<McpResource.List.Request, JsonNode>(
+                                handler,
+                                jsonReq
+                            ) { resources.listResources(it, req) }
+
+                        McpResource.Read.Method ->
+                            sessions[sId].respond<McpResource.Read.Request, JsonNode>(
+                                handler,
+                                jsonReq
+                            ) { resources.read(it, req) }
 
                         McpResource.Subscribe.Method -> {
                             val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
@@ -126,7 +145,13 @@ fun McpHandler(
                         McpInitialize.Initialized.Method -> Response(ACCEPTED)
                         Cancelled.Method -> Response(ACCEPTED)
 
-                        McpSampling.Method -> sessions[sId].respondTo(jsonReq, req, sampling::sample)
+                        McpSampling.Method ->
+                            sessions[sId].respond<McpSampling.Request, JsonNode>(handler, jsonReq) {
+                                sampling.sample(
+                                    it,
+                                    req
+                                )
+                            }
 
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
@@ -135,9 +160,21 @@ fun McpHandler(
                             Response(ACCEPTED)
                         }
 
-                        McpTool.Call.Method -> sessions[sId].respondTo(jsonReq, req, tools::call)
+                        McpTool.Call.Method ->
+                            sessions[sId].respond<McpTool.Call.Request, JsonNode>(handler, jsonReq) {
+                                tools.call(
+                                    it,
+                                    req
+                                )
+                            }
 
-                        McpTool.List.Method -> sessions[sId].respondTo(jsonReq, req, tools::list)
+                        McpTool.List.Method ->
+                            sessions[sId].respond<McpTool.List.Request, JsonNode>(handler, jsonReq) {
+                                tools.list(
+                                    it,
+                                    req
+                                )
+                            }
 
                         else -> Response(GONE)
                     }
@@ -161,12 +198,9 @@ fun McpHandler(
     )
 }
 
-private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-    ClientSseConnection<NODE>?.respondTo(req: JsonRpcRequest<NODE>, http: Request, fn: (IN, Request) -> OUT) =
-    when (this) {
-        null -> Response(GONE)
-        else -> {
-            send(req) { it: IN -> fn(it, http) }
-            Response(ACCEPTED)
-        }
-    }
+private inline fun <reified Req : ClientMessage.Request, NODE : Any> ClientSseConnection<JsonNode>?.respond(
+    handler: McpMessageHandler<NODE>, jsonReq: JsonRpcRequest<NODE>, fn: (Req) -> ServerMessage.Response
+) = when (this) {
+    null -> Response(GONE)
+    else -> Response(ACCEPTED).also { sse.send(handler<Req>(jsonReq, fn)) }
+}
