@@ -62,12 +62,10 @@ fun McpHandler(
 
     val serDe = Serde(json)
 
-    fun initialise(req: McpInitialize.Request, http: Request) =
-        McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
-
     val handler = McpMessageHandler(json)
     val sessions = ClientSessions(tools, resources, prompts, logger, random, handler)
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
+
 
     return poly(
         "/sse" bind sse {
@@ -77,9 +75,13 @@ fun McpHandler(
             "/message" httpBind POST to { req: Request ->
                 val sId = SessionId.parse(req.query("sessionId")!!)
 
+
+                fun initialise(req: McpInitialize.Request, http: Request) =
+                    McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
+
+                val sendBlock: (SseMessage) -> Response = sessions[sId]::send
                 val errorBlock: () -> Response = { Response(GONE) }
                 val unitBlock: (Unit) -> Response = { Response(ACCEPTED) }
-                val block: (SseMessage) -> Response = sessions[sId]::send
 
                 val jsonReq = Body.jsonRpcRequest(json).toLens()(req)
 
@@ -87,35 +89,35 @@ fun McpHandler(
                     when (McpRpcMethod.of(jsonReq.method)) {
                         McpInitialize.Method ->
                             handler<McpInitialize.Request>(jsonReq) { initialise(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpCompletion.Method ->
                             handler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpPing.Method ->
                             handler<McpPing.Request>(jsonReq) { Empty }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpPrompt.Get.Method ->
                             handler<McpPrompt.Get.Request>(jsonReq) { prompts.get(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpPrompt.List.Method ->
                             handler<McpPrompt.List.Request>(jsonReq) { prompts.list(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpResource.Template.List.Method ->
                             handler<McpResource.Template.List.Request>(jsonReq) { resources.listTemplates(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpResource.List.Method ->
                             handler<McpResource.List.Request>(jsonReq) { resources.listResources(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpResource.Read.Method ->
                             handler<McpResource.Read.Request>(jsonReq) { resources.read(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpResource.Subscribe.Method -> {
                             val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
@@ -136,7 +138,7 @@ fun McpHandler(
                         Cancelled.Method -> unitBlock(Unit)
 
                         McpSampling.Method -> handler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) }
-                            .let(block)
+                            .let(sendBlock)
 
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
@@ -149,11 +151,11 @@ fun McpHandler(
 
                         McpTool.Call.Method ->
                             handler<McpTool.Call.Request>(jsonReq) { tools.call(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         McpTool.List.Method ->
                             handler<McpTool.List.Request>(jsonReq) { tools.list(it, req) }
-                                .let(block)
+                                .let(sendBlock)
 
                         else -> errorBlock()
                     }
