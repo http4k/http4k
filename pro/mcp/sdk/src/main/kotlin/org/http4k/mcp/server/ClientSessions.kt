@@ -26,12 +26,12 @@ class ClientSessions<NODE : Any>(
     private val random: Random,
     private val handler: McpMessageHandler<NODE>
 ) {
-    private val sessions = ConcurrentHashMap<SessionId, ClientSession<NODE>>()
+    private val sessions = ConcurrentHashMap<SessionId, ClientSseConnection<NODE>>()
 
     fun add(sse: Sse) {
         val sessionId = SessionId.random(random)
 
-        val session = ClientSession(sse, handler)
+        val session = ClientSseConnection(sse, handler)
         sessions[sessionId] = session
         logger.subscribe(sessionId, error) { level, logger, data ->
             session.send(McpLogging.LoggingMessage(level, logger, data))

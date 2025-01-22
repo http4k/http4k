@@ -21,6 +21,7 @@ import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.processing.McpMessageHandler
+import org.http4k.mcp.processing.Serde
 import org.http4k.mcp.protocol.Cancelled
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.McpCompletion
@@ -161,7 +162,7 @@ fun McpHandler(
 }
 
 private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response, NODE : Any>
-    ClientSession<NODE>?.respondTo(req: JsonRpcRequest<NODE>, http: Request, fn: (IN, Request) -> OUT) =
+    ClientSseConnection<NODE>?.respondTo(req: JsonRpcRequest<NODE>, http: Request, fn: (IN, Request) -> OUT) =
     when (this) {
         null -> Response(GONE)
         else -> {

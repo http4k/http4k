@@ -9,7 +9,7 @@ import org.http4k.mcp.protocol.ServerMessage.Notification
 import org.http4k.mcp.protocol.ServerMessage.Response
 import org.http4k.sse.Sse
 
-class ClientSession<NODE : Any>(val sse: Sse, val handler: McpMessageHandler<NODE>) {
+class ClientSseConnection<NODE : Any>(val sse: Sse, val handler: McpMessageHandler<NODE>) {
     inline fun <reified IN : Request, OUT : Response> send(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
         sse.send(handler(req, fn))
 
@@ -17,6 +17,5 @@ class ClientSession<NODE : Any>(val sse: Sse, val handler: McpMessageHandler<NOD
         handler(hasMethod, req, id)
     )
 
-    fun send(resp: Response, id: NODE? = null) = sse.send(handler(resp, id))
     fun send(notification: Notification) = sse.send(handler(notification))
 }

@@ -5,8 +5,10 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
 import org.http4k.mcp.protocol.ServerMessage
-import org.http4k.mcp.server.Serde
 
+/**
+ * Handles MCP requests and
+ */
 class McpMessageHandler<NODE : Any>(val serDe: Serde<NODE>) {
     inline operator fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Response>
         invoke(req: JsonRpcRequest<NODE>, fn: (IN) -> OUT) =
