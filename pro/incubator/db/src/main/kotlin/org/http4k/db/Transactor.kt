@@ -13,11 +13,11 @@ interface Transactor<out Resource> {
     companion object {
         private const val KEY = "http4k-db-transactor"
 
-        fun <Resource : Any> transactionResourceFor(request: Request): Resource = RequestKey.of<Resource>(KEY)(request)
+        fun <Resource : Any> transactionResourceFor(request: Request): Resource = RequestKey.required<Resource>(KEY)(request)
 
         fun <Resource : Any> withTransactionResource(request: Request, resource: Resource): Request =
             request.with(
-                RequestKey.of<Resource>(KEY) of resource
+                RequestKey.required<Resource>(KEY) of resource
             )
     }
 }
