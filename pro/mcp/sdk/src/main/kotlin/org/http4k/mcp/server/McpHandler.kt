@@ -75,7 +75,6 @@ fun McpHandler(
             "/message" httpBind POST to { req: Request ->
                 val sId = SessionId.parse(req.query("sessionId")!!)
 
-                println(req.bodyString())
                 val jsonReq = Body.jsonRpcRequest(json).toLens()(req)
 
                 if (jsonReq.valid()) {
