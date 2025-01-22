@@ -42,6 +42,7 @@ import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
+import org.http4k.sse.Sse
 import kotlin.random.Random
 import org.http4k.routing.bind as httpBind
 
@@ -127,7 +128,7 @@ fun McpHandler(
                         McpResource.Subscribe.Method -> {
                             val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
                             resources.subscribe(sId, subscribeRequest) {
-                                sessions[sId]?.send(McpResource.Updated(subscribeRequest.uri))
+                                sessions[sId]?.send(handler(McpResource.Updated(subscribeRequest.uri)))
                             }
                             Response(ACCEPTED)
                         }
@@ -156,7 +157,9 @@ fun McpHandler(
                         McpRoot.Changed.Method -> {
                             val messageId = MessageId.random(random)
                             calls[messageId] = { roots.update(serDe(it)) }
-                            sessions[sId]?.send(McpRoot.List, McpRoot.List.Request(), json.asJsonObject(messageId))
+                            sessions[sId]?.send(
+                                handler(McpRoot.List, McpRoot.List.Request(), json.asJsonObject(messageId))
+                            )
                             Response(ACCEPTED)
                         }
 
@@ -198,9 +201,9 @@ fun McpHandler(
     )
 }
 
-private inline fun <reified Req : ClientMessage.Request, NODE : Any> ClientSseConnection<JsonNode>?.respond(
+private inline fun <reified Req : ClientMessage.Request, NODE : Any> Sse?.respond(
     handler: McpMessageHandler<NODE>, jsonReq: JsonRpcRequest<NODE>, fn: (Req) -> ServerMessage.Response
 ) = when (this) {
     null -> Response(GONE)
-    else -> Response(ACCEPTED).also { sse.send(handler<Req>(jsonReq, fn)) }
+    else -> Response(ACCEPTED).also { send(handler<Req>(jsonReq, fn)) }
 }

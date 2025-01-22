@@ -26,19 +26,18 @@ class ClientSessions<NODE : Any>(
     private val random: Random,
     private val handler: McpMessageHandler<NODE>
 ) {
-    private val sessions = ConcurrentHashMap<SessionId, ClientSseConnection<NODE>>()
+    private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
     fun add(sse: Sse) {
         val sessionId = SessionId.random(random)
 
-        val session = ClientSseConnection(sse, handler)
-        sessions[sessionId] = session
+        sessions[sessionId] = sse
         logger.subscribe(sessionId, error) { level, logger, data ->
-            session.send(McpLogging.LoggingMessage(level, logger, data))
+            sse.send(handler(McpLogging.LoggingMessage(level, logger, data)))
         }
-        prompts.onChange(sessionId) { session.send(McpPrompt.List.Changed) }
-        resources.onChange(sessionId) { session.send(McpResource.List.Changed) }
-        tools.onChange(sessionId) { session.send(McpTool.List.Changed) }
+        prompts.onChange(sessionId) { sse.send(handler(McpPrompt.List.Changed)) }
+        resources.onChange(sessionId) { sse.send(handler(McpResource.List.Changed)) }
+        tools.onChange(sessionId) { sse.send(handler(McpTool.List.Changed)) }
 
         sse.onClose {
             prompts.remove(sessionId)
