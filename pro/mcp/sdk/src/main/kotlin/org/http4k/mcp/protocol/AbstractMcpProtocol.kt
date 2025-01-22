@@ -21,7 +21,7 @@ import org.http4k.sse.SseMessage
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
-abstract class McpProtocol<RSP : Any>(
+abstract class AbstractMcpProtocol<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools,
     private val completions: Completions,
@@ -41,8 +41,8 @@ abstract class McpProtocol<RSP : Any>(
     protected abstract fun send(message: SseMessage, sessionId: SessionId): RSP
 
     operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request) =
-        if (jsonReq.valid()) {
-            when (McpRpcMethod.of(jsonReq.method)) {
+        when {
+            jsonReq.valid() -> when (McpRpcMethod.of(jsonReq.method)) {
                 McpInitialize.Method ->
                     send(
                         McpMessageHandler<McpInitialize.Request>(jsonReq) {
@@ -78,7 +78,12 @@ abstract class McpProtocol<RSP : Any>(
                     send(McpMessageHandler<McpPrompt.List.Request>(jsonReq) { prompts.list(it, req) }, sId)
 
                 McpResource.Template.List.Method ->
-                    send(McpMessageHandler<McpResource.Template.List.Request>(jsonReq) { resources.listTemplates(it, req) }, sId)
+                    send(McpMessageHandler<McpResource.Template.List.Request>(jsonReq) {
+                        resources.listTemplates(
+                            it,
+                            req
+                        )
+                    }, sId)
 
                 McpResource.List.Method ->
                     send(McpMessageHandler<McpResource.List.Request>(jsonReq) { resources.listResources(it, req) }, sId)
@@ -108,7 +113,10 @@ abstract class McpProtocol<RSP : Any>(
 
                 Cancelled.Method -> ok()
 
-                McpSampling.Method -> send(McpMessageHandler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) }, sId)
+                McpSampling.Method -> send(
+                    McpMessageHandler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) },
+                    sId
+                )
 
                 McpRoot.Changed.Method -> {
                     val messageId = MessageId.of(random.nextLong(0, MAX_VALUE))
@@ -125,17 +133,18 @@ abstract class McpProtocol<RSP : Any>(
 
                 else -> error()
             }
-        } else {
-            val result = Body.jsonRpcResult(McpJson).toLens()(req)
+            else -> {
+                val result = Body.jsonRpcResult(McpJson).toLens()(req)
 
-            when {
-                result.isError() -> error()
-                else -> with(McpJson) {
-                    val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
-                    try {
-                        calls[messageId]?.invoke(result)?.let { ok() } ?: error()
-                    } finally {
-                        calls -= messageId
+                when {
+                    result.isError() -> error()
+                    else -> with(McpJson) {
+                        val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
+                        try {
+                            calls[messageId]?.invoke(result)?.let { ok() } ?: error()
+                        } finally {
+                            calls -= messageId
+                        }
                     }
                 }
             }
