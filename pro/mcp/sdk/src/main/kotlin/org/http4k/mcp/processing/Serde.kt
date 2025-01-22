@@ -1,4 +1,4 @@
-package org.http4k.mcp.server
+package org.http4k.mcp.processing
 
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.renderError
