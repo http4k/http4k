@@ -18,9 +18,9 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.protocol.McpEntity
+import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.McpEntity
-import org.http4k.mcp.server.ServerMetaData
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.http4k.server.Helidon

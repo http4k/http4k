@@ -12,6 +12,8 @@ import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.jsonRpcRequest
 import org.http4k.lens.Query
 import org.http4k.lens.value
+import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.routing.routes
