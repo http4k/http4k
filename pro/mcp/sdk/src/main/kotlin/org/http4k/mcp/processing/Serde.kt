@@ -20,7 +20,7 @@ class Serde<NODE : Any>(val json: AutoMarshallingJson<NODE>) {
     }
 
     inline operator fun <reified OUT : Any> invoke(input: JsonRpcResult<NODE>): OUT = with(json) {
-        asA<OUT>(compact(input.result ?: json.nullNode()))
+        asA<OUT>(compact(input.result ?: nullNode()))
     }
 
     operator fun invoke(method: HasMethod, input: Request, id: NODE?) = with(json) {

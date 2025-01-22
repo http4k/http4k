@@ -66,7 +66,7 @@ fun McpHandler(
     fun initialise(req: McpInitialize.Request, http: Request) =
         McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
 
-    val sessions = ClientSessions(tools, resources, prompts, logger, random, McpMessageHandler(serDe))
+    val sessions = ClientSessions(tools, resources, prompts, logger, random, McpMessageHandler(json))
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
