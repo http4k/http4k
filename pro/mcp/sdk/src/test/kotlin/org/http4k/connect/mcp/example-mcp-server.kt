@@ -15,6 +15,7 @@ import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Prompt.Argument
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
@@ -84,7 +85,12 @@ private fun prompt1() = Prompt("prompt1", "description1") bind {
     PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
 }
 
-private fun prompt2() = Prompt("prompt2", "description1") bind {
+private fun prompt2() = Prompt(
+    "prompt2", "description1", listOf(
+        Argument("a1", "d1", true),
+        Argument("a2", "d2", false),
+    )
+) bind {
     PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
 }
 
