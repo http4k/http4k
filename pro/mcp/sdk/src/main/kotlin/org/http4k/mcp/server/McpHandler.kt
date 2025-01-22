@@ -21,7 +21,8 @@ import org.http4k.sse.SseMessage.Event
 import org.http4k.routing.bind as httpBind
 
 /**
- * This is the main entry point for the MCP server. It handles the various MCP messages on both HTTP and SSE.
+ * This is the main entry point for the MCP server. It sets up the SSE connection and then provides a
+ * session for the client to send messages to.
  */
 fun McpHandler(mcpProtocol: SseMcpProtocol, json: AutoMarshallingJson<JsonNode> = McpJson) = poly(
     "/sse" bind sse {
