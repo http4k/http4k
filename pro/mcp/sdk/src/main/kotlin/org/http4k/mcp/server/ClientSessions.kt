@@ -8,6 +8,7 @@ import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.LogLevel.error
+import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.protocol.McpLogging
 import org.http4k.mcp.protocol.McpPrompt
 import org.http4k.mcp.protocol.McpResource
@@ -18,19 +19,19 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 class ClientSessions<NODE : Any>(
-    private val serDe: Serde<NODE>,
     private val tools: Tools,
     private val resources: Resources,
     private val prompts: Prompts,
     private val logger: Logger,
-    private val random: Random
+    private val random: Random,
+    private val handler: McpMessageHandler<NODE>
 ) {
     private val sessions = ConcurrentHashMap<SessionId, ClientSession<NODE>>()
 
     fun add(sse: Sse) {
         val sessionId = SessionId.random(random)
 
-        val session = ClientSession(serDe, sse)
+        val session = ClientSession(sse, handler)
         sessions[sessionId] = session
         logger.subscribe(sessionId, error) { level, logger, data ->
             session.send(McpLogging.LoggingMessage(level, logger, data))

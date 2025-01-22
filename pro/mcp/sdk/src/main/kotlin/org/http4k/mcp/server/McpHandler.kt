@@ -20,6 +20,7 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.protocol.Cancelled
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.McpCompletion
@@ -64,7 +65,7 @@ fun McpHandler(
     fun initialise(req: McpInitialize.Request, http: Request) =
         McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
 
-    val sessions = ClientSessions(serDe, tools, resources, prompts, logger, random)
+    val sessions = ClientSessions(tools, resources, prompts, logger, random, McpMessageHandler(serDe))
     val calls = mutableMapOf<MessageId, (JsonRpcResult<JsonNode>) -> Unit>()
 
     return poly(
@@ -164,7 +165,7 @@ private inline fun <reified IN : ClientMessage.Request, OUT : ServerMessage.Resp
     when (this) {
         null -> Response(GONE)
         else -> {
-            process(req) { it: IN -> fn(it, http) }
+            send(req) { it: IN -> fn(it, http) }
             Response(ACCEPTED)
         }
     }
