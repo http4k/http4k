@@ -6,10 +6,8 @@ import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.features.Completions
-import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
-import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.ModelSelector
@@ -32,9 +30,7 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
         Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
         Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
         Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
-        Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
-        Roots(),
-        Logger()
+        Sampling(bindings.filterIsInstance<SamplingFeatureBinding>())
     ),
     McpJson
 )
