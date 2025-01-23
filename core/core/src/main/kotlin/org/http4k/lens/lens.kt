@@ -24,7 +24,7 @@ open class Lens<in IN : Any, out FINAL>(
  * A BiDiLens provides the bi-directional extraction of an entity from a target, or the insertion of an entity
  * into a target.
  */
-class BiDiLens<in IN : Any, FINAL>(
+open class BiDiLens<in IN : Any, FINAL>(
     meta: Meta,
     get: (IN) -> FINAL,
     private val lensSet: (FINAL, IN) -> IN
