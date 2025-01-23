@@ -1,4 +1,4 @@
-package org.http4k.mcp.stdio
+package org.http4k.mcp.util
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import java.io.Reader

@@ -15,6 +15,7 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.LogLevel.error
 import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.processing.Serde
+import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
@@ -69,7 +70,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
                     send(McpMessageHandler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }, sId)
 
                 McpPing.Method ->
-                    send(McpMessageHandler<McpPing.Request>(jsonReq) { ServerMessage.Response.Empty }, sId)
+                    send(McpMessageHandler<McpPing.Request>(jsonReq) { Empty }, sId)
 
                 McpPrompt.Get.Method ->
                     send(McpMessageHandler<McpPrompt.Get.Request>(jsonReq) { prompts.get(it, req) }, sId)
@@ -79,10 +80,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
 
                 McpResource.Template.List.Method ->
                     send(McpMessageHandler<McpResource.Template.List.Request>(jsonReq) {
-                        resources.listTemplates(
-                            it,
-                            req
-                        )
+                        resources.listTemplates(it, req)
                     }, sId)
 
                 McpResource.List.Method ->
@@ -133,6 +131,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
 
                 else -> error()
             }
+
             else -> {
                 val result = Body.jsonRpcResult(McpJson).toLens()(req)
 
