@@ -9,6 +9,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowSynchronizationStrategy.SYNCHRONIZED
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
@@ -34,6 +35,7 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.ArrayDeque
+import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
@@ -44,7 +46,7 @@ class ResilienceFiltersTest {
     fun `circuit break filter`() {
         val minimumOpenStateApparently = Duration.ofSeconds(1)
         val config = CircuitBreakerConfig.custom()
-            .slidingWindow(2, 2, COUNT_BASED)
+            .slidingWindow(2, 2, COUNT_BASED, SYNCHRONIZED)
             .permittedNumberOfCallsInHalfOpenState(2)
             .waitDurationInOpenState(minimumOpenStateApparently)
             .build()
@@ -172,7 +174,9 @@ class ResilienceFiltersTest {
             Thread(it, "My thread")
         }
 
-        val timeoutService = ResilienceFilters.TimeLimit(futureSupplier = { executorService.submit(it) })
+        val timeoutService = ResilienceFilters.TimeLimit(futureSupplier = { fn ->
+            executorService.submit(Callable { fn() })
+        })
             .then {
                 assertThat(Thread.currentThread().name, equalTo("My thread"))
                 Response(OK)
