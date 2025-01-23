@@ -78,4 +78,28 @@ class UserCredentialsOAuthSecurity(
     }
 }
 
+class ClientCredentialsOAuthSecurity(
+    val tokenUrl: Uri,
+    scopes: List<OAuthScope> = emptyList(),
+    filter: Filter = Filter.NoOp,
+    name: String = "oauthSecurityClientCredentials",
+    refreshUrl: Uri? = null,
+    extraFields: Map<String, String> = emptyMap()
+) : OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
+    companion object {
+        operator fun <T> invoke(
+            tokenUrl: Uri,
+            key: RequestContextLens<T>,
+            lookup: (String) -> T?,
+            refreshUrl: Uri? = null,
+            scopes: List<OAuthScope> = emptyList()
+        ) = ClientCredentialsOAuthSecurity(
+            tokenUrl = tokenUrl,
+            scopes = scopes,
+            filter = ServerFilters.BearerAuth(key, lookup),
+            refreshUrl = refreshUrl,
+        )
+    }
+}
+
 data class OAuthScope(val name: String, val description: String = name)

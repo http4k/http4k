@@ -5,6 +5,7 @@ import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.ClientCredentialsOAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
 import org.http4k.contract.security.OAuthScope
 import org.http4k.contract.security.OpenIdConnectSecurity
@@ -66,6 +67,19 @@ class ImplicitOAuthSecurityRendererTest : SecurityRendererContract {
 
 class UserCredentialsSecurityRendererTest : SecurityRendererContract {
     override val security = UserCredentialsOAuthSecurity(
+        Uri.of("/auth"),
+        listOf(OAuthScope("name", "value")),
+        Filter.NoOp,
+        "custom",
+        Uri.of("/refresh"),
+        mapOf("extra1" to "value2")
+    )
+
+    override val renderer = OpenApi3SecurityRenderer
+}
+
+class ClientCredentialsSecurityRendererTest : SecurityRendererContract {
+    override val security = ClientCredentialsOAuthSecurity(
         Uri.of("/auth"),
         listOf(OAuthScope("name", "value")),
         Filter.NoOp,
