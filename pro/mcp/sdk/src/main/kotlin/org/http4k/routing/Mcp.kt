@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
@@ -18,11 +19,13 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.sse.SseMcpProtocol
+import org.http4k.mcp.stdio.StdIoMcpProtocol
+import org.http4k.mcp.stdio.pipeMessagesToFromStdIo
 
 /**
- * Create a simple MCP server from a set of feature bindings.
+ * Create an HTTP MCP app from a set of feature bindings.
  */
-fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHandler(
+fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHandler(
     SseMcpProtocol(
         serverMetaData,
         Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
@@ -32,6 +35,24 @@ fun mcp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHa
         Sampling(bindings.filterIsInstance<SamplingFeatureBinding>())
     )
 )
+
+/**
+ * Create a StdIO MCP app from a set of feature bindings.
+ */
+fun mcpStdIo(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) {
+    SimpleSchedulerService(1).pipeMessagesToFromStdIo(
+        StdIoMcpProtocol(
+            serverMetaData,
+            System.out.writer(),
+            Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
+            Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
+            Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
+            Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
+            Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
+        ),
+        System.`in`.reader()
+    )()
+}
 
 infix fun <INPUT : Any> Tool<INPUT>.bind(handler: ToolHandler<INPUT>) = ToolFeatureBinding(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
