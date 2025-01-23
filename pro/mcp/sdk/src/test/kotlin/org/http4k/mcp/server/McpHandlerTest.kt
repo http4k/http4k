@@ -1,4 +1,4 @@
-package org.http4k.mcp
+package org.http4k.mcp.server
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
@@ -17,6 +17,11 @@ import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.SampleResponse
+import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.features.Completions
 import org.http4k.mcp.features.Logger
 import org.http4k.mcp.features.Prompts
@@ -61,22 +66,18 @@ import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.asSchema
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
-import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.random.Random
 
-@ExtendWith(JsonApprovalTest::class)
-class McpServerProtocolTest {
+class McpHandlerTest {
 
     private val metadata = ServerMetaData(McpEntity("server", Version.of("1")))
 
