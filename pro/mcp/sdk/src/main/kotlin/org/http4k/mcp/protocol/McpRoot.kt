@@ -17,7 +17,9 @@ object McpRoot {
     }
 
     @JsonSerializable
-    data object Changed : ClientMessage.Notification, HasMethod {
-        override val Method = McpRpcMethod.of("notifications/roots/list_changed")
+    data class Changed(override val method: McpRpcMethod = Method) : ClientMessage.Notification {
+        companion object : HasMethod {
+            override val Method = McpRpcMethod.of("notifications/roots/list_changed")
+        }
     }
 }

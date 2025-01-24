@@ -60,6 +60,7 @@ import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMetaData
@@ -102,13 +103,13 @@ class McpHandlerTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpRoot.Changed)
+            mcp.sendToMcp(McpRoot.Changed())
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), 6079152038928072179)
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(6079152038928072179))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), 6079152038928072179)
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(6079152038928072179))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -346,7 +347,7 @@ class McpHandlerTest {
             McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
-        mcp.sendToMcp(McpInitialize.Initialized)
+        mcp.sendToMcp(McpInitialize.Initialized())
     }
 }
 

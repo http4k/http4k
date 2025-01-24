@@ -138,7 +138,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
                 when {
                     result.isError() -> error()
                     else -> with(McpJson) {
-                        val id = result.id?.let { MessageId.parse(asFormatString(it)) }
+                        val id = result.id?.let { MessageId.parse(compact(it)) }
                         when (id) {
                             null -> ok()
                             else -> try {

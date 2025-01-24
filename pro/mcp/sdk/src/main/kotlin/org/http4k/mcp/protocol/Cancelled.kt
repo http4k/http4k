@@ -8,10 +8,9 @@ import se.ansman.kotshi.JsonSerializable
 data class Cancelled(
     val requestId: String,
     val reason: String?,
-    override val _meta: Meta = default
+    override val _meta: Meta = default,
+    override val method: McpRpcMethod = Method
 ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta {
-    override val method = Method
-
     companion object : HasMethod {
         override val Method = McpRpcMethod.of("notifications/cancelled")
     }

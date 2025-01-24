@@ -9,8 +9,6 @@ sealed interface ServerMessage {
         data object Empty : Response
     }
 
-    interface Notification : ServerMessage, McpNotification {
-        val method: McpRpcMethod
-    }
+    interface Notification : ServerMessage, McpNotification
 }
 

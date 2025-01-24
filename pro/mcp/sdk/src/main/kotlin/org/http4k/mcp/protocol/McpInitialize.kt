@@ -1,7 +1,6 @@
 package org.http4k.mcp.protocol
 
 import org.http4k.mcp.protocol.HasMeta.Companion.default
-import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import se.ansman.kotshi.JsonSerializable
 
@@ -24,7 +23,11 @@ object McpInitialize : HasMethod {
     ) : HasMeta, ServerMessage.Response
 
     @JsonSerializable
-    data object Initialized : ClientMessage.Notification, HasMethod {
-        override val Method = of("notifications/initialized")
+    data class Initialized(
+        override val method: McpRpcMethod = Method
+    ) : ClientMessage.Notification {
+        companion object : HasMethod {
+            override val Method = McpRpcMethod.of("notifications/initialized")
+        }
     }
 }
