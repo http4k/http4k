@@ -2,7 +2,6 @@ package org.http4k.mcp.features
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.util.ObservableList
@@ -26,18 +25,15 @@ class Resources(list: List<ResourceFeatureBinding>) : ObservableList<ResourceFea
     }
 
     fun listResources(req: McpResource.List.Request, http: Request) = McpResource.List.Response(
-        items
-            .map { it.toResource() }
-            .filterIsInstance<Resource.Static>()
+        items.map { it.toResource() }.filter { it.uri != null }
     )
 
     fun listTemplates(req: McpResource.Template.List.Request, http: Request) = McpResource.Template.List.Response(
-        items.map(ResourceFeatureBinding::toResource)
-            .filterIsInstance<Resource.Templated>()
+        items.map { it.toResource() }.filter { it.uriTemplate != null }
     )
 
     fun read(req: McpResource.Read.Request, http: Request) = items
-        .find { it.toResource().matches(req.uri) }
+        .find { it.matches(req.uri) }
         ?.read(req, http)
         ?: error("no resource")
 

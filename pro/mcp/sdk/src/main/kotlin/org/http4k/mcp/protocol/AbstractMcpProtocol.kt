@@ -41,7 +41,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
     protected abstract fun error(): RSP
     protected abstract fun send(message: SseMessage, sessionId: SessionId): RSP
 
-    operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request) =
+    operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request): RSP =
         when {
             jsonReq.valid() -> when (McpRpcMethod.of(jsonReq.method)) {
                 McpInitialize.Method ->
@@ -138,11 +138,14 @@ abstract class AbstractMcpProtocol<RSP : Any>(
                 when {
                     result.isError() -> error()
                     else -> with(McpJson) {
-                        val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
-                        try {
-                            calls[messageId]?.invoke(result)?.let { ok() } ?: error()
-                        } finally {
-                            calls -= messageId
+                        val id = result.id?.let { MessageId.parse(asFormatString(it)) }
+                        when (id) {
+                            null -> ok()
+                            else -> try {
+                                calls[id]?.invoke(result)?.let { ok() } ?: error()
+                            } finally {
+                                calls -= id
+                            }
                         }
                     }
                 }

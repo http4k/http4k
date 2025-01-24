@@ -3,12 +3,20 @@ package org.http4k.mcp.protocol
 import org.http4k.core.Uri
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
-object McpResource {
+@JsonSerializable
+data class McpResource(
+    val uri: Uri?,
+    val uriTemplate: Uri?,
+    val name: String,
+    val description: String?,
+    val mimeType: MimeType?
+) {
 
     object Read : HasMethod {
         override val Method = of("resources/read")
@@ -37,7 +45,7 @@ object McpResource {
 
         @JsonSerializable
         data class Response(
-            val resources: kotlin.collections.List<Resource>,
+            val resources: kotlin.collections.List<McpResource>,
             override val nextCursor: Cursor? = null,
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
@@ -90,7 +98,7 @@ object McpResource {
 
             @JsonSerializable
             data class Response(
-                val resourceTemplates: kotlin.collections.List<Resource.Templated>,
+                val resourceTemplates: kotlin.collections.List<McpResource>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = default
             ) : ServerMessage.Response, PaginatedResponse, HasMeta

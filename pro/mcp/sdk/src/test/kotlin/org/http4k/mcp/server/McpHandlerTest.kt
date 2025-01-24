@@ -1,6 +1,5 @@
 package org.http4k.mcp.server
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
@@ -68,6 +67,7 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
@@ -163,7 +163,7 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpResource.List, McpResource.List.Request())
 
-            assertNextMessage(McpResource.List.Response(listOf(resource)))
+            assertNextMessage(McpResource.List.Response(listOf(McpResource(resource.uri, null, "HTTP4K", "description", null))))
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
 
@@ -203,7 +203,7 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
 
-            assertNextMessage(McpResource.Template.List.Response(listOf(resource)))
+            assertNextMessage(McpResource.Template.List.Response(listOf(McpResource(null, resource.uriTemplate, "HTTP4K", "description", null))))
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
 
@@ -368,7 +368,7 @@ private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequ
     })
 }
 
-private fun TestSseClient.assertNextMessage(node: JsonNode) {
+private fun TestSseClient.assertNextMessage(node: McpNodeType) {
     assertThat(
         received().first(),
         equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))

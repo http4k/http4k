@@ -1,22 +1,25 @@
 package org.http4k.mcp.model
 
 import org.http4k.connect.model.Base64Blob
+import se.ansman.kotshi.JsonSerializable
+import se.ansman.kotshi.Polymorphic
+import se.ansman.kotshi.PolymorphicLabel
 
-sealed interface Content {
-    val type: String
+@JsonSerializable
+@Polymorphic("type")
+sealed class Content {
 
-    data class Text(val text: String) : Content {
+    @JsonSerializable
+    @PolymorphicLabel("text")
+    data class Text(val text: String) : Content() {
         constructor(value: Any) : this(value.toString())
-        override val type = "text"
     }
 
-    data class Image(val data: Base64Blob, val mimeType: MimeType) : Content {
-        override val type = "image"
-    }
+    @JsonSerializable
+    @PolymorphicLabel("image")
+    data class Image(val data: Base64Blob, val mimeType: MimeType) : Content()
 
-    data class EmbeddedResource(val resource: Resource.Content) : Content {
-        override val type = "resource"
-    }
-
-    data class Unknown(override val type: String) : Content
+    @JsonSerializable
+    @PolymorphicLabel("resource")
+    data class EmbeddedResource(val resource: Resource.Content) : Content()
 }
