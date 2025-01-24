@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
-import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -17,6 +16,7 @@ import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.int
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
@@ -68,7 +68,6 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
-import org.http4k.routing.asSchema
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
@@ -212,11 +211,13 @@ class McpHandlerTest {
         }
     }
 
-    data class FooBar(val foo: String, val bar: String)
-
     @Test
     fun `deal with tools`() {
-        val tool = Tool("name", "description", FooBar("foo", "bar"))
+        val tool = Tool(
+            "name", "description",
+            Tool.Arg.required("foo", "description1"),
+            Tool.Arg.int().optional("bar", "description2")
+        )
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
@@ -233,13 +234,23 @@ class McpHandlerTest {
                     listOf(
                         McpTool(
                             "name", "description",
-                            McpJson.convert(AutoJsonToJsonSchema(McpJson).asSchema(tool.example))
+                            mapOf(
+                                "type" to "object",
+                                "required" to listOf("foo"),
+                                "properties" to mapOf(
+                                    "foo" to mapOf("type" to "string", "description" to "description1"),
+                                    "bar" to mapOf("type" to "integer", "description" to "description2")
+                                )
+                            )
                         )
                     )
                 )
             )
 
-            mcp.sendToMcp(McpTool.Call, McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar")))
+            mcp.sendToMcp(
+                McpTool.Call,
+                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar"))
+            )
 
             assertNextMessage(McpTool.Call.Response(listOf(content)))
 
