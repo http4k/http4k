@@ -6,18 +6,21 @@ import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
+import se.ansman.kotshi.JsonSerializable
 
 object McpResource {
 
     object Read : HasMethod {
         override val Method = of("resources/read")
 
+        @JsonSerializable
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
         ) : ClientMessage.Request, HasMeta
 
-        class Response(
+        @JsonSerializable
+        data class Response(
             val contents: kotlin.collections.List<Resource.Content>,
             override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
@@ -26,22 +29,26 @@ object McpResource {
     object List : HasMethod {
         override val Method = of("resources/list")
 
+        @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
             override val _meta: Meta = default
         ) : PaginatedRequest, HasMeta
 
-        class Response(
+        @JsonSerializable
+        data class Response(
             val resources: kotlin.collections.List<Resource>,
             override val nextCursor: Cursor? = null,
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
+        @JsonSerializable
         data object Changed : ServerMessage.Notification {
             override val method = of("notifications/resources/list_changed")
         }
     }
 
+    @JsonSerializable
     data class Updated(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
         HasMeta {
         override val method = Method
@@ -54,6 +61,7 @@ object McpResource {
     object Subscribe : HasMethod {
         override val Method = of("resources/subscribe")
 
+        @JsonSerializable
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
@@ -63,6 +71,7 @@ object McpResource {
     object Unsubscribe : HasMethod {
         override val Method = of("resources/unsubscribe")
 
+        @JsonSerializable
         data class Request(
             val uri: Uri,
             override val _meta: Meta = default
@@ -73,12 +82,14 @@ object McpResource {
         object List : HasMethod {
             override val Method = of("resources/templates/list")
 
+            @JsonSerializable
             data class Request(
                 override val cursor: Cursor? = null,
                 override val _meta: Meta = default
             ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 
-            class Response(
+            @JsonSerializable
+            data class Response(
                 val resourceTemplates: kotlin.collections.List<Resource.Templated>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = default

@@ -1,9 +1,9 @@
 package org.http4k.mcp.util
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.http4k.format.ConfigurableJackson
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import org.http4k.format.ConfigurableMoshi
+import org.http4k.format.MoshiNode
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
@@ -20,11 +20,13 @@ import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
+import se.ansman.kotshi.KotshiJsonAdapterFactory
 
-typealias McpNodeType = JsonNode
+typealias McpNodeType = MoshiNode
 
-object McpJson : ConfigurableJackson(
-    KotlinModule.Builder().build()
+object McpJson : ConfigurableMoshi(
+    Moshi.Builder()
+        .add(McpJsonFactory)
         .asConfigurable()
         .withStandardMappings()
         .value(CostPriority)
@@ -41,5 +43,7 @@ object McpJson : ConfigurableJackson(
         .value(Temperature)
         .value(Version)
         .done()
-        .setSerializationInclusion(NON_NULL)
 )
+
+@KotshiJsonAdapterFactory
+object McpJsonFactory : JsonAdapter.Factory by KotshiMcpJsonFactory

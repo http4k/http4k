@@ -10,10 +10,12 @@ import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
+import se.ansman.kotshi.JsonSerializable
 
 object McpSampling : HasMethod {
     override val Method = McpRpcMethod.of("sampling/create_message")
 
+    @JsonSerializable
     data class Request(
         val messages: List<Message>,
         val maxTokens: MaxTokens,
@@ -26,6 +28,7 @@ object McpSampling : HasMethod {
         override val _meta: Meta = HasMeta.default
     ) : ServerMessage.Request, ClientMessage.Request, HasMeta
 
+    @JsonSerializable
     data class Response(
         val model: ModelIdentifier,
         val stopReason: StopReason,
