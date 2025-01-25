@@ -39,6 +39,7 @@ import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.ModelScore.Companion.MAX
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
@@ -354,7 +355,7 @@ class McpHandlerTest {
 
         val model = ModelIdentifier.of("name")
         val sampling = Sampling(listOf(
-            ModelSelector(model) { 1 } bind {
+            ModelSelector(model) { MAX } bind {
                 SampleResponse(
                     model,
                     StopReason.of("bored"),
