@@ -22,7 +22,7 @@ import org.http4k.sse.SseMessage
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
-abstract class AbstractMcpProtocol<RSP : Any>(
+abstract class McpProtocol<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools,
     private val completions: Completions,
