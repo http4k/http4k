@@ -16,6 +16,7 @@ fun DebuggingWriter(writer: Writer, output: Writer = System.err.writer()) = obje
                 if (cbuf.contains('\n')) {
                     output.write(written.toString())
                     written = StringBuilder()
+                    flush()
                 }
             }
     }
