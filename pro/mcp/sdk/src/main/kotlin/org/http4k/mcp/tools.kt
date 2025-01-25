@@ -9,9 +9,9 @@ import org.http4k.mcp.protocol.HasMeta.Companion.default
 /**
  * A tool handler invokes a tool with an input and returns a response
  */
-typealias ToolHandler<Input> = (ToolRequest<Input>) -> ToolResponse
+typealias ToolHandler = (ToolRequest) -> ToolResponse
 
-data class ToolRequest<Input>(val input: Input, val connectRequest: Request)
+data class ToolRequest(val args: Map<String, Any>, val connectRequest: Request)
 
 sealed interface ToolResponse {
     val meta: Meta

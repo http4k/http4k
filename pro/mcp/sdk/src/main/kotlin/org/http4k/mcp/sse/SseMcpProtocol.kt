@@ -11,7 +11,7 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
-import org.http4k.mcp.protocol.AbstractMcpProtocol
+import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.sse.Sse
@@ -29,7 +29,7 @@ class SseMcpProtocol(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     private val random: Random = Random,
-) : AbstractMcpProtocol<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
+) : McpProtocol<Response>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 

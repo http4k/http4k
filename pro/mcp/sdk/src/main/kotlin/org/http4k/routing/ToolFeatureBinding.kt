@@ -4,7 +4,6 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
-import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
@@ -15,24 +14,12 @@ import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.McpTool
-import org.http4k.mcp.util.McpJson
-import org.http4k.mcp.util.McpNodeType
 
-class ToolFeatureBinding<IN : Any>(
-    private val tool: Tool<IN>,
-    private val handler: ToolHandler<IN>,
-) : FeatureBinding {
+class ToolFeatureBinding(private val tool: Tool, private val handler: ToolHandler) : FeatureBinding {
 
-    fun toTool() =
-        McpTool(
-            tool.name, tool.description, McpJson.convert(
-                AutoJsonToJsonSchema(McpJson).asSchema(tool.example)
-            )
-        )
+    fun toTool() = McpTool(tool.name, tool.description, tool.toSchema())
 
-    fun call(mcp: McpTool.Call.Request, http: Request) = resultFrom {
-        with(McpJson) { ToolRequest(asA(asFormatString(mcp.arguments), tool.example::class), http) }
-    }
+    fun call(mcp: McpTool.Call.Request, http: Request) = resultFrom { ToolRequest(mcp.arguments, http) }
         .mapFailure { Error(InvalidParams) }
         .flatMap { resultFrom { handler(it) }.mapFailure { Error(InternalError) } }
         .get()
@@ -48,5 +35,15 @@ class ToolFeatureBinding<IN : Any>(
         }
 }
 
-fun <IN : Any> AutoJsonToJsonSchema<McpNodeType>.asSchema(input: IN) =
-    toSchema(input).definitions.first { it.first == input::class.simpleName!! }.second
+private fun Tool.toSchema() = mapOf(
+    "type" to "object",
+    "required" to args.filter { it.meta.required }.map { it.meta.name },
+    "properties" to mapOf(
+        *args.map {
+            it.meta.name to mapOf(
+                "type" to it.meta.paramMeta.description,
+                "description" to it.meta.description,
+            )
+        }.toTypedArray()
+    )
+)

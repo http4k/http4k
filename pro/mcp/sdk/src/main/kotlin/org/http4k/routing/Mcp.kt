@@ -29,7 +29,7 @@ fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = M
     SseMcpProtocol(
         serverMetaData,
         Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
-        Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
+        Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
         Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
         Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
         Sampling(bindings.filterIsInstance<SamplingFeatureBinding>())
@@ -45,7 +45,7 @@ fun mcpStdIo(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) {
             serverMetaData,
             System.out.writer(),
             Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
-            Tools(bindings.filterIsInstance<ToolFeatureBinding<*>>()),
+            Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
             Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
             Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
             Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
@@ -54,7 +54,7 @@ fun mcpStdIo(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) {
     )()
 }
 
-infix fun <INPUT : Any> Tool<INPUT>.bind(handler: ToolHandler<INPUT>) = ToolFeatureBinding(this, handler)
+infix fun Tool.bind(handler: ToolHandler) = ToolFeatureBinding(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
 infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)
