@@ -1,17 +1,22 @@
 package org.http4k.mcp.protocol
 
+import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
 object McpProgress {
     @JsonSerializable
-    data class Request(val progress: Int, val total: Double?) : ClientMessage.Request
+    data class Notification(
+        val progress: Int,
+        val total: Double?,
+        val progressToken: ProgressToken,
+        override val _meta: Meta = HasMeta.default
+    ) : ServerMessage.Notification, ClientMessage.Notification, HasMeta {
+        override val method = Method
 
-    @JsonSerializable
-    data class Response(val progress: Int, val total: Double?) : ServerMessage.Response
-
-    @JsonSerializable
-    data object Notification : ServerMessage.Notification {
-        override val method = of("notifications/progress")
+        companion object : HasMethod {
+            override val Method = of("notifications/progress")
+        }
     }
 }
