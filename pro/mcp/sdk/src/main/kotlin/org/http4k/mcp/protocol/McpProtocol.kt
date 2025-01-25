@@ -116,7 +116,7 @@ abstract class McpProtocol<RSP : Any>(
                 )
 
                 McpRoot.Changed.Method -> {
-                    val messageId = MessageId.of(random.nextLong(0, MAX_PRECISE_DOUBLE_INTEGER))
+                    val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
                     calls[messageId] = { roots.update(serDe(it)) }
                     send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(messageId)), sId)
                     ok()
@@ -156,6 +156,7 @@ abstract class McpProtocol<RSP : Any>(
 
 /**
  * This is the maximum Integer value that can be represented precisely by raw JSON number when
- * Moshi deserializes it as a double.
+ * Moshi deserializes it as a double. MCP servers seem to need a precise integer value for the
+ * message ID, so we need to limit the range of the message ID to this value.
  */
-private const val MAX_PRECISE_DOUBLE_INTEGER = 9_007_199_254_740_991L
+private const val MAX_MCP_MESSAGE_ID = 9_007_199_254_740_991L
