@@ -3,7 +3,7 @@ package org.http4k.mcp.protocol
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
-object Progress {
+object McpProgress {
     @JsonSerializable
     data class Request(val progress: Int, val total: Double?) : ClientMessage.Request
 
