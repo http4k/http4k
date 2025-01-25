@@ -13,7 +13,7 @@ import org.http4k.mcp.model.Temperature
 import se.ansman.kotshi.JsonSerializable
 
 object McpSampling : HasMethod {
-    override val Method = McpRpcMethod.of("sampling/create_message")
+    override val Method = McpRpcMethod.of("sampling/createMessage")
 
     @JsonSerializable
     data class Request(
