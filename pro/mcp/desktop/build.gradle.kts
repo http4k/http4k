@@ -23,11 +23,9 @@ graalvmNative {
 }
 
 dependencies {
-    api(project(":http4k-realtime-core"))
     api("dev.forkhandles:bunting4k")
-    api("dev.forkhandles:time4k")
+    api(project(":http4k-mcp-sdk"))
 
     testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation(project(":http4k-mcp-sdk"))
     testImplementation(project(":http4k-server-helidon"))
 }

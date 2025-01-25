@@ -1,4 +1,4 @@
-package org.http4k.mcp.internal
+package org.http4k.mcp.stdio
 
 import java.io.Reader
 import java.io.Writer

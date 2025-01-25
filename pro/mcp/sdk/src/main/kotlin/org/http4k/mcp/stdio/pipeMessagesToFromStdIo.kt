@@ -11,7 +11,7 @@ import org.http4k.mcp.util.readLines
 import java.io.Reader
 import java.util.UUID
 
-fun SimpleScheduler.pipeMessagesToFromStdIo(protocol: StdIoMcpProtocol, reader: Reader = System.`in`.reader()): () -> Unit = {
+fun SimpleScheduler.pipeMessagesToFromStdIo(protocol: StdIoMcpProtocol, reader: Reader): () -> Unit = {
     readLines(reader) {
         try {
             val req = Request(POST, "").body(it)
