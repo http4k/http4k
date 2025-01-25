@@ -15,11 +15,11 @@ import org.http4k.datastar.Signal
 import org.http4k.filter.debug
 import org.http4k.lens.accept
 import org.http4k.lens.datastarFragments
-import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.server.Http4kServer
+import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Event
@@ -46,11 +46,11 @@ abstract class DatastarServerContract(
 
     @BeforeEach
     fun before() {
-        server = poly(
-            routes("/noStream" hbind {
+        server = PolyHandler(
+            http = routes("/noStream" hbind {
                 Response(OK).datastarFragments(DatastarEvent.MergeFragments("hello"))
             }),
-            sse
+            sse = sse
         ).asServer(serverConfig(0)).start()
     }
 

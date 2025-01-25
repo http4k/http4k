@@ -34,8 +34,6 @@ data class UriTemplate private constructor(private val template: String) {
             if (paramValue.contains("/")) paramValue else paramValue.toPathSegmentEncoded()
         }
 
-    fun prefixed(prefix: String): UriTemplate = from("$prefix/$template")
-
     private fun Regex.findParameterValues(uri: String): List<String> =
         findAll(uri).first().groupValues.drop(1).map { it.toPathSegmentDecoded() }
 

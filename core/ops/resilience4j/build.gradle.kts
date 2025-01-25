@@ -9,14 +9,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-core"))
-
-    api(platform("io.github.resilience4j:resilience4j-bom:_"))
-    api("io.github.resilience4j:resilience4j-bulkhead")
-    api("io.github.resilience4j:resilience4j-circuitbreaker")
-    api("io.github.resilience4j:resilience4j-ratelimiter")
-    api("io.github.resilience4j:resilience4j-retry")
-    api("io.github.resilience4j:resilience4j-timelimiter")
-    testImplementation(testFixtures(project(":http4k-core")))
+    api(project(":http4k-resilience4j"))
 }
 

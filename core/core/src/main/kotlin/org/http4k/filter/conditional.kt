@@ -4,7 +4,9 @@ import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.then
 
-fun Filter.thenIf(predicate: (Request) -> Boolean, filter: Filter) = then(Filter { next ->
+typealias RequestPredicate = (Request) -> Boolean
+
+fun Filter.thenIf(predicate: RequestPredicate, filter: Filter) = then(Filter { next ->
     { request ->
         when {
             predicate(request) -> filter(next)(request)
@@ -13,4 +15,4 @@ fun Filter.thenIf(predicate: (Request) -> Boolean, filter: Filter) = then(Filter
     }
 })
 
-fun Filter.thenIfNot(predicate: (Request) -> Boolean, filter: Filter) = thenIf({ !predicate(it) }, filter)
+fun Filter.thenIfNot(predicate: RequestPredicate, filter: Filter) = thenIf({ !predicate(it) }, filter)

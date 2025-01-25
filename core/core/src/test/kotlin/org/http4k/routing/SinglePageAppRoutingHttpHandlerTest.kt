@@ -1,9 +1,11 @@
 package org.http4k.routing
 
 import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -18,9 +20,14 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
-    override val handler = validPath bind singlePageApp(
-        ResourceLoader.Classpath()
+class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+    override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(
+        validPath,
+        StaticRoutingHttpHandler(
+            pathSegments = validPath,
+            resourceLoader = ResourceLoader.Classpath(),
+            extraFileExtensionToContentTypes = emptyMap()
+        )
     )
 
     @Test
@@ -30,6 +37,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val criteria = isHomePage() and hasHeader("res-header", "foobar")
 
         assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
@@ -39,6 +47,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val criteria = isHomePage() and hasHeader("res-header", "foo")
 
         assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
@@ -48,6 +57,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val criteria = isHomePage() and hasHeader("res-header", "foo")
 
         assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
@@ -55,6 +65,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val request = Request(GET, "/not-found")
         val criteria = isHomePage()
 
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -64,12 +75,15 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val request = Request(GET, validPath)
         val withBasePath = handler.withBasePath(prefix)
 
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(withBasePath(request), criteria)
     }
 
     @Test
     fun `does not match non-GET requests for valid path`() {
+        assertThat(handler.matchAndInvoke(Request(OPTIONS, validPath)), absent())
         assertThat(handler(Request(OPTIONS, validPath)), hasStatus(OK))
+        assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(isHomePage()))
         assertThat(handler(Request(GET, validPath)), hasStatus(OK))
     }
 
@@ -86,11 +100,6 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val optionsResponse = hasStatus(OK).and(hasBody(""))
 
         assertThat(
-            app(Request(GET, "/index").header("Origin", "foo")),
-            isHomePage("public")
-        )
-
-        assertThat(
             app(Request(OPTIONS, "/api/ken").header("Origin", "foo")),
             optionsResponse
         )
@@ -98,6 +107,11 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         assertThat(
             app(Request(GET, "/api/ken").header("Origin", "foo")),
             hasStatus(OK).and(hasBody("ken"))
+        )
+
+        assertThat(
+            app(Request(GET, "/index").header("Origin", "foo")),
+            isHomePage("public")
         )
 
         assertThat(
@@ -112,6 +126,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val criteria = isHomePage("public")
 
         println(dslDefault(Request(GET, validPath)))
+        assertThat(dslDefault.matchAndInvoke(Request(GET, validPath)), present(criteria))
         assertThat(dslDefault(Request(GET, validPath)), criteria)
     }
 

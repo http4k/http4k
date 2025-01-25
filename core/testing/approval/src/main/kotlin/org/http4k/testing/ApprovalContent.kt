@@ -32,5 +32,8 @@ interface ApprovalContent {
             override fun invoke(input: HttpMessage) =
                 input.body(formatBody(input.bodyString())).toString().byteInputStream()
         }
+
+        @Deprecated("Use HttpTextBody", ReplaceWith("HttpTextBody()"))
+        fun HttpBodyOnly(formatter: (String) -> String = { it }) = HttpTextBody(formatter)
     }
 }

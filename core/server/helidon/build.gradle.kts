@@ -10,9 +10,10 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api(project(":http4k-bridge-helidon"))
-
-
+    api(project(":http4k-realtime-core"))
+    api("io.helidon.webserver:helidon-webserver:_")
+    api("io.helidon.webserver:helidon-webserver-sse:_")
+    api("io.helidon.webserver:helidon-webserver-websocket:_")
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
     testRuntimeOnly("org.junit.platform:junit-platform-console-standalone:_")

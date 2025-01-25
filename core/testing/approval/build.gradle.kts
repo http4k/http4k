@@ -16,7 +16,7 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter-api:_")
     implementation("com.natpryce:hamkrest:_")
     api(project(":http4k-format-jackson-yaml"))
-    implementation(project(":http4k-api-cloudevents"))
+    implementation(project(":http4k-cloudevents"))
     implementation(project(":http4k-web-datastar"))
 
     testImplementation(testFixtures(project(":http4k-core")))

@@ -12,7 +12,7 @@ import org.http4k.lens.TypedField.Defaulted
 import org.http4k.lens.TypedField.Optional
 import org.http4k.lens.TypedField.Path
 import org.http4k.lens.TypedField.Required
-import org.http4k.routing.RoutedMessage
+import org.http4k.routing.RequestWithRoute
 import org.http4k.routing.RoutedRequest
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
@@ -28,33 +28,29 @@ abstract class TypedHttpMessage {
     protected fun <IN : HttpMessage, OUT : Any> defaulted(
         spec: BiDiLensBuilder<IN, OUT>,
         default: (IN) -> OUT
-    ) = Defaulted(spec, default)
+    ) =
+        Defaulted(spec, default)
 
     protected fun <IN : HttpMessage, OUT : Any> body(spec: BiDiBodyLensSpec<OUT>, example: OUT? = null) =
         Body<IN, OUT>(spec, example)
 }
 
-abstract class TypedRequest private constructor(private val request: RoutedRequest) : TypedHttpMessage(),
-    Request by httpMessage<Request>(request), RoutedMessage by request {
-
-    protected constructor(request: Request) : this(
-        when {
-            request is RoutedRequest -> request
-            else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
-        }
-    )
-
+@Suppress("DEPRECATION")
+abstract class TypedRequest(request: Request) : TypedHttpMessage(), RequestWithRoute by httpMessage(
+    when {
+        request is RequestWithRoute -> request
+        else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
+    }
+) {
     protected constructor(method: Method, uri: Uri) : this(Request(method, uri))
 
     protected fun <OUT : Any> required(spec: PathLensSpec<OUT>): Path<OUT> = Path(spec)
-
-    override fun toString() = request.toMessage()
 }
 
-abstract class TypedResponse(private val response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
+abstract class TypedResponse(response: Response) : TypedHttpMessage(), Response by httpMessage(response) {
     protected constructor(status: Status) : this(Response(status))
 
-    override fun toString() = response.toMessage()
+    override fun toString() = super.toMessage()
 }
 
 private inline fun <reified IN> httpMessage(initial: IN): IN = Proxy.newProxyInstance(

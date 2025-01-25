@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -31,12 +32,12 @@ inline fun <reified T : Any> Storage.Companion.Jdbc(
     private val table = StorageTable(tableName)
 
     override fun get(key: String) = tx {
-        table.selectAll().where { table.id eq key }.firstOrNull()?.let { autoMarshalling.asA<T>(it[table.contents]) }
+        table.select { table.id eq key }.firstOrNull()?.let { autoMarshalling.asA<T>(it[table.contents]) }
     }
 
     override fun set(key: String, data: T) {
         tx {
-            when (table.selectAll().where { table.id eq key }.count()) {
+            when (table.select { table.id eq key }.count()) {
                 0L -> table.insert {
                     it[table.id] = key
                     it[contents] = autoMarshalling.asFormatString(data)
@@ -56,12 +57,11 @@ inline fun <reified T : Any> Storage.Companion.Jdbc(
     override fun keySet(keyPrefix: String) = tx {
         when {
             keyPrefix.isBlank() -> table.selectAll()
-            else -> table.selectAll().where { table.id like "$keyPrefix%" }
+            else -> table.select { table.id like "$keyPrefix%" }
         }.map { it[table.id] }.toSet()
     }
 
     override fun removeAll(keyPrefix: String) = tx {
-        @Suppress("KotlinConstantConditions")
         when {
             keyPrefix.isBlank() -> table.deleteAll().run { true }
             else -> table.deleteWhere { table.id like "$keyPrefix%" } > 0

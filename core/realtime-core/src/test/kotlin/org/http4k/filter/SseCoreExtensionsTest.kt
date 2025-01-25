@@ -16,6 +16,9 @@ import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import org.http4k.testing.testSseClient
 import org.http4k.util.TickingClock
+import org.http4k.websocket.WsFilter
+import org.http4k.websocket.WsResponse
+import org.http4k.websocket.then
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
@@ -46,6 +49,33 @@ class SseCoreExtensionsTest {
 
         assertThat(found.get(), equalTo(credentials))
     }
+
+    @Test
+    fun `can initialise and populate ws request context`() {
+        val found = AtomicReference<Credentials>(null)
+        val handler = ServerFilters.InitialiseWsRequestContext(contexts)
+            .then(WsFilter { next ->
+                {
+                    next(it.with(key of credentials))
+                }
+            })
+            .then {
+                found.set(key(it))
+                WsResponse { _ -> }
+            }
+
+        handler(Request(GET, "/"))
+
+        assertThat(found.get(), equalTo(credentials))
+    }
+
+    @Test
+    fun `can set subprotocol on WsResponse`() {
+        val handler = ServerFilters.SetWsSubProtocol("foobar")
+            .then { WsResponse { _ -> } }
+        assertThat(handler(Request(GET, "/")).subprotocol, equalTo("foobar"))
+    }
+
 
     @Test
     fun `debug request`() {
@@ -108,16 +138,17 @@ class SseCoreExtensionsTest {
     fun `reporting latency for request`() {
         var called = false
         val request = Request(GET, "")
-        val response = SseResponse { it.close() }
+        val response = SseResponse { _ -> }
 
         val tickingClock = TickingClock()
-        val socket = ResponseFilters.ReportSseTransaction(tickingClock) { (req, resp, duration) ->
+        ResponseFilters.ReportSseTransaction(tickingClock) { (req, resp, duration) ->
             called = true
             assertThat(req, equalTo(request))
             assertThat(resp, equalTo(response))
             assertThat(duration, equalTo(ofSeconds(1)))
-        }.then { response }
-        socket.testSseClient(request)
+        }.then { response }(request)
+
         assertTrue(called)
     }
+
 }

@@ -1,0 +1,25 @@
+{
+  "description" : "",
+  "children" : [ {
+    "description" : "/GET: /route-contract/route-contract",
+    "children" : [ ]
+  }, {
+    "description" : "/GET: /bad-request/bad-request",
+    "children" : [ ]
+  }, {
+    "description" : "/GET: /bad-request-query-via-meta/bad-request-query-via-meta",
+    "children" : [ ]
+  }, {
+    "description" : "/GET: /bad-request-body/bad-request-body",
+    "children" : [ ]
+  }, {
+    "description" : "/GET: /bad-request-body-via-meta/bad-request-body-via-meta",
+    "children" : [ ]
+  }, {
+    "description" : "/GET: /bad-request-body-ignore-body/bad-request-body-ignore-body",
+    "children" : [ ]
+  }, {
+    "description" : "/GET: /bad-request-body-ignore-all/bad-request-body-ignore-all",
+    "children" : [ ]
+  } ]
+}

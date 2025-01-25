@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Filter
@@ -38,7 +39,8 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     @Test
     override fun `does not match a particular route`() {
-        assertThat(handler(Request(GET, "/not-found").header("host", "host")), hasStatus(NOT_FOUND))
+        assertThat(handler.matchAndInvoke(Request(GET, "/not-found").header("host", "unknown")), absent())
+        assertThat(handler.matchAndInvoke(Request(GET, "/not-found").header("host", "host"))!!, hasStatus(NOT_FOUND))
         assertThat(
             handler(Request(GET, "/not-found").header("host", "host")),
             hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody)

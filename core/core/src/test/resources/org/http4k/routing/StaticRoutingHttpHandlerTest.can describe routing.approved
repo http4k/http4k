@@ -1,1 +1,4 @@
-"Static files /route-contract"
+{
+  "description" : "Static files /route-contract",
+  "children" : [ ]
+}

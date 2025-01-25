@@ -3,7 +3,6 @@ package org.http4k.routing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -13,13 +12,12 @@ import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri.Companion.of
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import java.util.concurrent.atomic.AtomicInteger
 
 class RoutingTest {
 
@@ -155,15 +153,7 @@ class RoutingTest {
     @Test
     fun `path parameters are available in request`() {
         val routes = routes(
-            "/{a}/{b}/{c}" bind GET to { req: Request ->
-                Response(OK).body(
-                    "matched ${req.path("a")}, ${req.path("b")}, ${
-                        req.path(
-                            "c"
-                        )
-                    }"
-                )
-            }
+            "/{a}/{b}/{c}" bind GET to { req: Request -> Response(OK).body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
         )
 
         val response = routes(Request(GET, "/x/y/z"))
@@ -223,7 +213,6 @@ class RoutingTest {
         var count = 0
         val filter = Filter { next ->
             {
-                println("applying")
                 next(it.replaceHeader("header", "value" + count++))
             }
         }
@@ -263,36 +252,22 @@ class RoutingTest {
 
     @Test
     fun `can add filter to router`() {
-        val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
-            {
-                calls.incrementAndGet()
-                next(it)
-            }
+            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = "/svc" bind changePathFilter.then(static())
-        val request = Request(GET, of("/svc/mybob.xml"))
-        val criteria = hasStatus(OK)
-
-        assertThat(handler(request), criteria)
-        assertThat(calls.get(), equalTo(1))
+        val req = Request(GET, Uri.of("/svc/notmybob.xml"))
+        assertThat(handler(req).status, equalTo(OK))
     }
 
     @Test
     fun `can add filter to a RoutingHttpHandler`() {
-        val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
-            {
-                calls.incrementAndGet()
-                next(it.uri(it.uri.path("/svc/mybob.xml")))
-            }
+            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = changePathFilter.then("/svc" bind static())
-        val request = Request(GET, of("/svc/mybob.xml"))
-        val criteria = hasStatus(OK)
-
-        assertThat(handler(request), criteria)
-        assertThat(calls.get(), equalTo(1))
+        val req = Request(GET, Uri.of("/svc/notmybob.xml"))
+        assertThat(handler(req).status, equalTo(OK))
     }
 
     @Test

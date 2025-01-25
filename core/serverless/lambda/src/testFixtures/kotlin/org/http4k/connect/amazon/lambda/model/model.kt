@@ -19,4 +19,6 @@ data class FunctionDetails(val arn: String, val name: String)
 
 data class Role(val name: String)
 
+data class Region(val name: String)
+
 enum class LambdaIntegrationType { ApiGatewayRest, ApiGatewayV1, ApiGatewayV2, ApplicationLoadBalancer, Invocation }

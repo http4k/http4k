@@ -33,38 +33,38 @@ class JettyEventStreamHandler(
                 val connectRequest = request.asHttp4kRequest()
                 when {
                     connectRequest != null -> {
-                        with(sse(connectRequest)) {
-                            when {
-                                handled -> {
-                                    response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
-                                        if (flushFailure == null) {
-                                            val output = Content.Sink.asOutputStream(response)
-                                            val scheduler = request.connectionMetaData.connector.scheduler
-                                            val server = request.connectionMetaData.connector.server
+                        val (status, headers, handled, consumer) = sse(connectRequest)
 
-                                            consumer(
-                                                JettyEventStreamEmitter(connectRequest,
-                                                    output,
-                                                    heartBeatDuration,
-                                                    scheduler,
-                                                    onClose = { emitter, emitterFailure ->
-                                                        if (emitterFailure == null) {
-                                                            callback.succeeded()
-                                                        } else {
-                                                            callback.failed(emitterFailure)
-                                                        }
-                                                        server.removeEventListener(emitter)
+                        when {
+                            handled -> {
+                                response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
+                                    if (flushFailure == null) {
+                                        val output = Content.Sink.asOutputStream(response)
+                                        val scheduler = request.connectionMetaData.connector.scheduler
+                                        val server = request.connectionMetaData.connector.server
+
+                                        consumer(
+                                            JettyEventStreamEmitter(connectRequest,
+                                                output,
+                                                heartBeatDuration,
+                                                scheduler,
+                                                onClose = { emitter, emitterFailure ->
+                                                    if (emitterFailure == null) {
+                                                        callback.succeeded()
+                                                    } else {
+                                                        callback.failed(emitterFailure)
                                                     }
-                                                ).also(server::addEventListener)
-                                            )
-                                        } else {
-                                            callback.failed(flushFailure)
-                                        }
+                                                    server.removeEventListener(emitter)
+                                                }
+                                            ).also(server::addEventListener)
+                                        )
+                                    } else {
+                                        callback.failed(flushFailure)
                                     }
                                 }
                             }
-                            handled
                         }
+                        handled
                     }
 
                     else -> false

@@ -20,7 +20,6 @@ import org.http4k.format.Json
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasStatus
-import org.http4k.lens.JsonRpcMapping
 import org.http4k.lens.string
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
@@ -357,8 +356,8 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
 abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE>) :
     JsonRpcServiceContract<NODE>({ counter ->
         val incrementParams =
-            JsonRpcMapping<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
-        val intResult: JsonRpcMapping<Int, NODE> = JsonRpcMapping { json.number(it) }
+            Mapping<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
+        val intResult: Mapping<Int, NODE> = Mapping { json.number(it) }
 
         JsonRpc.manual(json, CounterErrorHandler) {
             method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))

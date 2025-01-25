@@ -42,7 +42,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 abstract class HttpClientContract(
-    serverConfig: (Int, ServerConfig.StopMode) -> ServerConfig,
+    serverConfig: (Int) -> ServerConfig,
     val client: HttpHandler,
     private val timeoutClient: HttpHandler = client
 ) : AbstractHttpClientContract(serverConfig) {

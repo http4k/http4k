@@ -1,1 +1,4 @@
-"static files at "
+{
+  "description" : "Static files ",
+  "children" : [ ]
+}

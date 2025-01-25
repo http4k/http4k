@@ -58,7 +58,7 @@ import java.util.UUID.randomUUID
 interface CognitoContract : AwsContract {
     private val cognito
         get() =
-            Cognito.Http(aws.region, { aws.credentials }, http)
+        Cognito.Http(aws.region, { aws.credentials }, http)
 
     @Test
     @Disabled
@@ -76,7 +76,7 @@ interface CognitoContract : AwsContract {
     }
 
     @Test
-    fun `user pool domain lifecycle`() {
+    open fun `user pool domain lifecycle`() {
         withCognitoPool { id ->
             cognito.createResourceServer(id)
             val domain = CloudFrontDomain.of(randomUUID().toString())
@@ -91,7 +91,7 @@ interface CognitoContract : AwsContract {
     }
 
     @Test
-    fun `can get access token using client credentials grant`() {
+    open fun `can get access token using client credentials grant`() {
         withCognitoPool { id ->
             val poolClient = createUserPoolClient(id)
 
@@ -108,7 +108,7 @@ interface CognitoContract : AwsContract {
     }
 
     @Test
-    fun `can get access token using auth code grant`() {
+    open fun `can get access token using auth code grant`() {
         withCognitoPool { id ->
             val poolClient = createUserPoolClient(id)
 

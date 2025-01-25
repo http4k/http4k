@@ -1,8 +1,6 @@
 package org.http4k.core
 
-import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
-import org.http4k.sse.then
 import java.time.Duration
 import java.time.Instant
 
@@ -16,4 +14,3 @@ data class SseTransaction(
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
 }
 
-fun SseFilter.then(poly: PolyHandler): PolyHandler = poly.copy(sse = poly.sse?.let { then(it) })

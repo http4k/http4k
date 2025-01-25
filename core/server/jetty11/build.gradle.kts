@@ -11,7 +11,6 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
-    api(project(":http4k-bridge-servlet"))
 
     val jettyVersion = "11.0.20"
     api(platform("org.eclipse.jetty:jetty-bom:$jettyVersion"))
@@ -29,5 +28,4 @@ dependencies {
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
-    testImplementation(testFixtures(project(":http4k-bridge-servlet")))
 }

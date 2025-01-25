@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
+import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
@@ -61,7 +62,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             val storage = storageProvider(name).apply { clean() }
             return object : ServirtiumServer,
                 Http4kServer by
-                org.http4k.filter.TrafficFilters.RecordTo(Sink.Servirtium(storage, options))
+                TrafficFilters.RecordTo(Sink.Servirtium(storage, options))
                     .then(SetHostFrom(target))
                     .then(options.trafficPrinter())
                     .then(proxyClient)

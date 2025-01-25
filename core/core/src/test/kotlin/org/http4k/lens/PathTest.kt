@@ -162,7 +162,7 @@ class PathTest {
     fun uuid() = checkContract(Path.uuid(), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"))
 
     @Test
-    fun regex() = checkContract(Path.regexGroup("v(\\d+)", 1), "v123", "123")
+    fun regex() = checkContract(Path.regex("v(\\d+)", 1), "v123", "123")
 
     @Test
     fun boolean() {

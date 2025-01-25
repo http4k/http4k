@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 abstract class AsyncHttpHandlerContract(
-    serverConfig: (Int, ServerConfig.StopMode) -> ServerConfig,
+    serverConfig: (Int) -> ServerConfig,
     val client: AsyncHttpHandler,
     private val timeoutClient: AsyncHttpHandler
 ) : AbstractHttpClientContract(serverConfig) {

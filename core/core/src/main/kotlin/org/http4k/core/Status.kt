@@ -1,9 +1,6 @@
 package org.http4k.core
 
-import org.http4k.events.ProtocolStatus
-
-class Status internal constructor(override val code: Int, override val description: String, val clientGenerated: Boolean = false) :
-    ProtocolStatus {
+class Status internal constructor(val code: Int, val description: String, private val clientGenerated: Boolean = false) {
 
     constructor(code: Int, description: String?) : this(code, description ?: "No description", false)
 

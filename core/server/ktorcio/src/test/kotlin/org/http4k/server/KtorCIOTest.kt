@@ -6,8 +6,7 @@ import com.natpryce.hamkrest.present
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class KtorCIOTest :
-    ServerContract({ _, stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) }, ClientForServerTesting()) {
+class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8745) }, ClientForServerTesting()) {
 
     @Test
     override fun `ok when length already set`() {

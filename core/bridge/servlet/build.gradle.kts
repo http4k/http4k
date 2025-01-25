@@ -13,8 +13,4 @@ dependencies {
 
     implementation("javax.servlet:javax.servlet-api:_")
     implementation("jakarta.servlet:jakarta.servlet-api:_")
-
-    testFixturesImplementation("javax.servlet:javax.servlet-api:_")
-    testFixturesImplementation("jakarta.servlet:jakarta.servlet-api:_")
-    testFixturesApi("dev.forkhandles:mock4k:_")
 }

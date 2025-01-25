@@ -77,10 +77,12 @@ class RouterBasedHttpHandlerSpecialCaseTest {
         }))
 
         val req = Request(GET, "/somevalue").header("host", "host")
+        assertThat(handler.matchAndInvoke(req), criteria)
         assertThat(handler(req), criteria)
 
         val prefixReq = Request(GET, "/prefix/somevalue").header("host", "host")
         val withBasePath = handler.withBasePath(prefix)
+        assertThat(withBasePath.matchAndInvoke(prefixReq), criteria)
         assertThat(withBasePath(prefixReq), criteria)
     }
 
