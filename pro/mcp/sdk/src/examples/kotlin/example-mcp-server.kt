@@ -17,6 +17,7 @@ fun main() {
         reverseTool(),
         countingTool(),
         llm(),
+        sampleFromModel()
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
