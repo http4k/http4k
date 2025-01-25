@@ -2,18 +2,14 @@ package org.http4k.mcp.protocol
 
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.HasMeta.Companion.default
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
-object McpPrompt {
+@JsonSerializable
+data class McpPrompt(val name: String, val description: String?, val arguments: kotlin.collections.List<Argument>) {
     @JsonSerializable
-    data class Argument(
-        val name: String,
-        val description: String? = null,
-        val required: Boolean? = null,
-    )
+    data class Argument(val name: String, val description: String? = null, val required: Boolean? = null)
 
     object Get : HasMethod {
         override val Method = of("prompts/get")
@@ -41,7 +37,7 @@ object McpPrompt {
 
         @JsonSerializable
         data class Response(
-            val prompts: kotlin.collections.List<Prompt>,
+            val prompts: kotlin.collections.List<McpPrompt>,
             override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
 

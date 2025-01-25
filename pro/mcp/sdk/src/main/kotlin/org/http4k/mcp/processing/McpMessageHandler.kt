@@ -1,6 +1,7 @@
 package org.http4k.mcp.processing
 
-import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
@@ -8,7 +9,7 @@ import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.util.McpNodeType
 
 /**
- * Handles MCP processing and transforming from and ro JSON RPC messages
+ * Handles MCP processing and transforming from and to MCP messages
  */
 object McpMessageHandler {
 
@@ -17,12 +18,18 @@ object McpMessageHandler {
         runCatching { Serde<IN>(req) }
             .mapCatching(fn)
             .map { Serde(it, req.id) }
-            .recover { Serde(ErrorMessage.InternalError, req.id) }
-            .getOrElse { Serde(ErrorMessage.InvalidRequest, req.id) }
+            .recover {
+                when (it) {
+                    is McpException -> Serde(it.error, req.id)
+                    else -> Serde(InternalError, req.id)
+                }
+            }
+            .getOrElse { Serde(InvalidRequest, req.id) }
 
     operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: McpNodeType? = null) =
         Serde(hasMethod, req, id)
 
     operator fun invoke(resp: ServerMessage.Response, id: McpNodeType? = null) = Serde(resp, id)
+
     operator fun invoke(notification: ServerMessage.Notification) = Serde(notification)
 }

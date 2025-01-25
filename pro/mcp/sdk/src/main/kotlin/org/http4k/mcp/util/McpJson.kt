@@ -3,7 +3,12 @@ package org.http4k.mcp.util
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.http4k.format.ConfigurableMoshi
+import org.http4k.format.ListAdapter
+import org.http4k.format.MapAdapter
 import org.http4k.format.MoshiNode
+import org.http4k.format.MoshiNodeAdapter
+import org.http4k.format.SetAdapter
+import org.http4k.format.ThrowableAdapter
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
@@ -27,6 +32,11 @@ typealias McpNodeType = MoshiNode
 object McpJson : ConfigurableMoshi(
     Moshi.Builder()
         .add(McpJsonFactory)
+        .addLast(ThrowableAdapter)
+        .addLast(ListAdapter)
+        .addLast(SetAdapter)
+        .addLast(MapAdapter)
+        .addLast(MoshiNodeAdapter)
         .asConfigurable()
         .withStandardMappings()
         .value(CostPriority)

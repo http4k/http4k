@@ -13,11 +13,11 @@ import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
-import org.http4k.mcp.model.Prompt.Argument
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
+import org.http4k.routing.PromptFeatureBinding
 import org.http4k.routing.ToolFeatureBinding
 import org.http4k.routing.bind
 import org.jsoup.Jsoup
@@ -51,10 +51,10 @@ fun countingTool(): ToolFeatureBinding {
 }
 
 fun reverseTool(): ToolFeatureBinding {
-    val input = Tool.Arg.int().required("name")
+    val input = Tool.Arg.required("name")
 
     return Tool("reverse", "description", input) bind {
-        ToolResponse.Ok(listOf(Content.Text(input(it))))
+        ToolResponse.Ok(listOf(Content.Text(input(it).reversed())))
     }
 }
 
@@ -68,14 +68,17 @@ fun staticResource() =
     Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient())
 
 fun prompt1() = Prompt("prompt1", "description1") bind {
-    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
+    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.toString()))))
 }
 
-fun prompt2() = Prompt(
-    "prompt2", "description1", listOf(
-        Argument("a1", "d1", true),
-        Argument("a2", "d2", false),
-    )
-) bind {
-    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
+fun prompt2(): PromptFeatureBinding {
+    val arg1 = Prompt.Arg.required("a1", "d1")
+    val arg2 = Prompt.Arg.int().optional("a2", "d2")
+    return Prompt(
+        "prompt2", "description1",
+        arg1,
+        arg2
+    ) bind {
+        PromptResponse("description", listOf(Message(Role.assistant, Content.Text(arg1(it) + arg2(it)))))
+    }
 }
