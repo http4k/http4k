@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    testImplementation(testFixtures(project(":http4k-aws")))
+    testImplementation(testFixtures(project(":http4k-platform-aws")))
     testImplementation(testFixtures(project(":http4k-serverless-lambda")))
 }
 

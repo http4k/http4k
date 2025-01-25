@@ -9,13 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-core"))
-    api("io.ratpack:ratpack-core:_")
-
-    // to overcome CVEs from outdated ratpack
-    api(project(":http4k-format-jackson-yaml"))
-    api(project(":http4k-server-netty"))
-    api("com.google.guava:guava:_")
+    api(project(":http4k-bridge-ratpack"))
 
     testImplementation(testFixtures(project(":http4k-core")))
 }

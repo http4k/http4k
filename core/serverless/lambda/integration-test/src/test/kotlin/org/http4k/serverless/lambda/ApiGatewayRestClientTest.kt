@@ -4,7 +4,7 @@ import org.http4k.aws.awsCliUserProfiles
 import org.http4k.client.HttpClientContract
 import org.http4k.client.OkHttp
 import org.http4k.connect.amazon.apigateway.action.listApis
-import org.http4k.connect.amazon.lambda.model.Region
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.then
@@ -19,7 +19,7 @@ import org.opentest4j.TestAbortedException
 
 private fun client(): (Request) -> Response {
     val api = awsCliUserProfiles().profile("http4k-integration-test")
-        .let { it.restApiGatewayApiClient().listApis(Region(it.region)) }
+        .let { it.restApiGatewayApiClient().listApis(Region.of(it.region)) }
         .find { it.name == DeployRestApiGateway.apiName() }
         ?: throw TestAbortedException("API hasn't been deployed")
     val apiClient = ClientFilters.SetBaseUriFrom(api.apiEndpoint)
@@ -29,7 +29,7 @@ private fun client(): (Request) -> Response {
 }
 
 abstract class ApiGatewayRestHttpClientTest :
-    HttpClientContract({ NoOpServerConfig }, client(), client()) {
+    HttpClientContract({ _, _ -> NoOpServerConfig }, client(), client()) {
     override fun `connection refused are converted into 503`() = assumeTrue(false, "Unsupported client feature")
     override fun `handles response with custom status message`() = assumeTrue(false, "Unsupported client feature")
     override fun `unknown host are converted into 503`() = assumeTrue(false, "Unsupported client feature")
