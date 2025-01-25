@@ -11,6 +11,7 @@ import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.ModelScore
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
@@ -38,7 +39,7 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
     ResourceResponse(links)
 }
 
-fun llm() = ModelSelector(ModelIdentifier.of("my model")) { 1 } bind {
+fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bind {
     SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
 }
 
@@ -61,7 +62,11 @@ fun reverseTool(): ToolFeatureBinding {
 fun liveWeatherTool(): ToolFeatureBinding {
     val input = Tool.Arg.required("city")
 
-    return Tool("weather", "checks the weather for a particular city. returns the format '<weather>, <temperature> degrees'", input) bind {
+    return Tool(
+        "weather",
+        "checks the weather for a particular city. returns the format '<weather>, <temperature> degrees'",
+        input
+    ) bind {
         ToolResponse.Ok(listOf(Content.Text("Sunny and 100 degrees")))
     }
 }
