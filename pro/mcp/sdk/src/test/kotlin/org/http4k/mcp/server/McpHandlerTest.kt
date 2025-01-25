@@ -1,10 +1,8 @@
 package org.http4k.mcp.server
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
-import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -17,6 +15,7 @@ import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.int
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
@@ -61,6 +60,7 @@ import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMetaData
@@ -68,7 +68,7 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
-import org.http4k.routing.asSchema
+import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
@@ -103,13 +103,13 @@ class McpHandlerTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpRoot.Changed)
+            mcp.sendToMcp(McpRoot.Changed())
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), 6079152038928072179)
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(8299741232644245))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), 6079152038928072179)
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(8299741232644245))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -164,7 +164,7 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpResource.List, McpResource.List.Request())
 
-            assertNextMessage(McpResource.List.Response(listOf(resource)))
+            assertNextMessage(McpResource.List.Response(listOf(McpResource(resource.uri, null, "HTTP4K", "description", null))))
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
 
@@ -204,7 +204,7 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
 
-            assertNextMessage(McpResource.Template.List.Response(listOf(resource)))
+            assertNextMessage(McpResource.Template.List.Response(listOf(McpResource(null, resource.uriTemplate, "HTTP4K", "description", null))))
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
 
@@ -212,11 +212,13 @@ class McpHandlerTest {
         }
     }
 
-    data class FooBar(val foo: String, val bar: String)
-
     @Test
     fun `deal with tools`() {
-        val tool = Tool("name", "description", FooBar("foo", "bar"))
+        val tool = Tool(
+            "name", "description",
+            Tool.Arg.required("foo", "description1"),
+            Tool.Arg.int().optional("bar", "description2")
+        )
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
@@ -233,13 +235,23 @@ class McpHandlerTest {
                     listOf(
                         McpTool(
                             "name", "description",
-                            McpJson.convert(AutoJsonToJsonSchema(McpJson).asSchema(tool.example))
+                            mapOf(
+                                "type" to "object",
+                                "required" to listOf("foo"),
+                                "properties" to mapOf(
+                                    "foo" to mapOf("type" to "string", "description" to "description1"),
+                                    "bar" to mapOf("type" to "integer", "description" to "description2")
+                                )
+                            )
                         )
                     )
                 )
             )
 
-            mcp.sendToMcp(McpTool.Call, McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar")))
+            mcp.sendToMcp(
+                McpTool.Call,
+                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar"))
+            )
 
             assertNextMessage(McpTool.Call.Response(listOf(content)))
 
@@ -335,7 +347,7 @@ class McpHandlerTest {
             McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
-        mcp.sendToMcp(McpInitialize.Initialized)
+        mcp.sendToMcp(McpInitialize.Initialized())
     }
 }
 
@@ -357,7 +369,7 @@ private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequ
     })
 }
 
-private fun TestSseClient.assertNextMessage(node: JsonNode) {
+private fun TestSseClient.assertNextMessage(node: McpNodeType) {
     assertThat(
         received().first(),
         equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))

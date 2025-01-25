@@ -2,6 +2,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Uri
+import org.http4k.lens.int
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceResponse
@@ -17,6 +18,7 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
+import org.http4k.routing.ToolFeatureBinding
 import org.http4k.routing.bind
 import org.jsoup.Jsoup
 
@@ -40,12 +42,20 @@ fun llm() = ModelSelector(ModelIdentifier.of("my model")) { 1 } bind {
     SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
 }
 
-fun countingTool() = Tool("count", "description", Multiply(1, 2)) bind {
-    ToolResponse.Ok(listOf(Content.Text(it.input.first + it.input.second)))
+fun countingTool(): ToolFeatureBinding {
+    val first = Tool.Arg.int().required("first")
+    val second = Tool.Arg.int().required("second")
+    return Tool("count", "description", first, second) bind {
+        ToolResponse.Ok(listOf(Content.Text(first(it) + second(it))))
+    }
 }
 
-fun reverseTool() = Tool("reverse", "description", Reverse("name")) bind {
-    ToolResponse.Ok(listOf(Content.Text(it.input.input.reversed())))
+fun reverseTool(): ToolFeatureBinding {
+    val input = Tool.Arg.int().required("name")
+
+    return Tool("reverse", "description", input) bind {
+        ToolResponse.Ok(listOf(Content.Text(input(it))))
+    }
 }
 
 fun templatedResource() = Resource.Templated(
@@ -69,6 +79,3 @@ fun prompt2() = Prompt(
 ) bind {
     PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
 }
-
-data class Reverse(val input: String)
-data class Multiply(val first: Int, val second: Int)

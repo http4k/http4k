@@ -19,10 +19,9 @@ import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
-import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
-abstract class AbstractMcpProtocol<RSP : Any>(
+abstract class McpProtocol<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools,
     private val completions: Completions,
@@ -41,7 +40,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
     protected abstract fun error(): RSP
     protected abstract fun send(message: SseMessage, sessionId: SessionId): RSP
 
-    operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request) =
+    operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request): RSP =
         when {
             jsonReq.valid() -> when (McpRpcMethod.of(jsonReq.method)) {
                 McpInitialize.Method ->
@@ -117,7 +116,7 @@ abstract class AbstractMcpProtocol<RSP : Any>(
                 )
 
                 McpRoot.Changed.Method -> {
-                    val messageId = MessageId.of(random.nextLong(0, MAX_VALUE))
+                    val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
                     calls[messageId] = { roots.update(serDe(it)) }
                     send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(messageId)), sId)
                     ok()
@@ -138,11 +137,14 @@ abstract class AbstractMcpProtocol<RSP : Any>(
                 when {
                     result.isError() -> error()
                     else -> with(McpJson) {
-                        val messageId = MessageId.parse(asFormatString(result.id ?: nullNode()))
-                        try {
-                            calls[messageId]?.invoke(result)?.let { ok() } ?: error()
-                        } finally {
-                            calls -= messageId
+                        val id = result.id?.let { MessageId.parse(compact(it)) }
+                        when (id) {
+                            null -> ok()
+                            else -> try {
+                                calls[id]?.invoke(result)?.let { ok() } ?: error()
+                            } finally {
+                                calls -= id
+                            }
                         }
                     }
                 }
@@ -151,3 +153,10 @@ abstract class AbstractMcpProtocol<RSP : Any>(
 
     abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
 }
+
+/**
+ * This is the maximum Integer value that can be represented precisely by raw JSON number when
+ * Moshi deserializes it as a double. MCP servers seem to need a precise integer value for the
+ * message ID, so we need to limit the range of the message ID to this value.
+ */
+private const val MAX_MCP_MESSAGE_ID = 9_007_199_254_740_991L

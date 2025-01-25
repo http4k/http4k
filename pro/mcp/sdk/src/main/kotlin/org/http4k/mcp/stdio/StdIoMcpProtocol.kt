@@ -7,7 +7,7 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
-import org.http4k.mcp.protocol.AbstractMcpProtocol
+import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.sse.SseMessage
@@ -25,7 +25,7 @@ class StdIoMcpProtocol(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
-) : AbstractMcpProtocol<Unit>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
+) : McpProtocol<Unit>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
 
     override fun ok() {}
 
