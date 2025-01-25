@@ -10,7 +10,10 @@ fun DebuggingReader(reader: Reader, writer: Writer = System.err.writer()) = obje
         .also {
             read.append(cbuf)
             if (cbuf.contains('\n')) {
-                writer.write(read.toString() )
+                with(writer) {
+                    write(read.toString())
+                    flush()
+                }
                 read = StringBuilder()
             }
         }
