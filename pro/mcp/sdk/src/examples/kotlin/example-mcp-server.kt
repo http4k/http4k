@@ -16,7 +16,7 @@ fun main() {
         liveWeatherTool(),
         reverseTool(),
         countingTool(),
-        llm()
+        llm(),
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
