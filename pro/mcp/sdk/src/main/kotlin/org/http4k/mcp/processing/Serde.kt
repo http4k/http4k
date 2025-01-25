@@ -37,6 +37,6 @@ object Serde {
     }
 
     operator fun invoke(errorMessage: ErrorMessage, id: McpNodeType?) = with(McpJson) {
-        Event("message", compact(renderError(errorMessage, id)), id?.let(::asFormatString))
+        Event("message", compact(renderError(errorMessage, id)))
     }
 }
