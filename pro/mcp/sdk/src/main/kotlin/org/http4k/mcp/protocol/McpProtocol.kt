@@ -3,6 +3,7 @@ package org.http4k.mcp.protocol
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.format.jsonRpcResult
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.features.Completions
@@ -32,8 +33,6 @@ abstract class McpProtocol<RSP : Any>(
     private val logger: Logger,
     private val random: Random
 ) {
-    private val serDe = Serde
-
     private val calls = mutableMapOf<MessageId, (JsonRpcResult<McpNodeType>) -> Unit>()
 
     protected abstract fun ok(): RSP
@@ -89,20 +88,24 @@ abstract class McpProtocol<RSP : Any>(
                     send(McpMessageHandler<McpResource.Read.Request>(jsonReq) { resources.read(it, req) }, sId)
 
                 McpResource.Subscribe.Method -> {
-                    val subscribeRequest = serDe<McpResource.Subscribe.Request>(jsonReq)
+                    val subscribeRequest = Serde<McpResource.Subscribe.Request>(jsonReq)
                     resources.subscribe(sId, subscribeRequest) {
                         send(McpMessageHandler(McpResource.Updated(subscribeRequest.uri)), sId)
                     }
                     ok()
                 }
 
+                McpProgress.Notification.Method -> {
+                    ok()
+                }
+
                 McpLogging.SetLevel.Method -> {
-                    logger.setLevel(sId, serDe<McpLogging.SetLevel.Request>(jsonReq).level)
+                    logger.setLevel(sId, Serde<McpLogging.SetLevel.Request>(jsonReq).level)
                     ok()
                 }
 
                 McpResource.Unsubscribe.Method -> {
-                    resources.unsubscribe(sId, serDe(jsonReq))
+                    resources.unsubscribe(sId, Serde(jsonReq))
                     ok()
                 }
 
@@ -117,7 +120,7 @@ abstract class McpProtocol<RSP : Any>(
 
                 McpRoot.Changed.Method -> {
                     val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
-                    calls[messageId] = { roots.update(serDe(it)) }
+                    calls[messageId] = { roots.update(Serde(it)) }
                     send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(messageId)), sId)
                     ok()
                 }
@@ -128,14 +131,13 @@ abstract class McpProtocol<RSP : Any>(
                 McpTool.List.Method ->
                     send(McpMessageHandler<McpTool.List.Request>(jsonReq) { tools.list(it, req) }, sId)
 
-                else -> error()
+                else -> send(Serde(MethodNotFound, jsonReq.id), sId)
             }
 
             else -> {
                 val result = Body.jsonRpcResult(McpJson).toLens()(req)
-
                 when {
-                    result.isError() -> error()
+                    result.isError() -> ok()
                     else -> with(McpJson) {
                         val id = result.id?.let { MessageId.parse(compact(it)) }
                         when (id) {
