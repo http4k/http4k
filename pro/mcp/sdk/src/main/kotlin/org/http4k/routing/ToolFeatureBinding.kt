@@ -1,12 +1,13 @@
 package org.http4k.routing
 
-import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
+import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.lens.LensFailure
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
@@ -21,7 +22,15 @@ class ToolFeatureBinding(private val tool: Tool, private val handler: ToolHandle
 
     fun call(mcp: McpTool.Call.Request, http: Request) = resultFrom { ToolRequest(mcp.arguments, http) }
         .mapFailure { Error(InvalidParams) }
-        .flatMap { resultFrom { handler(it) }.mapFailure { Error(InternalError) } }
+        .map {
+            try {
+                handler(it)
+            } catch (e: LensFailure) {
+                Error(InvalidParams)
+            } catch (e: Exception) {
+                Error(InternalError)
+            }
+        }
         .get()
         .let {
             McpTool.Call.Response(

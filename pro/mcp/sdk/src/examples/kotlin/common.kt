@@ -51,7 +51,7 @@ fun countingTool(): ToolFeatureBinding {
 }
 
 fun reverseTool(): ToolFeatureBinding {
-    val input = Tool.Arg.int().required("name")
+    val input = Tool.Arg.required("name")
 
     return Tool("reverse", "description", input) bind {
         ToolResponse.Ok(listOf(Content.Text(input(it))))

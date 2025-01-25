@@ -17,7 +17,7 @@ import org.http4k.sse.SseMessage.Event
 
 object Serde {
     inline operator fun <reified OUT : Any> invoke(input: JsonRpcRequest<McpNodeType>): OUT = with(McpJson) {
-        asA<OUT>(compact(input.params ?: obj()))
+        asA<OUT>(asFormatString(input.params ?: obj()))
     }
 
     inline operator fun <reified OUT : Any> invoke(input: JsonRpcResult<McpNodeType>): OUT = with(McpJson) {
