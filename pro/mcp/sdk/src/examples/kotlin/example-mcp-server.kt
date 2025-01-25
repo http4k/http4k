@@ -13,6 +13,7 @@ fun main() {
         prompt2(),
         staticResource(),
         templatedResource(),
+        liveWeatherTool(),
         reverseTool(),
         countingTool(),
         llm()
