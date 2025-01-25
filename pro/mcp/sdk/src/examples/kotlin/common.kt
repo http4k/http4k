@@ -58,6 +58,14 @@ fun reverseTool(): ToolFeatureBinding {
     }
 }
 
+fun liveWeatherTool(): ToolFeatureBinding {
+    val input = Tool.Arg.required("city")
+
+    return Tool("weather", "checks the weather for a particular city. returns the format '<weather>, <temperature> degrees'", input) bind {
+        ToolResponse.Ok(listOf(Content.Text("Sunny and 100 degrees")))
+    }
+}
+
 fun templatedResource() = Resource.Templated(
     Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"),
     "HTTP4K ecosystem page",
