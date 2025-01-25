@@ -1,7 +1,6 @@
 package org.http4k.mcp.internal
 
 import dev.forkhandles.time.executors.SimpleScheduler
-import dev.forkhandles.time.executors.readLines
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -11,6 +10,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.lens.accept
 import org.http4k.lens.contentType
+import org.http4k.mcp.util.readLines
 import org.http4k.sse.SseClient
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event

@@ -21,6 +21,8 @@ import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.stdio.StdIoMcpProtocol
 import org.http4k.mcp.stdio.pipeMessagesToFromStdIo
+import java.io.Reader
+import java.io.Writer
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
@@ -39,24 +41,27 @@ fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = M
 /**
  * Create a StdIO MCP app from a set of feature bindings.
  */
-fun mcpStdIo(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) {
+fun mcpStdIo(
+    serverMetaData: ServerMetaData, vararg bindings: FeatureBinding,
+    reader: Reader = System.`in`.reader(),
+    writer: Writer = System.out.writer(),
+) {
     SimpleSchedulerService(1).pipeMessagesToFromStdIo(
         StdIoMcpProtocol(
             serverMetaData,
-            System.out.writer(),
+            writer,
             Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
             Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
             Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
             Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
             Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
         ),
-        System.`in`.reader()
+        reader
     )()
 }
 
 infix fun Tool.bind(handler: ToolHandler) = ToolFeatureBinding(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
-infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionFeatureBinding(this, handler)
-
+infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)

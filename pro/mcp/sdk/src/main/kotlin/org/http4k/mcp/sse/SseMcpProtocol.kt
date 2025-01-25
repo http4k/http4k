@@ -35,7 +35,7 @@ class SseMcpProtocol(
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun send(message: SseMessage, sessionId: SessionId) = when (val session = sessions[sessionId]) {
+    override fun send(message: SseMessage.Event, sessionId: SessionId) = when (val session = sessions[sessionId]) {
         null -> Response(GONE)
         else -> Response(ACCEPTED).also { session.send(message) }
     }

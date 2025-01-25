@@ -1,6 +1,8 @@
 import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.stdio.DebuggingReader
+import org.http4k.mcp.stdio.DebuggingWriter
 import org.http4k.routing.mcpStdIo
 
 fun main() {
@@ -13,6 +15,8 @@ fun main() {
         liveWeatherTool(),
         reverseTool(),
         countingTool(),
-        llm()
+        llm(),
+        reader = DebuggingReader(System.`in`.reader()),
+        writer = DebuggingWriter(System.out.writer())
     )
 }

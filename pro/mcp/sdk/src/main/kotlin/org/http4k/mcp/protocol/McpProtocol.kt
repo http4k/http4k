@@ -38,7 +38,7 @@ abstract class McpProtocol<RSP : Any>(
 
     protected abstract fun ok(): RSP
     protected abstract fun error(): RSP
-    protected abstract fun send(message: SseMessage, sessionId: SessionId): RSP
+    protected abstract fun send(message: SseMessage.Event, sessionId: SessionId): RSP
 
     operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request): RSP =
         when {

@@ -29,9 +29,9 @@ class StdIoMcpProtocol(
 
     override fun ok() {}
 
-    override fun send(message: SseMessage, sessionId: SessionId) =
+    override fun send(message: SseMessage.Event, sessionId: SessionId) =
         with(writer) {
-            write(message.toMessage())
+            write(message.data + "\n")
             flush()
         }
 

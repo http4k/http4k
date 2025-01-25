@@ -1,4 +1,4 @@
-package org.http4k.mcp.internal
+package org.http4k.mcp.stdio
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
