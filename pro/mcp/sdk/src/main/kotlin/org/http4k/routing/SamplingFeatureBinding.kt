@@ -13,16 +13,18 @@ class SamplingFeatureBinding(private val modelSelector: ModelSelector, private v
 
     fun sample(req: McpSampling.Request, connectRequest: Request) =
         handler(
-            SampleRequest(
-                req.messages,
-                req.maxTokens,
-                req.systemPrompt,
-                req.includeContext,
-                req.temperature,
-                req.stopSequences,
-                req.modelPreferences,
-                req.metadata,
-                connectRequest
-            )
+            with(req) {
+                SampleRequest(
+                    messages,
+                    maxTokens,
+                    systemPrompt,
+                    includeContext,
+                    temperature,
+                    stopSequences,
+                    modelPreferences,
+                    metadata,
+                    connectRequest
+                )
+            }
         ).let { McpSampling.Response(it.model, it.stopReason, it.role, it.content) }
 }
