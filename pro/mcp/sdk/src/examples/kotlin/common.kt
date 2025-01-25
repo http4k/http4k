@@ -95,3 +95,7 @@ fun prompt2(): PromptFeatureBinding {
         PromptResponse("description", listOf(Message(Role.assistant, Content.Text(arg1(it) + arg2(it)))))
     }
 }
+
+fun sampleFromModel() = ModelSelector(ModelIdentifier.of("my model")) bind {
+    SampleResponse(ModelIdentifier.of("my model"), StopReason.of("end"), Role.assistant, Content.Text("content"))
+}
