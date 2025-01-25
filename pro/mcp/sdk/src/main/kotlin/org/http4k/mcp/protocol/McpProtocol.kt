@@ -20,6 +20,7 @@ import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 abstract class McpProtocol<RSP : Any>(
@@ -33,7 +34,7 @@ abstract class McpProtocol<RSP : Any>(
     private val logger: Logger,
     private val random: Random
 ) {
-    private val calls = mutableMapOf<MessageId, (JsonRpcResult<McpNodeType>) -> Unit>()
+    private val calls = ConcurrentHashMap<MessageId, (JsonRpcResult<McpNodeType>) -> Unit>()
 
     protected abstract fun ok(): RSP
     protected abstract fun error(): RSP
