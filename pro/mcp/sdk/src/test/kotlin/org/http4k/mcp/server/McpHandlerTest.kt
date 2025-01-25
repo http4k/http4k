@@ -11,10 +11,13 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.format.renderError
 import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
@@ -117,7 +120,8 @@ class McpHandlerTest {
 
     @Test
     fun `deal with prompts`() {
-        val prompt = Prompt("prompt", "description", listOf(Prompt.Argument("name", "description", true)))
+        val intArg = Prompt.Arg.int().required("name", "description")
+        val prompt = Prompt("prompt", "description", intArg)
 
         val mcp = McpHandler(SseMcpProtocol(metadata, prompts = Prompts(
             listOf(
@@ -125,7 +129,7 @@ class McpHandlerTest {
                     PromptResponse(
                         "description",
                         listOf(
-                            Message(Role.assistant, Content.Text(it.input["name"]!!.reversed()))
+                            Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
                         )
                     )
                 }
@@ -137,16 +141,29 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpPrompt.List, McpPrompt.List.Request())
 
-            assertNextMessage(McpPrompt.List.Response(listOf(prompt)))
+            assertNextMessage(
+                McpPrompt.List.Response(
+                    listOf(
+                        McpPrompt(
+                            "prompt", "description",
+                            listOf(McpPrompt.Argument("name", "description", true))
+                        )
+                    )
+                )
+            )
 
-            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(prompt.name, mapOf("name" to "value")))
+            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(prompt.name, mapOf("name" to "123")))
 
             assertNextMessage(
                 McpPrompt.Get.Response(
-                    listOf(Message(Role.assistant, Content.Text("eulav"))),
+                    listOf(Message(Role.assistant, Content.Text("321"))),
                     "description"
                 )
             )
+
+            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(prompt.name, mapOf("name" to "notAnInt")))
+
+            assertNextMessage(InvalidParams)
         }
     }
 
@@ -164,7 +181,19 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpResource.List, McpResource.List.Request())
 
-            assertNextMessage(McpResource.List.Response(listOf(McpResource(resource.uri, null, "HTTP4K", "description", null))))
+            assertNextMessage(
+                McpResource.List.Response(
+                    listOf(
+                        McpResource(
+                            resource.uri,
+                            null,
+                            "HTTP4K",
+                            "description",
+                            null
+                        )
+                    )
+                )
+            )
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
 
@@ -204,7 +233,19 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
 
-            assertNextMessage(McpResource.Template.List.Response(listOf(McpResource(null, resource.uriTemplate, "HTTP4K", "description", null))))
+            assertNextMessage(
+                McpResource.Template.List.Response(
+                    listOf(
+                        McpResource(
+                            null,
+                            resource.uriTemplate,
+                            "HTTP4K",
+                            "description",
+                            null
+                        )
+                    )
+                )
+            )
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
 
@@ -214,15 +255,16 @@ class McpHandlerTest {
 
     @Test
     fun `deal with tools`() {
-        val tool = Tool(
-            "name", "description",
-            Tool.Arg.required("foo", "description1"),
-            Tool.Arg.int().optional("bar", "description2")
-        )
+        val stringArg = Tool.Arg.required("foo", "description1")
+        val intArg = Tool.Arg.int().optional("bar", "description2")
+
+        val tool = Tool("name", "description", stringArg, intArg)
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = Tools(listOf(tool bind { ToolResponse.Ok(listOf(content)) }))
+        val tools = Tools(listOf(tool bind {
+            ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
+        }))
         val mcp = McpHandler(SseMcpProtocol(metadata, tools = tools, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -250,10 +292,17 @@ class McpHandlerTest {
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "bar"))
+                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "123"))
             )
 
-            assertNextMessage(McpTool.Call.Response(listOf(content)))
+            assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
+
+            mcp.sendToMcp(
+                McpTool.Call,
+                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "notAnInt"))
+            )
+
+            assertNextMessage(McpTool.Call.Response(listOf(Content.Text("ERROR: -32602 Invalid params")), true))
 
             tools.items = emptyList()
 
@@ -349,6 +398,10 @@ class McpHandlerTest {
 
         mcp.sendToMcp(McpInitialize.Initialized())
     }
+}
+
+private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
+    assertNextMessage(with(McpJson) { renderError(error, number(1)) })
 }
 
 private fun TestSseClient.assertNextMessage(input: McpResponse) {

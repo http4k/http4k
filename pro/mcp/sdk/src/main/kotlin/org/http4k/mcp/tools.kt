@@ -11,7 +11,7 @@ import org.http4k.mcp.protocol.HasMeta.Companion.default
  */
 typealias ToolHandler = (ToolRequest) -> ToolResponse
 
-data class ToolRequest(val args: Map<String, Any>, val connectRequest: Request)
+data class ToolRequest(private val args: Map<String, Any>, val connectRequest: Request) : Map<String, Any> by args
 
 sealed interface ToolResponse {
     val meta: Meta
