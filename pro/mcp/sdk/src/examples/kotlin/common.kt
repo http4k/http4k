@@ -68,7 +68,7 @@ fun staticResource() =
     Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient())
 
 fun prompt1() = Prompt("prompt1", "description1") bind {
-    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
+    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.toString()))))
 }
 
 fun prompt2() = Prompt(
@@ -77,5 +77,5 @@ fun prompt2() = Prompt(
         Argument("a2", "d2", false),
     )
 ) bind {
-    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.input.toString()))))
+    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.toString()))))
 }

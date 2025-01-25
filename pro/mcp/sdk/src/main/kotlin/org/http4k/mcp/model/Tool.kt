@@ -19,8 +19,8 @@ class Tool private constructor(
     )
 
     object Arg : BiDiLensSpec<ToolRequest, String>("toolRequest", StringParam,
-        LensGet { name, target -> listOfNotNull(target.args[name]?.toString()) },
-        LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m.args + (name to v)) } }
+        LensGet { name, target -> listOfNotNull(target[name]?.toString()) },
+        LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m + (name to v)) } }
     )
 }
 

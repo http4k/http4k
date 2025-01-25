@@ -125,7 +125,7 @@ class McpHandlerTest {
                     PromptResponse(
                         "description",
                         listOf(
-                            Message(Role.assistant, Content.Text(it.input["name"]!!.reversed()))
+                            Message(Role.assistant, Content.Text(it["name"]!!.toString().reversed()))
                         )
                     )
                 }
