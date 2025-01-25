@@ -105,11 +105,11 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpRoot.Changed())
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(6079152038928072179))
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(8299741232644245))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(6079152038928072179))
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(8299741232644245))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }

@@ -19,7 +19,6 @@ import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
-import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 abstract class McpProtocol<RSP : Any>(
@@ -117,7 +116,7 @@ abstract class McpProtocol<RSP : Any>(
                 )
 
                 McpRoot.Changed.Method -> {
-                    val messageId = MessageId.of(random.nextLong(0, MAX_VALUE))
+                    val messageId = MessageId.of(random.nextLong(0, MAX_PRECISE_DOUBLE_INTEGER))
                     calls[messageId] = { roots.update(serDe(it)) }
                     send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(messageId)), sId)
                     ok()
@@ -154,3 +153,9 @@ abstract class McpProtocol<RSP : Any>(
 
     abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
 }
+
+/**
+ * This is the maximum Integer value that can be represented precisely by raw JSON number when
+ * Moshi deserializes it as a double.
+ */
+private const val MAX_PRECISE_DOUBLE_INTEGER = 9_007_199_254_740_991L
