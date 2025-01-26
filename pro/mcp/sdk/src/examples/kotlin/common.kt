@@ -21,6 +21,7 @@ import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.routing.bind
+import org.http4k.routing.multi
 import org.jsoup.Jsoup
 
 fun LinksOnPage(http: HttpHandler): ResourceHandler = {
@@ -38,6 +39,27 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
         }
     ResourceResponse(links)
 }
+
+fun sampling() = multi(
+    llm(),
+    sampleFromModel()
+)
+
+fun tools() = multi(
+    liveWeatherTool(),
+    reverseTool(),
+    countingTool()
+)
+
+fun resources() = multi(
+    staticResource(),
+    templatedResource()
+)
+
+fun prompts() = multi(
+    prompt1(),
+    prompt2()
+)
 
 fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bind {
     SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))

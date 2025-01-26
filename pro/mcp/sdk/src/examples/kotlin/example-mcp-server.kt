@@ -13,15 +13,10 @@ fun main() {
             McpEntity.of("http4k mcp server"), Version.of("0.1.0"),
             *McpCapability.entries.toTypedArray()
         ),
-        prompt1(),
-        prompt2(),
-        staticResource(),
-        templatedResource(),
-        liveWeatherTool(),
-        reverseTool(),
-        countingTool(),
-        llm(),
-        sampleFromModel()
+        prompts(),
+        resources(),
+        tools(),
+        sampling()
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
