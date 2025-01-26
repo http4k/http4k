@@ -1,6 +1,7 @@
 package org.http4k.mcp.features
 
 import org.http4k.mcp.SampleRequest
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.SessionId
@@ -12,16 +13,16 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class OutgoingSampling(private val list: List<OutgoingSamplingFeatureBinding>) : McpFeature {
 
-    private val subscriptions = ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request) -> Unit>()
+    private val subscriptions = ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()
 
     fun respond(entity: McpEntity, response: McpSampling.Response) {
         list.find { entity == it.toEntity() }?.process(response)
     }
 
     fun sample(entity: McpEntity, request: SampleRequest) {
-        subscriptions[subscriptions.keys.filter { it.first == entity }.random()]
-            ?.invoke(
-                with(request) {
+        with(request) {
+            subscriptions[subscriptions.keys.filter { it.first == entity }.random()]
+                ?.invoke(
                     McpSampling.Request(
                         messages,
                         maxTokens,
@@ -31,12 +32,13 @@ class OutgoingSampling(private val list: List<OutgoingSamplingFeatureBinding>) :
                         stopSequences,
                         modelPreferences,
                         metadata
-                    )
-                }
-            )
+                    ),
+                    requestId,
+                )
+        }
     }
 
-    fun onRequest(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request) -> Unit) {
+    fun onRequest(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, RequestId) -> Unit) {
         subscriptions[entity to sessionId] = fn
     }
 
