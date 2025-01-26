@@ -12,14 +12,10 @@ fun main() {
             McpEntity.of("http4k mcp stdio"), Version.of("0.1.0"),
             *McpCapability.entries.toTypedArray()
         ),
-        prompt1(),
-        prompt2(),
-        staticResource(),
-        templatedResource(),
-        liveWeatherTool(),
-        reverseTool(),
-        countingTool(),
-        llm(),
+        prompts(),
+        resources(),
+        tools(),
+        sampling(),
         reader = DebuggingReader(System.`in`.reader()),
         writer = DebuggingWriter(System.out.writer())
     )

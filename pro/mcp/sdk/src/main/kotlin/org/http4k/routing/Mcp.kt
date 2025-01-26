@@ -8,6 +8,7 @@ import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.capability.CapabilityBinding
+import org.http4k.mcp.capability.CapabilityBindings
 import org.http4k.mcp.capability.CompletionBinding
 import org.http4k.mcp.capability.Completions
 import org.http4k.mcp.capability.IncomingSampling
@@ -39,12 +40,12 @@ import java.io.Writer
 fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: CapabilityBinding) = McpHandler(
     SseMcpProtocol(
         serverMetaData,
-        Prompts(bindings.filterIsInstance<PromptBinding>()),
-        Tools(bindings.filterIsInstance<ToolBinding>()),
-        Resources(bindings.filterIsInstance<ResourceBinding>()),
-        Completions(bindings.filterIsInstance<CompletionBinding>()),
-        IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
-        OutgoingSampling(bindings.filterIsInstance<OutgoingSamplingBinding>())
+        Prompts(bindings.flatMap { it }.filterIsInstance<PromptBinding>()),
+        Tools(bindings.flatMap { it }.filterIsInstance<ToolBinding>()),
+        Resources(bindings.flatMap { it }.filterIsInstance<ResourceBinding>()),
+        Completions(bindings.flatMap { it }.filterIsInstance<CompletionBinding>()),
+        IncomingSampling(bindings.flatMap { it }.filterIsInstance<IncomingSamplingBinding>()),
+        OutgoingSampling(bindings.flatMap { it }.filterIsInstance<OutgoingSamplingBinding>())
     )
         .also { it.start() }
 )
@@ -61,11 +62,11 @@ fun mcpStdIo(
         serverMetaData,
         reader,
         writer,
-        Prompts(bindings.filterIsInstance<PromptBinding>()),
-        Tools(bindings.filterIsInstance<ToolBinding>()),
-        Resources(bindings.filterIsInstance<ResourceBinding>()),
-        Completions(bindings.filterIsInstance<CompletionBinding>()),
-        IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
+        Prompts(bindings.flatMap { it }.filterIsInstance<PromptBinding>()),
+        Tools(bindings.flatMap { it }.filterIsInstance<ToolBinding>()),
+        Resources(bindings.flatMap { it }.filterIsInstance<ResourceBinding>()),
+        Completions(bindings.flatMap { it }.filterIsInstance<CompletionBinding>()),
+        IncomingSampling(bindings.flatMap { it }.filterIsInstance<IncomingSamplingBinding>()),
     ).start(SimpleSchedulerService(1))
 }
 
@@ -75,3 +76,5 @@ infix fun Resource.bind(handler: ResourceHandler) = ResourceBinding(this, handle
 infix fun Reference.bind(handler: CompletionHandler) = CompletionBinding(this, handler)
 infix fun McpEntity.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingBinding(this, handler)
 infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingBinding(this, handler)
+
+fun multi(vararg bindings: CapabilityBinding) = CapabilityBindings(bindings = bindings)
