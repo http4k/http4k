@@ -21,6 +21,7 @@ import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.SseMessage.Ping
 import org.http4k.sse.SseMessage.Retry
 import org.http4k.sse.SseResponse
 import java.util.concurrent.CountDownLatch
@@ -58,7 +59,8 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
         override fun send(message: SseMessage) = apply {
             sseSink.emit(
                 when (message) {
-                    is Retry -> builder().reconnectDelay(message.backoff)
+                    is Retry -> builder().reconnectDelay(message.backoff).data("")
+                    is Ping -> builder().data("")
                     is Data -> builder().data(message.sanitizeForMultipleRecords())
                     is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
                         .let { if (message.id == null) it else it.id(message.id) }
@@ -69,6 +71,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
         private fun Data.sanitizeForMultipleRecords() = data.replace("\n", "\ndata:")
 
         override fun close() {
+            triggerClose()
             sseSink.close()
         }
     }

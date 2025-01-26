@@ -33,6 +33,10 @@ sealed interface SseMessage {
         override fun toMessage() = "retry: ${backoff.toMillis()}\n\n"
     }
 
+    data object Ping : SseMessage {
+        override fun toMessage() = ":\n\n"
+    }
+
     companion object {
         fun parse(message: String): SseMessage {
             val parts = message.split("\n").sortedBy { if (it.startsWith("event:")) -1 else 1 }
