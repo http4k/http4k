@@ -1,4 +1,4 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.protocol.messages
 
 import se.ansman.kotshi.JsonSerializable
 

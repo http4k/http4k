@@ -5,9 +5,12 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 
+/**
+ * Spec of a Completion capability.
+ */
 @JsonSerializable
 @Polymorphic("type")
-sealed class Reference {
+sealed class Reference : CapabilitySpec {
     @JsonSerializable
     @PolymorphicLabel("ref/resource")
     data class Resource(val uri: Uri) : Reference()

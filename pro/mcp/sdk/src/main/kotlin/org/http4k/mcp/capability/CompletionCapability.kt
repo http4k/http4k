@@ -4,9 +4,9 @@ import org.http4k.core.Request
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.protocol.McpCompletion
+import org.http4k.mcp.protocol.messages.McpCompletion
 
-class CompletionBinding(private val ref: Reference, private val handler: CompletionHandler) : CapabilityBinding {
+class CompletionCapability(private val ref: Reference, private val handler: CompletionHandler) : ServerCapability {
     fun toReference() = ref
 
     fun complete(mcp: McpCompletion.Request, http: Request) =

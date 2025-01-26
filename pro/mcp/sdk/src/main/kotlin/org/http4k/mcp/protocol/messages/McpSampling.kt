@@ -1,4 +1,4 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.protocol.messages
 
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.MaxTokens
@@ -10,6 +10,7 @@ import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
+import org.http4k.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
 
 object McpSampling : HasMethod {

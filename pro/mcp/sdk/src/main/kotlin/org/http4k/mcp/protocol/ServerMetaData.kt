@@ -1,5 +1,6 @@
 package org.http4k.mcp.protocol
 
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import se.ansman.kotshi.JsonSerializable
 
@@ -15,7 +16,7 @@ data class ServerMetaData internal constructor(
     constructor(
         entity: McpEntity,
         version: Version,
-        vararg capabilities: McpCapability,
+        vararg capabilities: ProtocolCapability,
         protocolVersion: ProtocolVersion = LATEST_VERSION
     ) : this(VersionedMcpEntity(entity, version), protocolVersion, ServerCapabilities(*capabilities))
 }

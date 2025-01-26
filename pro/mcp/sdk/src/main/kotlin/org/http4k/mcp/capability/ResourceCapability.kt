@@ -5,9 +5,9 @@ import org.http4k.core.Uri
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
-import org.http4k.mcp.protocol.McpResource
+import org.http4k.mcp.protocol.messages.McpResource
 
-class ResourceBinding(private val resource: Resource, val handler: ResourceHandler) : CapabilityBinding {
+class ResourceCapability(private val resource: Resource, val handler: ResourceHandler) : ServerCapability {
 
     fun toResource() = with(resource) {
         McpResource(

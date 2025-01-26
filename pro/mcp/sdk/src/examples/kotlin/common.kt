@@ -8,8 +8,8 @@ import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.capability.PromptBinding
-import org.http4k.mcp.capability.ToolBinding
+import org.http4k.mcp.capability.PromptCapability
+import org.http4k.mcp.capability.ToolCapability
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
@@ -65,7 +65,7 @@ fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bin
     SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
 }
 
-fun countingTool(): ToolBinding {
+fun countingTool(): ToolCapability {
     val first = Tool.Arg.int().required("first")
     val second = Tool.Arg.int().required("second")
     return Tool("count", "description", first, second) bind {
@@ -73,7 +73,7 @@ fun countingTool(): ToolBinding {
     }
 }
 
-fun reverseTool(): ToolBinding {
+fun reverseTool(): ToolCapability {
     val input = Tool.Arg.required("name")
 
     return Tool("reverse", "description", input) bind {
@@ -81,7 +81,7 @@ fun reverseTool(): ToolBinding {
     }
 }
 
-fun liveWeatherTool(): ToolBinding {
+fun liveWeatherTool(): ToolCapability {
     val input = Tool.Arg.required("city")
 
     return Tool(
@@ -106,7 +106,7 @@ fun prompt1() = Prompt("prompt1", "description1") bind {
     PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.toString()))))
 }
 
-fun prompt2(): PromptBinding {
+fun prompt2(): PromptCapability {
     val arg1 = Prompt.Arg.required("a1", "d1")
     val arg2 = Prompt.Arg.int().optional("a2", "d2")
     return Prompt(

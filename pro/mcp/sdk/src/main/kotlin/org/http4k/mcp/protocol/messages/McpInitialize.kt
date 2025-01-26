@@ -1,7 +1,12 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.protocol.messages
 
-import org.http4k.mcp.protocol.HasMeta.Companion.default
+import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.mcp.protocol.ServerCapabilities
+import org.http4k.mcp.protocol.VersionedMcpEntity
+import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 object McpInitialize : HasMethod {

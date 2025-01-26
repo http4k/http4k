@@ -7,10 +7,10 @@ import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.mcp.protocol.HasMethod
-import org.http4k.mcp.protocol.ServerMessage.Notification
-import org.http4k.mcp.protocol.ServerMessage.Request
-import org.http4k.mcp.protocol.ServerMessage.Response
+import org.http4k.mcp.protocol.messages.HasMethod
+import org.http4k.mcp.protocol.messages.ServerMessage.Notification
+import org.http4k.mcp.protocol.messages.ServerMessage.Request
+import org.http4k.mcp.protocol.messages.ServerMessage.Response
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 

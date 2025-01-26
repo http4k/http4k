@@ -2,12 +2,12 @@ package org.http4k.mcp.capability
 
 import org.http4k.core.Request
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.protocol.McpSampling
+import org.http4k.mcp.protocol.messages.McpSampling
 
 /**
  * Handles protocol traffic for sampling. Selects the best model to serve a request.
  */
-class IncomingSampling(private val list: List<IncomingSamplingBinding>) {
+class IncomingSampling(private val list: List<IncomingSamplingCapability>) {
 
     fun sample(mcp: McpSampling.Request, requestId: RequestId, http: Request) =
         mcp.selectModel()?.sample(mcp, requestId, http) ?: error("No model to serve request")

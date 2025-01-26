@@ -1,5 +1,5 @@
 import org.http4k.mcp.McpDesktop
-import org.http4k.mcp.protocol.McpEntity
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpHttp
