@@ -1,11 +1,12 @@
 package org.http4k.mcp.protocol
 
+import dev.forkhandles.time.executors.SimpleScheduler
+import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.capability.Completions
 import org.http4k.mcp.capability.IncomingSampling
 import org.http4k.mcp.capability.Logger
@@ -22,8 +23,12 @@ import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Future
 import kotlin.random.Random
 
+/**
+ * Models the MCP protocol in terms of message handling and session management.
+ */
 abstract class McpProtocol<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools,
@@ -36,9 +41,7 @@ abstract class McpProtocol<RSP : Any>(
     private val logger: Logger,
     private val random: Random
 ) {
-    private val calls = ConcurrentHashMap<RequestId, (JsonRpcResult<McpNodeType>) -> Unit>()
-
-    private val clients = ConcurrentHashMap<SessionId, McpEntity>()
+    private val clients = ConcurrentHashMap<SessionId, ClientSession>()
 
     protected abstract fun ok(): RSP
     protected abstract fun error(): RSP
@@ -50,8 +53,8 @@ abstract class McpProtocol<RSP : Any>(
                 McpInitialize.Method ->
                     send(
                         McpMessageHandler<McpInitialize.Request>(jsonReq) {
-                            val entity = it.clientInfo.name
-                            clients[sId] = entity
+                            val session = ClientSession(it.clientInfo, it.capabilities)
+                            clients[sId] = session
                             logger.subscribe(sId, error) { level, logger, data ->
                                 send(McpMessageHandler(McpLogging.LoggingMessage(level, logger, data)), sId)
                             }
@@ -59,8 +62,8 @@ abstract class McpProtocol<RSP : Any>(
                             resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
                             tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
 
-                            outgoingSampling.onRequest(sId, entity) { req, requestId ->
-                                calls[requestId] = { outgoingSampling.respond(entity, SerDe(it)) }
+                            outgoingSampling.onRequest(sId, session.entity) { req, requestId ->
+                                clients[sId]?.addCall(requestId) { outgoingSampling.respond(session.entity, SerDe(it)) }
                                 send(McpMessageHandler(McpSampling, req, McpJson.asJsonObject(requestId)), sId)
                             }
 
@@ -69,7 +72,7 @@ abstract class McpProtocol<RSP : Any>(
                                 prompts.remove(sId)
                                 resources.remove(sId)
                                 tools.remove(sId)
-                                outgoingSampling.remove(sId, entity)
+                                outgoingSampling.remove(sId, session.entity)
                                 logger.unsubscribe(sId)
                             }
 
@@ -135,7 +138,7 @@ abstract class McpProtocol<RSP : Any>(
 
                 McpRoot.Changed.Method -> {
                     val requestId = RequestId.random(random)
-                    calls[requestId] = { roots.update(SerDe(it)) }
+                    clients[sId]?.addCall(requestId) { roots.update(SerDe(it)) }
                     send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(requestId)), sId)
                     ok()
                 }
@@ -157,16 +160,17 @@ abstract class McpProtocol<RSP : Any>(
                         val id = result.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
                             null -> ok()
-                            else -> try {
-                                calls[id]?.invoke(result)?.let { ok() } ?: error()
-                            } finally {
-                                calls -= id
-                            }
+                            else -> clients[sId]?.processResult(id, result)?.let { ok() } ?: error()
                         }
                     }
                 }
             }
         }
 
-    abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
+    protected abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
+
+    /**
+     * Start the protocol.
+     */
+    abstract fun start(executor: SimpleScheduler = SimpleSchedulerService(1)): Future<*>
 }

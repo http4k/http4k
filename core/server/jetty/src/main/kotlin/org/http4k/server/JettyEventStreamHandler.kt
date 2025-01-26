@@ -116,6 +116,7 @@ internal class JettyEventStreamEmitter(
             is SseMessage.Event -> sendEvent(message.event, message.data, message.id)
             is SseMessage.Data -> sendData(message.data)
             is SseMessage.Retry -> sendRetry(message.backoff)
+            is SseMessage.Ping -> sendPing()
         }
     }
 
@@ -153,6 +154,13 @@ internal class JettyEventStreamEmitter(
             write(DELIMITER)
             flush()
         }
+    }
+
+    private fun sendPing() = lock.lock().use {
+        output.write(EMPTY_FIELD)
+        output.write(DELIMITER)
+        output.write(DELIMITER)
+        output.flush()
     }
 
     override fun close() = lock.lock().use {
@@ -205,6 +213,7 @@ internal class JettyEventStreamEmitter(
     }
 
     companion object {
+        private val EMPTY_FIELD = ":".toByteArray()
         private val DELIMITER = "\n".toByteArray()
         private val ID_FIELD = "id:".toByteArray()
         private val EVENT_FIELD = "event:".toByteArray()

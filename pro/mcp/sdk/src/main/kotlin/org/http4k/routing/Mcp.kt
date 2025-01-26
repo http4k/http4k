@@ -30,7 +30,6 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.stdio.StdIoMcpProtocol
-import org.http4k.mcp.stdio.pipeMessagesToFromStdIo
 import java.io.Reader
 import java.io.Writer
 
@@ -47,6 +46,7 @@ fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: CapabilityBinding) 
         IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
         OutgoingSampling(bindings.filterIsInstance<OutgoingSamplingBinding>())
     )
+        .also { it.start() }
 )
 
 /**
@@ -57,18 +57,16 @@ fun mcpStdIo(
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
 ) {
-    SimpleSchedulerService(1).pipeMessagesToFromStdIo(
-        StdIoMcpProtocol(
-            serverMetaData,
-            writer,
-            Prompts(bindings.filterIsInstance<PromptBinding>()),
-            Tools(bindings.filterIsInstance<ToolBinding>()),
-            Resources(bindings.filterIsInstance<ResourceBinding>()),
-            Completions(bindings.filterIsInstance<CompletionBinding>()),
-            IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
-        ),
-        reader
-    )()
+    StdIoMcpProtocol(
+        serverMetaData,
+        reader,
+        writer,
+        Prompts(bindings.filterIsInstance<PromptBinding>()),
+        Tools(bindings.filterIsInstance<ToolBinding>()),
+        Resources(bindings.filterIsInstance<ResourceBinding>()),
+        Completions(bindings.filterIsInstance<CompletionBinding>()),
+        IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
+    ).start(SimpleSchedulerService(1))
 }
 
 infix fun Tool.bind(handler: ToolHandler) = ToolBinding(this, handler)
