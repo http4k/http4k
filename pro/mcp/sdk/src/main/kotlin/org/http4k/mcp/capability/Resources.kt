@@ -1,17 +1,16 @@
-package org.http4k.mcp.features
+package org.http4k.mcp.capability
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.mcp.protocol.McpResource
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.util.ObservableList
-import org.http4k.routing.ResourceFeatureBinding
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Handles protocol traffic for resources features and subscriptions.
  */
-class Resources(list: List<ResourceFeatureBinding>) : ObservableList<ResourceFeatureBinding>(list), McpFeature {
+class Resources(list: List<ResourceBinding>) : ObservableList<ResourceBinding>(list) {
 
     private val subscriptions = ConcurrentHashMap<Pair<Uri, SessionId>, Set<(Uri) -> Unit>>()
 

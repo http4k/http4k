@@ -8,6 +8,8 @@ import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.capability.PromptBinding
+import org.http4k.mcp.capability.ToolBinding
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
@@ -18,8 +20,6 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
-import org.http4k.routing.PromptFeatureBinding
-import org.http4k.routing.ToolFeatureBinding
 import org.http4k.routing.bind
 import org.jsoup.Jsoup
 
@@ -43,7 +43,7 @@ fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bin
     SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
 }
 
-fun countingTool(): ToolFeatureBinding {
+fun countingTool(): ToolBinding {
     val first = Tool.Arg.int().required("first")
     val second = Tool.Arg.int().required("second")
     return Tool("count", "description", first, second) bind {
@@ -51,7 +51,7 @@ fun countingTool(): ToolFeatureBinding {
     }
 }
 
-fun reverseTool(): ToolFeatureBinding {
+fun reverseTool(): ToolBinding {
     val input = Tool.Arg.required("name")
 
     return Tool("reverse", "description", input) bind {
@@ -59,7 +59,7 @@ fun reverseTool(): ToolFeatureBinding {
     }
 }
 
-fun liveWeatherTool(): ToolFeatureBinding {
+fun liveWeatherTool(): ToolBinding {
     val input = Tool.Arg.required("city")
 
     return Tool(
@@ -84,7 +84,7 @@ fun prompt1() = Prompt("prompt1", "description1") bind {
     PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.toString()))))
 }
 
-fun prompt2(): PromptFeatureBinding {
+fun prompt2(): PromptBinding {
     val arg1 = Prompt.Arg.required("a1", "d1")
     val arg2 = Prompt.Arg.int().optional("a2", "d2")
     return Prompt(

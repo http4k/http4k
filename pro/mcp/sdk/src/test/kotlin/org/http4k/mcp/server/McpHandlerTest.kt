@@ -25,14 +25,14 @@ import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SampleRequest
 import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.features.Completions
-import org.http4k.mcp.features.IncomingSampling
-import org.http4k.mcp.features.Logger
-import org.http4k.mcp.features.OutgoingSampling
-import org.http4k.mcp.features.Prompts
-import org.http4k.mcp.features.Resources
-import org.http4k.mcp.features.Roots
-import org.http4k.mcp.features.Tools
+import org.http4k.mcp.capability.Completions
+import org.http4k.mcp.capability.IncomingSampling
+import org.http4k.mcp.capability.Logger
+import org.http4k.mcp.capability.OutgoingSampling
+import org.http4k.mcp.capability.Prompts
+import org.http4k.mcp.capability.Resources
+import org.http4k.mcp.capability.Roots
+import org.http4k.mcp.capability.Tools
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
@@ -54,6 +54,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientMessage
 import org.http4k.mcp.protocol.HasMethod
+import org.http4k.mcp.protocol.McpCapability
 import org.http4k.mcp.protocol.McpCompletion
 import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.McpInitialize
@@ -400,8 +401,12 @@ class McpHandlerTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            sampling.sample(serverName, SampleRequest(listOf(), MaxTokens.of(1), RequestId.of(1),
-                connectRequest = Request(GET, "")))
+            sampling.sample(
+                serverName, SampleRequest(
+                    listOf(), MaxTokens.of(1), RequestId.of(1),
+                    connectRequest = Request(GET, "")
+                )
+            )
 
             assertNextMessage(
                 McpSampling,
@@ -428,7 +433,7 @@ class McpHandlerTest {
         mcp.sendToMcp(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(clientName, Version.of("1")),
-                ClientCapabilities(), `2024-10-07`
+                ClientCapabilities(*McpCapability.entries.toTypedArray()), `2024-10-07`
             )
         )
 

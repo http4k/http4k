@@ -1,13 +1,13 @@
-package org.http4k.routing
+package org.http4k.mcp.capability
 
 import org.http4k.mcp.OutgoingSamplingHandler
 import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.McpSampling
 
-class OutgoingSamplingFeatureBinding(
+class OutgoingSamplingBinding(
     private val entity: McpEntity, private val handler: OutgoingSamplingHandler
-) : FeatureBinding {
+) : CapabilityBinding {
 
     fun toEntity() = entity
 

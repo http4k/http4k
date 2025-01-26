@@ -7,12 +7,19 @@ import org.http4k.mcp.OutgoingSamplingHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
-import org.http4k.mcp.features.Completions
-import org.http4k.mcp.features.IncomingSampling
-import org.http4k.mcp.features.OutgoingSampling
-import org.http4k.mcp.features.Prompts
-import org.http4k.mcp.features.Resources
-import org.http4k.mcp.features.Tools
+import org.http4k.mcp.capability.CapabilityBinding
+import org.http4k.mcp.capability.CompletionBinding
+import org.http4k.mcp.capability.Completions
+import org.http4k.mcp.capability.IncomingSampling
+import org.http4k.mcp.capability.IncomingSamplingBinding
+import org.http4k.mcp.capability.OutgoingSampling
+import org.http4k.mcp.capability.OutgoingSamplingBinding
+import org.http4k.mcp.capability.PromptBinding
+import org.http4k.mcp.capability.Prompts
+import org.http4k.mcp.capability.ResourceBinding
+import org.http4k.mcp.capability.Resources
+import org.http4k.mcp.capability.ToolBinding
+import org.http4k.mcp.capability.Tools
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
@@ -30,15 +37,15 @@ import java.io.Writer
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
-fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = McpHandler(
+fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: CapabilityBinding) = McpHandler(
     SseMcpProtocol(
         serverMetaData,
-        Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
-        Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
-        Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
-        Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
-        IncomingSampling(bindings.filterIsInstance<IncomingSamplingFeatureBinding>()),
-        OutgoingSampling(bindings.filterIsInstance<OutgoingSamplingFeatureBinding>())
+        Prompts(bindings.filterIsInstance<PromptBinding>()),
+        Tools(bindings.filterIsInstance<ToolBinding>()),
+        Resources(bindings.filterIsInstance<ResourceBinding>()),
+        Completions(bindings.filterIsInstance<CompletionBinding>()),
+        IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
+        OutgoingSampling(bindings.filterIsInstance<OutgoingSamplingBinding>())
     )
 )
 
@@ -46,7 +53,7 @@ fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = M
  * Create a StdIO MCP app from a set of feature bindings.
  */
 fun mcpStdIo(
-    serverMetaData: ServerMetaData, vararg bindings: FeatureBinding,
+    serverMetaData: ServerMetaData, vararg bindings: CapabilityBinding,
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
 ) {
@@ -54,19 +61,19 @@ fun mcpStdIo(
         StdIoMcpProtocol(
             serverMetaData,
             writer,
-            Prompts(bindings.filterIsInstance<PromptFeatureBinding>()),
-            Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
-            Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
-            Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
-            IncomingSampling(bindings.filterIsInstance<IncomingSamplingFeatureBinding>()),
+            Prompts(bindings.filterIsInstance<PromptBinding>()),
+            Tools(bindings.filterIsInstance<ToolBinding>()),
+            Resources(bindings.filterIsInstance<ResourceBinding>()),
+            Completions(bindings.filterIsInstance<CompletionBinding>()),
+            IncomingSampling(bindings.filterIsInstance<IncomingSamplingBinding>()),
         ),
         reader
     )()
 }
 
-infix fun Tool.bind(handler: ToolHandler) = ToolFeatureBinding(this, handler)
-infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
-infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
-infix fun Reference.bind(handler: CompletionHandler) = CompletionFeatureBinding(this, handler)
-infix fun McpEntity.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingFeatureBinding(this, handler)
-infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingFeatureBinding(this, handler)
+infix fun Tool.bind(handler: ToolHandler) = ToolBinding(this, handler)
+infix fun Prompt.bind(handler: PromptHandler) = PromptBinding(this, handler)
+infix fun Resource.bind(handler: ResourceHandler) = ResourceBinding(this, handler)
+infix fun Reference.bind(handler: CompletionHandler) = CompletionBinding(this, handler)
+infix fun McpEntity.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingBinding(this, handler)
+infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingBinding(this, handler)

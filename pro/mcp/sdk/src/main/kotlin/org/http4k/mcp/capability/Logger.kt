@@ -1,10 +1,10 @@
-package org.http4k.mcp.features
+package org.http4k.mcp.capability
 
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.protocol.SessionId
 import java.util.concurrent.ConcurrentHashMap
 
-class Logger : McpFeature {
+class Logger {
 
     private val subscriptions = ConcurrentHashMap<SessionId, Pair<LogLevel, LogFunction>>()
 

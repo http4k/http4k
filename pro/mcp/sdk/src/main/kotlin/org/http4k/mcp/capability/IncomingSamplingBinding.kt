@@ -1,4 +1,4 @@
-package org.http4k.routing
+package org.http4k.mcp.capability
 
 import org.http4k.core.Request
 import org.http4k.mcp.IncomingSamplingHandler
@@ -7,8 +7,10 @@ import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.McpSampling
 
-class IncomingSamplingFeatureBinding(private val modelSelector: ModelSelector, private val handler: IncomingSamplingHandler) :
-    FeatureBinding {
+class IncomingSamplingBinding(
+    private val modelSelector: ModelSelector,
+    private val handler: IncomingSamplingHandler
+) : CapabilityBinding {
 
     fun toModelSelector() = modelSelector
 
