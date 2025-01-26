@@ -7,6 +7,7 @@ import org.http4k.mcp.OutgoingSamplingHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
+import org.http4k.mcp.capability.CapabilityPack
 import org.http4k.mcp.capability.CompletionCapability
 import org.http4k.mcp.capability.Completions
 import org.http4k.mcp.capability.IncomingSampling
@@ -17,7 +18,6 @@ import org.http4k.mcp.capability.PromptCapability
 import org.http4k.mcp.capability.Prompts
 import org.http4k.mcp.capability.ResourceCapability
 import org.http4k.mcp.capability.Resources
-import org.http4k.mcp.capability.ServerCapabilities
 import org.http4k.mcp.capability.ServerCapability
 import org.http4k.mcp.capability.ToolCapability
 import org.http4k.mcp.capability.Tools
@@ -81,4 +81,4 @@ infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this
 infix fun McpEntity.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingCapability(this, handler)
 infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingCapability(this, handler)
 
-fun multi(vararg bindings: ServerCapability) = ServerCapabilities(bindings = bindings)
+fun compose(vararg bindings: ServerCapability) = CapabilityPack(bindings = bindings)
