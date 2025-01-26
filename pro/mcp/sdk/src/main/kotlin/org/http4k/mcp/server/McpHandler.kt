@@ -24,7 +24,7 @@ import org.http4k.routing.bind as httpBind
  * This is the main entry point for the MCP server. It sets up the SSE connection and then provides a
  * session for the client to send messages to.
  */
-    fun McpHandler(mcpProtocol: SseMcpProtocol) = poly(
+fun McpHandler(mcpProtocol: SseMcpProtocol) = poly(
     "/sse" bind sse {
         it.send(
             Event("endpoint", Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString())
