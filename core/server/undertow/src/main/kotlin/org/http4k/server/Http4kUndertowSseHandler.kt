@@ -9,6 +9,7 @@ import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.SseMessage.Ping
 import org.http4k.sse.SseMessage.Retry
 import java.io.IOException
 import java.nio.channels.ClosedChannelException
@@ -22,6 +23,7 @@ fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
                     is Retry -> connection.sendRetry(message.backoff.toMillis(), CloseOnFailure)
                     is Data -> connection.send(message.data, CloseOnFailure)
                     is Event -> connection.send(message.data, message.event, message.id, CloseOnFailure)
+                    is Ping -> connection.send("", "ping", "", CloseOnFailure)
                 }
             }
 

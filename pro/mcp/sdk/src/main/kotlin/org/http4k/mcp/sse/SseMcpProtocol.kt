@@ -1,5 +1,6 @@
 package org.http4k.mcp.sse
 
+import dev.forkhandles.time.executors.SimpleSchedulerService
 import dev.forkhandles.values.random
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
@@ -19,6 +20,8 @@ import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.SseMessage.Ping
+import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -33,6 +36,8 @@ class SseMcpProtocol(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     private val random: Random = Random,
+    private val executor: SimpleSchedulerService = SimpleSchedulerService(1),
+    private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : McpProtocol<Response>(
     metaData,
     tools,
@@ -45,7 +50,6 @@ class SseMcpProtocol(
     logger,
     random
 ) {
-
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
     override fun ok() = Response(ACCEPTED)
@@ -67,6 +71,19 @@ class SseMcpProtocol(
     fun newSession(sse: Sse): SessionId {
         val sessionId = SessionId.random(random)
         sessions[sessionId] = sse
+        sse.onClose { sessions.remove(sessionId) }
+        setupPing(sse)
         return sessionId
+    }
+
+    private fun setupPing(sse: Sse) {
+        executor.submit {
+            sse.use {
+                while(true) {
+                    Thread.sleep(keepAliveDelay.toMillis())
+                    it.send(Ping)
+                }
+            }
+        }
     }
 }

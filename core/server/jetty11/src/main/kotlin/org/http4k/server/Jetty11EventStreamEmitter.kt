@@ -31,6 +31,7 @@ class Jetty11EventStreamEmitter(
             is SseMessage.Event -> sendEvent(message.event, message.data, message.id)
             is SseMessage.Data -> sendData(message.data)
             is SseMessage.Retry -> sendRetry(message.backoff)
+            is SseMessage.Ping -> sendPing()
         }
     }
 
@@ -59,6 +60,13 @@ class Jetty11EventStreamEmitter(
     private fun sendRetry(duration: Duration) = lock.lock().use {
         output.write(RETRY_FIELD)
         output.write(duration.toMillis().toString().toByteArray())
+        output.write(DELIMITER)
+        output.write(DELIMITER)
+        output.flush()
+    }
+
+    private fun sendPing() = lock.lock().use {
+        output.write(EMPTY_FIELD)
         output.write(DELIMITER)
         output.write(DELIMITER)
         output.flush()
@@ -109,5 +117,6 @@ class Jetty11EventStreamEmitter(
         private val EVENT_FIELD = "event:".toByteArray()
         private val DATA_FIELD = "data:".toByteArray()
         private val RETRY_FIELD = "retry:".toByteArray()
+        private val EMPTY_FIELD = ":".toByteArray()
     }
 }
