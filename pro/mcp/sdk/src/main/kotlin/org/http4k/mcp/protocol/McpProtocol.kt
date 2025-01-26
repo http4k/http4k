@@ -51,34 +51,7 @@ abstract class McpProtocol<RSP : Any>(
         when {
             jsonReq.valid() -> when (McpRpcMethod.of(jsonReq.method)) {
                 McpInitialize.Method ->
-                    send(
-                        McpMessageHandler<McpInitialize.Request>(jsonReq) {
-                            val session = ClientSession(it.clientInfo, it.capabilities)
-                            clients[sId] = session
-                            logger.subscribe(sId, error) { level, logger, data ->
-                                send(McpMessageHandler(McpLogging.LoggingMessage(level, logger, data)), sId)
-                            }
-                            prompts.onChange(sId) { send(McpMessageHandler(McpPrompt.List.Changed()), sId) }
-                            resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
-                            tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
-
-                            outgoingSampling.onRequest(sId, session.entity) { req, requestId ->
-                                clients[sId]?.addCall(requestId) { outgoingSampling.respond(session.entity, SerDe(it)) }
-                                send(McpMessageHandler(McpSampling, req, McpJson.asJsonObject(requestId)), sId)
-                            }
-
-                            onClose(sId) {
-                                clients.remove(sId)
-                                prompts.remove(sId)
-                                resources.remove(sId)
-                                tools.remove(sId)
-                                outgoingSampling.remove(sId, session.entity)
-                                logger.unsubscribe(sId)
-                            }
-
-                            McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
-                        }, sId
-                    )
+                    send(McpMessageHandler<McpInitialize.Request>(jsonReq) { handleInitialize(it, sId) }, sId)
 
                 McpCompletion.Method ->
                     send(McpMessageHandler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }, sId)
@@ -166,6 +139,34 @@ abstract class McpProtocol<RSP : Any>(
                 }
             }
         }
+
+    private fun handleInitialize(request: McpInitialize.Request, sId: SessionId): McpInitialize.Response {
+        val session = ClientSession(request.clientInfo, request.capabilities)
+
+        clients[sId] = session
+        logger.subscribe(sId, error) { level, logger, data ->
+            send(McpMessageHandler(McpLogging.LoggingMessage(level, logger, data)), sId)
+        }
+        prompts.onChange(sId) { send(McpMessageHandler(McpPrompt.List.Changed()), sId) }
+        resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
+        tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
+
+        outgoingSampling.onRequest(sId, session.entity) { req, requestId ->
+            clients[sId]?.addCall(requestId) { outgoingSampling.respond(session.entity, SerDe(it)) }
+            send(McpMessageHandler(McpSampling, req, McpJson.asJsonObject(requestId)), sId)
+        }
+
+        onClose(sId) {
+            clients.remove(sId)
+            prompts.remove(sId)
+            resources.remove(sId)
+            tools.remove(sId)
+            outgoingSampling.remove(sId, session.entity)
+            logger.unsubscribe(sId)
+        }
+
+        return McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
+    }
 
     protected abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
 
