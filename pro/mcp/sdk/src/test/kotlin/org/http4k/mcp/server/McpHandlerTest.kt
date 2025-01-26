@@ -45,6 +45,7 @@ import org.http4k.mcp.model.ModelScore.Companion.MAX
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
@@ -66,7 +67,6 @@ import org.http4k.mcp.protocol.McpResponse
 import org.http4k.mcp.protocol.McpRoot
 import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.McpTool
-import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMetaData
@@ -115,11 +115,11 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpRoot.Changed())
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(8299741232644245))
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), RequestId.of(8299741232644920))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(8299741232644245))
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), RequestId.of(8299741232644920))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -400,16 +400,17 @@ class McpHandlerTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            sampling.sample(serverName, SampleRequest(listOf(), MaxTokens.of(1), connectRequest = Request(GET, "")))
+            sampling.sample(serverName, SampleRequest(listOf(), MaxTokens.of(1), RequestId.of(1),
+                connectRequest = Request(GET, "")))
 
             assertNextMessage(
                 McpSampling,
                 McpSampling.Request(listOf(), MaxTokens.of(1)),
-                MessageId.of(8299741232644245)
+                RequestId.of(1)
             )
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
-                MessageId.of(8299741232644245)
+                RequestId.of(1)
             )
 
             assertThat(received, equalTo(SampleResponse(model, StopReason.of("bored"), Role.assistant, content)))

@@ -15,6 +15,7 @@ import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.LogLevel.error
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.processing.McpMessageHandler
 import org.http4k.mcp.processing.SerDe
 import org.http4k.mcp.protocol.ServerMessage.Response.Empty
@@ -35,7 +36,7 @@ abstract class McpProtocol<RSP : Any>(
     private val logger: Logger,
     private val random: Random
 ) {
-    private val calls = ConcurrentHashMap<MessageId, (JsonRpcResult<McpNodeType>) -> Unit>()
+    private val calls = ConcurrentHashMap<RequestId, (JsonRpcResult<McpNodeType>) -> Unit>()
 
     private val clients = ConcurrentHashMap<SessionId, McpEntity>()
 
@@ -58,10 +59,9 @@ abstract class McpProtocol<RSP : Any>(
                             resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
                             tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
 
-                            outgoingSampling.onRequest(sId, entity) {
-                                val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
-                                calls[messageId] = { outgoingSampling.respond(entity, SerDe(it)) }
-                                send(McpMessageHandler(McpSampling, it, McpJson.asJsonObject(messageId)), sId)
+                            outgoingSampling.onRequest(sId, entity) { req, requestId ->
+                                calls[requestId] = { outgoingSampling.respond(entity, SerDe(it)) }
+                                send(McpMessageHandler(McpSampling, req, McpJson.asJsonObject(requestId)), sId)
                             }
 
                             onClose(sId) {
@@ -122,17 +122,22 @@ abstract class McpProtocol<RSP : Any>(
 
                 Cancelled.Method -> ok()
 
-                McpSampling.Method -> send(
-                    McpMessageHandler<McpSampling.Request>(jsonReq) { incomingSampling.sample(it, req) },
-                    sId
-                )
+                McpSampling.Method -> {
+                    val requestId = McpJson.asA(jsonReq.id ?: McpJson.nullNode(), RequestId::class)
+                    send(
+                        McpMessageHandler<McpSampling.Request>(jsonReq) {
+                            incomingSampling.sample(it, requestId, req)
+                        },
+                        sId
+                    )
+                }
 
                 McpProgress.Notification.Method -> ok()
 
                 McpRoot.Changed.Method -> {
-                    val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
-                    calls[messageId] = { roots.update(SerDe(it)) }
-                    send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(messageId)), sId)
+                    val requestId = RequestId.random(random)
+                    calls[requestId] = { roots.update(SerDe(it)) }
+                    send(McpMessageHandler(McpRoot.List, McpRoot.List.Request(), McpJson.asJsonObject(requestId)), sId)
                     ok()
                 }
 
@@ -142,7 +147,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpTool.List.Method ->
                     send(McpMessageHandler<McpTool.List.Request>(jsonReq) { tools.list(it, req) }, sId)
 
-                    else -> send(SerDe(MethodNotFound, jsonReq.id), sId)
+                else -> send(SerDe(MethodNotFound, jsonReq.id), sId)
             }
 
             else -> {
@@ -150,7 +155,7 @@ abstract class McpProtocol<RSP : Any>(
                 when {
                     result.isError() -> ok()
                     else -> with(McpJson) {
-                        val id = result.id?.let { MessageId.parse(compact(it)) }
+                        val id = result.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
                             null -> ok()
                             else -> try {
@@ -166,10 +171,3 @@ abstract class McpProtocol<RSP : Any>(
 
     abstract fun onClose(sessionId: SessionId, fn: () -> Unit)
 }
-
-/**
- * This is the maximum Integer value that can be represented precisely by raw JSON number when
- * Moshi deserializes it as a double. MCP servers seem to need a precise integer value for the
- * message ID, so we need to limit the range of the message ID to this value.
- */
-private const val MAX_MCP_MESSAGE_ID = 9_007_199_254_740_991L
