@@ -97,7 +97,7 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
         }
 
     private fun Class<*>?.isA(testCase: Class<*>): Boolean =
-        this?.let { testCase != this && testCase.isAssignableFrom(this) } ?: false
+        this?.let { testCase.isAssignableFrom(this) } ?: false
 }
 
 class UnmappedValue(type: Type) : Exception("unmapped type $type")

@@ -5,12 +5,22 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.format.MoshiArray
+import org.http4k.format.MoshiBoolean
+import org.http4k.format.MoshiDecimal
+import org.http4k.format.MoshiInteger
+import org.http4k.format.MoshiNode
+import org.http4k.format.MoshiNull
+import org.http4k.format.MoshiObject
+import org.http4k.format.MoshiString
+import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.model.Content
+import org.http4k.mcp.ToolResponse.Error
+import org.http4k.mcp.ToolResponse.Ok
+import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.messages.McpTool
 
@@ -18,28 +28,29 @@ class ToolCapability(private val tool: Tool, private val handler: ToolHandler) :
 
     fun toTool() = McpTool(tool.name, tool.description, tool.toSchema())
 
-    fun call(mcp: McpTool.Call.Request, http: Request) = resultFrom { ToolRequest(mcp.arguments, http) }
-        .mapFailure { ToolResponse.Error(ErrorMessage.InvalidParams) }
-        .map {
-            try {
-                handler(it)
-            } catch (e: LensFailure) {
-                ToolResponse.Error(ErrorMessage.InvalidParams)
-            } catch (e: Exception) {
-                ToolResponse.Error(ErrorMessage.InternalError)
+    fun call(mcp: McpTool.Call.Request, http: Request) =
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), http) }
+            .mapFailure { Error(InvalidParams) }
+            .map {
+                try {
+                    handler(it)
+                } catch (e: LensFailure) {
+                    Error(InvalidParams)
+                } catch (e: Exception) {
+                    Error(InternalError)
+                }
             }
-        }
-        .get()
-        .let {
-            McpTool.Call.Response(
-                when (it) {
-                    is ToolResponse.Ok -> it.content
-                    is ToolResponse.Error -> listOf(Content.Text("ERROR: " + it.error.code + " " + it.error.message))
-                },
-                it is ToolResponse.Error,
-                it.meta
-            )
-        }
+            .get()
+            .let {
+                McpTool.Call.Response(
+                    when (it) {
+                        is Ok -> it.content
+                        is Error -> listOf(Text("ERROR: " + it.error.code + " " + it.error.message))
+                    },
+                    it is Error,
+                    it.meta
+                )
+            }
 }
 
 private fun Tool.toSchema() = mapOf(
@@ -54,3 +65,16 @@ private fun Tool.toSchema() = mapOf(
         }.toTypedArray()
     )
 )
+
+private fun Map<String, MoshiNode>.coerceIntoStrings() =
+    mapNotNull { it.value.asString()?.let { value -> it.key to value } }.toMap()
+
+private fun MoshiNode.asString(): Any? = when (this) {
+    MoshiNull -> null
+    is MoshiArray -> elements.mapNotNull { it.asString() }
+    is MoshiBoolean -> value.toString()
+    is MoshiString -> value
+    is MoshiDecimal -> value.toString()
+    is MoshiInteger -> value.toString()
+    is MoshiObject -> attributes.mapValues { it.value.asString() }
+}

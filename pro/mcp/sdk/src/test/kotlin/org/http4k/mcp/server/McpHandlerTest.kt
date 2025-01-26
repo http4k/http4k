@@ -11,6 +11,8 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.format.MoshiInteger
+import org.http4k.format.MoshiString
 import org.http4k.format.renderError
 import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
@@ -274,6 +276,7 @@ class McpHandlerTest {
         val tools = Tools(listOf(tool bind {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
+
         val mcp = McpHandler(SseMcpProtocol(metadata, tools = tools, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -301,14 +304,14 @@ class McpHandlerTest {
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "123"))
+                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)))
             )
 
             assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(tool.name, mapOf("foo" to "foo", "bar" to "notAnInt"))
+                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")))
             )
 
             assertNextMessage(McpTool.Call.Response(listOf(Content.Text("ERROR: -32602 Invalid params")), true))
