@@ -1,4 +1,4 @@
-package org.http4k.routing
+package org.http4k.mcp.capability
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -7,7 +7,7 @@ import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.McpResource
 
-class ResourceFeatureBinding(private val resource: Resource, val handler: ResourceHandler) : FeatureBinding {
+class ResourceBinding(private val resource: Resource, val handler: ResourceHandler) : CapabilityBinding {
 
     fun toResource() = with(resource) {
         McpResource(

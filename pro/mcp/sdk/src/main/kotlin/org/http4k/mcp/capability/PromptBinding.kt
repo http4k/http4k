@@ -1,8 +1,7 @@
-package org.http4k.routing
+package org.http4k.mcp.capability
 
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.LensFailure
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptRequest
@@ -10,7 +9,7 @@ import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.processing.McpException
 import org.http4k.mcp.protocol.McpPrompt
 
-class PromptFeatureBinding(private val prompt: Prompt, val handler: PromptHandler) : FeatureBinding {
+class PromptBinding(private val prompt: Prompt, val handler: PromptHandler) : CapabilityBinding {
     fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.args.map {
         McpPrompt.Argument(it.meta.name, it.meta.description, it.meta.required)
     })
@@ -19,9 +18,8 @@ class PromptFeatureBinding(private val prompt: Prompt, val handler: PromptHandle
         handler(PromptRequest(mcp.arguments, http))
             .let { McpPrompt.Get.Response(it.messages, it.description) }
     } catch (e: LensFailure) {
-        throw McpException(InvalidParams, e)
+        throw McpException(ErrorMessage.InvalidParams, e)
     } catch (e: Exception) {
-        throw McpException(InternalError, e)
+        throw McpException(ErrorMessage.InternalError, e)
     }
 }
-

@@ -1,19 +1,19 @@
-package org.http4k.mcp.features
+package org.http4k.mcp.capability
 
 import org.http4k.mcp.SampleRequest
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.routing.OutgoingSamplingFeatureBinding
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Handles protocol traffic for sampling from the MCP Client.
  */
-class OutgoingSampling(private val list: List<OutgoingSamplingFeatureBinding>) : McpFeature {
+class OutgoingSampling(private val list: List<OutgoingSamplingBinding>) {
 
-    private val subscriptions = ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()
+    private val subscriptions =
+        ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()
 
     fun respond(entity: McpEntity, response: McpSampling.Response) {
         list.find { entity == it.toEntity() }?.process(response)
