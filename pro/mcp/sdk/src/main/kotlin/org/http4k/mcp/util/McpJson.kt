@@ -20,6 +20,7 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
+import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.MessageId
 import org.http4k.mcp.protocol.ProtocolVersion
@@ -42,6 +43,7 @@ object McpJson : ConfigurableMoshi(
         .value(CostPriority)
         .value(IntelligencePriority)
         .value(MaxTokens)
+        .value(McpEntity)
         .value(McpRpcMethod)
         .value(MessageId)
         .value(MimeType)

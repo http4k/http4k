@@ -38,6 +38,8 @@ abstract class McpProtocol<RSP : Any>(
 ) {
     private val calls = ConcurrentHashMap<MessageId, (JsonRpcResult<McpNodeType>) -> Unit>()
 
+    private val clients = ConcurrentHashMap<SessionId, McpEntity>()
+
     protected abstract fun ok(): RSP
     protected abstract fun error(): RSP
     protected abstract fun send(message: SseMessage.Event, sessionId: SessionId): RSP
@@ -48,6 +50,8 @@ abstract class McpProtocol<RSP : Any>(
                 McpInitialize.Method ->
                     send(
                         McpMessageHandler<McpInitialize.Request>(jsonReq) {
+                            val entity = it.clientInfo.name
+                            clients[sId] = entity
                             logger.subscribe(sId, error) { level, logger, data ->
                                 send(McpMessageHandler(McpLogging.LoggingMessage(level, logger, data)), sId)
                             }
@@ -55,17 +59,18 @@ abstract class McpProtocol<RSP : Any>(
                             resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
                             tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
 
-                            outgoingSampling.onRequest(sId) {
+                            outgoingSampling.onRequest(sId, entity) {
                                 val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
+                                calls[messageId] = { outgoingSampling.respond(entity, SerDe(it)) }
                                 send(McpMessageHandler(McpSampling, it, McpJson.asJsonObject(messageId)), sId)
-                                calls[messageId] = { outgoingSampling.respond(SerDe(it)) }
                             }
 
                             onClose(sId) {
+                                clients.remove(sId)
                                 prompts.remove(sId)
                                 resources.remove(sId)
                                 tools.remove(sId)
-                                outgoingSampling.remove(sId)
+                                outgoingSampling.remove(sId, entity)
 
                                 logger.unsubscribe(sId)
                             }

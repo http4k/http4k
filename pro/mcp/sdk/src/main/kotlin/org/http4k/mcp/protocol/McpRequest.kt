@@ -1,3 +1,3 @@
 package org.http4k.mcp.protocol
 
-sealed interface McpRequest
+sealed interface McpRequest : HasMeta

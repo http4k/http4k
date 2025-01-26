@@ -13,12 +13,12 @@ import org.http4k.mcp.features.OutgoingSampling
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Tools
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.McpHandler
 import org.http4k.mcp.sse.SseMcpProtocol
@@ -68,5 +68,5 @@ infix fun Tool.bind(handler: ToolHandler) = ToolFeatureBinding(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionFeatureBinding(this, handler)
-infix fun ModelIdentifier.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingFeatureBinding(this, handler)
+infix fun McpEntity.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingFeatureBinding(this, handler)
 infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingFeatureBinding(this, handler)
