@@ -1,5 +1,6 @@
 package org.http4k.mcp.protocol.messages
 
+import org.http4k.format.MoshiNode
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
@@ -37,7 +38,7 @@ data class McpTool(val name: ToolName, val description: String, val inputSchema:
         @JsonSerializable
         data class Request(
             val name: ToolName,
-            val arguments: Map<String, Any> = emptyMap(),
+            val arguments: Map<String, MoshiNode> = emptyMap(),
             override val _meta: Meta = default
         ) : ClientMessage.Request, HasMeta
 

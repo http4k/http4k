@@ -22,7 +22,13 @@ class Tool private constructor(
     )
 
     object Arg : BiDiLensSpec<ToolRequest, String>("toolRequest", StringParam,
-        LensGet { name, target -> listOfNotNull(target[name]?.toString()) },
+        LensGet { name, target ->
+            when (val value = target[name]) {
+                null -> emptyList()
+                is List<*> -> value.map { it.toString() }
+                else -> listOf(value.toString())
+            }
+        },
         LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m + (name to v)) } }
     )
 }
