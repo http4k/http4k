@@ -51,9 +51,8 @@ data class McpResource(
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
         @JsonSerializable
-        data object Changed : ServerMessage.Notification {
-            override val method = of("notifications/resources/list_changed")
-        }
+        data class Changed(override val method: McpRpcMethod = of("notifications/resources/list_changed")) :
+            ServerMessage.Notification
     }
 
     @JsonSerializable

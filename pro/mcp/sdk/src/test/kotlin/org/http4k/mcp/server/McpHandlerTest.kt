@@ -309,7 +309,7 @@ class McpHandlerTest {
 
             tools.items = emptyList()
 
-            assertNextMessage(McpTool.List.Changed)
+            assertNextMessage(McpTool.List.Changed())
         }
     }
 
