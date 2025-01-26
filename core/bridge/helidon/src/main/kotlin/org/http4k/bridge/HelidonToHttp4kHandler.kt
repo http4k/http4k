@@ -55,31 +55,46 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 
     res.status(create(status.code, status.description))
 
+    val latch = CountDownLatch(1)
+
     val sse = object : PushAdaptingSse(http4kRequest) {
         override fun send(message: SseMessage) = apply {
-            sseSink.emit(
-                when (message) {
-                    is Retry -> builder().reconnectDelay(message.backoff).data("")
-                    is Ping -> builder().data("")
-                    is Data -> builder().data(message.sanitizeForMultipleRecords())
-                    is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
-                        .let { if (message.id == null) it else it.id(message.id) }
-                }.build()
-            )
+            try {
+                sseSink.emit(
+                    when (message) {
+                        is Retry -> builder().reconnectDelay(message.backoff).data("")
+                        is Ping -> builder().data("")
+                        is Data -> builder().data(message.sanitizeForMultipleRecords())
+                        is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
+                            .let { if (message.id == null) it else it.id(message.id) }
+                    }.build()
+                )
+            } catch (e: IllegalStateException) {
+                triggerClose()
+                latch.countDown()
+            }
         }
 
         private fun Data.sanitizeForMultipleRecords() = data.replace("\n", "\ndata:")
 
         override fun close() {
-            triggerClose()
-            sseSink.close()
+            try {
+                sseSink.close()
+            } finally {
+                triggerClose()
+                latch.countDown()
+            }
         }
     }
-    val latch = CountDownLatch(1)
 
     sse.onClose(latch::countDown)
 
-    consumer(sse)
+    try {
+        consumer(sse)
+    } catch (e: Exception) {
+        sse.close()
+    }
+
     latch.await()
 }
 
