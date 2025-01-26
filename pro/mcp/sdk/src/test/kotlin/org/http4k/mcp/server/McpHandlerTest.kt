@@ -38,6 +38,7 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.MaxTokens
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.ModelIdentifier
@@ -52,28 +53,27 @@ import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.ClientMessage
-import org.http4k.mcp.protocol.HasMethod
-import org.http4k.mcp.protocol.McpCapability
-import org.http4k.mcp.protocol.McpCompletion
-import org.http4k.mcp.protocol.McpEntity
-import org.http4k.mcp.protocol.McpInitialize
-import org.http4k.mcp.protocol.McpLogging
-import org.http4k.mcp.protocol.McpNotification
-import org.http4k.mcp.protocol.McpPing
-import org.http4k.mcp.protocol.McpPrompt
-import org.http4k.mcp.protocol.McpRequest
-import org.http4k.mcp.protocol.McpResource
-import org.http4k.mcp.protocol.McpResponse
-import org.http4k.mcp.protocol.McpRoot
-import org.http4k.mcp.protocol.McpSampling
-import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
-import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
+import org.http4k.mcp.protocol.messages.ClientMessage
+import org.http4k.mcp.protocol.messages.HasMethod
+import org.http4k.mcp.protocol.messages.McpCompletion
+import org.http4k.mcp.protocol.messages.McpInitialize
+import org.http4k.mcp.protocol.messages.McpLogging
+import org.http4k.mcp.protocol.messages.McpNotification
+import org.http4k.mcp.protocol.messages.McpPing
+import org.http4k.mcp.protocol.messages.McpPrompt
+import org.http4k.mcp.protocol.messages.McpRequest
+import org.http4k.mcp.protocol.messages.McpResource
+import org.http4k.mcp.protocol.messages.McpResponse
+import org.http4k.mcp.protocol.messages.McpRoot
+import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.protocol.messages.McpTool
+import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -433,7 +433,7 @@ class McpHandlerTest {
         mcp.sendToMcp(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(clientName, Version.of("1")),
-                ClientCapabilities(*McpCapability.entries.toTypedArray()), `2024-10-07`
+                ClientCapabilities(*ProtocolCapability.entries.toTypedArray()), `2024-10-07`
             )
         )
 

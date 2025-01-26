@@ -1,8 +1,8 @@
 package org.http4k.mcp.protocol
 
-import org.http4k.mcp.protocol.McpCapability.Experimental
-import org.http4k.mcp.protocol.McpCapability.RootChanged
-import org.http4k.mcp.protocol.McpCapability.Sampling
+import org.http4k.mcp.protocol.ProtocolCapability.Experimental
+import org.http4k.mcp.protocol.ProtocolCapability.RootChanged
+import org.http4k.mcp.protocol.ProtocolCapability.Sampling
 import se.ansman.kotshi.JsonSerializable
 
 /**
@@ -14,7 +14,7 @@ data class ClientCapabilities internal constructor(
     val experimental: Unit? = null,
     val sampling: Unit? = null,
 ) {
-    constructor(vararg capabilities: McpCapability) : this(
+    constructor(vararg capabilities: ProtocolCapability) : this(
         Root(capabilities.contains(RootChanged)),
         if (capabilities.contains(Experimental)) Unit else null,
         if (capabilities.contains(Sampling)) Unit else null,

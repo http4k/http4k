@@ -12,9 +12,9 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.protocol.McpTool
+import org.http4k.mcp.protocol.messages.McpTool
 
-class ToolBinding(private val tool: Tool, private val handler: ToolHandler) : CapabilityBinding {
+class ToolCapability(private val tool: Tool, private val handler: ToolHandler) : ServerCapability {
 
     fun toTool() = McpTool(tool.name, tool.description, tool.toSchema())
 

@@ -7,11 +7,14 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.mcp.PromptRequest
 
+/**
+ * Spec of a Prompt capability.
+ */
 class Prompt private constructor(
     val name: String,
     val description: String?,
     val args: List<BiDiLens<PromptRequest, *>>
-) {
+) : CapabilitySpec {
     constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>) :
         this(name, description, args.toList())
 

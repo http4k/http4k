@@ -1,6 +1,6 @@
 import org.http4k.filter.debug
-import org.http4k.mcp.protocol.McpCapability
-import org.http4k.mcp.protocol.McpEntity
+import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpHttp
@@ -11,7 +11,7 @@ fun main() {
     val mcpServer = mcpHttp(
         ServerMetaData(
             McpEntity.of("http4k mcp server"), Version.of("0.1.0"),
-            *McpCapability.entries.toTypedArray()
+            *ProtocolCapability.entries.toTypedArray()
         ),
         prompts(),
         resources(),

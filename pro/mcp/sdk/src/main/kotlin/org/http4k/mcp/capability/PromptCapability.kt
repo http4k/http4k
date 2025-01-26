@@ -7,9 +7,9 @@ import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.processing.McpException
-import org.http4k.mcp.protocol.McpPrompt
+import org.http4k.mcp.protocol.messages.McpPrompt
 
-class PromptBinding(private val prompt: Prompt, val handler: PromptHandler) : CapabilityBinding {
+class PromptCapability(private val prompt: Prompt, val handler: PromptHandler) : ServerCapability {
     fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.args.map {
         McpPrompt.Argument(it.meta.name, it.meta.description, it.meta.required)
     })

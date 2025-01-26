@@ -1,12 +1,13 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.protocol.messages
 
 import org.http4k.core.Uri
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
-import org.http4k.mcp.protocol.HasMeta.Companion.default
+import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
+import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable

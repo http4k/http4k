@@ -3,9 +3,9 @@ package org.http4k.mcp.processing
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.mcp.protocol.ClientMessage
-import org.http4k.mcp.protocol.HasMethod
-import org.http4k.mcp.protocol.ServerMessage
+import org.http4k.mcp.protocol.messages.ClientMessage
+import org.http4k.mcp.protocol.messages.HasMethod
+import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.util.McpNodeType
 
 /**

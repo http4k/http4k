@@ -1,7 +1,7 @@
 package org.http4k.mcp.capability
 
 import org.http4k.mcp.model.Root
-import org.http4k.mcp.protocol.McpRoot
+import org.http4k.mcp.protocol.messages.McpRoot
 import org.http4k.mcp.util.ObservableList
 
 /**

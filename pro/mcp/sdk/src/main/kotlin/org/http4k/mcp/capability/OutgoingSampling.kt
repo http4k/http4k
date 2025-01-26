@@ -1,16 +1,16 @@
 package org.http4k.mcp.capability
 
 import org.http4k.mcp.SampleRequest
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.protocol.McpEntity
-import org.http4k.mcp.protocol.McpSampling
 import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.protocol.messages.McpSampling
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Handles protocol traffic for sampling from the MCP Client.
  */
-class OutgoingSampling(private val list: List<OutgoingSamplingBinding>) {
+class OutgoingSampling(private val list: List<OutgoingSamplingCapability>) {
 
     private val subscriptions =
         ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()

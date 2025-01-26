@@ -4,7 +4,7 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.protocol.HasMeta.Companion.default
+import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 
 /**
  * A tool handler invokes a tool with an input and returns a response

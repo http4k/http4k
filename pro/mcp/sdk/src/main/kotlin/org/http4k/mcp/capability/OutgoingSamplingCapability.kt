@@ -2,12 +2,12 @@ package org.http4k.mcp.capability
 
 import org.http4k.mcp.OutgoingSamplingHandler
 import org.http4k.mcp.SampleResponse
-import org.http4k.mcp.protocol.McpEntity
-import org.http4k.mcp.protocol.McpSampling
+import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.protocol.messages.McpSampling
 
-class OutgoingSamplingBinding(
+class OutgoingSamplingCapability(
     private val entity: McpEntity, private val handler: OutgoingSamplingHandler
-) : CapabilityBinding {
+) : ServerCapability {
 
     fun toEntity() = entity
 

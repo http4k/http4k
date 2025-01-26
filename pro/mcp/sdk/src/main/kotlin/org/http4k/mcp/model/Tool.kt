@@ -7,11 +7,14 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.mcp.ToolRequest
 
+/**
+ * Description of a Tool capability.
+ */
 class Tool private constructor(
     val name: String,
     val description: String,
     val args: List<BiDiLens<ToolRequest, *>>
-) {
+) : CapabilitySpec {
     constructor(name: String, description: String, vararg arguments: BiDiLens<ToolRequest, *>) : this(
         name,
         description,

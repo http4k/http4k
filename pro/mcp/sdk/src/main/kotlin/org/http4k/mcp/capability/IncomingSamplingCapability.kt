@@ -5,12 +5,12 @@ import org.http4k.mcp.IncomingSamplingHandler
 import org.http4k.mcp.SampleRequest
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.protocol.McpSampling
+import org.http4k.mcp.protocol.messages.McpSampling
 
-class IncomingSamplingBinding(
+class IncomingSamplingCapability(
     private val modelSelector: ModelSelector,
     private val handler: IncomingSamplingHandler
-) : CapabilityBinding {
+) : ServerCapability {
 
     fun toModelSelector() = modelSelector
 

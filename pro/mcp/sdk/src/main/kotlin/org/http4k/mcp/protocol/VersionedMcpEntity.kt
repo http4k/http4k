@@ -1,5 +1,6 @@
 package org.http4k.mcp.protocol
 
+import org.http4k.mcp.model.McpEntity
 import se.ansman.kotshi.JsonSerializable
 
 /**

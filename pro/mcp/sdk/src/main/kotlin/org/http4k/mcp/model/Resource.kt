@@ -6,7 +6,7 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 
-sealed class Resource {
+sealed class Resource : CapabilitySpec  {
     abstract fun matches(uri: Uri): Boolean
 
     abstract val name: String

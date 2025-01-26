@@ -5,7 +5,7 @@ import org.http4k.mcp.model.ModelScore.Companion.MAX
 /**
  * A selector used to choose the best model for a given request.
  */
-interface ModelSelector {
+interface ModelSelector : CapabilitySpec {
     val name: ModelIdentifier
     fun score(model: ModelPreferences): ModelScore
 
