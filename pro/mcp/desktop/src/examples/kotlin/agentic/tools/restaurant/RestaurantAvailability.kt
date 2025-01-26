@@ -10,8 +10,8 @@ import org.http4k.routing.bind
 import java.time.LocalDate
 
 fun RestaurantAvailability(name: String): ToolCapability {
-    val dateArg = Tool.Arg.localDate().required("date")
-    val peopleArg = Tool.Arg.int().required("people")
+    val dateArg = Tool.Arg.localDate().required("date", "date in format yyyy-mm-dd")
+    val peopleArg = Tool.Arg.int().required("people", "how many people are in the party")
     return Tool(
         "$name Resraurant availability", "for restaurant $name, provides a list of available slots for a given number of people on a specified date",
         dateArg,
