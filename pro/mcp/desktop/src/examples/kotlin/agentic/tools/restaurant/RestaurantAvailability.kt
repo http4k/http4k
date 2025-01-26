@@ -13,15 +13,16 @@ fun RestaurantAvailability(name: String): ToolCapability {
     val dateArg = Tool.Arg.localDate().required("date", "date in format yyyy-mm-dd")
     val peopleArg = Tool.Arg.int().required("people", "how many people are in the party")
     return Tool(
-        "$name Resraurant availability", "for restaurant $name, provides a list of available slots for a given number of people on a specified date",
+        "${name.filter { it.isLetterOrDigit() }}_availability",
+        "for restaurant $name, provides a list of available slots for a given number of people on a specified date",
         dateArg,
         peopleArg
     ) bind {
-        val date: LocalDate = dateArg(it)
-        val people: Int = peopleArg(it)
+        val date = dateArg(it)
+        val people = peopleArg(it)
 
         val slots = when {
-            date == LocalDate.of(2025, 3, 22) -> listOf( // Free slots on specific dates
+            date == LocalDate.of(2025, 3, 22) -> listOf(
                 Content.Text("18:00 - Available for $people people"),
                 Content.Text("19:00 - Available for $people people"),
                 Content.Text("20:00 - Available for $people people")

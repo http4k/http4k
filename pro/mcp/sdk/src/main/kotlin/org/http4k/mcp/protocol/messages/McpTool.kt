@@ -3,12 +3,13 @@ package org.http4k.mcp.protocol.messages
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
-data class McpTool(val name: String, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
+data class McpTool(val name: ToolName, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
     object List : HasMethod {
         override val Method = of("tools/list")
 
@@ -35,7 +36,7 @@ data class McpTool(val name: String, val description: String, val inputSchema: M
 
         @JsonSerializable
         data class Request(
-            val name: String,
+            val name: ToolName,
             val arguments: Map<String, Any> = emptyMap(),
             override val _meta: Meta = default
         ) : ClientMessage.Request, HasMeta

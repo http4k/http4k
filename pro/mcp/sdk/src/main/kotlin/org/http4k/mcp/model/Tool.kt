@@ -11,12 +11,12 @@ import org.http4k.mcp.ToolRequest
  * Description of a Tool capability.
  */
 class Tool private constructor(
-    val name: String,
+    val name: ToolName,
     val description: String,
     val args: List<BiDiLens<ToolRequest, *>>
 ) : CapabilitySpec {
     constructor(name: String, description: String, vararg arguments: BiDiLens<ToolRequest, *>) : this(
-        name,
+        ToolName.of(name),
         description,
         arguments.toList()
     )

@@ -21,7 +21,7 @@ import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.routing.bind
-import org.http4k.routing.multi
+import org.http4k.routing.compose
 import org.jsoup.Jsoup
 
 fun LinksOnPage(http: HttpHandler): ResourceHandler = {
@@ -40,23 +40,23 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
     ResourceResponse(links)
 }
 
-fun sampling() = multi(
+fun sampling() = compose(
     llm(),
     sampleFromModel()
 )
 
-fun tools() = multi(
+fun tools() = compose(
     liveWeatherTool(),
     reverseTool(),
     countingTool()
 )
 
-fun resources() = multi(
+fun resources() = compose(
     staticResource(),
     templatedResource()
 )
 
-fun prompts() = multi(
+fun prompts() = compose(
     prompt1(),
     prompt2()
 )

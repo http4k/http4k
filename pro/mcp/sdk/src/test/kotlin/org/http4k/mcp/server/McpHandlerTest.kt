@@ -52,6 +52,7 @@ import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
@@ -284,7 +285,7 @@ class McpHandlerTest {
                 McpTool.List.Response(
                     listOf(
                         McpTool(
-                            "name", "description",
+                            ToolName.of("name"), "description",
                             mapOf(
                                 "type" to "object",
                                 "required" to listOf("foo"),
