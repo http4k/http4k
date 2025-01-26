@@ -22,6 +22,7 @@ import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
+import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
@@ -53,6 +54,7 @@ object McpJson : ConfigurableMoshi(
         .value(SpeedPriority)
         .value(StopReason)
         .value(Temperature)
+        .value(ToolName)
         .value(Version)
         .done()
 )
