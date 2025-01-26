@@ -83,8 +83,7 @@ class SseMcpProtocol(
                     sse.send(Ping)
                 } catch (e: Exception) {
                     sessions.remove(sessionId)
-                    // disconnect
-                    runCatching { sse.close() }.onFailure { System.err.println("ERROR CLOSING SSE") }
+                    sse.close()
                 }
             }
         }
