@@ -96,10 +96,6 @@ abstract class McpProtocol<RSP : Any>(
                     ok()
                 }
 
-                McpProgress.Notification.Method -> {
-                    ok()
-                }
-
                 McpLogging.SetLevel.Method -> {
                     logger.setLevel(sId, Serde<McpLogging.SetLevel.Request>(jsonReq).level)
                     ok()
@@ -118,6 +114,8 @@ abstract class McpProtocol<RSP : Any>(
                     McpMessageHandler<McpSampling.Request>(jsonReq) { sampling.sample(it, req) },
                     sId
                 )
+
+                McpProgress.Notification.Method -> ok()
 
                 McpRoot.Changed.Method -> {
                     val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
