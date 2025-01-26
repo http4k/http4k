@@ -2,15 +2,18 @@ package org.http4k.routing
 
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.mcp.CompletionHandler
+import org.http4k.mcp.IncomingSamplingHandler
+import org.http4k.mcp.OutgoingSamplingHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
-import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.features.Completions
+import org.http4k.mcp.features.IncomingSampling
+import org.http4k.mcp.features.OutgoingSampling
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
-import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
+import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
@@ -34,7 +37,8 @@ fun mcpHttp(serverMetaData: ServerMetaData, vararg bindings: FeatureBinding) = M
         Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
         Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
         Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
-        Sampling(bindings.filterIsInstance<SamplingFeatureBinding>())
+        IncomingSampling(bindings.filterIsInstance<IncomingSamplingFeatureBinding>()),
+        OutgoingSampling(bindings.filterIsInstance<OutgoingSamplingFeatureBinding>())
     )
 )
 
@@ -54,7 +58,7 @@ fun mcpStdIo(
             Tools(bindings.filterIsInstance<ToolFeatureBinding>()),
             Resources(bindings.filterIsInstance<ResourceFeatureBinding>()),
             Completions(bindings.filterIsInstance<CompletionFeatureBinding>()),
-            Sampling(bindings.filterIsInstance<SamplingFeatureBinding>()),
+            IncomingSampling(bindings.filterIsInstance<IncomingSamplingFeatureBinding>()),
         ),
         reader
     )()
@@ -64,4 +68,5 @@ infix fun Tool.bind(handler: ToolHandler) = ToolFeatureBinding(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptFeatureBinding(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceFeatureBinding(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionFeatureBinding(this, handler)
-infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingFeatureBinding(this, handler)
+infix fun ModelIdentifier.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingFeatureBinding(this, handler)
+infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingFeatureBinding(this, handler)

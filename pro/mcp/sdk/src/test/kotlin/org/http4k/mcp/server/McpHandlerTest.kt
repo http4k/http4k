@@ -22,14 +22,16 @@ import org.http4k.lens.int
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.SampleRequest
 import org.http4k.mcp.SampleResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.features.Completions
+import org.http4k.mcp.features.IncomingSampling
 import org.http4k.mcp.features.Logger
+import org.http4k.mcp.features.OutgoingSampling
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
-import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
@@ -350,11 +352,11 @@ class McpHandlerTest {
     }
 
     @Test
-    fun `deal with sampling`() {
+    fun `deal with incoming sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = Sampling(listOf(
+        val sampling = IncomingSampling(listOf(
             ModelSelector(model) { MAX } bind {
                 SampleResponse(
                     model,
@@ -365,7 +367,7 @@ class McpHandlerTest {
             }
         ))
 
-        val mcp = McpHandler(SseMcpProtocol(metadata, sampling = sampling, random = Random(0)))
+        val mcp = McpHandler(SseMcpProtocol(metadata, incomingSampling = sampling, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -375,6 +377,35 @@ class McpHandlerTest {
             assertNextMessage(
                 McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content)
             )
+        }
+    }
+
+    @Test
+    fun `deal with outgoing sampling`() {
+        var received: SampleResponse? = null
+
+        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+
+        val model = ModelIdentifier.of("name")
+        val sampling = OutgoingSampling(listOf(
+            model bind { received = it }
+        ))
+
+        val mcp = McpHandler(SseMcpProtocol(metadata, outgoingSampling = sampling, random = Random(0)))
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            sampling.sample(sessionId, SampleRequest(listOf(), MaxTokens.of(1), connectRequest = Request(GET, "")))
+
+            assertNextMessage(
+                McpSampling,
+                McpSampling.Request(listOf(), MaxTokens.of(1)),
+                MessageId.of(8299741232644245)
+            )
+            mcp.sendToMcp(McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content), MessageId.of(8299741232644245))
+
+            assertThat(received, equalTo(SampleResponse(model, StopReason.of("bored"), Role.assistant, content)))
         }
     }
 
