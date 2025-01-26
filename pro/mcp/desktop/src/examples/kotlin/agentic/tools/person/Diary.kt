@@ -9,9 +9,9 @@ import org.http4k.routing.bind
 import java.time.LocalDate
 
 fun Diary(name: String, appointments: (LocalDate) -> List<Content.Text>): ToolCapability {
-    val arg = Tool.Arg.localDate().required("date")
+    val arg = Tool.Arg.localDate().required("date", "date in format yyyy-mm-dd")
     return Tool(
-        "diaryF$name", "details $name's diary appointments. Responds with a list of appointments for the given date",
+        "diary for $name", "details $name's diary appointments. Responds with a list of appointments for the given date",
         arg,
     ) bind {
         ToolResponse.Ok(appointments(arg(it)))

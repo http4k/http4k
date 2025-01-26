@@ -11,9 +11,9 @@ import org.http4k.routing.bind
 import java.time.LocalDate
 
 fun BookMeal(name: String): ToolCapability {
-    val dateArg = Tool.Arg.localDate().required("date")
-    val peopleArg = Tool.Arg.int().required("people")
-    val timeArg = Tool.Arg.localTime().required("time")
+    val dateArg = Tool.Arg.localDate().required("date", "date for the booking. in format yyyy-mm-dd")
+    val peopleArg = Tool.Arg.int().required("people", "how many people are in the party")
+    val timeArg = Tool.Arg.localTime().required("time", "time for the booking. in the format 10:15")
     return Tool(
         "$name Book meal", "Books a slot for a given date, time, and number of people at $name",
         dateArg, peopleArg, timeArg,
