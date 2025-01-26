@@ -1,10 +1,11 @@
 package org.http4k.mcp.protocol
 
-import se.ansman.kotshi.JsonSerializable
+import dev.forkhandles.values.NonBlankStringValueFactory
+import dev.forkhandles.values.StringValue
 
 /**
- * A description of an entity taking part in the MCP protocol - can be a client or a server.
+ * Represents the name of the MCP entity. Used for identification and matching purposes.
  */
-@JsonSerializable
-data class McpEntity(val name: String, val version: Version)
-
+class McpEntity private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<McpEntity>(::McpEntity)
+}

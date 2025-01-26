@@ -72,6 +72,7 @@ import org.http4k.mcp.protocol.ServerMessage
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -83,9 +84,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.random.Random
 
-class McpHandlerTest {
 
-    private val metadata = ServerMetaData(McpEntity("server", Version.of("1")))
+class McpHandlerTest {
+    private val serverName = McpEntity.of("server")
+    private val clientName = McpEntity.of("server")
+
+    private val metadata = ServerMetaData(serverName, Version.of("1"))
 
     @Test
     fun `performs init loop on startup`() {
@@ -388,7 +392,7 @@ class McpHandlerTest {
 
         val model = ModelIdentifier.of("name")
         val sampling = OutgoingSampling(listOf(
-            model bind { received = it }
+            clientName bind { received = it }
         ))
 
         val mcp = McpHandler(SseMcpProtocol(metadata, outgoingSampling = sampling, random = Random(0)))
@@ -396,14 +400,17 @@ class McpHandlerTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            sampling.sample(sessionId, SampleRequest(listOf(), MaxTokens.of(1), connectRequest = Request(GET, "")))
+            sampling.sample(serverName, SampleRequest(listOf(), MaxTokens.of(1), connectRequest = Request(GET, "")))
 
             assertNextMessage(
                 McpSampling,
                 McpSampling.Request(listOf(), MaxTokens.of(1)),
                 MessageId.of(8299741232644245)
             )
-            mcp.sendToMcp(McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content), MessageId.of(8299741232644245))
+            mcp.sendToMcp(
+                McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
+                MessageId.of(8299741232644245)
+            )
 
             assertThat(received, equalTo(SampleResponse(model, StopReason.of("bored"), Role.assistant, content)))
         }
@@ -419,7 +426,7 @@ class McpHandlerTest {
 
         mcp.sendToMcp(
             McpInitialize, McpInitialize.Request(
-                McpEntity("client", Version.of("1")),
+                VersionedMcpEntity(clientName, Version.of("1")),
                 ClientCapabilities(), `2024-10-07`
             )
         )

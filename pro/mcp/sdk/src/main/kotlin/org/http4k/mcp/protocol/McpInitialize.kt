@@ -9,14 +9,14 @@ object McpInitialize : HasMethod {
 
     @JsonSerializable
     data class Request(
-        val clientInfo: McpEntity,
+        val clientInfo: VersionedMcpEntity,
         val capabilities: ClientCapabilities = ClientCapabilities(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION
     ) : ClientMessage.Request
 
     @JsonSerializable
     data class Response(
-        val serverInfo: McpEntity,
+        val serverInfo: VersionedMcpEntity,
         val capabilities: ServerCapabilities = ServerCapabilities(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
         override val _meta: Map<String, Any> = default,
