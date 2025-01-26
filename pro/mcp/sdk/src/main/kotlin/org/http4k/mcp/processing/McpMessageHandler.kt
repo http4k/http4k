@@ -15,21 +15,21 @@ object McpMessageHandler {
 
     inline operator fun <reified IN : ClientMessage.Request>
         invoke(req: JsonRpcRequest<McpNodeType>, fn: (IN) -> ServerMessage.Response) =
-        runCatching { Serde<IN>(req) }
+        runCatching { SerDe<IN>(req) }
             .mapCatching(fn)
-            .map { Serde(it, req.id) }
+            .map { SerDe(it, req.id) }
             .recover {
                 when (it) {
-                    is McpException -> Serde(it.error, req.id)
-                    else -> Serde(InternalError, req.id)
+                    is McpException -> SerDe(it.error, req.id)
+                    else -> SerDe(InternalError, req.id)
                 }
             }
-            .getOrElse { Serde(InvalidRequest, req.id) }
+            .getOrElse { SerDe(InvalidRequest, req.id) }
 
     operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: McpNodeType? = null) =
-        Serde(hasMethod, req, id)
+        SerDe(hasMethod, req, id)
 
-    operator fun invoke(resp: ServerMessage.Response, id: McpNodeType? = null) = Serde(resp, id)
+    operator fun invoke(resp: ServerMessage.Response, id: McpNodeType? = null) = SerDe(resp, id)
 
-    operator fun invoke(notification: ServerMessage.Notification) = Serde(notification)
+    operator fun invoke(notification: ServerMessage.Notification) = SerDe(notification)
 }

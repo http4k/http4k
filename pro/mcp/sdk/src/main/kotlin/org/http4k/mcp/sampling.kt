@@ -12,9 +12,14 @@ import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
 
 /**
- * A sampling handler is responsible for completing a model request
+ *  Processes a sampling request from an MCP client
  */
-typealias SamplingHandler = (SampleRequest) -> SampleResponse
+typealias IncomingSamplingHandler = (SampleRequest) -> SampleResponse
+
+/**
+ * Processes a sampling response from an MCP client
+ */
+typealias OutgoingSamplingHandler = (SampleResponse) -> Unit
 
 data class SampleRequest(
     val messages: List<Message>,

@@ -1,11 +1,12 @@
 package org.http4k.mcp.stdio
 
 import org.http4k.mcp.features.Completions
+import org.http4k.mcp.features.IncomingSampling
 import org.http4k.mcp.features.Logger
+import org.http4k.mcp.features.OutgoingSampling
 import org.http4k.mcp.features.Prompts
 import org.http4k.mcp.features.Resources
 import org.http4k.mcp.features.Roots
-import org.http4k.mcp.features.Sampling
 import org.http4k.mcp.features.Tools
 import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
@@ -21,11 +22,12 @@ class StdIoMcpProtocol(
     tools: Tools = Tools(emptyList()),
     resources: Resources = Resources(emptyList()),
     completions: Completions = Completions(emptyList()),
-    sampling: Sampling = Sampling(emptyList()),
+    incomingSampling: IncomingSampling = IncomingSampling(emptyList()),
+    outgoingSampling: OutgoingSampling = OutgoingSampling(emptyList()),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
-) : McpProtocol<Unit>(metaData, tools, completions, resources, roots, sampling, prompts, logger, random) {
+) : McpProtocol<Unit>(metaData, tools, completions, resources, roots, incomingSampling, outgoingSampling, prompts, logger, random) {
 
     override fun ok() {}
 
