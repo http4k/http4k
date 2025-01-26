@@ -20,7 +20,6 @@ import org.http4k.mcp.processing.SerDe
 import org.http4k.mcp.protocol.ServerMessage.Response.Empty
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
-import org.http4k.sse.SseMessage
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -42,7 +41,7 @@ abstract class McpProtocol<RSP : Any>(
 
     protected abstract fun ok(): RSP
     protected abstract fun error(): RSP
-    protected abstract fun send(message: SseMessage.Event, sessionId: SessionId): RSP
+    protected abstract fun send(message: McpNodeType, sessionId: SessionId): RSP
 
     operator fun invoke(sId: SessionId, jsonReq: JsonRpcRequest<McpNodeType>, req: Request): RSP =
         when {
@@ -143,7 +142,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpTool.List.Method ->
                     send(McpMessageHandler<McpTool.List.Request>(jsonReq) { tools.list(it, req) }, sId)
 
-                else -> send(SerDe(MethodNotFound, jsonReq.id), sId)
+                    else -> send(SerDe(MethodNotFound, jsonReq.id), sId)
             }
 
             else -> {

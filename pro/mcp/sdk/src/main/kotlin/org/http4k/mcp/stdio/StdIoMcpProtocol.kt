@@ -11,7 +11,8 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.sse.SseMessage
+import org.http4k.mcp.util.McpJson.compact
+import org.http4k.mcp.util.McpNodeType
 import java.io.Writer
 import kotlin.random.Random
 
@@ -27,15 +28,25 @@ class StdIoMcpProtocol(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
-) : McpProtocol<Unit>(metaData, tools, completions, resources, roots, incomingSampling, outgoingSampling, prompts, logger, random) {
+) : McpProtocol<Unit>(
+    metaData,
+    tools,
+    completions,
+    resources,
+    roots,
+    incomingSampling,
+    outgoingSampling,
+    prompts,
+    logger,
+    random
+) {
 
     override fun ok() {}
 
-    override fun send(message: SseMessage.Event, sessionId: SessionId) =
-        with(writer) {
-            write(message.data + "\n")
-            flush()
-        }
+    override fun send(message: McpNodeType, sessionId: SessionId) = with(writer) {
+        write(compact(message) + "\n")
+        flush()
+    }
 
     override fun error() = Unit
 
