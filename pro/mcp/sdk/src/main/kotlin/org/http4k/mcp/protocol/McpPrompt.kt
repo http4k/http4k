@@ -42,8 +42,7 @@ data class McpPrompt(val name: String, val description: String?, val arguments: 
         ) : ServerMessage.Response, HasMeta
 
         @JsonSerializable
-        data object Changed : ServerMessage.Notification {
-            override val method = of("notifications/prompts/list_changed")
-        }
+        data class Changed(override val method: McpRpcMethod = of("notifications/prompts/list_changed")) :
+            ServerMessage.Notification
     }
 }

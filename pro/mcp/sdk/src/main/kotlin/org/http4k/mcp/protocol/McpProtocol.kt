@@ -51,9 +51,9 @@ abstract class McpProtocol<RSP : Any>(
                             logger.subscribe(sId, error) { level, logger, data ->
                                 send(McpMessageHandler(McpLogging.LoggingMessage(level, logger, data)), sId)
                             }
-                            prompts.onChange(sId) { send(McpMessageHandler(McpPrompt.List.Changed), sId) }
-                            resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed), sId) }
-                            tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed), sId) }
+                            prompts.onChange(sId) { send(McpMessageHandler(McpPrompt.List.Changed()), sId) }
+                            resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
+                            tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
 
                             outgoingSampling.onRequest(sId) {
                                 val messageId = MessageId.of(random.nextLong(0, MAX_MCP_MESSAGE_ID))
@@ -77,8 +77,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpCompletion.Method ->
                     send(McpMessageHandler<McpCompletion.Request>(jsonReq) { completions.complete(it, req) }, sId)
 
-                McpPing.Method ->
-                    send(McpMessageHandler<McpPing.Request>(jsonReq) { Empty }, sId)
+                McpPing.Method -> send(McpMessageHandler<McpPing.Request>(jsonReq) { Empty }, sId)
 
                 McpPrompt.Get.Method ->
                     send(McpMessageHandler<McpPrompt.Get.Request>(jsonReq) { prompts.get(it, req) }, sId)
