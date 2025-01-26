@@ -10,8 +10,8 @@ import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.filter.debug
 import org.http4k.mcp.internal.pipeSseTraffic
-import org.http4k.mcp.stdio.DebuggingReader
-import org.http4k.mcp.stdio.DebuggingWriter
+import org.http4k.mcp.util.DebuggingReader
+import org.http4k.mcp.util.DebuggingWriter
 
 object McpDesktop {
     @JvmStatic

@@ -2,8 +2,8 @@ import org.http4k.mcp.protocol.McpCapability
 import org.http4k.mcp.protocol.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.stdio.DebuggingReader
-import org.http4k.mcp.stdio.DebuggingWriter
+import org.http4k.mcp.util.DebuggingReader
+import org.http4k.mcp.util.DebuggingWriter
 import org.http4k.routing.mcpStdIo
 
 fun main() {
