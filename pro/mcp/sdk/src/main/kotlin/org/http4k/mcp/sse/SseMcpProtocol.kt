@@ -52,7 +52,10 @@ class SseMcpProtocol(
 
     override fun send(message: McpNodeType, sessionId: SessionId) = when (val session = sessions[sessionId]) {
         null -> Response(GONE)
-        else -> Response(ACCEPTED).also { session.send(Event("message", compact(message))) }
+        else -> {
+            session.send(Event("message", compact(message)))
+            Response(ACCEPTED)
+        }
     }
 
     override fun error() = Response(GONE)
