@@ -15,8 +15,10 @@ import org.http4k.mcp.features.Tools
 import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.util.McpJson.compact
+import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
-import org.http4k.sse.SseMessage
+import org.http4k.sse.SseMessage.Event
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -31,15 +33,26 @@ class SseMcpProtocol(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     private val random: Random = Random,
-) : McpProtocol<Response>(metaData, tools, completions, resources, roots, incomingSampling, outgoingSampling, prompts, logger, random) {
+) : McpProtocol<Response>(
+    metaData,
+    tools,
+    completions,
+    resources,
+    roots,
+    incomingSampling,
+    outgoingSampling,
+    prompts,
+    logger,
+    random
+) {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun send(message: SseMessage.Event, sessionId: SessionId) = when (val session = sessions[sessionId]) {
+    override fun send(message: McpNodeType, sessionId: SessionId) = when (val session = sessions[sessionId]) {
         null -> Response(GONE)
-        else -> Response(ACCEPTED).also { session.send(message) }
+        else -> Response(ACCEPTED).also { session.send(Event("message", compact(message))) }
     }
 
     override fun error() = Response(GONE)

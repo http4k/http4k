@@ -13,7 +13,6 @@ import org.http4k.mcp.protocol.ServerMessage.Request
 import org.http4k.mcp.protocol.ServerMessage.Response
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
-import org.http4k.sse.SseMessage.Event
 
 object SerDe {
     inline operator fun <reified OUT : Any> invoke(input: JsonRpcRequest<McpNodeType>): OUT = with(McpJson) {
@@ -25,18 +24,18 @@ object SerDe {
     }
 
     operator fun invoke(method: HasMethod, input: Request, id: McpNodeType?) = with(McpJson) {
-        Event("message", compact(renderRequest(method.Method.value, asJsonObject(input), id ?: McpJson.nullNode())))
+        renderRequest(method.Method.value, asJsonObject(input), id ?: nullNode())
     }
 
     operator fun invoke(input: Response, id: McpNodeType?) = with(McpJson) {
-        Event("message", compact(renderResult(asJsonObject(input), id ?: McpJson.nullNode())))
+        renderResult(asJsonObject(input), id ?: nullNode())
     }
 
     operator fun invoke(input: Notification) = with(McpJson) {
-        Event("message", compact(renderNotification(input)))
+        renderNotification(input)
     }
 
     operator fun invoke(errorMessage: ErrorMessage, id: McpNodeType?) = with(McpJson) {
-        Event("message", compact(renderError(errorMessage, id)))
+        renderError(errorMessage, id)
     }
 }
