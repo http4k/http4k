@@ -70,7 +70,6 @@ abstract class McpProtocol<RSP : Any>(
                                 resources.remove(sId)
                                 tools.remove(sId)
                                 outgoingSampling.remove(sId, entity)
-
                                 logger.unsubscribe(sId)
                             }
 
