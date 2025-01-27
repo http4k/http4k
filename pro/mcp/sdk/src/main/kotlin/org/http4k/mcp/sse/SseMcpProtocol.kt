@@ -20,7 +20,6 @@ import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
-import org.http4k.sse.SseMessage.Ping
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -80,7 +79,7 @@ class SseMcpProtocol(
             Thread.sleep(keepAliveDelay.toMillis())
             sessions.toList().forEach { (sessionId, sse) ->
                 try {
-                    sse.send(Ping)
+                    sse.send(Event("ping", ""))
                 } catch (e: Exception) {
                     sessions.remove(sessionId)
                     sse.close()
