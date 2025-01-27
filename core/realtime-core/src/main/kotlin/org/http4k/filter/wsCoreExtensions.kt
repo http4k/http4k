@@ -38,6 +38,7 @@ private fun originalWsBehaviour(e: Throwable): WsResponse {
     return WsResponse { it.close(WsStatus.ABNORMAL_CLOSE) }
 }
 
+@Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
 fun ServerFilters.InitialiseWsRequestContext(contexts: Store<RequestContext>) = WsFilter { next ->
     {
         val context = RequestContext()

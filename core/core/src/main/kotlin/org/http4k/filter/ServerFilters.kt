@@ -374,6 +374,7 @@ object ServerFilters {
     /**
      * Initialise a RequestContext for each request which passes through the Filter stack,
      */
+    @Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
     object InitialiseRequestContext {
         operator fun invoke(contexts: Store<RequestContext>): Filter = Filter { next ->
             {

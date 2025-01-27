@@ -9,6 +9,7 @@ import java.util.UUID
 @Deprecated("Replaced with RequestKey", ReplaceWith("RequestLens<T>"))
 typealias RequestContextLens<T> = RequestLens<T>
 
+@Deprecated("Replaced with RequestKey mechanism")
 object RequestContextKey {
     fun <T> required(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()): RequestLens<T> {
         val meta = Meta(true, "context", ObjectParam, name, null, emptyMap())
