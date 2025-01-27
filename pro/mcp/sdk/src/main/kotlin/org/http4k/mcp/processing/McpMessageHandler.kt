@@ -29,7 +29,7 @@ object McpMessageHandler {
     operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: McpNodeType) =
         SerDe(hasMethod, req, id)
 
-    operator fun invoke(resp: ServerMessage.Response, id: McpNodeType? = null) = SerDe(resp, id)
+    operator fun invoke(resp: ServerMessage.Response, id: McpNodeType) = SerDe(resp, id)
 
     operator fun invoke(hasMethod: HasMethod, notification: ServerMessage.Notification) = SerDe(hasMethod, notification)
 }
