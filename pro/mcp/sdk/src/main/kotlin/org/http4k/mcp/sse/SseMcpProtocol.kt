@@ -72,19 +72,17 @@ class SseMcpProtocol(
         return sessionId
     }
 
-    override fun start(executor: SimpleScheduler) = executor.submit(::removeDeadConnections)
-
-    private fun removeDeadConnections() {
-        while (true) {
-            Thread.sleep(keepAliveDelay.toMillis())
-            sessions.toList().forEach { (sessionId, sse) ->
-                try {
-                    sse.send(Event("ping", ""))
-                } catch (e: Exception) {
-                    sessions.remove(sessionId)
-                    sse.close()
-                }
+    private fun pruneDeadConnections() {
+        sessions.toList().forEach { (sessionId, sse) ->
+            try {
+                sse.send(Event("ping", ""))
+            } catch (e: Exception) {
+                sessions.remove(sessionId)
+                sse.close()
             }
         }
     }
+
+    override fun start(executor: SimpleScheduler) =
+        executor.scheduleWithFixedDelay(::pruneDeadConnections, keepAliveDelay, keepAliveDelay)
 }

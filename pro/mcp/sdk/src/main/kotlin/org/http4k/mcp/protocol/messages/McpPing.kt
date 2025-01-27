@@ -7,5 +7,5 @@ object McpPing : HasMethod {
     override val Method = of("ping")
 
     @JsonSerializable
-    data object Request : ClientMessage.Request
+    data object Request : ClientMessage.Request, ServerMessage.Notification
 }
