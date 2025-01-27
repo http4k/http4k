@@ -23,8 +23,8 @@ fun sse(routers: List<RoutingSseHandler>) =
     RoutingSseHandler(routers.flatMap { it.routes })
 
 data class SseResponseWithContext(
-    private val delegate: SseResponse,
-    val context: Map<String, Any>
+    val delegate: SseResponse,
+    val context: Map<String, Any> = emptyMap()
 ) : SseResponse by delegate, RoutedMessage {
 
     constructor(delegate: SseResponse, uriTemplate: UriTemplate) : this(

@@ -20,7 +20,7 @@ interface RoutedMessage {
     }
 }
 
-data class RequestWithContext(private val delegate: Request, val context: Map<String, Any>) :
+data class RequestWithContext(val delegate: Request, val context: Map<String, Any> = emptyMap()) :
     Request by delegate,
     RoutedMessage {
 
@@ -75,7 +75,7 @@ data class RequestWithContext(private val delegate: Request, val context: Map<St
         RequestWithContext(delegate.body(body, length), context)
 }
 
-data class ResponseWithContext(private val delegate: Response, val context: Map<String, Any>) :
+data class ResponseWithContext(val delegate: Response, val context: Map<String, Any> = emptyMap()) :
     Response by delegate,
     RoutedMessage {
 

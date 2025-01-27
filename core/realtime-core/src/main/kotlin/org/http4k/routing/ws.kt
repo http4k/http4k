@@ -17,8 +17,8 @@ fun websockets(routers: List<RoutingWsHandler>) = RoutingWsHandler(routers.flatM
 fun websockets(ws: WsConsumer): WsHandler = { WsResponse(ws) }
 
 class WsResponseWithContext(
-    private val delegate: WsResponse,
-    val context: Map<String, Any>
+    val delegate: WsResponse,
+    val context: Map<String, Any> = emptyMap()
 ) : WsResponse by delegate, RoutedMessage {
 
     constructor(delegate: WsResponse, uriTemplate: UriTemplate) : this(
