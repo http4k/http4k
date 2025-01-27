@@ -46,7 +46,8 @@ class TemplatedWsRoute(
     router = router,
     filter = filter,
     responseFor = { WsResponse { it.close(REFUSE) } },
-    addUriTemplateFilter = { next -> { RoutedWsResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+    // FIXME
+    addUriTemplateFilter = { next -> { RoutedWsResponse(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
 ) {
     override fun withBasePath(prefix: String) = TemplatedWsRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 

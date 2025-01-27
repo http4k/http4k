@@ -18,7 +18,7 @@ import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
-import org.http4k.routing.RoutedResponse
+import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -125,7 +125,7 @@ class ChaosEngineTest {
 
         val routed = appWithChaos(Request(GET, "/foo/bob"))
         assertThat(routed, hasStatus(I_M_A_TEAPOT).and(hasBody("foobob")))
-        assertThat((routed as RoutedResponse).xUriTemplate, equalTo(UriTemplate.from("{bib}/{bar}")))
+        assertThat((routed as ResponseWithContext).xUriTemplate, equalTo(UriTemplate.from("{bib}/{bar}")))
     }
 
     @Test
@@ -138,7 +138,7 @@ class ChaosEngineTest {
 
         val routed = appWithChaos(Request(GET, "/foo/bob"))
         assertThat(routed, hasStatus(I_M_A_TEAPOT))
-        assertThat((routed as RoutedResponse).xUriTemplate, equalTo(UriTemplate.from("{path:.*}")))
+        assertThat((routed as ResponseWithContext).xUriTemplate, equalTo(UriTemplate.from("{path:.*}")))
     }
 
     @Test

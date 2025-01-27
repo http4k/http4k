@@ -52,7 +52,8 @@ class TemplatedSseRoute(
     router = router,
     filter = filter,
     responseFor = { SseResponse(it, emptyList(), false, Sse::close) },
-    addUriTemplateFilter = { next -> { RoutedSseResponse(next(RoutedRequest(it, uriTemplate)), uriTemplate) } }
+    // FIXME
+    addUriTemplateFilter = { next -> { RoutedSseResponse(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
 ) {
     override fun withBasePath(prefix: String) = TemplatedSseRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 

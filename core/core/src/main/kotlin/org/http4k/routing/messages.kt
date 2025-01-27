@@ -9,56 +9,78 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
 import java.io.InputStream
 
 interface RoutedMessage {
     val xUriTemplate: UriTemplate
+
+    companion object {
+        internal const val X_URI_TEMPLATE = "xUriTemplate"
+    }
 }
 
-data class RoutedRequest(private val delegate: Request, override val xUriTemplate: UriTemplate) : Request by delegate,
+data class RequestWithContext(private val delegate: Request, private val context: Map<String, Any>) :
+    Request by delegate,
     RoutedMessage {
+
+    constructor(delegate: Request, uriTemplate: UriTemplate) : this(delegate, mapOf(X_URI_TEMPLATE to uriTemplate))
+
+    override val xUriTemplate: UriTemplate
+        get() {
+            return context[X_URI_TEMPLATE] as? UriTemplate
+                ?: throw IllegalStateException("Request was not routed, so no uri-template present")
+        }
+
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()
 
     override fun toString(): String = delegate.toString()
 
-    override fun method(method: Method): Request = RoutedRequest(delegate.method(method), xUriTemplate)
+    override fun method(method: Method): Request = RequestWithContext(delegate.method(method), context)
 
-    override fun uri(uri: Uri): Request = RoutedRequest(delegate.uri(uri), xUriTemplate)
+    override fun uri(uri: Uri): Request = RequestWithContext(delegate.uri(uri), context)
 
-    override fun query(name: String, value: String?): Request = RoutedRequest(delegate.query(name, value), xUriTemplate)
+    override fun query(name: String, value: String?): Request = RequestWithContext(delegate.query(name, value), context)
 
-    override fun removeQuery(name: String): Request = RoutedRequest(delegate.removeQuery(name), xUriTemplate)
+    override fun removeQuery(name: String): Request = RequestWithContext(delegate.removeQuery(name), context)
 
-    override fun removeQueries(prefix: String): Request = RoutedRequest(delegate.removeQueries(prefix), xUriTemplate)
+    override fun removeQueries(prefix: String): Request = RequestWithContext(delegate.removeQueries(prefix), context)
 
-    override fun source(source: RequestSource): Request = RoutedRequest(delegate.source(source), xUriTemplate)
+    override fun source(source: RequestSource): Request = RequestWithContext(delegate.source(source), context)
 
     override fun header(name: String, value: String?): Request =
-        RoutedRequest(delegate.header(name, value), xUriTemplate)
+        RequestWithContext(delegate.header(name, value), context)
 
-    override fun headers(headers: Headers): Request = RoutedRequest(delegate.headers(headers), xUriTemplate)
+    override fun headers(headers: Headers): Request = RequestWithContext(delegate.headers(headers), context)
 
     override fun replaceHeader(name: String, value: String?): Request =
-        RoutedRequest(delegate.replaceHeader(name, value), xUriTemplate)
+        RequestWithContext(delegate.replaceHeader(name, value), context)
 
-    override fun replaceHeaders(source: Headers): Request = RoutedRequest(delegate.replaceHeaders(source), xUriTemplate)
+    override fun replaceHeaders(source: Headers): Request = RequestWithContext(delegate.replaceHeaders(source), context)
 
-    override fun removeHeader(name: String): Request = RoutedRequest(delegate.removeHeader(name), xUriTemplate)
+    override fun removeHeader(name: String): Request = RequestWithContext(delegate.removeHeader(name), context)
 
-    override fun removeHeaders(prefix: String): Request = RoutedRequest(delegate.removeHeaders(prefix), xUriTemplate)
+    override fun removeHeaders(prefix: String): Request = RequestWithContext(delegate.removeHeaders(prefix), context)
 
-    override fun body(body: Body): Request = RoutedRequest(delegate.body(body), xUriTemplate)
+    override fun body(body: Body): Request = RequestWithContext(delegate.body(body), context)
 
-    override fun body(body: String): Request = RoutedRequest(delegate.body(body), xUriTemplate)
+    override fun body(body: String): Request = RequestWithContext(delegate.body(body), context)
 
     override fun body(body: InputStream, length: Long?): Request =
-        RoutedRequest(delegate.body(body, length), xUriTemplate)
+        RequestWithContext(delegate.body(body, length), context)
 }
 
-class RoutedResponse(private val delegate: Response, override val xUriTemplate: UriTemplate) : Response by delegate,
+class ResponseWithContext(private val delegate: Response, private val context: Map<String, Any>) : Response by delegate,
     RoutedMessage {
+
+    constructor(delegate: Response, uriTemplate: UriTemplate) : this(delegate, mapOf(X_URI_TEMPLATE to uriTemplate))
+
+    override val xUriTemplate: UriTemplate
+        get() = context["xUriTemplate"] as? UriTemplate
+            ?: throw IllegalStateException("Request was not routed, so no uri-template present")
+
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()
@@ -66,26 +88,26 @@ class RoutedResponse(private val delegate: Response, override val xUriTemplate: 
     override fun toString(): String = delegate.toString()
 
     override fun header(name: String, value: String?): Response =
-        RoutedResponse(delegate.header(name, value), xUriTemplate)
+        ResponseWithContext(delegate.header(name, value), context)
 
-    override fun headers(headers: Headers): Response = RoutedResponse(delegate.headers(headers), xUriTemplate)
+    override fun headers(headers: Headers): Response = ResponseWithContext(delegate.headers(headers), context)
 
     override fun replaceHeader(name: String, value: String?): Response =
-        RoutedResponse(delegate.replaceHeader(name, value), xUriTemplate)
+        ResponseWithContext(delegate.replaceHeader(name, value), context)
 
     override fun replaceHeaders(source: Headers): Response =
-        RoutedResponse(delegate.replaceHeaders(source), xUriTemplate)
+        ResponseWithContext(delegate.replaceHeaders(source), context)
 
-    override fun removeHeader(name: String): Response = RoutedResponse(delegate.removeHeader(name), xUriTemplate)
+    override fun removeHeader(name: String): Response = ResponseWithContext(delegate.removeHeader(name), context)
 
-    override fun removeHeaders(prefix: String): Response = RoutedResponse(delegate.removeHeaders(prefix), xUriTemplate)
+    override fun removeHeaders(prefix: String): Response = ResponseWithContext(delegate.removeHeaders(prefix), context)
 
-    override fun body(body: Body): Response = RoutedResponse(delegate.body(body), xUriTemplate)
+    override fun body(body: Body): Response = ResponseWithContext(delegate.body(body), context)
 
-    override fun body(body: String): Response = RoutedResponse(delegate.body(body), xUriTemplate)
+    override fun body(body: String): Response = ResponseWithContext(delegate.body(body), context)
 
     override fun body(body: InputStream, length: Long?): Response =
-        RoutedResponse(delegate.body(body, length), xUriTemplate)
+        ResponseWithContext(delegate.body(body, length), context)
 
-    override fun status(new: Status): Response = RoutedResponse(delegate.status(new), xUriTemplate)
+    override fun status(new: Status): Response = ResponseWithContext(delegate.status(new), context)
 }

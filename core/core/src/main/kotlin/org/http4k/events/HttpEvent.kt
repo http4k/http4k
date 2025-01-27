@@ -6,8 +6,8 @@ import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.events.ProtocolEvent.Incoming
 import org.http4k.events.ProtocolEvent.Outgoing
+import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
-import org.http4k.routing.RoutedRequest
 
 object HttpEvent {
 
@@ -24,7 +24,7 @@ object HttpEvent {
         tx.request.method,
         tx.response.status,
         tx.duration.toMillis(),
-        if (tx.request is RoutedRequest) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+        if (tx.request is RequestWithContext) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
     )
 
     fun Outgoing(

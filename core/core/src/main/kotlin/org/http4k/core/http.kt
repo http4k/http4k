@@ -6,7 +6,7 @@ import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.length
 import org.http4k.lens.WebForm
-import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RequestWithContext
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -267,7 +267,7 @@ interface Request : HttpMessage {
             Request(method, Uri.of(uri), version)
 
         operator fun invoke(method: Method, template: UriTemplate, version: String = HTTP_1_1): Request =
-            RoutedRequest(Request(method, template.toString(), version), template)
+            RequestWithContext(Request(method, template.toString(), version), template)
     }
 }
 

@@ -35,8 +35,8 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
-import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
+import org.http4k.routing.RequestWithContext
+import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
@@ -92,7 +92,7 @@ class ClientFiltersTest {
 
         val redirectingClient = ClientFilters.FollowRedirects().then(server)
 
-        val response = redirectingClient(Request(GET, "/r1")) as RoutedResponse
+        val response = redirectingClient(Request(GET, "/r1")) as ResponseWithContext
 
         assertThat(response.xUriTemplate, equalTo(UriTemplate.from("r1")))
     }
@@ -536,10 +536,10 @@ class ClientFiltersTest {
 
         val app = ClientFilters.CleanProxy().then { r: Request ->
             captured.set(r)
-            RoutedResponse(resp, UriTemplate.from("foo"))
+            ResponseWithContext(resp, UriTemplate.from("foo"))
         }
 
-        val output = app(RoutedRequest(req, UriTemplate.from("foo")))
+        val output = app(RequestWithContext(req, UriTemplate.from("foo")))
 
         assertThat(captured.get(), equalTo(req).and(isA<MemoryRequest>()))
         assertThat(output, equalTo(resp).and(isA<MemoryResponse>()))

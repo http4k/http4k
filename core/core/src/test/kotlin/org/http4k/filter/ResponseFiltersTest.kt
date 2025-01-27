@@ -26,8 +26,8 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
+import org.http4k.routing.RequestWithContext
+import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.toHttpHandler
@@ -77,8 +77,8 @@ class ResponseFiltersTest {
     @Test
     fun `prioritises routed response when reporting a transaction`() {
         var called = false
-        val request = RoutedRequest(Request(GET, ""), UriTemplate.from("foo"))
-        val response = RoutedResponse(Response(OK), UriTemplate.from("bar"))
+        val request = RequestWithContext(Request(GET, ""), UriTemplate.from("foo"))
+        val response = ResponseWithContext(Response(OK), UriTemplate.from("bar"))
 
         ReportHttpTransaction(TickingClock()) { tx ->
             called = true
