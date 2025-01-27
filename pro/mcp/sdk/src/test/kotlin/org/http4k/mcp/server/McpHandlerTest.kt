@@ -14,7 +14,6 @@ import org.http4k.core.Uri
 import org.http4k.format.MoshiInteger
 import org.http4k.format.MoshiString
 import org.http4k.format.renderError
-import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.hamkrest.hasStatus
@@ -117,7 +116,7 @@ class McpHandlerTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpRoot.Changed())
+            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification)
 
             assertNextMessage(McpRoot.List, McpRoot.List.Request(), RequestId.of(8299741232644920))
 
@@ -214,7 +213,7 @@ class McpHandlerTest {
 
             resources.triggerUpdated(resource.uri)
 
-            assertNextMessage(McpResource.Updated(resource.uri))
+            assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
 
             mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
 
@@ -318,7 +317,7 @@ class McpHandlerTest {
 
             tools.items = emptyList()
 
-            assertNextMessage(McpTool.List.Changed())
+            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
         }
     }
 
@@ -337,7 +336,7 @@ class McpHandlerTest {
 
             logger.log(sessionId, LogLevel.info, "message", emptyMap())
 
-            assertNextMessage(McpLogging.LoggingMessage(LogLevel.info, "message", emptyMap()))
+            assertNextMessage(McpLogging.LoggingMessage, McpLogging.LoggingMessage.Notification(LogLevel.info, "message", emptyMap()))
         }
     }
 
@@ -445,7 +444,7 @@ class McpHandlerTest {
             McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
-        mcp.sendToMcp(McpInitialize.Initialized())
+        mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
     }
 }
 
@@ -457,8 +456,8 @@ private fun TestSseClient.assertNextMessage(input: McpResponse) {
     assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
 }
 
-private fun TestSseClient.assertNextMessage(notification: McpNotification) {
-    assertNextMessage(with(McpJson) { renderNotification(notification) })
+private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, notification: McpNotification) {
+    assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(notification), nullNode()) })
 }
 
 private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest, id: Any) {
@@ -490,9 +489,9 @@ private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
     })
 }
 
-private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Notification) {
+private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Notification) {
     sendToMcp(with(McpJson) {
-        compact(renderNotification(hasMethod))
+        compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
     })
 }
 

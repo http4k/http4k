@@ -89,7 +89,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpResource.Subscribe.Method -> {
                     val subscribeRequest = SerDe<McpResource.Subscribe.Request>(jsonReq)
                     resources.subscribe(sId, subscribeRequest) {
-                        send(McpMessageHandler(McpResource.Updated(subscribeRequest.uri)), sId)
+                        send(McpMessageHandler(McpResource.Updated, McpResource.Updated.Notification(subscribeRequest.uri)), sId)
                     }
                     ok()
                 }
@@ -118,7 +118,7 @@ abstract class McpProtocol<RSP : Any>(
                     )
                 }
 
-                McpProgress.Notification.Method -> ok()
+                McpProgress.Method -> ok()
 
                 McpRoot.Changed.Method -> {
                     val requestId = RequestId.random(random)
@@ -156,11 +156,11 @@ abstract class McpProtocol<RSP : Any>(
 
         clients[sId] = session
         logger.subscribe(sId, error) { level, logger, data ->
-            send(McpMessageHandler(McpLogging.LoggingMessage(level, logger, data)), sId)
+            send(McpMessageHandler(McpLogging.LoggingMessage, McpLogging.LoggingMessage.Notification(level, logger, data)), sId)
         }
-        prompts.onChange(sId) { send(McpMessageHandler(McpPrompt.List.Changed()), sId) }
-        resources.onChange(sId) { send(McpMessageHandler(McpResource.List.Changed()), sId) }
-        tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed()), sId) }
+        prompts.onChange(sId) { send(McpMessageHandler(McpPrompt.List.Changed, McpPrompt.List.Changed.Notification), sId) }
+        resources.onChange(sId) { send(McpMessageHandler(McpResource.List, McpResource.List.Changed.Notification), sId) }
+        tools.onChange(sId) { send(McpMessageHandler(McpTool.List.Changed, McpTool.List.Changed.Notification), sId) }
 
         outgoingSampling.onRequest(sId, session.entity) { req, requestId ->
             clients[sId]?.addCall(requestId) { outgoingSampling.respond(session.entity, SerDe(it)) }

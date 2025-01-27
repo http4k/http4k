@@ -51,19 +51,19 @@ data class McpResource(
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        @JsonSerializable
-        data class Changed(override val method: McpRpcMethod = of("notifications/resources/list_changed")) :
-            ServerMessage.Notification
+        data object Changed : HasMethod {
+            override val Method: McpRpcMethod = of("notifications/resources/list_changed")
+
+            @JsonSerializable
+            data object Notification : ServerMessage.Notification
+        }
     }
 
-    @JsonSerializable
-    data class Updated(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification,
-        HasMeta {
-        override val method = Method
+    data object Updated : HasMethod {
+        override val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
-        companion object : HasMethod {
-            override val Method = of("notifications/resources/updated")
-        }
+        @JsonSerializable
+        data class Notification(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification, HasMeta
     }
 
     object Subscribe : HasMethod {
