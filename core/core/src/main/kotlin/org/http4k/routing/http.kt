@@ -30,7 +30,6 @@ class TemplatedHttpRoute(
     router = router,
     filter = filter,
     responseFor = { Response(it) },
-    // FIXME
     addUriTemplateFilter = { next -> { ResponseWithContext(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
 ) {
     override fun withBasePath(prefix: String) = TemplatedHttpRoute(uriTemplate.prefixed(prefix), handler, router, filter)

@@ -9,7 +9,7 @@ import org.http4k.core.WsTransaction
 import org.http4k.events.WsEvent
 import org.http4k.events.WsEvent.Outgoing
 import org.http4k.routing.RequestWithContext
-import org.http4k.routing.RoutedWsResponse
+import org.http4k.routing.WsResponseWithContext
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus.Companion.BUGGYCLOSE
 import org.junit.jupiter.api.Test
@@ -50,7 +50,7 @@ class WsEventTest {
             Outgoing(
                 WsTransaction(
                     request = Request(GET, "/bob"),
-                    response = RoutedWsResponse(WsResponse("sub") {}, UriTemplate.from("bar")),
+                    response = WsResponseWithContext(WsResponse("sub") {}, UriTemplate.from("bar")),
                     status = BUGGYCLOSE,
                     start = startTime,
                     duration = ZERO,

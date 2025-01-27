@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import org.http4k.core.Method
 import org.http4k.core.UriTemplate
+import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
 import org.http4k.sse.NoOp
 import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
@@ -21,11 +22,25 @@ fun sse(vararg list: RoutingSseHandler): RoutingSseHandler = sse(list.toList())
 fun sse(routers: List<RoutingSseHandler>) =
     RoutingSseHandler(routers.flatMap { it.routes })
 
-class RoutedSseResponse(
-    val delegate: SseResponse,
-    override val xUriTemplate: UriTemplate,
+data class SseResponseWithContext(
+    private val delegate: SseResponse,
+    val context: Map<String, Any>
 ) : SseResponse by delegate, RoutedMessage {
-    override fun withConsumer(consumer: SseConsumer) = RoutedSseResponse(delegate.withConsumer(consumer), xUriTemplate)
+
+    constructor(delegate: SseResponse, uriTemplate: UriTemplate) : this(
+        if (delegate is SseResponseWithContext) delegate.delegate else delegate,
+        if (delegate is SseResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate)
+        else mapOf(X_URI_TEMPLATE to uriTemplate)
+    )
+
+    override val xUriTemplate: UriTemplate
+        get() {
+            return context[X_URI_TEMPLATE] as? UriTemplate
+                ?: throw IllegalStateException("Message was not routed, so no uri-template present")
+        }
+
+    override fun withConsumer(consumer: SseConsumer) =
+        SseResponseWithContext(delegate.withConsumer(consumer), xUriTemplate)
 
     override fun equals(other: Any?): Boolean = delegate == other
 
@@ -52,8 +67,7 @@ class TemplatedSseRoute(
     router = router,
     filter = filter,
     responseFor = { SseResponse(it, emptyList(), false, Sse::close) },
-    // FIXME
-    addUriTemplateFilter = { next -> { RoutedSseResponse(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
+    addUriTemplateFilter = { next -> { SseResponseWithContext(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
 ) {
     override fun withBasePath(prefix: String) = TemplatedSseRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 

@@ -16,15 +16,18 @@ interface RoutedMessage {
     val xUriTemplate: UriTemplate
 
     companion object {
-        internal const val X_URI_TEMPLATE = "xUriTemplate"
+        const val X_URI_TEMPLATE = "xUriTemplate"
     }
 }
 
-data class RequestWithContext(private val delegate: Request, private val context: Map<String, Any>) :
+data class RequestWithContext(private val delegate: Request, val context: Map<String, Any>) :
     Request by delegate,
     RoutedMessage {
 
-    constructor(delegate: Request, uriTemplate: UriTemplate) : this(delegate, mapOf(X_URI_TEMPLATE to uriTemplate))
+    constructor(delegate: Request, uriTemplate: UriTemplate) : this(
+        if (delegate is RequestWithContext) delegate.delegate else delegate,
+        if (delegate is RequestWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(X_URI_TEMPLATE to uriTemplate)
+    )
 
     override val xUriTemplate: UriTemplate
         get() {
@@ -72,14 +75,20 @@ data class RequestWithContext(private val delegate: Request, private val context
         RequestWithContext(delegate.body(body, length), context)
 }
 
-class ResponseWithContext(private val delegate: Response, private val context: Map<String, Any>) : Response by delegate,
+data class ResponseWithContext(private val delegate: Response, val context: Map<String, Any>) :
+    Response by delegate,
     RoutedMessage {
 
-    constructor(delegate: Response, uriTemplate: UriTemplate) : this(delegate, mapOf(X_URI_TEMPLATE to uriTemplate))
+    constructor(delegate: Response, uriTemplate: UriTemplate) : this(
+        if (delegate is ResponseWithContext) delegate.delegate else delegate,
+        if (delegate is ResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(
+            X_URI_TEMPLATE to uriTemplate
+        )
+    )
 
     override val xUriTemplate: UriTemplate
         get() = context["xUriTemplate"] as? UriTemplate
-            ?: throw IllegalStateException("Request was not routed, so no uri-template present")
+            ?: throw IllegalStateException("Message was not routed, so no uri-template present")
 
     override fun equals(other: Any?): Boolean = delegate == other
 

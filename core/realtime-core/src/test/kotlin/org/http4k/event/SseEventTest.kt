@@ -10,7 +10,7 @@ import org.http4k.core.UriTemplate
 import org.http4k.events.SseEvent
 import org.http4k.events.SseEvent.Outgoing
 import org.http4k.routing.RequestWithContext
-import org.http4k.routing.RoutedSseResponse
+import org.http4k.routing.SseResponseWithContext
 import org.http4k.sse.SseResponse
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
@@ -48,7 +48,7 @@ class SseEventTest {
             Outgoing(
                 SseTransaction(
                     request = Request(GET, "/bob"),
-                    response = RoutedSseResponse(SseResponse(OK) {}, UriTemplate.from("bar")),
+                    response = SseResponseWithContext(SseResponse(OK) {}, UriTemplate.from("bar")),
                     start = startTime,
                     duration = ZERO,
                     labels = mapOf()
