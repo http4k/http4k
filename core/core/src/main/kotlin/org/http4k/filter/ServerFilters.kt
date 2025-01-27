@@ -27,7 +27,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
-import org.http4k.lens.RequestContextLens
+import org.http4k.lens.RequestLens
 import org.http4k.lens.bearerToken
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
@@ -171,7 +171,7 @@ object ServerFilters {
         /**
          * Population of a RequestContext with custom principal object
          */
-        operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) =
+        operator fun <T> invoke(realm: String, key: RequestLens<T>, lookup: (Credentials) -> T?) =
             Filter { next ->
                 {
                     Header.AUTHORIZATION_BASIC(it)
@@ -203,7 +203,7 @@ object ServerFilters {
         /**
          * Population of a RequestContext with custom principal object
          */
-        operator fun <T> invoke(key: RequestContextLens<T>, lookup: (String) -> T?) = Filter { next ->
+        operator fun <T> invoke(key: RequestLens<T>, lookup: (String) -> T?) = Filter { next ->
             {
                 it.bearerToken()
                     ?.let(lookup)

@@ -5,12 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
-import org.http4k.lens.RequestContextKey
+import org.http4k.lens.RequestKey
 import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.Test
 
@@ -19,16 +18,20 @@ class BasicAuthenticationTest {
     @Test
     fun wrong_token_type() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = handler(Request(GET, "/")
-            .header("Authorization", "Bearer: foobar"))
+        val response = handler(
+            Request(GET, "/")
+                .header("Authorization", "Bearer: foobar")
+        )
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
     fun invalid_base64() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = handler(Request(GET, "/")
-            .header("Authorization", "Basic ababa"))
+        val response = handler(
+            Request(GET, "/")
+                .header("Authorization", "Basic ababa")
+        )
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
@@ -70,7 +73,8 @@ class BasicAuthenticationTest {
 
     @Test
     fun allow_injecting_authorize_function() {
-        val handler = ServerFilters.BasicAuth("my realm") { it.user == "user" && it.password == "password" }.then { Response(OK) }
+        val handler =
+            ServerFilters.BasicAuth("my realm") { it.user == "user" && it.password == "password" }.then { Response(OK) }
         val response = ClientFilters.BasicAuth("user", "password").then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
@@ -78,7 +82,12 @@ class BasicAuthenticationTest {
     @Test
     fun allow_injecting_credential_provider() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
-        val response = ClientFilters.BasicAuth(CredentialsProvider { Credentials("user", "password") }).then(handler)(Request(GET, "/"))
+        val response = ClientFilters.BasicAuth(CredentialsProvider { Credentials("user", "password") }).then(handler)(
+            Request(
+                GET,
+                "/"
+            )
+        )
         assertThat(response.status, equalTo(OK))
     }
 
@@ -91,13 +100,10 @@ class BasicAuthenticationTest {
 
     @Test
     fun populates_request_context_for_later_retrieval() {
-        val contexts = RequestContexts()
-        val key = RequestContextKey.required<Credentials>(contexts)
+        val key = RequestKey.of<Credentials>()
 
-        val handler =
-            ServerFilters.InitialiseRequestContext(contexts)
-                .then(ServerFilters.BasicAuth("my realm", key) { it })
-                .then { req -> Response(OK).body(key(req).toString()) }
+        val handler = ServerFilters.BasicAuth("my realm", key) { it }
+            .then { req -> Response(OK).body(key(req).toString()) }
 
         val response = ClientFilters.BasicAuth("user", "password").then(handler)(Request(GET, "/"))
 

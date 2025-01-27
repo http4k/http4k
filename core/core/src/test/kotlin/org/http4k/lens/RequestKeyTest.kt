@@ -1,6 +1,5 @@
 package org.http4k.lens
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -16,38 +15,22 @@ class RequestKeyTest {
 
     @Test
     fun `value present`() {
-
-        assertThat(RequestKey.optional("hello")(request), equalTo("world"))
-        assertThat(RequestKey.required("hello")(request), equalTo("world"))
-
-        val expected: List<String?> = listOf("world")
-        assertThat(RequestKey.multi.required("hello")(request), equalTo(expected))
-        assertThat(RequestKey.multi.optional("hello")(request), equalTo(expected))
+        assertThat(RequestKey.of<String>("hello")(request), equalTo("world"))
     }
 
     @Test
     fun `value missing`() {
-        assertThat(RequestKey.optional("world")(request), absent())
-
-        val requiredRequestKey = RequestKey.required("world")
+        val requiredRequestKey = RequestKey.of<String>("world")
         assertThat(
             { requiredRequestKey(request) },
             throws(lensFailureWith<Request>(Missing(requiredRequestKey.meta), overallType = Failure.Type.Missing))
-        )
-
-        assertThat(RequestKey.multi.optional("world")(request), absent())
-        val requiredMultiRequestKey = RequestKey.multi.required("world")
-        assertThat(
-            { requiredMultiRequestKey(request) },
-            throws(lensFailureWith<Request>(Missing(requiredMultiRequestKey.meta), overallType = Failure.Type.Missing))
         )
     }
 
     @Test
     fun `sets value on request`() {
-        val key = RequestKey.required("bob")
+        val key = RequestKey.of<String>("bob")
         val withRequestKey = request.with(key of "hello")
         assertThat(key(withRequestKey), equalTo("hello"))
     }
-
 }
