@@ -26,7 +26,7 @@ object McpMessageHandler {
             }
             .getOrElse { SerDe(InvalidRequest, req.id) }
 
-    operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: McpNodeType? = null) =
+    operator fun invoke(hasMethod: HasMethod, req: ServerMessage.Request, id: McpNodeType) =
         SerDe(hasMethod, req, id)
 
     operator fun invoke(resp: ServerMessage.Response, id: McpNodeType? = null) = SerDe(resp, id)

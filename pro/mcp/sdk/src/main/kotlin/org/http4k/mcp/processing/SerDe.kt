@@ -7,9 +7,9 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.protocol.messages.HasMethod
-import org.http4k.mcp.protocol.messages.ServerMessage.Notification
-import org.http4k.mcp.protocol.messages.ServerMessage.Request
-import org.http4k.mcp.protocol.messages.ServerMessage.Response
+import org.http4k.mcp.protocol.messages.McpNotification
+import org.http4k.mcp.protocol.messages.McpRequest
+import org.http4k.mcp.protocol.messages.McpResponse
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 
@@ -22,15 +22,15 @@ object SerDe {
         asA<OUT>(compact(input.result ?: nullNode()))
     }
 
-    operator fun invoke(method: HasMethod, input: Request, id: McpNodeType?) = with(McpJson) {
-        renderRequest(method.Method.value, asJsonObject(input), id ?: nullNode())
+    operator fun invoke(method: HasMethod, input: McpRequest, id: McpNodeType) = with(McpJson) {
+        renderRequest(method.Method.value, asJsonObject(input), id)
     }
 
-    operator fun invoke(input: Response, id: McpNodeType?) = with(McpJson) {
+    operator fun invoke(input: McpResponse, id: McpNodeType?) = with(McpJson) {
         renderResult(asJsonObject(input), id ?: nullNode())
     }
 
-    operator fun invoke(method: HasMethod, input: Notification) = with(McpJson) {
+    operator fun invoke(method: HasMethod, input: McpNotification) = with(McpJson) {
         renderRequest(method.Method.value, asJsonObject(input), nullNode())
     }
 
