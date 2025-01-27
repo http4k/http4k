@@ -1,4 +1,4 @@
-package org.http4k.mcp.processing
+package org.http4k.mcp.protocol
 
 import org.http4k.jsonrpc.ErrorMessage
 

@@ -6,7 +6,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.model.Prompt
-import org.http4k.mcp.processing.McpException
+import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpPrompt
 
 class PromptCapability(private val prompt: Prompt, val handler: PromptHandler) : ServerCapability {
