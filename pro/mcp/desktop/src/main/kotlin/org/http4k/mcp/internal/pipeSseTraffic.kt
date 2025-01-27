@@ -44,6 +44,8 @@ fun pipeSseTraffic(
                                     )
                                 }
 
+                                "ping" -> {}
+
                                 else -> write("${msg.data}\n")
                             }
 
