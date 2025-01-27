@@ -47,7 +47,7 @@ fun mcpHttp(serverMetaData: ServerMetaData, vararg capabilities: ServerCapabilit
         IncomingSampling(capabilities.flatMap { it }.filterIsInstance<IncomingSamplingCapability>()),
         OutgoingSampling(capabilities.flatMap { it }.filterIsInstance<OutgoingSamplingCapability>())
     )
-//        .also { it.start() }
+        .also { it.start() }
 )
 
 /**
