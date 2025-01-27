@@ -9,6 +9,9 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-contract-ui-redoc"))
+    api(project(":http4k-api-openapi"))
+    api("org.webjars:redoc:_")
+
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 

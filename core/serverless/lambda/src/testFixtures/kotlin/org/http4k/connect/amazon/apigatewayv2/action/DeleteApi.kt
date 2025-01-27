@@ -2,7 +2,7 @@ package org.http4k.connect.amazon.apigatewayv2.action
 
 import org.http4k.connect.amazon.apigatewayv2.AwsApiGatewayV2Action
 import org.http4k.connect.amazon.apigatewayv2.model.ApiId
-import org.http4k.connect.amazon.kClass
+import org.http4k.connect.kClass
 import org.http4k.core.Method
 import org.http4k.core.Request
 

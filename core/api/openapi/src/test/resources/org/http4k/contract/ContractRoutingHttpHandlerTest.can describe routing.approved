@@ -1,0 +1,1 @@
+"\nGET: /route-contract\nGET: /bad-request\nGET: /bad-request-query-via-meta\nGET: /bad-request-body\nGET: /bad-request-body-via-meta\nGET: /bad-request-body-ignore-body\nGET: /bad-request-body-ignore-all"

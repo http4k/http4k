@@ -11,16 +11,18 @@ plugins {
 dependencies {
     constraints {
         rootProject.subprojects
+            .asSequence()
             .filter { it.name != project.name }
             .filter { shouldBePublished(it) }
+            .filterNot { it.name == "http4k-mcp" }
             .filterNot { it.name == "http4k-tools" }
             .sortedBy { it.name }
+            .toList()
             .forEach { api(it) }
     }
 }
 
 fun shouldBePublished(p: Project) = setOf(
-    "enterprise", // TODO - remove this to publish
     "example",
     "test-function",
     "integration-test",

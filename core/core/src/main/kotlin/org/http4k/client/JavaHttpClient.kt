@@ -39,12 +39,12 @@ object JavaHttpClient {
         requestModifier: (HttpRequest.Builder) -> HttpRequest.Builder = { it },
     ) = object : HttpHandler {
         override fun invoke(request: Request): Response = try {
-            val javaRequest = request.toJavaHttpRequest(requestBodyMode, requestModifier)
+            val javaRequest = request.fromHttp4k(requestBodyMode, requestModifier)
             when (responseBodyMode) {
                 is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
-                    .run { coreResponse().body(Body(ByteBuffer.wrap(body()))) }
+                    .run { asHttp4k().body(Body(ByteBuffer.wrap(body()))) }
                 is Stream -> httpClient.send(javaRequest, BodyHandlers.ofInputStream())
-                    .run { coreResponse().body(body()) }
+                    .run { asHttp4k().body(body()) }
             }
         } catch (e: UnknownHostException) {
             Response(UNKNOWN_HOST.toClientStatus(e))
@@ -66,7 +66,7 @@ object PreCannedJavaHttpClients {
         .build()
 }
 
-private fun Request.toJavaHttpRequest(bodyMode: BodyMode, requestModifier: (HttpRequest.Builder) -> HttpRequest.Builder) =
+fun Request.fromHttp4k(bodyMode: BodyMode, requestModifier: (HttpRequest.Builder) -> HttpRequest.Builder) =
     HttpRequest.newBuilder()
         .uri(URI.create(uri.toString()))
         .apply {
@@ -77,7 +77,7 @@ private fun Request.toJavaHttpRequest(bodyMode: BodyMode, requestModifier: (Http
         .let(requestModifier)
         .build()
 
-private fun <T> HttpResponse<T>.coreResponse() =
+fun <T> HttpResponse<T>.asHttp4k() =
     Response(Status(statusCode(), "")).headers(headers().map()
         .map { headerNameToValues ->
             headerNameToValues.value

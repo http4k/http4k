@@ -15,11 +15,11 @@ dependencies {
 
     testImplementation("dev.forkhandles:values4k:_")
     testImplementation(project(":http4k-core"))
-    testImplementation(project(":http4k-jsonrpc"))
+    testImplementation(project(":http4k-api-jsonrpc"))
     testImplementation(project(":http4k-testing-hamkrest"))
 
     testFixturesImplementation("dev.forkhandles:values4k:_")
     testFixturesImplementation(testFixtures(project(":http4k-core")))
-    testFixturesImplementation(testFixtures(project(":http4k-contract")))
-    testFixturesImplementation(testFixtures(project(":http4k-jsonrpc")))
+    testFixturesImplementation(testFixtures(project(":http4k-api-openapi")))
+    testFixturesImplementation(testFixtures(project(":http4k-api-jsonrpc")))
 }

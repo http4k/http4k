@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "http4k Tools for HTTP Traffic Capture"
+description = "http4k Tools for HTTP Traffic Capture/Playback"
 
 val license by project.extra { Apache2 }
 
@@ -10,4 +10,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+
+    testImplementation(testFixtures(project(":http4k-core")))
 }

@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-aws"))
+    api(project(":http4k-platform-aws"))
 
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")

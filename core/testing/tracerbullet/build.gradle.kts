@@ -18,5 +18,5 @@ dependencies {
     testImplementation(project(":http4k-client-apache"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(path = ":http4k-testing-approval"))
-    testImplementation(testFixtures(project(":http4k-contract")))
+    testImplementation(testFixtures(project(":http4k-api-openapi")))
 }

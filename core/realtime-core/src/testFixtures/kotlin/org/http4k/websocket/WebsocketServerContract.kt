@@ -18,11 +18,11 @@ import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.string
 import org.http4k.routing.path
+import org.http4k.routing.poly
 import org.http4k.routing.routes
+import org.http4k.routing.websocket.bind
 import org.http4k.routing.websockets
-import org.http4k.routing.ws.bind
 import org.http4k.server.Http4kServer
-import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
@@ -56,7 +56,7 @@ abstract class WebsocketServerContract(
 
     @BeforeEach
     fun before() {
-        val routes = routes(
+        val http = routes(
             "/hello/{name}" hbind { r: Request -> Response(OK).body(r.path("name")!!) }
         )
         val ws = websockets(
@@ -103,7 +103,10 @@ abstract class WebsocketServerContract(
                 }
             })
 
-        server = PolyHandler(routes.takeIf { httpSupported }, ws).asServer(serverConfig(0)).start()
+        server = when {
+            httpSupported -> poly(http, ws).asServer(serverConfig(0)).start()
+            else -> poly(ws).asServer(serverConfig(0)).start()
+        }
     }
 
     @AfterEach

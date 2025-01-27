@@ -8,7 +8,7 @@ import org.http4k.testingStopMode
 import org.junit.jupiter.api.Test
 
 class Jetty11LoomTest :
-    ServerContract({ Jetty11Loom(it, testingStopMode) }, ClientForServerTesting()) {
+    ServerContract(::Jetty11Loom, ClientForServerTesting()) {
     override fun requestScheme() = equalTo("http")
 
     @Test

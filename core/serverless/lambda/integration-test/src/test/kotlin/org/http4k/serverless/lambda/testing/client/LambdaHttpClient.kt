@@ -1,7 +1,7 @@
 package org.http4k.serverless.lambda.testing.client
 
+import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.lambda.model.Function
-import org.http4k.connect.amazon.lambda.model.Region
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -28,7 +28,7 @@ abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
     protected abstract fun Response.fromLambdaFormat(): Response
 
     private val filter = createFunctionRequest(function)
-        .then(ClientFilters.SetAwsServiceUrl("lambda", region.name))
+        .then(ClientFilters.SetAwsServiceUrl("lambda", region.value))
 
     override fun invoke(handler: HttpHandler): HttpHandler = filter(handler)
 }
