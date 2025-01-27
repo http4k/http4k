@@ -3,6 +3,7 @@ package org.http4k.mcp.protocol.messages
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
 object McpRoot {
@@ -17,10 +18,10 @@ object McpRoot {
             ClientMessage.Response, HasMeta
     }
 
-    @JsonSerializable
-    data class Changed(override val method: McpRpcMethod = Method) : ClientMessage.Notification {
-        companion object : HasMethod {
-            override val Method = McpRpcMethod.of("notifications/roots/list_changed")
-        }
+    data object Changed : HasMethod {
+        override val Method: McpRpcMethod = of("notifications/roots/list_changed")
+
+        @JsonSerializable
+        data object Notification : ClientMessage.Notification
     }
 }

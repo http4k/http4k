@@ -16,17 +16,15 @@ object McpLogging {
             HasMeta
     }
 
-    @JsonSerializable
-    data class LoggingMessage(
-        val level: LogLevel,
-        val logger: String? = null,
-        val data: Map<String, Any> = emptyMap(),
-        override val _meta: Meta = default
-    ) : ServerMessage.Notification, HasMeta {
-        override val method = Method
+    object LoggingMessage : HasMethod {
+        override val Method = McpRpcMethod.of("notifications/message")
 
-        companion object : HasMethod {
-            override val Method = McpRpcMethod.of("notifications/message")
-        }
+        @JsonSerializable
+        data class Notification(
+            val level: LogLevel,
+            val logger: String? = null,
+            val data: Map<String, Any> = emptyMap(),
+            override val _meta: Meta = default
+        ) : ServerMessage.Notification, HasMeta
     }
 }

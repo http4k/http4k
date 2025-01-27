@@ -1,7 +1,6 @@
 package org.http4k.mcp.processing
 
 import org.http4k.format.renderError
-import org.http4k.format.renderNotification
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
@@ -31,8 +30,8 @@ object SerDe {
         renderResult(asJsonObject(input), id ?: nullNode())
     }
 
-    operator fun invoke(input: Notification) = with(McpJson) {
-        renderNotification(input)
+    operator fun invoke(method: HasMethod, input: Notification) = with(McpJson) {
+        renderRequest(method.Method.value, asJsonObject(input), nullNode())
     }
 
     operator fun invoke(errorMessage: ErrorMessage, id: McpNodeType?) = with(McpJson) {

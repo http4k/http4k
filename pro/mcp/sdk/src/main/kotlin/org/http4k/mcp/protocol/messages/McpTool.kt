@@ -27,9 +27,12 @@ data class McpTool(val name: ToolName, val description: String, val inputSchema:
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        @JsonSerializable
-        data class Changed(override val method: McpRpcMethod = of("notifications/tools/list_changed")) :
-            ServerMessage.Notification
+        data object Changed : HasMethod {
+            override val Method: McpRpcMethod = of("notifications/tools/list_changed")
+
+            @JsonSerializable
+            data object Notification : ServerMessage.Notification
+        }
     }
 
     object Call : HasMethod {
