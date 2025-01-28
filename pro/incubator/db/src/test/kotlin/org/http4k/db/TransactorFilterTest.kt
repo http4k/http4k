@@ -2,6 +2,7 @@ package org.http4k.db
 
 import org.http4k.core.*
 import org.http4k.core.Method.GET
+import org.http4k.core.Status.Companion.OK
 import org.http4k.db.testing.AccountRepository
 import org.http4k.db.testing.PlainSqlAccountRepository
 import org.http4k.routing.bind
@@ -17,11 +18,11 @@ fun main() {
                 val repository: AccountRepository = req.transactionResource()
 
                 val balance = repository.getBalance(req.path("account")!!)
-                Response(Status.OK).body(balance.toString())
+                Response(OK).body(balance.toString())
             })
 
     val server = Filter.NoOp
-        .then(TransactionPerRequestFilter(transactor))
+        .then(TransactionPerRequestFilter(transactor)) // injects the AccountRepository into the request
         .then(app)
 
     server(Request(GET, "/balance/DEPOSITS")).let(::println)
