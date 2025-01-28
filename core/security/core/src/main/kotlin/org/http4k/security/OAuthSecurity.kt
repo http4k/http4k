@@ -5,7 +5,6 @@ import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.RequestLens
-import org.http4k.security.OAuthProvider
 
 sealed class OAuthSecurity(
     override val filter: Filter,
