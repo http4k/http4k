@@ -1,4 +1,4 @@
-package org.http4k.contract.security
+package org.http4k.security
 
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
@@ -25,21 +25,7 @@ class AuthCodeOAuthSecurity(
     name: String = "oauthSecurityAuthCode",
     refreshUrl: Uri? = null,
     extraFields: Map<String, String> = emptyMap()
-) :
-    OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
-
-    companion object {
-        operator fun invoke(
-            oAuthProvider: OAuthProvider,
-            customScopes: List<OAuthScope>? = null
-        ) = AuthCodeOAuthSecurity(
-            oAuthProvider.providerConfig.authUri,
-            oAuthProvider.providerConfig.tokenUri,
-            customScopes ?: oAuthProvider.scopes.map { OAuthScope(it, "") },
-            oAuthProvider.authFilter
-        )
-    }
-}
+) : OAuthSecurity(filter, name, scopes, refreshUrl, extraFields)
 
 class ImplicitOAuthSecurity(
     val authorizationUrl: Uri,

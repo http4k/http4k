@@ -1,4 +1,4 @@
-package org.http4k.contract.security
+package org.http4k.security
 
 import org.http4k.core.Filter
 

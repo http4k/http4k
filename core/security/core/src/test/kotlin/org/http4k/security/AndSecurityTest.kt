@@ -1,11 +1,8 @@
-package org.http4k.contract
+package org.http4k.security
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.Security
-import org.http4k.contract.security.and
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

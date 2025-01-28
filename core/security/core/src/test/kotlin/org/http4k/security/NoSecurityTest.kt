@@ -1,8 +1,8 @@
-package org.http4k.contract
+package org.http4k.security
+
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.security.NoSecurity
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
