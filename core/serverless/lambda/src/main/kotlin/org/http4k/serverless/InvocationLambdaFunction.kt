@@ -4,31 +4,25 @@ import com.amazonaws.services.lambda.runtime.Context
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
-import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import java.io.InputStream
 
 /**
  * Function loader for Invocation Lambdas
  */
-class InvocationFnLoader(private val appLoader: AppLoaderWithContexts) : FnLoader<Context> {
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+class InvocationFnLoader(private val appLoader: AppLoader) : FnLoader<Context> {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts("lambda")
-
     override operator fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
-        val app = appLoader(env, contexts)
+        val app = appLoader(env)
         return FnHandler { inputStream, ctx ->
             val request = Request(POST, "/2015-03-31/functions/${ctx.functionName}/invocations")
                 .header("X-Amz-Invocation-Type", "RequestResponse")
                 .header("X-Amz-Log-Type", "Tail").body(inputStream)
             CatchAll()
-                .then(InitialiseRequestContext(contexts))
-                .then(AddLambdaContextAndRequest(ctx, inputStream, contexts))
+                .then(AddLambdaContextAndRequest(ctx, inputStream))
                 .then(app)(request)
                 .body.stream
         }
@@ -40,9 +34,8 @@ class InvocationFnLoader(private val appLoader: AppLoaderWithContexts) : FnLoade
  * It uses the local environment to instantiate the HttpHandler which can be used
  * for further invocations.
  */
-abstract class InvocationLambdaFunction(appLoader: AppLoaderWithContexts) :
+abstract class InvocationLambdaFunction(appLoader: AppLoader) :
     AwsLambdaEventFunction(InvocationFnLoader(appLoader)) {
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
 

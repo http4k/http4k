@@ -1,6 +1,5 @@
 package org.http4k.serverless
 
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.base64Encode
@@ -8,33 +7,26 @@ import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
-import org.http4k.filter.ServerFilters.InitialiseRequestContext
+import org.http4k.lens.RequestKey
 import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.util.Locale.getDefault
 
-const val OW_REQUEST_KEY = "HTTP4K_OW_REQUEST"
+val OW_REQUEST_KEY = RequestKey.of<JsonObject>("HTTP4K_OW_REQUEST")
 
 class OpenWhiskFunction(
-    appLoader: AppLoaderWithContexts,
+    appLoader: AppLoader,
     private val detectBinaryBody: DetectBinaryBody = NonBinary
 ) : (JsonObject) -> JsonObject {
 
-    constructor(
-        input: AppLoader,
-        detectBinaryBody: DetectBinaryBody = NonBinary
-    ) : this(AppLoaderWithContexts { env, _ -> input(env) }, detectBinaryBody)
-
-    private val contexts = RequestContexts("openwhisk")
-    private val app = appLoader(System.getenv(), contexts)
+    private val app = appLoader(System.getenv())
 
     override fun invoke(request: JsonObject) =
         CatchAll()
-            .then(InitialiseRequestContext(contexts))
-            .then(AddOpenWhiskRequest(request, contexts))
+            .then(AddOpenWhiskRequest(request))
             .then(app)
             .invoke(request.asHttp4k()).toGson()
 
@@ -72,10 +64,9 @@ class OpenWhiskFunction(
     }
 }
 
-private fun AddOpenWhiskRequest(request: JsonElement, contexts: RequestContexts) = Filter { next ->
+private fun AddOpenWhiskRequest(request: JsonObject) = Filter { next ->
     {
-        contexts[it][OW_REQUEST_KEY] = request
-        next(it)
+        next(it.with(OW_REQUEST_KEY of request))
     }
 }
 

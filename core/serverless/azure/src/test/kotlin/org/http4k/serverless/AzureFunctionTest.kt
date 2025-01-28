@@ -28,10 +28,10 @@ class AzureFunctionTest {
 
         val response = Response(Status(200, "")).header("a", "b").body("hello there")
 
-        val function = object : AzureFunction(AppLoaderWithContexts { env, contexts ->
+        val function = object : AzureFunction(AppLoader { env ->
             {
-                assertThat(contexts[it].get<ExecutionContext>(AZURE_CONTEXT_KEY), sameInstance(context))
-                assertThat(contexts[it].get<Request>(AZURE_REQUEST_KEY), equalTo(request))
+                assertThat(AZURE_CONTEXT_KEY(it), sameInstance(context))
+                assertThat(AZURE_REQUEST_KEY(it), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 assertThat(
                     it.removeHeader("x-http4k-context-azure"), equalTo(

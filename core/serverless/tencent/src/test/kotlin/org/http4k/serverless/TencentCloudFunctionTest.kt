@@ -29,10 +29,10 @@ class TencentCloudFunctionTest {
             queryStringParameters = mapOf("query" to "value")
         }
 
-        val tencent = object : TencentCloudFunction(AppLoaderWithContexts { env, contexts ->
+        val tencent = object : TencentCloudFunction(AppLoader { env ->
             {
-                assertThat(contexts[it].get<Request>(TENCENT_CONTEXT_KEY), sameInstance(context))
-                assertThat(contexts[it].get<Request>(TENCENT_REQUEST_KEY), equalTo(request))
+                assertThat(TENCENT_CONTEXT_KEY(it), sameInstance(context))
+                assertThat(TENCENT_REQUEST_KEY(it), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 assertThat(
                     it.removeHeader("x-http4k-context-tencent"), equalTo(
