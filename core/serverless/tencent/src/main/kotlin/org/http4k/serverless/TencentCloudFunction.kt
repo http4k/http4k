@@ -12,37 +12,33 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
-import org.http4k.filter.ServerFilters.InitialiseRequestContext
+import org.http4k.lens.RequestKey
 
-const val TENCENT_REQUEST_KEY = "HTTP4K_TENCENT_REQUEST"
-const val TENCENT_CONTEXT_KEY = "HTTP4K_TENCENT_CONTEXT"
+val TENCENT_REQUEST_KEY = RequestKey.of<APIGatewayProxyRequestEvent>("HTTP4K_TENCENT_REQUEST")
+val TENCENT_CONTEXT_KEY = RequestKey.of<Context>("HTTP4K_TENCENT_CONTEXT")
 
-abstract class TencentCloudFunction(appLoader: AppLoaderWithContexts) {
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+abstract class TencentCloudFunction(appLoader: AppLoader) {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts("tencent")
-    private val app = appLoader(System.getenv(), contexts)
+    private val app = appLoader(System.getenv())
 
     fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context?) =
         CatchAll()
-            .then(InitialiseRequestContext(contexts))
-            .then(AddTencent(request, context, contexts))
+            .then(AddTencent(request, context))
             .then(app)(request.asHttp4kRequest())
             .asTencent()
 }
 
-private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?, contexts: RequestContexts) =
+private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?) =
     Filter { next ->
         {
-            ctx?.apply { contexts[it][TENCENT_CONTEXT_KEY] = this }
-            contexts[it][TENCENT_REQUEST_KEY] = request
-            next(it)
+            val reqWithReq = it.with(TENCENT_REQUEST_KEY of request)
+            next(ctx?.run { reqWithReq.with(TENCENT_CONTEXT_KEY of this) } ?: reqWithReq)
         }
     }
 

@@ -16,9 +16,9 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.routing.All
+import org.http4k.routing.RequestWithContext
+import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.RouteMatcher
-import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
 import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingMatch
@@ -127,7 +127,7 @@ data class ContractRouteMatcher(
             Filter { next ->
                 {
                     val xUriTemplate = UriTemplate.from(routeIdentity.ifEmpty { "/" })
-                    RoutedResponse(next(RoutedRequest(it, xUriTemplate)), xUriTemplate)
+                    ResponseWithContext(next(RequestWithContext(it, xUriTemplate)), xUriTemplate)
                 }
             }
         }

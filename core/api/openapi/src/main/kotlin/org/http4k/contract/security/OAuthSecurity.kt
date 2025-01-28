@@ -4,7 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.filter.ServerFilters
-import org.http4k.lens.RequestContextLens
+import org.http4k.lens.RequestLens
 import org.http4k.security.OAuthProvider
 
 sealed class OAuthSecurity(
@@ -65,7 +65,7 @@ class UserCredentialsOAuthSecurity(
     companion object {
         operator fun <T> invoke(
             tokenUrl: Uri,
-            key: RequestContextLens<T>,
+            key: RequestLens<T>,
             lookup: (String) -> T?,
             refreshUrl: Uri? = null,
             scopes: List<OAuthScope> = emptyList()
@@ -89,7 +89,7 @@ class ClientCredentialsOAuthSecurity(
     companion object {
         operator fun <T> invoke(
             tokenUrl: Uri,
-            key: RequestContextLens<T>,
+            key: RequestLens<T>,
             lookup: (String) -> T?,
             refreshUrl: Uri? = null,
             scopes: List<OAuthScope> = emptyList()

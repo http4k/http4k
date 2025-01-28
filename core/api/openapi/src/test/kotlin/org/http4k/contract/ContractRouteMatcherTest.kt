@@ -36,7 +36,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.http4k.routing.RoutedResponse
+import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -127,7 +127,7 @@ class ContractRouteMatcherTest {
             "/root/bar" bind contract {
                 routes += "/foo/bar" / Path.of("world") bindContract GET to { { Response(OK) } }
             })
-        val response = root(Request(GET, "/root/bar/foo/bar/hello")) as RoutedResponse
+        val response = root(Request(GET, "/root/bar/foo/bar/hello")) as ResponseWithContext
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/bar/foo/bar/{world}")))
@@ -198,7 +198,7 @@ class ContractRouteMatcherTest {
                 routes += Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } }
             }
         )
-        val response: RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
+        val response: ResponseWithContext = root(Request(GET, "/root/hello/planet")) as ResponseWithContext
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/hello/{world}")))

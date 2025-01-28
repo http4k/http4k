@@ -1,10 +1,8 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Jackson.asFormatString
@@ -25,10 +23,10 @@ class ApplicationLoadBalancerLambdaFunctionTest {
             "httpMethod" to "GET"
         )
 
-        val lambda = object : ApplicationLoadBalancerLambdaFunction(AppLoaderWithContexts { env, contexts ->
+        val lambda = object : ApplicationLoadBalancerLambdaFunction(AppLoader { env ->
             {
-                assertThat(contexts[it].get<Context>(LAMBDA_CONTEXT_KEY), equalTo(lambdaContext))
-                assertThat(contexts[it].get<Request>(LAMBDA_REQUEST_KEY), equalTo(request))
+                assertThat(LAMBDA_CONTEXT_KEY(it), equalTo(lambdaContext))
+                assertThat(LAMBDA_REQUEST_KEY(it), equalTo(request))
                 assertThat(env, equalTo(System.getenv()))
                 Response(OK).header("a", "b").body("hello there")
             }

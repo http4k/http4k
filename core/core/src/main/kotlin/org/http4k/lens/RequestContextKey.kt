@@ -6,10 +6,12 @@ import org.http4k.core.Store
 import org.http4k.lens.ParamMeta.ObjectParam
 import java.util.UUID
 
-typealias RequestContextLens<T> = BiDiLens<Request, T>
+@Deprecated("Replaced with RequestKey", ReplaceWith("RequestLens<T>"))
+typealias RequestContextLens<T> = RequestLens<T>
 
+@Deprecated("Replaced with RequestKey mechanism")
 object RequestContextKey {
-    fun <T> required(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
+    fun <T> required(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()): RequestLens<T> {
         val meta = Meta(true, "context", ObjectParam, name, null, emptyMap())
         val get: (Request) -> T = { target ->
             store[target].let {

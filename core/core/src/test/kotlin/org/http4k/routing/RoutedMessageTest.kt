@@ -21,53 +21,53 @@ class RoutedMessageTest {
 
     @Test
     fun `routed request can be extended`() {
-        class ExtendedRequest(val delegate: RoutedRequest) : Request by delegate, RoutedMessage by delegate {
+        class ExtendedRequest(val delegate: RequestWithContext) : Request by delegate, RoutedMessage by delegate {
             override fun query(name: String, value: String?): ExtendedRequest =
-                ExtendedRequest(delegate.query(name, value) as RoutedRequest)
+                ExtendedRequest(delegate.query(name, value) as RequestWithContext)
         }
 
-        val request = ExtendedRequest(RoutedRequest(Request(GET, "/the-path"), from("/{pathParam}")))
+        val request = ExtendedRequest(RequestWithContext(Request(GET, "/the-path"), from("/{pathParam}")))
 
         assertThat(request.path("pathParam"), equalTo("the-path"))
         assertThat(request.query("name", "value"), isA<ExtendedRequest>())
 
-        checkMessageFields<RoutedRequest>(request)
+        checkMessageFields<RequestWithContext>(request)
     }
 
     @Test
     fun `routed response can be extended`() {
-        class ExtendedResponse(val delegate: RoutedResponse) : Response by delegate, RoutedMessage by delegate {
+        class ExtendedResponse(val delegate: ResponseWithContext) : Response by delegate, RoutedMessage by delegate {
             override fun header(name: String, value: String?): ExtendedResponse =
-                ExtendedResponse(delegate.header(name, value) as RoutedResponse)
+                ExtendedResponse(delegate.header(name, value) as ResponseWithContext)
         }
 
-        val response = ExtendedResponse(RoutedResponse(Response(OK, "/the-path"), from("/{pathParam}")))
+        val response = ExtendedResponse(ResponseWithContext(Response(OK, "/the-path"), from("/{pathParam}")))
 
         assertThat(response.header("name", "value"), isA<ExtendedResponse>())
     }
 
     @Test
     fun `request manipulations maintain the same type`() {
-        val request = RoutedRequest(Request(GET, "/"), template)
+        val request = RequestWithContext(Request(GET, "/"), template)
 
-        assertThat(request.method(POST), isA<RoutedRequest>())
-        assertThat(request.uri(Uri.of("/changed")), isA<RoutedRequest>())
-        assertThat(request.query("foo", "bar"), isA<RoutedRequest>())
-        assertThat(request.headers(listOf("foo" to "bar")), isA<RoutedRequest>())
-        assertThat(request.removeQuery("foo"), isA<RoutedRequest>())
-        assertThat(request.removeQueries("foo"), isA<RoutedRequest>())
-        assertThat(request.source(RequestSource("localhost")), isA<RoutedRequest>())
+        assertThat(request.method(POST), isA<RequestWithContext>())
+        assertThat(request.uri(Uri.of("/changed")), isA<RequestWithContext>())
+        assertThat(request.query("foo", "bar"), isA<RequestWithContext>())
+        assertThat(request.headers(listOf("foo" to "bar")), isA<RequestWithContext>())
+        assertThat(request.removeQuery("foo"), isA<RequestWithContext>())
+        assertThat(request.removeQueries("foo"), isA<RequestWithContext>())
+        assertThat(request.source(RequestSource("localhost")), isA<RequestWithContext>())
 
-        checkMessageFields<RoutedRequest>(request)
+        checkMessageFields<RequestWithContext>(request)
     }
 
     @Test
     fun `response manipulations maintain the same type`() {
-        val response = RoutedResponse(Response(NOT_FOUND), template)
+        val response = ResponseWithContext(Response(NOT_FOUND), template)
 
-        assertThat(response.status(OK), isA<RoutedResponse>())
+        assertThat(response.status(OK), isA<ResponseWithContext>())
 
-        checkMessageFields<RoutedResponse>(response)
+        checkMessageFields<ResponseWithContext>(response)
     }
 
     private inline fun <reified T : Any> checkMessageFields(request: HttpMessage) {

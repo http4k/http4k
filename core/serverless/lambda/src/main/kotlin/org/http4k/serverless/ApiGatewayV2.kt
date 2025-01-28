@@ -16,8 +16,7 @@ import java.util.Locale.getDefault
 /**
  * Function loader for ApiGatewayV2 Lambdas
  */
-class ApiGatewayV2FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(ApiGatewayV2AwsHttpAdapter, input) {
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+class ApiGatewayV2FnLoader(input: AppLoader) : ApiGatewayFnLoader(ApiGatewayV2AwsHttpAdapter, input) {
     constructor(input: HttpHandler) : this(AppLoader { input })
 }
 
@@ -28,13 +27,8 @@ class ApiGatewayV2FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(Ap
  *
  * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
-abstract class ApiGatewayV2LambdaFunction(input: AppLoaderWithContexts) :
+abstract class ApiGatewayV2LambdaFunction(input: AppLoader) :
     AwsLambdaEventFunction(ApiGatewayV2FnLoader(input)) {
-
-    /**
-     * Use this constructor if you need to read ENV variables to make your HttpHandler
-     */
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
 
     /**
      * Use this constructor if you just want to convert a standard HttpHandler
