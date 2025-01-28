@@ -2,12 +2,6 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.AuthCodeOAuthSecurity
-import org.http4k.contract.security.BasicAuthSecurity
-import org.http4k.contract.security.BearerAuthSecurity
-import org.http4k.contract.security.and
-import org.http4k.contract.security.or
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
@@ -58,9 +52,15 @@ import org.http4k.lens.multipartForm
 import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
+import org.http4k.security.ApiKeySecurity
+import org.http4k.security.AuthCodeOAuthSecurity
+import org.http4k.security.BasicAuthSecurity
+import org.http4k.security.BearerAuthSecurity
 import org.http4k.security.FakeOAuthPersistence
 import org.http4k.security.OAuthProvider
+import org.http4k.security.and
 import org.http4k.security.gitHub
+import org.http4k.security.or
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -111,7 +111,7 @@ abstract class ContractRendererContract<NODE : Any>(
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             tags += Tag("hello", "world")
-            security = ApiKeySecurity(Query.required("the_api_key"), { true })
+            security = ApiKeySecurity(param = Query.required("the_api_key"), validateKey = { true })
             routes += "/nometa" bindContract GET to { _ -> Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
@@ -190,10 +190,12 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract POST to { _ -> Response(OK) }
             routes += "/and_auth" meta {
                 security =
-                    BasicAuthSecurity("foo", credentials, "and1").and(BasicAuthSecurity("foo", credentials, "and2"))
+                    BasicAuthSecurity("foo", credentials, "and1")
+                        .and(BasicAuthSecurity("foo", credentials, "and2"))
             } bindContract POST to { _ -> Response(OK) }
             routes += "/or_auth" meta {
-                security = BasicAuthSecurity("foo", credentials, "or1").or(BasicAuthSecurity("foo", credentials, "or2"))
+                security = BasicAuthSecurity("foo", credentials, "or1")
+                    .or(BasicAuthSecurity("foo", credentials, "or2"))
             } bindContract POST to { _ -> Response(OK) }
             routes += "/oauth2_auth" meta {
                 security = AuthCodeOAuthSecurity(

@@ -25,7 +25,9 @@ class AuthCodeOAuthSecurity(
     name: String = "oauthSecurityAuthCode",
     refreshUrl: Uri? = null,
     extraFields: Map<String, String> = emptyMap()
-) : OAuthSecurity(filter, name, scopes, refreshUrl, extraFields)
+) : OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
+    companion object
+}
 
 class ImplicitOAuthSecurity(
     val authorizationUrl: Uri,

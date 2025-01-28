@@ -6,8 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
 import org.http4k.contract.PreFlightExtraction.Companion.None
 import org.http4k.contract.openapi.OpenAPIJackson
-import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.simple.SimpleJson
 import org.http4k.core.Body
 import org.http4k.core.Credentials
@@ -39,6 +37,8 @@ import org.http4k.lens.int
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.ApiKeySecurity
+import org.http4k.security.BasicAuthSecurity
 import org.junit.jupiter.api.Test
 
 class ContractRouteMatcherTest {

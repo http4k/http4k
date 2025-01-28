@@ -1,5 +1,8 @@
 package org.http4k.contract.security
 
+import org.http4k.security.OAuthProvider
+import org.http4k.security.OAuthScope
+
 @Deprecated("Moved module", ReplaceWith("org.http4k.security.ApiKeySecurity<T>"))
 typealias ApiKeySecurity<T> = org.http4k.security.ApiKeySecurity<T>
 
@@ -35,3 +38,9 @@ typealias OpenIdConnectSecurity = org.http4k.security.OpenIdConnectSecurity
 
 @Deprecated("Moved module", ReplaceWith("org.http4k.security.OAuthScope"))
 typealias OAuthScope = org.http4k.security.OAuthScope
+
+@Deprecated("Moved module", ReplaceWith("org.http4k.security.AuthCodeOAuthSecurity"))
+fun AuthCodeOAuthSecurity(
+    oAuthProvider: OAuthProvider,
+    customScopes: List<OAuthScope>? = null
+) = org.http4k.security.AuthCodeOAuthSecurity(oAuthProvider, customScopes)

@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "http4k support for chaos testing"
+description = "http4k support for Chaos Testing"
 
 val license by project.extra { Apache2 }
 
@@ -11,6 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-api-openapi"))
+    api(project(":http4k-security-core"))
     api(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-testing-approval"))
 

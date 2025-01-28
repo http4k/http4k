@@ -6,8 +6,6 @@ import org.http4k.contract.bindContract
 import org.http4k.contract.contract
 import org.http4k.contract.openapi.AddSimpleFieldToRootNode
 import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.ImplicitOAuthSecurity
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.NoOp
@@ -18,6 +16,8 @@ import org.http4k.core.Uri
 import org.http4k.format.Argo
 import org.http4k.lens.Query
 import org.http4k.routing.bind
+import org.http4k.security.ApiKeySecurity
+import org.http4k.security.ImplicitOAuthSecurity
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 

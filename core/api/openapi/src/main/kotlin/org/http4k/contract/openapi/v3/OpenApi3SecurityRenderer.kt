@@ -4,14 +4,14 @@ import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.RenderModes
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.rendererFor
-import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.AuthCodeOAuthSecurity
-import org.http4k.contract.security.BasicAuthSecurity
-import org.http4k.contract.security.BearerAuthSecurity
-import org.http4k.contract.security.ClientCredentialsOAuthSecurity
-import org.http4k.contract.security.ImplicitOAuthSecurity
-import org.http4k.contract.security.OpenIdConnectSecurity
-import org.http4k.contract.security.UserCredentialsOAuthSecurity
+import org.http4k.security.ApiKeySecurity
+import org.http4k.security.AuthCodeOAuthSecurity
+import org.http4k.security.BasicAuthSecurity
+import org.http4k.security.BearerAuthSecurity
+import org.http4k.security.ClientCredentialsOAuthSecurity
+import org.http4k.security.ImplicitOAuthSecurity
+import org.http4k.security.OpenIdConnectSecurity
+import org.http4k.security.UserCredentialsOAuthSecurity
 
 /**
  * Compose the supported Security models

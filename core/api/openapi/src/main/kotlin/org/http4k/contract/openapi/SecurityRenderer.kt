@@ -1,8 +1,8 @@
 package org.http4k.contract.openapi
 
-import org.http4k.contract.security.AndSecurity
-import org.http4k.contract.security.OrSecurity
-import org.http4k.contract.security.Security
+import org.http4k.security.AndSecurity
+import org.http4k.security.OrSecurity
+import org.http4k.security.Security
 
 /**
  * Provides rendering of Security models in to OpenApi specs.
@@ -21,7 +21,7 @@ interface SecurityRenderer {
 
             override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
                 is AndSecurity -> security.renderAll { ref<NODE>(it) }?.toObj()
-                is OrSecurity -> security.all.mapNotNull<Security, Render<NODE>> { ref(it) }.toArray()
+                is OrSecurity -> security.mapNotNull<Security, Render<NODE>> { ref(it) }.toArray()
                 else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
             }
 

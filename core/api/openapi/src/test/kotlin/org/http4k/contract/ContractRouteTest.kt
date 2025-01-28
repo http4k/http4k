@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.contract.ContractRouterMatch.MatchingHandler
 import org.http4k.contract.ContractRouterMatch.Unmatched
-import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
@@ -29,6 +28,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.RouterDescription.Companion.unavailable
+import org.http4k.security.ApiKeySecurity
 import org.junit.jupiter.api.Test
 
 class ContractRouteTest {

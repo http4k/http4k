@@ -1,8 +1,8 @@
 package org.http4k.contract.openapi
 
 import org.http4k.contract.openapi.v3.OpenApi3SecurityRenderer
-import org.http4k.contract.security.and
-import org.http4k.contract.security.or
+import org.http4k.security.and
+import org.http4k.security.or
 
 class IllegalNestingSecurityRenderingTest : SecurityRendererContract {
     // this is illegal because OR securities can only exist on the top level

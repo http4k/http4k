@@ -22,7 +22,7 @@ fun Security.and(that: Security): Security = when (this) {
     else -> AndSecurity(listOf(this) + that)
 }
 
-internal data class AndSecurity(internal val all: List<Security>) : Security, Iterable<Security> {
+data class AndSecurity(internal val all: List<Security>) : Security, Iterable<Security> {
     override fun iterator() = all.iterator()
 
     override val filter = all.fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
@@ -33,7 +33,7 @@ fun Security.or(that: Security): Security = when (this) {
     else -> OrSecurity(listOf(this) + that)
 }
 
-internal data class OrSecurity(internal val all: List<Security>) : Security, Iterable<Security> {
+data class OrSecurity(private val all: List<Security>) : Security, Iterable<Security> {
     override fun iterator() = all.iterator()
 
     override val filter = Filter { next ->

@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_YAML
@@ -25,6 +24,7 @@ import org.http4k.lens.Validator.Strict
 import org.http4k.lens.multipartForm
 import org.http4k.lens.string
 import org.http4k.routing.bind
+import org.http4k.security.ApiKeySecurity
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
