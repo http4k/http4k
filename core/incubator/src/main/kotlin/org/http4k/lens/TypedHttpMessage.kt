@@ -12,8 +12,8 @@ import org.http4k.lens.TypedField.Defaulted
 import org.http4k.lens.TypedField.Optional
 import org.http4k.lens.TypedField.Path
 import org.http4k.lens.TypedField.Required
+import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
-import org.http4k.routing.RoutedRequest
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicReference
@@ -34,13 +34,13 @@ abstract class TypedHttpMessage {
         Body<IN, OUT>(spec, example)
 }
 
-abstract class TypedRequest private constructor(private val request: RoutedRequest) : TypedHttpMessage(),
+abstract class TypedRequest private constructor(private val request: RequestWithContext) : TypedHttpMessage(),
     Request by httpMessage<Request>(request), RoutedMessage by request {
 
     protected constructor(request: Request) : this(
         when {
-            request is RoutedRequest -> request
-            else -> RoutedRequest(request, UriTemplate.from(request.uri.path))
+            request is RequestWithContext -> request
+            else -> RequestWithContext(request, UriTemplate.from(request.uri.path))
         }
     )
 

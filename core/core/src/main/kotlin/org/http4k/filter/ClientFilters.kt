@@ -25,7 +25,7 @@ import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
-import org.http4k.routing.RoutedResponse
+import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
@@ -194,14 +194,15 @@ object ClientFilters {
             when {
                 attempt > 1 -> previousValue
                 else -> when (this) {
-                    is RoutedResponse -> this.xUriTemplate
+                    is ResponseWithContext -> xUriTemplate
                     else -> null
                 }
             }
 
         private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when (uriTemplate) {
             null -> this
-            else -> RoutedResponse(this, uriTemplate)
+            //FIXME
+            else -> ResponseWithContext(this, uriTemplate)
         }
 
         private fun Request.toNewLocation(location: String): Request {

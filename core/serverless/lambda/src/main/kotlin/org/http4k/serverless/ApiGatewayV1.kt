@@ -14,12 +14,7 @@ import org.http4k.core.toUrlFormEncoded
  *
  * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
-class ApiGatewayV1FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(ApiGatewayV1AwsHttpAdapter, input) {
-
-    /**
-     * Use this constructor if you need to read ENV variables to make your HttpHandler
-     */
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+class ApiGatewayV1FnLoader(input: AppLoader) : ApiGatewayFnLoader(ApiGatewayV1AwsHttpAdapter, input) {
 
     /**
      * Use this constructor if you just want to convert a standard HttpHandler
@@ -34,13 +29,8 @@ class ApiGatewayV1FnLoader(input: AppLoaderWithContexts) : ApiGatewayFnLoader(Ap
  *
  * Use main constructor if you need to read ENV variables to make your HttpHandler and the AWS context
  */
-abstract class ApiGatewayV1LambdaFunction(input: AppLoaderWithContexts) :
+abstract class ApiGatewayV1LambdaFunction(input: AppLoader) :
     AwsLambdaEventFunction(ApiGatewayV1FnLoader(input)) {
-
-    /**
-     * Use this constructor if you need to read ENV variables to make your HttpHandler
-     */
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
 
     /**
      * Use this constructor if you just want to convert a standard HttpHandler

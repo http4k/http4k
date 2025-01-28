@@ -25,7 +25,7 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.body.form
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RequestWithContext
 import org.junit.jupiter.api.Test
 
 class CollectPageViewTest {
@@ -52,7 +52,7 @@ class CollectPageViewTest {
 
     @Test
     fun `logs routed request as page view`() {
-        val response = analytics(RoutedRequest(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}")))
+        val response = analytics(RequestWithContext(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}")))
 
         assertThat(response, hasStatus(OK))
         assertPageView("some/{hello}", "some/{hello}", "")

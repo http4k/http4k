@@ -36,6 +36,7 @@ private fun originalSseBehaviour(e: Throwable): SseResponse {
     return SseResponse(INTERNAL_SERVER_ERROR) { it.close() }
 }
 
+@Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
 fun ServerFilters.InitialiseSseRequestContext(contexts: Store<RequestContext>) = SseFilter { next ->
     {
         val context = RequestContext()

@@ -3,8 +3,8 @@ package org.http4k.events
 import org.http4k.core.Method
 import org.http4k.core.Uri
 import org.http4k.core.WsTransaction
+import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
-import org.http4k.routing.RoutedRequest
 import org.http4k.websocket.WsStatus
 
 object WsEvent {
@@ -21,7 +21,7 @@ object WsEvent {
         tx.request.method,
         tx.status,
         tx.duration.toMillis(),
-        if (tx.request is RoutedRequest) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+        if (tx.request is RequestWithContext) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
     )
 
     fun Outgoing(
