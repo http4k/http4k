@@ -4,8 +4,6 @@ import org.http4k.contract.ContractRouterMatch.MatchedWithoutHandler
 import org.http4k.contract.ContractRouterMatch.MatchingHandler
 import org.http4k.contract.ContractRouterMatch.MethodNotMatched
 import org.http4k.contract.ContractRouterMatch.Unmatched
-import org.http4k.contract.security.NoSecurity.filter
-import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
@@ -23,6 +21,8 @@ import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingMatch
 import org.http4k.routing.and
+import org.http4k.security.NoSecurity.filter
+import org.http4k.security.Security
 
 data class ContractRouteMatcher(
     private val renderer: ContractRenderer,

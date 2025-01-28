@@ -25,7 +25,6 @@ import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
-import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.HttpMessage
@@ -47,6 +46,7 @@ import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.WebForm
+import org.http4k.security.Security
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger

@@ -1,13 +1,13 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion.All
-import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.NoOp
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 import org.http4k.routing.RoutingHttpHandler
+import org.http4k.security.Security
 import org.http4k.util.Appendable
 
 fun contract(fn: ContractBuilder.() -> Unit): RoutingHttpHandler = ContractBuilder().apply(fn).run {

@@ -16,7 +16,6 @@ import org.http4k.contract.jsonschema.v2.value
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -33,6 +32,7 @@ import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.security.Security
 import java.io.InputStream
 import java.util.Locale.getDefault
 

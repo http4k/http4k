@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
@@ -15,6 +14,7 @@ import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Lens
+import org.http4k.security.Security
 import org.http4k.util.Appendable
 
 open class HttpMessageMeta<out T : HttpMessage>(

@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -22,6 +21,7 @@ import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import org.http4k.security.ApiKeySecurity
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.util.FixedClock
