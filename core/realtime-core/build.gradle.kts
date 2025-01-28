@@ -10,6 +10,9 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+
+    implementation(project(":http4k-security-core"))
+
     testFixturesApi(testFixtures(project(":http4k-core")))
     testApi(testFixtures(project(":http4k-core")))
 
