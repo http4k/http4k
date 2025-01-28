@@ -61,7 +61,7 @@ class BearerAuthenticationTest {
 
     @Test
     fun populates_request_context_for_later_retrieval() {
-        val key = RequestKey.of<Credentials>()
+        val key = RequestKey.of<Credentials>("credentials")
 
         val handler = BearerAuth(key) { Credentials(it, it) }
             .then { req -> Response(OK).body(key(req).toString()) }
