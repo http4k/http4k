@@ -14,7 +14,7 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-core")))
 
     testImplementation(project(":http4k-testing-strikt"))
-    testImplementation("dev.forkhandles:result4k:_")
+    api("dev.forkhandles:result4k:_")
 
     testImplementation("org.hsqldb:hsqldb:_")
 
