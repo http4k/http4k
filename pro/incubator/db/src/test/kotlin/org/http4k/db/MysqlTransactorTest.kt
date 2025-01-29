@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.http4k.db.testing.ExposedAccountRepository
 import org.http4k.db.testing.PlainSqlAccountRepository
+import org.opentest4j.TestAbortedException
 import javax.sql.DataSource
 
 class MysqlDataSourceTransactorTest : TransactorContract() {
@@ -18,12 +19,16 @@ class MysqlExposedTransactorTest : TransactorContract() {
     override fun prepareDb() = setupDatabase(createDatasourceForDb())
 }
 
-fun createDatasourceForDb(database: String = "") = HikariDataSource(HikariConfig().apply {
-    driverClassName = "com.mysql.cj.jdbc.Driver"
-    username = "root"
-    password = "mysecretpassword"
-    jdbcUrl = "jdbc:mysql://localhost:3306/$database"
-})
+fun createDatasourceForDb(database: String = "") = try {
+    HikariDataSource(HikariConfig().apply {
+        driverClassName = "com.mysql.cj.jdbc.Driver"
+        username = "root"
+        password = "mysecretpassword"
+        jdbcUrl = "jdbc:mysql://localhost:3306/$database"
+    })
+} catch (e: Exception) {
+    throw TestAbortedException("MySQL not available")
+}
 
 fun setupDatabase(dataSource: DataSource) {
     dataSource.connection.createStatement().use { statement ->
