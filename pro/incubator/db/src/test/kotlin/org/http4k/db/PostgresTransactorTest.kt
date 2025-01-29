@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.http4k.db.testing.ExposedAccountRepository
 import org.http4k.db.testing.PlainSqlAccountRepository
+import org.opentest4j.TestAbortedException
 import java.sql.Connection
 
 class PostgresDataSourceTransactorTest : TransactorWithRetryContract() {
@@ -18,12 +19,16 @@ class PostgresExposedTransactorTest : TransactorContract() {
     override fun prepareDb() = initialisePostgres(dataSource.connection)
 }
 
-fun createDataSource() = HikariDataSource(HikariConfig().apply {
-    driverClassName = "org.postgresql.Driver"
-    username = "postgres"
-    password = "mysecretpassword"
-    jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
-})
+fun createDataSource() = try {
+    HikariDataSource(HikariConfig().apply {
+        driverClassName = "org.postgresql.Driver"
+        username = "postgres"
+        password = "mysecretpassword"
+        jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
+    })
+} catch (e: Exception) {
+    throw TestAbortedException("Postgres not available")
+}
 
 private fun initialisePostgres(connection: Connection) {
     connection.createStatement().use {
