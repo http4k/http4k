@@ -10,12 +10,12 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 
 fun main() {
-    val transactor = DataSourceTransactor<AccountRepository>(createDataSource(), ::PlainSqlAccountRepository)
+    val transactor = DataSourceTransactor(createDataSource(), ::PlainSqlAccountRepository)
 
     val app = routes(
         "/balance/{account}" bind GET to
             { req: Request ->
-                val repository: AccountRepository = req.transactionResource()
+                val repository: AccountRepository = Transactor.transactionResourceFor(req)
 
                 val balance = repository.getBalance(req.path("account")!!)
                 Response(OK).body(balance.toString())
