@@ -6,7 +6,7 @@ import org.http4k.db.testing.ExposedAccountRepository
 import org.http4k.db.testing.PlainSqlAccountRepository
 import javax.sql.DataSource
 
-class MysqlDataSourcerTransactorTest : TransactorContract() {
+class MysqlDataSourceTransactorTest : TransactorContract() {
     override val dataSource = createDatasourceForDb("http4k")
     override fun transactor() = DataSourceTransactor(dataSource, ::PlainSqlAccountRepository)
     override fun prepareDb() = setupDatabase(createDatasourceForDb())
