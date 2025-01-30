@@ -14,6 +14,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
@@ -35,7 +36,7 @@ fun TransactionalPostbox(
             .mapFailure(PostboxError::TransactionFailure)
             .flatMap { it }
             .map { it.toResponse(requestId, statusTemplate) }
-            .mapFailure { Response(INTERNAL_SERVER_ERROR.description(it.description)) }
+            .mapFailure { it.toResponse() }
             .get()
     }
 }
@@ -52,7 +53,7 @@ fun PostboxHandler(
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
                     .map { it.toResponse(requestId, statusTemplate) }
-                    .mapFailure { Response(INTERNAL_SERVER_ERROR.description(it.description)) }
+                    .mapFailure { it.toResponse() }
             }.get()
     })
 
@@ -62,6 +63,14 @@ private fun RequestProcessingStatus.toResponse(requestId: RequestId, statusTempl
 
     is RequestProcessingStatus.Processed -> response
 }
+
+private fun PostboxError.toResponse() =
+    when (this) {
+        is PostboxError.RequestNotFound -> Response(NOT_FOUND.description(description))
+        is PostboxError.StorageFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
+        is PostboxError.TransactionFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
+    }
+
 
 interface Postbox {
     fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>

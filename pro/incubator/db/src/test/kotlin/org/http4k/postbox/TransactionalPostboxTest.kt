@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.db.InMemoryTransactor
 import org.http4k.hamkrest.hasStatus
@@ -64,6 +65,11 @@ class TransactionalPostboxTest {
         assertThat(response, hasStatus(INTERNAL_SERVER_ERROR))
 
         assertThat(postbox.pendingRequests(), equalTo(emptyList()))
+    }
+
+    @Test
+    fun `handles status for unknown request`() {
+        assertThat(postboxHandler(Request(GET, "/postbox/unknown")), hasStatus(NOT_FOUND))
     }
 }
 
