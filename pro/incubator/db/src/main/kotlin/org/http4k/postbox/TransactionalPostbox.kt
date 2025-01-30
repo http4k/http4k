@@ -75,6 +75,7 @@ private fun PostboxError.toResponse() =
 interface Postbox {
     fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>
     fun status(requestId: RequestId): Result<RequestProcessingStatus, PostboxError>
+    fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError>
 }
 
 sealed class PostboxError(val description: String) {

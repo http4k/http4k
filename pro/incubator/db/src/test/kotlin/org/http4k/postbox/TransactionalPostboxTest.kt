@@ -104,12 +104,11 @@ class TestPostbox : Postbox {
         }
     }
 
-    fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
-        return findRequest(requestId)?.let {
+    override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> =
+        findRequest(requestId)?.let {
             requests[requestId] = it.first to response
             Success(Unit)
         } ?: Failure(PostboxError.RequestNotFound)
-    }
 
     override fun status(requestId: RequestId) =
         findRequest(requestId)?.let {
