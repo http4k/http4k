@@ -12,3 +12,4 @@ fun <T, Resource> Transactor<Resource>.performAsResult(mode: Mode = ReadWrite, w
     } catch (e: Exception) {
         Failure(e)
     }
+
