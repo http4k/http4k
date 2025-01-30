@@ -41,7 +41,7 @@ fun TransactionalPostbox(
     }
 }
 
-fun PostboxHandler(
+fun PostboxStatusHandler(
     transactor: Transactor<Postbox>,
     statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
 ): RoutingHttpHandler =

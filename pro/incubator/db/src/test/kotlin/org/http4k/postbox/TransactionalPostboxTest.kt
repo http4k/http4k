@@ -21,19 +21,19 @@ class TransactionalPostboxTest {
     private val postbox = TestPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
     private val idFromUrl = { req: Request -> RequestId.of(req.uri.path.removePrefix("/")) }
-    private val interceptorHandler = TransactionalPostbox(transactor, idFromUrl)
-    private val postboxHandler = PostboxHandler(transactor)
+    private val requestHandler = TransactionalPostbox(transactor, idFromUrl)
+    private val statusHandler = PostboxStatusHandler(transactor)
 
     @Test
     fun `stores request for background processing`() {
         val aRequest = Request(POST, "/hello").body("hello")
 
-        val interceptorResponse = interceptorHandler(aRequest)
+        val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
         assertThat(postbox.pendingRequests(), equalTo(listOf(aRequest)))
 
-        val postboxResponse = postboxHandler(Request(GET, interceptorResponse.header("Link")!!))
+        val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 
         assertThat(postboxResponse, hasStatus(ACCEPTED))
     }
@@ -46,17 +46,17 @@ class TransactionalPostboxTest {
         postbox.store(idFromUrl(aRequest), aRequest)
         postbox.markProcessed(idFromUrl(aRequest), aResponse)
 
-        val interceptorResponse = interceptorHandler(aRequest)
+        val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, equalTo(aResponse))
 
-        val postboxResponse = postboxHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
+        val postboxResponse = statusHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
 
         assertThat(postboxResponse, equalTo(aResponse))
     }
 
     @Test
     fun `handles storage failures`() {
-        val postboxHandler = interceptorHandler
+        val postboxHandler = requestHandler
         val aRequest = Request(POST, "/hello").body("hello")
 
         postbox.failNext()
@@ -69,7 +69,7 @@ class TransactionalPostboxTest {
 
     @Test
     fun `handles status for unknown request`() {
-        assertThat(postboxHandler(Request(GET, "/postbox/unknown")), hasStatus(NOT_FOUND))
+        assertThat(statusHandler(Request(GET, "/postbox/unknown")), hasStatus(NOT_FOUND))
     }
 }
 
