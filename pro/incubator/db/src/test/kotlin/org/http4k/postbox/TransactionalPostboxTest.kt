@@ -67,8 +67,6 @@ class TransactionalPostboxTest {
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))
     }
 
-
-
     @Test
     fun `handles storage failures`() {
         val postboxHandler = requestHandler
