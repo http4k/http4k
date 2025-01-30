@@ -60,17 +60,25 @@ fun PostboxStatusHandler(
 
 fun ProcessRequest(
     postbox: Postbox,
-    requestId: RequestId,
-    postboxRequest: Request,
+    pending: Postbox.PendingRequest,
     targetHandler: HttpHandler,
     successCriteria: (Response) -> Boolean = { it.status.successful }
 ): Result<Unit, PostboxError> {
-    return targetHandler(postboxRequest).let { response ->
+    return targetHandler(pending.request).let { response ->
         if (successCriteria(response)) {
-            postbox.markProcessed(requestId, response)
+            postbox.markProcessed(pending.requestId, response)
         } else {
             Failure(PostboxError.RequestProcessingFailure("response was not successful"))
         }
+    }
+}
+
+fun ProcessRequests(
+    transactor: Transactor<Postbox>,
+    finalServer: HttpHandler
+) = transactor.perform { postbox ->
+    for (pending in postbox.pendingRequests()) {
+        ProcessRequest(postbox, pending, finalServer)
     }
 }
 
@@ -94,6 +102,9 @@ interface Postbox {
     fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>
     fun status(requestId: RequestId): Result<RequestProcessingStatus, PostboxError>
     fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError>
+    fun pendingRequests(): List<PendingRequest>
+
+    data class PendingRequest(val requestId: RequestId, val request: Request)
 }
 
 sealed class PostboxError(val description: String) {
