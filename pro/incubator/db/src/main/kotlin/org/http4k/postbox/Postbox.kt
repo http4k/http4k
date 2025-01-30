@@ -9,7 +9,7 @@ import org.http4k.lens.Path
 import org.http4k.lens.asResult
 
 interface Postbox {
-    fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>
+    fun store(pending: PendingRequest): Result<RequestProcessingStatus, PostboxError>
     fun status(requestId: RequestId): Result<RequestProcessingStatus, PostboxError>
     fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError>
     fun pendingRequests(): List<PendingRequest>

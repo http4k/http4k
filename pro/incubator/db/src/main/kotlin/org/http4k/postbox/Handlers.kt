@@ -24,9 +24,9 @@ fun PostboxInterceptorHandler(
     transactor: Transactor<Postbox>,
     requestIdResolver: (Request) -> RequestId = { RequestId.of(UUID.randomUUID().toString()) },
     statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
-): HttpHandler = { req: Request ->
-    val requestId = requestIdResolver(req)
-    transactor.performAsResult { it.store(requestId, req) }
+): HttpHandler = { request: Request ->
+    val requestId = requestIdResolver(request)
+    transactor.performAsResult { it.store(Postbox.PendingRequest(requestId, request)) }
         .mapFailure(PostboxError::TransactionFailure)
         .flatMap { it }
         .map { it.toResponse(requestId, statusTemplate) }
