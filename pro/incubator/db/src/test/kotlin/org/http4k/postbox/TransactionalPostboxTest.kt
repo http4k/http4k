@@ -19,7 +19,7 @@ class TransactionalPostboxTest {
     private val postbox = InMemoryPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
     private val idFromUrl = { req: Request -> RequestId.of(req.uri.path.removePrefix("/")) }
-    private val requestHandler = TransactionalPostbox(transactor, idFromUrl)
+    private val requestHandler = PostboxInterceptorHandler(transactor, idFromUrl)
     private val statusHandler = PostboxStatusHandler(transactor)
 
     @Test
@@ -58,7 +58,7 @@ class TransactionalPostboxTest {
         val finalServer = { request: Request -> Response(OK).body(request.body) }
         postbox.store(idFromUrl(aRequest), aRequest)
 
-        ProcessRequests(transactor, finalServer)
+        ProcessPendingRequests(transactor, finalServer)
 
         val postboxResponse = statusHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))

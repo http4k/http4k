@@ -26,7 +26,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.util.UUID
 
-fun TransactionalPostbox(
+fun PostboxInterceptorHandler(
     transactor: Transactor<Postbox>,
     requestIdResolver: (Request) -> RequestId = { RequestId.of(UUID.randomUUID().toString()) },
     statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
@@ -58,7 +58,7 @@ fun PostboxStatusHandler(
             }.get()
     })
 
-fun ProcessRequest(
+fun ProcessPendindRequest(
     postbox: Postbox,
     pending: Postbox.PendingRequest,
     targetHandler: HttpHandler,
@@ -73,12 +73,12 @@ fun ProcessRequest(
     }
 }
 
-fun ProcessRequests(
+fun ProcessPendingRequests(
     transactor: Transactor<Postbox>,
     finalServer: HttpHandler
 ) = transactor.perform { postbox ->
     for (pending in postbox.pendingRequests()) {
-        ProcessRequest(postbox, pending, finalServer)
+        ProcessPendindRequest(postbox, pending, finalServer)
     }
 }
 
