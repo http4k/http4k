@@ -34,7 +34,7 @@ fun TransactionalPostbox(
         transactor.performAsResult { it.store(requestId, req) }
             .mapFailure(PostboxError::TransactionFailure)
             .flatMap { it }
-            .map { Response(ACCEPTED).header("Link", statusTemplate.generate(mapOf("requestId" to requestId.value))) }
+            .map { it.toResponse(requestId, statusTemplate) }
             .mapFailure { Response(INTERNAL_SERVER_ERROR.description(it.description)) }
             .get()
     }
@@ -51,17 +51,17 @@ fun PostboxHandler(
                 transactor.performAsResult { postbox -> postbox.status(requestId) }
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
-                    .map {
-                        when (it) {
-                            RequestProcessingStatus.Pending ->
-                                Response(ACCEPTED).header("Link", "/postbox/${requestId}")
-
-                            is RequestProcessingStatus.Processed -> it.response
-                        }
-                    }
+                    .map { it.toResponse(requestId, statusTemplate) }
                     .mapFailure { Response(INTERNAL_SERVER_ERROR.description(it.description)) }
             }.get()
     })
+
+private fun RequestProcessingStatus.toResponse(requestId: RequestId, statusTemplate: UriTemplate) = when (this) {
+    RequestProcessingStatus.Pending ->
+        Response(ACCEPTED).header("Link", statusTemplate.generate(mapOf("requestId" to requestId.value)))
+
+    is RequestProcessingStatus.Processed -> response
+}
 
 interface Postbox {
     fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>

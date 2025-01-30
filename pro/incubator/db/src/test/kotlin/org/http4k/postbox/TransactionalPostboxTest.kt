@@ -5,37 +5,57 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
 import org.http4k.db.InMemoryTransactor
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class TransactionalPostboxTest {
     private val postbox = TestPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
+    private val idFromUrl = { req: Request -> RequestId.of(req.uri.path.removePrefix("/")) }
+    private val interceptorHandler = TransactionalPostbox(transactor, idFromUrl)
+    private val postboxHandler = PostboxHandler(transactor)
 
     @Test
     fun `stores request for background processing`() {
         val aRequest = Request(POST, "/hello").body("hello")
 
-        val interceptorResponse = TransactionalPostbox(transactor)(aRequest)
+        val interceptorResponse = interceptorHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
         assertThat(postbox.pendingRequests(), equalTo(listOf(aRequest)))
 
-        val postboxResponse = PostboxHandler(transactor)(Request(Method.GET, interceptorResponse.header("Link")!!))
+        val postboxResponse = postboxHandler(Request(GET, interceptorResponse.header("Link")!!))
 
         assertThat(postboxResponse, hasStatus(ACCEPTED))
     }
 
     @Test
+    fun `returns response if request has been already processed`() {
+        val aRequest = Request(POST, "/hello").body("hello")
+        val aResponse = Response(OK).body("foo")
+
+        postbox.store(idFromUrl(aRequest), aRequest)
+        postbox.markProcessed(idFromUrl(aRequest), aResponse)
+
+        val interceptorResponse = interceptorHandler(aRequest)
+        assertThat(interceptorResponse, equalTo(aResponse))
+
+        val postboxResponse = postboxHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
+
+        assertThat(postboxResponse, equalTo(aResponse))
+    }
+
+    @Test
     fun `handles storage failures`() {
-        val postboxHandler = TransactionalPostbox(transactor)
+        val postboxHandler = interceptorHandler
         val aRequest = Request(POST, "/hello").body("hello")
 
         postbox.failNext()
@@ -48,31 +68,52 @@ class TransactionalPostboxTest {
 }
 
 class TestPostbox : Postbox {
-    private val requests = mutableListOf<RequestWithId>()
+    private val requests = mutableMapOf<RequestId, Pair<Request, Response?>>()
+
     private var fail = false
 
     fun failNext() {
         fail = true
     }
 
+    private fun findRequest(requestId: RequestId) = requests[requestId]
+
     override fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError> {
         return if (!fail) {
-            val requestWithId = RequestWithId(request, requestId)
-            requests.add(requestWithId)
-            Success(RequestProcessingStatus.Pending)
+            val existingRequest = findRequest(requestId)
+            if (existingRequest == null) {
+                requests[requestId] = request to null
+                Success(RequestProcessingStatus.Pending)
+            } else {
+                val response = existingRequest.second
+                if (response == null) {
+                    Success(RequestProcessingStatus.Pending)
+                } else {
+                    Success(RequestProcessingStatus.Processed(response))
+                }
+            }
         } else {
             fail = false;
             Failure(PostboxError.StorageFailure(IllegalStateException("Failed to store request")))
         }
     }
 
+    fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
+        return findRequest(requestId)?.let {
+            requests[requestId] = it.first to response
+            Success(Unit)
+        } ?: Failure(PostboxError.RequestNotFound)
+    }
+
     override fun status(requestId: RequestId) =
-        requests.find { it.id == requestId }?.let {
-            Success(RequestProcessingStatus.Pending)
+        findRequest(requestId)?.let {
+            when {
+                it.second != null -> Success(RequestProcessingStatus.Processed(it.second!!))
+                else -> Success(RequestProcessingStatus.Pending)
+            }
         } ?: Failure(PostboxError.RequestNotFound)
 
-    fun pendingRequests() = requests.map { it.request }.toList()
+    fun pendingRequests() = requests.values.map { it.first }.toList()
 
-    private data class RequestWithId(val request: Request, val id: RequestId)
 }
 
