@@ -1,5 +1,6 @@
 package org.http4k.postbox
 
+import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
@@ -57,6 +58,22 @@ fun PostboxStatusHandler(
             }.get()
     })
 
+fun ProcessRequest(
+    postbox: Postbox,
+    requestId: RequestId,
+    postboxRequest: Request,
+    targetHandler: HttpHandler,
+    successCriteria: (Response) -> Boolean = { it.status.successful }
+): Result<Unit, PostboxError> {
+    return targetHandler(postboxRequest).let { response ->
+        if (successCriteria(response)) {
+            postbox.markProcessed(requestId, response)
+        } else {
+            Failure(PostboxError.RequestProcessingFailure("response was not successful"))
+        }
+    }
+}
+
 private fun RequestProcessingStatus.toResponse(requestId: RequestId, statusTemplate: UriTemplate) = when (this) {
     RequestProcessingStatus.Pending ->
         Response(ACCEPTED).header("Link", statusTemplate.generate(mapOf("requestId" to requestId.value)))
@@ -69,6 +86,7 @@ private fun PostboxError.toResponse() =
         is PostboxError.RequestNotFound -> Response(NOT_FOUND.description(description))
         is PostboxError.StorageFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
         is PostboxError.TransactionFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
+        is PostboxError.RequestProcessingFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
     }
 
 
@@ -82,6 +100,7 @@ sealed class PostboxError(val description: String) {
     data object RequestNotFound : PostboxError("request not found")
     data class StorageFailure(val cause: Exception) : PostboxError("storage failed (cause: ${cause.message})")
     data class TransactionFailure(val cause: Exception) : PostboxError("transaction failed (cause: ${cause.message})")
+    data class RequestProcessingFailure(val reason: String) : PostboxError(reason)
 }
 
 sealed class RequestProcessingStatus {

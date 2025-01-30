@@ -55,6 +55,19 @@ class TransactionalPostboxTest {
     }
 
     @Test
+    fun `updates status of request`() {
+        val aRequest = Request(POST, "/hello").body("hello")
+        val finalServer = { request: Request -> Response(OK).body(request.body) }
+        postbox.store(idFromUrl(aRequest), aRequest)
+
+        val result = transactor.perform { ProcessRequest(it, idFromUrl(aRequest), aRequest, finalServer) }
+        assertThat(result, equalTo(Success(Unit)))
+
+        val postboxResponse = statusHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
+        assertThat(postboxResponse, equalTo(Response(OK).body("hello")))
+    }
+
+    @Test
     fun `handles storage failures`() {
         val postboxHandler = requestHandler
         val aRequest = Request(POST, "/hello").body("hello")
