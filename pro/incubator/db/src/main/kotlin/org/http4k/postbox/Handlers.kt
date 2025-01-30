@@ -24,16 +24,14 @@ fun PostboxInterceptorHandler(
     transactor: Transactor<Postbox>,
     requestIdResolver: (Request) -> RequestId = { RequestId.of(UUID.randomUUID().toString()) },
     statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
-): HttpHandler {
-    return { req: Request ->
-        val requestId = requestIdResolver(req)
-        transactor.performAsResult { it.store(requestId, req) }
-            .mapFailure(PostboxError::TransactionFailure)
-            .flatMap { it }
-            .map { it.toResponse(requestId, statusTemplate) }
-            .mapFailure { it.toResponse() }
-            .get()
-    }
+): HttpHandler = { req: Request ->
+    val requestId = requestIdResolver(req)
+    transactor.performAsResult { it.store(requestId, req) }
+        .mapFailure(PostboxError::TransactionFailure)
+        .flatMap { it }
+        .map { it.toResponse(requestId, statusTemplate) }
+        .mapFailure { it.toResponse() }
+        .get()
 }
 
 fun PostboxStatusHandler(
