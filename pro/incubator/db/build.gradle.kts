@@ -15,6 +15,7 @@ dependencies {
 
     testImplementation(project(":http4k-testing-strikt"))
     api("dev.forkhandles:result4k:_")
+    api("dev.forkhandles:values4k:_")
 
     testImplementation("org.hsqldb:hsqldb:_")
 
