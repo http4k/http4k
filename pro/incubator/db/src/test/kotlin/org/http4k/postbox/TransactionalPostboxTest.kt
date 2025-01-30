@@ -15,6 +15,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.db.InMemoryTransactor
 import org.http4k.hamkrest.hasStatus
+import org.http4k.postbox.Postbox.PendingRequest
 import org.junit.jupiter.api.Test
 
 class TransactionalPostboxTest {
@@ -31,7 +32,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
-        assertThat(postbox.pendingRequests(), equalTo(listOf(aRequest)))
+        assertThat(postbox.pendingRequests(), equalTo(listOf(PendingRequest(idFromUrl(aRequest), aRequest))))
 
         val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 
@@ -60,12 +61,13 @@ class TransactionalPostboxTest {
         val finalServer = { request: Request -> Response(OK).body(request.body) }
         postbox.store(idFromUrl(aRequest), aRequest)
 
-        val result = transactor.perform { ProcessRequest(it, idFromUrl(aRequest), aRequest, finalServer) }
-        assertThat(result, equalTo(Success(Unit)))
+        ProcessRequests(transactor, finalServer)
 
         val postboxResponse = statusHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))
     }
+
+
 
     @Test
     fun `handles storage failures`() {
@@ -131,7 +133,6 @@ class TestPostbox : Postbox {
             }
         } ?: Failure(PostboxError.RequestNotFound)
 
-    fun pendingRequests() = requests.values.map { it.first }.toList()
-
+    override fun pendingRequests() = requests.map { PendingRequest(it.key, it.value.first) }.toList()
 }
 
