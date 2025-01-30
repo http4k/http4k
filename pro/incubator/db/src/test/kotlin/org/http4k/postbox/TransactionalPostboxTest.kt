@@ -29,7 +29,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
-        assertThat(postbox.pendingRequests(), equalTo(listOf(PendingRequest(idFromUrl(aRequest), aRequest))))
+        assertThat(postbox.pendingRequests(), equalTo(listOf(aRequest.asPending())))
 
         val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 
@@ -41,13 +41,13 @@ class TransactionalPostboxTest {
         val aRequest = Request(POST, "/hello").body("hello")
         val aResponse = Response(OK).body("foo")
 
-        postbox.store(idFromUrl(aRequest), aRequest)
-        postbox.markProcessed(idFromUrl(aRequest), aResponse)
+        postbox.store(aRequest.asPending())
+        postbox.markProcessed(aRequest.id(), aResponse)
 
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, equalTo(aResponse))
 
-        val postboxResponse = statusHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
+        val postboxResponse = statusHandler(Request(GET, "/postbox/${aRequest.id()}"))
 
         assertThat(postboxResponse, equalTo(aResponse))
     }
@@ -56,11 +56,11 @@ class TransactionalPostboxTest {
     fun `updates status of request`() {
         val aRequest = Request(POST, "/hello").body("hello")
         val finalServer = { request: Request -> Response(OK).body(request.body) }
-        postbox.store(idFromUrl(aRequest), aRequest)
+        postbox.store(aRequest.asPending())
 
         ProcessPendingRequests(transactor, finalServer)
 
-        val postboxResponse = statusHandler(Request(GET, "/postbox/${idFromUrl(aRequest)}"))
+        val postboxResponse = statusHandler(Request(GET, "/postbox/${aRequest.id()}"))
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))
     }
 
@@ -81,4 +81,7 @@ class TransactionalPostboxTest {
     fun `handles status for unknown request`() {
         assertThat(statusHandler(Request(GET, "/postbox/unknown")), hasStatus(NOT_FOUND))
     }
+
+    private fun Request.asPending() = PendingRequest(id(), this)
+    private fun Request.id() = idFromUrl(this)
 }
