@@ -14,6 +14,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.UriTemplate
 import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
 import org.http4k.lens.Path
@@ -25,21 +26,25 @@ import java.util.UUID
 
 fun TransactionalPostbox(
     transactor: Transactor<Postbox>,
-    requestIdResolver: (Request) -> RequestId = { RequestId.of(UUID.randomUUID().toString()) }
+    requestIdResolver: (Request) -> RequestId = { RequestId.of(UUID.randomUUID().toString()) },
+    statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
 ): HttpHandler {
     return { req: Request ->
         val requestId = requestIdResolver(req)
         transactor.performAsResult { it.store(requestId, req) }
             .mapFailure(PostboxError::TransactionFailure)
             .flatMap { it }
-            .map { Response(ACCEPTED).header("Link", "/postbox/${requestId}") }
+            .map { Response(ACCEPTED).header("Link", statusTemplate.generate(mapOf("requestId" to requestId.value))) }
             .mapFailure { Response(INTERNAL_SERVER_ERROR.description(it.description)) }
             .get()
     }
 }
 
-fun PostboxHandler(transactor: Transactor<Postbox>): RoutingHttpHandler =
-    routes("/postbox/{requestId}" bind GET to { req: Request ->
+fun PostboxHandler(
+    transactor: Transactor<Postbox>,
+    statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
+): RoutingHttpHandler =
+    routes(statusTemplate.toString() bind GET to { req: Request ->
         RequestId.lens(req)
             .mapFailure { Response(BAD_REQUEST.description(it.message.orEmpty())) }
             .flatMap { requestId ->
