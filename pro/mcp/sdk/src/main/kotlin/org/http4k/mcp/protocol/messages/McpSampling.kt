@@ -32,7 +32,7 @@ object McpSampling : HasMethod {
     @JsonSerializable
     data class Response(
         val model: ModelIdentifier,
-        val stopReason: StopReason,
+        val stopReason: StopReason?,
         val role: Role,
         val content: Content
     ) : ServerMessage.Response, ClientMessage.Response

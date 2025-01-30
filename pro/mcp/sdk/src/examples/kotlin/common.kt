@@ -62,7 +62,14 @@ fun prompts() = compose(
 )
 
 fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bind {
-    SampleResponse(ModelIdentifier.of("my model"), StopReason.of("stop"), Role.assistant, Content.Text("content"))
+    listOf(
+        SampleResponse(
+            ModelIdentifier.of("my model"),
+            StopReason.of("stop"),
+            Role.assistant,
+            Content.Text("content")
+        )
+    ).asSequence()
 }
 
 fun countingTool(): ToolCapability {
@@ -119,5 +126,12 @@ fun prompt2(): PromptCapability {
 }
 
 fun sampleFromModel() = ModelSelector(ModelIdentifier.of("my model")) bind {
-    SampleResponse(ModelIdentifier.of("my model"), StopReason.of("end"), Role.assistant, Content.Text("content"))
+    listOf(
+        SampleResponse(
+            ModelIdentifier.of("my model"),
+            StopReason.of("end"),
+            Role.assistant,
+            Content.Text("content")
+        )
+    ).asSequence()
 }

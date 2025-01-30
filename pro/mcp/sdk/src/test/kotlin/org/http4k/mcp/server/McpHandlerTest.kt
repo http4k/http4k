@@ -336,7 +336,10 @@ class McpHandlerTest {
 
             logger.log(sessionId, LogLevel.info, "message", emptyMap())
 
-            assertNextMessage(McpLogging.LoggingMessage, McpLogging.LoggingMessage.Notification(LogLevel.info, "message", emptyMap()))
+            assertNextMessage(
+                McpLogging.LoggingMessage,
+                McpLogging.LoggingMessage.Notification(LogLevel.info, "message", emptyMap())
+            )
         }
     }
 
@@ -361,17 +364,16 @@ class McpHandlerTest {
 
     @Test
     fun `deal with incoming sampling`() {
-        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+        val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+        val content2 = Content.Text("this is the end!")
 
         val model = ModelIdentifier.of("name")
         val sampling = IncomingSampling(listOf(
             ModelSelector(model) { MAX } bind {
-                SampleResponse(
-                    model,
-                    StopReason.of("bored"),
-                    Role.assistant,
-                    content
-                )
+                listOf(
+                    SampleResponse(model, null, Role.assistant, content1),
+                    SampleResponse(model, StopReason.of("bored"), Role.assistant, content2)
+                ).asSequence()
             }
         ))
 
@@ -382,21 +384,21 @@ class McpHandlerTest {
 
             mcp.sendToMcp(McpSampling, McpSampling.Request(listOf(), MaxTokens.of(1)))
 
-            assertNextMessage(
-                McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content)
-            )
+            assertNextMessage(McpSampling.Response(model, null, Role.assistant, content1))
+
+            assertNextMessage(McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content2))
         }
     }
 
     @Test
     fun `deal with outgoing sampling`() {
-        var received: SampleResponse? = null
+        var received = mutableListOf<SampleResponse>()
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
         val sampling = OutgoingSampling(listOf(
-            clientName bind { received = it }
+            clientName bind { received += it }
         ))
 
         val mcp = McpHandler(SseMcpProtocol(metadata, outgoingSampling = sampling, random = Random(0)))
@@ -416,12 +418,21 @@ class McpHandlerTest {
                 McpSampling.Request(listOf(), MaxTokens.of(1)),
                 RequestId.of(1)
             )
+
+            mcp.sendToMcp(
+                McpSampling.Response(model, null, Role.assistant, content),
+                RequestId.of(1)
+            )
+
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
                 RequestId.of(1)
             )
 
-            assertThat(received, equalTo(SampleResponse(model, StopReason.of("bored"), Role.assistant, content)))
+            assertThat(received, equalTo(listOf(
+                SampleResponse(model, null, Role.assistant, content),
+                SampleResponse(model, StopReason.of("bored"), Role.assistant, content)
+            )))
         }
     }
 

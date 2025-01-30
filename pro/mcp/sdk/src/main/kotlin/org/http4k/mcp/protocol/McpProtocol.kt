@@ -119,12 +119,26 @@ abstract class McpProtocol<RSP : Any>(
 
                 McpSampling.Method -> {
                     val requestId = McpJson.asA(jsonReq.id ?: McpJson.nullNode(), RequestId::class)
-                    send(
-                        jsonReq.respondTo<McpSampling.Request> {
-                            incomingSampling.sample(it, requestId, req)
-                        },
-                        sId
-                    )
+                    runCatching { jsonReq.fromJsonRpc<McpSampling.Request>() }
+                        .map {
+                            runCatching {
+                                incomingSampling.sample(it, requestId, req)
+                                    .forEach { send(it.toJsonRpc(jsonReq.id), sId) }
+                                ok()
+                            }.recover {
+                                send(
+                                    when (it) {
+                                        is McpException -> it.error.toJsonRpc(jsonReq.id)
+                                        else -> InternalError.toJsonRpc(jsonReq.id)
+                                    }, sId
+                                )
+                                error()
+                            }.getOrElse { error() }
+                        }
+                        .getOrElse {
+                            send(InvalidRequest.toJsonRpc(jsonReq.id), sId)
+                            error()
+                        }
                 }
 
                 McpProgress.Method -> ok()
@@ -166,13 +180,13 @@ abstract class McpProtocol<RSP : Any>(
         clients[sId] = session
         logger.subscribe(sId, error) { level, logger, data ->
             send(
-                McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(
-                    McpLogging.LoggingMessage
-                ),
+                McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage),
                 sId
             )
         }
-        prompts.onChange(sId) { send(McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed), sId) }
+        prompts.onChange(sId) {
+            send(McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed), sId)
+        }
         resources.onChange(sId) { send(McpResource.List.Changed.Notification.toJsonRpc(McpResource.List), sId) }
         tools.onChange(sId) { send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 

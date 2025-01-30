@@ -30,5 +30,5 @@ class IncomingSamplingCapability(
                     connectRequest
                 )
             }
-        ).let { McpSampling.Response(it.model, it.stopReason, it.role, it.content) }
+        ).map { McpSampling.Response(it.model, it.stopReason, it.role, it.content) }
 }
