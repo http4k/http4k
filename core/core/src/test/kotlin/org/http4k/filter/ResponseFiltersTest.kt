@@ -531,4 +531,39 @@ class ResponseFiltersTest {
         val handler = ResponseFilters.Modify(CONTENT_TYPE of APPLICATION_PDF).then { Response(OK) }
         assertThat(handler(Request(GET, "")), hasHeader("content-type", "application/pdf; charset=utf-8"))
     }
+
+    @Test
+    fun `response headers inclusion`() {
+        val app = ResponseFilters.IncludeHeaders("foo", "bar")
+            .then { _ -> Response(OK).headers(listOf(
+                "foo" to "foo",
+                "bar" to "bar",
+                "baz" to "baz"
+            )) }
+
+        val response = app(Request(GET, ""))
+
+        assertThat(response.headers, equalTo(listOf(
+            "foo" to "foo",
+            "bar" to "bar",
+        )))
+    }
+
+
+
+    @Test
+    fun `response headers exclusion`() {
+        val app = ResponseFilters.ExcludeHeaders("foo", "bar")
+            .then { _ -> Response(OK).headers(listOf(
+                "foo" to "foo",
+                "bar" to "bar",
+                "baz" to "baz"
+            )) }
+
+        val response = app(Request(GET, ""))
+
+        assertThat(response.headers, equalTo(listOf(
+            "baz" to "baz"
+        )))
+    }
 }

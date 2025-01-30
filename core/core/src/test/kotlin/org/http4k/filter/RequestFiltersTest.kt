@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_PDF
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -148,5 +149,37 @@ class RequestFiltersTest {
             )
         ).then { Response(OK) }
         assertThat(handler(Request(GET, "")), hasStatus(OK))
+    }
+
+    @Test
+    fun `request headers inclusion`() {
+        val app = RequestFilters.IncludeHeaders("foo", "bar")
+            .then { request -> Response(OK).headers(request.headers) }
+
+        val response = app(Request(Method.GET, "").headers(listOf(
+            "foo" to "foo",
+            "bar" to "bar",
+            "baz" to "baz"
+        )))
+
+        assertThat(response.headers, equalTo(listOf(
+            "foo" to "foo",
+            "bar" to "bar",
+        )))
+    }
+    @Test
+    fun `request headers exclusion`() {
+        val app = RequestFilters.ExcludeHeaders("foo", "bar")
+            .then { request -> Response(OK).headers(request.headers) }
+
+        val response = app(Request(Method.GET, "").headers(listOf(
+            "foo" to "foo",
+            "bar" to "bar",
+            "baz" to "baz"
+        )))
+
+        assertThat(response.headers, equalTo(listOf(
+            "baz" to "baz"
+        )))
     }
 }

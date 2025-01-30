@@ -222,6 +222,29 @@ object ResponseFilters {
      * Modify response with lenses
      */
     fun Modify(vararg modifiers: (Response) -> Response): Filter = Filter { next -> { next(it).with(*modifiers) } }
+
+    /**
+    * Only include headers matching the given names
+    */
+    fun IncludeHeaders(vararg headerNames: String) = Filter { next ->
+        {
+            next(it).let { response ->
+                response.replaceHeaders(response.headers.filter { (key, _) -> headerNames.contains(key) })
+            }
+        }
+    }
+
+    /**
+     * Exclude headers matching the given names
+     */
+    fun ExcludeHeaders(vararg headerNames: String) = Filter { next ->
+        {
+            next(it).let { response ->
+                response.replaceHeaders(response.headers.filter { (key, _) -> !headerNames.contains(key) })
+            }
+        }
+    }
+
 }
 
 typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction
