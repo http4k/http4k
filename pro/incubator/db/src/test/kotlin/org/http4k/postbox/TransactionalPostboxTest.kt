@@ -55,11 +55,11 @@ class TestPostbox : Postbox {
         fail = true
     }
 
-    override fun store(request: Request): Result<RequestId, PostboxError> {
+    override fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError> {
         return if (!fail) {
-            val requestWithId = RequestWithId(request, RequestId.of(UUID.randomUUID().toString()))
+            val requestWithId = RequestWithId(request, requestId)
             requests.add(requestWithId)
-            Success(requestWithId.id)
+            Success(RequestProcessingStatus.Pending)
         } else {
             fail = false;
             Failure(PostboxError.StorageFailure(IllegalStateException("Failed to store request")))

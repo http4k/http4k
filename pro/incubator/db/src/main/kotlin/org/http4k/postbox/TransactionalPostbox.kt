@@ -21,13 +21,18 @@ import org.http4k.lens.asResult
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import java.util.UUID
 
-fun TransactionalPostbox(transactor: Transactor<Postbox>): HttpHandler {
+fun TransactionalPostbox(
+    transactor: Transactor<Postbox>,
+    requestIdResolver: (Request) -> RequestId = { RequestId.of(UUID.randomUUID().toString()) }
+): HttpHandler {
     return { req: Request ->
-        transactor.performAsResult { it.store(req) }
+        val requestId = requestIdResolver(req)
+        transactor.performAsResult { it.store(requestId, req) }
             .mapFailure(PostboxError::TransactionFailure)
             .flatMap { it }
-            .map { Response(ACCEPTED).header("Link", "/postbox/${it}") }
+            .map { Response(ACCEPTED).header("Link", "/postbox/${requestId}") }
             .mapFailure { Response(INTERNAL_SERVER_ERROR.description(it.description)) }
             .get()
     }
@@ -37,13 +42,15 @@ fun PostboxHandler(transactor: Transactor<Postbox>): RoutingHttpHandler =
     routes("/postbox/{requestId}" bind GET to { req: Request ->
         RequestId.lens(req)
             .mapFailure { Response(BAD_REQUEST.description(it.message.orEmpty())) }
-            .flatMap { reqId ->
-                transactor.performAsResult { postbox -> postbox.status(reqId) }
+            .flatMap { requestId ->
+                transactor.performAsResult { postbox -> postbox.status(requestId) }
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
                     .map {
                         when (it) {
-                            RequestProcessingStatus.Pending -> Response(ACCEPTED).header("Link", "/postbox/${it}")
+                            RequestProcessingStatus.Pending ->
+                                Response(ACCEPTED).header("Link", "/postbox/${requestId}")
+
                             is RequestProcessingStatus.Processed -> it.response
                         }
                     }
@@ -52,7 +59,7 @@ fun PostboxHandler(transactor: Transactor<Postbox>): RoutingHttpHandler =
     })
 
 interface Postbox {
-    fun store(request: Request): Result<RequestId, PostboxError>
+    fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>
     fun status(requestId: RequestId): Result<RequestProcessingStatus, PostboxError>
 }
 
