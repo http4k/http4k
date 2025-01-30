@@ -429,6 +429,12 @@ class McpHandlerTest {
                 RequestId.of(1)
             )
 
+            // this is ignored!
+            mcp.sendToMcp(
+                McpSampling.Response(model, StopReason.of("another stop reason"), Role.assistant, content),
+                RequestId.of(1)
+            )
+
             assertThat(received, equalTo(listOf(
                 SampleResponse(model, null, Role.assistant, content),
                 SampleResponse(model, StopReason.of("bored"), Role.assistant, content)

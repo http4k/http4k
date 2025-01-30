@@ -1,10 +1,11 @@
 package org.http4k.mcp.capability
 
 import org.http4k.mcp.SampleRequest
+import org.http4k.mcp.model.CompletionStatus
+import org.http4k.mcp.model.CompletionStatus.Finished
+import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.protocol.Done
-import org.http4k.mcp.protocol.Done.YES
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
 import java.util.concurrent.ConcurrentHashMap
@@ -17,9 +18,9 @@ class OutgoingSampling(private val list: List<OutgoingSamplingCapability>) {
     private val subscriptions =
         ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()
 
-    fun respond(entity: McpEntity, response: McpSampling.Response): Done {
+    fun respond(entity: McpEntity, response: McpSampling.Response): CompletionStatus {
         list.find { entity == it.toEntity() }?.process(response)
-        return if (response.stopReason != null) YES else Done.NO
+        return if (response.stopReason != null) Finished else InProgress
     }
 
     fun sample(entity: McpEntity, request: SampleRequest) {
