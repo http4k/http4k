@@ -52,7 +52,11 @@ private fun requestIdResolver() = { req: Request ->
 
 private fun MyServiceHandler(client: HttpHandler) = { request: Request ->
     val message = request.path("message")!!
-    println("Received message: $message with identity ${request.header("x-idempotency-key")}")
+
+    // Makes the request to the third party service.
+    // If there's a transactional outbox:
+        // On first call it'll store the request and return a 202 with a Link header to check the status of the request.
+        // On subsequent calls it'll return either 202 again or the response from the third party service.
     client(Request(POST, "http://localhost:8000")
         .header("x-idempotency-key", request.header("x-idempotency-key"))
         .body(message))
