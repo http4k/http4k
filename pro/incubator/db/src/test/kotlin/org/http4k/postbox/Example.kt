@@ -24,6 +24,7 @@ fun main() {
     ThirdPartySlowService().asServer(SunHttp(8000)).start()
 
     val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox()).also {
+        // please notice in-memory transactor locks the postbox so multiple threads can't access it at the same time
         startOutboxBackgroundProcessor(it)
     }
 
@@ -54,7 +55,7 @@ private fun MyServiceHandler(client: HttpHandler) = { request: Request ->
     val message = request.path("message")!!
 
     // Makes the request to the third party service.
-    // If there's a transactional outbox:
+    // If the client is a transactional outbox, rather than the real thing:
         // On first call it'll store the request and return a 202 with a Link header to check the status of the request.
         // On subsequent calls it'll return either 202 again or the response from the third party service.
     client(Request(POST, "http://localhost:8000")
