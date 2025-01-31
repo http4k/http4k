@@ -39,7 +39,7 @@ fun main() {
 fun ThirdPartySlowService() = { req: Request -> Thread.sleep(10000); Response(OK).body(req.bodyString().reversed()) }
 
 fun startOutboxBackgroundProcessor(transactor: Transactor<Postbox>) {
-    Executors.newSingleThreadExecutor().execute {
+    Executors.newVirtualThreadPerTaskExecutor().execute {
         while (true) {
             ProcessPendingRequests(transactor, JavaHttpClient())
             Thread.sleep(5000)
