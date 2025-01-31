@@ -15,7 +15,6 @@ import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import java.util.*
-import java.util.concurrent.Executors
 
 
 val statusUriTemplate = UriTemplate.from("/api/status/{requestId}")
