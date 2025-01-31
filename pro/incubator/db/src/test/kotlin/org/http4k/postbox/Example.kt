@@ -2,6 +2,7 @@ package org.http4k.postbox
 
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -27,11 +28,11 @@ fun main() {
         PostboxProcessing(transactor, JavaHttpClient(), events = StdOutEvents).start()
     }
 
-    val transactionalOutbox = PostboxInterceptorHandler(transactor, requestIdResolver(), statusUriTemplate)
+    val transactionalOutbox = PostboxHandlers(transactor, requestIdResolver(), statusUriTemplate)
 
     routes(
-        "/api/reverse/{message}" bind POST to MyServiceHandler(transactionalOutbox),
-        PostboxStatusHandler(transactor, statusUriTemplate)
+        "/api/reverse/{message}" bind POST to MyServiceHandler(transactionalOutbox.interceptor),
+        "/api/status/{requestId}" bind GET to transactionalOutbox.status
     ).asServer(SunHttp(9000)).start()
 }
 
