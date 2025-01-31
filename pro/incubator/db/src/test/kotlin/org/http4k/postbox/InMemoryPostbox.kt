@@ -51,5 +51,8 @@ class InMemoryPostbox : Postbox {
             }
         } ?: Failure(PostboxError.RequestNotFound)
 
-    override fun pendingRequests() = requests.map { Postbox.PendingRequest(it.key, it.value.first) }.toList()
+    override fun pendingRequests() = requests
+        .filter { it.value.second == null }
+        .map { Postbox.PendingRequest(it.key, it.value.first) }
+        .toList()
 }
