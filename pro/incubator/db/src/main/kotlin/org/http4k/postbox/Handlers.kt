@@ -24,9 +24,6 @@ import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.routing.RoutedMessage
 import org.http4k.routing.path
 
-/**
- * Resolves the request id from a given request
- */
 typealias RequestIdResolver = (Request) -> RequestId?
 
 typealias PendingResponseGenerator = (RequestId) -> Response
