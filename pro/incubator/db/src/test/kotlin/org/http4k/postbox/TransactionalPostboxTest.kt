@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 class TransactionalPostboxTest {
     private val postbox = InMemoryPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
+    private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
     private val idFromUrl = { req: Request -> RequestId.of(req.uri.path.removePrefix("/")) }
     private val requestHandler = PostboxInterceptorHandler(transactor, idFromUrl)
     private val statusHandler = PostboxStatusHandler(transactor)
@@ -29,7 +30,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
-        assertThat(postbox.pendingRequests(), equalTo(listOf(aRequest.asPending())))
+        assertThat(postbox.pendingRequests(10), equalTo(listOf(aRequest.asPending())))
 
         val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 
@@ -55,10 +56,9 @@ class TransactionalPostboxTest {
     @Test
     fun `updates status of request`() {
         val aRequest = Request(POST, "/hello").body("hello")
-        val finalServer = { request: Request -> Response(OK).body(request.body) }
         postbox.store(aRequest.asPending())
 
-        ProcessPendingRequests(transactor, finalServer)
+        processing.processPendingRequests()
 
         val postboxResponse = statusHandler(Request(GET, "/postbox/${aRequest.id()}"))
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))
@@ -74,7 +74,7 @@ class TransactionalPostboxTest {
 
         assertThat(response, hasStatus(INTERNAL_SERVER_ERROR))
 
-        assertThat(postbox.pendingRequests(), equalTo(emptyList()))
+        assertThat(postbox.pendingRequests(10), equalTo(emptyList()))
     }
 
     @Test

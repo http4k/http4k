@@ -50,7 +50,7 @@ interface Postbox {
      *
      * @return a list of all pending requests in first-in-first-out order
      */
-    fun pendingRequests(): List<PendingRequest>
+    fun pendingRequests(batchSize: Int): List<PendingRequest>
 
     data class PendingRequest(val requestId: RequestId, val request: Request)
 }

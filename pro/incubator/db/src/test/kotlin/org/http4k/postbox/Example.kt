@@ -15,6 +15,7 @@ import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import java.util.*
+import java.util.concurrent.Executors
 
 
 val statusUriTemplate = UriTemplate.from("/api/status/{requestId}")
@@ -22,9 +23,9 @@ val statusUriTemplate = UriTemplate.from("/api/status/{requestId}")
 fun main() {
     ThirdPartySlowService().asServer(SunHttp(8000)).start()
 
-    val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox()).also {
+    val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox()).also { transactor ->
         // please notice in-memory transactor locks the postbox so multiple threads can't access it at the same time
-        PostboxProcessing(it, JavaHttpClient(), events = StdOutEvents).start()
+        PostboxProcessing(transactor, JavaHttpClient(), events = StdOutEvents).start()
     }
 
     val transactionalOutbox = PostboxInterceptorHandler(transactor, requestIdResolver(), statusUriTemplate)
