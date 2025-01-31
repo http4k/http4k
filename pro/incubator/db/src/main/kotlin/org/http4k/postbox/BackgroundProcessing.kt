@@ -11,9 +11,7 @@ import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
 import org.http4k.events.Event
 import org.http4k.events.Events
-import org.http4k.postbox.ProcessingEvent.BatchProcessingFailed
-import org.http4k.postbox.ProcessingEvent.BatchProcessingSucceeded
-import org.http4k.postbox.ProcessingEvent.PollWait
+import org.http4k.postbox.ProcessingEvent.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.time.Duration
@@ -57,33 +55,37 @@ class PostboxProcessing(
         executorService.execute(this)
     }
 
-    fun processPendingRequests(): Result<Int, RequestProcessingFailure> = transactor.performAsResult { postbox ->
+    fun processPendingRequests(): Result<Int, RequestProcessingError> = transactor.performAsResult { postbox ->
         // TODO: exclude requests marked as permanent failures
         // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
         val pendingRequests = postbox.pendingRequests(batchSize)
         for (pending in pendingRequests) {
             processPendingRequest(postbox, pending)
+                .peek { events(RequestProcessingSucceeded(pending.requestId)) }
+                .peekFailure { events(RequestProcessingFailed(it.reason)) }
         }
         pendingRequests.size
-    }.mapFailure { RequestProcessingFailure(it.message.orEmpty()) }
+    }.mapFailure { RequestProcessingError(it.message.orEmpty()) }
 
     private fun processPendingRequest(
         postbox: Postbox, pending: Postbox.PendingRequest,
         successCriteria: (Response) -> Boolean = { it.status.successful }
-    ): Result<Unit, RequestProcessingFailure> = target(pending.request).let { response ->
+    ): Result<Unit, RequestProcessingError> = target(pending.request).let { response ->
         if (successCriteria(response)) {
             postbox.markProcessed(pending.requestId, response)
-                .mapFailure { RequestProcessingFailure(it.description) }
+                .mapFailure { RequestProcessingError(it.description) }
         } else {
-            Failure(RequestProcessingFailure("response was not successful"))
+            Failure(RequestProcessingError("response did not pass success criteria"))
         }
     }
 }
 
-data class RequestProcessingFailure(val reason: String)
+data class RequestProcessingError(val reason: String)
 
 sealed class ProcessingEvent : Event {
     data class BatchProcessingSucceeded(val batchSize: Int, val duration: Duration) : ProcessingEvent()
-    data class BatchProcessingFailed(val cause: String) : ProcessingEvent()
+    data class BatchProcessingFailed(val reason: String) : ProcessingEvent()
+    data class RequestProcessingSucceeded(val requestId: RequestId) : ProcessingEvent()
+    data class RequestProcessingFailed(val reason: String) : ProcessingEvent()
     data class PollWait(val duration: Duration) : ProcessingEvent()
 }
