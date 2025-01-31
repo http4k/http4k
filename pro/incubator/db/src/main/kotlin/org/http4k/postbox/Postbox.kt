@@ -59,7 +59,6 @@ sealed class PostboxError(val description: String) {
     data object RequestNotFound : PostboxError("request not found")
     data class StorageFailure(val cause: Exception) : PostboxError("storage failed (cause: ${cause.message})")
     data class TransactionFailure(val cause: Exception) : PostboxError("transaction failed (cause: ${cause.message})")
-    data class RequestProcessingFailure(val reason: String) : PostboxError(reason)
 }
 
 sealed class RequestProcessingStatus {

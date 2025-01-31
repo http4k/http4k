@@ -62,7 +62,6 @@ private fun PostboxError.toResponse() =
         is PostboxError.RequestNotFound -> Response(NOT_FOUND.description(description))
         is PostboxError.StorageFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
         is PostboxError.TransactionFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
-        is PostboxError.RequestProcessingFailure -> Response(INTERNAL_SERVER_ERROR.description(description))
     }
 
 
