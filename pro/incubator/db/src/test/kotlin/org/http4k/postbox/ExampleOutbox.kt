@@ -7,9 +7,11 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
+import org.http4k.core.UriTemplate
 import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
+import org.http4k.postbox.PendingResponseGenerators.Empty
+import org.http4k.postbox.PendingResponseGenerators.linkHeader
 import org.http4k.postbox.RequestIdResolvers.fromHeader
 import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.routing.bind
@@ -27,9 +29,7 @@ fun main() {
         PostboxProcessing(transactor, JavaHttpClient(), events = StdOutEvents).start()
     }
 
-    val transactionalOutbox = PostboxHandlers(transactor,
-        { Uri.of("/api/notificationStatus/${it.value}") }
-    )
+    val transactionalOutbox = PostboxHandlers(transactor)
 
     routes(
         "/api/{orderId}/notify" bind POST to NotificationHandler(transactionalOutbox.intercepting(fromHeader("x-order-id"))),

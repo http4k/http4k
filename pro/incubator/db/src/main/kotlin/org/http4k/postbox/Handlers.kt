@@ -10,13 +10,17 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
-import org.http4k.postbox.RequestProcessingStatus.*
+import org.http4k.lens.location
+import org.http4k.postbox.PendingResponseGenerators.Empty
+import org.http4k.postbox.RequestProcessingStatus.Pending
+import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.routing.RoutedMessage
 import org.http4k.routing.path
 
@@ -25,12 +29,14 @@ import org.http4k.routing.path
  */
 typealias RequestIdResolver = (Request) -> RequestId?
 
+typealias PendingResponseGenerator = (RequestId) -> Response
+
 /**
  * Configures HTTP handlers for a transactional postbox.
  */
 class PostboxHandlers(
     private val transactor: Transactor<Postbox>,
-    private val statusUriBuilder: (RequestId) -> Uri = { Uri.of("/${it.value}") }
+    private val responseGenerator: PendingResponseGenerator = Empty
 ) {
 
     /**
@@ -46,7 +52,7 @@ class PostboxHandlers(
                 transactor.performAsResult { it.store(Postbox.PendingRequest(requestId, request)) }
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
-                    .map { it.toResponse(statusUriBuilder(requestId)) }
+                    .map { it.toResponse(requestId) }
                     .mapFailure { it.toResponse() }
 
             }.get()
@@ -66,14 +72,14 @@ class PostboxHandlers(
                 transactor.performAsResult { postbox -> postbox.status(requestId) }
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
-                    .map { it.toResponse(statusUriBuilder(requestId)) }
+                    .map { it.toResponse(requestId) }
                     .mapFailure { it.toResponse() }
             }.get()
     }
 
 
-    private fun RequestProcessingStatus.toResponse(statusUri: Uri) = when (this) {
-        is Pending -> Response(ACCEPTED).header("Link", statusUri.toString())
+    private fun RequestProcessingStatus.toResponse(requestId: RequestId) = when (this) {
+        is Pending -> responseGenerator(requestId)
         is Processed -> response
     }
 
@@ -95,6 +101,21 @@ object RequestIdResolvers {
                 is RoutedMessage -> request.path(pathName)
                 else -> uriTemplate.extract(request.uri.path)[pathName]
             }?.let(RequestId.Companion::of)
+        }
+}
+
+object PendingResponseGenerators {
+
+    val Empty = { _: RequestId -> Response(ACCEPTED) }
+
+    fun linkHeader(pathName: String, uriTemplate: UriTemplate = UriTemplate.from("/{$pathName}")) =
+        { requestId: RequestId ->
+            Response(ACCEPTED).header("Link", uriTemplate.generate(mapOf(pathName to requestId.value)))
+        }
+
+    fun redirect(pathName: String, uriTemplate: UriTemplate = UriTemplate.from("{$pathName}")) =
+        { requestId: RequestId ->
+            Response(FOUND).location(Uri.of(uriTemplate.generate(mapOf(pathName to requestId.value))))
         }
 }
 

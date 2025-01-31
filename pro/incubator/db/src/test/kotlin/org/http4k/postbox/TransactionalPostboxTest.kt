@@ -12,6 +12,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.db.InMemoryTransactor
 import org.http4k.hamkrest.hasStatus
+import org.http4k.postbox.PendingResponseGenerators.linkHeader
 import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.junit.jupiter.api.Test
@@ -20,7 +21,7 @@ class TransactionalPostboxTest {
     private val postbox = InMemoryPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
     private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
-    private val handlers = PostboxHandlers(transactor)
+    private val handlers = PostboxHandlers(transactor, linkHeader("requestId"))
     private val requestHandler = handlers.intercepting(fromPath("requestId"))
     private val statusHandler = handlers.status(fromPath("requestId"))
 
