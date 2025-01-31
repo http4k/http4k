@@ -13,16 +13,16 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.db.InMemoryTransactor
 import org.http4k.hamkrest.hasStatus
 import org.http4k.postbox.Postbox.PendingRequest
+import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.junit.jupiter.api.Test
 
 class TransactionalPostboxTest {
     private val postbox = InMemoryPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
     private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
-    private val handlers = PostboxHandlers(transactor, { req -> RequestId.of(req.uri.path.removePrefix("/")) })
-    private val idFromUrl = { req: Request -> RequestId.of(req.uri.path.removePrefix("/")) }
-    private val requestHandler = handlers.interceptor
-    private val statusHandler = handlers.status
+    private val handlers = PostboxHandlers(transactor)
+    private val requestHandler = handlers.intercepting(fromPath("requestId"))
+    private val statusHandler = handlers.status(fromPath("requestId"))
 
     @Test
     fun `stores request for background processing`() {
@@ -84,5 +84,5 @@ class TransactionalPostboxTest {
     }
 
     private fun Request.asPending() = PendingRequest(id(), this)
-    private fun Request.id() = idFromUrl(this)
+    private fun Request.id() = fromPath("requestId")(this) ?: error("No id found")
 }

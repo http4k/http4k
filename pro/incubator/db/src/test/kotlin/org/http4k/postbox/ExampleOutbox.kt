@@ -10,6 +10,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
+import org.http4k.postbox.RequestIdResolvers.fromHeader
+import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -26,14 +28,12 @@ fun main() {
     }
 
     val transactionalOutbox = PostboxHandlers(transactor,
-        { it.header("x-order-id")?.let(RequestId.Companion::of) },
-        { Uri.of("/api/notificationStatus/${it.value}") },
-        { it.path("orderId")?.let(RequestId.Companion::of) }
+        { Uri.of("/api/notificationStatus/${it.value}") }
     )
 
     routes(
-        "/api/{orderId}/notify" bind POST to NotificationHandler(transactionalOutbox.interceptor),
-        "/api/notificationStatus/{orderId}" bind GET to transactionalOutbox.status
+        "/api/{orderId}/notify" bind POST to NotificationHandler(transactionalOutbox.intercepting(fromHeader("x-order-id"))),
+        "/api/notificationStatus/{orderId}" bind GET to transactionalOutbox.status(fromPath("orderId"))
     ).asServer(SunHttp(9000)).start()
 }
 
