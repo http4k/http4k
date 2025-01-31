@@ -19,9 +19,10 @@ class TransactionalPostboxTest {
     private val postbox = InMemoryPostbox()
     private val transactor = InMemoryTransactor<Postbox>(postbox)
     private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
+    private val handlers = PostboxHandlers(transactor, { req -> RequestId.of(req.uri.path.removePrefix("/")) })
     private val idFromUrl = { req: Request -> RequestId.of(req.uri.path.removePrefix("/")) }
-    private val requestHandler = PostboxInterceptorHandler(transactor, idFromUrl)
-    private val statusHandler = PostboxStatusHandler(transactor)
+    private val requestHandler = handlers.interceptor
+    private val statusHandler = handlers.status
 
     @Test
     fun `stores request for background processing`() {
