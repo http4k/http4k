@@ -25,7 +25,7 @@ fun main() {
     val inbox = PostboxHandlers(transactor, redirect("taskId", from("http://localhost:9000/workload/status/{taskId}")))
 
     routes(
-        "/workload/submit/{taskId}" bind POST to (inbox.intercepting(fromPath("taskId"))),
+        "/workload/submit/{taskId}" bind POST to inbox.intercepting(fromPath("taskId")),
         "/workload/status/{taskId}" bind GET to inbox.status(fromPath("taskId"))
     ).asServer(SunHttp(9000)).start()
 }
