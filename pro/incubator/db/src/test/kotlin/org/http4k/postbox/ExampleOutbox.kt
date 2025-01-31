@@ -21,11 +21,13 @@ import org.http4k.server.asServer
 fun main() {
     ThirdPartySlowSmsService().asServer(SunHttp(8000)).start()
 
-    val outbox = PostboxHandlers(InMemoryTransactor<Postbox>(InMemoryPostbox()).also { transactor ->
+    val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox()).also { transactor ->
         // Notice: in-memory transactor locks the postbox so multiple threads can't access it at the same time.
         // For production use a real database.
         PostboxProcessing(transactor, JavaHttpClient(), events = StdOutEvents).start()
-    })
+    }
+
+    val outbox = PostboxHandlers(transactor)
 
     routes(
         "/api/{orderId}/notify" bind POST to NotificationHandler(outbox.intercepting(fromHeader("x-order-id"))),
