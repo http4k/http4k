@@ -8,10 +8,48 @@ import org.http4k.core.Response
 import org.http4k.lens.Path
 import org.http4k.lens.asResult
 
+/**
+ * Postbox is the storage mechanism for requests that are to be processed asynchronously.
+ */
 interface Postbox {
+    /**
+     * Store a request in the Postbox for later processing.
+     *
+     * @param pending the request to store, which includes an id and the request itself
+     *
+     * @return the status of the request processing
+     *  - If the request is new or has not been processed, the status will be [RequestProcessingStatus.Pending]
+     *  - If the request has been processed, the status will be [RequestProcessingStatus.Processed]
+     */
     fun store(pending: PendingRequest): Result<RequestProcessingStatus, PostboxError>
+
+    /**
+     * Retrieve the status of a request.
+     *
+     * @param requestId the id of the request to check
+     *
+     * @return the status of the request processing
+     *   - If the request has not been processed, the status will be [RequestProcessingStatus.Pending]
+     *   - If the request has been processed, the status will be [RequestProcessingStatus.Processed]
+     *   - If the request is not found, the result will be a failure with [PostboxError.RequestNotFound]
+     */
     fun status(requestId: RequestId): Result<RequestProcessingStatus, PostboxError>
+
+    /**
+     * Mark a request as processed with the given response.
+     *
+     * @return Unit if the request was successfully marked as processed or a
+     * failure with [PostboxError.RequestNotFound] if the request is not found.
+     *
+     * TODO: handle the case where the request is already marked as processed
+     */
     fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError>
+
+    /**
+     * Retrieve all pending requests. Those are the ones that have not been marked as processed yet.
+     *
+     * @return a list of all pending requests in first-in-first-out order
+     */
     fun pendingRequests(): List<PendingRequest>
 
     data class PendingRequest(val requestId: RequestId, val request: Request)
