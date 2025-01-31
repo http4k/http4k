@@ -49,7 +49,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, equalTo(aResponse))
 
-        val postboxResponse = statusHandler(Request(GET, "/postbox/${aRequest.id()}"))
+        val postboxResponse = statusHandler(Request(GET, "/${aRequest.id()}"))
 
         assertThat(postboxResponse, equalTo(aResponse))
     }
@@ -61,7 +61,7 @@ class TransactionalPostboxTest {
 
         processing.processPendingRequests()
 
-        val postboxResponse = statusHandler(Request(GET, "/postbox/${aRequest.id()}"))
+        val postboxResponse = statusHandler(Request(GET, "/${aRequest.id()}"))
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))
     }
 
@@ -80,7 +80,7 @@ class TransactionalPostboxTest {
 
     @Test
     fun `handles status for unknown request`() {
-        assertThat(statusHandler(Request(GET, "/postbox/unknown")), hasStatus(NOT_FOUND))
+        assertThat(statusHandler(Request(GET, "/unknown")), hasStatus(NOT_FOUND))
     }
 
     private fun Request.asPending() = PendingRequest(id(), this)

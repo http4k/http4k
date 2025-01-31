@@ -1,5 +1,6 @@
 package org.http4k.postbox
 
+import dev.forkhandles.result4k.asResultOr
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
@@ -11,9 +12,10 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.core.UriTemplate
+import org.http4k.core.Uri
 import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
+import org.http4k.postbox.RequestProcessingStatus.*
 import java.util.*
 
 /**
@@ -21,8 +23,9 @@ import java.util.*
  */
 class PostboxHandlers(
     private val transactor: Transactor<Postbox>,
-    private val requestIdResolver: (Request) -> RequestId  = { RequestId.of(UUID.randomUUID().toString()) },
-    private val statusTemplate: UriTemplate = UriTemplate.from("/postbox/{requestId}")
+    private val interceptorIdResolver: (Request) -> RequestId? = { RequestId.of(UUID.randomUUID().toString()) },
+    private val statusUriBuilder: (RequestId) -> Uri = { Uri.of("/${it.value}") },
+    private val statusIdResolver: (Request) -> RequestId? = interceptorIdResolver
 ) {
 
     /**
@@ -33,13 +36,15 @@ class PostboxHandlers(
      * If the request has already been processed, it'll return the response obtained as part of processing it.
      */
     val interceptor: HttpHandler = { request: Request ->
-        val requestId = requestIdResolver(request)
-        transactor.performAsResult { it.store(Postbox.PendingRequest(requestId, request)) }
-            .mapFailure(PostboxError::TransactionFailure)
-            .flatMap { it }
-            .map { it.toResponse(requestId, statusTemplate) }
-            .mapFailure { it.toResponse() }
-            .get()
+        interceptorIdResolver(request).asResultOr { Response(BAD_REQUEST.description("request id not found")) }
+            .flatMap { requestId ->
+                transactor.performAsResult { it.store(Postbox.PendingRequest(requestId, request)) }
+                    .mapFailure(PostboxError::TransactionFailure)
+                    .flatMap { it }
+                    .map { it.toResponse(statusUriBuilder(requestId)) }
+                    .mapFailure { it.toResponse() }
+
+            }.get()
     }
 
     /**
@@ -50,23 +55,20 @@ class PostboxHandlers(
      * If the request is not found, it'll return a 404.
      */
     val status: HttpHandler = { req: Request ->
-        RequestId.lens(req)
-            .mapFailure { Response(BAD_REQUEST.description(it.message.orEmpty())) }
+        statusIdResolver(req).asResultOr { Response(BAD_REQUEST.description("request id not found")) }
             .flatMap { requestId ->
                 transactor.performAsResult { postbox -> postbox.status(requestId) }
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
-                    .map { it.toResponse(requestId, statusTemplate) }
+                    .map { it.toResponse(statusUriBuilder(requestId)) }
                     .mapFailure { it.toResponse() }
             }.get()
     }
 
 
-    private fun RequestProcessingStatus.toResponse(requestId: RequestId, statusTemplate: UriTemplate) = when (this) {
-        RequestProcessingStatus.Pending ->
-            Response(ACCEPTED).header("Link", statusTemplate.generate(mapOf("requestId" to requestId.value)))
-
-        is RequestProcessingStatus.Processed -> response
+    private fun RequestProcessingStatus.toResponse(statusUri: Uri) = when (this) {
+        is Pending -> Response(ACCEPTED).header("Link", statusUri.toString())
+        is Processed -> response
     }
 
     private fun PostboxError.toResponse() =
