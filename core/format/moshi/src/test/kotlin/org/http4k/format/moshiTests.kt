@@ -4,12 +4,18 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import com.squareup.moshi.Moshi.Builder
+import dev.forkhandles.data.MoshiNodeDataContainer
+import dev.forkhandles.values.AbstractValue
+import dev.forkhandles.values.BooleanValueFactory
 import org.http4k.core.Body
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Moshi.auto
 import org.http4k.format.StrictnessMode.FailOnUnknown
+import org.http4k.hamkrest.hasBody
 import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -259,5 +265,33 @@ class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
                 """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.2,"bigInt":12344,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
             assertThat(compact(input), equalTo(expected))
         }
+    }
+}
+
+class MoshiDataContainerTest {
+
+    class MyValue private constructor(value: Boolean) : AbstractValue<Boolean>(value) {
+        companion object : BooleanValueFactory<MyValue>(::MyValue)
+    }
+
+    class Foo(node: MoshiNode) : MoshiNodeDataContainer(node) {
+        val foo by required<String>()
+        var bar by required(MyValue)
+    }
+
+    @Test
+    fun `can use custom data container to modify a MoshiNode`() {
+        val json = """{"foo":"world","bar":true}"""
+
+        val lens = Body.json(::Foo).toLens()
+
+        val data = lens(Request(GET, "").body(json))
+        assertThat(data.foo, equalTo("world"))
+        assertThat(data.bar, equalTo(MyValue.of(true)))
+        data.bar = MyValue.of(false)
+        assertThat(data.bar, equalTo(MyValue.of(false)))
+
+        val updated = Request(GET, "").with(lens of data)
+        assertThat(updated, hasBody("""{"foo":"world","bar":false}"""))
     }
 }
