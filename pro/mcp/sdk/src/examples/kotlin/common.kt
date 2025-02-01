@@ -13,7 +13,6 @@ import org.http4k.mcp.capability.ToolCapability
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
-import org.http4k.mcp.model.ModelScore
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Resource
@@ -41,7 +40,6 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
 }
 
 fun sampling() = compose(
-    llm(),
     sampleFromModel()
 )
 
@@ -60,17 +58,6 @@ fun prompts() = compose(
     prompt1(),
     prompt2()
 )
-
-fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bind {
-    listOf(
-        SamplingResponse(
-            ModelIdentifier.of("my model"),
-            StopReason.of("stop"),
-            Role.assistant,
-            Content.Text("content")
-        )
-    ).asSequence()
-}
 
 fun countingTool(): ToolCapability {
     val first = Tool.Arg.int().required("first")
@@ -110,7 +97,7 @@ fun staticResource() =
     Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient())
 
 fun prompt1() = Prompt("prompt1", "description1") bind {
-    PromptResponse("description", listOf(Message(Role.assistant, Content.Text(it.toString()))))
+    PromptResponse(listOf(Message(Role.assistant, Content.Text(it.toString()))), "description")
 }
 
 fun prompt2(): PromptCapability {
@@ -121,7 +108,7 @@ fun prompt2(): PromptCapability {
         arg1,
         arg2
     ) bind {
-        PromptResponse("description", listOf(Message(Role.assistant, Content.Text(arg1(it) + arg2(it)))))
+        PromptResponse(listOf(Message(Role.assistant, Content.Text(arg1(it) + arg2(it)))), "description")
     }
 }
 
@@ -129,9 +116,15 @@ fun sampleFromModel() = ModelSelector(ModelIdentifier.of("my model")) bind {
     listOf(
         SamplingResponse(
             ModelIdentifier.of("my model"),
+            null,
+            Role.assistant,
+            Content.Text("content1")
+        ),
+        SamplingResponse(
+            ModelIdentifier.of("my model"),
             StopReason.of("end"),
             Role.assistant,
-            Content.Text("content")
+            Content.Text("content2")
         )
     ).asSequence()
 }

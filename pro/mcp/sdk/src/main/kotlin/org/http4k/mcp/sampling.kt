@@ -6,7 +6,6 @@ import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelPreferences
-import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
 import org.http4k.mcp.model.StopReason
@@ -25,14 +24,13 @@ typealias OutgoingSamplingHandler = (SamplingResponse) -> Unit
 data class SamplingRequest(
     val messages: List<Message>,
     val maxTokens: MaxTokens,
-    val requestId: RequestId,
     val systemPrompt: String? = null,
     val includeContext: SamplingIncludeContext? = null,
     val temperature: Temperature? = null,
     val stopSequences: List<String>? = null,
     val modelPreferences: ModelPreferences? = null,
     val metadata: Map<String, Any> = emptyMap(),
-    val connectRequest: Request
+    val connectRequest: Request? = null
 )
 
 data class SamplingResponse(

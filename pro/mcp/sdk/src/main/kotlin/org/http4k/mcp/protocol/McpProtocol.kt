@@ -117,12 +117,11 @@ abstract class McpProtocol<RSP : Any>(
 
                 Cancelled.Method -> ok()
 
-                McpSampling.Method -> {
-                    val requestId = McpJson.asA(jsonReq.id ?: McpJson.nullNode(), RequestId::class)
+                McpSampling.Method ->
                     runCatching { jsonReq.fromJsonRpc<McpSampling.Request>() }
                         .map {
                             runCatching {
-                                incomingSampling.sample(it, requestId, req)
+                                incomingSampling.sample(it, req)
                                     .forEach { send(it.toJsonRpc(jsonReq.id), sId) }
                                 ok()
                             }.recover {
@@ -139,7 +138,6 @@ abstract class McpProtocol<RSP : Any>(
                             send(InvalidRequest.toJsonRpc(jsonReq.id), sId)
                             error()
                         }
-                }
 
                 McpProgress.Method -> ok()
 
@@ -190,9 +188,9 @@ abstract class McpProtocol<RSP : Any>(
         resources.onChange(sId) { send(McpResource.List.Changed.Notification.toJsonRpc(McpResource.List), sId) }
         tools.onChange(sId) { send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 
-        outgoingSampling.onRequest(sId, session.entity) { req, requestId ->
-            clients[sId]?.addCall(requestId) { outgoingSampling.respond(session.entity, it.fromJsonRpc()) }
-            send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(requestId)), sId)
+        outgoingSampling.onRequest(sId, session.entity) { req, id ->
+            clients[sId]?.addCall(id) { outgoingSampling.respond(session.entity, it.fromJsonRpc()) }
+            send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
         }
 
         onClose(sId) {

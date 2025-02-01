@@ -137,10 +137,10 @@ class McpHandlerTest {
             listOf(
                 prompt bind {
                     PromptResponse(
-                        "description",
                         listOf(
                             Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
-                        )
+                        ),
+                        "description",
                     )
                 }
             )
@@ -392,7 +392,7 @@ class McpHandlerTest {
 
     @Test
     fun `deal with outgoing sampling`() {
-        var received = mutableListOf<SamplingResponse>()
+        val received = mutableListOf<SamplingResponse>()
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
@@ -408,9 +408,9 @@ class McpHandlerTest {
 
             sampling.sample(
                 serverName, SamplingRequest(
-                    listOf(), MaxTokens.of(1), RequestId.of(1),
+                    listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")
-                )
+                ), RequestId.of(1)
             )
 
             assertNextMessage(
@@ -435,10 +435,14 @@ class McpHandlerTest {
                 RequestId.of(1)
             )
 
-            assertThat(received, equalTo(listOf(
-                SamplingResponse(model, null, Role.assistant, content),
-                SamplingResponse(model, StopReason.of("bored"), Role.assistant, content)
-            )))
+            assertThat(
+                received, equalTo(
+                    listOf(
+                        SamplingResponse(model, null, Role.assistant, content),
+                        SamplingResponse(model, StopReason.of("bored"), Role.assistant, content)
+                    )
+                )
+            )
         }
     }
 

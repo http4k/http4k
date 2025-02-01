@@ -23,7 +23,7 @@ class OutgoingSampling(private val list: List<OutgoingSamplingCapability>) {
         return if (response.stopReason != null) Finished else InProgress
     }
 
-    fun sample(entity: McpEntity, request: SamplingRequest) {
+    fun sample(entity: McpEntity, request: SamplingRequest, id: RequestId) {
         with(request) {
             subscriptions[subscriptions.keys.filter { it.first == entity }.random()]
                 ?.invoke(
@@ -37,7 +37,7 @@ class OutgoingSampling(private val list: List<OutgoingSamplingCapability>) {
                         modelPreferences,
                         metadata
                     ),
-                    requestId,
+                    id
                 )
         }
     }

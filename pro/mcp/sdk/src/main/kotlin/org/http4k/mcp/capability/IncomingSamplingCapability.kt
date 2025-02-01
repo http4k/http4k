@@ -4,7 +4,6 @@ import org.http4k.core.Request
 import org.http4k.mcp.IncomingSamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.model.ModelSelector
-import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpSampling
 
 class IncomingSamplingCapability(
@@ -14,13 +13,12 @@ class IncomingSamplingCapability(
 
     fun toModelSelector() = modelSelector
 
-    fun sample(req: McpSampling.Request, requestId: RequestId, connectRequest: Request) =
+    fun sample(req: McpSampling.Request, connectRequest: Request) =
         handler(
             with(req) {
                 SamplingRequest(
                     messages,
                     maxTokens,
-                    requestId,
                     systemPrompt,
                     includeContext,
                     temperature,

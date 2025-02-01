@@ -8,6 +8,9 @@ import org.http4k.mcp.model.Message
  */
 typealias PromptHandler = (PromptRequest) -> PromptResponse
 
-data class PromptRequest(private val args: Map<String, Any>, val connectRequest: Request) : Map<String, Any> by args
+data class PromptRequest(
+    private val args: Map<String, String> = emptyMap(),
+    val connectRequest: Request? = null
+) : Map<String, String> by args
 
-data class PromptResponse(val description: String, val messages: List<Message>)
+data class PromptResponse(val messages: List<Message>, val description: String? = null)

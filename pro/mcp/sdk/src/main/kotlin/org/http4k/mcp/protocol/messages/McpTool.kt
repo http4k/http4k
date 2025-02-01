@@ -10,6 +10,7 @@ import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
+@JsonSerializable
 data class McpTool(val name: ToolName, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
     object List : HasMethod {
         override val Method = of("tools/list")

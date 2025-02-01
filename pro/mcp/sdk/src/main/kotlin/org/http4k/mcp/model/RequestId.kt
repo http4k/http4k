@@ -9,7 +9,7 @@ import kotlin.random.Random
 
 class RequestId private constructor(value: Long) : LongValue(value) {
     companion object : LongValueFactory<RequestId>(::RequestId, 1L.minValue.and(MAX_MCP_REQUEST_ID.maxValue)) {
-        fun random(random: Random) = of(random.nextLong(1, MAX_MCP_REQUEST_ID))
+        fun random(random: Random = Random) = of(random.nextLong(1, MAX_MCP_REQUEST_ID))
     }
 }
 

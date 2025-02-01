@@ -18,6 +18,7 @@ dependencies {
     api("se.ansman.kotshi:api:_")
 
     api(project(":http4k-api-jsonrpc"))
+    api("com.launchdarkly:okhttp-eventsource:_")
     api(project(":http4k-connect-core"))
     api("dev.forkhandles:values4k")
     api("dev.forkhandles:result4k")

@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap
 class ClientSession(client: VersionedMcpEntity, val capabilities: ClientCapabilities) {
     private val calls: MutableMap<RequestId, (JsonRpcResult<McpNodeType>) -> CompletionStatus> = ConcurrentHashMap()
 
-    fun addCall(requestId: RequestId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {
-        calls[requestId] = callback
+    fun addCall(id: RequestId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {
+        calls[id] = callback
     }
 
     fun processResult(id: RequestId, result: JsonRpcResult<MoshiNode>) {

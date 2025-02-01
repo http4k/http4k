@@ -10,7 +10,7 @@ typealias CompletionHandler = (CompletionRequest) -> CompletionResponse
 data class CompletionRequest(
     val ref: Reference,
     val argument: CompletionArgument,
-    val connectRequest: Request
+    val connectRequest: Request? = null
 )
 
 data class CompletionResponse(val completion: Completion)

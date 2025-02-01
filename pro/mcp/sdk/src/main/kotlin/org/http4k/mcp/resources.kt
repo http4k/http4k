@@ -11,6 +11,9 @@ import org.http4k.mcp.protocol.messages.HasMeta
  */
 typealias ResourceHandler = (ResourceRequest) -> ResourceResponse
 
-data class ResourceRequest(val uri: Uri, val connectRequest: Request)
+data class ResourceRequest(
+    val uri: Uri,
+    val connectRequest: Request? = null
+)
 
 data class ResourceResponse(val list: List<Resource.Content>, val meta: Meta = HasMeta.default)

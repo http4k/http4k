@@ -2,6 +2,7 @@ package org.http4k.mcp.util
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import org.http4k.connect.model.Base64Blob
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -41,6 +42,7 @@ object McpJson : ConfigurableMoshi(
         .addLast(MoshiNodeAdapter)
         .asConfigurable()
         .withStandardMappings()
+        .value(Base64Blob)
         .value(CostPriority)
         .value(IntelligencePriority)
         .value(MaxTokens)
