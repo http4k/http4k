@@ -61,7 +61,7 @@ jobs:
           command: collect
           params: test-results --include="**/build/test-results/**/TEST-*.xml"
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v5.2.0
+        uses: mikepenz/action-junit-report@v5.3.0
         if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
