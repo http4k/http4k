@@ -1,0 +1,1 @@
+MoshiObject(attributes={object=MoshiObject(attributes={string=MoshiString(value=string2)}), optionalObject=MoshiObject(attributes={string=MoshiString(value=string)}), subClass=MoshiObject(attributes={string=MoshiString(value=string2), grandchild=MoshiObject(attributes={long=MoshiInteger(value=1234)})}), optionalSubClass=MoshiNull})
