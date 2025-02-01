@@ -59,10 +59,10 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
         val json =
             """{"string":"hello", "child":{"string":"world","numbers":[1, 1.2],"bool":true},"numbers":[],"bool":false}"""
         val expected = MoshiObject(
-            mapOf(
+            mutableMapOf(
                 "string" to MoshiString("hello"),
                 "child" to MoshiObject(
-                    mapOf(
+                    mutableMapOf(
                         "string" to MoshiString("world"),
                         "numbers" to MoshiArray(
                             listOf(
@@ -87,10 +87,10 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     @Test
     fun `write MoshiElement to string`() {
         val element = MoshiObject(
-            mapOf(
+            mutableMapOf(
                 "string" to MoshiString("hello"),
                 "child" to MoshiObject(
-                    mapOf(
+                    mutableMapOf(
                         "string" to MoshiString("world"),
                         "numbers" to MoshiArray(
                             listOf(
@@ -122,10 +122,10 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
             Moshi.asJsonObject(obj),
             equalTo(
                 MoshiObject(
-                    mapOf(
+                    mutableMapOf(
                         "string" to MoshiString("hello"),
                         "child" to MoshiObject(
-                            mapOf(
+                            mutableMapOf(
                                 "string" to MoshiString("world"),
                                 "numbers" to MoshiArray(
                                     listOf(
@@ -146,10 +146,10 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
     @Test
     fun `convert MoshiElement to arbObject`() {
         val element = MoshiObject(
-            mapOf(
+            mutableMapOf(
                 "string" to MoshiString("hello"),
                 "child" to MoshiObject(
-                    mapOf(
+                    mutableMapOf(
                         "string" to MoshiString("world"),
                         "numbers" to MoshiArray(
                             listOf(

@@ -41,7 +41,7 @@ open class ConfigurableMoshi(
 
     override fun String.asJsonObject() = MoshiNode.wrap(objectAdapter.fromJson(this))
 
-    override fun <LIST : Iterable<Pair<String, MoshiNode>>> LIST.asJsonObject() = MoshiObject(toMap())
+    override fun <LIST : Iterable<Pair<String, MoshiNode>>> LIST.asJsonObject() = MoshiObject(toMap().toMutableMap())
     override fun String?.asJsonValue() = if (this == null) MoshiNull else MoshiString(this)
     override fun Int?.asJsonValue() = if (this == null) MoshiNull else MoshiInteger(this)
     override fun Double?.asJsonValue() = if (this == null) MoshiNull else MoshiDecimal(this)
