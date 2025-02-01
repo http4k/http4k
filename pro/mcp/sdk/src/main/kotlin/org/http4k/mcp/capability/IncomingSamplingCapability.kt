@@ -2,7 +2,7 @@ package org.http4k.mcp.capability
 
 import org.http4k.core.Request
 import org.http4k.mcp.IncomingSamplingHandler
-import org.http4k.mcp.SampleRequest
+import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpSampling
@@ -17,7 +17,7 @@ class IncomingSamplingCapability(
     fun sample(req: McpSampling.Request, requestId: RequestId, connectRequest: Request) =
         handler(
             with(req) {
-                SampleRequest(
+                SamplingRequest(
                     messages,
                     maxTokens,
                     requestId,

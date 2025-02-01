@@ -15,14 +15,14 @@ import org.http4k.mcp.model.Temperature
 /**
  *  Processes a sampling request from an MCP client
  */
-typealias IncomingSamplingHandler = (SampleRequest) -> Sequence<SampleResponse>
+typealias IncomingSamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
 
 /**
  * Processes a sampling response from an MCP client
  */
-typealias OutgoingSamplingHandler = (SampleResponse) -> Unit
+typealias OutgoingSamplingHandler = (SamplingResponse) -> Unit
 
-data class SampleRequest(
+data class SamplingRequest(
     val messages: List<Message>,
     val maxTokens: MaxTokens,
     val requestId: RequestId,
@@ -35,7 +35,7 @@ data class SampleRequest(
     val connectRequest: Request
 )
 
-data class SampleResponse(
+data class SamplingResponse(
     val model: ModelIdentifier,
     val stopReason: StopReason?,
     val role: Role,

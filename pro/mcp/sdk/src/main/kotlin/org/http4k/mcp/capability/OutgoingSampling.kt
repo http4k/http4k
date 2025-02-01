@@ -1,6 +1,6 @@
 package org.http4k.mcp.capability
 
-import org.http4k.mcp.SampleRequest
+import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
@@ -23,7 +23,7 @@ class OutgoingSampling(private val list: List<OutgoingSamplingCapability>) {
         return if (response.stopReason != null) Finished else InProgress
     }
 
-    fun sample(entity: McpEntity, request: SampleRequest) {
+    fun sample(entity: McpEntity, request: SamplingRequest) {
         with(request) {
             subscriptions[subscriptions.keys.filter { it.first == entity }.random()]
                 ?.invoke(

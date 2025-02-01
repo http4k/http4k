@@ -23,8 +23,8 @@ import org.http4k.lens.int
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SampleRequest
-import org.http4k.mcp.SampleResponse
+import org.http4k.mcp.SamplingRequest
+import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.capability.Completions
 import org.http4k.mcp.capability.IncomingSampling
@@ -371,8 +371,8 @@ class McpHandlerTest {
         val sampling = IncomingSampling(listOf(
             ModelSelector(model) { MAX } bind {
                 listOf(
-                    SampleResponse(model, null, Role.assistant, content1),
-                    SampleResponse(model, StopReason.of("bored"), Role.assistant, content2)
+                    SamplingResponse(model, null, Role.assistant, content1),
+                    SamplingResponse(model, StopReason.of("bored"), Role.assistant, content2)
                 ).asSequence()
             }
         ))
@@ -392,7 +392,7 @@ class McpHandlerTest {
 
     @Test
     fun `deal with outgoing sampling`() {
-        var received = mutableListOf<SampleResponse>()
+        var received = mutableListOf<SamplingResponse>()
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
@@ -407,7 +407,7 @@ class McpHandlerTest {
             assertInitializeLoop(mcp)
 
             sampling.sample(
-                serverName, SampleRequest(
+                serverName, SamplingRequest(
                     listOf(), MaxTokens.of(1), RequestId.of(1),
                     connectRequest = Request(GET, "")
                 )
@@ -436,8 +436,8 @@ class McpHandlerTest {
             )
 
             assertThat(received, equalTo(listOf(
-                SampleResponse(model, null, Role.assistant, content),
-                SampleResponse(model, StopReason.of("bored"), Role.assistant, content)
+                SamplingResponse(model, null, Role.assistant, content),
+                SamplingResponse(model, StopReason.of("bored"), Role.assistant, content)
             )))
         }
     }

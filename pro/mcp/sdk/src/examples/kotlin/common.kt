@@ -6,7 +6,7 @@ import org.http4k.lens.int
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SampleResponse
+import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.capability.PromptCapability
 import org.http4k.mcp.capability.ToolCapability
@@ -63,7 +63,7 @@ fun prompts() = compose(
 
 fun llm() = ModelSelector(ModelIdentifier.of("my model")) { ModelScore.MAX } bind {
     listOf(
-        SampleResponse(
+        SamplingResponse(
             ModelIdentifier.of("my model"),
             StopReason.of("stop"),
             Role.assistant,
@@ -127,7 +127,7 @@ fun prompt2(): PromptCapability {
 
 fun sampleFromModel() = ModelSelector(ModelIdentifier.of("my model")) bind {
     listOf(
-        SampleResponse(
+        SamplingResponse(
             ModelIdentifier.of("my model"),
             StopReason.of("end"),
             Role.assistant,
