@@ -219,6 +219,22 @@ class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
 }"""
 
     @Test
+    fun `handles long values correctly`() {
+        val input = Long.MAX_VALUE
+        val json = Moshi.asFormatString(input)
+        assertThat(Moshi.parse(json), equalTo(MoshiInteger(input)))
+        assertThat(Moshi.asA<Long>(json), equalTo(input))
+    }
+
+    @Test
+    fun `handles double values correctly`() {
+        val input = Double.MAX_VALUE
+        val json = Moshi.asFormatString(input)
+        assertThat(Moshi.parse(json), equalTo(MoshiDecimal(input)))
+        assertThat(Moshi.asA<Double>(json), equalTo(input))
+    }
+
+    @Test
     override fun `serializes object to json`() {
         j {
             val input = obj(
@@ -244,4 +260,14 @@ class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
             assertThat(compact(input), equalTo(expected))
         }
     }
+}
+
+
+fun main() {
+    val input = Long.MAX_VALUE
+    val json = Moshi.asFormatString(input)
+    println(input)
+    println(json)
+    println(Moshi.parse(json))
+    println(Moshi.asA<Long>(json))
 }

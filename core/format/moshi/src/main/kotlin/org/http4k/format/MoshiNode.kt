@@ -1,5 +1,8 @@
 package org.http4k.format
 
+import kotlin.Long.Companion.MAX_VALUE
+import kotlin.Long.Companion.MIN_VALUE
+
 sealed interface MoshiNode {
     companion object
 }
@@ -28,19 +31,26 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
         .map { wrap(it) }
         .toList()
         .let { MoshiArray(it) }
+
     is Map<*, *> -> obj
         .mapKeys { (key, _) -> key.toString() }
         .mapValues { (_, value) -> wrap(value) }
         .let { MoshiObject(it) }
-    is Number -> {
-        val decimalValue = obj.toString().toBigDecimal()
-        if (decimalValue.stripTrailingZeros().scale() <= 0) {
-            MoshiInteger(decimalValue.toLong())
-        } else {
-            MoshiDecimal(decimalValue.toDouble())
-        }
+
+    is Number -> when {
+        obj is Double && obj.isSafeToConvertToLong() -> MoshiInteger(obj.toLong())
+        obj is Float && obj.isSafeToConvertToLong() -> MoshiInteger(obj.toLong())
+        obj is Long || obj is Int -> MoshiInteger(obj.toLong())
+        else -> MoshiDecimal(obj.toDouble())
     }
+
     is String -> MoshiString(obj)
     is Boolean -> MoshiBoolean(obj)
     else -> throw IllegalArgumentException("Invalid json value: $obj")
 }
+
+private fun Double.isSafeToConvertToLong() =
+    this % 1.0 == 0.0 && this in MIN_VALUE.toDouble()..MAX_VALUE.toDouble()
+
+private fun Float.isSafeToConvertToLong() =
+    this % 1.0 == 0.0 && this in MIN_VALUE.toFloat()..MAX_VALUE.toFloat()
