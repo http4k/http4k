@@ -43,11 +43,11 @@ open class ConfigurableMoshi(
 
     override fun <LIST : Iterable<Pair<String, MoshiNode>>> LIST.asJsonObject() = MoshiObject(toMap())
     override fun String?.asJsonValue() = if (this == null) MoshiNull else MoshiString(this)
-    override fun Int?.asJsonValue() = if (this == null) MoshiNull else MoshiInteger(toLong())
+    override fun Int?.asJsonValue() = if (this == null) MoshiNull else MoshiInteger(this)
     override fun Double?.asJsonValue() = if (this == null) MoshiNull else MoshiDecimal(this)
-    override fun Long?.asJsonValue() = if (this == null) MoshiNull else MoshiInteger(this)
+    override fun Long?.asJsonValue() = if (this == null) MoshiNull else MoshiLong(this)
     override fun BigDecimal?.asJsonValue() = if (this == null) MoshiNull else MoshiDecimal(toDouble())
-    override fun BigInteger?.asJsonValue() = if (this == null) MoshiNull else MoshiInteger(toLong())
+    override fun BigInteger?.asJsonValue() = if (this == null) MoshiNull else MoshiLong(toLong())
     override fun Boolean?.asJsonValue() = if (this == null) MoshiNull else MoshiBoolean(this)
     override fun <T : Iterable<MoshiNode>> T.asJsonArray() = MoshiArray(toList())
 
@@ -56,12 +56,17 @@ open class ConfigurableMoshi(
         ?.unwrap()?.toString()
 
     override fun decimal(value: MoshiNode) = (value as MoshiDecimal).value.toBigDecimal()
-    override fun integer(value: MoshiNode) = ((value as MoshiInteger).value)
+    override fun integer(value: MoshiNode) = when(value) {
+        is MoshiLong -> value.value
+        is MoshiInteger -> value.value.toLong()
+        else -> throw IllegalArgumentException("Not an integer")
+    }
     override fun bool(value: MoshiNode) = (value as MoshiBoolean).value
     override fun text(value: MoshiNode) = when (value) {
         is MoshiString -> value.value
         is MoshiBoolean -> value.value.toString()
         is MoshiInteger -> value.value.toString()
+        is MoshiLong -> value.value.toString()
         is MoshiDecimal -> value.value.toString()
         is MoshiArray -> ""
         is MoshiObject -> ""
@@ -79,6 +84,7 @@ open class ConfigurableMoshi(
         is MoshiObject -> JsonType.Object
         is MoshiArray -> JsonType.Array
         is MoshiInteger -> JsonType.Integer
+        is MoshiLong -> JsonType.Integer
         is MoshiDecimal -> JsonType.Number
         is MoshiString -> JsonType.String
         is MoshiBoolean -> JsonType.Boolean
@@ -107,14 +113,14 @@ open class ConfigurableMoshi(
     /**
      * Convenience function to read an object as JSON from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 
     override fun asJsonObject(input: Any): MoshiNode = MoshiNode.wrap(objectAdapter.toJsonValue(input))
 
     override fun <T : Any> asA(j: MoshiNode, target: KClass<T>): T = adapterFor(target)
         .fromJsonValue(j.unwrap())!!
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -191,4 +197,5 @@ private object UnitAdapter : JsonAdapter<Unit>() {
 }
 
 inline operator fun <reified T : Any> ConfigurableMoshi.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
-inline operator fun <reified T : Any, R : HttpMessage> ConfigurableMoshi.invoke(item: T) = autoBody<T>().toLens().of<R>(item)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableMoshi.invoke(item: T) =
+    autoBody<T>().toLens().of<R>(item)

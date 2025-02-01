@@ -194,7 +194,7 @@ class MoshiAutoTest : AutoMarshallingJsonContract(Moshi) {
 
         assertThat(marshaller.asFormatString(MyValue.of("hello")), equalTo(""""hello""""))
         assertThat(marshaller.asFormatString(MyOtherValue.of("world")), equalTo(""""world""""))
-        assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("unknown")).also { println(it) } }
+        assertThrows<Exception> { marshaller.asFormatString(UnknownValueType.of("unknown")) }
     }
 
     @Test
@@ -222,7 +222,7 @@ class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
     fun `handles long values correctly`() {
         val input = Long.MAX_VALUE
         val json = Moshi.asFormatString(input)
-        assertThat(Moshi.parse(json), equalTo(MoshiInteger(input)))
+        assertThat(Moshi.parse(json), equalTo(MoshiLong(input)))
         assertThat(Moshi.asA<Long>(json), equalTo(input))
     }
 
@@ -260,14 +260,4 @@ class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
             assertThat(compact(input), equalTo(expected))
         }
     }
-}
-
-
-fun main() {
-    val input = Long.MAX_VALUE
-    val json = Moshi.asFormatString(input)
-    println(input)
-    println(json)
-    println(Moshi.parse(json))
-    println(Moshi.asA<Long>(json))
 }

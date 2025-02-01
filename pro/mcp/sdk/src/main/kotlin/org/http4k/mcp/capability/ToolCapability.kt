@@ -9,6 +9,7 @@ import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiBoolean
 import org.http4k.format.MoshiDecimal
 import org.http4k.format.MoshiInteger
+import org.http4k.format.MoshiLong
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiNull
 import org.http4k.format.MoshiObject
@@ -76,5 +77,6 @@ private fun MoshiNode.asString(): Any? = when (this) {
     is MoshiString -> value
     is MoshiDecimal -> value.toString()
     is MoshiInteger -> value.toString()
+    is MoshiLong -> value.toString()
     is MoshiObject -> attributes.mapValues { it.value.asString() }
 }

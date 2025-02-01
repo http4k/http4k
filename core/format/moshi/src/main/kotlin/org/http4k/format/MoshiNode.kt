@@ -10,7 +10,8 @@ sealed interface MoshiNode {
 data class MoshiArray(val elements: List<MoshiNode>) : MoshiNode
 data class MoshiObject(val attributes: Map<String, MoshiNode>) : MoshiNode
 data class MoshiString(val value: String) : MoshiNode
-data class MoshiInteger(val value: Long) : MoshiNode
+data class MoshiInteger(val value: Int) : MoshiNode
+data class MoshiLong(val value: Long) : MoshiNode
 data class MoshiDecimal(val value: Double) : MoshiNode
 data class MoshiBoolean(val value: Boolean) : MoshiNode
 data object MoshiNull : MoshiNode
@@ -20,6 +21,7 @@ fun MoshiNode.unwrap(): Any? = when (this) {
     is MoshiObject -> attributes.mapValues { (_, value) -> value.unwrap() }
     is MoshiString -> value
     is MoshiInteger -> value
+    is MoshiLong -> value
     is MoshiDecimal -> value
     is MoshiNull -> null
     is MoshiBoolean -> value
@@ -38,9 +40,11 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
         .let { MoshiObject(it) }
 
     is Number -> when {
-        obj is Double && obj.isSafeToConvertToLong() -> MoshiInteger(obj.toLong())
-        obj is Float && obj.isSafeToConvertToLong() -> MoshiInteger(obj.toLong())
-        obj is Long || obj is Int -> MoshiInteger(obj.toLong())
+        obj is Double && obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
+        obj is Double && obj.isSafeToConvertToLong() -> MoshiLong(obj.toLong())
+        obj is Long && obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
+        obj is Long -> MoshiLong(obj.toLong())
+        obj is Int || obj is Short -> MoshiInteger(obj.toInt())
         else -> MoshiDecimal(obj.toDouble())
     }
 
@@ -52,5 +56,8 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
 private fun Double.isSafeToConvertToLong() =
     this % 1.0 == 0.0 && this in MIN_VALUE.toDouble()..MAX_VALUE.toDouble()
 
-private fun Float.isSafeToConvertToLong() =
-    this % 1.0 == 0.0 && this in MIN_VALUE.toFloat()..MAX_VALUE.toFloat()
+private fun Double.isSafeToConvertToInt() =
+    this % 1.0 == 0.0 && this in Int.MIN_VALUE.toDouble()..Int.MAX_VALUE.toDouble()
+
+private fun Long.isSafeToConvertToInt() =
+    this in Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()
