@@ -21,7 +21,7 @@ jobs:
           # required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
       - name: Buildnote report
-        uses: buildnote/action@v0.2.10
+        uses: buildnote/action@v0.2.11
         if: always()
         env:
           BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
@@ -52,7 +52,7 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Buildnote
-        uses: buildnote/action@v0.2.10
+        uses: buildnote/action@v0.2.11
         if: always()
         env:
           BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
