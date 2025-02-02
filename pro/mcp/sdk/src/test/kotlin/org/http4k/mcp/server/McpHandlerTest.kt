@@ -76,7 +76,7 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.sse.SseMcpProtocol
+import org.http4k.mcp.server.sse.SseMcpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind

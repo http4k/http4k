@@ -1,10 +1,12 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.server.protocol
 
 import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 

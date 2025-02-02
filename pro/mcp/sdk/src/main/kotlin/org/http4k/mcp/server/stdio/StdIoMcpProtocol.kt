@@ -1,11 +1,10 @@
-package org.http4k.mcp.stdio
+package org.http4k.mcp.server.stdio
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.format.jsonRpcRequest
-import org.http4k.mcp.protocol.McpProtocol
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.Completions
@@ -16,6 +15,7 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType

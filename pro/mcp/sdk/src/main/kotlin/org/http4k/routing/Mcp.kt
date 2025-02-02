@@ -29,8 +29,8 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.sse.SseMcpProtocol
-import org.http4k.mcp.stdio.StdIoMcpProtocol
+import org.http4k.mcp.server.sse.SseMcpProtocol
+import org.http4k.mcp.server.stdio.StdIoMcpProtocol
 import java.io.Reader
 import java.io.Writer
 

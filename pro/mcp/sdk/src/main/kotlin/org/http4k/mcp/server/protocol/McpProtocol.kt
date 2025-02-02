@@ -1,16 +1,20 @@
-package org.http4k.mcp.protocol
+package org.http4k.mcp.server.protocol
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.format.jsonRpcResult
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.mcp.model.LogLevel.error
+import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.protocol.McpException
+import org.http4k.mcp.protocol.McpRpcMethod
+import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.Cancelled
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpCompletion
@@ -24,7 +28,6 @@ import org.http4k.mcp.protocol.messages.McpRoot
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
-import org.http4k.mcp.protocol.messages.ServerMessage.Response.Empty
 import org.http4k.mcp.protocol.messages.fromJsonRpc
 import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.server.capability.Completions
@@ -71,7 +74,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpCompletion.Method ->
                     send(jsonReq.respondTo<McpCompletion.Request> { completions.complete(it, req) }, sId)
 
-                McpPing.Method -> send(jsonReq.respondTo<McpPing.Request> { Empty }, sId)
+                McpPing.Method -> send(jsonReq.respondTo<McpPing.Request> { ServerMessage.Response.Empty }, sId)
 
                 McpPrompt.Get.Method ->
                     send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, req) }, sId)
@@ -128,14 +131,14 @@ abstract class McpProtocol<RSP : Any>(
                                 send(
                                     when (it) {
                                         is McpException -> it.error.toJsonRpc(jsonReq.id)
-                                        else -> InternalError.toJsonRpc(jsonReq.id)
+                                        else -> ErrorMessage.InternalError.toJsonRpc(jsonReq.id)
                                     }, sId
                                 )
                                 error()
                             }.getOrElse { error() }
                         }
                         .getOrElse {
-                            send(InvalidRequest.toJsonRpc(jsonReq.id), sId)
+                            send(ErrorMessage.InvalidRequest.toJsonRpc(jsonReq.id), sId)
                             error()
                         }
 
@@ -154,7 +157,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpTool.List.Method ->
                     send(jsonReq.respondTo<McpTool.List.Request> { tools.list(it, req) }, sId)
 
-                else -> send(MethodNotFound.toJsonRpc(jsonReq.id), sId)
+                else -> send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
             }
 
             else -> {
@@ -176,7 +179,7 @@ abstract class McpProtocol<RSP : Any>(
         val session = ClientSession(request.clientInfo, request.capabilities)
 
         clients[sId] = session
-        logger.subscribe(sId, error) { level, logger, data ->
+        logger.subscribe(sId, LogLevel.error) { level, logger, data ->
             send(
                 McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage),
                 sId
