@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Uri
-import org.http4k.sse.SseClient
+import org.http4k.sse.Http4kSseClient
 import org.http4k.sse.SseMessage.Event
 import org.junit.jupiter.api.Test
 import java.io.StringWriter
@@ -42,7 +42,7 @@ class PipeSseTraffictTest {
                 Response(ACCEPTED)
             },
             { _: Request ->
-                object : SseClient {
+                object : Http4kSseClient {
                     override fun received() = expectedList.asSequence()
                     override fun close() {}
                 }

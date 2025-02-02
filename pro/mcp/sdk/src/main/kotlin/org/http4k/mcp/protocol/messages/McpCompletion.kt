@@ -8,7 +8,7 @@ import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
-object McpCompletion : HasMethod {
+object McpCompletion : McpRpc {
     override val Method = McpRpcMethod.of("completion/complete")
 
     @JsonSerializable

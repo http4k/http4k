@@ -15,13 +15,13 @@ inline fun <reified OUT : Any> JsonRpcRequest<McpNodeType>.fromJsonRpc(): OUT =
 inline fun <reified OUT : Any> JsonRpcResult<McpNodeType>.fromJsonRpc(): OUT =
     McpJson.asA<OUT>(McpJson.compact(result ?: McpJson.nullNode()))
 
-fun McpRequest.toJsonRpc(method: HasMethod, id: McpNodeType) =
+fun McpRequest.toJsonRpc(method: McpRpc, id: McpNodeType) =
     McpJson.renderRequest(method.Method.value, McpJson.asJsonObject(this), id)
 
 fun McpResponse.toJsonRpc(id: McpNodeType?) =
     McpJson.renderResult(McpJson.asJsonObject(this), id ?: McpJson.nullNode())
 
-fun McpNotification.toJsonRpc(method: HasMethod) =
+fun McpNotification.toJsonRpc(method: McpRpc) =
     McpJson.renderRequest(method.Method.value, McpJson.asJsonObject(this), McpJson.nullNode())
 
 fun ErrorMessage.toJsonRpc(id: McpNodeType?) = McpJson.renderError(this, id)

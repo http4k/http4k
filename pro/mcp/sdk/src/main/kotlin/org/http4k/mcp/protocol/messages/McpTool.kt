@@ -12,7 +12,7 @@ import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class McpTool(val name: ToolName, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
-    object List : HasMethod {
+    object List : McpRpc {
         override val Method = of("tools/list")
 
         @JsonSerializable
@@ -28,7 +28,7 @@ data class McpTool(val name: ToolName, val description: String, val inputSchema:
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        data object Changed : HasMethod {
+        data object Changed : McpRpc {
             override val Method: McpRpcMethod = of("notifications/tools/list_changed")
 
             @JsonSerializable
@@ -36,7 +36,7 @@ data class McpTool(val name: ToolName, val description: String, val inputSchema:
         }
     }
 
-    object Call : HasMethod {
+    object Call : McpRpc {
         override val Method = of("tools/call")
 
         @JsonSerializable

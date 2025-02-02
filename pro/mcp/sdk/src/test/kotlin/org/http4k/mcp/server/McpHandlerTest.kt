@@ -62,7 +62,6 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
-import org.http4k.mcp.protocol.messages.HasMethod
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpLogging
@@ -73,6 +72,7 @@ import org.http4k.mcp.protocol.messages.McpRequest
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpResponse
 import org.http4k.mcp.protocol.messages.McpRoot
+import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
@@ -477,11 +477,11 @@ private fun TestSseClient.assertNextMessage(input: McpResponse) {
     assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
 }
 
-private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, notification: McpNotification) {
+private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpNotification) {
     assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(notification), nullNode()) })
 }
 
-private fun TestSseClient.assertNextMessage(hasMethod: HasMethod, input: McpRequest, id: Any) {
+private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpRequest, id: Any) {
     assertNextMessage(with(McpJson) {
         renderRequest(
             hasMethod.Method.value,
@@ -498,7 +498,7 @@ private fun TestSseClient.assertNextMessage(node: McpNodeType) {
     )
 }
 
-private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Request) {
+private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) {
     sendToMcp(with(McpJson) {
         compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
     })
@@ -510,7 +510,7 @@ private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
     })
 }
 
-private fun PolyHandler.sendToMcp(hasMethod: HasMethod, input: ClientMessage.Notification) {
+private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) {
     sendToMcp(with(McpJson) {
         compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
     })

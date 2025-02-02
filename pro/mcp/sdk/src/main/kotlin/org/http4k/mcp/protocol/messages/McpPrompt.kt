@@ -12,7 +12,7 @@ data class McpPrompt(val name: String, val description: String?, val arguments: 
     @JsonSerializable
     data class Argument(val name: String, val description: String? = null, val required: Boolean? = null)
 
-    object Get : HasMethod {
+    object Get : McpRpc {
         override val Method = of("prompts/get")
 
         @JsonSerializable
@@ -30,7 +30,7 @@ data class McpPrompt(val name: String, val description: String?, val arguments: 
         ) : ServerMessage.Response, HasMeta
     }
 
-    object List : HasMethod {
+    object List : McpRpc {
         override val Method = of("prompts/list")
 
         @JsonSerializable
@@ -42,7 +42,7 @@ data class McpPrompt(val name: String, val description: String?, val arguments: 
             override val _meta: Meta = default
         ) : ServerMessage.Response, HasMeta
 
-        object Changed : HasMethod {
+        object Changed : McpRpc {
             override val Method: McpRpcMethod = of("notifications/prompts/list_changed")
 
             @JsonSerializable

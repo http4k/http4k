@@ -1,7 +1,6 @@
 package org.http4k.mcp.client
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -10,62 +9,93 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.format.MoshiObject
 import org.http4k.format.renderRequest
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.lens.accept
 import org.http4k.lens.contentType
-import org.http4k.mcp.CompletionRequest
-import org.http4k.mcp.CompletionResponse
-import org.http4k.mcp.PromptRequest
-import org.http4k.mcp.PromptResponse
-import org.http4k.mcp.ResourceRequest
-import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingRequest
-import org.http4k.mcp.SamplingResponse
-import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.ToolResponse.Error
-import org.http4k.mcp.ToolResponse.Ok
-import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.client.McpClient.Completions
+import org.http4k.mcp.client.McpClient.Prompts
+import org.http4k.mcp.client.McpClient.Resources
+import org.http4k.mcp.client.McpClient.Sampling
+import org.http4k.mcp.client.McpClient.Tools
+import org.http4k.mcp.client.internal.ClientCompletions
+import org.http4k.mcp.client.internal.ClientPrompts
+import org.http4k.mcp.client.internal.ClientResources
+import org.http4k.mcp.client.internal.ClientSampling
+import org.http4k.mcp.client.internal.ClientTools
+import org.http4k.mcp.client.internal.NotificationCallback
+import org.http4k.mcp.client.internal.asAOrThrow
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
-import org.http4k.mcp.protocol.messages.HasMethod
-import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.protocol.messages.McpPrompt
-import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.protocol.messages.McpSampling
-import org.http4k.mcp.protocol.messages.McpTool
+import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
+import org.http4k.sse.Http4kSseClient
 import org.http4k.sse.SseMessage.Event
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.concurrent.thread
 
+/**
+ * Single connection MCP client.
+ */
 class Http4kMcpClient(
     private val sseRequest: Request,
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
     http: HttpHandler,
-    private val protocolVersion: ProtocolVersion,
+    private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
-    private var running = false
+    private val running = AtomicBoolean(false)
 
     private val http = ClientFilters.SetHostFrom(sseRequest.uri).then(http)
+
+    private val sseClient = Http4kSseClient(http)
     private val endpoint = AtomicReference<String>()
 
     private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (Event) -> Boolean>>()
+
+    private val notificationCallbacks = mutableListOf<NotificationCallback<*>>()
+
     private val messageQueues = ConcurrentHashMap<RequestId, LinkedBlockingQueue<Event>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
-        startThread(startLatch)
+        sseClient(sseRequest) {
+            when (it) {
+                is Event -> when (it.event) {
+                    "endpoint" -> {
+                        endpoint.set(it.data)
+                        running.set(true)
+                        startLatch.countDown()
+                    }
+
+                    "ping" -> {}
+                    else -> with(McpJson) {
+                        val request = JsonRpcResult(this, (parse(it.data) as MoshiObject).attributes)
+                        val id = asA<RequestId>(compact(request.id ?: nullNode()))
+
+                        messageQueues[id]
+                            ?.also { queue ->
+                                queue.put(it)
+
+                                val (latch, isComplete) = requests[id] ?: return@also
+                                if (isComplete(it)) requests.remove(id)
+                                latch.countDown()
+                            } // TODO add notifications here
+                    }
+                }
+
+                else -> {}
+            }
+            running.get()
+        }
+
         startLatch.await()
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
@@ -78,207 +108,76 @@ class Http4kMcpClient(
             .onFailure { close() }
     }
 
-    override fun tools() = object : McpClient.Tools {
-        override fun list() = performRequest(McpTool.List, McpTool.List.Request())
-            .mapCatching { (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpTool.List.Response>() }
-            .map { it.tools }
+    override fun tools(): Tools =
+        ClientTools(::findQueue, ::performRequest, notificationCallbacks::add)
 
-        override fun call(name: ToolName, request: ToolRequest) =
-            performRequest(
-                McpTool.Call,
-                McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
-            )
-                .mapCatching { (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpTool.Call.Response>() }
-                .mapCatching {
-                    when (it.isError) {
-                        true -> Error(ErrorMessage(-1, it.content.joinToString()))
-                        else -> Ok(it.content)
-                    }
-                }
-    }
+    override fun prompts(): Prompts =
+        ClientPrompts(::findQueue, ::performRequest, notificationCallbacks::add)
 
-    override fun prompts() = object : McpClient.Prompts {
-        override fun list() = performRequest(McpPrompt.List, McpPrompt.List.Request())
-            .mapCatching { (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpPrompt.List.Response>() }
-            .map { it.prompts }
+    override fun sampling(): Sampling =
+        ClientSampling(::findQueue, ::performRequest)
 
-        override fun get(name: String, request: PromptRequest) =
-            performRequest(McpPrompt.Get, McpPrompt.Get.Request(name, request))
-                .mapCatching { (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpPrompt.Get.Response>() }
-                .map { PromptResponse(it.messages, it.description) }
-    }
+    override fun resources(): Resources =
+        ClientResources(::findQueue, ::performRequest, notificationCallbacks::add)
 
-    override fun sampling() = object : McpClient.Sampling {
-        override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {
-            fun hasStopReason(message: Event): Boolean = message.data.contains(""""stopReason":"""")
+    override fun completions(): Completions =
+        ClientCompletions(::findQueue, ::performRequest)
 
-            val messages = performRequest(
-                McpSampling,
-                with(request) {
-                    McpSampling.Request(
-                        messages,
-                        maxTokens,
-                        systemPrompt,
-                        includeContext,
-                        temperature,
-                        stopSequences,
-                        modelPreferences,
-                        metadata
-                    )
-                },
-                ::hasStopReason
-            ).map { messageQueues[it] ?: error("No queue") }.getOrThrow()
-
-            return sequence {
-                while (true) {
-                    val message = messages.take()
-                    yield(
-                        runCatching { message.asAOrThrow<McpSampling.Response>() }
-                            .map { it: McpSampling.Response ->
-                                SamplingResponse(
-                                    it.model,
-                                    it.stopReason,
-                                    it.role,
-                                    it.content
-                                )
-                            }
-                    )
-
-                    if (hasStopReason(message)) {
-                        break
-                    }
-                }
-            }
-        }
-    }
-
-    override fun resources() = object : McpClient.Resources {
-        override fun list() = performRequest(McpResource.List, McpResource.List.Request())
-            .mapCatching {
-                (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpResource.List.Response>()
-            }
-            .map { it.resources }
-
-        override fun read(name: String, request: ResourceRequest) =
-            performRequest(McpResource.Read, McpResource.Read.Request(request.uri))
-                .mapCatching {
-                    (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpResource.Read.Response>()
-                }
-                .map { ResourceResponse(it.contents) }
-    }
-
-    override fun completions() = object : McpClient.Completions {
-        override fun complete(request: CompletionRequest) =
-            performRequest(McpCompletion, McpCompletion.Request(request.ref, request.argument))
-                .mapCatching {
-                    (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpCompletion.Response>()
-                }
-                .map { CompletionResponse(it.completion) }
-    }
-
-    private fun notify(method: HasMethod, mcp: ClientMessage.Notification): Result<Unit> {
-        val request = Request(POST, Uri.of(endpoint.get()))
-            .contentType(APPLICATION_JSON)
-            .body(
-                McpJson.compact(
-                    McpJson.renderRequest(
-                        method.Method.value,
-                        McpJson.asJsonObject(mcp),
-                        McpJson.nullNode()
-                    )
-                )
-            )
-
+    private fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
+        val response = http(toHttpRequest(method, mcp))
         return when {
-            http(request).status.successful -> runCatching { Unit }
-            else -> runCatching { error("Failed!") }
+            response.status.successful -> runCatching { Unit }
+            else -> runCatching { error("Failed HTTP ${response.status}") }
         }
     }
+
+    private fun findQueue(id: RequestId): LinkedBlockingQueue<Event> =
+        messageQueues[id] ?: error("no queue")
 
     private fun performRequest(
-        method: HasMethod,
-        request: ClientMessage.Request,
+        method: McpRpc,
+        request: ClientMessage,
         isComplete: (Event) -> Boolean = { true }
     ): Result<RequestId> {
         val requestId = RequestId.random()
-
-        val httpReq = Request(POST, Uri.of(endpoint.get()))
-            .contentType(APPLICATION_JSON)
-            .body(with(McpJson) {
-                compact(renderRequest(method.Method.value, asJsonObject(request), asJsonObject(requestId)))
-            })
 
         val latch = CountDownLatch(1)
 
         requests[requestId] = latch to isComplete
         messageQueues[requestId] = LinkedBlockingQueue<Event>()
 
+        val response = http(toHttpRequest(method, request, requestId))
         return when {
-            http(httpReq).status.successful -> {
+            response.status.successful -> {
                 latch.await()
                 runCatching { requestId }
             }
 
             else -> {
+                latch.await()
                 requests.remove(requestId)
                 messageQueues.remove(requestId)
-                runCatching { error("Failed!") }
+                runCatching { error("Failed HTTP ${response.status}") }
             }
         }
     }
 
-    private fun startThread(startLatch: CountDownLatch) = thread {
-        do {
-            try {
-                val response = http(sseRequest.accept(TEXT_EVENT_STREAM))
-
-                response.body.stream.chunkedSseSequence().forEach { msg ->
-                    when (msg) {
-                        is Event -> when (msg.event) {
-                            "endpoint" -> {
-                                endpoint.set(msg.data)
-                                running = true
-                                startLatch.countDown()
-                            }
-
-                            "ping" -> {}
-                            else -> with(McpJson) {
-                                val request = JsonRpcResult(this, (parse(msg.data) as MoshiObject).attributes)
-                                val id = asA<RequestId>(compact(request.id ?: nullNode()))
-
-                                messageQueues[id]?.let { queue ->
-                                    queue.put(msg)
-
-                                    val (latch, isComplete) = requests[id] ?: return@let
-                                    if (isComplete(msg)) {
-                                        requests.remove(id)
-                                    }
-                                    latch.countDown()
-                                }
-                            }
-                        }
-
-                        else -> {}
-                    }
-                    if (!running) return@thread
-                }
-            } catch (e: Exception) {
-                System.err.println("Error: $e")
-                e.printStackTrace()
-            }
-
-        } while (running)
-    }
+    private fun toHttpRequest(
+        rpc: McpRpc,
+        request: ClientMessage,
+        requestId: RequestId? = null
+    ) = Request(POST, Uri.of(endpoint.get()))
+        .contentType(APPLICATION_JSON)
+        .body(with(McpJson) {
+            compact(
+                renderRequest(rpc.Method.value,
+                    asJsonObject(request),
+                    requestId?.let { asJsonObject(it) } ?: nullNode())
+            )
+        })
 
     override fun close() {
-        running = false
-    }
-}
-
-private inline fun <reified T : Any> Event.asAOrThrow() = with(McpJson) {
-    val result = JsonRpcResult(this, (parse(data) as MoshiObject).attributes)
-    when {
-        result.isError() -> error("Failed: " + asFormatString(result.error ?: nullNode()))
-        else -> asA<T>(compact(result.result ?: nullNode()))
+        running.set(false)
+        sseClient.close()
     }
 }

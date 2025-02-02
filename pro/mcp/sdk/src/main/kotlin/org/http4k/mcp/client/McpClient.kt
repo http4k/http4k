@@ -31,11 +31,13 @@ interface McpClient : AutoCloseable {
     fun completions(): Completions
 
     interface Tools {
+        fun onChange(fn: () -> Unit)
         fun list(): Result<List<McpTool>>
         fun call(name: ToolName, request: ToolRequest): Result<ToolResponse>
     }
 
     interface Prompts {
+        fun onChange(fn: () -> Unit)
         fun list(): Result<List<McpPrompt>>
         fun get(name: String, request: PromptRequest): Result<PromptResponse>
     }
@@ -45,6 +47,7 @@ interface McpClient : AutoCloseable {
     }
 
     interface Resources {
+        fun onChange(fn: () -> Unit)
         fun list(): Result<List<McpResource>>
         fun read(name: String, request: ResourceRequest): Result<ResourceResponse>
     }

@@ -5,7 +5,7 @@ import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
-object McpProgress : HasMethod {
+object McpProgress : McpRpc {
     override val Method = of("notifications/progress")
 
     @JsonSerializable

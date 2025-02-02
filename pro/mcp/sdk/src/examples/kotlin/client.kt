@@ -1,5 +1,3 @@
-package org.http4k.mcp.client
-
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Method.GET
@@ -10,6 +8,7 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.client.Http4kMcpClient
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
@@ -17,7 +16,6 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 
@@ -26,8 +24,7 @@ fun main() {
         Request(GET, "http://localhost:3001/sse"),
         VersionedMcpEntity(McpEntity.of("foobar"), Version.of("1.0.0")),
         ClientCapabilities(),
-        JavaHttpClient(responseBodyMode = Stream),
-        LATEST_VERSION,
+        JavaHttpClient(responseBodyMode = Stream)
     )
 
     println(mcpClient.start())

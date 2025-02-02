@@ -7,7 +7,7 @@ import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
 object McpRoot {
-    object List : HasMethod {
+    object List : McpRpc {
         override val Method = McpRpcMethod.of("roots/list")
 
         @JsonSerializable
@@ -18,7 +18,7 @@ object McpRoot {
             ClientMessage.Response, HasMeta
     }
 
-    data object Changed : HasMethod {
+    data object Changed : McpRpc {
         override val Method: McpRpcMethod = of("notifications/roots/list_changed")
 
         @JsonSerializable

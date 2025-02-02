@@ -7,7 +7,7 @@ import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 object McpLogging {
-    object SetLevel : HasMethod {
+    object SetLevel : McpRpc {
         override val Method = McpRpcMethod.of("logging/set_level")
 
         @JsonSerializable
@@ -16,7 +16,7 @@ object McpLogging {
             HasMeta
     }
 
-    object LoggingMessage : HasMethod {
+    object LoggingMessage : McpRpc {
         override val Method = McpRpcMethod.of("notifications/message")
 
         @JsonSerializable

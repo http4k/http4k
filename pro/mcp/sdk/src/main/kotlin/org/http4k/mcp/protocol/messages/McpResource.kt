@@ -19,7 +19,7 @@ data class McpResource(
     val mimeType: MimeType?
 ) {
 
-    object Read : HasMethod {
+    object Read : McpRpc {
         override val Method = of("resources/read")
 
         @JsonSerializable
@@ -35,7 +35,7 @@ data class McpResource(
         ) : ServerMessage.Response, HasMeta
     }
 
-    object List : HasMethod {
+    object List : McpRpc {
         override val Method = of("resources/list")
 
         @JsonSerializable
@@ -51,7 +51,7 @@ data class McpResource(
             override val _meta: Meta = default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        data object Changed : HasMethod {
+        data object Changed : McpRpc {
             override val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
             @JsonSerializable
@@ -59,14 +59,14 @@ data class McpResource(
         }
     }
 
-    data object Updated : HasMethod {
+    data object Updated : McpRpc {
         override val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
         @JsonSerializable
         data class Notification(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification, HasMeta
     }
 
-    object Subscribe : HasMethod {
+    object Subscribe : McpRpc {
         override val Method = of("resources/subscribe")
 
         @JsonSerializable
@@ -76,7 +76,7 @@ data class McpResource(
         ) : ClientMessage.Request, HasMeta
     }
 
-    object Unsubscribe : HasMethod {
+    object Unsubscribe : McpRpc {
         override val Method = of("resources/unsubscribe")
 
         @JsonSerializable
@@ -87,7 +87,7 @@ data class McpResource(
     }
 
     object Template {
-        object List : HasMethod {
+        object List : McpRpc {
             override val Method = of("resources/templates/list")
 
             @JsonSerializable
