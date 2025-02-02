@@ -12,21 +12,17 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ToolName
-import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.ProtocolVersion
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.ServerCapabilities
-import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 
-interface McpClient {
-    fun initialize(
-        clientInfo: VersionedMcpEntity,
-        capabilities: ClientCapabilities = ClientCapabilities(),
-        protocolVersion: ProtocolVersion = LATEST_VERSION
-    ): Result<ServerCapabilities>
+/**
+ * Client for the MCP protocol.
+ */
+interface McpClient : AutoCloseable {
+    fun start(): Result<ServerCapabilities>
+    fun stop() = close()
 
     fun tools(): Tools
     fun prompts(): Prompts

@@ -3,6 +3,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Uri
 import org.http4k.lens.int
+import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceResponse
@@ -10,11 +11,13 @@ import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.capability.PromptCapability
 import org.http4k.mcp.capability.ToolCapability
+import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
@@ -52,6 +55,12 @@ fun tools() = compose(
 fun resources() = compose(
     staticResource(),
     templatedResource()
+)
+
+fun completions() = compose(
+    Reference.Prompt("prompt2") bind {
+        CompletionResponse(Completion(listOf("1", "2")))
+    }
 )
 
 fun prompts() = compose(

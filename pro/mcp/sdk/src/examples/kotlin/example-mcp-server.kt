@@ -16,7 +16,8 @@ fun main() {
         prompts(),
         resources(),
         tools(),
-        sampling()
+        sampling(),
+        completions()
     )
 
     mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
