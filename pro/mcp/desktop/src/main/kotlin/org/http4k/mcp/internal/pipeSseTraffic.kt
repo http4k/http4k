@@ -11,7 +11,7 @@ import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.lens.accept
 import org.http4k.lens.contentType
 import org.http4k.mcp.util.readLines
-import org.http4k.sse.Http4kSseClient
+import org.http4k.sse.SseClient
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import java.io.Reader
@@ -26,7 +26,7 @@ fun pipeSseTraffic(
     scheduler: SimpleScheduler,
     sseRequest: Request,
     http: HttpHandler,
-    makeSseClient: (Request) -> Http4kSseClient,
+    makeSseClient: (Request) -> SseClient,
 ) {
     val httpWithHost = SetHostFrom(sseRequest.uri).then(http)
     makeSseClient(sseRequest.accept(TEXT_EVENT_STREAM))
