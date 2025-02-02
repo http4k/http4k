@@ -1,3 +1,5 @@
+package client
+
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Method.GET

@@ -1,3 +1,5 @@
+package server
+
 import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolCapability
