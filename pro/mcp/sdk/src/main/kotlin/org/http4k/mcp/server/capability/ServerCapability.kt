@@ -1,4 +1,4 @@
-package org.http4k.mcp.capability
+package org.http4k.mcp.server.capability
 
 /**
  * Marker interface for classes which are used to bind capabilities to the MCP server.

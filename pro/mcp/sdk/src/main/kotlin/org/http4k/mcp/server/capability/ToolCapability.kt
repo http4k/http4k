@@ -1,4 +1,4 @@
-package org.http4k.mcp.capability
+package org.http4k.mcp.server.capability
 
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map

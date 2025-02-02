@@ -1,4 +1,4 @@
-package org.http4k.mcp.capability
+package org.http4k.mcp.server.capability
 
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished

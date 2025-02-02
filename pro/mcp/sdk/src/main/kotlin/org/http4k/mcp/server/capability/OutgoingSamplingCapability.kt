@@ -1,4 +1,4 @@
-package org.http4k.mcp.capability
+package org.http4k.mcp.server.capability
 
 import org.http4k.mcp.OutgoingSamplingHandler
 import org.http4k.mcp.SamplingResponse

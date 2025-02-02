@@ -9,8 +9,6 @@ import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.capability.PromptCapability
-import org.http4k.mcp.capability.ToolCapability
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
@@ -22,6 +20,8 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.server.capability.PromptCapability
+import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
 import org.http4k.routing.compose
 import org.jsoup.Jsoup

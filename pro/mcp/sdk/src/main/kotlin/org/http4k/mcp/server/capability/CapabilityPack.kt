@@ -1,4 +1,4 @@
-package org.http4k.mcp.capability
+package org.http4k.mcp.server.capability
 
 /**
  * Provides the facility to compose many capabilities together.
