@@ -5,10 +5,15 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.lens.accept
 import org.http4k.mcp.client.internal.chunkedSseSequence
+import java.time.Duration
+import java.time.Duration.ofSeconds
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
-class Http4kSseClient(private val http: HttpHandler) : AutoCloseable {
+class Http4kSseClient(
+    private val http: HttpHandler,
+    private val reconnectionDelay: Duration = ofSeconds(1)
+) : AutoCloseable {
 
     private val running = AtomicBoolean(false)
 
@@ -21,15 +26,14 @@ class Http4kSseClient(private val http: HttpHandler) : AutoCloseable {
 
                     when {
                         response.status.successful ->
-                            response.body.stream.chunkedSseSequence().forEach { msg: SseMessage ->
-                                if (!onMessage(msg)) return@thread
+                            response.body.stream.chunkedSseSequence().forEach {
+                                if (!onMessage(it)) return@thread
                             }
 
                         else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
                     }
                 } catch (e: Exception) {
-                    System.err.println("Error: $e")
-                    e.printStackTrace()
+                    Thread.sleep(reconnectionDelay)
                 }
             } while (running.get())
         }

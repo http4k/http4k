@@ -1,6 +1,5 @@
 package org.http4k.mcp.internal
 
-import dev.forkhandles.time.executors.SimpleScheduler
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -10,12 +9,12 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.lens.accept
 import org.http4k.lens.contentType
-import org.http4k.mcp.util.readLines
-import org.http4k.sse.SseClient
+import org.http4k.sse.Http4kSseClient
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import java.io.Reader
 import java.io.Writer
+import kotlin.concurrent.thread
 
 /**
  * Connect to the SSE, constructing the request using the passed function
@@ -23,37 +22,35 @@ import java.io.Writer
 fun pipeSseTraffic(
     input: Reader,
     output: Writer,
-    scheduler: SimpleScheduler,
     sseRequest: Request,
-    http: HttpHandler,
-    makeSseClient: (Request) -> SseClient,
+    http: HttpHandler
 ) {
     val httpWithHost = SetHostFrom(sseRequest.uri).then(http)
-    makeSseClient(sseRequest.accept(TEXT_EVENT_STREAM))
-        .use {
-            it.received()
-                .forEach { msg ->
-                    with(output) {
-                        when (msg) {
-                            is Event -> when (msg.event) {
-                                "endpoint" -> scheduler.readLines(input) {
+    Http4kSseClient(http).use { client ->
+        client(sseRequest.accept(TEXT_EVENT_STREAM)) { msg ->
+            when (msg) {
+                is Event -> when (msg.event) {
+                    "endpoint" ->
+                        thread {
+                            input.buffered().lineSequence().forEach {
+                                require(
                                     httpWithHost(
-                                        Request(POST, msg.data)
-                                            .contentType(APPLICATION_JSON)
-                                            .body(it)
-                                    )
-                                }
-
-                                "ping" -> {}
-
-                                else -> write("${msg.data}\n")
+                                        Request(POST, msg.data).contentType(APPLICATION_JSON).body(it)
+                                    ).status.successful
+                                )
                             }
-
-                            is Data -> write("${msg.data}\n")
-                            else -> {}
                         }
-                        flush()
-                    }
+
+                    "ping" -> {}
+
+                    else -> output.write("${msg.data}\n")
                 }
+
+                is Data -> output.write("${msg.data}\n")
+                else -> {}
+            }
+            output.flush()
+            true
         }
+    }
 }

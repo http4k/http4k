@@ -1,14 +1,16 @@
 package org.http4k.mcp
 
 import dev.forkhandles.bunting.use
-import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.client.JavaHttpClient
-import org.http4k.client.JavaSseClient
+import org.http4k.core.BodyMode.Stream
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.extend
-import org.http4k.filter.debug
+import org.http4k.core.then
+import org.http4k.filter.DebuggingFilters
 import org.http4k.mcp.internal.pipeSseTraffic
 import org.http4k.mcp.util.DebuggingReader
 import org.http4k.mcp.util.DebuggingWriter
@@ -20,10 +22,10 @@ object McpDesktop {
             pipeSseTraffic(
                 if (debug) DebuggingReader(System.`in`.reader()) else System.`in`.reader(),
                 if (debug) DebuggingWriter(System.out.writer()) else System.out.writer(),
-                SimpleSchedulerService(1),
                 Request(GET, Uri.of(url).extend(Uri.of("sse"))),
-                if (debug) JavaHttpClient().debug(System.err) else JavaHttpClient(),
-                JavaSseClient()
+                (if (debug) DebuggingFilters.PrintRequestAndResponse(System.err, true) else Filter.NoOp)
+                    .then(JavaHttpClient(responseBodyMode = Stream))
             )
+
         }
 }

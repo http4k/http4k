@@ -40,15 +40,15 @@ fun main() {
             .complete(CompletionRequest(Reference.Prompt("prompt2"), CompletionArgument("foo", "bar"))).getOrThrow()
     )
 
-    println(mcpClient.tools().list().getOrThrow())
-    println(mcpClient.tools().call(ToolName.of("weather"), ToolRequest(mapOf("city" to "london"))).getOrThrow())
-
     println(
         mcpClient.sampling().sample(
             ModelIdentifier.of("asd"),
             SamplingRequest(listOfNotNull(), MaxTokens.of(123))
         ).map { it.getOrThrow() }.toList()
     )
+
+    println(mcpClient.tools().list().getOrThrow())
+    println(mcpClient.tools().call(ToolName.of("weather"), ToolRequest(mapOf("city" to "london"))).getOrThrow())
 
     mcpClient.stop()
 }
