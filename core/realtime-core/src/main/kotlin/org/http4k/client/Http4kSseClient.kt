@@ -1,13 +1,12 @@
 package org.http4k.client
 
+import org.http4k.client.SseReconnectionMode.Disconnect
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.lens.accept
 import org.http4k.sse.SseMessage
 import java.io.InputStream
-import java.time.Duration
-import java.time.Duration.ofSeconds
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -16,13 +15,13 @@ import kotlin.concurrent.thread
  */
 class Http4kSseClient(
     private val http: HttpHandler,
-    private val reconnectionDelay: Duration = ofSeconds(1)
+    private var reconnectionMode: SseReconnectionMode = Disconnect,
+    private val onError: (Exception) -> Unit = {}
 ) : AutoCloseable {
 
-    private val running = AtomicBoolean(false)
+    private val running = AtomicBoolean(true)
 
     operator fun invoke(sseRequest: Request, onMessage: (SseMessage) -> Boolean) {
-        running.set(true)
         thread {
             do {
                 try {
@@ -30,31 +29,31 @@ class Http4kSseClient(
 
                     when {
                         response.status.successful ->
-                            response.body.stream.chunkedSseSequence().forEach {
+                            response.body.stream.chunkedSseSequence(running).forEach {
                                 if (!onMessage(it)) return@thread
                             }
 
                         else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
                     }
                 } catch (e: Exception) {
-                    Thread.sleep(reconnectionDelay)
+                    onError(e)
                 }
-            } while (running.get())
+            } while (reconnectionMode.doReconnect())
         }
     }
 
     override fun close() {
-        running.set(false)
+        reconnectionMode = Disconnect
     }
 }
 
-internal fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
+internal fun InputStream.chunkedSseSequence(running: AtomicBoolean): Sequence<SseMessage> = sequence {
     use {
         val buffer = StringBuilder()
         var lastChar: Int = -1
         var newlineCount = 0
 
-        while (true) {
+        while (running.get()) {
             val current = it.read()
             if (current == -1) {
                 if (buffer.isNotEmpty()) {

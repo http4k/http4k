@@ -1,6 +1,8 @@
 package org.http4k.mcp.internal
 
 import org.http4k.client.Http4kSseClient
+import org.http4k.client.SseReconnectionMode
+import org.http4k.client.SseReconnectionMode.Immediate
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -23,10 +25,11 @@ fun pipeSseTraffic(
     input: Reader,
     output: Writer,
     sseRequest: Request,
-    http: HttpHandler
+    http: HttpHandler,
+    reconnectionMode: SseReconnectionMode = Immediate
 ) {
     val httpWithHost = SetHostFrom(sseRequest.uri).then(http)
-    Http4kSseClient(http).use { client ->
+    Http4kSseClient(http, reconnectionMode).use { client ->
         client(sseRequest.accept(TEXT_EVENT_STREAM)) { msg ->
             when (msg) {
                 is Event -> when (msg.event) {
