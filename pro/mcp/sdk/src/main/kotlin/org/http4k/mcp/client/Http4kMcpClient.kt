@@ -1,5 +1,6 @@
 package org.http4k.mcp.client
 
+import org.http4k.client.Http4kSseClient
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -33,7 +34,6 @@ import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
-import org.http4k.sse.Http4kSseClient
 import org.http4k.sse.SseMessage.Event
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
