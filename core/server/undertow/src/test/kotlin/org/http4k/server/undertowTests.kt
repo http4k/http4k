@@ -12,6 +12,6 @@ class UndertowTest : ServerContract(::Undertow, ClientForServerTesting()) {
 
 class UndertowWebsocketTest : WebsocketServerContract(::Undertow, JavaHttpClient())
 
-class UndertowSseTest : SseServerContract(::Undertow, JavaHttpClient())
+class UndertowSseTest : SseServerContract(::Undertow)
 
-class UndertowDatastarTest : DatastarServerContract(::Undertow, JavaHttpClient())
+class UndertowDatastarTest : DatastarServerContract(::Undertow)

@@ -6,8 +6,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.PATCH
@@ -44,9 +44,9 @@ import org.http4k.routing.bind as hbind
 
 
 abstract class SseServerContract(
-    private val serverConfig: (Int) -> PolyServerConfig,
-    private val client: HttpHandler
+    private val serverConfig: (Int) -> PolyServerConfig
 ) : PortBasedTest {
+    private val client = JavaHttpClient(responseBodyMode = Stream)
     private val err = ByteArrayOutputStream()
     private val sysErr = System.err
 

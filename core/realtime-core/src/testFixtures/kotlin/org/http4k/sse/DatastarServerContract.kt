@@ -2,8 +2,9 @@ package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -30,9 +31,9 @@ import org.junit.jupiter.api.Test
 import org.http4k.routing.bind as hbind
 
 abstract class DatastarServerContract(
-    private val serverConfig: (Int) -> PolyServerConfig,
-    private val client: HttpHandler
+    private val serverConfig: (Int) -> PolyServerConfig
 ): PortBasedTest {
+    private val client = JavaHttpClient(responseBodyMode = Stream)
 
     private lateinit var server: Http4kServer
 
