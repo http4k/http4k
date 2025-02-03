@@ -25,8 +25,11 @@ For instance, if you have an existing adapter such as:
 
 ```kotlin
 class SmsNotificationClient(val client: HttpHandler){
-    fun sendSms(destination: String, message: String) {
-        client(Request(POST, "/sms").header("destination", destination).body(message))
+    fun sendSms(messageId: String, destination: String, message: String) {
+        client(Request(POST, "/sms")
+            .header("x-message-id", messageId)
+            .header("destination", destination)
+            .body(message))
     }
 }
 ```
@@ -40,7 +43,7 @@ val smsClient = SmsNotificationClient(client)
 After:
 ```kotlin
 val outbox: Transactor<Postbox> = ...
-val smsClient = SmsNotificationClient(outbox.intercepting(fromHeader("destination")))
+val smsClient = SmsNotificationClient(outbox.intercepting(fromHeader("x-message-id")))
 ```
 
 ### Idempotency
