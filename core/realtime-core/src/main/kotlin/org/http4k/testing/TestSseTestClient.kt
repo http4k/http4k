@@ -3,7 +3,6 @@ package org.http4k.testing
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.sse.PushAdaptingSse
-import org.http4k.sse.SseClient
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
@@ -12,7 +11,7 @@ import java.util.ArrayDeque
 /**
  * A class that is used for *offline* testing of a routed Sse, without starting up a Server.
  */
-class TestSseClient internal constructor(sseResponse: SseResponse, request: Request) : SseClient {
+class TestSseTestClient internal constructor(sseResponse: SseResponse, request: Request) : SseTestClient {
 
     val status = sseResponse.status
     val headers = sseResponse.headers
@@ -43,6 +42,6 @@ class TestSseClient internal constructor(sseResponse: SseResponse, request: Requ
     }
 }
 
-fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request), request)
-fun PolyHandler.testSseClient(request: Request): TestSseClient =
+fun SseHandler.testSseClient(request: Request): TestSseTestClient = TestSseTestClient(invoke(request), request)
+fun PolyHandler.testSseClient(request: Request): TestSseTestClient =
     sse?.testSseClient(request) ?: error("No SSE handler set.")

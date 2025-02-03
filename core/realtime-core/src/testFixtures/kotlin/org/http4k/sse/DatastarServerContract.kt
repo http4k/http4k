@@ -24,6 +24,7 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Event
+import org.http4k.testing.BlockingSseTestClient
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -62,7 +63,7 @@ abstract class DatastarServerContract(
 
     @Test
     fun `can receive messages from sse`() {
-        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/signal"))
+        val client = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/signal"))
 
         val toList = client.received().toList()
         assertThat(

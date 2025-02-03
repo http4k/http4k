@@ -34,6 +34,7 @@ import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
+import org.http4k.testing.BlockingSseTestClient
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -159,7 +160,7 @@ abstract class SseServerContract(
 
     @Test
     fun `does not error when we do not call close`() {
-        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/noclose"))
+        val client = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/noclose"))
         assertThat(
             client.received().take(1).toList(),
             equalTo(listOf(Event("event", "hello\nworld!", "456")))
@@ -172,7 +173,7 @@ abstract class SseServerContract(
 
     @Test
     fun `can receive messages from sse`() {
-        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob"))
+        val client = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/hello/bob"))
 
         assertThat(
             client.received().take(3).toList(),
@@ -297,7 +298,7 @@ abstract class SseServerContract(
 
     @Test
     fun `can reject request`() {
-        val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob?reject=true"))
+        val client = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/hello/bob?reject=true"))
 
         assertThat(
             client.received().toList(),
@@ -307,9 +308,9 @@ abstract class SseServerContract(
 
     @Test
     fun `can receive messages from sse using multiple clients`() {
-        val client1 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/leia"))
-        val client2 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/luke"))
-        val client3 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/anakin"))
+        val client1 = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/hello/leia"))
+        val client2 = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/hello/luke"))
+        val client3 = BlockingSseTestClient(Uri.of("http://localhost:${server.port()}/hello/anakin"))
 
         assertThat(
             client1.received().take(3).toList(),

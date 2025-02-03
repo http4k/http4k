@@ -1,17 +1,18 @@
-package org.http4k.sse
+package org.http4k.testing
 
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
 import com.launchdarkly.eventsource.background.BackgroundEventHandler
 import com.launchdarkly.eventsource.background.BackgroundEventSource
 import org.http4k.core.Uri
+import org.http4k.sse.SseMessage
 import java.net.URI
 import java.util.concurrent.LinkedBlockingQueue
 
-class BlockingSseClient(
+class BlockingSseTestClient(
     uri: Uri,
     private val queue: LinkedBlockingQueue<() -> SseMessage?> = LinkedBlockingQueue<() -> SseMessage?>()
-) : SseClient {
+) : SseTestClient {
     private val handler = Handler(queue)
     private val client = BackgroundEventSource.Builder(handler, EventSource.Builder(URI.create(uri.toString()))).build()
 
@@ -25,6 +26,7 @@ class BlockingSseClient(
         client.close()
     }
 }
+
 
 private class Handler(private val queue: LinkedBlockingQueue<() -> SseMessage?>) : BackgroundEventHandler {
     override fun onOpen() {
