@@ -97,9 +97,9 @@ routes("/sms" bind POST to postbox.intercepting(myResolver))
 
 ### Filtering request/response data
 
-When storing requests, you may want to remove sensitive data or filter the request/response data. 
+When storing requests, you may want to remove sensitive data or manipulate the request/response data. 
 
-This can be achieved using any http4k `Filter`. For instance:
+This can be achieved using any http4k `Filter`. For instance, using one of the built-in filters:
 
 ```kotlin
 val outbox: PostboxTransactor = ...
