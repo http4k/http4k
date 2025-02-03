@@ -64,6 +64,12 @@ val datasource = HikariDataSource(HikariConfig().apply {
 val transactor = ExposedTransactor(datasource, ::ExposedPostbox)
 ```
 
+The currently supported transactors are:
+
+* In-memory - for testing purposes, manages the transaction in the same thread using simple locks
+* Exposed - for SQL databases, manages the transaction using Exposed
+* Datasource - for SQL databases, manages the transaction using JDBC DataSource and expects databases to support [Serializable isolation level](https://en.wikipedia.org/wiki/Isolation_(database_systems)#Serializable)
+
 ### Idempotency
 
 Idempotency for the Postbox is achieved by having a deterministic `requestId` for each received request.
