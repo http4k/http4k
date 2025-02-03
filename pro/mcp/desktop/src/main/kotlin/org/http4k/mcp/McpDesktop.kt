@@ -2,6 +2,7 @@ package org.http4k.mcp
 
 import dev.forkhandles.bunting.use
 import org.http4k.client.JavaHttpClient
+import org.http4k.client.SseReconnectionMode.Immediate
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
@@ -24,8 +25,8 @@ object McpDesktop {
                 if (debug) DebuggingWriter(System.out.writer()) else System.out.writer(),
                 Request(GET, Uri.of(url).extend(Uri.of("sse"))),
                 (if (debug) DebuggingFilters.PrintRequestAndResponse(System.err, true) else Filter.NoOp)
-                    .then(JavaHttpClient(responseBodyMode = Stream))
+                    .then(JavaHttpClient(responseBodyMode = Stream)),
+                Immediate
             )
-
         }
 }

@@ -2,7 +2,6 @@ package org.http4k.mcp.internal
 
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.SseReconnectionMode
-import org.http4k.client.SseReconnectionMode.Immediate
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -26,23 +25,29 @@ fun pipeSseTraffic(
     output: Writer,
     sseRequest: Request,
     http: HttpHandler,
-    reconnectionMode: SseReconnectionMode = Immediate
+    reconnectionMode: SseReconnectionMode
 ) {
+    val incomingMessages = input.buffered().lineSequence()
+
     val httpWithHost = SetHostFrom(sseRequest.uri).then(http)
     Http4kSseClient(http, reconnectionMode).use { client ->
         client(sseRequest.accept(TEXT_EVENT_STREAM)) { msg ->
             when (msg) {
                 is Event -> when (msg.event) {
-                    "endpoint" ->
+                    "endpoint" -> {
                         thread {
-                            input.buffered().lineSequence().forEach {
-                                require(
-                                    httpWithHost(
-                                        Request(POST, msg.data).contentType(APPLICATION_JSON).body(it)
-                                    ).status.successful
-                                )
-                            }
+                            incomingMessages
+                                .forEach {
+                                    require(
+                                        httpWithHost(
+                                            Request(POST, msg.data)
+                                                .contentType(APPLICATION_JSON)
+                                                .body(it)
+                                        ).status.successful
+                                    )
+                                }
                         }
+                    }
 
                     "ping" -> {}
 

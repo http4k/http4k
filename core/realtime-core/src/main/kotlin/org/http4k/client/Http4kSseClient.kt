@@ -32,7 +32,7 @@ class Http4kSseClient(
 
                     when {
                         response.status.successful ->
-                            response.body.stream.chunkedSseSequence(running).forEach {
+                            response.body.stream.chunkedSseSequence().forEach {
                                 if (!onMessage(it)) return@thread
                             }
 
@@ -51,13 +51,13 @@ class Http4kSseClient(
     }
 }
 
-internal fun InputStream.chunkedSseSequence(running: AtomicBoolean): Sequence<SseMessage> = sequence {
+internal fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
     use {
         val buffer = StringBuilder()
         var lastChar: Int = -1
         var newlineCount = 0
 
-        while (running.get()) {
+        while (true) {
             val current = it.read()
             if (current == -1) {
                 if (buffer.isNotEmpty()) {
