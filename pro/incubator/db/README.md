@@ -95,6 +95,20 @@ val postbox: PostboxTransactor = ...
 routes("/sms" bind POST to postbox.intercepting(myResolver))
 ```
 
+### Filtering request/response data
+
+When storing requests, you may want to remove sensitive data or filter the request/response data. 
+
+This can be achieved using any http4k `Filter`. For instance:
+
+```kotlin
+val outbox: PostboxTransactor = ...
+val outboxClient = RequestFilters.ExcludeHeaders("Authorization")
+    .then(outbox.intercepting(fromHeader("x-message-id")))
+
+val smsClient = SmsNotificationClient(outboxClient)
+```
+
 ### Background Processing
 
 The Postbox provides a simple mechanism to process the requests in the background. Here's an example:
