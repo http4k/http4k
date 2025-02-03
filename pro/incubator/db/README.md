@@ -43,9 +43,14 @@ val smsClient = SmsNotificationClient(client)
 
 After:
 ```kotlin
-val outbox: Transactor<Postbox> = ...
+val outbox: PostboxTransactor = ...
 val smsClient = SmsNotificationClient(outbox.intercepting(fromHeader("x-message-id")))
 ```
+
+### Storage
+
+The Postbox require a transactional storage for requests to be stored and processed reliably. For that, it uses a 
+```kotlin```
 
 ### Idempotency
 
@@ -68,7 +73,7 @@ In this example, the `X-Request-Id` header is used to identify the request and c
 This resolver can then be passed to the Postbox interceptor:
 
 ```kotlin
-val postbox: Transactor<Postbox> = ...
+val postbox: PostboxTransactor = ...
 routes("/sms" bind POST to postbox.intercepting(myResolver))
 ```
 
@@ -83,7 +88,7 @@ val myRequestHandler: HttpHandler = { request -> // this is the request stored i
     if(success) Response(OK) else Response(INTERNAL_SERVER_ERROR) // indicates if the request was processed successfully
 }
 
-val postbox: Transactor<Postbox> = ...
+val postbox: PostboxTransactor = ...
     
 PostboxProcessing(transactor, myRequestHandler).start()
 ```
@@ -123,7 +128,7 @@ The Postbox provides a separate `HttpHandler` to check the status or retrieve th
 Here's an example:
 
 ```kotlin
-val postbox: Transactor<Postbox> = ...
+val postbox: PostboxTransactor = ...
 val handlers = PostboxHandlers(transactor)
 
 routes("/status/{requestId}" bind GET to handlers.status(fromPath("requestId")))
@@ -134,7 +139,7 @@ routes("/status/{requestId}" bind GET to handlers.status(fromPath("requestId")))
 The Postbox can also be used to capture requests and serve the responses after processing them. Here's an example:
 
 ```kotlin
-val transactor: Transactor<Postbox> = ...
+val transactor: PostboxTransactor = ...
 val handler: HttpHandler = ...// a handler to process the requests in the background
 
 PostboxProcessing(transactor, handler).start()
@@ -149,8 +154,6 @@ routes(
     "/workload/status/{taskId}" bind GET to inbox.status(fromPath("taskId"))
 ).asServer(SunHttp(9000)).start()
 ```
-
-### Managing the Postbox storage
 
 ## Testing
 

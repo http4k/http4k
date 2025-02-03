@@ -33,7 +33,7 @@ typealias PendingResponseGenerator = (RequestId) -> Response
  * Configures HTTP handlers for a transactional postbox.
  */
 class PostboxHandlers(
-    private val transactor: Transactor<Postbox>,
+    private val transactor: PostboxTransactor,
     private val responseGenerator: PendingResponseGenerator = Empty
 ) {
 
