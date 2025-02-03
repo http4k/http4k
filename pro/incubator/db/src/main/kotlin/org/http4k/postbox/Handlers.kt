@@ -19,6 +19,7 @@ import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
 import org.http4k.lens.location
 import org.http4k.postbox.PendingResponseGenerators.Empty
+import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.routing.RoutedMessage
@@ -43,7 +44,7 @@ class PostboxHandlers(
      * It'll return a 202 with a Link header to check the status of the request.
      * If the request has already been processed, it'll return the response obtained as part of processing it.
      */
-    fun intercepting(resolver: RequestIdResolver): HttpHandler = { request: Request ->
+    fun intercepting(resolver: RequestIdResolver = fromPath()): HttpHandler = { request: Request ->
         resolver(request).asResultOr { Response(BAD_REQUEST.description("request id not found")) }
             .flatMap { requestId ->
                 transactor.performAsResult { it.store(Postbox.PendingRequest(requestId, request)) }
@@ -99,6 +100,8 @@ object RequestIdResolvers {
                 else -> uriTemplate.extract(request.uri.path)[pathName]
             }?.let(RequestId.Companion::of)
         }
+
+    fun fromPath() = { request: Request -> RequestId.of(request.uri.path) }
 }
 
 object PendingResponseGenerators {
