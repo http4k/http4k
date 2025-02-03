@@ -2,7 +2,7 @@
 
 This module provides a simple mechanism to introduce async processing for HTTP messages.
 
-The most usual use-case for this mechanism is the implementation of the [Transactional Outbox](https://microservices.io/patterns/data/transactional-outbox.html) pattern to prevent data inconsistencies and bugs when sending messages between services or external systems.
+The most common use-case for this mechanism is the implementation of the [Transactional Outbox](https://microservices.io/patterns/data/transactional-outbox.html) pattern to prevent data inconsistencies and bugs when sending messages between services or external systems.
 
 ## Getting started
 
