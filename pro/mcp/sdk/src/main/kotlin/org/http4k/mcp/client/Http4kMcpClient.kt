@@ -124,7 +124,7 @@ class Http4kMcpClient(
         ClientCompletions(::findQueue, ::performRequest)
 
     private fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
-        val response = http(toHttpRequest(method, mcp))
+        val response = http(mcp.toHttpRequest(method))
         return when {
             response.status.successful -> runCatching { Unit }
             else -> runCatching { error("Failed HTTP ${response.status}") }
@@ -135,9 +135,7 @@ class Http4kMcpClient(
         messageQueues[id] ?: error("no queue")
 
     private fun performRequest(
-        method: McpRpc,
-        request: ClientMessage,
-        isComplete: (Event) -> Boolean = { true }
+        method: McpRpc, request: ClientMessage, isComplete: (Event) -> Boolean = { true }
     ): Result<RequestId> {
         val requestId = RequestId.random()
 
@@ -146,7 +144,7 @@ class Http4kMcpClient(
         requests[requestId] = latch to isComplete
         messageQueues[requestId] = LinkedBlockingQueue<Event>()
 
-        val response = http(toHttpRequest(method, request, requestId))
+        val response = http(request.toHttpRequest(method, requestId))
         return when {
             response.status.successful -> {
                 latch.await()
@@ -162,19 +160,16 @@ class Http4kMcpClient(
         }
     }
 
-    private fun toHttpRequest(
-        rpc: McpRpc,
-        request: ClientMessage,
-        requestId: RequestId? = null
-    ) = Request(POST, Uri.of(endpoint.get()))
-        .contentType(APPLICATION_JSON)
-        .body(with(McpJson) {
-            compact(
-                renderRequest(rpc.Method.value,
-                    asJsonObject(request),
-                    requestId?.let { asJsonObject(it) } ?: nullNode())
-            )
-        })
+    private fun ClientMessage.toHttpRequest(rpc: McpRpc, requestId: RequestId? = null) =
+        Request(POST, Uri.of(endpoint.get()))
+            .contentType(APPLICATION_JSON)
+            .body(with(McpJson) {
+                compact(
+                    renderRequest(rpc.Method.value,
+                        asJsonObject(this@toHttpRequest),
+                        requestId?.let { asJsonObject(it) } ?: nullNode())
+                )
+            })
 
     override fun close() {
         running.set(false)
