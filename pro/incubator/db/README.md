@@ -40,6 +40,7 @@ Before:
 val client = SetBaseUriFrom(Uri.of("https://sms-service.external").then(OkHttp())
 val smsClient = SmsNotificationClient(client)
 ```
+
 After:
 ```kotlin
 val outbox: Transactor<Postbox> = ...
@@ -98,8 +99,6 @@ val myCustomResult = Response(ACCEPTED).body("Your request is being processed. P
 
 val postbox = PostboxHandlers(transactor, myCustomResult)
 ```
-
-```kotlin
 
 ### Checking the status of postbox requests
 
