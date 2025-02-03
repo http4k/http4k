@@ -85,7 +85,9 @@ PostboxProcessing(transactor, myRequestHandler).start()
 
 This will start a single background (virtual) thread to process the requests in the Postbox using polling.
 
-It'll do so by polling a small bach of pending requests and processing them in a single database transaction. The responses for those requests are stored so they can be consumed or served later.
+It'll do so by periodically processing a small bach of pending requests in a single database transaction. 
+
+The responses for those requests are stored so they can be consumed or served later.
 
 ### Configuring response for pending requests
 
