@@ -49,7 +49,7 @@ val smsClient = SmsNotificationClient(outbox.intercepting(fromHeader("x-message-
 
 ### Transactional storage
 
-The Postbox require a transactional storage for requests to be stored and processed reliably. For that, it uses a `Transactor` to manage the transaction lifecycle.
+The Postbox requires a transactional storage for requests to be kept and processed reliably. For that, we use a `Transactor` to manage the transaction lifecycle.
 
 Here's an example of how to create a `Transactor` for a PostgreSQL database managed with [Exposed](https://jetbrains.github.io/Exposed/home.html):
 
