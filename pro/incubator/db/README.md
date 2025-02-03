@@ -79,6 +79,25 @@ val postbox: Transactor<Postbox> = ...
 PostboxProcessing(transactor, myRequestHandler).start()
 ```
 
+### Configuring response for pending requests
+
+By default, the Postbox will return a `202 Accepted` response for requests that are still pending. 
+
+Out-of-the-box options are:
+* Empty - returns a `202 Accepted` response with no body
+* Link - returns a `202 Accepted` response with a `Link` header pointing to the status endpoint
+* Redirect - returns a `303 See Other` response with a `Location` header pointing to the status endpoint
+
+Alternatively, you can customize this response by providing a custom `PendingResponseGenerator` for the Postbox:
+
+```kotlin
+val myCustomResult = Response(ACCEPTED).body("Your request is being processed. Please check back later")
+
+val postbox = PostboxHandlers(transactor, myCustomResult)
+```
+
+```kotlin
+
 ### Checking the status of postbox requests
 
 The Postbox provides a separate `HttpHandler` to check the status or retrieve the response of processed requests. 
