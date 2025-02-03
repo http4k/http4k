@@ -49,8 +49,20 @@ val smsClient = SmsNotificationClient(outbox.intercepting(fromHeader("x-message-
 
 ### Storage
 
-The Postbox require a transactional storage for requests to be stored and processed reliably. For that, it uses a 
-```kotlin```
+The Postbox require a transactional storage for requests to be stored and processed reliably. For that, it uses a `Transactor` to manage the transaction lifecycle.
+
+Here's an example of how to create a `Transactor` for a PostgreSQL database managed with [Exposed](https://jetbrains.github.io/Exposed/home.html):
+
+```kotlin
+val datasource = HikariDataSource(HikariConfig().apply {
+        driverClassName = "org.postgresql.Driver"
+        username = "postgres"
+        password = "mysecretpassword"
+        jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
+    })
+
+val transactor = ExposedTransactor(datasource, ::ExposedPostbox)
+```
 
 ### Idempotency
 
