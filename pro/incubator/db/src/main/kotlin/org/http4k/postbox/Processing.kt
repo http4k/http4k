@@ -23,7 +23,7 @@ import kotlin.time.TimeSource.Monotonic.markNow
  * PostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
  */
 class PostboxProcessing(
-    private val transactor: Transactor<Postbox>,
+    private val transactor: PostboxTransactor,
     private val target: HttpHandler,
     private val batchSize: Int = 10,
     private val maxPollingTime: Duration = 5.seconds,

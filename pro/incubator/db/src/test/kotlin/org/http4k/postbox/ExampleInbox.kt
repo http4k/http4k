@@ -16,7 +16,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 fun main() {
-    val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox()).also { transactor ->
+    val transactor = InMemoryTransactor(InMemoryPostbox()).also { transactor ->
         // Notice: in-memory transactor locks the postbox so multiple threads can't access it at the same time.
         // For production use a real database.
         PostboxProcessing(transactor, SlowInternalHandler, events = StdOutEvents).start()
