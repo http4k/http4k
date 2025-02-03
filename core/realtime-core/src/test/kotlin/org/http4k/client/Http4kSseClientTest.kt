@@ -32,7 +32,7 @@ class Http4kSseClientTest : PortBasedTest {
 
         try {
             val messages = mutableListOf<SseMessage>()
-            val latch = CountDownLatch(2)
+            val latch = CountDownLatch(1)
 
             Http4kSseClient(JavaHttpClient(responseBodyMode = Stream)).use { client ->
                 client(Request(GET, "http://localhost:${server.port()}").accept(TEXT_EVENT_STREAM)) { msg ->
@@ -41,6 +41,7 @@ class Http4kSseClientTest : PortBasedTest {
                     true
                 }
 
+                Thread.sleep(100)
                 latch.await()
 
                 assertThat(

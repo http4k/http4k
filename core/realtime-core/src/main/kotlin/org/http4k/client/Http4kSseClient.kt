@@ -16,11 +16,14 @@ import kotlin.concurrent.thread
 class Http4kSseClient(
     private val http: HttpHandler,
     private var reconnectionMode: SseReconnectionMode = Disconnect,
-    private val onError: (Exception) -> Unit = {}
+    private val reportError: (Exception) -> Unit = {}
 ) : AutoCloseable {
 
     private val running = AtomicBoolean(true)
 
+    /**
+     * Connect to the given SSE endpoint and invoke the given function for each message received.
+     */
     operator fun invoke(sseRequest: Request, onMessage: (SseMessage) -> Boolean) {
         thread {
             do {
@@ -36,13 +39,14 @@ class Http4kSseClient(
                         else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
                     }
                 } catch (e: Exception) {
-                    onError(e)
+                    reportError(e)
                 }
             } while (reconnectionMode.doReconnect())
         }
     }
 
     override fun close() {
+        running.set(false)
         reconnectionMode = Disconnect
     }
 }
