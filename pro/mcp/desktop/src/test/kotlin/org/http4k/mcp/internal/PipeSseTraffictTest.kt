@@ -2,6 +2,7 @@ package org.http4k.mcp.internal
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.client.SseReconnectionMode.Immediate
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -64,7 +65,8 @@ class PipeSseTrafficTest {
                 inputMessages.joinToString("\n").reader(),
                 output,
                 Request(GET, "http://host/sse"),
-                http
+                http,
+                Immediate
             )
         }
 
