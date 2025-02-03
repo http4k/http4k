@@ -94,6 +94,10 @@ It'll do so by periodically processing a small bach of pending requests in a sin
 
 The responses for those requests are stored so they can be consumed or served later.
 
+#### Retries & Polling config
+
+// TODO
+
 ### Configuring response for pending requests
 
 By default, the Postbox will return a `202 Accepted` response for requests that are still pending. 
@@ -145,8 +149,6 @@ routes(
     "/workload/status/{taskId}" bind GET to inbox.status(fromPath("taskId"))
 ).asServer(SunHttp(9000)).start()
 ```
-
-### Retries
 
 ### Managing the Postbox storage
 
