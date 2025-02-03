@@ -51,7 +51,12 @@ val smsClient = SmsNotificationClient(outbox.intercepting(fromHeader("x-message-
 
 Idempotency for the Postbox is achieved by having a deterministic `requestId` for each received request.
 
-That can be achieved this by implementing the `RequestIdResolver` function, like this:
+Out-of-the-box options are:
+
+* Header - uses a header value to identify the request
+* Path - uses a path parameter to identify the request
+
+Alternatively, you can customise this by implementing the `RequestIdResolver` function, like this:
 
 ```kotlin
 val myResolver: RequestIdResolver = { request: Request ->
@@ -94,6 +99,7 @@ The responses for those requests are stored so they can be consumed or served la
 By default, the Postbox will return a `202 Accepted` response for requests that are still pending. 
 
 Out-of-the-box options are:
+
 * Empty - returns a `202 Accepted` response with no body
 * Link - returns a `202 Accepted` response with a `Link` header pointing to the status endpoint
 * Redirect - returns a `303 See Other` response with a `Location` header pointing to the status endpoint
