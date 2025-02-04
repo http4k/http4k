@@ -11,6 +11,7 @@ import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.RequestIdResolvers.fromHeader
 import org.http4k.postbox.RequestIdResolvers.fromPath
+import org.http4k.postbox.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes

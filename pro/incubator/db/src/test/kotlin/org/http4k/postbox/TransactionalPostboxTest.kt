@@ -15,6 +15,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.postbox.PendingResponseGenerators.linkHeader
 import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.RequestIdResolvers.fromPath
+import org.http4k.postbox.inmemory.InMemoryPostbox
 import org.junit.jupiter.api.Test
 
 class TransactionalPostboxTest {

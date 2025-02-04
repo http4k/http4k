@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
+import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.createdAt
@@ -52,7 +53,7 @@ class ExposedPostbox : Postbox {
         PostboxTable.select(listOf(PostboxTable.requestId, request, response))
             .where { PostboxTable.requestId eq requestId.value }
             .singleOrNull()
-            ?.toStatus() ?: Failure(PostboxError.RequestNotFound)
+            ?.toStatus() ?: Failure(RequestNotFound)
 
     private fun ResultRow.toStatus() = if (this[response] != null) {
         Success(RequestProcessingStatus.Processed(Response.parse(this[response]!!)))
@@ -61,10 +62,11 @@ class ExposedPostbox : Postbox {
     }
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
-        PostboxTable.update(where = { PostboxTable.requestId eq requestId.value }) { row ->
+        val update = PostboxTable.update(where = { PostboxTable.requestId eq requestId.value }) { row ->
             row[PostboxTable.response] = response.toString()
         }
-        return Success(Unit)
+        return if (update == 0) Failure(RequestNotFound)
+        else Success(Unit)
     }
 
     override fun pendingRequests(batchSize: Int) =

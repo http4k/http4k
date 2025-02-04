@@ -1,10 +1,14 @@
-package org.http4k.postbox
+package org.http4k.postbox.inmemory
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.postbox.Postbox
+import org.http4k.postbox.PostboxError
+import org.http4k.postbox.RequestId
+import org.http4k.postbox.RequestProcessingStatus
 
 class InMemoryPostbox : Postbox {
     private val requests = mutableMapOf<RequestId, Pair<Request, Response?>>()
