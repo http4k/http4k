@@ -131,6 +131,8 @@ It'll do so by periodically processing a small bach of pending requests in a sin
 
 The responses for those requests are stored so they can be consumed or served later.
 
+By default, a request will be marked as processed if the handler returns a `2xx` status code. Otherwise, it'll be marked as failed. This behaviour can be customised using the `successCriteria` (`(Response) -> Boolean`) parameter of the `PostboxProcessing` constructor.
+
 #### Retries & Polling config
 
 // TODO
