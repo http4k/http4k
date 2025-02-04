@@ -48,7 +48,7 @@ abstract class PostboxContract {
 
         store(PendingRequest(requestId, request1))
 
-        markProcessed(requestId, Response(I_M_A_TEAPOT))
+        markProcessed(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
         store(PendingRequest(requestId, request2), expectedStatus = Success(Processed(Response(I_M_A_TEAPOT))))
 
@@ -82,6 +82,11 @@ abstract class PostboxContract {
     }
 
     @Test
+    fun `cannot mark a request as processed if it does not exist`() {
+        markProcessed(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
+    }
+
+    @Test
     fun `can check status of a request`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
@@ -91,7 +96,7 @@ abstract class PostboxContract {
 
         checkStatus(request.requestId, Success(Pending))
 
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT))
+        markProcessed(request.requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
         checkStatus(request.requestId, Success(Processed(Response(I_M_A_TEAPOT))))
     }
@@ -101,9 +106,13 @@ abstract class PostboxContract {
         assertThat(status, equalTo(expected))
     }
 
-    private fun markProcessed(requestId: RequestId, response: Response) {
+    private fun markProcessed(
+        requestId: RequestId,
+        response: Response,
+        expects: Result<Unit, PostboxError> = Success(Unit)
+    ) {
         val result = postbox.perform { it.markProcessed(requestId, response) }
-        assertThat(result, equalTo(Success(Unit)))
+        assertThat(result, equalTo(expects))
     }
 
     private fun checkPending(vararg expected: PendingRequest) {

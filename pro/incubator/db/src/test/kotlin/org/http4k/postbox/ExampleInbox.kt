@@ -10,6 +10,7 @@ import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.PendingResponseGenerators.redirect
 import org.http4k.postbox.RequestIdResolvers.fromPath
+import org.http4k.postbox.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
