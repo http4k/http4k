@@ -34,13 +34,14 @@ class PostboxProcessing(
     private val maxPollingTime: Duration = 5.seconds,
     private val events: Events = { },
     private val executorService: ExecutorService = Executors.newVirtualThreadPerTaskExecutor(),
+    private val successCriteria: (Response) -> Boolean = { it.status.successful }
 ) : Runnable {
     private var running = true
 
     override fun run() {
         while (running) {
             val mark = markNow()
-            val result = processPendingRequests()
+            val result = processPendingRequests(successCriteria)
             val elapsedTime = mark.elapsedNow()
 
             result
@@ -63,12 +64,12 @@ class PostboxProcessing(
         executorService.execute(this)
     }
 
-    fun processPendingRequests(): Result<Int, RequestProcessingError> = transactor.performAsResult { postbox ->
+    fun processPendingRequests(successCriteria: (Response) -> Boolean): Result<Int, RequestProcessingError> = transactor.performAsResult { postbox ->
         // TODO: implement max number of retries?
         // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
         val pendingRequests = postbox.pendingRequests(batchSize)
         for (pending in pendingRequests) {
-            processPendingRequest(postbox, pending)
+            processPendingRequest(postbox, pending,successCriteria)
                 .peek { events(RequestProcessingSucceeded(pending.requestId)) }
                 .peekFailure { events(RequestProcessingFailed(it.reason)) }
         }
@@ -77,7 +78,7 @@ class PostboxProcessing(
 
     private fun processPendingRequest(
         postbox: Postbox, pending: Postbox.PendingRequest,
-        successCriteria: (Response) -> Boolean = { it.status.successful }
+        successCriteria: (Response) -> Boolean
     ): Result<Unit, RequestProcessingError> = target(pending.request).let { response ->
         if (successCriteria(response)) {
             postbox.markProcessed(pending.requestId, response)
