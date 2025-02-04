@@ -3,60 +3,77 @@ package org.http4k.postbox
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.RequestProcessingStatus.Pending
-import org.http4k.postbox.exposed.ExposedPostbox
-import org.jetbrains.exposed.sql.deleteAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 
 abstract class PostboxContract {
     abstract val postbox: PostboxTransactor
 
     @Test
     fun `can store request in datasource`() {
-        val newRequest = PendingRequest(RequestId.of(UUID.randomUUID().toString()), Request(Method.GET, "/"))
+        val newRequest = PendingRequest(id(1), Request(GET, "/"))
 
-        val result = postbox.perform { it.store(newRequest) }
-        assertThat(result, equalTo(Success(Pending)))
+        store(newRequest)
 
-        val pending = postbox.perform { it.pendingRequests(1) }
-        assertThat(pending, equalTo(listOf(PendingRequest(newRequest.requestId, newRequest.request))))
+        checkPending(newRequest)
     }
 
     @Test
     fun `store is idempotent`() {
-        val requestId = RequestId.of(UUID.randomUUID().toString())
-        val request1 = Request(Method.GET, "/foo")
-        val request2 = Request(Method.GET, "/bar")
+        val requestId = id(1)
+        val request1 = Request(GET, "/foo")
+        val request2 = Request(GET, "/bar")
 
-        val result = postbox.perform { it.store(PendingRequest(requestId, request1)) }
-        assertThat(result, equalTo(Success(Pending)))
+        store(PendingRequest(requestId, request1))
+        store(PendingRequest(requestId, request2))
 
-        val result2 = postbox.perform { it.store(PendingRequest(requestId, request2)) }
-        assertThat(result2, equalTo(Success(Pending)))
+        checkPending(PendingRequest(requestId, request1))
+    }
 
-        val pending = postbox.perform { it.pendingRequests(10) }
-        assertThat(pending, equalTo(listOf(PendingRequest(requestId, request1))))
+    @Test
+    fun `multiple stores for the same request do not affect pending retrieval order`() {
+        val newRequestOne = PendingRequest(id(1), Request(GET, "/foo"))
+        val newRequestTwo = PendingRequest(id(2), Request(GET, "/bar"))
+
+        store(newRequestOne)
+        store(newRequestTwo)
+
+        checkPending(newRequestOne, newRequestTwo)
+
+        store(newRequestOne)
+
+        checkPending(newRequestOne, newRequestTwo)
+
     }
 
     @Test
     fun `can mark request as processed`() {
-        val request = PendingRequest(RequestId.of(UUID.randomUUID().toString()), Request(Method.GET, "/"))
+        val request = PendingRequest(id(1), Request(GET, "/"))
 
-        postbox.perform { it.store(request) }
+        store(request)
 
         val result = postbox.perform { it.markProcessed(request.requestId, Response(I_M_A_TEAPOT)) }
         assertThat(result, equalTo(Success(Unit)))
 
-        val pending = postbox.perform { it.pendingRequests(10) }
-        assertThat(pending, equalTo(emptyList()))
+        checkPending()
     }
+
+    private fun checkPending(vararg expected: PendingRequest) {
+        val pending = postbox.perform { it.pendingRequests(10) }
+        assertThat(pending, equalTo(expected.toList()))
+    }
+
+    private fun store(request: PendingRequest) {
+        val result = postbox.perform { it.store(request) }
+        assertThat(result, equalTo(Success(Pending)))
+    }
+
+    private fun id(id: Int) = RequestId.of(id.toString())
 
 }
 
