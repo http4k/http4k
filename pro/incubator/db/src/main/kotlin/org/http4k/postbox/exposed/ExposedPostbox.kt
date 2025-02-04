@@ -3,11 +3,15 @@ package org.http4k.postbox.exposed
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
+import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
@@ -22,7 +26,7 @@ class ExposedPostbox(prefix: String) : Postbox {
 
     override fun store(pending: Postbox.PendingRequest): Result<RequestProcessingStatus, PostboxError> =
         table.upsertReturning(
-            returning = listOf(table.requestId, table.response),
+            returning = listOf(table.requestId, table.response, table.failed),
             onUpdateExclude = listOf(table.request)
         ) { row ->
             row[requestId] = pending.requestId.value
@@ -30,20 +34,52 @@ class ExposedPostbox(prefix: String) : Postbox {
         }.single().toStatus()
 
     override fun status(requestId: RequestId) =
-        table.select(listOf(table.requestId, table.request, table.response))
+        table.select(listOf(table.requestId, table.request, table.response, table.failed))
             .where { table.requestId eq requestId.value }
             .singleOrNull()
             ?.toStatus() ?: Failure(RequestNotFound)
 
-    private fun ResultRow.toStatus() = if (this[table.response] != null) {
-        Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
-    } else {
-        Success(RequestProcessingStatus.Pending)
+    private fun ResultRow.toStatus() = when {
+        this[table.failed] -> {
+            Success(RequestProcessingStatus.Failed(this[table.response]?.let(Response::parse)))
+        }
+
+        this[table.response] != null -> {
+            Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
+        }
+
+        else -> {
+            Success(RequestProcessingStatus.Pending)
+        }
     }
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
         val update = table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response.toString()
+        }
+        return if (update == 0) Failure(RequestNotFound)
+        else Success(Unit)
+    }
+
+    override fun markFailed(requestId: RequestId, response: Response?): Result<Unit, PostboxError> =
+        status(requestId)
+            .onFailure { return it }
+            .let {
+                when (it) {
+                    is RequestProcessingStatus.Failed -> markFailureInternal(requestId, it.response ?: response)
+                    is RequestProcessingStatus.Pending -> markFailureInternal(requestId, response)
+                    is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
+                }
+            }
+
+
+    private fun markFailureInternal(
+        requestId: RequestId,
+        response: Response?
+    ): Result<Unit, PostboxError> {
+        val update = table.update(where = { table.requestId eq requestId.value }) { row ->
+            row[table.response] = response.toString()
+            row[table.failed] = true
         }
         return if (update == 0) Failure(RequestNotFound)
         else Success(Unit)

@@ -8,9 +8,12 @@ import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
+import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
+import org.http4k.postbox.RequestProcessingStatus.Failed
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.junit.jupiter.api.Test
@@ -84,6 +87,51 @@ abstract class PostboxContract {
     @Test
     fun `cannot mark a request as processed if it does not exist`() {
         markProcessed(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
+    }
+
+    @Test
+    fun `can mark request as failed`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markFailed(request, Response(I_M_A_TEAPOT))
+
+        checkPending()
+        checkStatus(request.requestId, Success(Failed(Response(I_M_A_TEAPOT))))
+    }
+
+    @Test
+    fun `subsequent marks as failures do not override existing response`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markFailed(request, Response(I_M_A_TEAPOT))
+        markFailed(request, Response(BAD_REQUEST))
+
+        checkPending()
+        checkStatus(request.requestId, Success(Failed(Response(I_M_A_TEAPOT))))
+    }
+
+    @Test
+    fun `cannot mark request as failed after it has been processed`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markProcessed(request.requestId, Response(I_M_A_TEAPOT))
+        markFailed(request, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
+
+        checkPending()
+    }
+
+    private fun markFailed(
+        request: PendingRequest, response: Response? = null,
+        expecting: Result<Unit, PostboxError> = Success(Unit)
+    ) {
+        val result = postbox.perform { it.markFailed(request.requestId, response) }
+        assertThat(result, equalTo(expecting))
     }
 
     @Test

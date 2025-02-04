@@ -13,5 +13,6 @@ class PostboxTable(prefix: String) : Table("${prefix}_postbox") {
     val createdAt: Column<Instant> = timestamp("created_at").defaultExpression(dbTimestampNow)
     val request: Column<String> = text("request")
     val response: Column<String?> = text("response").nullable()
+    val failed = bool("failed").default(false)
     override val primaryKey = PrimaryKey(requestId, name = "${prefix}_request_id_pk")
 }
