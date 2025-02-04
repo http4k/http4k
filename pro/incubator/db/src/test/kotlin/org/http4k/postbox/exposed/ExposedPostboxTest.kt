@@ -14,10 +14,10 @@ class ExposedPostboxTest : PostboxContract() {
         postbox.perform { ExposedPostbox.Companion.PostboxTable.deleteAll() }
     }
 
-    override val postbox = ExposedTransactor(testDataSource(), { ExposedPostbox() })
+    override val postbox = ExposedTransactor(postboxDatasource(), { ExposedPostbox() })
 }
 
-private fun testDataSource() = try {
+fun postboxDatasource() = try {
     HikariDataSource(HikariConfig().apply {
         driverClassName = "org.postgresql.Driver"
         username = "postgres"

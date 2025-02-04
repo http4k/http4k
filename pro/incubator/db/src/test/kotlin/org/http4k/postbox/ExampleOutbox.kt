@@ -7,11 +7,12 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.db.InMemoryTransactor
+import org.http4k.db.ExposedTransactor
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.RequestIdResolvers.fromHeader
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.inmemory.InMemoryPostbox
+import org.http4k.postbox.exposed.ExposedPostbox
+import org.http4k.postbox.exposed.postboxDatasource
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -22,9 +23,7 @@ import org.http4k.server.asServer
 fun main() {
     ThirdPartySlowSmsService().asServer(SunHttp(8000)).start()
 
-    val transactor = InMemoryTransactor(InMemoryPostbox()).also { transactor ->
-        // Notice: in-memory transactor locks the postbox so multiple threads can't access it at the same time.
-        // For production use a real database.
+    val transactor = ExposedTransactor(postboxDatasource(), { ExposedPostbox() }).also { transactor ->
         PostboxProcessing(transactor, JavaHttpClient(), events = StdOutEvents).start()
     }
 
