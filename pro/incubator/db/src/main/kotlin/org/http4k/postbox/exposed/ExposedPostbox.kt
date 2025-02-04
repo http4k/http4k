@@ -10,6 +10,7 @@ import org.http4k.postbox.PostboxError
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.createdAt
+import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.request
 import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.requestId
 import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.response
 import org.jetbrains.exposed.sql.Column
@@ -20,6 +21,7 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insertReturning
 import org.jetbrains.exposed.sql.javatime.JavaInstantColumnType
 import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.sql.upsertReturning
 import java.time.Instant
 
 class ExposedPostbox : Postbox {
@@ -35,9 +37,9 @@ class ExposedPostbox : Postbox {
     }
 
     override fun store(pending: Postbox.PendingRequest): Result<RequestProcessingStatus, PostboxError> =
-        PostboxTable.insertReturning(
-            listOf(requestId, response),
-            ignoreErrors = false
+        PostboxTable.upsertReturning(
+            returning = listOf(requestId, response),
+            onUpdateExclude = listOf(createdAt, request)
         ) { row ->
             row[requestId] = pending.requestId.value
             row[request] = pending.request.toString()
@@ -58,14 +60,14 @@ class ExposedPostbox : Postbox {
     }
 
     override fun pendingRequests(batchSize: Int) =
-        PostboxTable.select(listOf(requestId, PostboxTable.request))
+        PostboxTable.select(listOf(requestId, request))
             .where(response.isNull())
             .orderBy(createdAt, DESC)
             .limit(batchSize)
             .map {
                 Postbox.PendingRequest(
                     RequestId.of(it[requestId]),
-                    Request.parse(it[PostboxTable.request])
+                    Request.parse(it[request])
                 )
             }
 }
