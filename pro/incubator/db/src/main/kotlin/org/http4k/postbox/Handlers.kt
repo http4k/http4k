@@ -13,6 +13,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.db.Transactor
@@ -80,7 +81,7 @@ class PostboxHandlers(
     private fun RequestProcessingStatus.toResponse(requestId: RequestId) = when (this) {
         is Pending -> responseGenerator(requestId)
         is Processed -> response
-        is Failed -> Response(INTERNAL_SERVER_ERROR.description("request failed"))
+        is Failed -> response ?: Response(NO_CONTENT)
     }
 
     private fun PostboxError.toResponse() =

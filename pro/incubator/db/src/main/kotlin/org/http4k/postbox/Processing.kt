@@ -2,10 +2,15 @@ package org.http4k.postbox
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.get
+import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.peek
 import dev.forkhandles.result4k.peekFailure
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
@@ -78,7 +83,10 @@ class PostboxProcessing(
             postbox.markProcessed(pending.requestId, response)
                 .mapFailure { RequestProcessingError(it.description) }
         } else {
-            Failure(RequestProcessingError("response did not pass success criteria"))
+            postbox.markFailed(pending.requestId, response)
+                .mapFailure { RequestProcessingError(it.description) }
+                .flatMap { Failure(RequestProcessingError("response did not pass success criteria")) }
+                .get().let(::Failure)
         }
     }
 }
