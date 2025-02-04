@@ -7,15 +7,15 @@ import javax.sql.DataSource
 
 object ExposedPostboxSchema {
 
-    fun create(dataSource: DataSource) {
+    fun create(dataSource: DataSource, prefix: String = "http4k") {
         ExposedTransactor(dataSource) { }.perform {
-            SchemaUtils.create(ExposedPostbox.Companion.PostboxTable)
+            SchemaUtils.create(PostboxTable(prefix))
         }
     }
 
-    fun printCreateStatements(dataSource: DataSource) {
+    fun printCreateStatements(dataSource: DataSource, prefix: String = "http4k") {
         ExposedTransactor(dataSource) { }.perform(Transactor.Mode.ReadOnly) {
-            SchemaUtils.createStatements(ExposedPostbox.Companion.PostboxTable).joinToString("\n").also(::println)
+            SchemaUtils.createStatements(PostboxTable(prefix)).joinToString("\n").also(::println)
         }
     }
 }

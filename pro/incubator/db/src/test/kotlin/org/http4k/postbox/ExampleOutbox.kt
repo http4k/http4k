@@ -7,11 +7,9 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.db.ExposedTransactor
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.RequestIdResolvers.fromHeader
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.exposed.ExposedPostbox
 import org.http4k.postbox.exposed.PostboxTransactor
 import org.http4k.postbox.exposed.postgresDataSource
 import org.http4k.routing.bind
