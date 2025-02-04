@@ -60,7 +60,7 @@ interface Postbox {
     fun markFailed(requestId: RequestId, response: Response? = null): Result<Unit, PostboxError>
 
     /**
-     * Retrieve all pending requests. Those are the ones that have not been marked as processed yet.
+     * Retrieve all pending requests. Those are the ones that have not been marked as processed or failed yet.
      *
      * @return a list of all pending requests in first-in-first-out order
      */
@@ -83,7 +83,7 @@ sealed class PostboxError(val description: String) {
 sealed class RequestProcessingStatus {
     data object Pending : RequestProcessingStatus()
     data class Processed(val response: Response) : RequestProcessingStatus()
-    data class Failed(val response: Response?) : RequestProcessingStatus()
+    data class Failed(val response: Response? = null) : RequestProcessingStatus()
 }
 
 class RequestId private constructor(value: String) : StringValue(value) {

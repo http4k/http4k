@@ -67,7 +67,7 @@ class InMemoryPostbox : Postbox {
         } ?: Failure(PostboxError.RequestNotFound)
 
     override fun pendingRequests(batchSize: Int) = requests
-        .filter { it.value.response == null }
+        .filter { it.value.response == null && !it.value.failed }
         .map { Postbox.PendingRequest(it.key, it.value.request) }
         .toList()
 

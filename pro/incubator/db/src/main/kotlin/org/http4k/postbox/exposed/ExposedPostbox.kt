@@ -3,8 +3,6 @@ package org.http4k.postbox.exposed
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -17,7 +15,11 @@ import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.booleanLiteral
+import org.jetbrains.exposed.sql.not
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsertReturning
 
@@ -78,7 +80,7 @@ class ExposedPostbox(prefix: String) : Postbox {
         response: Response?
     ): Result<Unit, PostboxError> {
         val update = table.update(where = { table.requestId eq requestId.value }) { row ->
-            row[table.response] = response.toString()
+            row[table.response] = response?.toString()
             row[table.failed] = true
         }
         return if (update == 0) Failure(RequestNotFound)
@@ -87,7 +89,7 @@ class ExposedPostbox(prefix: String) : Postbox {
 
     override fun pendingRequests(batchSize: Int) =
         table.select(listOf(table.requestId, table.request))
-            .where(table.response.isNull())
+            .where(table.response.isNull() and not(table.failed eq booleanLiteral(true)))
             .orderBy(table.createdAt, ASC)
             .limit(batchSize)
             .map {
