@@ -102,6 +102,18 @@ abstract class PostboxContract {
     }
 
     @Test
+    fun `can mark request as failed without a response`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markFailed(request)
+
+        checkPending()
+        checkStatus(request.requestId, Success(Failed()))
+    }
+
+    @Test
     fun `subsequent marks as failures do not override existing response`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
