@@ -1,5 +1,6 @@
 package org.http4k.postbox.exposed
 
+import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
@@ -15,11 +16,10 @@ import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.requestI
 import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.response
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.CustomFunction
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
-import org.jetbrains.exposed.sql.SortOrder.DESC
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insertReturning
 import org.jetbrains.exposed.sql.javatime.JavaInstantColumnType
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.update
@@ -46,16 +46,18 @@ class ExposedPostbox : Postbox {
         ) { row ->
             row[requestId] = pending.requestId.value
             row[request] = pending.request.toString()
-        }.single().let { row ->
-            if (row[response] != null) {
-                Success(RequestProcessingStatus.Processed(Response.parse(row[response]!!)))
-            } else {
-                Success(RequestProcessingStatus.Pending)
-            }
-        }
+        }.single().toStatus()
 
-    override fun status(requestId: RequestId): Result<RequestProcessingStatus, PostboxError> {
-        TODO("Not yet implemented")
+    override fun status(requestId: RequestId) =
+        PostboxTable.select(listOf(PostboxTable.requestId, request, response))
+            .where { PostboxTable.requestId eq requestId.value }
+            .singleOrNull()
+            ?.toStatus() ?: Failure(PostboxError.RequestNotFound)
+
+    private fun ResultRow.toStatus() = if (this[response] != null) {
+        Success(RequestProcessingStatus.Processed(Response.parse(this[response]!!)))
+    } else {
+        Success(RequestProcessingStatus.Pending)
     }
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
