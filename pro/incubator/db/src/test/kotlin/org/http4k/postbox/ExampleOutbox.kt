@@ -12,7 +12,8 @@ import org.http4k.events.StdOutEvents
 import org.http4k.postbox.RequestIdResolvers.fromHeader
 import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.postbox.exposed.ExposedPostbox
-import org.http4k.postbox.exposed.postboxDatasource
+import org.http4k.postbox.exposed.PostboxTransactor
+import org.http4k.postbox.exposed.postgresDataSource
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -23,7 +24,7 @@ import org.http4k.server.asServer
 fun main() {
     ThirdPartySlowSmsService().asServer(SunHttp(8000)).start()
 
-    val transactor = ExposedTransactor(postboxDatasource(), { ExposedPostbox() }).also { transactor ->
+    val transactor = PostboxTransactor(postgresDataSource()).also { transactor ->
         PostboxProcessing(transactor, JavaHttpClient(), events = StdOutEvents).start()
     }
 

@@ -6,19 +6,18 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate.Companion.from
-import org.http4k.db.ExposedTransactor
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.PendingResponseGenerators.redirect
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.exposed.ExposedPostbox
-import org.http4k.postbox.exposed.postboxDatasource
+import org.http4k.postbox.exposed.PostboxTransactor
+import org.http4k.postbox.exposed.postgresDataSource
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 fun main() {
-    val transactor = ExposedTransactor(postboxDatasource(), { ExposedPostbox() }).also { transactor ->
+    val transactor = PostboxTransactor(postgresDataSource()).also { transactor ->
         PostboxProcessing(transactor, SlowInternalHandler, events = StdOutEvents).start()
     }
 
