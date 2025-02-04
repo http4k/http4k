@@ -11,73 +11,53 @@ import org.http4k.postbox.PostboxError
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
-import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.createdAt
-import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.request
-import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.requestId
-import org.http4k.postbox.exposed.ExposedPostbox.Companion.PostboxTable.response
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.CustomFunction
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.javatime.JavaInstantColumnType
-import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsertReturning
-import java.time.Instant
 
-class ExposedPostbox : Postbox {
-    companion object {
-        private val dbTimestampNow = object : CustomFunction<Instant>("now", JavaInstantColumnType()) {}
-
-        object PostboxTable : Table("postbox") {
-            val requestId: Column<String> = varchar("request_id", 36)
-            val createdAt: Column<Instant> = timestamp("created_at").defaultExpression(dbTimestampNow)
-            val request: Column<String> = text("request")
-            val response: Column<String?> = text("response").nullable()
-            override val primaryKey = PrimaryKey(requestId, name = "request_id_pk")
-        }
-    }
+class ExposedPostbox(prefix: String) : Postbox {
+    private val table = PostboxTable(prefix)
 
     override fun store(pending: Postbox.PendingRequest): Result<RequestProcessingStatus, PostboxError> =
-        PostboxTable.upsertReturning(
-            returning = listOf(requestId, response),
-            onUpdateExclude = listOf(request)
+        table.upsertReturning(
+            returning = listOf(table.requestId, table.response),
+            onUpdateExclude = listOf(table.request)
         ) { row ->
             row[requestId] = pending.requestId.value
             row[request] = pending.request.toString()
         }.single().toStatus()
 
     override fun status(requestId: RequestId) =
-        PostboxTable.select(listOf(PostboxTable.requestId, request, response))
-            .where { PostboxTable.requestId eq requestId.value }
+        table.select(listOf(table.requestId, table.request, table.response))
+            .where { table.requestId eq requestId.value }
             .singleOrNull()
             ?.toStatus() ?: Failure(RequestNotFound)
 
-    private fun ResultRow.toStatus() = if (this[response] != null) {
-        Success(RequestProcessingStatus.Processed(Response.parse(this[response]!!)))
+    private fun ResultRow.toStatus() = if (this[table.response] != null) {
+        Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
     } else {
         Success(RequestProcessingStatus.Pending)
     }
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
-        val update = PostboxTable.update(where = { PostboxTable.requestId eq requestId.value }) { row ->
-            row[PostboxTable.response] = response.toString()
+        val update = table.update(where = { table.requestId eq requestId.value }) { row ->
+            row[table.response] = response.toString()
         }
         return if (update == 0) Failure(RequestNotFound)
         else Success(Unit)
     }
 
     override fun pendingRequests(batchSize: Int) =
-        PostboxTable.select(listOf(requestId, request))
-            .where(response.isNull())
-            .orderBy(createdAt, ASC)
+        table.select(listOf(table.requestId, table.request))
+            .where(table.response.isNull())
+            .orderBy(table.createdAt, ASC)
             .limit(batchSize)
             .map {
                 Postbox.PendingRequest(
-                    RequestId.of(it[requestId]),
-                    Request.parse(it[request])
+                    RequestId.of(it[table.requestId]),
+                    Request.parse(it[table.request])
                 )
             }
 }
