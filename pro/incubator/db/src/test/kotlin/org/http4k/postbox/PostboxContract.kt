@@ -3,6 +3,7 @@ package org.http4k.postbox
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -11,6 +12,7 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestProcessingStatus.Pending
+import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.junit.jupiter.api.Test
 
 abstract class PostboxContract {
@@ -22,6 +24,7 @@ abstract class PostboxContract {
 
         store(newRequest)
 
+        checkStatus(newRequest.requestId, Success(Pending))
         checkPending(newRequest)
     }
 
@@ -35,6 +38,21 @@ abstract class PostboxContract {
         store(PendingRequest(requestId, request2))
 
         checkPending(PendingRequest(requestId, request1))
+    }
+
+    @Test
+    fun `store is idempotent even after processing`() {
+        val requestId = id(1)
+        val request1 = Request(GET, "/foo")
+        val request2 = Request(GET, "/bar")
+
+        store(PendingRequest(requestId, request1))
+
+        markProcessed(requestId, Response(I_M_A_TEAPOT))
+
+        store(PendingRequest(requestId, request2), expectedStatus = Success(Processed(Response(I_M_A_TEAPOT))))
+
+        checkPending()
     }
 
     @Test
@@ -67,19 +85,20 @@ abstract class PostboxContract {
     fun `can check status of a request`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
-        val status1 = postbox.perform { it.status(request.requestId) }
-        assertThat(status1, equalTo(Failure(RequestNotFound)))
+        checkStatus(request.requestId, Failure(RequestNotFound))
 
         store(request)
 
-        val status = postbox.perform { it.status(request.requestId) }
-        assertThat(status, equalTo(Success(Pending)))
+        checkStatus(request.requestId, Success(Pending))
 
         markProcessed(request.requestId, Response(I_M_A_TEAPOT))
 
-        val status3 = postbox.perform { it.status(request.requestId) }
-        assertThat(status3, equalTo(Success(RequestProcessingStatus.Processed(Response(I_M_A_TEAPOT)))))
+        checkStatus(request.requestId, Success(Processed(Response(I_M_A_TEAPOT))))
+    }
 
+    private fun checkStatus(requestId: RequestId, expected: Result<RequestProcessingStatus, PostboxError>) {
+        val status = postbox.perform { it.status(requestId) }
+        assertThat(status, equalTo(expected))
     }
 
     private fun markProcessed(requestId: RequestId, response: Response) {
@@ -92,9 +111,12 @@ abstract class PostboxContract {
         assertThat(pending, equalTo(expected.toList()))
     }
 
-    private fun store(request: PendingRequest) {
+    private fun store(
+        request: PendingRequest,
+        expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending)
+    ) {
         val result = postbox.perform { it.store(request) }
-        assertThat(result, equalTo(Success(Pending)))
+        assertThat(result, equalTo(expectedStatus))
     }
 
     private fun id(id: Int) = RequestId.of(id.toString())
