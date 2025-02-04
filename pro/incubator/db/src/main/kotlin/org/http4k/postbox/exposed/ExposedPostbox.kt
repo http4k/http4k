@@ -42,17 +42,11 @@ class ExposedPostbox(prefix: String) : Postbox {
             ?.toStatus() ?: Failure(RequestNotFound)
 
     private fun ResultRow.toStatus() = when {
-        this[table.failed] -> {
-            Success(RequestProcessingStatus.Failed(this[table.response]?.let(Response::parse)))
-        }
-
-        this[table.response] != null -> {
+        this[table.failed] -> Success(RequestProcessingStatus.Failed(this[table.response]?.let(Response::parse)))
+        this[table.response] != null ->
             Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
-        }
 
-        else -> {
-            Success(RequestProcessingStatus.Pending)
-        }
+        else -> Success(RequestProcessingStatus.Pending)
     }
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
