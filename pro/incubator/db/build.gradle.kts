@@ -27,4 +27,5 @@ dependencies {
     api(platform("org.jetbrains.exposed:exposed-bom:_"))
     api(JetBrains.exposed.core)
     api(JetBrains.exposed.jdbc)
+    api("org.jetbrains.exposed:exposed-java-time:_")
 }
