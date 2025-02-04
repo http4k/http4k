@@ -4,9 +4,16 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.http4k.db.ExposedTransactor
 import org.http4k.postbox.PostboxContract
+import org.jetbrains.exposed.sql.deleteAll
+import org.junit.jupiter.api.BeforeEach
 import org.opentest4j.TestAbortedException
 
 class ExposedPostboxTest : PostboxContract() {
+    @BeforeEach
+    fun before() {
+        postbox.perform { ExposedPostbox.Companion.PostboxTable.deleteAll() }
+    }
+
     override val postbox = ExposedTransactor(testDataSource(), { ExposedPostbox() })
 }
 

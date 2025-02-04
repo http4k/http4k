@@ -8,6 +8,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
+import org.http4k.postbox.RequestProcessingStatus.Pending
+import org.http4k.postbox.exposed.ExposedPostbox
+import org.jetbrains.exposed.sql.deleteAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -19,7 +23,7 @@ abstract class PostboxContract {
         val newRequest = PendingRequest(RequestId.of(UUID.randomUUID().toString()), Request(Method.GET, "/"))
 
         val result = postbox.perform { it.store(newRequest) }
-        assertThat(result, equalTo(Success(RequestProcessingStatus.Pending)))
+        assertThat(result, equalTo(Success(Pending)))
 
         val pending = postbox.perform { it.pendingRequests(1) }
         assertThat(pending, equalTo(listOf(PendingRequest(newRequest.requestId, newRequest.request))))
@@ -32,10 +36,10 @@ abstract class PostboxContract {
         val request2 = Request(Method.GET, "/bar")
 
         val result = postbox.perform { it.store(PendingRequest(requestId, request1)) }
-        assertThat(result, equalTo(Success(RequestProcessingStatus.Pending)))
+        assertThat(result, equalTo(Success(Pending)))
 
         val result2 = postbox.perform { it.store(PendingRequest(requestId, request2)) }
-        assertThat(result2, equalTo(Success(RequestProcessingStatus.Pending)))
+        assertThat(result2, equalTo(Success(Pending)))
 
         val pending = postbox.perform { it.pendingRequests(10) }
         assertThat(pending, equalTo(listOf(PendingRequest(requestId, request1))))
