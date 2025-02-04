@@ -59,7 +59,6 @@ class PostboxProcessing(
     }
 
     fun processPendingRequests(): Result<Int, RequestProcessingError> = transactor.performAsResult { postbox ->
-        // TODO: exclude requests marked as permanent failures
         // TODO: implement max number of retries?
         // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
         val pendingRequests = postbox.pendingRequests(batchSize)
