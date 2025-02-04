@@ -7,11 +7,12 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
+import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 
 class InMemoryPostbox : Postbox {
-    private val requests = mutableMapOf<RequestId, Pair<Request, Response?>>()
+    private val requests = mutableMapOf<RequestId, Record>()
 
     private var fail = false
 
@@ -25,10 +26,10 @@ class InMemoryPostbox : Postbox {
         return if (!fail) {
             val existingRequest = findRequest(pending.requestId)
             if (existingRequest == null) {
-                requests[pending.requestId] = pending.request to null
+                requests[pending.requestId] = Record(pending.request)
                 Success(RequestProcessingStatus.Pending)
             } else {
-                val response = existingRequest.second
+                val response = existingRequest.response
                 if (response == null) {
                     Success(RequestProcessingStatus.Pending)
                 } else {
@@ -43,20 +44,32 @@ class InMemoryPostbox : Postbox {
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> =
         findRequest(requestId)?.let {
-            requests[requestId] = it.first to response
+            requests[requestId] = Record(it.request, response)
             Success(Unit)
+        } ?: Failure(PostboxError.RequestNotFound)
+
+    override fun markFailed(requestId: RequestId, response: Response?): Result<Unit, PostboxError> =
+        findRequest(requestId)?.let {
+            if(it.response != null && !it.failed) {
+                return Failure(RequestAlreadyProcessed)
+            }else{
+            requests[requestId] = Record(it.request, it.response ?: response, failed = true)
+            Success(Unit)}
         } ?: Failure(PostboxError.RequestNotFound)
 
     override fun status(requestId: RequestId) =
         findRequest(requestId)?.let {
             when {
-                it.second != null -> Success(RequestProcessingStatus.Processed(it.second!!))
+                it.failed -> Success(RequestProcessingStatus.Failed(it.response))
+                it.response != null -> Success(RequestProcessingStatus.Processed(it.response))
                 else -> Success(RequestProcessingStatus.Pending)
             }
         } ?: Failure(PostboxError.RequestNotFound)
 
     override fun pendingRequests(batchSize: Int) = requests
-        .filter { it.value.second == null }
-        .map { Postbox.PendingRequest(it.key, it.value.first) }
+        .filter { it.value.response == null }
+        .map { Postbox.PendingRequest(it.key, it.value.request) }
         .toList()
+
+    private data class Record(val request: Request, val response: Response? = null, val failed: Boolean = false)
 }

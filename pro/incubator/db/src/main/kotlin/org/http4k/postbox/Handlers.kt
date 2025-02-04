@@ -20,6 +20,7 @@ import org.http4k.db.performAsResult
 import org.http4k.lens.location
 import org.http4k.postbox.PendingResponseGenerators.Empty
 import org.http4k.postbox.RequestIdResolvers.fromPath
+import org.http4k.postbox.RequestProcessingStatus.Failed
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.routing.RoutedMessage
@@ -79,6 +80,7 @@ class PostboxHandlers(
     private fun RequestProcessingStatus.toResponse(requestId: RequestId) = when (this) {
         is Pending -> responseGenerator(requestId)
         is Processed -> response
+        is Failed -> Response(INTERNAL_SERVER_ERROR.description("request failed"))
     }
 
     private fun PostboxError.toResponse() =
