@@ -22,7 +22,7 @@ abstract class PostboxContract {
     abstract val postbox: PostboxTransactor
 
     @Test
-    fun `can store request in datasource`() {
+    fun `store request`() {
         val newRequest = PendingRequest(id(1), Request(GET, "/"))
 
         store(newRequest)
@@ -32,7 +32,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `store is idempotent`() {
+    fun `store request is idempotent`() {
         val requestId = id(1)
         val request1 = Request(GET, "/foo")
         val request2 = Request(GET, "/bar")
@@ -44,7 +44,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `store is idempotent even after processing`() {
+    fun `store request does not update previous request`() {
         val requestId = id(1)
         val request1 = Request(GET, "/foo")
         val request2 = Request(GET, "/bar")
@@ -59,7 +59,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `multiple attempts to store the same request do not affect pending retrieval order`() {
+    fun `store request multiple times does not affect pending retrieval order`() {
         val newRequestOne = PendingRequest(id(1), Request(GET, "/foo"))
         val newRequestTwo = PendingRequest(id(2), Request(GET, "/bar"))
 
@@ -74,7 +74,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `can mark request as processed`() {
+    fun `mark request as processed`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
@@ -90,7 +90,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `can mark request as failed`() {
+    fun `mark request as failed`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
@@ -102,7 +102,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `can mark request as failed without a response`() {
+    fun `mark request as failed without a response`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
@@ -114,7 +114,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `subsequent marks as failures do not override existing response`() {
+    fun `marks request as failed multiple times does not update an existing response`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
@@ -138,16 +138,8 @@ abstract class PostboxContract {
         checkPending()
     }
 
-    private fun markFailed(
-        request: PendingRequest, response: Response? = null,
-        expecting: Result<Unit, PostboxError> = Success(Unit)
-    ) {
-        val result = postbox.perform { it.markFailed(request.requestId, response) }
-        assertThat(result, equalTo(expecting))
-    }
-
     @Test
-    fun `can check status of a request`() {
+    fun `check status of a request`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         checkStatus(request.requestId, Failure(RequestNotFound))
@@ -159,6 +151,14 @@ abstract class PostboxContract {
         markProcessed(request.requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
         checkStatus(request.requestId, Success(Processed(Response(I_M_A_TEAPOT))))
+    }
+
+    private fun markFailed(
+        request: PendingRequest, response: Response? = null,
+        expecting: Result<Unit, PostboxError> = Success(Unit)
+    ) {
+        val result = postbox.perform { it.markFailed(request.requestId, response) }
+        assertThat(result, equalTo(expecting))
     }
 
     private fun checkStatus(requestId: RequestId, expected: Result<RequestProcessingStatus, PostboxError>) {
