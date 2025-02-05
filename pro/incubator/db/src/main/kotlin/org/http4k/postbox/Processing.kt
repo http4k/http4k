@@ -101,10 +101,10 @@ sealed class ProcessingEvent : Event {
 }
 
 interface ExecutionContext {
-    fun stop()
     fun isRunning(): Boolean
-    fun pause(duration: Duration)
     fun start(runnable: Runnable)
+    fun pause(duration: Duration)
+    fun stop()
     fun currentTime(): Instant
 }
 
