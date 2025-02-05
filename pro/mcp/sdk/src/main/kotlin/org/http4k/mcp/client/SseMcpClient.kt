@@ -96,7 +96,7 @@ class SseMcpClient(
                                         queue.put(data)
 
                                         val (latch, isComplete) = requests[id] ?: return@also
-                                        if (isComplete(data)) requests.remove(id)
+                                        if (message.isError() || isComplete(data)) requests.remove(id)
                                         latch.countDown()
                                     }
                             }
