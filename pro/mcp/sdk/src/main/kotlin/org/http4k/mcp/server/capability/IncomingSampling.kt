@@ -1,6 +1,8 @@
 package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
+import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpSampling
 
 /**
@@ -9,7 +11,7 @@ import org.http4k.mcp.protocol.messages.McpSampling
 class IncomingSampling(private val list: List<IncomingSamplingCapability>) {
 
     fun sample(mcp: McpSampling.Request, http: Request) =
-        mcp.selectModel()?.sample(mcp, http) ?: error("No model to serve request")
+        mcp.selectModel()?.sample(mcp, http) ?: throw McpException(MethodNotFound)
 
     private fun McpSampling.Request.selectModel() = when {
         modelPreferences == null -> list.firstOrNull()

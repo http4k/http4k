@@ -130,9 +130,9 @@ abstract class McpProtocol<RSP : Any>(
                             }.recover {
                                 send(
                                     when (it) {
-                                        is McpException -> it.error.toJsonRpc(jsonReq.id)
-                                        else -> ErrorMessage.InternalError.toJsonRpc(jsonReq.id)
-                                    }, sId
+                                        is McpException -> it.error
+                                        else -> InternalError
+                                    }.toJsonRpc(jsonReq.id), sId
                                 )
                                 error()
                             }.getOrElse { error() }
