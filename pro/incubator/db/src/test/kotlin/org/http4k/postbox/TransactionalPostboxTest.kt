@@ -35,7 +35,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
-        assertThat(postbox.pendingRequests(10, timeSource()), equalTo(listOf(aRequest.asPending())))
+        assertThat(postbox.pendingRequests(10, timeSource()), equalTo(listOf(PendingRequest(aRequest.id(), aRequest, timeSource()))))
 
         val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 
@@ -87,6 +87,5 @@ class TransactionalPostboxTest {
         assertThat(statusHandler(Request(GET, "/unknown")), hasStatus(NOT_FOUND))
     }
 
-    private fun Request.asPending() = PendingRequest(id(), this)
     private fun Request.id() = fromPath("requestId")(this) ?: error("No id found")
 }
