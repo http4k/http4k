@@ -4,77 +4,64 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.FixedTimeSource
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNPROCESSABLE_ENTITY
 import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
+import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.inmemory.InMemoryPostbox
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.AbstractExecutorService
-import java.util.concurrent.TimeUnit
 
 class PostboxProcessingTest {
 
+    private val timeSource = FixedTimeSource()
+    private val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox(timeSource))
+    private val testTarget = routes(
+        "/success" bind { Response(OK) },
+        "/failure" bind { Response(BAD_GATEWAY) },
+        "/permanent_failure" bind { Response(UNPROCESSABLE_ENTITY) },
+        "/exception" bind { throw RuntimeException("boom") }
+    )
+
+    private val requestForSuccess = Request(GET, "/success")
+
+    private val processor = PostboxProcessing(
+        transactor,
+        testTarget,
+        context = TestExecutionContext(timeSource, 10),
+        events = StdOutEvents,
+    )
+
     @Test
     fun `process a single pending request`() {
-        val timeSource = FixedTimeSource()
-        val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox(timeSource))
-        val okResponse = { _: Request -> Response(OK) }
-        val successCriteria: (Response) -> Boolean = { it.status.successful }
+        val requestId = RequestId.of("0")
 
-        val events = StdOutEvents
+        store(requestId, requestForSuccess)
+        processor.start()
 
-        transactor.perform { it.store(RequestId.of("0"), Request(Method.GET, "/")) }
+        checkPendingRequest(emptyList())
+        checkStatus(requestId, Processed(Response(OK)))
+    }
 
-        PostboxProcessing(
-            transactor,
-            okResponse,
-            context = TestExecutionContext(timeSource, 10),
-            events = events,
-            successCriteria = successCriteria
-        ).start()
-
-        assertThat(transactor.perform { it.pendingRequests(10, timeSource()) }, equalTo(emptyList()))
+    private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
         assertThat(
-            transactor.perform { it.status(RequestId.of("0")) },
-            equalTo(Success(RequestProcessingStatus.Processed(Response(OK))))
+            transactor.perform { it.status(requestId) },
+            equalTo(Success(processed))
         )
     }
-}
 
-class TestExecutionContext(private val timeSource: FixedTimeSource, private val maxTicks: Int = 10) : ExecutionContext {
-    private var ticks = 0
-    override fun stop() {
+    private fun checkPendingRequest(expected: List<Postbox.PendingRequest>) {
+        assertThat(transactor.perform { it.pendingRequests(10, timeSource()) }, equalTo(expected))
     }
 
-    override fun isRunning() = ticks < maxTicks
-
-    override fun pause(duration: Duration) {
-        ticks++
-        timeSource.tick(duration)
-    }
-
-    override fun start(runnable: Runnable) {
-        DirectExecutor.execute(runnable)
-    }
-
-    override fun currentTime(): Instant = timeSource()
-
-    companion object {
-        object DirectExecutor : AbstractExecutorService() {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-
-            override fun shutdown() {}
-            override fun shutdownNow(): MutableList<Runnable> = mutableListOf()
-            override fun isShutdown(): Boolean = false
-            override fun isTerminated(): Boolean = false
-            override fun awaitTermination(timeout: Long, unit: TimeUnit): Boolean = true
-        }
+    private fun store(requestId: RequestId, request: Request) {
+        transactor.perform { it.store(requestId, request) }
     }
 }
+
