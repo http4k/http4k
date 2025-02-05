@@ -28,6 +28,7 @@ import java.time.Duration
 
 abstract class PostboxContract {
     val timeSource = FixedTimeSource()
+    private val tick = Duration.ofSeconds(1)
     abstract val postbox: PostboxTransactor
 
     private val requestId = id(1)
@@ -35,10 +36,11 @@ abstract class PostboxContract {
 
     @Test
     fun `store request`() {
+        val now = timeSource()
         store(requestId, request)
 
-        checkStatus(requestId, Success(Pending))
-        checkPending(PendingRequest(requestId, request, timeSource()))
+        checkStatus(requestId, Success(Pending(now)))
+        checkPending(PendingRequest(requestId, request, now))
     }
 
     @Test
@@ -71,11 +73,14 @@ abstract class PostboxContract {
         val request2 = Request(GET, "/2")
 
         val pendingOne = store(requestId, request)
+
+        timeSource.tick(tick)
+
         val pendingTwo = store(requestId2, request2)
 
         checkPending(pendingOne, pendingTwo)
 
-        store(requestId, request)
+        store(requestId, request, Success(Pending(pendingOne.processingTime)))
 
         checkPending(pendingOne, pendingTwo)
     }
@@ -179,9 +184,10 @@ abstract class PostboxContract {
 
     @Test
     fun `check status of a pending request`() {
+        val now = timeSource()
         store(requestId, request)
 
-        checkStatus(requestId, Success(Pending))
+        checkStatus(requestId, Success(Pending(now)))
     }
 
     @Test
@@ -194,8 +200,10 @@ abstract class PostboxContract {
 
     @Test
     fun `check status of a dead request`() {
+        val now = timeSource()
         store(requestId, request)
-        checkStatus(requestId, Success(Pending))
+
+        checkStatus(requestId, Success(Pending(now)))
 
         markDead(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
@@ -204,13 +212,16 @@ abstract class PostboxContract {
 
     @Test
     fun `mark request as failed`() {
+        val now = timeSource()
+        val later = Duration.ofSeconds(10)
+
         store(requestId, request)
 
-        markFailed(requestId, Duration.ofSeconds(10), Response(I_M_A_TEAPOT))
+        markFailed(requestId, later, Response(I_M_A_TEAPOT))
 
         checkPending()
 
-        checkStatus(requestId, Success(Pending))
+        checkStatus(requestId, Success(Pending(now + later)))
     }
 
     private fun markFailed(
@@ -253,9 +264,8 @@ abstract class PostboxContract {
     private fun store(
         requestId: RequestId,
         request: Request,
-        expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending)
+        expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending(timeSource()))
     ): PendingRequest {
-        timeSource.tick(Duration.ofSeconds(1))
         val result = postbox.perform { it.store(requestId, request) }
         assertThat(result, equalTo(expectedStatus))
         return PendingRequest(requestId, request, timeSource())

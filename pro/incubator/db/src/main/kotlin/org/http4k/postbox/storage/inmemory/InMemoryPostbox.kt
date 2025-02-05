@@ -29,14 +29,15 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
 
     override fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError> {
         return if (!fail) {
+            val now = timeSource()
             val existingRequest = findRequest(requestId)
             if (existingRequest == null) {
-                requests[requestId] = Record(timeSource(), request)
-                Success(RequestProcessingStatus.Pending)
+                requests[requestId] = Record(now, request)
+                Success(RequestProcessingStatus.Pending(now))
             } else {
                 val response = existingRequest.response
                 if (response == null) {
-                    Success(RequestProcessingStatus.Pending)
+                    Success(RequestProcessingStatus.Pending(existingRequest.processAt))
                 } else {
                     Success(RequestProcessingStatus.Processed(response))
                 }
@@ -95,7 +96,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
     override fun status(requestId: RequestId) =
         findRequest(requestId)?.let {
             when (it.status) {
-                PENDING -> Success(RequestProcessingStatus.Pending)
+                PENDING -> Success(RequestProcessingStatus.Pending(it.processAt))
                 PROCESSED -> Success(RequestProcessingStatus.Processed(it.response!!))
                 DEAD -> Success(RequestProcessingStatus.Dead(it.response))
             }
