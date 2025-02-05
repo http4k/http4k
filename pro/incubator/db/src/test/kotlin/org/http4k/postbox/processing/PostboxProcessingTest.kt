@@ -16,7 +16,7 @@ import org.http4k.postbox.Postbox
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.RequestProcessingStatus.Processed
-import org.http4k.postbox.inmemory.InMemoryPostbox
+import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test

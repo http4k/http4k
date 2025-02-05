@@ -9,8 +9,8 @@ import org.http4k.core.UriTemplate.Companion.from
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.PendingResponseGenerators.redirect
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.exposed.PostboxTransactor
-import org.http4k.postbox.exposed.postgresDataSource
+import org.http4k.postbox.storage.exposed.PostboxTransactor
+import org.http4k.postbox.storage.exposed.postgresDataSource
 import org.http4k.postbox.processing.PostboxProcessing
 import org.http4k.routing.bind
 import org.http4k.routing.routes

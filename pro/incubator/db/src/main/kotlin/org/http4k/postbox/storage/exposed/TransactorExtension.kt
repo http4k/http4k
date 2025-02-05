@@ -1,4 +1,4 @@
-package org.http4k.postbox.exposed
+package org.http4k.postbox.storage.exposed
 
 import dev.forkhandles.time.TimeSource
 import dev.forkhandles.time.systemTime
