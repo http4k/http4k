@@ -65,11 +65,10 @@ class ExposedPostbox(prefix: String) : Postbox {
         requestId: RequestId,
         response: Response
     ): Result<Unit, PostboxError> {
-        val update = table.update(where = { table.requestId eq requestId.value }) { row ->
+        table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response.toString()
         }
-        return if (update == 0) Failure(RequestNotFound)
-        else Success(Unit)
+        return Success(Unit)
     }
 
     override fun markFailed(requestId: RequestId, response: Response?): Result<Unit, PostboxError> =
@@ -88,12 +87,11 @@ class ExposedPostbox(prefix: String) : Postbox {
         requestId: RequestId,
         response: Response?
     ): Result<Unit, PostboxError> {
-        val update = table.update(where = { table.requestId eq requestId.value }) { row ->
+        table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response?.toString()
             row[table.failed] = true
         }
-        return if (update == 0) Failure(RequestNotFound)
-        else Success(Unit)
+        return Success(Unit)
     }
 
     override fun pendingRequests(batchSize: Int) =
