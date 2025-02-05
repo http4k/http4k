@@ -127,6 +127,19 @@ abstract class PostboxContract {
     }
 
     @Test
+    fun `marks request as failed multiple times store response if previous was null`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markFailed(request, null)
+        markFailed(request, Response(BAD_REQUEST))
+
+        checkPending()
+        checkStatus(request.requestId, Success(Failed(Response(BAD_REQUEST))))
+    }
+
+    @Test
     fun `cannot mark request as failed after it has been processed`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
