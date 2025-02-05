@@ -151,11 +151,9 @@ abstract class McpProtocol<RSP : Any>(
                     ok()
                 }
 
-                McpTool.Call.Method ->
-                    send(jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, req) }, sId)
+                McpTool.Call.Method -> send(jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, req) }, sId)
 
-                McpTool.List.Method ->
-                    send(jsonReq.respondTo<McpTool.List.Request> { tools.list(it, req) }, sId)
+                McpTool.List.Method -> send(jsonReq.respondTo<McpTool.List.Request> { tools.list(it, req) }, sId)
 
                 else -> send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
             }

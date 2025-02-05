@@ -11,6 +11,8 @@ import org.http4k.mcp.util.ObservableList
  */
 class Tools(list: List<ToolCapability>) : ObservableList<ToolCapability>(list) {
 
+    constructor(vararg list: ToolCapability) : this(list.toList())
+
     fun list(req: McpTool.List.Request, http: Request) = McpTool.List.Response(items.map(ToolCapability::toTool))
 
     fun call(req: McpTool.Call.Request, http: Request) = items

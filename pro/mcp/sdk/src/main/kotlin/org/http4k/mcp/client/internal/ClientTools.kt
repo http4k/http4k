@@ -13,6 +13,7 @@ import org.http4k.mcp.util.McpNodeType
 
 internal class ClientTools(
     private val queueFor: (RequestId) -> Iterable<McpNodeType>,
+    private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Tools {
@@ -21,7 +22,8 @@ internal class ClientTools(
     }
 
     override fun list() = sender(McpTool.List, McpTool.List.Request()) { true }
-        .mapCatching(queueFor).map { it.first().asAOrThrow<McpTool.List.Response>() }
+        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .map { it.first().asAOrThrow<McpTool.List.Response>() }
         .map { it.tools }
 
     override fun call(name: ToolName, request: ToolRequest) =
@@ -29,7 +31,8 @@ internal class ClientTools(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         ) { true }
-            .mapCatching(queueFor).map { it.first().asAOrThrow<McpTool.Call.Response>() }
+            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .map { it.first().asAOrThrow<McpTool.Call.Response>() }
             .mapCatching {
                 when (it.isError) {
                     true -> ToolResponse.Error(ErrorMessage(-1, it.content.joinToString()))

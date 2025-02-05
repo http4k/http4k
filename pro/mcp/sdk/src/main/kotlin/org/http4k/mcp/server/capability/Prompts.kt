@@ -11,6 +11,9 @@ import org.http4k.mcp.util.ObservableList
  * Handles protocol traffic for prompts features.
  */
 class Prompts(bindings: List<PromptCapability>) : ObservableList<PromptCapability>(bindings) {
+
+    constructor(vararg bindings: PromptCapability) : this(bindings.toList())
+
     fun get(req: Get.Request, http: Request) = items
         .find { it.toPrompt().name == req.name }
         ?.get(req, http)

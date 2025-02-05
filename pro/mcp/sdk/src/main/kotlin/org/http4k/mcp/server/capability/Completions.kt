@@ -6,6 +6,9 @@ import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpCompletion
 
 class Completions(private val bindings: List<CompletionCapability>) {
+
+    constructor(vararg bindings: CompletionCapability) : this(bindings.toList())
+
     fun complete(mcp: McpCompletion.Request, http: Request) =
         bindings.find { it.toReference() == mcp.ref }
             ?.complete(mcp, http)

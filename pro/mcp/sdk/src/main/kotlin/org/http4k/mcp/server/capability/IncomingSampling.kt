@@ -10,6 +10,8 @@ import org.http4k.mcp.protocol.messages.McpSampling
  */
 class IncomingSampling(private val list: List<IncomingSamplingCapability>) {
 
+    constructor(vararg list: IncomingSamplingCapability) : this(list.toList())
+
     fun sample(mcp: McpSampling.Request, http: Request) =
         mcp.selectModel()?.sample(mcp, http) ?: throw McpException(MethodNotFound)
 

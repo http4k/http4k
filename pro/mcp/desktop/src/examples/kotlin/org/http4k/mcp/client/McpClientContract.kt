@@ -30,12 +30,19 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.McpSseHandler
+import org.http4k.mcp.server.capability.Completions
+import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.Resources
+import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.sse.RealtimeMcpProtocol
 import org.http4k.routing.bind
-import org.http4k.routing.mcpSse
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
 
 interface McpClientContract : PortBasedTest {
     @Test
@@ -45,27 +52,40 @@ interface McpClientContract : PortBasedTest {
             SamplingResponse(model, null, assistant, Content.Text("hello")),
             SamplingResponse(model, StopReason.of("foobar"), assistant, Content.Text("world"))
         )
-        val server = mcpSse(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            Prompt("prompt", "description1") bind {
-                PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
-            },
-            Tool("reverse", "description", Tool.Arg.required("name")) bind {
-                ToolResponse.Ok(listOf(Content.Text(it.javaClass.simpleName.toString().reversed())))
-            },
-            Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
-                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-            },
-            Reference.Resource(Uri.of("https://http4k.org")) bind {
-                CompletionResponse(Completion(listOf("1", "2")))
-            },
-            ModelSelector(model) bind {
-                samplingResponses.asSequence()
-            }
-        )
-            .asServer(Helidon(0)).start()
+
+        val tools = Tools(Tool("reverse", "description", Tool.Arg.required("name")) bind {
+            ToolResponse.Ok(listOf(Content.Text(it.javaClass.simpleName.toString().reversed())))
+        })
+
+        val server = McpSseHandler(
+            RealtimeMcpProtocol(
+                ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+                Prompts(Prompt("prompt", "description1") bind {
+                    PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
+                }
+                ),
+                tools,
+                Resources(
+                    Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
+                        ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                    }
+                ),
+                Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+                    CompletionResponse(Completion(listOf("1", "2")))
+                }),
+                IncomingSampling(ModelSelector(model) bind {
+                    samplingResponses.asSequence()
+                })
+            ).also { it.start() }
+        ).asServer(Helidon(0)).start()
 
         val mcpClient = clientFor(Uri.of("http://localhost:${server.port()}/sse"))
+
+        val latch = CountDownLatch(1)
+
+        mcpClient.tools().onChange {
+            latch.countDown()
+        }
 
         mcpClient.start()
 
@@ -110,10 +130,15 @@ interface McpClientContract : PortBasedTest {
             ).map { it.getOrThrow() }.toList(), equalTo(samplingResponses)
         )
 
-        mcpClient.stop()
+        tools.items = emptyList()
 
+        latch.await()
+
+        assertThat(mcpClient.tools().list().getOrThrow().size, equalTo(0))
+
+        mcpClient.stop()
         server.stop()
     }
 
-    fun clientFor(uri: Uri): SseMcpClient
+    fun clientFor(uri: Uri): McpClient
 }

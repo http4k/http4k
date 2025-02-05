@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Handles protocol traffic for resources features and subscriptions.
  */
 class Resources(list: List<ResourceCapability>) : ObservableList<ResourceCapability>(list) {
+    constructor(vararg list: ResourceCapability) : this(list.toList())
 
     private val subscriptions = ConcurrentHashMap<Pair<Uri, SessionId>, Set<(Uri) -> Unit>>()
 

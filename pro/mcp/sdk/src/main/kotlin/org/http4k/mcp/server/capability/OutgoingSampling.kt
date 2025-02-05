@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class OutgoingSampling(private val list: List<OutgoingSamplingCapability>) {
 
+    constructor(vararg list: OutgoingSamplingCapability) : this(list.toList())
+
     private val subscriptions =
         ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()
 

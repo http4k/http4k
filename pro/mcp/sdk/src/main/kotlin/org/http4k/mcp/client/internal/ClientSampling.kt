@@ -11,6 +11,7 @@ import java.util.concurrent.BlockingQueue
 
 internal class ClientSampling(
     private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
+    private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
     override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {

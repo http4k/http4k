@@ -10,6 +10,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.format.MoshiObject
 import org.http4k.format.renderRequest
+import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.lens.contentType
@@ -27,6 +28,7 @@ import org.http4k.mcp.client.internal.NotificationCallback
 import org.http4k.mcp.client.internal.asAOrThrow
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
@@ -112,7 +114,11 @@ class SseMcpClient(
         startLatch.await()
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
-            .mapCatching { (messageQueues[it]?.first() ?: error("No queue")).asAOrThrow<McpInitialize.Response>() }
+            .mapCatching { reqId: RequestId ->
+                (messageQueues[reqId]?.first()
+                    ?: throw McpException(InternalError)).asAOrThrow<McpInitialize.Response>()
+                    .also { messageQueues.remove(reqId) }
+            }
             .mapCatching { response ->
                 notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
                     .map { response.capabilities }
@@ -122,25 +128,25 @@ class SseMcpClient(
     }
 
     override fun tools(): Tools =
-        ClientTools(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method, { mutableListOf() }).add(callback)
+        ClientTools(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): Prompts =
-        ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method, { mutableListOf() }).add(callback)
+        ClientPrompts(::findQueue,::tidyUp,  ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun sampling(): Sampling =
-        ClientSampling(::findQueue, ::performRequest)
+        ClientSampling(::findQueue, ::tidyUp, ::performRequest)
 
     override fun resources(): Resources =
-        ClientResources(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method, { mutableListOf() }).add(callback)
+        ClientResources(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): Completions =
-        ClientCompletions(::findQueue, ::performRequest)
+        ClientCompletions(::findQueue, ::tidyUp, ::performRequest)
 
     private fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
         val response = http(mcp.toHttpRequest(method))
@@ -150,15 +156,20 @@ class SseMcpClient(
         }
     }
 
-    private fun findQueue(id: RequestId): LinkedBlockingQueue<McpNodeType> =
-        messageQueues[id] ?: error("no queue")
+    private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue")
+
+    private fun tidyUp(requestId: RequestId) {
+        requests.remove(requestId)
+        messageQueues.remove(requestId)
+    }
+
 
     private fun performRequest(
         method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }
     ): Result<RequestId> {
         val requestId = RequestId.random()
 
-        val latch = CountDownLatch(1)
+        val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
         requests[requestId] = latch to isComplete
         messageQueues[requestId] = LinkedBlockingQueue()
