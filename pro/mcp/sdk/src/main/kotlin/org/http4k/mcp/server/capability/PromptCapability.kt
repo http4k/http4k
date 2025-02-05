@@ -1,7 +1,8 @@
 package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptRequest
@@ -18,8 +19,8 @@ class PromptCapability(private val prompt: Prompt, val handler: PromptHandler) :
         handler(PromptRequest(mcp.arguments, http))
             .let { McpPrompt.Get.Response(it.messages, it.description) }
     } catch (e: LensFailure) {
-        throw McpException(ErrorMessage.InvalidParams, e)
+        throw McpException(InvalidParams, e)
     } catch (e: Exception) {
-        throw McpException(ErrorMessage.InternalError, e)
+        throw McpException(InternalError, e)
     }
 }

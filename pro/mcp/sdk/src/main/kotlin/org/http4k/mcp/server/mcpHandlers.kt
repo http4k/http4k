@@ -11,20 +11,22 @@ import org.http4k.format.jsonRpcRequest
 import org.http4k.lens.Query
 import org.http4k.lens.value
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.sse.SseMcpProtocol
+import org.http4k.mcp.server.sse.RealtimeMcpProtocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
+import org.http4k.routing.websocket.bind
+import org.http4k.routing.websockets
 import org.http4k.sse.SseMessage.Event
 import org.http4k.routing.bind as httpBind
 
 /**
  * This is the main entry point for the MCP server. It sets up the SSE connection and then provides a
- * session for the client to send messages to.
+ * endpoint for the client to send messages to.
  */
-fun McpHandler(mcpProtocol: SseMcpProtocol) = poly(
+fun McpSseHandler(mcpProtocol: RealtimeMcpProtocol) = poly(
     "/sse" bind sse {
         it.send(
             Event("endpoint", Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString())
@@ -37,5 +39,17 @@ fun McpHandler(mcpProtocol: SseMcpProtocol) = poly(
             }
         ))
 )
+
+/**
+ * This is the main entry point for the MCP server.
+ */
+fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol) =
+    "/ws" bind websockets {
+        val sessionId = mcpProtocol.newSession(it)
+        it.onMessage {
+            val req = Request(POST, "/ws").body(it.bodyString())
+            mcpProtocol(sessionId, Body.jsonRpcRequest(McpJson).toLens()(req), req)
+        }
+    }
 
 private val sessionId = Query.value(SessionId).required("sessionId")

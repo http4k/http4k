@@ -1,6 +1,8 @@
 package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.ObservableList
 
@@ -14,5 +16,5 @@ class Tools(list: List<ToolCapability>) : ObservableList<ToolCapability>(list) {
     fun call(req: McpTool.Call.Request, http: Request) = items
         .find { it.toTool().name == req.name }
         ?.call(req, http)
-        ?: error("no tool with name ${req.name}")
+        ?: throw McpException(InvalidParams)
 }

@@ -10,6 +10,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.format.MoshiObject
 import org.http4k.format.renderRequest
+import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.lens.contentType
 import org.http4k.mcp.client.McpClient.Completions
@@ -26,6 +27,7 @@ import org.http4k.mcp.client.internal.NotificationCallback
 import org.http4k.mcp.client.internal.asAOrThrow
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.ServerCapabilities
@@ -34,6 +36,7 @@ import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
@@ -44,7 +47,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Single connection MCP client.
  */
-class Http4kMcpClient(
+class SseMcpClient(
     private val sseRequest: Request,
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
@@ -58,11 +61,11 @@ class Http4kMcpClient(
     private val sseClient = Http4kSseClient(http)
     private val endpoint = AtomicReference<String>()
 
-    private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (Event) -> Boolean>>()
+    private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
 
-    private val notificationCallbacks = mutableListOf<NotificationCallback<*>>()
+    private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
 
-    private val messageQueues = ConcurrentHashMap<RequestId, LinkedBlockingQueue<Event>>()
+    private val messageQueues = ConcurrentHashMap<RequestId, LinkedBlockingQueue<McpNodeType>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
@@ -77,17 +80,27 @@ class Http4kMcpClient(
 
                     "ping" -> {}
                     else -> with(McpJson) {
-                        val request = JsonRpcResult(this, (parse(it.data) as MoshiObject).attributes)
-                        val id = asA<RequestId>(compact(request.id ?: nullNode()))
+                        val data = parse(it.data) as MoshiObject
 
-                        messageQueues[id]
-                            ?.also { queue ->
-                                queue.put(it)
+                        when {
+                            data["id"] == null -> {
+                                val message = JsonRpcRequest(this, data.attributes)
+                                notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach { it.process(message) }
+                            }
 
-                                val (latch, isComplete) = requests[id] ?: return@also
-                                if (isComplete(it)) requests.remove(id)
-                                latch.countDown()
-                            } // TODO add notifications here
+                            else -> {
+                                val message = JsonRpcResult(this, data.attributes)
+                                val id = asA<RequestId>(compact(message.id ?: nullNode()))
+                                messageQueues[id]
+                                    ?.also { queue ->
+                                        queue.put(data)
+
+                                        val (latch, isComplete) = requests[id] ?: return@also
+                                        if (isComplete(data)) requests.remove(id)
+                                        latch.countDown()
+                                    }
+                            }
+                        }
                     }
                 }
 
@@ -109,16 +122,22 @@ class Http4kMcpClient(
     }
 
     override fun tools(): Tools =
-        ClientTools(::findQueue, ::performRequest, notificationCallbacks::add)
+        ClientTools(::findQueue, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method, { mutableListOf() }).add(callback)
+        }
 
     override fun prompts(): Prompts =
-        ClientPrompts(::findQueue, ::performRequest, notificationCallbacks::add)
+        ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method, { mutableListOf() }).add(callback)
+        }
 
     override fun sampling(): Sampling =
         ClientSampling(::findQueue, ::performRequest)
 
     override fun resources(): Resources =
-        ClientResources(::findQueue, ::performRequest, notificationCallbacks::add)
+        ClientResources(::findQueue, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method, { mutableListOf() }).add(callback)
+        }
 
     override fun completions(): Completions =
         ClientCompletions(::findQueue, ::performRequest)
@@ -131,18 +150,18 @@ class Http4kMcpClient(
         }
     }
 
-    private fun findQueue(id: RequestId): LinkedBlockingQueue<Event> =
+    private fun findQueue(id: RequestId): LinkedBlockingQueue<McpNodeType> =
         messageQueues[id] ?: error("no queue")
 
     private fun performRequest(
-        method: McpRpc, request: ClientMessage, isComplete: (Event) -> Boolean = { true }
+        method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }
     ): Result<RequestId> {
         val requestId = RequestId.random()
 
         val latch = CountDownLatch(1)
 
         requests[requestId] = latch to isComplete
-        messageQueues[requestId] = LinkedBlockingQueue<Event>()
+        messageQueues[requestId] = LinkedBlockingQueue()
 
         val response = http(request.toHttpRequest(method, requestId))
         return when {

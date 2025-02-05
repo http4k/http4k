@@ -5,10 +5,10 @@ import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpCompletion
-import org.http4k.sse.SseMessage
+import org.http4k.mcp.util.McpNodeType
 
 internal class ClientCompletions(
-    private val queueFor: (RequestId) -> Iterable<SseMessage.Event>,
+    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val sender: McpRpcSender
 ) : McpClient.Completions {
     override fun complete(request: CompletionRequest) =

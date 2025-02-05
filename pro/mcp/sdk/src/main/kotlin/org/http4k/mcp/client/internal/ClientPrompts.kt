@@ -5,20 +5,16 @@ import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpPrompt
-import org.http4k.sse.SseMessage
+import org.http4k.mcp.protocol.messages.McpRpc
+import org.http4k.mcp.util.McpNodeType
 
 internal class ClientPrompts(
-    private val queueFor: (RequestId) -> Iterable<SseMessage.Event>,
+    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val sender: McpRpcSender,
-    private val register: (NotificationCallback<*>) -> Any
+    private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Prompts {
     override fun onChange(fn: () -> Unit) {
-        register(
-            NotificationCallback(
-                McpPrompt.List.Changed,
-                McpPrompt.List.Changed.Notification::class
-            ) { fn() }
-        )
+        register(McpPrompt.List, NotificationCallback(McpPrompt.List.Changed.Notification::class) { fn() })
     }
 
     override fun list() = sender(McpPrompt.List, McpPrompt.List.Request()) { true }

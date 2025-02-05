@@ -5,13 +5,13 @@ import org.http4k.core.PolyHandler
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.routing.mcpHttp
+import org.http4k.routing.mcpSse
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
 fun al(): PolyHandler =
-    mcpHttp(
+    mcpSse(
         ServerMetaData(McpEntity.of("al"), Version.of("0.0.1")),
         PersonToolPack("Al", ::al)
     )

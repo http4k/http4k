@@ -20,11 +20,13 @@ import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
+import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class SseMcpProtocol(
+class RealtimeMcpProtocol(
     metaData: ServerMetaData,
     prompts: Prompts = Prompts(emptyList()),
     tools: Tools = Tools(emptyList()),
@@ -48,14 +50,21 @@ class SseMcpProtocol(
     logger,
     random
 ) {
-    private val sessions = ConcurrentHashMap<SessionId, Sse>()
+    private val sseSessions = ConcurrentHashMap<SessionId, Sse>()
+    private val wsSessions = ConcurrentHashMap<SessionId, Websocket>()
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun send(message: McpNodeType, sessionId: SessionId) = when (val session = sessions[sessionId]) {
-        null -> Response(GONE)
+    override fun send(message: McpNodeType, sessionId: SessionId) = when (val sse = sseSessions[sessionId]) {
+        null -> when(val wsSession = wsSessions[sessionId]) {
+            null -> Response(GONE)
+            else -> {
+                wsSession.send(WsMessage(Event("message", compact(message)).toMessage()))
+                Response(ACCEPTED)
+            }
+        }
         else -> {
-            session.send(Event("message", compact(message)))
+            sse.send(Event("message", compact(message)))
             Response(ACCEPTED)
         }
     }
@@ -63,21 +72,27 @@ class SseMcpProtocol(
     override fun error() = Response(GONE)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
-        sessions[sessionId]?.onClose(fn)
+        sseSessions[sessionId]?.onClose(fn)
     }
 
     fun newSession(sse: Sse): SessionId {
         val sessionId = SessionId.random(random)
-        sessions[sessionId] = sse
+        sseSessions[sessionId] = sse
+        return sessionId
+    }
+
+    fun newSession(websocket: Websocket): SessionId {
+        val sessionId = SessionId.random(random)
+        wsSessions[sessionId] = websocket
         return sessionId
     }
 
     private fun pruneDeadConnections() =
-        sessions.toList().forEach { (sessionId, sse) ->
+        sseSessions.toList().forEach { (sessionId, sse) ->
             try {
                 sse.send(Event("ping", ""))
             } catch (e: Exception) {
-                sessions.remove(sessionId)
+                sseSessions.remove(sessionId)
                 sse.close()
             }
         }

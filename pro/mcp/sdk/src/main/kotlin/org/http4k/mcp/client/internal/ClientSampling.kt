@@ -6,15 +6,15 @@ import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpSampling
-import org.http4k.sse.SseMessage
+import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.BlockingQueue
 
 internal class ClientSampling(
-    private val queueFor: (RequestId) -> BlockingQueue<SseMessage.Event>,
+    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
     override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {
-        fun hasStopReason(message: SseMessage.Event) = message.data.replace(" ", "").contains(""""stopReason":"""")
+        fun hasStopReason(message: McpNodeType) = message.asAOrThrow<SamplingResponse>().stopReason != null
 
         val messages = sender(
             McpSampling,

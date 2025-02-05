@@ -5,7 +5,9 @@ sealed interface MoshiNode {
 }
 
 data class MoshiArray(val elements: List<MoshiNode>) : MoshiNode
-data class MoshiObject(val attributes: MutableMap<String, MoshiNode>) : MoshiNode
+data class MoshiObject(val attributes: MutableMap<String, MoshiNode>) : MoshiNode {
+    operator fun get(name: String) = attributes[name]
+}
 
 data class MoshiString(val value: String) : MoshiNode
 data class MoshiInteger(val value: Int) : MoshiNode

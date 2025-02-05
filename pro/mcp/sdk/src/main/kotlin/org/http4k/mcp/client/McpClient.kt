@@ -49,7 +49,7 @@ interface McpClient : AutoCloseable {
     interface Resources {
         fun onChange(fn: () -> Unit)
         fun list(): Result<List<McpResource>>
-        fun read(name: String, request: ResourceRequest): Result<ResourceResponse>
+        fun read(request: ResourceRequest): Result<ResourceResponse>
     }
 
     interface Completions {

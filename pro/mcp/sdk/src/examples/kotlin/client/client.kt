@@ -10,7 +10,7 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.client.Http4kMcpClient
+import org.http4k.mcp.client.SseMcpClient
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
@@ -22,7 +22,7 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 
 fun main() {
-    val mcpClient = Http4kMcpClient(
+    val mcpClient = SseMcpClient(
         Request(GET, "http://localhost:3001/sse"),
         VersionedMcpEntity(McpEntity.of("foobar"), Version.of("1.0.0")),
         ClientCapabilities(),
@@ -35,7 +35,7 @@ fun main() {
     println(mcpClient.prompts().get("prompt2", PromptRequest(mapOf("a1" to "foo"))).getOrThrow())
 
     println(mcpClient.resources().list().getOrThrow())
-    println(mcpClient.resources().read("HTTP4K", ResourceRequest(Uri.of("https://www.http4k.org"))).getOrThrow())
+    println(mcpClient.resources().read(ResourceRequest(Uri.of("https://www.http4k.org"))).getOrThrow())
 
     println(
         mcpClient.completions()

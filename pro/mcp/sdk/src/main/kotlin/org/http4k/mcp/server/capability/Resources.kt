@@ -2,6 +2,8 @@ package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.util.ObservableList
@@ -34,7 +36,7 @@ class Resources(list: List<ResourceCapability>) : ObservableList<ResourceCapabil
     fun read(req: McpResource.Read.Request, http: Request) = items
         .find { it.matches(req.uri) }
         ?.read(req, http)
-        ?: error("no resource")
+        ?: throw McpException(InvalidParams)
 
     fun subscribe(sessionId: SessionId, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit) {
         subscriptions.getOrPut(req.uri to sessionId, ::emptySet).let {
