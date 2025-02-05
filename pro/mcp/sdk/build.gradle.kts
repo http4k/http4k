@@ -26,7 +26,7 @@ dependencies {
 
     ksp("se.ansman.kotshi:compiler:_")
 
-    api(project(":http4k-client-websocket"))
+    testImplementation(project(":http4k-client-websocket"))
 
     testImplementation("org.jsoup:jsoup:_")
     testImplementation(testFixtures(project(":http4k-core")))
