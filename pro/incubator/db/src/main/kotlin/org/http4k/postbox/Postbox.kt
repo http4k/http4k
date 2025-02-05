@@ -70,7 +70,6 @@ interface Postbox {
      */
     fun pendingRequests(batchSize: Int): List<PendingRequest>
 
-
     data class PendingRequest(val requestId: RequestId, val request: Request)
 }
 
