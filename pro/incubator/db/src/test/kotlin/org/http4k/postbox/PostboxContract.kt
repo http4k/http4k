@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.time.FixedTimeSource
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -19,8 +20,10 @@ import org.http4k.postbox.RequestProcessingStatus.Dead
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.junit.jupiter.api.Test
+import java.time.Duration
 
 abstract class PostboxContract {
+    val timeSource = FixedTimeSource()
     abstract val postbox: PostboxTransactor
 
     @Test
@@ -62,8 +65,8 @@ abstract class PostboxContract {
 
     @Test
     fun `store request multiple times does not affect pending retrieval order`() {
-        val newRequestOne = PendingRequest(id(1), Request(GET, "/foo"))
-        val newRequestTwo = PendingRequest(id(2), Request(GET, "/bar"))
+        val newRequestOne = PendingRequest(id(1), Request(GET, "/one"))
+        val newRequestTwo = PendingRequest(id(2), Request(GET, "/two"))
 
         store(newRequestOne)
         store(newRequestTwo)
@@ -198,6 +201,29 @@ abstract class PostboxContract {
         checkStatus(request.requestId, Success(Processed(Response(I_M_A_TEAPOT))))
     }
 
+    @Test
+    fun `mark request as failed`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markFailed(request.requestId, Duration.ofSeconds(10), Response(I_M_A_TEAPOT))
+
+        checkPending()
+
+        checkStatus(request.requestId, Success(Pending))
+    }
+
+    private fun markFailed(
+        requestId: RequestId,
+        delay: Duration,
+        response: Response? = null,
+        expecting: Result<Unit, PostboxError> = Success(Unit)
+    ) {
+        val result = postbox.perform { it.markFailed(requestId, delay, response) }
+        assertThat(result, equalTo(expecting))
+    }
+
     private fun markDead(
         requestId: RequestId, response: Response? = null,
         expecting: Result<Unit, PostboxError> = Success(Unit)
@@ -221,7 +247,7 @@ abstract class PostboxContract {
     }
 
     private fun checkPending(vararg expected: PendingRequest) {
-        val pending = postbox.perform { it.pendingRequests(10) }
+        val pending = postbox.perform { it.pendingRequests(10, timeSource()) }
         assertThat(pending, equalTo(expected.toList()))
     }
 
@@ -229,6 +255,7 @@ abstract class PostboxContract {
         request: PendingRequest,
         expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending)
     ) {
+        timeSource.tick(Duration.ofSeconds(1))
         val result = postbox.perform { it.store(request) }
         assertThat(result, equalTo(expectedStatus))
     }
