@@ -1,6 +1,5 @@
 package org.http4k.mcp.client
 
-import org.http4k.client.JettyWebsocketClient
 import org.http4k.core.Request
 import org.http4k.format.MoshiObject
 import org.http4k.format.renderRequest
@@ -36,24 +35,27 @@ import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
+import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 /**
  * Single connection MCP client.
  */
 class WsMcpClient(
     private val wsRequest: Request,
+    private val websocketFactory: WebsocketFactory,
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
     private val running = AtomicBoolean(false)
 
-    private val wsClient by lazy { JettyWebsocketClient.blocking(wsRequest.uri, wsRequest.headers) }
+    private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
     private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
 
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
@@ -63,46 +65,51 @@ class WsMcpClient(
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
 
-        wsClient
-            .received()
-            .forEach {
-                when (val msg = SseMessage.parse(it.bodyString())) {
-                    is Event -> when (msg.event) {
-                        "endpoint" -> {
-                            running.set(true)
-                            startLatch.countDown()
-                        }
+        thread {
+            wsClient
+                .received()
+                .forEach {
+                    when (val msg = SseMessage.parse(it.bodyString())) {
+                        is Event -> when (msg.event) {
+                            "endpoint" -> {
+                                startLatch.countDown()
+                            }
 
-                        "ping" -> {}
-                        else -> with(McpJson) {
-                            val data = parse(msg.data) as MoshiObject
+                            "ping" -> {}
+                            else -> with(McpJson) {
+                                val data = parse(msg.data) as MoshiObject
 
-                            when {
-                                data["id"] == null -> {
-                                    val message = JsonRpcRequest(this, data.attributes)
-                                    notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach { it.process(message) }
-                                }
-
-                                else -> {
-                                    val message = JsonRpcResult(this, data.attributes)
-                                    val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                    messageQueues[id]
-                                        ?.also { queue ->
-                                            queue.put(data)
-
-                                            val (latch, isComplete) = requests[id] ?: return@also
-                                            if (message.isError() || isComplete(data)) requests.remove(id)
-                                            latch.countDown()
+                                when {
+                                    data["id"] == null -> {
+                                        val message = JsonRpcRequest(this, data.attributes)
+                                        notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach {
+                                            it.process(
+                                                message
+                                            )
                                         }
+                                    }
+
+                                    else -> {
+                                        val message = JsonRpcResult(this, data.attributes)
+                                        val id = asA<RequestId>(compact(message.id ?: nullNode()))
+                                        messageQueues[id]
+                                            ?.also { queue ->
+                                                queue.put(data)
+
+                                                val (latch, isComplete) = requests[id] ?: return@also
+                                                if (message.isError() || isComplete(data)) requests.remove(id)
+                                                latch.countDown()
+                                            }
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    else -> {}
+                        else -> {}
+                    }
+                    running.get()
                 }
-                running.get()
-            }
+        }
 
         startLatch.await()
 
@@ -177,7 +184,7 @@ class WsMcpClient(
                 compact(
                     McpJson.renderRequest(
                         rpc.Method.value,
-                        asJsonObject(this),
+                        asJsonObject(request),
                         asJsonObject(requestId)
                     )
                 )
