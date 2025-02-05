@@ -11,8 +11,9 @@ class PostboxTable(prefix: String) : Table("${prefix}_postbox") {
     private val dbTimestampNow = object : CustomFunction<Instant>("now", JavaInstantColumnType()) {}
     val requestId: Column<String> = varchar("request_id", 36)
     val createdAt: Column<Instant> = timestamp("created_at").defaultExpression(dbTimestampNow)
+    val processAt: Column<Instant> = timestamp("process_at").defaultExpression(dbTimestampNow)
     val request: Column<String> = text("request")
     val response: Column<String?> = text("response").nullable()
-    val failed = bool("failed").default(false)
+    val dead = bool("dead").default(false)
     override val primaryKey = PrimaryKey(requestId, name = "${prefix}_request_id_pk")
 }

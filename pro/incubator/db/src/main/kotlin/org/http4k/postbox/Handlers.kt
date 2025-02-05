@@ -16,12 +16,11 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
-import org.http4k.db.Transactor
 import org.http4k.db.performAsResult
 import org.http4k.lens.location
 import org.http4k.postbox.PendingResponseGenerators.Empty
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.RequestProcessingStatus.Failed
+import org.http4k.postbox.RequestProcessingStatus.Dead
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.routing.RoutedMessage
@@ -81,7 +80,7 @@ class PostboxHandlers(
     private fun RequestProcessingStatus.toResponse(requestId: RequestId) = when (this) {
         is Pending -> responseGenerator(requestId)
         is Processed -> response
-        is Failed -> response ?: Response(NO_CONTENT)
+        is Dead -> response ?: Response(NO_CONTENT)
     }
 
     private fun PostboxError.toResponse() =

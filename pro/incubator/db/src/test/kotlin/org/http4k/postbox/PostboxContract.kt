@@ -12,10 +12,10 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.CONTINUE
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
-import org.http4k.postbox.PostboxError.Companion.RequestAlreadyFailed
+import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
-import org.http4k.postbox.RequestProcessingStatus.Failed
+import org.http4k.postbox.RequestProcessingStatus.Dead
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.junit.jupiter.api.Test
@@ -110,75 +110,75 @@ abstract class PostboxContract {
 
         store(request)
 
-        markFailed(request.requestId, Response(BAD_REQUEST))
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT), Failure(RequestAlreadyFailed))
+        markDead(request.requestId, Response(BAD_REQUEST))
+        markProcessed(request.requestId, Response(I_M_A_TEAPOT), Failure(RequestMarkedAsDead))
 
         checkPending()
     }
 
     @Test
-    fun `mark request as failed`() {
+    fun `mark request as dead`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
 
-        markFailed(requestId = request.requestId, Response(I_M_A_TEAPOT))
+        markDead(requestId = request.requestId, Response(I_M_A_TEAPOT))
 
         checkPending()
-        checkStatus(request.requestId, Success(Failed(Response(I_M_A_TEAPOT))))
+        checkStatus(request.requestId, Success(Dead(Response(I_M_A_TEAPOT))))
     }
 
     @Test
-    fun `cannot mark a request as failed if it does not exist`() {
-        markFailed(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
+    fun `cannot mark a request as dead if it does not exist`() {
+        markDead(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
     }
 
     @Test
-    fun `mark request as failed without a response`() {
+    fun `mark request as dead without a response`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
 
-        markFailed(requestId = request.requestId)
+        markDead(requestId = request.requestId)
 
         checkPending()
-        checkStatus(request.requestId, Success(Failed()))
+        checkStatus(request.requestId, Success(Dead()))
     }
 
     @Test
-    fun `marks request as failed multiple times does not update an existing response`() {
+    fun `marks request as dead multiple times does not update an existing response`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
 
-        markFailed(requestId = request.requestId, Response(I_M_A_TEAPOT))
-        markFailed(requestId = request.requestId, Response(BAD_REQUEST))
+        markDead(requestId = request.requestId, Response(I_M_A_TEAPOT))
+        markDead(requestId = request.requestId, Response(BAD_REQUEST))
 
         checkPending()
-        checkStatus(request.requestId, Success(Failed(Response(I_M_A_TEAPOT))))
+        checkStatus(request.requestId, Success(Dead(Response(I_M_A_TEAPOT))))
     }
 
     @Test
-    fun `marks request as failed multiple times store response if previous was null`() {
+    fun `marks request as dead multiple times store response if previous was null`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
 
-        markFailed(requestId = request.requestId, null)
-        markFailed(requestId = request.requestId, Response(BAD_REQUEST))
+        markDead(requestId = request.requestId, null)
+        markDead(requestId = request.requestId, Response(BAD_REQUEST))
 
         checkPending()
-        checkStatus(request.requestId, Success(Failed(Response(BAD_REQUEST))))
+        checkStatus(request.requestId, Success(Dead(Response(BAD_REQUEST))))
     }
 
     @Test
-    fun `cannot mark request as failed after it has been processed`() {
+    fun `cannot mark request as dead after it has been processed`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
 
         markProcessed(request.requestId, Response(I_M_A_TEAPOT))
-        markFailed(request.requestId, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
+        markDead(request.requestId, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
 
         checkPending()
     }
@@ -198,11 +198,11 @@ abstract class PostboxContract {
         checkStatus(request.requestId, Success(Processed(Response(I_M_A_TEAPOT))))
     }
 
-    private fun markFailed(
+    private fun markDead(
         requestId: RequestId, response: Response? = null,
         expecting: Result<Unit, PostboxError> = Success(Unit)
     ) {
-        val result = postbox.perform { it.markFailed(requestId, response) }
+        val result = postbox.perform { it.markDead(requestId, response) }
         assertThat(result, equalTo(expecting))
     }
 

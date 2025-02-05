@@ -84,7 +84,7 @@ class PostboxProcessing(
             postbox.markProcessed(pending.requestId, response)
                 .mapFailure { RequestProcessingError(it.description) }
         } else {
-            postbox.markFailed(pending.requestId, response)
+            postbox.markDead(pending.requestId, response)
                 .mapFailure { RequestProcessingError(it.description) }
                 .flatMap { Failure(RequestProcessingError("response did not pass success criteria")) }
                 .get().let(::Failure)
