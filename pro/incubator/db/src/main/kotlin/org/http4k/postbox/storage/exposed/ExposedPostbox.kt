@@ -34,7 +34,7 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
 
     override fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError> =
         table.upsertReturning(
-            returning = listOf(table.requestId, table.response, table.status),
+            returning = listOf(table.requestId, table.response, table.status, table.processAt),
             onUpdateExclude = listOf(table.request, table.createdAt, table.processAt, table.status)
         ) { row ->
             val now = timeSource()
@@ -46,13 +46,13 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
         }.single().toStatus()
 
     override fun status(requestId: RequestId) =
-        table.select(listOf(table.requestId, table.request, table.response, table.status))
+        table.select(listOf(table.requestId, table.request, table.response, table.status, table.processAt))
             .where { table.requestId eq requestId.value }
             .singleOrNull()
             ?.toStatus() ?: Failure(RequestNotFound)
 
     private fun ResultRow.toStatus() = when (this[table.status]) {
-        PENDING -> Success(RequestProcessingStatus.Pending)
+        PENDING -> Success(RequestProcessingStatus.Pending(this[table.processAt]))
         PROCESSED -> Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
         DEAD -> Success(RequestProcessingStatus.Dead(this[table.response]?.let(Response::parse)))
     }
