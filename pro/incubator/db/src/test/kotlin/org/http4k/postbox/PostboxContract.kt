@@ -26,208 +26,187 @@ abstract class PostboxContract {
     val timeSource = FixedTimeSource()
     abstract val postbox: PostboxTransactor
 
-    private fun PostboxRequest(requestId: RequestId, request: Request) = requestId to request
-
-    private val Pair<RequestId, Request>.requestId get() = first
-    private val Pair<RequestId, Request>.request get() = second
-    private fun Pair<RequestId, Request>.toPending()  = PendingRequest(first, second, timeSource())
+    private val requestId = id(1)
+    private val request = Request(GET, "/1")
 
     @Test
     fun `store request`() {
-        val newRequest = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(newRequest.requestId, newRequest.request)
-
-        checkStatus(newRequest.requestId, Success(Pending))
-        checkPending(newRequest.toPending())
+        checkStatus(requestId, Success(Pending))
+        checkPending(PendingRequest(requestId, request, timeSource()))
     }
 
     @Test
     fun `store request is idempotent`() {
-        val requestId = id(1)
-        val request1 = Request(GET, "/foo")
-        val request2 = Request(GET, "/bar")
+        val requestTwo = Request(GET, "/2")
 
-        val requestToRemove = PostboxRequest(requestId, request1)
-        store(requestToRemove.requestId, requestToRemove.request)
-        val firstTime= timeSource()
+        val firstPending = store(requestId, request)
 
-        val requestToRemove1 = PostboxRequest(requestId, request2)
-        store(requestToRemove1.requestId, requestToRemove1.request)
+        store(requestId, requestTwo)
 
-        checkPending(PendingRequest(requestId, request1, firstTime))
+        checkPending(firstPending)
     }
 
     @Test
     fun `store request does not update previous request`() {
-        val requestId = id(1)
-        val request1 = Request(GET, "/foo")
-        val request2 = Request(GET, "/bar")
+        val requestTwo = Request(GET, "/2")
 
-        val requestToRemove = PostboxRequest(requestId, request1)
-        store(requestToRemove.requestId, requestToRemove.request)
+        store(requestId, request)
 
         markProcessed(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
-        val requestToRemove1 = PostboxRequest(requestId, request2)
-        store(
-            requestToRemove1.requestId,
-            requestToRemove1.request,
-            expectedStatus = Success(Processed(Response(I_M_A_TEAPOT)))
-        )
+        store(requestId, requestTwo, Success(Processed(Response(I_M_A_TEAPOT))))
 
         checkPending()
     }
 
     @Test
     fun `store request multiple times does not affect pending retrieval order`() {
-        val newRequestOne = PostboxRequest(id(1), Request(GET, "/one"))
-        val newRequestTwo = PostboxRequest(id(2), Request(GET, "/two"))
+        val requestId2 = id(2)
+        val request2 = Request(GET, "/2")
 
-        val pendingOne = store(newRequestOne.requestId, newRequestOne.request)
-        val pendingTwo = store(newRequestTwo.requestId, newRequestTwo.request)
+        val pendingOne = store(requestId, request)
+        val pendingTwo = store(requestId2, request2)
 
         checkPending(pendingOne, pendingTwo)
 
-        store(newRequestOne.requestId, newRequestOne.request)
+        store(requestId, request)
 
         checkPending(pendingOne, pendingTwo)
     }
 
     @Test
     fun `mark request as processed`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT))
+        markProcessed(requestId, Response(I_M_A_TEAPOT))
 
         checkPending()
     }
 
     @Test
     fun `cannot mark a request as processed if it does not exist`() {
-        markProcessed(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
+        markProcessed(requestId, Response(I_M_A_TEAPOT), Failure(RequestNotFound))
     }
 
     @Test
     fun `cannot mark request as processed after it has already been processed`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markProcessed(request.requestId, Response(CONTINUE))
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT), expects = Failure(RequestAlreadyProcessed))
+        markProcessed(requestId, Response(CONTINUE))
+        markProcessed(requestId, Response(I_M_A_TEAPOT), expects = Failure(RequestAlreadyProcessed))
 
         checkPending()
-        checkStatus(request.requestId, Success(Processed(Response(CONTINUE))))
+        checkStatus(requestId, Success(Processed(Response(CONTINUE))))
     }
 
     @Test
     fun `cannot mark request as processed after it has been marked as failed`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markDead(request.requestId, Response(BAD_REQUEST))
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT), Failure(RequestMarkedAsDead))
+        markDead(requestId, Response(BAD_REQUEST))
+        markProcessed(requestId, Response(I_M_A_TEAPOT), Failure(RequestMarkedAsDead))
 
         checkPending()
     }
 
     @Test
     fun `mark request as dead`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markDead(requestId = request.requestId, Response(I_M_A_TEAPOT))
+        markDead(requestId, Response(I_M_A_TEAPOT))
 
         checkPending()
-        checkStatus(request.requestId, Success(Dead(Response(I_M_A_TEAPOT))))
+        checkStatus(requestId, Success(Dead(Response(I_M_A_TEAPOT))))
     }
 
     @Test
     fun `cannot mark a request as dead if it does not exist`() {
-        markDead(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
+        markDead(requestId, Response(I_M_A_TEAPOT), Failure(RequestNotFound))
     }
 
     @Test
     fun `mark request as dead without a response`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markDead(requestId = request.requestId)
+        markDead(requestId)
 
         checkPending()
-        checkStatus(request.requestId, Success(Dead()))
+        checkStatus(requestId, Success(Dead()))
     }
 
     @Test
     fun `marks request as dead multiple times does not update an existing response`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markDead(requestId = request.requestId, Response(I_M_A_TEAPOT))
-        markDead(requestId = request.requestId, Response(BAD_REQUEST))
+        markDead(requestId, Response(I_M_A_TEAPOT))
+        markDead(requestId, Response(BAD_REQUEST))
 
         checkPending()
-        checkStatus(request.requestId, Success(Dead(Response(I_M_A_TEAPOT))))
+        checkStatus(requestId, Success(Dead(Response(I_M_A_TEAPOT))))
     }
 
     @Test
     fun `marks request as dead multiple times store response if previous was null`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markDead(requestId = request.requestId, null)
-        markDead(requestId = request.requestId, Response(BAD_REQUEST))
+        markDead(requestId, null)
+        markDead(requestId, Response(BAD_REQUEST))
 
         checkPending()
-        checkStatus(request.requestId, Success(Dead(Response(BAD_REQUEST))))
+        checkStatus(requestId, Success(Dead(Response(BAD_REQUEST))))
     }
 
     @Test
     fun `cannot mark request as dead after it has been processed`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT))
-        markDead(request.requestId, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
+        markProcessed(requestId, Response(I_M_A_TEAPOT))
+        markDead(requestId, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
 
         checkPending()
     }
 
     @Test
-    fun `check status of a request`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+    fun `check status of a non existing request`() {
+        checkStatus(requestId, Failure(RequestNotFound))
+    }
 
-        checkStatus(request.requestId, Failure(RequestNotFound))
+    @Test
+    fun `check status of a pending request`() {
+        store(requestId, request)
 
-        store(request.requestId, request.request)
+        checkStatus(requestId, Success(Pending))
+    }
 
-        checkStatus(request.requestId, Success(Pending))
+    @Test
+    fun `check status of a processed request`() {
+        store(requestId, request)
+        markProcessed(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
-        markProcessed(request.requestId, Response(I_M_A_TEAPOT), Success(Unit))
+        checkStatus(requestId, Success(Processed(Response(I_M_A_TEAPOT))))
+    }
 
-        checkStatus(request.requestId, Success(Processed(Response(I_M_A_TEAPOT))))
+    @Test
+    fun `check status of a dead request`() {
+        store(requestId, request)
+        checkStatus(requestId, Success(Pending))
+
+        markDead(requestId, Response(I_M_A_TEAPOT), Success(Unit))
+
+        checkStatus(requestId, Success(Dead(Response(I_M_A_TEAPOT))))
     }
 
     @Test
     fun `mark request as failed`() {
-        val request = PostboxRequest(id(1), Request(GET, "/"))
+        store(requestId, request)
 
-        store(request.requestId, request.request)
-
-        markFailed(request.requestId, Duration.ofSeconds(10), Response(I_M_A_TEAPOT))
+        markFailed(requestId, Duration.ofSeconds(10), Response(I_M_A_TEAPOT))
 
         checkPending()
 
-        checkStatus(request.requestId, Success(Pending))
+        checkStatus(requestId, Success(Pending))
     }
 
     private fun markFailed(
