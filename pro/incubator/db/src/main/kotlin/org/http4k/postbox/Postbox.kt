@@ -18,6 +18,8 @@ interface Postbox {
      *
      * @param pending the request to store, which includes an id and the request itself
      *
+     * If the request is already stored, it will ignore the new value and return the status of the existing one.
+     *
      * @return the status of the request processing
      *  - If the request is new or has not been processed, the status will be [RequestProcessingStatus.Pending]
      *  - If the request has been processed, the status will be [RequestProcessingStatus.Processed]
@@ -39,10 +41,10 @@ interface Postbox {
     /**
      * Mark a request as processed with the given response.
      *
-     * @return Unit if the request was successfully marked as processed or a
-     * failure with [PostboxError.RequestNotFound] if the request is not found.
-     *
-     * TODO: handle the case where the request is already marked as processed
+     * @return
+     *  - If the request was successfully marked as processed, the result will be a success with [Unit]
+     *  - If the request has been already processed or marked as failed, the result will be a failure with [PostboxError.StorageFailure]
+     *  - If the request is not present, the result will be a failure with  [PostboxError.RequestNotFound]
      */
     fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError>
 
@@ -51,6 +53,8 @@ interface Postbox {
      *
      * @param requestId the id of the request to mark as failed
      * @param response the response to store with the failed request (optional)
+     *
+     * If a response was not previously stored, the new response will be stored. Subsequent responses will be ignored.
      *
      * @return
      *   - If the request was successfully marked as failed, returns a success with [Unit]
@@ -77,6 +81,7 @@ sealed class PostboxError(val description: String) {
 
     companion object {
         val RequestAlreadyProcessed = StorageFailure(IllegalStateException("request already processed"))
+        val RequestAlreadyFailed = StorageFailure(IllegalStateException("request already marked as failed"))
     }
 }
 

@@ -9,8 +9,10 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.CONTINUE
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
+import org.http4k.postbox.PostboxError.Companion.RequestAlreadyFailed
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestProcessingStatus.Failed
@@ -90,15 +92,45 @@ abstract class PostboxContract {
     }
 
     @Test
+    fun `cannot mark request as processed after it has already been processed`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markProcessed(request.requestId, Response(CONTINUE))
+        markProcessed(request.requestId, Response(I_M_A_TEAPOT), expects = Failure(RequestAlreadyProcessed))
+
+        checkPending()
+        checkStatus(request.requestId, Success(Processed(Response(CONTINUE))))
+    }
+
+    @Test
+    fun `cannot mark request as processed after it has been marked as failed`() {
+        val request = PendingRequest(id(1), Request(GET, "/"))
+
+        store(request)
+
+        markFailed(request.requestId, Response(BAD_REQUEST))
+        markProcessed(request.requestId, Response(I_M_A_TEAPOT), Failure(RequestAlreadyFailed))
+
+        checkPending()
+    }
+
+    @Test
     fun `mark request as failed`() {
         val request = PendingRequest(id(1), Request(GET, "/"))
 
         store(request)
 
-        markFailed(request, Response(I_M_A_TEAPOT))
+        markFailed(requestId = request.requestId, Response(I_M_A_TEAPOT))
 
         checkPending()
         checkStatus(request.requestId, Success(Failed(Response(I_M_A_TEAPOT))))
+    }
+
+    @Test
+    fun `cannot mark a request as failed if it does not exist`() {
+        markFailed(id(1), Response(I_M_A_TEAPOT), Failure(RequestNotFound))
     }
 
     @Test
@@ -107,7 +139,7 @@ abstract class PostboxContract {
 
         store(request)
 
-        markFailed(request)
+        markFailed(requestId = request.requestId)
 
         checkPending()
         checkStatus(request.requestId, Success(Failed()))
@@ -119,8 +151,8 @@ abstract class PostboxContract {
 
         store(request)
 
-        markFailed(request, Response(I_M_A_TEAPOT))
-        markFailed(request, Response(BAD_REQUEST))
+        markFailed(requestId = request.requestId, Response(I_M_A_TEAPOT))
+        markFailed(requestId = request.requestId, Response(BAD_REQUEST))
 
         checkPending()
         checkStatus(request.requestId, Success(Failed(Response(I_M_A_TEAPOT))))
@@ -132,8 +164,8 @@ abstract class PostboxContract {
 
         store(request)
 
-        markFailed(request, null)
-        markFailed(request, Response(BAD_REQUEST))
+        markFailed(requestId = request.requestId, null)
+        markFailed(requestId = request.requestId, Response(BAD_REQUEST))
 
         checkPending()
         checkStatus(request.requestId, Success(Failed(Response(BAD_REQUEST))))
@@ -146,7 +178,7 @@ abstract class PostboxContract {
         store(request)
 
         markProcessed(request.requestId, Response(I_M_A_TEAPOT))
-        markFailed(request, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
+        markFailed(request.requestId, Response(BAD_REQUEST), Failure(RequestAlreadyProcessed))
 
         checkPending()
     }
@@ -167,10 +199,10 @@ abstract class PostboxContract {
     }
 
     private fun markFailed(
-        request: PendingRequest, response: Response? = null,
+        requestId: RequestId, response: Response? = null,
         expecting: Result<Unit, PostboxError> = Success(Unit)
     ) {
-        val result = postbox.perform { it.markFailed(request.requestId, response) }
+        val result = postbox.perform { it.markFailed(requestId, response) }
         assertThat(result, equalTo(expecting))
     }
 
