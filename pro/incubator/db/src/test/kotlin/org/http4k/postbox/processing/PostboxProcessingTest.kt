@@ -1,4 +1,4 @@
-package org.http4k.postbox
+package org.http4k.postbox.processing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -12,6 +12,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNPROCESSABLE_ENTITY
 import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
+import org.http4k.postbox.Postbox
+import org.http4k.postbox.RequestId
+import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.inmemory.InMemoryPostbox
 import org.http4k.routing.bind

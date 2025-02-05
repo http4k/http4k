@@ -11,6 +11,7 @@ import org.http4k.postbox.PendingResponseGenerators.redirect
 import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.postbox.exposed.PostboxTransactor
 import org.http4k.postbox.exposed.postgresDataSource
+import org.http4k.postbox.processing.PostboxProcessing
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
