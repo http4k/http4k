@@ -163,7 +163,6 @@ class SseMcpClient(
         messageQueues.remove(requestId)
     }
 
-
     private fun performRequest(
         method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }
     ): Result<RequestId> {
