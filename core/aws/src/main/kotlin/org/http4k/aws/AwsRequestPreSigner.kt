@@ -42,7 +42,7 @@ fun AwsRequestPreSigner(
 
     AwsPreSignedRequest(
         method = fullRequest.method,
-        uri = fullRequest.query("X-Amz-Signature", signature).uri,
+        uri = fullRequest.query("X-Amz-Signature", signature).encodePlusCharInPath().uri,
         signedHeaders = fullRequest.headers,
         expires = clock.instant() + expires
     )
