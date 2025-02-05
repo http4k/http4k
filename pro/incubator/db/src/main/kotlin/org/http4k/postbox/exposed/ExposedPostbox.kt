@@ -32,17 +32,17 @@ import java.time.Instant
 class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postbox {
     private val table = PostboxTable(prefix)
 
-    override fun store(pending: Postbox.PendingRequest): Result<RequestProcessingStatus, PostboxError> =
+    override fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError> =
         table.upsertReturning(
             returning = listOf(table.requestId, table.response, table.status),
             onUpdateExclude = listOf(table.request, table.createdAt, table.processAt, table.status)
         ) { row ->
             val now = timeSource()
-            row[requestId] = pending.requestId.value
+            row[table.requestId] = requestId.value
             row[createdAt] = now
             row[processAt] = now
             row[status] = PENDING
-            row[request] = pending.request.toString()
+            row[table.request] = request.toString()
         }.single().toStatus()
 
     override fun status(requestId: RequestId) =

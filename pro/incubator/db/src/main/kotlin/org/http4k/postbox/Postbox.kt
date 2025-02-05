@@ -15,6 +15,7 @@ import java.time.Instant
  * Postbox is the storage mechanism for requests that are to be processed asynchronously.
  */
 interface Postbox {
+
     /**
      * Store a request in the Postbox for later processing.
      *
@@ -28,7 +29,7 @@ interface Postbox {
      *
      *  //TODO: test storing after processing/dead
      */
-    fun store(pending: PendingRequest): Result<RequestProcessingStatus, PostboxError>
+    fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError>
 
     /**
      * Retrieve the status of a request.
