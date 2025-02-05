@@ -7,6 +7,8 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.peek
 import dev.forkhandles.result4k.peekFailure
+import dev.forkhandles.time.TimeSource
+import dev.forkhandles.time.systemTime
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.db.performAsResult
@@ -67,7 +69,7 @@ class PostboxProcessing(
     fun processPendingRequests(successCriteria: (Response) -> Boolean): Result<Int, RequestProcessingError> = transactor.performAsResult { postbox ->
         // TODO: implement max number of retries?
         // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
-        val pendingRequests = postbox.pendingRequests(batchSize)
+        val pendingRequests = postbox.pendingRequests(batchSize, systemTime())
         for (pending in pendingRequests) {
             processPendingRequest(postbox, pending,successCriteria)
                 .peek { events(RequestProcessingSucceeded(pending.requestId)) }

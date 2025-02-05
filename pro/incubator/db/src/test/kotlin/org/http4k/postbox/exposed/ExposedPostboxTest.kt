@@ -10,5 +10,5 @@ class ExposedPostboxTest : PostboxContract() {
         postbox.perform { PostboxTable("test").deleteAll() }
     }
 
-    override val postbox = PostboxTransactor(postgresDataSource("test"), "test")
+    override val postbox = PostboxTransactor(postgresDataSource("test"), timeSource, "test")
 }

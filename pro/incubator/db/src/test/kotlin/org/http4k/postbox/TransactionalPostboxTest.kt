@@ -2,6 +2,7 @@ package org.http4k.postbox
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.time.FixedTimeSource
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -19,7 +20,8 @@ import org.http4k.postbox.inmemory.InMemoryPostbox
 import org.junit.jupiter.api.Test
 
 class TransactionalPostboxTest {
-    private val postbox = InMemoryPostbox()
+    private val timeSource = FixedTimeSource()
+    private val postbox = InMemoryPostbox(timeSource)
     private val transactor = InMemoryTransactor<Postbox>(postbox)
     private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
     private val handlers = PostboxHandlers(transactor, linkHeader("requestId"))
@@ -33,7 +35,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
-        assertThat(postbox.pendingRequests(10), equalTo(listOf(aRequest.asPending())))
+        assertThat(postbox.pendingRequests(10, timeSource()), equalTo(listOf(aRequest.asPending())))
 
         val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 
@@ -77,7 +79,7 @@ class TransactionalPostboxTest {
 
         assertThat(response, hasStatus(INTERNAL_SERVER_ERROR))
 
-        assertThat(postbox.pendingRequests(10), equalTo(emptyList()))
+        assertThat(postbox.pendingRequests(10, timeSource()), equalTo(emptyList()))
     }
 
     @Test

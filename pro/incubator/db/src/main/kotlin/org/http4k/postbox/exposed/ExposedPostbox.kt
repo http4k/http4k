@@ -4,6 +4,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.time.TimeSource
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
@@ -14,52 +15,84 @@ import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
+import org.http4k.postbox.exposed.PostboxTable.Status.DEAD
+import org.http4k.postbox.exposed.PostboxTable.Status.PENDING
+import org.http4k.postbox.exposed.PostboxTable.Status.PROCESSED
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.booleanLiteral
-import org.jetbrains.exposed.sql.not
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsertReturning
+import java.time.Duration
+import java.time.Instant
 
-class ExposedPostbox(prefix: String) : Postbox {
+class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postbox {
     private val table = PostboxTable(prefix)
 
     override fun store(pending: Postbox.PendingRequest): Result<RequestProcessingStatus, PostboxError> =
         table.upsertReturning(
-            returning = listOf(table.requestId, table.response, table.dead),
-            onUpdateExclude = listOf(table.request)
+            returning = listOf(table.requestId, table.response, table.status),
+            onUpdateExclude = listOf(table.request, table.createdAt, table.processAt, table.status)
         ) { row ->
+            val now = timeSource()
             row[requestId] = pending.requestId.value
+            row[createdAt] = now
+            row[processAt] = now
+            row[status] = PENDING
             row[request] = pending.request.toString()
         }.single().toStatus()
 
     override fun status(requestId: RequestId) =
-        table.select(listOf(table.requestId, table.request, table.response, table.dead))
+        table.select(listOf(table.requestId, table.request, table.response, table.status))
             .where { table.requestId eq requestId.value }
             .singleOrNull()
             ?.toStatus() ?: Failure(RequestNotFound)
 
-    private fun ResultRow.toStatus() = when {
-        this[table.dead] -> Success(RequestProcessingStatus.Dead(this[table.response]?.let(Response::parse)))
-        this[table.response] != null ->
-            Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
-
-        else -> Success(RequestProcessingStatus.Pending)
+    private fun ResultRow.toStatus() = when (this[table.status]) {
+        PENDING -> Success(RequestProcessingStatus.Pending)
+        PROCESSED -> Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
+        DEAD -> Success(RequestProcessingStatus.Dead(this[table.response]?.let(Response::parse)))
     }
 
     override fun markProcessed(requestId: RequestId, response: Response) =
         status(requestId)
             .onFailure { return it }
             .let {
-                when(it){
+                when (it) {
                     is RequestProcessingStatus.Pending -> markProcessedInternal(requestId, response)
                     is RequestProcessingStatus.Dead -> Failure(RequestMarkedAsDead)
                     is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
                 }
             }
+
+    override fun markFailed(
+        requestId: RequestId,
+        delayReprocessing: Duration,
+        response: Response?
+    ): Result<Unit, PostboxError> = status(requestId)
+        .onFailure { return it }
+        .let {
+            when (it) {
+                is RequestProcessingStatus.Pending -> markFailedInternal(requestId, delayReprocessing, response)
+                is RequestProcessingStatus.Dead -> Failure(RequestMarkedAsDead)
+                is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
+            }
+        }
+
+    private fun markFailedInternal(
+        requestId: RequestId,
+        delayReprocessing: Duration,
+        response: Response?
+    ): Result<Unit, PostboxError> {
+        table.update(where = { table.requestId eq requestId.value }) { row ->
+            row[table.response] = response.toString()
+            row[table.processAt] = timeSource() + delayReprocessing
+        }
+        return Success(Unit)
+    }
 
     private fun markProcessedInternal(
         requestId: RequestId,
@@ -67,6 +100,7 @@ class ExposedPostbox(prefix: String) : Postbox {
     ): Result<Unit, PostboxError> {
         table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response.toString()
+            row[table.status] = PROCESSED
         }
         return Success(Unit)
     }
@@ -76,27 +110,27 @@ class ExposedPostbox(prefix: String) : Postbox {
             .onFailure { return it }
             .let {
                 when (it) {
-                    is RequestProcessingStatus.Dead -> markFailureInternal(requestId, it.response ?: response)
-                    is RequestProcessingStatus.Pending -> markFailureInternal(requestId, response)
+                    is RequestProcessingStatus.Dead -> markDeadInternal(requestId, it.response ?: response)
+                    is RequestProcessingStatus.Pending -> markDeadInternal(requestId, response)
                     is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
                 }
             }
 
 
-    private fun markFailureInternal(
+    private fun markDeadInternal(
         requestId: RequestId,
         response: Response?
     ): Result<Unit, PostboxError> {
         table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response?.toString()
-            row[table.dead] = true
+            row[table.status] = DEAD
         }
         return Success(Unit)
     }
 
-    override fun pendingRequests(batchSize: Int) =
+    override fun pendingRequests(batchSize: Int, atTime: Instant) =
         table.select(listOf(table.requestId, table.request))
-            .where(table.response.isNull() and not(table.dead eq booleanLiteral(true)))
+            .where(table.response.isNull() and (table.status eq PENDING) and (table.processAt lessEq atTime))
             .orderBy(table.processAt, ASC)
             .limit(batchSize)
             .map {
