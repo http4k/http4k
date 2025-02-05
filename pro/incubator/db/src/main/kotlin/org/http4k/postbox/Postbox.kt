@@ -49,19 +49,19 @@ interface Postbox {
     fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError>
 
     /**
-     * Mark a request as failed with an optional response.
+     * Mark a request as permanently failed (dead) with an optional response.
      *
-     * @param requestId the id of the request to mark as failed
-     * @param response the response to store with the failed request (optional)
+     * @param requestId the id of the request to mark as dead
+     * @param response the response to store with the dead request (optional)
      *
      * If a response was not previously stored, the new response will be stored. Subsequent responses will be ignored.
      *
      * @return
-     *   - If the request was successfully marked as failed, returns a success with [Unit]
+     *   - If the request was successfully marked as dead, returns a success with [Unit]
      *   - If the request is not found, the result will be a failure with [PostboxError.RequestNotFound]
      *   - If the request has been already processed, the result will be a failure with [PostboxError.StorageFailure]
      */
-    fun markFailed(requestId: RequestId, response: Response? = null): Result<Unit, PostboxError>
+    fun markDead(requestId: RequestId, response: Response? = null): Result<Unit, PostboxError>
 
     /**
      * Retrieve all pending requests. Those are the ones that have not been marked as processed or failed yet.
@@ -80,14 +80,14 @@ sealed class PostboxError(val description: String) {
 
     companion object {
         val RequestAlreadyProcessed = StorageFailure(IllegalStateException("request already processed"))
-        val RequestAlreadyFailed = StorageFailure(IllegalStateException("request already marked as failed"))
+        val RequestMarkedAsDead = StorageFailure(IllegalStateException("request already marked as dead"))
     }
 }
 
 sealed class RequestProcessingStatus {
     data object Pending : RequestProcessingStatus()
     data class Processed(val response: Response) : RequestProcessingStatus()
-    data class Failed(val response: Response? = null) : RequestProcessingStatus()
+    data class Dead(val response: Response? = null) : RequestProcessingStatus()
 }
 
 class RequestId private constructor(value: String) : StringValue(value) {
