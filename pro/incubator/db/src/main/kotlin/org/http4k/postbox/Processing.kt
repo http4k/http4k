@@ -7,7 +7,6 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.peek
 import dev.forkhandles.result4k.peekFailure
-import dev.forkhandles.time.TimeSource
 import dev.forkhandles.time.systemTime
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
@@ -19,11 +18,9 @@ import org.http4k.postbox.ProcessingEvent.BatchProcessingSucceeded
 import org.http4k.postbox.ProcessingEvent.PollWait
 import org.http4k.postbox.ProcessingEvent.RequestProcessingFailed
 import org.http4k.postbox.ProcessingEvent.RequestProcessingSucceeded
-import java.util.concurrent.ExecutorService
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.Executors
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.TimeSource.Monotonic.markNow
 
 
 /**
@@ -33,18 +30,16 @@ class PostboxProcessing(
     private val transactor: PostboxTransactor,
     private val target: HttpHandler,
     private val batchSize: Int = 10,
-    private val maxPollingTime: Duration = 5.seconds,
+    private val maxPollingTime: Duration = Duration.ofSeconds(5),
     private val events: Events = { },
-    private val executorService: ExecutorService = Executors.newVirtualThreadPerTaskExecutor(),
+    private val context: ExecutionContext = DefaultExecutionContext,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
-) : Runnable {
-    private var running = true
-
-    override fun run() {
-        while (running) {
-            val mark = markNow()
+)  {
+    private val task = Runnable {
+        while (context.isRunning()) {
+            val t0 = context.currentTime()
             val result = processPendingRequests(successCriteria)
-            val elapsedTime = mark.elapsedNow()
+            val elapsedTime = Duration.between(t0, context.currentTime())
 
             result
                 .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
@@ -53,30 +48,31 @@ class PostboxProcessing(
             val remainingTime = maxPollingTime - elapsedTime
             if (remainingTime > Duration.ZERO) {
                 events(PollWait(remainingTime))
-                Thread.sleep(remainingTime.inWholeMilliseconds)
+                context.pause(remainingTime)
             }
         }
     }
 
     fun stop() {
-        running = false
+        context.stop()
     }
 
     fun start() {
-        executorService.execute(this)
+        context.start(task)
     }
 
-    fun processPendingRequests(successCriteria: (Response) -> Boolean): Result<Int, RequestProcessingError> = transactor.performAsResult { postbox ->
-        // TODO: implement max number of retries?
-        // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
-        val pendingRequests = postbox.pendingRequests(batchSize, systemTime())
-        for (pending in pendingRequests) {
-            processPendingRequest(postbox, pending,successCriteria)
-                .peek { events(RequestProcessingSucceeded(pending.requestId)) }
-                .peekFailure { events(RequestProcessingFailed(it.reason)) }
-        }
-        pendingRequests.size
-    }.mapFailure { RequestProcessingError(it.message.orEmpty()) }
+    fun processPendingRequests(successCriteria: (Response) -> Boolean): Result<Int, RequestProcessingError> =
+        transactor.performAsResult { postbox ->
+            // TODO: implement max number of retries?
+            // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
+            val pendingRequests = postbox.pendingRequests(batchSize, systemTime())
+            for (pending in pendingRequests) {
+                processPendingRequest(postbox, pending, successCriteria)
+                    .peek { events(RequestProcessingSucceeded(pending.requestId)) }
+                    .peekFailure { events(RequestProcessingFailed(it.reason)) }
+            }
+            pendingRequests.size
+        }.mapFailure { RequestProcessingError(it.message.orEmpty()) }
 
     private fun processPendingRequest(
         postbox: Postbox, pending: Postbox.PendingRequest,
@@ -102,4 +98,34 @@ sealed class ProcessingEvent : Event {
     data class RequestProcessingSucceeded(val requestId: RequestId) : ProcessingEvent()
     data class RequestProcessingFailed(val reason: String) : ProcessingEvent()
     data class PollWait(val duration: Duration) : ProcessingEvent()
+}
+
+interface ExecutionContext {
+    fun stop()
+    fun isRunning(): Boolean
+    fun pause(duration: Duration)
+    fun start(runnable: Runnable)
+    fun currentTime(): Instant
+}
+
+object DefaultExecutionContext : ExecutionContext {
+    private var running = true
+    private var executor = Executors.newVirtualThreadPerTaskExecutor()
+
+    override fun stop() {
+        running = false
+        executor.shutdown()
+    }
+
+    override fun isRunning(): Boolean = running
+
+    override fun start(runnable: Runnable) {
+        executor.execute(runnable)
+    }
+
+    override fun currentTime(): Instant = Instant.now()
+
+    override fun pause(duration: Duration) {
+        Thread.sleep(duration)
+    }
 }
