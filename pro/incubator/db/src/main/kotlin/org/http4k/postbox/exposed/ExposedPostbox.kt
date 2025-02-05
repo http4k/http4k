@@ -129,14 +129,15 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
     }
 
     override fun pendingRequests(batchSize: Int, atTime: Instant) =
-        table.select(listOf(table.requestId, table.request))
+        table.select(listOf(table.requestId, table.request, table.processAt))
             .where(table.response.isNull() and (table.status eq PENDING) and (table.processAt lessEq atTime))
             .orderBy(table.processAt, ASC)
             .limit(batchSize)
             .map {
                 Postbox.PendingRequest(
                     RequestId.of(it[table.requestId]),
-                    Request.parse(it[table.request])
+                    Request.parse(it[table.request]),
+                    it[table.processAt]
                 )
             }
 }

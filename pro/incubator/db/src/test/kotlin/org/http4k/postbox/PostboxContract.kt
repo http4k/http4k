@@ -26,14 +26,20 @@ abstract class PostboxContract {
     val timeSource = FixedTimeSource()
     abstract val postbox: PostboxTransactor
 
+    private fun PostboxRequest(requestId: RequestId, request: Request) = requestId to request
+
+    private val Pair<RequestId, Request>.requestId get() = first
+    private val Pair<RequestId, Request>.request get() = second
+    private fun Pair<RequestId, Request>.toPending()  = PendingRequest(first, second, timeSource())
+
     @Test
     fun `store request`() {
-        val newRequest = PendingRequest(id(1), Request(GET, "/"))
+        val newRequest = PostboxRequest(id(1), Request(GET, "/"))
 
         store(newRequest.requestId, newRequest.request)
 
         checkStatus(newRequest.requestId, Success(Pending))
-        checkPending(newRequest)
+        checkPending(newRequest.toPending())
     }
 
     @Test
@@ -42,12 +48,14 @@ abstract class PostboxContract {
         val request1 = Request(GET, "/foo")
         val request2 = Request(GET, "/bar")
 
-        val requestToRemove = PendingRequest(requestId, request1)
+        val requestToRemove = PostboxRequest(requestId, request1)
         store(requestToRemove.requestId, requestToRemove.request)
-        val requestToRemove1 = PendingRequest(requestId, request2)
+        val firstTime= timeSource()
+
+        val requestToRemove1 = PostboxRequest(requestId, request2)
         store(requestToRemove1.requestId, requestToRemove1.request)
 
-        checkPending(PendingRequest(requestId, request1))
+        checkPending(PendingRequest(requestId, request1, firstTime))
     }
 
     @Test
@@ -56,12 +64,12 @@ abstract class PostboxContract {
         val request1 = Request(GET, "/foo")
         val request2 = Request(GET, "/bar")
 
-        val requestToRemove = PendingRequest(requestId, request1)
+        val requestToRemove = PostboxRequest(requestId, request1)
         store(requestToRemove.requestId, requestToRemove.request)
 
         markProcessed(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
-        val requestToRemove1 = PendingRequest(requestId, request2)
+        val requestToRemove1 = PostboxRequest(requestId, request2)
         store(
             requestToRemove1.requestId,
             requestToRemove1.request,
@@ -73,22 +81,22 @@ abstract class PostboxContract {
 
     @Test
     fun `store request multiple times does not affect pending retrieval order`() {
-        val newRequestOne = PendingRequest(id(1), Request(GET, "/one"))
-        val newRequestTwo = PendingRequest(id(2), Request(GET, "/two"))
+        val newRequestOne = PostboxRequest(id(1), Request(GET, "/one"))
+        val newRequestTwo = PostboxRequest(id(2), Request(GET, "/two"))
+
+        val pendingOne = store(newRequestOne.requestId, newRequestOne.request)
+        val pendingTwo = store(newRequestTwo.requestId, newRequestTwo.request)
+
+        checkPending(pendingOne, pendingTwo)
 
         store(newRequestOne.requestId, newRequestOne.request)
-        store(newRequestTwo.requestId, newRequestTwo.request)
 
-        checkPending(newRequestOne, newRequestTwo)
-
-        store(newRequestOne.requestId, newRequestOne.request)
-
-        checkPending(newRequestOne, newRequestTwo)
+        checkPending(pendingOne, pendingTwo)
     }
 
     @Test
     fun `mark request as processed`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -104,7 +112,7 @@ abstract class PostboxContract {
 
     @Test
     fun `cannot mark request as processed after it has already been processed`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -117,7 +125,7 @@ abstract class PostboxContract {
 
     @Test
     fun `cannot mark request as processed after it has been marked as failed`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -129,7 +137,7 @@ abstract class PostboxContract {
 
     @Test
     fun `mark request as dead`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -146,7 +154,7 @@ abstract class PostboxContract {
 
     @Test
     fun `mark request as dead without a response`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -158,7 +166,7 @@ abstract class PostboxContract {
 
     @Test
     fun `marks request as dead multiple times does not update an existing response`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -171,7 +179,7 @@ abstract class PostboxContract {
 
     @Test
     fun `marks request as dead multiple times store response if previous was null`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -184,7 +192,7 @@ abstract class PostboxContract {
 
     @Test
     fun `cannot mark request as dead after it has been processed`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -196,7 +204,7 @@ abstract class PostboxContract {
 
     @Test
     fun `check status of a request`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         checkStatus(request.requestId, Failure(RequestNotFound))
 
@@ -211,7 +219,7 @@ abstract class PostboxContract {
 
     @Test
     fun `mark request as failed`() {
-        val request = PendingRequest(id(1), Request(GET, "/"))
+        val request = PostboxRequest(id(1), Request(GET, "/"))
 
         store(request.requestId, request.request)
 
@@ -263,10 +271,11 @@ abstract class PostboxContract {
         requestId: RequestId,
         request: Request,
         expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending)
-    ) {
+    ): PendingRequest {
         timeSource.tick(Duration.ofSeconds(1))
         val result = postbox.perform { it.store(requestId, request) }
         assertThat(result, equalTo(expectedStatus))
+        return PendingRequest(requestId, request, timeSource())
     }
 
     private fun id(id: Int) = RequestId.of(id.toString())
