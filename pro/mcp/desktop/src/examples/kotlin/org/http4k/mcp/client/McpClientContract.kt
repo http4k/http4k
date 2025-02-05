@@ -30,7 +30,6 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.McpSseHandler
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Prompts
@@ -38,8 +37,7 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.sse.RealtimeMcpProtocol
 import org.http4k.routing.bind
-import org.http4k.server.Helidon
-import org.http4k.server.asServer
+import org.http4k.server.Http4kServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
@@ -57,29 +55,29 @@ interface McpClientContract : PortBasedTest {
             ToolResponse.Ok(listOf(Content.Text(it.javaClass.simpleName.toString().reversed())))
         })
 
-        val server = McpSseHandler(
-            RealtimeMcpProtocol(
-                ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-                Prompts(Prompt("prompt", "description1") bind {
-                    PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
+        val protocol = RealtimeMcpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            Prompts(Prompt("prompt", "description1") bind {
+                PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
+            }
+            ),
+            tools,
+            Resources(
+                Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
+                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }
-                ),
-                tools,
-                Resources(
-                    Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
-                        ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-                    }
-                ),
-                Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
-                    CompletionResponse(Completion(listOf("1", "2")))
-                }),
-                IncomingSampling(ModelSelector(model) bind {
-                    samplingResponses.asSequence()
-                })
-            ).also { it.start() }
-        ).asServer(Helidon(0)).start()
+            ),
+            Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+                CompletionResponse(Completion(listOf("1", "2")))
+            }),
+            IncomingSampling(ModelSelector(model) bind {
+                samplingResponses.asSequence()
+            })
+        )
+        val server = toPolyHandler(protocol).start()
+        protocol.start()
 
-        val mcpClient = clientFor(Uri.of("http://localhost:${server.port()}/sse"))
+        val mcpClient = clientFor(server.port())
 
         val latch = CountDownLatch(1)
 
@@ -140,5 +138,7 @@ interface McpClientContract : PortBasedTest {
         server.stop()
     }
 
-    fun clientFor(uri: Uri): McpClient
+    fun toPolyHandler(protocol: RealtimeMcpProtocol): Http4kServer
+
+    fun clientFor(port: Int): McpClient
 }
