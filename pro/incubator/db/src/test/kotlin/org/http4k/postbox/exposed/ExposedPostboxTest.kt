@@ -5,10 +5,15 @@ import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.BeforeEach
 
 class ExposedPostboxTest : PostboxContract() {
+
     @BeforeEach
     fun before() {
         postbox.perform { PostboxTable("test").deleteAll() }
     }
 
-    override val postbox = PostboxTransactor(postgresDataSource("test"), timeSource, "test")
+    override val postbox = PostboxTransactor(dataSource, timeSource, "test")
+
+    companion object {
+        val dataSource by lazy { postgresDataSource("test") }
+    }
 }

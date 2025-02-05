@@ -12,5 +12,7 @@ fun postgresDataSource(prefix: String = "http4k") = try {
         jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
     }).also { ExposedPostboxSchema.create(it, prefix) }
 } catch (e: Exception) {
+    System.err.println("Postgres not available")
+    e.printStackTrace(System.err)
     throw TestAbortedException("Postgres not available", e)
 }
