@@ -9,6 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
+import org.http4k.postbox.PostboxError.Companion.RequestAlreadyFailed
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
@@ -49,7 +50,21 @@ class ExposedPostbox(prefix: String) : Postbox {
         else -> Success(RequestProcessingStatus.Pending)
     }
 
-    override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> {
+    override fun markProcessed(requestId: RequestId, response: Response) =
+        status(requestId)
+            .onFailure { return it }
+            .let {
+                when(it){
+                    is RequestProcessingStatus.Pending -> markProcessedInternal(requestId, response)
+                    is RequestProcessingStatus.Failed -> Failure(RequestAlreadyFailed)
+                    is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
+                }
+            }
+
+    private fun markProcessedInternal(
+        requestId: RequestId,
+        response: Response
+    ): Result<Unit, PostboxError> {
         val update = table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response.toString()
         }

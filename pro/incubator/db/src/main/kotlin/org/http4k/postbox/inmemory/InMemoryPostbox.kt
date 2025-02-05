@@ -7,6 +7,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
+import org.http4k.postbox.PostboxError.Companion.RequestAlreadyFailed
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
@@ -44,17 +45,24 @@ class InMemoryPostbox : Postbox {
 
     override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> =
         findRequest(requestId)?.let {
-            requests[requestId] = Record(it.request, response)
-            Success(Unit)
+            when {
+                it.failed -> Failure(RequestAlreadyFailed)
+                it.response != null -> Failure(RequestAlreadyProcessed)
+                else -> {
+                    requests[requestId] = Record(it.request, it.response ?: response)
+                    Success(Unit)
+                }
+            }
         } ?: Failure(PostboxError.RequestNotFound)
 
     override fun markFailed(requestId: RequestId, response: Response?): Result<Unit, PostboxError> =
         findRequest(requestId)?.let {
-            if(it.response != null && !it.failed) {
+            if (it.response != null && !it.failed) {
                 return Failure(RequestAlreadyProcessed)
-            }else{
-            requests[requestId] = Record(it.request, it.response ?: response, failed = true)
-            Success(Unit)}
+            } else {
+                requests[requestId] = Record(it.request, it.response ?: response, failed = true)
+                Success(Unit)
+            }
         } ?: Failure(PostboxError.RequestNotFound)
 
     override fun status(requestId: RequestId) =
