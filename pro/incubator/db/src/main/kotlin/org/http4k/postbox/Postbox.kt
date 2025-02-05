@@ -64,7 +64,7 @@ interface Postbox {
     fun markDead(requestId: RequestId, response: Response? = null): Result<Unit, PostboxError>
 
     /**
-     * Retrieve all pending requests. Those are the ones that have not been marked as processed or failed yet.
+     * Retrieve all pending requests. Those are the ones that have not been marked as processed or dead yet.
      *
      * @return a list of all pending requests in first-in-first-out order
      */
