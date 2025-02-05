@@ -1,4 +1,4 @@
-package org.http4k.postbox.inmemory
+package org.http4k.postbox.storage.inmemory
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
@@ -12,7 +12,7 @@ import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
-import org.http4k.postbox.inmemory.InMemoryPostbox.Status.*
+import org.http4k.postbox.storage.inmemory.InMemoryPostbox.Status.*
 import java.time.Duration
 import java.time.Instant
 

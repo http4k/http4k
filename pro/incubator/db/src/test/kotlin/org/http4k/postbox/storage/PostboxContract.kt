@@ -1,4 +1,4 @@
-package org.http4k.postbox
+package org.http4k.postbox.storage
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -13,9 +13,13 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.CONTINUE
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.postbox.Postbox.PendingRequest
+import org.http4k.postbox.PostboxError
 import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
+import org.http4k.postbox.PostboxTransactor
+import org.http4k.postbox.RequestId
+import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.RequestProcessingStatus.Dead
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed

@@ -1,4 +1,4 @@
-package org.http4k.postbox.exposed
+package org.http4k.postbox.storage.exposed
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
@@ -15,9 +15,9 @@ import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
-import org.http4k.postbox.exposed.PostboxTable.Status.DEAD
-import org.http4k.postbox.exposed.PostboxTable.Status.PENDING
-import org.http4k.postbox.exposed.PostboxTable.Status.PROCESSED
+import org.http4k.postbox.storage.exposed.PostboxTable.Status.DEAD
+import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
+import org.http4k.postbox.storage.exposed.PostboxTable.Status.PROCESSED
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

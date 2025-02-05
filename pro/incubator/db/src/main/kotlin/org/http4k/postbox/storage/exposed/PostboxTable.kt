@@ -1,6 +1,6 @@
-package org.http4k.postbox.exposed
+package org.http4k.postbox.storage.exposed
 
-import org.http4k.postbox.exposed.PostboxTable.Status.PENDING
+import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.CustomFunction
 import org.jetbrains.exposed.sql.Table

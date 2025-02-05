@@ -15,7 +15,6 @@ import java.time.Instant
  * Postbox is the storage mechanism for requests that are to be processed asynchronously.
  */
 interface Postbox {
-
     /**
      * Store a request in the Postbox for later processing.
      *

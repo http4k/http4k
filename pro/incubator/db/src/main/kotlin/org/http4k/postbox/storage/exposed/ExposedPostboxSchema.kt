@@ -1,4 +1,4 @@
-package org.http4k.postbox.exposed
+package org.http4k.postbox.storage.exposed
 
 import org.http4k.db.ExposedTransactor
 import org.http4k.db.Transactor

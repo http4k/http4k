@@ -1,7 +1,8 @@
-package org.http4k.postbox.exposed
+package org.http4k.postbox.storage.exposed
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.http4k.postbox.storage.exposed.ExposedPostboxSchema
 
 fun main() {
     HikariDataSource(HikariConfig().apply {
