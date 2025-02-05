@@ -1,4 +1,4 @@
-package org.http4k.postbox
+package org.http4k.postbox.processing
 
 import dev.forkhandles.time.FixedTimeSource
 import java.time.Duration

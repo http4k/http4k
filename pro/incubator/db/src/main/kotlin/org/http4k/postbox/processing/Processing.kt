@@ -1,4 +1,4 @@
-package org.http4k.postbox
+package org.http4k.postbox.processing
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
@@ -11,16 +11,11 @@ import dev.forkhandles.time.systemTime
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.db.performAsResult
-import org.http4k.events.Event
 import org.http4k.events.Events
-import org.http4k.postbox.ProcessingEvent.BatchProcessingFailed
-import org.http4k.postbox.ProcessingEvent.BatchProcessingSucceeded
-import org.http4k.postbox.ProcessingEvent.PollWait
-import org.http4k.postbox.ProcessingEvent.RequestProcessingFailed
-import org.http4k.postbox.ProcessingEvent.RequestProcessingSucceeded
+import org.http4k.postbox.Postbox
+import org.http4k.postbox.PostboxTransactor
+import org.http4k.postbox.processing.ProcessingEvent.*
 import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.Executors
 
 
 /**
@@ -92,40 +87,5 @@ class PostboxProcessing(
 
 data class RequestProcessingError(val reason: String)
 
-sealed class ProcessingEvent : Event {
-    data class BatchProcessingSucceeded(val batchSize: Int, val duration: Duration) : ProcessingEvent()
-    data class BatchProcessingFailed(val reason: String) : ProcessingEvent()
-    data class RequestProcessingSucceeded(val requestId: RequestId) : ProcessingEvent()
-    data class RequestProcessingFailed(val reason: String) : ProcessingEvent()
-    data class PollWait(val duration: Duration) : ProcessingEvent()
-}
 
-interface ExecutionContext {
-    fun isRunning(): Boolean
-    fun start(runnable: Runnable)
-    fun pause(duration: Duration)
-    fun stop()
-    fun currentTime(): Instant
-}
 
-object DefaultExecutionContext : ExecutionContext {
-    private var running = true
-    private var executor = Executors.newVirtualThreadPerTaskExecutor()
-
-    override fun stop() {
-        running = false
-        executor.shutdown()
-    }
-
-    override fun isRunning(): Boolean = running
-
-    override fun start(runnable: Runnable) {
-        executor.execute(runnable)
-    }
-
-    override fun currentTime(): Instant = Instant.now()
-
-    override fun pause(duration: Duration) {
-        Thread.sleep(duration)
-    }
-}
