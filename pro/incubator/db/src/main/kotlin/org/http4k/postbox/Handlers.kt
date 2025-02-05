@@ -48,7 +48,7 @@ class PostboxHandlers(
     fun intercepting(resolver: RequestIdResolver = fromPath()): HttpHandler = { request: Request ->
         resolver(request).asResultOr { Response(BAD_REQUEST.description("request id not found")) }
             .flatMap { requestId ->
-                transactor.performAsResult { it.store(Postbox.PendingRequest(requestId, request)) }
+                transactor.performAsResult { it.store(requestId, request) }
                     .mapFailure(PostboxError::TransactionFailure)
                     .flatMap { it }
                     .map { it.toResponse(requestId) }

@@ -47,7 +47,7 @@ class TransactionalPostboxTest {
         val aRequest = Request(POST, "/hello").body("hello")
         val aResponse = Response(OK).body("foo")
 
-        postbox.store(aRequest.asPending())
+        postbox.store(aRequest.id(), aRequest)
         postbox.markProcessed(aRequest.id(), aResponse)
 
         val interceptorResponse = requestHandler(aRequest)
@@ -61,7 +61,7 @@ class TransactionalPostboxTest {
     @Test
     fun `updates status of request`() {
         val aRequest = Request(POST, "/hello").body("hello")
-        postbox.store(aRequest.asPending())
+        postbox.store(aRequest.id(), aRequest)
 
         processing.processPendingRequests({ it.status.successful })
 
