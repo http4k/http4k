@@ -10,6 +10,7 @@ import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SamplingRequest
+import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Completion
@@ -19,10 +20,12 @@ import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
-import org.http4k.mcp.model.Role
+import org.http4k.mcp.model.Role.assistant
+import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
@@ -37,10 +40,15 @@ import org.junit.jupiter.api.Test
 interface McpClientContract : PortBasedTest {
     @Test
     fun `can interact with server`() {
+        val model = ModelIdentifier.of("my model")
+        val samplingResponses = listOf(
+            SamplingResponse(model, null, assistant, Content.Text("hello")),
+            SamplingResponse(model, StopReason.of("foobar"), assistant, Content.Text("world"))
+        )
         val server = mcpSse(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             Prompt("prompt", "description1") bind {
-                PromptResponse(listOf(Message(Role.assistant, Content.Text(it.toString()))), "description")
+                PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             },
             Tool("reverse", "description", Tool.Arg.required("name")) bind {
                 ToolResponse.Ok(listOf(Content.Text(it.javaClass.simpleName.toString().reversed())))
@@ -51,6 +59,9 @@ interface McpClientContract : PortBasedTest {
             Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
             },
+            ModelSelector(model) bind {
+                samplingResponses.asSequence()
+            }
         )
             .asServer(Helidon(0)).start()
 
@@ -92,10 +103,12 @@ interface McpClientContract : PortBasedTest {
             equalTo(ToolResponse.Ok(listOf(Content.Text("tseuqeRlooT"))))
         )
 
-        mcpClient.sampling().sample(
-            ModelIdentifier.of("asd"),
-            SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-        ).map { it.getOrThrow() }.toList()
+        assertThat(
+            mcpClient.sampling().sample(
+                ModelIdentifier.of("asd"),
+                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
+            ).map { it.getOrThrow() }.toList(), equalTo(samplingResponses)
+        )
 
         mcpClient.stop()
 
