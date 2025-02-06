@@ -21,8 +21,6 @@ object DefaultExecutionContext : ExecutionContext {
 
     override fun currentTime(): Instant = Instant.now()
 
-    override fun random(max: Int): Int = (0..max).random()
-
     override fun pause(duration: Duration) {
         Thread.sleep(duration)
     }

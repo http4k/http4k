@@ -21,6 +21,7 @@ import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
+import java.time.Duration
 
 class PostboxProcessingTest {
 
@@ -42,6 +43,7 @@ class PostboxProcessingTest {
         testTarget,
         context = TestExecutionContext(timeSource, iterations),
         events = StdOutEvents,
+        backoffStrategy = { _, _ -> Duration.ofSeconds(5) }
     )
 
     @Test
@@ -64,6 +66,16 @@ class PostboxProcessingTest {
         getProcessor(1).start()
 
         checkStatus(requestId, Pending(1, now.plusSeconds(2)))
+    }
+
+    @Test
+    fun `a failed request gets marked as dead after maximum attempts reached`() {
+        val requestId = RequestId.of("0")
+
+        store(requestId, requestForFailure)
+        getProcessor(4).start()
+
+        checkStatus(requestId, RequestProcessingStatus.Dead(Response(BAD_GATEWAY)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
