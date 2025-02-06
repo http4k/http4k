@@ -15,6 +15,7 @@ import org.http4k.events.StdOutEvents
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
+import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
@@ -62,7 +63,7 @@ class PostboxProcessingTest {
         processor.start()
 
         checkPendingRequest(emptyList())
-        checkStatus(requestId, RequestProcessingStatus.Pending(1, now.plusSeconds(2)))
+        checkStatus(requestId, Pending(1, now.plusSeconds(2)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
