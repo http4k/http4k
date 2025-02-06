@@ -131,11 +131,18 @@ It'll do so by periodically processing a small bach of pending requests in a sin
 
 The responses for those requests are stored so they can be consumed or served later.
 
-By default, a request will be marked as processed if the handler returns a `2xx` status code. Otherwise, it'll be marked as failed. This behaviour can be customised using the `successCriteria` (`(Response) -> Boolean`) parameter of the `PostboxProcessing` constructor.
+By default, a request will be marked as processed if the handler returns a `2xx` status code. Otherwise, it'll be marked as failed and reprocessed later using an incremental backoff strategy. If it exceeds the maximum retry attempts, the request is marked as "dead" and won't be reprocessed. 
 
-#### Retries & Polling config
+You can configure `PostboxProcessing` by providing the following options:
 
-// TODO
+| Option | Description                                                                               | Default                                             |
+|--------|-------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| `batchSize` | The number of requests to process in a single batch                                       | 10                                                  |
+| `maxPollingTime` | The maximum time to wait between polling requests                                         | 5 seconds                                           |
+| `successCriteria` | A `(Response) -> Boolean` function to determine if the request was processed successfully | `response.status.successful` (i.e. status code 2xx) |
+| `maxFailures` | The maximum number of failures before marking the request as "dead"                       | 3                                                   |
+| `backoffStrategy` | A function to calculate the delay before trying to reprocess a request again              | (((# failures) ^ 2) * 5 seconds) + random(10) seconds |
+
 
 ### Configuring response for pending requests
 
