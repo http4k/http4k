@@ -224,6 +224,22 @@ abstract class PostboxContract {
         checkStatus(requestId, Success(Pending(1, now + later)))
     }
 
+    @Test
+    fun `mark request as failed multiple times increases counter and processing time`() {
+        val now = timeSource()
+        val later = Duration.ofSeconds(10)
+
+        store(requestId, request)
+
+        markFailed(requestId, later, Response(I_M_A_TEAPOT))
+        markFailed(requestId, later, Response(I_M_A_TEAPOT))
+        markFailed(requestId, later, Response(I_M_A_TEAPOT))
+
+        checkPending()
+
+        checkStatus(requestId, Success(Pending(3, now + Duration.ofSeconds(30))))
+    }
+
     private fun markFailed(
         requestId: RequestId,
         delay: Duration,
