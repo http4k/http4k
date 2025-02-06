@@ -7,17 +7,21 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.peek
 import dev.forkhandles.result4k.peekFailure
-import dev.forkhandles.time.systemTime
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.db.performAsResult
 import org.http4k.events.Events
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxTransactor
-import org.http4k.postbox.processing.ProcessingEvent.*
-import org.junit.jupiter.api.fail
+import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingFailed
+import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingSucceeded
+import org.http4k.postbox.processing.ProcessingEvent.PollWait
+import org.http4k.postbox.processing.ProcessingEvent.RequestProcessingFailed
+import org.http4k.postbox.processing.ProcessingEvent.RequestProcessingSucceeded
 import java.time.Duration
 import kotlin.math.pow
+import kotlin.time.DurationUnit.MILLISECONDS
+import kotlin.time.toDuration
 
 
 /**
@@ -63,7 +67,7 @@ class PostboxProcessing(
         transactor.performAsResult { postbox ->
             // TODO: implement max number of retries?
             // TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently?
-            val pendingRequests = postbox.pendingRequests(batchSize, systemTime())
+            val pendingRequests = postbox.pendingRequests(batchSize, context.currentTime())
             for (pending in pendingRequests) {
                 processPendingRequest(postbox, pending, successCriteria)
                     .peek { events(RequestProcessingSucceeded(pending.requestId)) }
@@ -83,14 +87,15 @@ class PostboxProcessing(
             if (pending.failures >= maxFailures) {
                 postbox.markDead(pending.requestId, response)
                     .mapFailure { RequestProcessingError(it.description) }
-                    .flatMap { Failure(RequestProcessingError("could not mark as dead")) }
+                    .flatMap { Failure(RequestProcessingError("${pending.requestId} did not pass success criteria after ${pending.failures} attempts. Marked as dead")) }
                     .get().let(::Failure)
             } else {
                 val nextDelay =
                     2.0.pow(pending.failures.toDouble()) * Duration.ofSeconds(2).toMillis() + context.random(10) * 1000
                 postbox.markFailed(pending.requestId, Duration.ofMillis(nextDelay.toLong()), response)
                     .mapFailure { RequestProcessingError(it.description) }
-                    .flatMap { Failure(RequestProcessingError("could not mark as failed")) }
+                    .flatMap {
+                        Failure(RequestProcessingError("${pending.requestId} did not pass success criteria. Marked as failed (reprocessing in ${nextDelay.toLong().toDuration(MILLISECONDS)})")) }
                     .get().let(::Failure)
             }
 
