@@ -39,7 +39,7 @@ abstract class PostboxContract {
         val now = timeSource()
         store(requestId, request)
 
-        checkStatus(requestId, Success(Pending(now)))
+        checkStatus(requestId, Success(Pending(0, now)))
         checkPending(PendingRequest(requestId, request, now))
     }
 
@@ -80,7 +80,7 @@ abstract class PostboxContract {
 
         checkPending(pendingOne, pendingTwo)
 
-        store(requestId, request, Success(Pending(pendingOne.processingTime)))
+        store(requestId, request, Success(Pending(0, pendingOne.processingTime)))
 
         checkPending(pendingOne, pendingTwo)
     }
@@ -187,7 +187,7 @@ abstract class PostboxContract {
         val now = timeSource()
         store(requestId, request)
 
-        checkStatus(requestId, Success(Pending(now)))
+        checkStatus(requestId, Success(Pending(0, now)))
     }
 
     @Test
@@ -203,7 +203,7 @@ abstract class PostboxContract {
         val now = timeSource()
         store(requestId, request)
 
-        checkStatus(requestId, Success(Pending(now)))
+        checkStatus(requestId, Success(Pending(0, now)))
 
         markDead(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
@@ -221,7 +221,7 @@ abstract class PostboxContract {
 
         checkPending()
 
-        checkStatus(requestId, Success(Pending(now + later)))
+        checkStatus(requestId, Success(Pending(1, now + later)))
     }
 
     private fun markFailed(
@@ -264,7 +264,7 @@ abstract class PostboxContract {
     private fun store(
         requestId: RequestId,
         request: Request,
-        expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending(timeSource()))
+        expectedStatus: Result<RequestProcessingStatus, PostboxError> = Success(Pending(0, timeSource()))
     ): PendingRequest {
         val result = postbox.perform { it.store(requestId, request) }
         assertThat(result, equalTo(expectedStatus))

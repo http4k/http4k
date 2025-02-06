@@ -33,11 +33,11 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
             val existingRequest = findRequest(requestId)
             if (existingRequest == null) {
                 requests[requestId] = Record(now, request)
-                Success(RequestProcessingStatus.Pending(now))
+                Success(RequestProcessingStatus.Pending(0, now))
             } else {
                 val response = existingRequest.response
                 if (response == null) {
-                    Success(RequestProcessingStatus.Pending(existingRequest.processAt))
+                    Success(RequestProcessingStatus.Pending(existingRequest.failures, existingRequest.processAt))
                 } else {
                     Success(RequestProcessingStatus.Processed(response))
                 }
@@ -68,7 +68,12 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
     ): Result<Unit, PostboxError> = findRequest(requestId)?.let {
         when (it.status) {
             PENDING -> {
-                requests[requestId] = Record(it.processAt + delayReprocessing, it.request, it.response ?: response)
+                requests[requestId] = Record(
+                    it.processAt + delayReprocessing,
+                    it.request,
+                    it.response ?: response,
+                    failures = it.failures + 1
+                )
                 Success(Unit)
             }
 
@@ -96,7 +101,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
     override fun status(requestId: RequestId) =
         findRequest(requestId)?.let {
             when (it.status) {
-                PENDING -> Success(RequestProcessingStatus.Pending(it.processAt))
+                PENDING -> Success(RequestProcessingStatus.Pending(it.failures, it.processAt))
                 PROCESSED -> Success(RequestProcessingStatus.Processed(it.response!!))
                 DEAD -> Success(RequestProcessingStatus.Dead(it.response))
             }
@@ -111,7 +116,8 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
         val processAt: Instant,
         val request: Request,
         val response: Response? = null,
-        val status: Status = PENDING
+        val status: Status = PENDING,
+        val failures: Int = 0
     )
 
     private enum class Status {
