@@ -23,6 +23,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.time.Duration.ofSeconds
 
 class PostboxProcessingTest {
 
@@ -44,7 +45,7 @@ class PostboxProcessingTest {
         testTarget,
         context = TestExecutionContext(timeSource, iterations),
         events = StdOutEvents,
-        backoffStrategy = { _, _ -> Duration.ofSeconds(5) }
+        backoffStrategy = { _, _ -> ofSeconds(5) }
     )
 
     @Test
@@ -82,12 +83,12 @@ class PostboxProcessingTest {
     @Test
     fun `default backoff strategy`(){
         val randomSource:RandomSource = { 7 }
-        assertThat(defaultBackoffStrategy(0, randomSource), equalTo(Duration.ofSeconds(12)))
-        assertThat(defaultBackoffStrategy(1, randomSource), equalTo(Duration.ofSeconds(17)))
-        assertThat(defaultBackoffStrategy(2, randomSource), equalTo(Duration.ofSeconds(27)))
-        assertThat(defaultBackoffStrategy(3, randomSource), equalTo(Duration.ofSeconds(47)))
-        assertThat(defaultBackoffStrategy(4, randomSource), equalTo(Duration.ofSeconds(87)))
-        assertThat(defaultBackoffStrategy(5, randomSource), equalTo(Duration.ofSeconds(167)))
+        assertThat(defaultBackoffStrategy(0, randomSource), equalTo(ofSeconds(12)))
+        assertThat(defaultBackoffStrategy(1, randomSource), equalTo(ofSeconds(17)))
+        assertThat(defaultBackoffStrategy(2, randomSource), equalTo(ofSeconds(27)))
+        assertThat(defaultBackoffStrategy(3, randomSource), equalTo(ofSeconds(47)))
+        assertThat(defaultBackoffStrategy(4, randomSource), equalTo(ofSeconds(87)))
+        assertThat(defaultBackoffStrategy(5, randomSource), equalTo(ofSeconds(167)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
