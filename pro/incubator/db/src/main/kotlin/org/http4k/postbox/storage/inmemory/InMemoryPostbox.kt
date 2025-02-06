@@ -108,7 +108,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
         } ?: Failure(PostboxError.RequestNotFound)
 
     override fun pendingRequests(batchSize: Int, atTime: Instant) = requests
-        .filter { it.value.response == null && it.value.status == PENDING && it.value.processAt <= atTime }
+        .filter { it.value.status == PENDING && it.value.processAt <= atTime }
         .map { Postbox.PendingRequest(it.key, it.value.request, it.value.processAt, it.value.failures) }
         .toList()
 

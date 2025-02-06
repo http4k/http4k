@@ -16,6 +16,7 @@ class TestExecutionContext(private val timeSource: FixedTimeSource, private val 
     override fun pause(duration: Duration) {
         ticks++
         timeSource.tick(duration)
+        println("ts=${timeSource()}")
     }
 
     override fun start(runnable: Runnable) {

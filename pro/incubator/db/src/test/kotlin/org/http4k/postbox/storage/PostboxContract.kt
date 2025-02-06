@@ -25,6 +25,7 @@ import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.time.Instant
 
 abstract class PostboxContract {
     val timeSource = FixedTimeSource()
@@ -235,9 +236,12 @@ abstract class PostboxContract {
         markFailed(requestId, later, Response(I_M_A_TEAPOT))
         markFailed(requestId, later, Response(I_M_A_TEAPOT))
 
-        checkPending()
+        checkPending(atTime = now)
 
-        checkStatus(requestId, Success(Pending(3, now + Duration.ofSeconds(30))))
+        val expectedProcessTime = now + Duration.ofSeconds(30)
+        checkStatus(requestId, Success(Pending(3, expectedProcessTime)))
+
+        checkPending(PendingRequest(requestId, request, expectedProcessTime, 3), atTime = expectedProcessTime + Duration.ofSeconds(1))
     }
 
     private fun markFailed(
@@ -272,8 +276,8 @@ abstract class PostboxContract {
         assertThat(result, equalTo(expects))
     }
 
-    private fun checkPending(vararg expected: PendingRequest) {
-        val pending = postbox.perform { it.pendingRequests(10, timeSource()) }
+    private fun checkPending(vararg expected: PendingRequest, atTime: Instant = timeSource()) {
+        val pending = postbox.perform { it.pendingRequests(10, atTime) }
         assertThat(pending, equalTo(expected.toList()))
     }
 

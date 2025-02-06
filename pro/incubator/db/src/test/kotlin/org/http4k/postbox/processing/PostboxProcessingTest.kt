@@ -36,10 +36,11 @@ class PostboxProcessingTest {
     private val requestForSuccess = Request(GET, "/success")
     private val requestForFailure = Request(GET, "/failure")
 
-    private val processor = PostboxProcessing(
+
+    private fun getProcessor(iterations: Int) = PostboxProcessing(
         transactor,
         testTarget,
-        context = TestExecutionContext(timeSource, 10),
+        context = TestExecutionContext(timeSource, iterations),
         events = StdOutEvents,
     )
 
@@ -48,7 +49,7 @@ class PostboxProcessingTest {
         val requestId = RequestId.of("0")
 
         store(requestId, requestForSuccess)
-        processor.start()
+        getProcessor(1).start()
 
         checkPendingRequest(emptyList())
         checkStatus(requestId, Processed(Response(OK)))
@@ -60,9 +61,8 @@ class PostboxProcessingTest {
         val now = timeSource()
 
         store(requestId, requestForFailure)
-        processor.start()
+        getProcessor(1).start()
 
-        checkPendingRequest(emptyList())
         checkStatus(requestId, Pending(1, now.plusSeconds(2)))
     }
 
