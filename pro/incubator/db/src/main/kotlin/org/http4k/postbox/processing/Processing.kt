@@ -32,7 +32,7 @@ class PostboxProcessing(
     private val events: Events = { },
     private val context: ExecutionContext = DefaultExecutionContext,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
-)  {
+) {
     private val task = Runnable {
         while (context.isRunning()) {
             val t0 = context.currentTime()
@@ -80,13 +80,14 @@ class PostboxProcessing(
             postbox.markProcessed(pending.requestId, response)
                 .mapFailure { RequestProcessingError(it.description) }
         } else {
-            if(pending.failures >= maxFailures) {
+            if (pending.failures >= maxFailures) {
                 postbox.markDead(pending.requestId, response)
                     .mapFailure { RequestProcessingError(it.description) }
                     .flatMap { Failure(RequestProcessingError("could not mark as dead")) }
                     .get().let(::Failure)
-            }else{
-                val nextDelay = 2.0.pow(pending.failures.toDouble()) *  Duration.ofSeconds(2).toMillis()
+            } else {
+                val nextDelay =
+                    2.0.pow(pending.failures.toDouble()) * Duration.ofSeconds(2).toMillis() + context.random(10) * 1000
                 postbox.markFailed(pending.requestId, Duration.ofMillis(nextDelay.toLong()), response)
                     .mapFailure { RequestProcessingError(it.description) }
                     .flatMap { Failure(RequestProcessingError("could not mark as failed")) }
