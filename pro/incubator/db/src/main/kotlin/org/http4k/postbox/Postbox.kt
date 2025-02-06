@@ -107,7 +107,7 @@ sealed class PostboxError(val description: String) {
 }
 
 sealed class RequestProcessingStatus {
-    data class Pending(val processAt: Instant) : RequestProcessingStatus()
+    data class Pending(val failures: Int, val processAt: Instant) : RequestProcessingStatus()
     data class Processed(val response: Response) : RequestProcessingStatus()
     data class Dead(val response: Response? = null) : RequestProcessingStatus()
 }

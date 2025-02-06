@@ -10,10 +10,11 @@ import java.time.Instant
 
 class PostboxTable(prefix: String) : Table("${prefix}_postbox") {
     val requestId: Column<String> = varchar("request_id", 36)
-    val createdAt: Column<Instant> = timestamp("created_at")
-    val processAt: Column<Instant> = timestamp("process_at")
     val request: Column<String> = text("request")
     val response: Column<String?> = text("response").nullable()
+    val createdAt: Column<Instant> = timestamp("created_at")
+    val processAt: Column<Instant> = timestamp("process_at")
+    val failures: Column<Int> = integer("failures").default(0)
     val status = enumeration<Status>("status").default(PENDING)
     override val primaryKey = PrimaryKey(requestId, name = "${prefix}_request_id_pk")
 

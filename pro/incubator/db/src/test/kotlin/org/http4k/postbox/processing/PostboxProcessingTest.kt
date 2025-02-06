@@ -63,7 +63,7 @@ class PostboxProcessingTest {
         processor.start()
 
         checkPendingRequest(emptyList())
-        checkStatus(requestId, RequestProcessingStatus.Pending(timeSource().plusSeconds(10)))
+        checkStatus(requestId, RequestProcessingStatus.Pending(0, timeSource().plusSeconds(10)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {

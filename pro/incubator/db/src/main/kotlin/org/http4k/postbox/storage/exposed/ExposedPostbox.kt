@@ -20,9 +20,11 @@ import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PROCESSED
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsertReturning
@@ -34,8 +36,8 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
 
     override fun store(requestId: RequestId, request: Request): Result<RequestProcessingStatus, PostboxError> =
         table.upsertReturning(
-            returning = listOf(table.requestId, table.response, table.status, table.processAt),
-            onUpdateExclude = listOf(table.request, table.createdAt, table.processAt, table.status)
+            returning = listOf(table.requestId, table.response, table.status, table.processAt, table.failures),
+            onUpdateExclude = listOf(table.request, table.createdAt, table.processAt, table.status, table.failures)
         ) { row ->
             val now = timeSource()
             row[table.requestId] = requestId.value
@@ -46,13 +48,22 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
         }.single().toStatus()
 
     override fun status(requestId: RequestId) =
-        table.select(listOf(table.requestId, table.request, table.response, table.status, table.processAt))
+        table.select(
+            listOf(
+                table.requestId,
+                table.request,
+                table.response,
+                table.status,
+                table.processAt,
+                table.failures
+            )
+        )
             .where { table.requestId eq requestId.value }
             .singleOrNull()
             ?.toStatus() ?: Failure(RequestNotFound)
 
     private fun ResultRow.toStatus() = when (this[table.status]) {
-        PENDING -> Success(RequestProcessingStatus.Pending(this[table.processAt]))
+        PENDING -> Success(RequestProcessingStatus.Pending(this[table.failures], this[table.processAt]))
         PROCESSED -> Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
         DEAD -> Success(RequestProcessingStatus.Dead(this[table.response]?.let(Response::parse)))
     }
@@ -90,6 +101,7 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
         table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response.toString()
             row[table.processAt] = timeSource() + delayReprocessing
+            row[table.failures] = table.failures + 1
         }
         return Success(Unit)
     }
