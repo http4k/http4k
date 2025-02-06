@@ -92,7 +92,12 @@ interface Postbox {
      */
     fun pendingRequests(batchSize: Int, atTime: Instant): List<PendingRequest>
 
-    data class PendingRequest(val requestId: RequestId, val request: Request, val processingTime: Instant)
+    data class PendingRequest(
+        val requestId: RequestId,
+        val request: Request,
+        val processingTime: Instant,
+        val failures: Int
+    )
 }
 
 sealed class PostboxError(val description: String) {

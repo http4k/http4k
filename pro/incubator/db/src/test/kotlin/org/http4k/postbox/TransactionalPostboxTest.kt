@@ -36,7 +36,7 @@ class TransactionalPostboxTest {
         val interceptorResponse = requestHandler(aRequest)
         assertThat(interceptorResponse, hasStatus(ACCEPTED))
 
-        assertThat(postbox.pendingRequests(10, timeSource()), equalTo(listOf(PendingRequest(aRequest.id(), aRequest, timeSource()))))
+        assertThat(postbox.pendingRequests(10, timeSource()), equalTo(listOf(PendingRequest(aRequest.id(), aRequest, timeSource(), 0))))
 
         val postboxResponse = statusHandler(Request(GET, interceptorResponse.header("Link")!!))
 

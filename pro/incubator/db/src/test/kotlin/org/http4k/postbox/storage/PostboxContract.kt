@@ -40,7 +40,7 @@ abstract class PostboxContract {
         store(requestId, request)
 
         checkStatus(requestId, Success(Pending(0, now)))
-        checkPending(PendingRequest(requestId, request, now))
+        checkPending(PendingRequest(requestId, request, now, 0))
     }
 
     @Test
@@ -284,7 +284,7 @@ abstract class PostboxContract {
     ): PendingRequest {
         val result = postbox.perform { it.store(requestId, request) }
         assertThat(result, equalTo(expectedStatus))
-        return PendingRequest(requestId, request, timeSource())
+        return PendingRequest(requestId, request, timeSource(), 0)
     }
 
     private fun id(id: Int) = RequestId.of(id.toString())
