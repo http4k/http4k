@@ -20,8 +20,7 @@ import org.http4k.postbox.processing.ProcessingEvent.RequestProcessingFailed
 import org.http4k.postbox.processing.ProcessingEvent.RequestProcessingSucceeded
 import java.time.Duration
 import kotlin.math.pow
-import kotlin.time.DurationUnit.MILLISECONDS
-import kotlin.time.toDuration
+import kotlin.time.toKotlinDuration
 
 
 /**
@@ -35,6 +34,7 @@ class PostboxProcessing(
     private val maxPollingTime: Duration = Duration.ofSeconds(5),
     private val events: Events = { },
     private val context: ExecutionContext = DefaultExecutionContext,
+    private val backoffStrategy: BackoffStrategy = ::defaultBackoffStrategy,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
 ) {
     private val task = Runnable {
@@ -90,20 +90,36 @@ class PostboxProcessing(
                     .flatMap { Failure(RequestProcessingError("${pending.requestId} did not pass success criteria after ${pending.failures} attempts. Marked as dead")) }
                     .get().let(::Failure)
             } else {
-                val nextDelay =
-                    2.0.pow(pending.failures.toDouble()) * Duration.ofSeconds(2).toMillis() + context.random(10) * 1000
-                postbox.markFailed(pending.requestId, Duration.ofMillis(nextDelay.toLong()), response)
+                val delay = backoffStrategy(pending.failures, { (0..it).random() })
+                postbox.markFailed(pending.requestId, delay, response)
                     .mapFailure { RequestProcessingError(it.description) }
                     .flatMap {
-                        Failure(RequestProcessingError("${pending.requestId} did not pass success criteria. Marked as failed (reprocessing in ${nextDelay.toLong().toDuration(MILLISECONDS)})")) }
+                        Failure(
+                            RequestProcessingError(
+                                "${pending.requestId} did not pass success criteria. Marked as failed (failure #${pending.failures + 1}, reprocessing in ${
+                                    delay.toKotlinDuration()
+                                })"
+                            )
+                        )
+                    }
                     .get().let(::Failure)
             }
 
         }
     }
+
+    companion object {
+        fun defaultBackoffStrategy(failures: Int, random: RandomSource): Duration = Duration.ofMillis(
+            (2.0.pow(failures.toDouble()) * Duration.ofSeconds(5).toMillis() + random(10) * 1000).toLong()
+        )
+    }
 }
 
 data class RequestProcessingError(val reason: String)
+
+typealias RandomSource = (Int) -> Int
+
+typealias BackoffStrategy = (failures: Int, random: RandomSource) -> Duration
 
 
 
