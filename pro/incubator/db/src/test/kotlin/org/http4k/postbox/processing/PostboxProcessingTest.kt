@@ -17,6 +17,7 @@ import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
+import org.http4k.postbox.processing.PostboxProcessing.Companion.defaultBackoffStrategy
 import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -76,6 +77,17 @@ class PostboxProcessingTest {
         getProcessor(4).start()
 
         checkStatus(requestId, RequestProcessingStatus.Dead(Response(BAD_GATEWAY)))
+    }
+
+    @Test
+    fun `default backoff strategy`(){
+        val randomSource:RandomSource = { 7 }
+        assertThat(defaultBackoffStrategy(0, randomSource), equalTo(Duration.ofSeconds(12)))
+        assertThat(defaultBackoffStrategy(1, randomSource), equalTo(Duration.ofSeconds(17)))
+        assertThat(defaultBackoffStrategy(2, randomSource), equalTo(Duration.ofSeconds(27)))
+        assertThat(defaultBackoffStrategy(3, randomSource), equalTo(Duration.ofSeconds(47)))
+        assertThat(defaultBackoffStrategy(4, randomSource), equalTo(Duration.ofSeconds(87)))
+        assertThat(defaultBackoffStrategy(5, randomSource), equalTo(Duration.ofSeconds(167)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
