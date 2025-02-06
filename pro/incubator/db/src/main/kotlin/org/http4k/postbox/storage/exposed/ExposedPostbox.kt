@@ -15,17 +15,20 @@ import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
+import org.http4k.postbox.RequestProcessingStatus.*
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.DEAD
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PROCESSED
+import org.jetbrains.exposed.sql.PlusOp
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
-import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.javatime.duration
+import org.jetbrains.exposed.sql.javatime.durationLiteral
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsertReturning
 import java.time.Duration
@@ -63,9 +66,9 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
             ?.toStatus() ?: Failure(RequestNotFound)
 
     private fun ResultRow.toStatus() = when (this[table.status]) {
-        PENDING -> Success(RequestProcessingStatus.Pending(this[table.failures], this[table.processAt]))
-        PROCESSED -> Success(RequestProcessingStatus.Processed(Response.parse(this[table.response]!!)))
-        DEAD -> Success(RequestProcessingStatus.Dead(this[table.response]?.let(Response::parse)))
+        PENDING -> Success(Pending(this[table.failures], this[table.processAt]))
+        PROCESSED -> Success(Processed(Response.parse(this[table.response]!!)))
+        DEAD -> Success(Dead(this[table.response]?.let(Response::parse)))
     }
 
     override fun markProcessed(requestId: RequestId, response: Response) =
@@ -73,9 +76,9 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
             .onFailure { return it }
             .let {
                 when (it) {
-                    is RequestProcessingStatus.Pending -> markProcessedInternal(requestId, response)
-                    is RequestProcessingStatus.Dead -> Failure(RequestMarkedAsDead)
-                    is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
+                    is Pending -> markProcessedInternal(requestId, response)
+                    is Dead -> Failure(RequestMarkedAsDead)
+                    is Processed -> Failure(RequestAlreadyProcessed)
                 }
             }
 
@@ -87,20 +90,21 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
         .onFailure { return it }
         .let {
             when (it) {
-                is RequestProcessingStatus.Pending -> markFailedInternal(requestId, delayReprocessing, response)
-                is RequestProcessingStatus.Dead -> Failure(RequestMarkedAsDead)
-                is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
+                is Pending -> markFailedInternal(requestId, delayReprocessing, response, it.processAt)
+                is Dead -> Failure(RequestMarkedAsDead)
+                is Processed -> Failure(RequestAlreadyProcessed)
             }
         }
 
     private fun markFailedInternal(
         requestId: RequestId,
         delayReprocessing: Duration,
-        response: Response?
+        response: Response?,
+        previousProcessAt: Instant
     ): Result<Unit, PostboxError> {
         table.update(where = { table.requestId eq requestId.value }) { row ->
             row[table.response] = response.toString()
-            row[table.processAt] = timeSource() + delayReprocessing
+            row[table.processAt] = previousProcessAt + delayReprocessing
             row[table.failures] = table.failures + 1
         }
         return Success(Unit)
@@ -122,9 +126,9 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
             .onFailure { return it }
             .let {
                 when (it) {
-                    is RequestProcessingStatus.Dead -> markDeadInternal(requestId, it.response ?: response)
-                    is RequestProcessingStatus.Pending -> markDeadInternal(requestId, response)
-                    is RequestProcessingStatus.Processed -> Failure(RequestAlreadyProcessed)
+                    is Dead -> markDeadInternal(requestId, it.response ?: response)
+                    is Pending -> markDeadInternal(requestId, response)
+                    is Processed -> Failure(RequestAlreadyProcessed)
                 }
             }
 
