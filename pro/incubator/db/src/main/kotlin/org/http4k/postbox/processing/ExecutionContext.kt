@@ -9,4 +9,5 @@ interface ExecutionContext {
     fun pause(duration: Duration)
     fun stop()
     fun currentTime(): Instant
+    fun random(max: Int): Int
 }

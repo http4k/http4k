@@ -24,6 +24,8 @@ class TestExecutionContext(private val timeSource: FixedTimeSource, private val 
 
     override fun currentTime(): Instant = timeSource()
 
+    override fun random(max: Int): Int = 0
+
     companion object {
         object DirectExecutor : AbstractExecutorService() {
             override fun execute(command: Runnable) {

@@ -15,7 +15,9 @@ import org.http4k.events.Events
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxTransactor
 import org.http4k.postbox.processing.ProcessingEvent.*
+import org.junit.jupiter.api.fail
 import java.time.Duration
+import kotlin.math.pow
 
 
 /**
@@ -25,6 +27,7 @@ class PostboxProcessing(
     private val transactor: PostboxTransactor,
     private val target: HttpHandler,
     private val batchSize: Int = 10,
+    private val maxFailures: Int = 3,
     private val maxPollingTime: Duration = Duration.ofSeconds(5),
     private val events: Events = { },
     private val context: ExecutionContext = DefaultExecutionContext,
@@ -77,10 +80,19 @@ class PostboxProcessing(
             postbox.markProcessed(pending.requestId, response)
                 .mapFailure { RequestProcessingError(it.description) }
         } else {
-            postbox.markDead(pending.requestId, response)
-                .mapFailure { RequestProcessingError(it.description) }
-                .flatMap { Failure(RequestProcessingError("response did not pass success criteria")) }
-                .get().let(::Failure)
+            if(pending.failures >= maxFailures) {
+                postbox.markDead(pending.requestId, response)
+                    .mapFailure { RequestProcessingError(it.description) }
+                    .flatMap { Failure(RequestProcessingError("could not mark as dead")) }
+                    .get().let(::Failure)
+            }else{
+                val nextDelay = 2.0.pow(pending.failures.toDouble()) *  Duration.ofSeconds(2).toMillis()
+                postbox.markFailed(pending.requestId, Duration.ofMillis(nextDelay.toLong()), response)
+                    .mapFailure { RequestProcessingError(it.description) }
+                    .flatMap { Failure(RequestProcessingError("could not mark as failed")) }
+                    .get().let(::Failure)
+            }
+
         }
     }
 }
