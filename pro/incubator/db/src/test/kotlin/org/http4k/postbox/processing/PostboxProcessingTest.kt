@@ -22,31 +22,28 @@ import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
-import java.time.Duration
 import java.time.Duration.ofSeconds
 
 class PostboxProcessingTest {
 
     private val timeSource = FixedTimeSource()
     private val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox(timeSource))
-    private val testTarget = routes(
-        "/success" bind { Response(OK) },
+    private val testTarget = routes("/success" bind { Response(OK) },
         "/failure" bind { Response(BAD_GATEWAY) },
         "/permanent_failure" bind { Response(UNPROCESSABLE_ENTITY) },
-        "/exception" bind { throw RuntimeException("boom") }
-    )
+        "/exception" bind { throw RuntimeException("boom") })
 
     private val requestForSuccess = Request(GET, "/success")
     private val requestForFailure = Request(GET, "/failure")
 
 
-    private fun getProcessor(iterations: Int) = PostboxProcessing(
-        transactor,
+    private val reprocessingDelay = ofSeconds(5)
+
+    private fun getProcessor(iterations: Int) = PostboxProcessing(transactor,
         testTarget,
         context = TestExecutionContext(timeSource, iterations),
         events = StdOutEvents,
-        backoffStrategy = { _, _ -> ofSeconds(5) }
-    )
+        backoffStrategy = { _, _ -> reprocessingDelay })
 
     @Test
     fun `process a single pending request`() {
@@ -67,7 +64,25 @@ class PostboxProcessingTest {
         store(requestId, requestForFailure)
         getProcessor(1).start()
 
-        checkStatus(requestId, Pending(1, now.plusSeconds(2)))
+        checkStatus(requestId, Pending(1, now + reprocessingDelay))
+    }
+
+    @Test
+    fun `a failed request does not affect other requests in batch`() {
+        val now = timeSource()
+        val r1 = RequestId.of("1")
+        val r2 = RequestId.of("2")
+        val r3 = RequestId.of("3")
+
+        store(r1, requestForFailure)
+        store(r2, requestForSuccess)
+        store(r3, requestForSuccess)
+
+        getProcessor(1).start()
+
+        checkPendingRequest(listOf(Postbox.PendingRequest(r1, requestForFailure, now + reprocessingDelay, 1)))
+        checkStatus(r2, Processed(Response(OK)))
+        checkStatus(r3, Processed(Response(OK)))
     }
 
     @Test
@@ -81,8 +96,8 @@ class PostboxProcessingTest {
     }
 
     @Test
-    fun `default backoff strategy`(){
-        val randomSource:RandomSource = { 7 }
+    fun `default backoff strategy`() {
+        val randomSource: RandomSource = { 7 }
         assertThat(defaultBackoffStrategy(0, randomSource), equalTo(ofSeconds(12)))
         assertThat(defaultBackoffStrategy(1, randomSource), equalTo(ofSeconds(17)))
         assertThat(defaultBackoffStrategy(2, randomSource), equalTo(ofSeconds(27)))
@@ -93,8 +108,7 @@ class PostboxProcessingTest {
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
         assertThat(
-            transactor.perform { it.status(requestId) },
-            equalTo(Success(processed))
+            transactor.perform { it.status(requestId) }, equalTo(Success(processed))
         )
     }
 
