@@ -19,7 +19,6 @@ import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class PostboxProcessingTest {
@@ -55,15 +54,15 @@ class PostboxProcessingTest {
     }
 
     @Test
-    @Disabled
     fun `a failed request gets scheduled to be processed later`() {
         val requestId = RequestId.of("0")
+        val now = timeSource()
 
         store(requestId, requestForFailure)
         processor.start()
 
         checkPendingRequest(emptyList())
-        checkStatus(requestId, RequestProcessingStatus.Pending(0, timeSource().plusSeconds(10)))
+        checkStatus(requestId, RequestProcessingStatus.Pending(1, now.plusSeconds(2)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
