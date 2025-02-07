@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
 class SseMcpClient(
-    private val sseRequest: Request,
+    sseRequest: Request,
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
     http: HttpHandler,
@@ -93,7 +93,7 @@ class SseMcpClient(
                                 else -> {
                                     val message = JsonRpcResult(this, data.attributes)
                                     val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                    messageQueues[id]?.put(data)
+                                    messageQueues[id]?.add(data) ?: error("no queue")
                                     val (latch, isComplete) = requests[id] ?: return@forEach
                                     if (message.isError() || isComplete(data)) {
                                         requests.remove(id)
@@ -188,7 +188,8 @@ class SseMcpClient(
             .contentType(APPLICATION_JSON)
             .body(with(McpJson) {
                 compact(
-                    renderRequest(rpc.Method.value,
+                    renderRequest(
+                        rpc.Method.value,
                         asJsonObject(this@toHttpRequest),
                         requestId?.let { asJsonObject(it) } ?: nullNode())
                 )

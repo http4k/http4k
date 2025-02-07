@@ -7,11 +7,10 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.util.McpNodeType
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.atomic.AtomicReference
 
 internal class ClientSampling(
-    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
+    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
     override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {

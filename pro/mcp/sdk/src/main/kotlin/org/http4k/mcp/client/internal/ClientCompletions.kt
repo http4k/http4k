@@ -6,10 +6,9 @@ import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.util.McpNodeType
-import java.util.concurrent.BlockingQueue
 
 internal class ClientCompletions(
-    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
+    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val sender: McpRpcSender,
 ) : McpClient.Completions {
     override fun complete(request: CompletionRequest) =

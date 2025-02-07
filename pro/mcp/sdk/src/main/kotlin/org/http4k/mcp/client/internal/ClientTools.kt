@@ -10,10 +10,9 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
-import java.util.concurrent.BlockingQueue
 
 internal class ClientTools(
-    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
+    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Tools {
