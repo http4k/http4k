@@ -2,7 +2,7 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.SseReconnectionMode.Immediate
+import org.http4k.client.SseReconnectionMode.Disconnect
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -42,8 +42,10 @@ class PipeSseTrafficTest : PortBasedTest {
                 "/sse" -> {
                     thread {
                         outputStream.use { o ->
-                            expectedList.forEach { o.write(it.toMessage().toByteArray()) }
-                            o.flush()
+                            expectedList.forEach {
+                                o.write(it.toMessage().toByteArray())
+                                o.flush()
+                            }
                         }
                     }
 
@@ -68,7 +70,7 @@ class PipeSseTrafficTest : PortBasedTest {
                 output,
                 Request(GET, "http://host/sse"),
                 http,
-                Immediate
+                Disconnect
             )
         }
 
