@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-val ALIBABA_REQUEST_KEY = RequestKey.of<HttpServletRequest>("HTTP4K_ALIBABA_REQUEST")
-val ALIBABA_CONTEXT_KEY = RequestKey.of<Context>("HTTP4K_ALIBABA_CONTEXT")
+val ALIBABA_REQUEST_KEY = RequestKey.required<HttpServletRequest>("HTTP4K_ALIBABA_REQUEST")
+val ALIBABA_CONTEXT_KEY = RequestKey.required<Context>("HTTP4K_ALIBABA_CONTEXT")
 
 abstract class AlibabaCloudHttpFunction(appLoader: AppLoader) : HttpRequestHandler {
     constructor(input: HttpHandler) : this(AppLoader { input })

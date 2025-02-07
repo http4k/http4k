@@ -13,7 +13,7 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.lens.RequestKey
 
-val GCF_REQUEST_KEY = RequestKey.of<HttpRequest>("HTTP4K_GCF_REQUEST")
+val GCF_REQUEST_KEY = RequestKey.required<HttpRequest>("HTTP4K_GCF_REQUEST")
 
 abstract class GoogleCloudHttpFunction(appLoader: AppLoader) : HttpFunction {
     constructor(input: HttpHandler) : this(AppLoader { input })

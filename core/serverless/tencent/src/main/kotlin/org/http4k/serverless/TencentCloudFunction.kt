@@ -19,8 +19,8 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.lens.RequestKey
 
-val TENCENT_REQUEST_KEY = RequestKey.of<APIGatewayProxyRequestEvent>("HTTP4K_TENCENT_REQUEST")
-val TENCENT_CONTEXT_KEY = RequestKey.of<Context>("HTTP4K_TENCENT_CONTEXT")
+val TENCENT_REQUEST_KEY = RequestKey.required<APIGatewayProxyRequestEvent>("HTTP4K_TENCENT_REQUEST")
+val TENCENT_CONTEXT_KEY = RequestKey.required<Context>("HTTP4K_TENCENT_CONTEXT")
 
 abstract class TencentCloudFunction(appLoader: AppLoader) {
     constructor(input: HttpHandler) : this(AppLoader { input })

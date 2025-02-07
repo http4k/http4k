@@ -15,7 +15,7 @@ import org.http4k.lens.RequestKey
 import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.util.Locale.getDefault
 
-val OW_REQUEST_KEY = RequestKey.of<JsonObject>("HTTP4K_OW_REQUEST")
+val OW_REQUEST_KEY = RequestKey.required<JsonObject>("HTTP4K_OW_REQUEST")
 
 class OpenWhiskFunction(
     appLoader: AppLoader,

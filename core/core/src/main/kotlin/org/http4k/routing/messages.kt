@@ -20,7 +20,7 @@ interface RoutedMessage {
     }
 }
 
-data class RequestWithContext(val delegate: Request, val context: Map<String, Any> = emptyMap()) :
+data class RequestWithContext(val delegate: Request, val context: Map<String, Any?> = emptyMap()) :
     Request by delegate,
     RoutedMessage {
 

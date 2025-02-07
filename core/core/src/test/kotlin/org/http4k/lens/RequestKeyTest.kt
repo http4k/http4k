@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -22,12 +23,13 @@ class RequestKeyTest {
 
     @Test
     fun `value present`() {
-        assertThat(RequestKey.of<String>("hello")(request), equalTo("world"))
+        assertThat(RequestKey.required<String>("hello")(request), equalTo("world"))
+        assertThat(RequestKey.optional<String>("hello")(request), equalTo("world"))
     }
 
     @Test
-    fun `value missing`() {
-        val requiredRequestKey = RequestKey.of<String>("world")
+    fun `required value missing`() {
+        val requiredRequestKey = RequestKey.required<String>("world")
         assertThat(
             { requiredRequestKey(request) },
             throws(lensFailureWith<Request>(Missing(requiredRequestKey.meta), overallType = Failure.Type.Missing))
@@ -35,19 +37,39 @@ class RequestKeyTest {
     }
 
     @Test
-    fun `sets value on request`() {
-        val key = RequestKey.of<String>("bob")
-        val withRequestKey = request.with(key of "hello")
-        assertThat(key(withRequestKey), equalTo("hello"))
+    fun `optional value missing`() {
+        val optionalRequestKey = RequestKey.optional<String>("world")
+        assertThat(optionalRequestKey(request), absent())
     }
 
     @Test
-    fun `context value makes it through routing`() {
+    fun `sets value on request`() {
+        val requiredKey = RequestKey.required<String>("bob")
+        assertThat(requiredKey(request.with(requiredKey of "hello")), equalTo("hello"))
+
+        val optionalKey = RequestKey.required<String>("bob")
+        assertThat(optionalKey(request.with(optionalKey of "hello")), equalTo("hello"))
+    }
+
+    @Test
+    fun `required context value makes it through routing`() {
         val app: HttpHandler =
-            routes("" bind GET to { req: Request -> Response(Status.OK).body(RequestKey.of<String>("foo")(req)) })
+            routes("" bind GET to { req: Request -> Response(Status.OK).body(RequestKey.required<String>("foo")(req)) })
         val resp = Filter { next ->
             {
-                next(it.with(RequestKey.of<String>("foo") of "bar"))
+                next(it.with(RequestKey.required<String>("foo") of "bar"))
+            }
+        }.then(app)(Request(GET, ""))
+        assertThat(resp.bodyString(), equalTo("bar"))
+    }
+
+    @Test
+    fun `optional context value makes it through routing`() {
+        val app: HttpHandler =
+            routes("" bind GET to { req: Request -> Response(Status.OK).body(RequestKey.optional<String>("foo")(req)!!) })
+        val resp = Filter { next ->
+            {
+                next(it.with(RequestKey.optional<String>("foo") of "bar"))
             }
         }.then(app)(Request(GET, ""))
         assertThat(resp.bodyString(), equalTo("bar"))

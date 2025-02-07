@@ -5,8 +5,8 @@ import org.http4k.core.Filter
 import org.http4k.core.with
 import org.http4k.lens.RequestKey
 
-val LAMBDA_CONTEXT_KEY = RequestKey.of<Context>("HTTP4K_LAMBDA_CONTEXT")
-val LAMBDA_REQUEST_KEY = RequestKey.of<Any>("HTTP4K_LAMBDA_REQUEST")
+val LAMBDA_CONTEXT_KEY = RequestKey.required<Context>("HTTP4K_LAMBDA_CONTEXT")
+val LAMBDA_REQUEST_KEY = RequestKey.required<Any>("HTTP4K_LAMBDA_REQUEST")
 
 internal fun AddLambdaContextAndRequest(ctx: Context, request: Any) = Filter { next ->
     {

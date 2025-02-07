@@ -15,8 +15,8 @@ import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.lens.RequestKey
 import java.util.Optional
 
-val AZURE_REQUEST_KEY = RequestKey.of<HttpRequestMessage<Optional<String>>>("HTTP4K_AZURE_REQUEST")
-val AZURE_CONTEXT_KEY = RequestKey.of<ExecutionContext>("HTTP4K_AZURE_CONTEXT")
+val AZURE_REQUEST_KEY = RequestKey.required<HttpRequestMessage<Optional<String>>>("HTTP4K_AZURE_REQUEST")
+val AZURE_CONTEXT_KEY = RequestKey.required<ExecutionContext>("HTTP4K_AZURE_CONTEXT")
 
 abstract class AzureFunction(appLoader: AppLoader) {
     constructor(input: HttpHandler) : this(AppLoader { input })

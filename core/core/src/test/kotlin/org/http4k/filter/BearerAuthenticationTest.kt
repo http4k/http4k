@@ -53,7 +53,7 @@ class BearerAuthenticationTest {
     }
 
     @Test
-    fun when_no_credentials_return_unuathorised() {
+    fun when_no_credentials_return_unauthorised() {
         val handler = BearerAuth("token").then { Response(OK) }
         val response = ClientFilters.BearerAuth(CredentialsProvider { null }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
@@ -61,7 +61,7 @@ class BearerAuthenticationTest {
 
     @Test
     fun populates_request_context_for_later_retrieval() {
-        val key = RequestKey.of<Credentials>("credentials")
+        val key = RequestKey.required<Credentials>("credentials")
 
         val handler = BearerAuth(key) { Credentials(it, it) }
             .then { req -> Response(OK).body(key(req).toString()) }

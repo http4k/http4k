@@ -92,7 +92,7 @@ class BasicAuthenticationTest {
     }
 
     @Test
-    fun when_no_credentials_return_unuathorised() {
+    fun when_no_credentials_return_unauthorised() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
         val response = ClientFilters.BasicAuth(CredentialsProvider { null }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
@@ -100,7 +100,7 @@ class BasicAuthenticationTest {
 
     @Test
     fun populates_request_context_for_later_retrieval() {
-        val key = RequestKey.of<Credentials>("credentials")
+        val key = RequestKey.required<Credentials>("credentials")
 
         val handler = ServerFilters.BasicAuth("my realm", key) { it }
             .then { req -> Response(OK).body(key(req).toString()) }
