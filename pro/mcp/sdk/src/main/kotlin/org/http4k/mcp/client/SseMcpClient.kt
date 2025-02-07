@@ -55,12 +55,14 @@ class SseMcpClient(
     http: HttpHandler,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
-    private val running = AtomicBoolean(false)
 
     private val http = ClientFilters.SetHostFrom(sseRequest.uri).then(http)
 
-    private val sseClient = Http4kSseClient(sseRequest, http)
     private val endpoint = AtomicReference<String>()
+
+    private val sseClient = Http4kSseClient(sseRequest, http)
+
+    private val running = AtomicBoolean(false)
 
     private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
 
@@ -70,6 +72,7 @@ class SseMcpClient(
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
+
         thread {
             sseClient.received().forEach {
                 when (it) {
@@ -94,10 +97,8 @@ class SseMcpClient(
                                     val message = JsonRpcResult(this, data.attributes)
                                     val id = asA<RequestId>(compact(message.id ?: nullNode()))
                                     messageQueues[id]?.add(data) ?: error("no queue")
-                                    val (latch, isComplete) = requests[id] ?: return@forEach
-                                    if (message.isError() || isComplete(data)) {
-                                        requests.remove(id)
-                                    }
+                                    val (latch, isComplete) = requests[id] ?: error("no queue")
+                                    if (message.isError() || isComplete(data)) requests.remove(id)
                                     latch.countDown()
                                 }
                             }
@@ -126,26 +127,21 @@ class SseMcpClient(
             .onFailure { close() }
     }
 
-    override fun tools(): Tools =
-        ClientTools(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+    override fun tools(): Tools = ClientTools(::findQueue, ::performRequest) { rpc, callback ->
+        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+    }
 
-    override fun prompts(): Prompts =
-        ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+    override fun prompts(): Prompts = ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
+        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+    }
 
-    override fun sampling(): Sampling =
-        ClientSampling(::findQueue, ::performRequest)
+    override fun sampling(): Sampling = ClientSampling(::findQueue, ::performRequest)
 
-    override fun resources(): Resources =
-        ClientResources(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+    override fun resources(): Resources = ClientResources(::findQueue, ::performRequest) { rpc, callback ->
+        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+    }
 
-    override fun completions(): Completions =
-        ClientCompletions(::findQueue, ::performRequest)
+    override fun completions(): Completions = ClientCompletions(::findQueue, ::performRequest)
 
     private fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
         val response = http(mcp.toHttpRequest(method))
@@ -157,9 +153,8 @@ class SseMcpClient(
 
     private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue")
 
-    private fun performRequest(
-        method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }
-    ): Result<RequestId> {
+    private fun performRequest(method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true })
+        : Result<RequestId> {
         val requestId = RequestId.random()
 
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)

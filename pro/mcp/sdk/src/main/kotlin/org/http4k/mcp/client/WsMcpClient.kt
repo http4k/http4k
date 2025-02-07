@@ -30,8 +30,6 @@ import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
-import org.http4k.mcp.util.McpJson.asJsonObject
-import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
@@ -54,9 +52,10 @@ class WsMcpClient(
     private val capabilities: ClientCapabilities,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
+    private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
+
     private val running = AtomicBoolean(false)
 
-    private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
     private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
 
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
@@ -90,7 +89,7 @@ class WsMcpClient(
                                         val message = JsonRpcResult(this, data.attributes)
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
                                         messageQueues[id]?.put(data) ?: error("no queue")
-                                        val (latch, isComplete) = requests[id] ?: return@forEach
+                                        val (latch, isComplete) = requests[id] ?: error("no queue")
                                         if (message.isError() || isComplete(data)) {
                                             requests.remove(id)
                                         }
@@ -122,40 +121,26 @@ class WsMcpClient(
             .onFailure { close() }
     }
 
-    override fun tools(): Tools =
-        ClientTools(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+    override fun tools(): Tools = ClientTools(::findQueue, ::performRequest) { rpc, callback ->
+        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+    }
 
-    override fun prompts(): Prompts =
-        ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+    override fun prompts(): Prompts = ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
+        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+    }
 
-    override fun sampling(): Sampling =
-        ClientSampling(::findQueue, ::performRequest)
+    override fun sampling(): Sampling = ClientSampling(::findQueue, ::performRequest)
 
     override fun resources(): Resources =
         ClientResources(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
-    override fun completions(): Completions =
-        ClientCompletions(::findQueue, ::performRequest)
+    override fun completions(): Completions = ClientCompletions(::findQueue, ::performRequest)
 
-    private fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
-        wsClient.send(
-            WsMessage(
-                compact(
-                    McpJson.renderRequest(
-                        rpc.Method.value,
-                        asJsonObject(mcp),
-                        McpJson.nullNode()
-                    )
-                )
-            )
-        )
-        return Result.success(Unit)
+    private fun notify(rpc: McpRpc, mcp: ClientMessage.Notification) = with(McpJson) {
+        wsClient.send(WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(mcp), nullNode()))))
+        Result.success(Unit)
     }
 
     private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue")
@@ -169,17 +154,11 @@ class WsMcpClient(
         requests[requestId] = latch to isComplete
         messageQueues[requestId] = LinkedBlockingQueue()
 
-        wsClient.send(
-            WsMessage(
-                compact(
-                    McpJson.renderRequest(
-                        rpc.Method.value,
-                        asJsonObject(request),
-                        asJsonObject(requestId)
-                    )
-                )
+        with(McpJson) {
+            wsClient.send(
+                WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId))))
             )
-        )
+        }
         latch.await()
 
         return Result.success(requestId)
