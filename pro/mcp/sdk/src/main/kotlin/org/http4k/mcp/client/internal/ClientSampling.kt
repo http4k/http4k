@@ -41,7 +41,6 @@ internal class ClientSampling(
             runCatching {
                 val it = msg.asAOrThrow<McpSampling.Response>()
                 SamplingResponse(it.model, it.stopReason, it.role, it.content)
-
             }
         }
     }
