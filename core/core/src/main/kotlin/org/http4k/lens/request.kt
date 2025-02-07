@@ -11,6 +11,9 @@ typealias RequestLens<T> = BiDiLens<Request, T>
  */
 object RequestKey {
 
+    /**
+     * Represents a mandatory value in the context of a Request.
+     */
     fun <T : Any> required(name: String): RequestLens<T> {
         val meta = Meta(true, "context", ObjectParam, name, null, emptyMap())
         val get: (Request) -> T = { target ->
@@ -28,6 +31,10 @@ object RequestKey {
         }
         return BiDiLens(meta, get, setter)
     }
+
+    /**
+     * Represents a nullable value in the context of a Request.
+     */
     fun <T : Any> optional(name: String): RequestLens<T?> {
         val meta = Meta(true, "context", ObjectParam, name, null, emptyMap())
         val get: (Request) -> T? = { target ->
