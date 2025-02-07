@@ -6,7 +6,11 @@ import org.http4k.routing.RequestWithContext
 
 typealias RequestLens<T> = BiDiLens<Request, T>
 
+/**
+ * Provides a way to attach and retrieve values from the context of a Request.
+ */
 object RequestKey {
+
     fun <T : Any> required(name: String): RequestLens<T> {
         val meta = Meta(true, "context", ObjectParam, name, null, emptyMap())
         val get: (Request) -> T = { target ->
