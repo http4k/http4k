@@ -20,7 +20,7 @@ fun interface ProjectCompiler {
         }
 
         /**
-         * Compile the project using Gradle.
+         * Compile the project using Gradle. The default task is `compileKotlin`, which may need to be be overridden.
          */
         fun Gradle(task: String = "compileKotlin") = ProjectCompiler {
             val process = ProcessBuilder()

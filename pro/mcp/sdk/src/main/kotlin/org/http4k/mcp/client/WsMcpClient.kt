@@ -37,6 +37,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
@@ -60,7 +61,7 @@ class WsMcpClient(
 
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
 
-    private val messageQueues = ConcurrentHashMap<RequestId, LinkedBlockingQueue<McpNodeType>>()
+    private val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
@@ -71,9 +72,7 @@ class WsMcpClient(
                 .forEach {
                     when (val msg = SseMessage.parse(it.bodyString())) {
                         is Event -> when (msg.event) {
-                            "endpoint" -> {
-                                startLatch.countDown()
-                            }
+                            "endpoint" -> startLatch.countDown()
 
                             "ping" -> {}
                             else -> with(McpJson) {
@@ -83,23 +82,19 @@ class WsMcpClient(
                                     data["id"] == null -> {
                                         val message = JsonRpcRequest(this, data.attributes)
                                         notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach {
-                                            it.process(
-                                                message
-                                            )
+                                            it.process(message)
                                         }
                                     }
 
                                     else -> {
                                         val message = JsonRpcResult(this, data.attributes)
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                        messageQueues[id]
-                                            ?.also { queue ->
-                                                queue.put(data)
-
-                                                val (latch, isComplete) = requests[id] ?: return@also
-                                                if (message.isError() || isComplete(data)) requests.remove(id)
-                                                latch.countDown()
-                                            }
+                                        messageQueues[id]?.put(data)
+                                        val (latch, isComplete) = requests[id] ?: return@forEach
+                                        if (message.isError() || isComplete(data)) {
+                                            requests.remove(id)
+                                        }
+                                        latch.countDown()
                                     }
                                 }
                             }
@@ -115,7 +110,7 @@ class WsMcpClient(
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
             .mapCatching { reqId: RequestId ->
-                (messageQueues[reqId]?.first()
+                (messageQueues[reqId]?.take()
                     ?: throw McpException(InternalError)).asAOrThrow<McpInitialize.Response>()
                     .also { messageQueues.remove(reqId) }
             }
@@ -128,25 +123,25 @@ class WsMcpClient(
     }
 
     override fun tools(): Tools =
-        ClientTools(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+        ClientTools(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+        ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun sampling(): Sampling =
-        ClientSampling(::findQueue, ::tidyUp, ::performRequest)
+        ClientSampling(::findQueue, ::performRequest)
 
     override fun resources(): Resources =
-        ClientResources(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+        ClientResources(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): Completions =
-        ClientCompletions(::findQueue, ::tidyUp, ::performRequest)
+        ClientCompletions(::findQueue, ::performRequest)
 
     private fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
         wsClient.send(
@@ -164,11 +159,6 @@ class WsMcpClient(
     }
 
     private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue")
-
-    private fun tidyUp(requestId: RequestId) {
-        requests.remove(requestId)
-        messageQueues.remove(requestId)
-    }
 
     private fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true })
         : Result<RequestId> {

@@ -7,10 +7,10 @@ import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpNodeType
+import java.util.concurrent.BlockingQueue
 
 internal class ClientResources(
-    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
-    private val tidyUp: (RequestId) -> Unit,
+    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Resources {
@@ -19,13 +19,13 @@ internal class ClientResources(
     }
 
     override fun list() = sender(McpResource.List, McpResource.List.Request()) { true }
-        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .mapCatching(queueFor)
         .map { it.first().asAOrThrow<McpResource.List.Response>() }
         .map { it.resources }
 
     override fun read(request: ResourceRequest) =
         sender(McpResource.Read, McpResource.Read.Request(request.uri)) { true }
-            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .mapCatching(queueFor)
             .map { it.first().asAOrThrow<McpResource.Read.Response>() }
             .map { ResourceResponse(it.contents) }
 }

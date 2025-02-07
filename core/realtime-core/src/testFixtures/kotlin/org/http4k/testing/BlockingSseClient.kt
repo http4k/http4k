@@ -9,10 +9,10 @@ import org.http4k.sse.SseMessage
 import java.net.URI
 import java.util.concurrent.LinkedBlockingQueue
 
-class BlockingSseTestClient(
+class BlockingSseClient(
     uri: Uri,
     private val queue: LinkedBlockingQueue<() -> SseMessage?> = LinkedBlockingQueue<() -> SseMessage?>()
-) : SseTestClient {
+) : SseClient {
     private val handler = Handler(queue)
     private val client = BackgroundEventSource.Builder(handler, EventSource.Builder(URI.create(uri.toString()))).build()
 

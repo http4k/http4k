@@ -19,6 +19,8 @@ import kotlin.io.path.exists
 
 /**
  * Watches for changes on the classpath source and rebuilds the project when changes are detected.
+ * If you have a project with a different structure, you can implement your own [PathWatcher] to pick up any
+ * custom paths to watch.
  */
 class ProjectCompilingPathWatcher(
     private val projectCompiler: ProjectCompiler = Gradle(),

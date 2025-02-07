@@ -81,7 +81,7 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage
-import org.http4k.testing.TestSseTestClient
+import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -223,7 +223,7 @@ class McpSseHandlerTest {
         }
     }
 
-    private fun TestSseTestClient.assertNoResponse() =
+    private fun TestSseClient.assertNoResponse() =
         assertThrows<NoSuchElementException> { received().first() }
 
     @Test
@@ -446,7 +446,7 @@ class McpSseHandlerTest {
         }
     }
 
-    private fun TestSseTestClient.assertInitializeLoop(mcp: PolyHandler) {
+    private fun TestSseClient.assertInitializeLoop(mcp: PolyHandler) {
         assertThat(status, equalTo(OK))
 
         assertThat(
@@ -469,19 +469,19 @@ class McpSseHandlerTest {
     }
 }
 
-private fun TestSseTestClient.assertNextMessage(error: ErrorMessage) {
+private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
     assertNextMessage(with(McpJson) { renderError(error, number(1)) })
 }
 
-private fun TestSseTestClient.assertNextMessage(input: McpResponse) {
+private fun TestSseClient.assertNextMessage(input: McpResponse) {
     assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
 }
 
-private fun TestSseTestClient.assertNextMessage(hasMethod: McpRpc, notification: McpNotification) {
+private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpNotification) {
     assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(notification), nullNode()) })
 }
 
-private fun TestSseTestClient.assertNextMessage(hasMethod: McpRpc, input: McpRequest, id: Any) {
+private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpRequest, id: Any) {
     assertNextMessage(with(McpJson) {
         renderRequest(
             hasMethod.Method.value,
@@ -491,7 +491,7 @@ private fun TestSseTestClient.assertNextMessage(hasMethod: McpRpc, input: McpReq
     })
 }
 
-private fun TestSseTestClient.assertNextMessage(node: McpNodeType) {
+private fun TestSseClient.assertNextMessage(node: McpNodeType) {
     assertThat(
         received().first(),
         equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))

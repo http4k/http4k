@@ -6,7 +6,10 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.lens.accept
 import org.http4k.sse.SseMessage
+import org.http4k.testing.SseClient
 import java.io.InputStream
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -14,17 +17,16 @@ import kotlin.concurrent.thread
  * Simple SSE client leveraging standard HttpHandlers.
  */
 class Http4kSseClient(
+    private val sseRequest: Request,
     private val http: HttpHandler,
     private var reconnectionMode: SseReconnectionMode = Disconnect,
     private val reportError: (Exception) -> Unit = {}
-) : AutoCloseable {
+) : SseClient {
 
     private val running = AtomicBoolean(true)
+    private val messageQueue: BlockingQueue<SseMessage> = LinkedBlockingQueue()
 
-    /**
-     * Connect to the given SSE endpoint and invoke the given function for each message received.
-     */
-    operator fun invoke(sseRequest: Request, onMessage: (SseMessage) -> Boolean) {
+    override fun received(): Sequence<SseMessage> = sequence {
         thread {
             do {
                 try {
@@ -33,7 +35,8 @@ class Http4kSseClient(
                     when {
                         response.status.successful ->
                             response.body.stream.chunkedSseSequence().forEach {
-                                if (!onMessage(it)) return@thread
+                                println("GOT $it")
+                                messageQueue.put(it)
                             }
 
                         else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
@@ -42,6 +45,10 @@ class Http4kSseClient(
                     reportError(e)
                 }
             } while (reconnectionMode.doReconnect())
+        }
+
+        while (running.get()) {
+            yield(messageQueue.take())
         }
     }
 

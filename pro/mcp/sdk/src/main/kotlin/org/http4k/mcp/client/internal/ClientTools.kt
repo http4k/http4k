@@ -10,10 +10,10 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
+import java.util.concurrent.BlockingQueue
 
 internal class ClientTools(
-    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
-    private val tidyUp: (RequestId) -> Unit,
+    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Tools {
@@ -22,7 +22,7 @@ internal class ClientTools(
     }
 
     override fun list() = sender(McpTool.List, McpTool.List.Request()) { true }
-        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .mapCatching(queueFor)
         .map { it.first().asAOrThrow<McpTool.List.Response>() }
         .map { it.tools }
 
@@ -31,7 +31,7 @@ internal class ClientTools(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         ) { true }
-            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .mapCatching(queueFor)
             .map { it.first().asAOrThrow<McpTool.Call.Response>() }
             .mapCatching {
                 when (it.isError) {

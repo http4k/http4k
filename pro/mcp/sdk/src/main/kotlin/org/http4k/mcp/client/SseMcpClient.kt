@@ -40,15 +40,14 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 
-/**
- * Single connection MCP client.
- */
 class SseMcpClient(
     private val sseRequest: Request,
     private val clientInfo: VersionedMcpEntity,
@@ -60,55 +59,55 @@ class SseMcpClient(
 
     private val http = ClientFilters.SetHostFrom(sseRequest.uri).then(http)
 
-    private val sseClient = Http4kSseClient(http)
+    private val sseClient = Http4kSseClient(sseRequest, http)
     private val endpoint = AtomicReference<String>()
 
     private val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
 
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
 
-    private val messageQueues = ConcurrentHashMap<RequestId, LinkedBlockingQueue<McpNodeType>>()
+    private val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
-        sseClient(sseRequest) {
-            when (it) {
-                is Event -> when (it.event) {
-                    "endpoint" -> {
-                        endpoint.set(it.data)
-                        running.set(true)
-                        startLatch.countDown()
-                    }
+        thread {
+            sseClient.received().forEach {
+                when (it) {
+                    is Event -> when (it.event) {
+                        "endpoint" -> {
+                            endpoint.set(it.data)
+                            running.set(true)
+                            startLatch.countDown()
+                        }
 
-                    "ping" -> {}
-                    else -> with(McpJson) {
-                        val data = parse(it.data) as MoshiObject
+                        "ping" -> {}
+                        else -> with(McpJson) {
+                            val data = parse(it.data) as MoshiObject
 
-                        when {
-                            data["id"] == null -> {
-                                val message = JsonRpcRequest(this, data.attributes)
-                                notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach { it.process(message) }
-                            }
+                            when {
+                                data["id"] == null -> {
+                                    val message = JsonRpcRequest(this, data.attributes)
+                                    notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach { it.process(message) }
+                                }
 
-                            else -> {
-                                val message = JsonRpcResult(this, data.attributes)
-                                val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                messageQueues[id]
-                                    ?.also { queue ->
-                                        queue.put(data)
-
-                                        val (latch, isComplete) = requests[id] ?: return@also
-                                        if (message.isError() || isComplete(data)) requests.remove(id)
-                                        latch.countDown()
+                                else -> {
+                                    val message = JsonRpcResult(this, data.attributes)
+                                    val id = asA<RequestId>(compact(message.id ?: nullNode()))
+                                    messageQueues[id]?.put(data)
+                                    val (latch, isComplete) = requests[id] ?: return@forEach
+                                    if (message.isError() || isComplete(data)) {
+                                        requests.remove(id)
                                     }
+                                    latch.countDown()
+                                }
                             }
                         }
                     }
-                }
 
-                else -> {}
+                    else -> {}
+                }
+                running.get()
             }
-            running.get()
         }
 
         startLatch.await()
@@ -128,25 +127,25 @@ class SseMcpClient(
     }
 
     override fun tools(): Tools =
-        ClientTools(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+        ClientTools(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): Prompts =
-        ClientPrompts(::findQueue,::tidyUp,  ::performRequest) { rpc, callback ->
+        ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun sampling(): Sampling =
-        ClientSampling(::findQueue, ::tidyUp, ::performRequest)
+        ClientSampling(::findQueue, ::performRequest)
 
     override fun resources(): Resources =
-        ClientResources(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+        ClientResources(::findQueue, ::performRequest) { rpc, callback ->
             notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): Completions =
-        ClientCompletions(::findQueue, ::tidyUp, ::performRequest)
+        ClientCompletions(::findQueue, ::performRequest)
 
     private fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
         val response = http(mcp.toHttpRequest(method))
@@ -157,11 +156,6 @@ class SseMcpClient(
     }
 
     private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue")
-
-    private fun tidyUp(requestId: RequestId) {
-        requests.remove(requestId)
-        messageQueues.remove(requestId)
-    }
 
     private fun performRequest(
         method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }

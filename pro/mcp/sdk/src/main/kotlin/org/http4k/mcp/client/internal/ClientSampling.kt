@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicReference
 
 internal class ClientSampling(
     private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
-    private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
     override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {
@@ -38,18 +37,11 @@ internal class ClientSampling(
             .mapCatching { reqId -> queueFor(reqId).also { requestId.set(reqId) } }
             .getOrThrow()
 
-        return sequence {
-            while (true) {
-                val message = messages.take()
-                yield(
-                    runCatching { message.asAOrThrow<McpSampling.Response>() }
-                        .map { SamplingResponse(it.model, it.stopReason, it.role, it.content) }
-                )
+        return messages.asSequence().map { msg ->
+            runCatching {
+                val it = msg.asAOrThrow<McpSampling.Response>()
+                SamplingResponse(it.model, it.stopReason, it.role, it.content)
 
-                if (hasStopReason(message)) {
-                    tidyUp(requestId.get())
-                    break
-                }
             }
         }
     }
