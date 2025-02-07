@@ -35,10 +35,9 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -60,7 +59,7 @@ class WsMcpClient(
 
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
 
-    private val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
+    private val messageQueues = ConcurrentHashMap<RequestId, ConcurrentLinkedQueue<McpNodeType>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
@@ -88,7 +87,7 @@ class WsMcpClient(
                                     else -> {
                                         val message = JsonRpcResult(this, data.attributes)
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                        messageQueues[id]?.put(data) ?: error("no queue")
+                                        messageQueues[id]?.add(data) ?: error("no queue")
                                         val (latch, isComplete) = requests[id] ?: error("no queue")
                                         if (message.isError() || isComplete(data)) {
                                             requests.remove(id)
@@ -108,8 +107,8 @@ class WsMcpClient(
         startLatch.await()
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
-            .mapCatching { reqId: RequestId ->
-                (messageQueues[reqId]?.take()
+            .mapCatching { reqId ->
+                (messageQueues[reqId]?.poll()
                     ?: throw McpException(InternalError)).asAOrThrow<McpInitialize.Response>()
                     .also { messageQueues.remove(reqId) }
             }
@@ -152,7 +151,7 @@ class WsMcpClient(
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
         requests[requestId] = latch to isComplete
-        messageQueues[requestId] = LinkedBlockingQueue()
+        messageQueues[requestId] = ConcurrentLinkedQueue()
 
         with(McpJson) {
             wsClient.send(

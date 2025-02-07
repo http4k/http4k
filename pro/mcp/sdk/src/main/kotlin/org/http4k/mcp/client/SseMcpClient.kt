@@ -40,10 +40,9 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
@@ -68,7 +67,7 @@ class SseMcpClient(
 
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
 
-    private val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
+    private val messageQueues = ConcurrentHashMap<RequestId, ConcurrentLinkedQueue<McpNodeType>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
@@ -114,8 +113,8 @@ class SseMcpClient(
         startLatch.await()
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
-            .mapCatching { reqId: RequestId ->
-                (messageQueues[reqId]?.first()
+            .mapCatching { reqId ->
+                (messageQueues[reqId]?.poll()
                     ?: throw McpException(InternalError)).asAOrThrow<McpInitialize.Response>()
                     .also { messageQueues.remove(reqId) }
             }
@@ -160,7 +159,7 @@ class SseMcpClient(
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
         requests[requestId] = latch to isComplete
-        messageQueues[requestId] = LinkedBlockingQueue()
+        messageQueues[requestId] = ConcurrentLinkedQueue()
 
         val response = http(request.toHttpRequest(method, requestId))
         return when {
