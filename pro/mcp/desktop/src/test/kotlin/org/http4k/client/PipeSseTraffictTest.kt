@@ -1,4 +1,4 @@
-package org.http4k.mcp.internal
+package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -10,7 +10,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.contentType
+import org.http4k.mcp.internal.pipeSseTraffic
 import org.http4k.sse.SseMessage.Event
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -18,7 +20,7 @@ import java.io.StringWriter
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-class PipeSseTrafficTest {
+class PipeSseTrafficTest : PortBasedTest {
 
     @Test
     fun `pipes input and output to correct place`() {
