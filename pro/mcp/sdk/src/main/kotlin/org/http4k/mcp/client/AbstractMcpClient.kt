@@ -63,11 +63,7 @@ abstract class AbstractMcpClient(
                                 when {
                                     data["id"] == null -> {
                                         val message = JsonRpcRequest(this, data.attributes)
-                                        notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach {
-                                            it.process(
-                                                message
-                                            )
-                                        }
+                                        notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach { it(message) }
                                     }
 
                                     else -> {

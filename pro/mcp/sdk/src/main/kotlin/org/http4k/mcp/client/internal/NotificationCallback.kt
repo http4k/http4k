@@ -9,7 +9,7 @@ internal class NotificationCallback<T : Any>(
     private val clazz: KClass<T>,
     private val callback: (T) -> Unit
 ) {
-    fun process(req: JsonRpcRequest<McpNodeType>) {
+    operator fun invoke(req: JsonRpcRequest<McpNodeType>) {
         callback(McpJson.asA(McpJson.asFormatString(req.params ?: McpJson.nullNode()), clazz))
     }
 }
