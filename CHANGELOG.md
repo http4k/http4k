@@ -5,10 +5,11 @@ changes with their rationale when appropriate:
 
 ### v5.46.0.1 (uncut)
 - **http4-aws** : Fix AWS signature when path contains plus symbol. H/T @aharin
+- **http4k-template-core** : [Unlikely break] Fix classpath template resolution on Windows.  H/T @oharaandrew314
 
 ### v5.46.0.0
 - **http4k-*** : Upgrade some dependency versions.
-- **http4-connect-amazon-s3** : [Unlikely break] Make name and region parameters of S3Bucket
+- **http4-connect-amazon-s3** : [Unlikely break] Make name and region parameters of S3Bucket.  H/T @oharaandrew314
 - **http4-contract** : Add ClientCredentialsOAuthSecurity. H/T @ashcor
 
 ### v5.45.2.0

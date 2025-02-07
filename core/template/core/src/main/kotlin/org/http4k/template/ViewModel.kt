@@ -11,7 +11,7 @@ interface ViewModel {
      * This is the path of the template file - which matches the fully qualified classname. The templating suffix
      * is added by the template implementation (eg. java.lang.String -> java/lang/String.hbs)
      */
-    fun template(): String = javaClass.name.replace('.', File.separatorChar)
+    fun template(): String = javaClass.name.replace('.', '/')
 }
 
 fun Body.Companion.viewModel(renderer: TemplateRenderer, contentType: ContentType) =
