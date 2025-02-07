@@ -19,6 +19,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 
 class Http4kSseClientTest : PortBasedTest {
 
@@ -34,26 +35,30 @@ class Http4kSseClientTest : PortBasedTest {
             val messages = mutableListOf<SseMessage>()
             val latch = CountDownLatch(1)
 
-            Http4kSseClient(JavaHttpClient(responseBodyMode = Stream)).use { client ->
-                client(Request(GET, "http://localhost:${server.port()}").accept(TEXT_EVENT_STREAM)) { msg ->
-                    messages.add(msg)
-                    latch.countDown()
-                    true
-                }
+            thread {
+                Http4kSseClient(
+                    Request(GET, "http://localhost:${server.port()}").accept(TEXT_EVENT_STREAM),
+                    JavaHttpClient(responseBodyMode = Stream)
+                )
+                    .received()
+                    .forEach { msg ->
+                        messages.add(msg)
+                        latch.countDown()
+                    }
+            }
 
-                Thread.sleep(100)
-                latch.await()
+            Thread.sleep(100)
+            latch.await()
 
-                assertThat(
-                    messages,
-                    equalTo(
-                        listOf(
-                            Event("event", "data1"),
-                            Data("data2")
-                        )
+            assertThat(
+                messages,
+                equalTo(
+                    listOf(
+                        Event("event", "data1"),
+                        Data("data2")
                     )
                 )
-            }
+            )
         } finally {
             server.stop()
         }
@@ -70,16 +75,20 @@ class Http4kSseClientTest : PortBasedTest {
             val okMessage = AtomicReference<SseMessage>()
             val latch = CountDownLatch(1)
 
-            Http4kSseClient(JavaHttpClient(responseBodyMode = Stream)).use { client ->
-                client(Request(GET, "http://localhost:${server.port()}").accept(TEXT_EVENT_STREAM)) { msg ->
-                    okMessage.set(msg)
-                    latch.countDown()
-                    true
-                }
-
-                latch.await()
-                assertThat(okMessage.get(), equalTo(goodMessage))
+            thread {
+                Http4kSseClient(
+                    Request(GET, "http://localhost:${server.port()}").accept(TEXT_EVENT_STREAM),
+                    JavaHttpClient(responseBodyMode = Stream)
+                )
+                    .received()
+                    .forEach { msg ->
+                        okMessage.set(msg)
+                        latch.countDown()
+                    }
             }
+
+            latch.await()
+            assertThat(okMessage.get(), equalTo(goodMessage))
         } finally {
             server.stop()
         }
