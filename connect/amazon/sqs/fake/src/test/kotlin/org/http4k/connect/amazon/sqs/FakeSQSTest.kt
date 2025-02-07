@@ -2,6 +2,7 @@ package org.http4k.connect.amazon.sqs
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
 import org.http4k.connect.amazon.FakeAwsContract
 import org.http4k.connect.amazon.core.model.Tag
 import org.http4k.connect.successValue
@@ -36,6 +37,21 @@ class FakeSQSTest : SQSContract, FakeAwsContract {
             } finally {
                 deleteQueue(created.QueueUrl, expires).successValue()
             }
+        }
+    }
+
+    @Test
+    fun `FakeSQS listMessages helper`() {
+        with (sqs) {
+            val created = createQueue(queueName).successValue()
+
+            sendMessage(created.QueueUrl, "hi").successValue()
+            sendMessage(created.QueueUrl, "by").successValue()
+
+            val messages = http.listMessages(queueName)
+            assertThat(messages, hasSize(equalTo(2)))
+            assertThat(messages[0].body, equalTo("hi"))
+            assertThat(messages[1].body, equalTo("by"))
         }
     }
 }

@@ -88,7 +88,7 @@ class FakeSNSTest : SNSContract, FakeAwsContract {
     }
 
     @Test
-    fun `FakeSns listNotifications helper`() {
+    fun `FakeSns listMessages helper`() {
         with(sns) {
             val topicArn = createTopic(topicName, listOf(), mapOf()).successValue().topicArn
 
@@ -96,9 +96,9 @@ class FakeSNSTest : SNSContract, FakeAwsContract {
             publishMessage("by", topicArn = topicArn).successValue()
         }
 
-        val notifications = http.listNotifications(topicName)
-        assertThat(notifications, hasSize(equalTo(2)))
-        assertThat(notifications[0].message, equalTo("hi"))
-        assertThat(notifications[1].message, equalTo("by"))
+        val messages = http.listMessages(topicName)
+        assertThat(messages, hasSize(equalTo(2)))
+        assertThat(messages[0].message, equalTo("hi"))
+        assertThat(messages[1].message, equalTo("by"))
     }
 }

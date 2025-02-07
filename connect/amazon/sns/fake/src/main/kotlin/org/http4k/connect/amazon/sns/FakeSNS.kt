@@ -34,7 +34,7 @@ class FakeSNS(
      */
     fun client() = SNS.Http(region, { AwsCredentials("accessKey", "secret") }, this)
 
-    fun listNotifications(topicName: TopicName) = topics[topicName.value].orEmpty()
+    fun listMessages(topicName: TopicName) = topics[topicName.value].orEmpty()
 }
 
 data class SNSMessage(val message: String, val subject: String?, val attributes: List<MessageAttribute>)
