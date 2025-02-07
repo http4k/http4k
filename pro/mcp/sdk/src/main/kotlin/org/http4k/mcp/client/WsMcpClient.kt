@@ -89,7 +89,7 @@ class WsMcpClient(
                                     else -> {
                                         val message = JsonRpcResult(this, data.attributes)
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                        messageQueues[id]?.put(data)
+                                        messageQueues[id]?.put(data) ?: error("no queue")
                                         val (latch, isComplete) = requests[id] ?: return@forEach
                                         if (message.isError() || isComplete(data)) {
                                             requests.remove(id)
