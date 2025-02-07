@@ -35,7 +35,6 @@ class Http4kSseClient(
                     when {
                         response.status.successful ->
                             response.body.stream.chunkedSseSequence().forEach {
-                                println("GOT $it")
                                 messageQueue.put(it)
                             }
 
