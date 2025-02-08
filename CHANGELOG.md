@@ -33,9 +33,8 @@ changes with their rationale when appropriate:
 - **http4k-contract** : [Breaking] `withPostSecurityFilter()` removed as is part of the contract DSL.
 - **http4k-** : [Breaking] Removal of all deprecations. See the migration guide for more details.
 - **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey`lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
-- **http4k-connect-kms** : [Breaking] `CustomerKeySpec` removed and replaced with `KeySpec` (as per AWS deprecations)
+- **http4k-connect-amazon-kms** : [Breaking] `CustomerKeySpec` removed and replaced with `KeySpec` (as per AWS deprecations)
 - **http4k-server** - [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted should be handled by user implementations.
-- **http4k-*** - [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted should be handled by user implementations.
 - **http4k-api-contract** - [Breaking] Security implementations moved from contract to security-core. This has involved repackaging them, but the APIs remain the same.
 - **http4k-api-jsonrpc** - [Breaking] Repackaging of some classes - APIs remain the same.
 - **http4k-cloudnative** : [Breaking] Code has moved to a combination of `http4k-config`, `http4k-platform-core` and `http4k-platform-k8s` modules.
