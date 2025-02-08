@@ -54,7 +54,7 @@ changes with their rationale when appropriate:
 - **http4k-bridge-ktor** : [New module!] Easy migrations from/to Ktor-based servers.
 - **http4k-bridge-micronaut** : [New module!] Easy migrations from/to Micronaut-based servers.
 - **http4k-bridge-ratpack** : [New module!] Easy migrations from/to Ratpack-based servers.
-- **http4k-web-datastar** : [New module!] Deep support for the super-powerful [Datastar](https://data0star.dev) Hypermedia library, which helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework..
+- **http4k-web-datastar** : [New module!] Deep support for the super-powerful [Datastar](https://data-star.dev) Hypermedia library, which helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework..
 - **http4k-tools-traffic-capture** : [New module!] A set of tools to help the capture and replay of traffic from any HTTP server.
 
 
