@@ -8,6 +8,7 @@ import se.ansman.kotshi.JsonSerializable
  * Information about the server and it's capacities.
  */
 @JsonSerializable
+@ConsistentCopyVisibility
 data class ServerMetaData internal constructor(
     val entity: VersionedMcpEntity,
     val protocolVersion: ProtocolVersion = LATEST_VERSION,

@@ -9,6 +9,7 @@ import se.ansman.kotshi.JsonSerializable
  * Determines what features the client supports.
  */
 @JsonSerializable
+@ConsistentCopyVisibility
 data class ClientCapabilities internal constructor(
     val roots: Root? = null,
     val experimental: Unit? = null,

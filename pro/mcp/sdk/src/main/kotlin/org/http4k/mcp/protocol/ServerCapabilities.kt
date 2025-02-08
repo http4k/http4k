@@ -9,6 +9,7 @@ import org.http4k.mcp.protocol.ProtocolCapability.ToolsChanged
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
+@ConsistentCopyVisibility
 data class ServerCapabilities internal constructor(
     val tools: ToolCapabilities = ToolCapabilities(),
     val prompts: PromptCapabilities = PromptCapabilities(),
