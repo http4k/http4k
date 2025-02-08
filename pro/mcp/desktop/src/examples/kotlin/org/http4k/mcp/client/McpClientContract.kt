@@ -87,6 +87,13 @@ interface McpClientContract : PortBasedTest {
 
         mcpClient.start()
 
+        assertThat(
+            mcpClient.sampling().sample(
+                ModelIdentifier.of("asd"),
+                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
+            ).map { it.getOrThrow() }.toList(), equalTo(samplingResponses)
+        )
+
         assertThat(mcpClient.prompts().list().getOrThrow().size, equalTo(1))
         assertThat(
             mcpClient.prompts().get("prompt", PromptRequest(mapOf("a1" to "foo"))).getOrThrow().description,
