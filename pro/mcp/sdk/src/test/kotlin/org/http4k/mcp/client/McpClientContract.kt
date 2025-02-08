@@ -35,14 +35,14 @@ import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.sse.RealtimeMcpProtocol
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
 import org.http4k.server.Http4kServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-interface McpClientContract : PortBasedTest {
+interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
     @Test
     fun `can interact with server`() {
         val model = ModelIdentifier.of("my model")
@@ -55,18 +55,15 @@ interface McpClientContract : PortBasedTest {
             ToolResponse.Ok(listOf(Content.Text(it.javaClass.simpleName.toString().reversed())))
         })
 
-        val protocol = RealtimeMcpProtocol(
+        val protocol = protocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             Prompts(Prompt("prompt", "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
-            }
-            ),
+            }),
             tools,
-            Resources(
-                Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
-                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-                }
-            ),
+            Resources(Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
+                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+            }),
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
             }),
@@ -145,7 +142,16 @@ interface McpClientContract : PortBasedTest {
         server.stop()
     }
 
-    fun toPolyHandler(protocol: RealtimeMcpProtocol): Http4kServer
+    fun protocol(
+        serverMetaData: ServerMetaData,
+        prompts: Prompts,
+        tools: Tools,
+        resources: Resources,
+        completions: Completions,
+        incomingSampling: IncomingSampling
+    ): P
+
+    fun toPolyHandler(protocol: P): Http4kServer
 
     fun clientFor(port: Int): McpClient
 }
