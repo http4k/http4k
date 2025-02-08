@@ -38,7 +38,7 @@ abstract class AbstractMcpClient(
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
     private val running = AtomicBoolean(false)
-    protected val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
+    protected val requests = ConcurrentHashMap<RequestId, CountDownLatch>()
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
     protected val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
 
@@ -69,9 +69,9 @@ abstract class AbstractMcpClient(
                                     else -> {
                                         val message = JsonRpcResult(this, data.attributes)
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                        messageQueues[id]?.add(data) ?: error("no queue")
-                                        val (latch, isComplete) = requests[id] ?: error("no queue")
-                                        if (message.isError() || isComplete(data)) requests.remove(id)
+                                        messageQueues[id]?.add(data) ?: error("no queue for $id")
+                                        val latch = requests[id] ?: error("no request found for $id")
+                                        if (message.isError()) tidyUp(id)
                                         latch.countDown()
                                     }
                                 }

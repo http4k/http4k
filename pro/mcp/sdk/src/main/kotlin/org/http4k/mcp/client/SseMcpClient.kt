@@ -58,7 +58,7 @@ class SseMcpClient(
 
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
-        requests[requestId] = latch to isComplete
+        requests[requestId] = latch
         messageQueues[requestId] = ArrayBlockingQueue(100)
 
         val response = http(request.toHttpRequest(rpc, requestId))

@@ -45,7 +45,7 @@ class WsMcpClient(
 
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
-        requests[requestId] = latch to isComplete
+        requests[requestId] = latch
         messageQueues[requestId] = ArrayBlockingQueue(100)
 
         with(McpJson) {
