@@ -62,17 +62,18 @@ class SseMcpClient(
         messageQueues[requestId] = ArrayBlockingQueue(100)
 
         val response = http(request.toHttpRequest(rpc, requestId))
-        return when {
-            response.status.successful -> {
-                latch.await()
-                runCatching { requestId }
-            }
+        return runCatching {
+            when {
+                response.status.successful -> {
+                    latch.await()
+                    requestId
+                }
 
-            else -> {
-                latch.await()
-                requests.remove(requestId)
-                messageQueues.remove(requestId)
-                runCatching { error("Failed HTTP ${response.status}") }
+                else -> {
+                    tidyUp(requestId)
+                    latch.await()
+                    error("Failed HTTP ${response.status}")
+                }
             }
         }
     }

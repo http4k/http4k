@@ -17,6 +17,7 @@ import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
+import kotlin.Result.Companion.success
 
 /**
  * Single connection MCP client.
@@ -30,33 +31,33 @@ class WsMcpClient(
 ) : AbstractMcpClient(clientInfo, capabilities, protocolVersion) {
     private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
 
-    override fun received(): Sequence<SseMessage> = wsClient.received().map { SseMessage.parse(it.bodyString()) }
+    override fun received() = wsClient.received().map { SseMessage.parse(it.bodyString()) }
 
     override fun endpoint(it: Event) {}
 
     override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification) = with(McpJson) {
         wsClient.send(WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(mcp), nullNode()))))
-        Result.success(Unit)
+        success(Unit)
     }
 
-    override fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean)
-        : Result<RequestId> {
-        val requestId = RequestId.random()
+    override fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean) =
+        runCatching {
+            val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
-        val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
+            val requestId = RequestId.random()
 
-        requests[requestId] = latch
-        messageQueues[requestId] = ArrayBlockingQueue(100)
+            requests[requestId] = latch
+            messageQueues[requestId] = ArrayBlockingQueue(100)
 
-        with(McpJson) {
-            wsClient.send(
-                WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId))))
-            )
+            with(McpJson) {
+                wsClient.send(
+                    WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId))))
+                )
+            }
+            latch.await()
+
+            requestId
         }
-        latch.await()
-
-        return Result.success(requestId)
-    }
 
     override fun close() {
         super.close()

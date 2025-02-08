@@ -1,7 +1,6 @@
 package org.http4k.mcp.client
 
 import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.client.internal.ClientCompletions
@@ -13,7 +12,6 @@ import org.http4k.mcp.client.internal.NotificationCallback
 import org.http4k.mcp.client.internal.asAOrThrow
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
@@ -69,8 +67,8 @@ abstract class AbstractMcpClient(
                                     else -> {
                                         val message = JsonRpcResult(this, data.attributes)
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                        messageQueues[id]?.add(data) ?: error("no queue for $id")
-                                        val latch = requests[id] ?: error("no request found for $id")
+                                        messageQueues[id]?.add(data) ?: error("no queue for $id: $data")
+                                        val latch = requests[id] ?: error("no request found for $id: $data")
                                         if (message.isError()) tidyUp(id)
                                         latch.countDown()
                                     }
@@ -89,13 +87,10 @@ abstract class AbstractMcpClient(
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
             .mapCatching { reqId ->
-                (messageQueues[reqId]?.poll()
-                    ?: throw McpException(InternalError)).asAOrThrow<McpInitialize.Response>()
-                    .also { messageQueues.remove(reqId) }
-            }
-            .mapCatching { response ->
+                val response = findQueue(reqId).poll().asAOrThrow<McpInitialize.Response>()
                 notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
                     .map { response.capabilities }
+                    .also { tidyUp(reqId) }
                     .getOrThrow()
             }
             .onFailure { close() }
@@ -105,15 +100,17 @@ abstract class AbstractMcpClient(
         notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
     }
 
-    override fun prompts(): McpClient.Prompts = ClientPrompts(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
-        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-    }
+    override fun prompts(): McpClient.Prompts =
+        ClientPrompts(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+        }
 
     override fun sampling(): McpClient.Sampling = ClientSampling(::findQueue, ::tidyUp, ::performRequest)
 
-    override fun resources(): McpClient.Resources = ClientResources(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
-        notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-    }
+    override fun resources(): McpClient.Resources =
+        ClientResources(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
+            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+        }
 
     override fun completions(): McpClient.Completions = ClientCompletions(::findQueue, ::tidyUp, ::performRequest)
 
@@ -127,7 +124,7 @@ abstract class AbstractMcpClient(
         running.set(false)
     }
 
-    private fun tidyUp(requestId: RequestId) {
+    protected fun tidyUp(requestId: RequestId) {
         requests.remove(requestId)
         messageQueues.remove(requestId)
     }
