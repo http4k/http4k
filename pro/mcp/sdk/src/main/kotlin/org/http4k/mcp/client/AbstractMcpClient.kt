@@ -101,21 +101,21 @@ abstract class AbstractMcpClient(
             .onFailure { close() }
     }
 
-    override fun tools(): McpClient.Tools = ClientTools(::findQueue, ::performRequest) { rpc, callback ->
+    override fun tools(): McpClient.Tools = ClientTools(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
         notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
     }
 
-    override fun prompts(): McpClient.Prompts = ClientPrompts(::findQueue, ::performRequest) { rpc, callback ->
+    override fun prompts(): McpClient.Prompts = ClientPrompts(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
         notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
     }
 
-    override fun sampling(): McpClient.Sampling = ClientSampling(::findQueue, ::performRequest)
+    override fun sampling(): McpClient.Sampling = ClientSampling(::findQueue, ::tidyUp, ::performRequest)
 
-    override fun resources(): McpClient.Resources = ClientResources(::findQueue, ::performRequest) { rpc, callback ->
+    override fun resources(): McpClient.Resources = ClientResources(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
         notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
     }
 
-    override fun completions(): McpClient.Completions = ClientCompletions(::findQueue, ::performRequest)
+    override fun completions(): McpClient.Completions = ClientCompletions(::findQueue, ::tidyUp, ::performRequest)
 
     protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit>
 
@@ -127,7 +127,13 @@ abstract class AbstractMcpClient(
         running.set(false)
     }
 
+    private fun tidyUp(requestId: RequestId) {
+        requests.remove(requestId)
+        messageQueues.remove(requestId)
+    }
+
     protected abstract fun endpoint(it: Event)
     protected abstract fun received(): Sequence<SseMessage>
-    private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue")
+
+    private fun findQueue(id: RequestId) = messageQueues[id] ?: error("no queue for $id")
 }

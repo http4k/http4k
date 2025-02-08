@@ -10,6 +10,7 @@ import org.http4k.mcp.util.McpNodeType
 
 internal class ClientResources(
     private val queueFor: (RequestId) -> Iterable<McpNodeType>,
+    private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Resources {
@@ -18,13 +19,13 @@ internal class ClientResources(
     }
 
     override fun list() = sender(McpResource.List, McpResource.List.Request()) { true }
-        .mapCatching(queueFor)
+        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .map { it.first().asAOrThrow<McpResource.List.Response>() }
         .map { it.resources }
 
     override fun read(request: ResourceRequest) =
         sender(McpResource.Read, McpResource.Read.Request(request.uri)) { true }
-            .mapCatching(queueFor)
+            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .map { it.first().asAOrThrow<McpResource.Read.Response>() }
             .map { ResourceResponse(it.contents) }
 }
