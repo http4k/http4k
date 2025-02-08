@@ -11,7 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.with
-import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RequestWithContext
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -53,7 +53,7 @@ class PathTest {
 
     @Test
     fun `value present in request when it has been pre-parsed`() {
-        val target = RoutedRequest(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}"))
+        val target = RequestWithContext(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}"))
 
         assertThat(Path.of("hello")(target), equalTo("world"))
         assertThat(Path.of("hello").extract(target), equalTo("world"))
@@ -90,14 +90,14 @@ class PathTest {
     fun `sets value on request uri with proper encoding`() {
         fun checkEncodeDecode(unencoded: String, encoded: String) {
             val pathParam = Path.of("bob")
-            val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of unencoded), UriTemplate.from("/first/{bob}/second"))
+            val updated = RequestWithContext(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of unencoded), UriTemplate.from("/first/{bob}/second"))
             assertThat(updated, equalTo(Request(GET, "http://bob.com/first/$encoded/second")))
             assertThat(pathParam(updated), equalTo(unencoded))
         }
 
         fun checkDecode(encoded: String, unencoded: String) {
             val pathParam = Path.of("bob")
-            val updated = RoutedRequest(Request(GET, Uri.of("http://bob.com/first/$encoded/second")), UriTemplate.from("/first/{bob}/second"))
+            val updated = RequestWithContext(Request(GET, Uri.of("http://bob.com/first/$encoded/second")), UriTemplate.from("/first/{bob}/second"))
             assertThat(pathParam(updated), equalTo(unencoded))
         }
 
@@ -162,7 +162,7 @@ class PathTest {
     fun uuid() = checkContract(Path.uuid(), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"))
 
     @Test
-    fun regex() = checkContract(Path.regex("v(\\d+)", 1), "v123", "123")
+    fun regex() = checkContract(Path.regexGroup("v(\\d+)", 1), "v123", "123")
 
     @Test
     fun boolean() {

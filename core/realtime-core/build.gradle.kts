@@ -10,8 +10,13 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+
+    implementation(project(":http4k-security-core"))
+
     testFixturesApi(testFixtures(project(":http4k-core")))
     testApi(testFixtures(project(":http4k-core")))
+
+    testApi(project(":http4k-server-helidon"))
 
     testFixturesApi("io.mockk:mockk:_")
     testFixturesApi(project(":http4k-client-websocket"))

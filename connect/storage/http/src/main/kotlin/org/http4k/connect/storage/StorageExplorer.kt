@@ -5,8 +5,6 @@ import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
-import org.http4k.contract.security.NoSecurity
-import org.http4k.contract.security.Security
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
@@ -30,6 +28,8 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
+import org.http4k.security.NoSecurity
+import org.http4k.security.Security
 
 inline fun <reified T : Any> Storage<T>.asHttpHandler(
     bodyLens: BiDiBodyLens<T> = Body.auto<T>().toLens(),

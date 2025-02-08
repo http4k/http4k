@@ -6,8 +6,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.PATCH
@@ -25,15 +25,16 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.contentType
 import org.http4k.routing.path
+import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.server.Http4kServer
-import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
+import org.http4k.testing.BlockingSseClient
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -44,9 +45,9 @@ import org.http4k.routing.bind as hbind
 
 
 abstract class SseServerContract(
-    private val serverConfig: (Int) -> PolyServerConfig,
-    private val client: HttpHandler
+    private val serverConfig: (Int) -> PolyServerConfig
 ) : PortBasedTest {
+    private val client = JavaHttpClient(responseBodyMode = Stream)
     private val err = ByteArrayOutputStream()
     private val sysErr = System.err
 
@@ -123,8 +124,8 @@ abstract class SseServerContract(
 
     @BeforeEach
     fun before() {
-        server = PolyHandler(http, sse = sse).asServer(serverConfig(0)).start()
-        serverOnlySse = PolyHandler(null, sse = sse).asServer(serverConfig(0)).start()
+        server = poly(http, sse).asServer(serverConfig(0)).start()
+        serverOnlySse = poly(sse).asServer(serverConfig(0)).start()
     }
 
     @AfterEach
@@ -351,7 +352,7 @@ abstract class SseServerContract(
 
     @Test
     open fun `when no http handler messages without the event stream header don't blow up`() {
-        PolyHandler(sse = sse).asServer(serverConfig(0)).start().use {
+        poly(sse).asServer(serverConfig(0)).start().use {
             assertThat(
                 client(Request(GET, "http://localhost:${it.port()}/hello/bob")),
                 hasStatus(BAD_REQUEST) or hasStatus(NOT_FOUND)

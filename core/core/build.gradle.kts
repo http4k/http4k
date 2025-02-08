@@ -10,8 +10,6 @@ plugins {
 
 dependencies {
     api(Kotlin.stdlib)
-    implementation("javax.servlet:javax.servlet-api:_")
-    implementation("jakarta.servlet:jakarta.servlet-api:_")
     implementation("dev.forkhandles:result4k:_")
     implementation("dev.forkhandles:values4k:_")
 
@@ -22,8 +20,6 @@ dependencies {
     testFixturesImplementation("io.opentelemetry:opentelemetry-sdk")
     testFixturesImplementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
-    testFixturesImplementation("javax.servlet:javax.servlet-api:_")
-    testFixturesImplementation("jakarta.servlet:jakarta.servlet-api:_")
     testFixturesImplementation("dev.forkhandles:result4k:_")
     testFixturesImplementation("dev.forkhandles:values4k:_")
     testFixturesApi(project(":http4k-client-apache4"))

@@ -9,6 +9,9 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-graphql"))
+    api(project(":http4k-core"))
+    api(project(":http4k-format-jackson"))
+    api("com.graphql-java:graphql-java:_")
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 

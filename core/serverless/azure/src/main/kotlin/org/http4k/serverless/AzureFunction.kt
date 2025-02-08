@@ -8,22 +8,20 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
-import org.http4k.filter.ServerFilters.InitialiseRequestContext
+import org.http4k.lens.RequestKey
 import java.util.Optional
 
-const val AZURE_REQUEST_KEY = "HTTP4K_AZURE_REQUEST"
-const val AZURE_CONTEXT_KEY = "HTTP4K_AZURE_CONTEXT"
+val AZURE_REQUEST_KEY = RequestKey.required<HttpRequestMessage<Optional<String>>>("HTTP4K_AZURE_REQUEST")
+val AZURE_CONTEXT_KEY = RequestKey.required<ExecutionContext>("HTTP4K_AZURE_CONTEXT")
 
-abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
-    constructor(input: AppLoader) : this(AppLoaderWithContexts { env, _ -> input(env) })
+abstract class AzureFunction(appLoader: AppLoader) {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val contexts = RequestContexts("azure")
-    private val app = appLoader(System.getenv(), contexts)
+    private val app = appLoader(System.getenv())
 
     abstract fun handleRequest(
         req: HttpRequestMessage<Optional<String>>,
@@ -32,20 +30,14 @@ abstract class AzureFunction(appLoader: AppLoaderWithContexts) {
 
     protected fun handle(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) =
         CatchAll()
-            .then(InitialiseRequestContext(contexts))
-            .then(AddAzure(request, ctx, contexts))
+            .then(AddAzure(request, ctx))
             .then(app)(request.asHttp4k())
             .asAzure(request)
 }
 
-private fun AddAzure(
-    request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext,
-    contexts: RequestContexts
-) = Filter { next ->
+private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) = Filter { next ->
     {
-        contexts[it][AZURE_CONTEXT_KEY] = ctx
-        contexts[it][AZURE_REQUEST_KEY] = request
-        next(it)
+        next(it.with(AZURE_CONTEXT_KEY of ctx, AZURE_REQUEST_KEY of request))
     }
 }
 

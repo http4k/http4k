@@ -11,8 +11,6 @@ import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
-import org.http4k.contract.security.NoSecurity
-import org.http4k.contract.security.Security
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -35,6 +33,8 @@ import org.http4k.format.Jackson.string
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.NoSecurity
+import org.http4k.security.Security
 import java.time.Clock
 import java.time.Duration.ofMinutes
 import java.time.Instant.ofEpochSecond

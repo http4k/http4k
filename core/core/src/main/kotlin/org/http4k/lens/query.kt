@@ -20,4 +20,3 @@ inline fun <reified T : Enum<T>> Query.enum(caseSensitive: Boolean = true) = map
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
     EnumParam(T::class)
 )
-

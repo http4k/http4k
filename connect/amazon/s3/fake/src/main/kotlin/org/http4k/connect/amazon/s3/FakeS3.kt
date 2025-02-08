@@ -43,8 +43,8 @@ class FakeS3(
     private val clock: Clock = Clock.systemUTC()
 ) : ChaoticHttpHandler() {
 
-    private val isS3 = { it: Request -> it.subdomain(buckets) == "s3" }.asRouter()
-    private val isBucket = { it: Request -> it.subdomain(buckets) != "s3" }.asRouter()
+    private val isS3 = { it: Request -> it.subdomain(buckets) == "s3" }.asRouter("is s3")
+    private val isBucket = { it: Request -> it.subdomain(buckets) != "s3" }.asRouter("is bucket")
 
     override val app = routes(
         isS3 bind routes(

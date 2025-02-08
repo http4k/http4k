@@ -45,7 +45,7 @@ import java.util.UUID
 @Suppress("DEPRECATION")
 fun AwsJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider) = route<CreateKey> {
     val keyId = KMSKeyId.of(UUID.randomUUID().toString())
-    val keySpec = it.KeySpec ?: it.CustomerMasterKeySpec ?: SYMMETRIC_DEFAULT
+    val keySpec = it.KeySpec ?: SYMMETRIC_DEFAULT
 
     val keyPair = when (keySpec) {
         CustomerMasterKeySpec.RSA_2048 -> KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }
@@ -62,7 +62,7 @@ fun AwsJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider) = route<Cr
         keyId = keyId,
         arn = keyId.toArn(),
         keyUsage = it.KeyUsage ?: KeyUsage.ENCRYPT_DECRYPT,
-        customerMasterKeySpec = keySpec,
+        keySpec = keySpec,
         publicKeyContent = keyPair?.public?.let { key ->
             EncryptionKeyContent(key.format, Base64Blob.encode(key.encoded))
         },
@@ -111,7 +111,7 @@ fun AwsJsonFake.encrypt(keys: Storage<StoredCMK>) = route<Encrypt> { req ->
 fun AwsJsonFake.getPublicKey(keys: Storage<StoredCMK>) = route<GetPublicKey> {
     keys[it.KeyId.toArn().value]?.let { cmk ->
         PublicKey(
-            KMSKeyId.of(cmk.arn), cmk.customerMasterKeySpec, cmk.customerMasterKeySpec, cmk.keyUsage,
+            KMSKeyId.of(cmk.arn), cmk.keySpec, cmk.keyUsage,
             cmk.publicKeyContent!!.encoded, null,
             cmk.signingAlgorithms
         )

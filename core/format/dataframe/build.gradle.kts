@@ -5,6 +5,7 @@ description = "http4k KotlinX DataFrame support"
 val license by project.extra { Apache2 }
 
 plugins {
+    kotlin("jvm")
     id("org.jetbrains.kotlinx.dataframe")
     id("org.http4k.community")
 }

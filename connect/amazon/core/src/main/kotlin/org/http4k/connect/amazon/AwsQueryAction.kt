@@ -17,6 +17,7 @@ import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiBoolean
 import org.http4k.format.MoshiDecimal
 import org.http4k.format.MoshiInteger
+import org.http4k.format.MoshiLong
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiNull
 import org.http4k.format.MoshiObject
@@ -111,6 +112,7 @@ private fun MoshiObject.toList(prefix: String = ""): List<Pair<String, String>> 
                 is MoshiBoolean -> element.value.toString()
                 is MoshiDecimal -> element.value.toString()
                 is MoshiInteger -> element.value.toString()
+                is MoshiLong -> element.value.toString()
                 is MoshiObject -> error("nested objects not supported")
                 is MoshiString -> element.value
                 MoshiNull -> ""
@@ -120,6 +122,7 @@ private fun MoshiObject.toList(prefix: String = ""): List<Pair<String, String>> 
         is MoshiBoolean -> listOf(prefix + key to node.value.toString())
         is MoshiDecimal -> listOf(prefix + key to node.value.toString())
         is MoshiInteger -> listOf(prefix + key to node.value.toString())
+        is MoshiLong -> listOf(prefix + key to node.value.toString())
         MoshiNull -> emptyList()
     }
 }.flatten()

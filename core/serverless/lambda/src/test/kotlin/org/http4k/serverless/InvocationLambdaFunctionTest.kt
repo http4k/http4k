@@ -1,6 +1,5 @@
 package org.http4k.serverless
 
-import com.amazonaws.services.lambda.runtime.Context
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.POST
@@ -18,9 +17,9 @@ class InvocationLambdaFunctionTest {
 
         val request = "input body"
 
-        val lambda = object : InvocationLambdaFunction(AppLoaderWithContexts { env, contexts ->
+        val lambda = object : InvocationLambdaFunction(AppLoader { env ->
             {
-                assertThat(contexts[it].get<Context>(LAMBDA_CONTEXT_KEY), equalTo(lambdaContext))
+                assertThat(LAMBDA_CONTEXT_KEY(it), equalTo(lambdaContext))
                 assertThat(env, equalTo(System.getenv()))
                 assertThat(
                     it.removeHeader("x-http4k-context-lambda"), equalTo(

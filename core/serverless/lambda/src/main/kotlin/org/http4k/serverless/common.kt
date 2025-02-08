@@ -2,15 +2,14 @@ package org.http4k.serverless
 
 import com.amazonaws.services.lambda.runtime.Context
 import org.http4k.core.Filter
-import org.http4k.core.RequestContexts
+import org.http4k.core.with
+import org.http4k.lens.RequestKey
 
-const val LAMBDA_CONTEXT_KEY = "HTTP4K_LAMBDA_CONTEXT"
-const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"
+val LAMBDA_CONTEXT_KEY = RequestKey.required<Context>("HTTP4K_LAMBDA_CONTEXT")
+val LAMBDA_REQUEST_KEY = RequestKey.required<Any>("HTTP4K_LAMBDA_REQUEST")
 
-internal fun AddLambdaContextAndRequest(ctx: Context, request: Any, contexts: RequestContexts) = Filter { next ->
+internal fun AddLambdaContextAndRequest(ctx: Context, request: Any) = Filter { next ->
     {
-        contexts[it][LAMBDA_CONTEXT_KEY] = ctx
-        contexts[it][LAMBDA_REQUEST_KEY] = request
-        next(it)
+        next(it.with(LAMBDA_CONTEXT_KEY of ctx, LAMBDA_REQUEST_KEY of request))
     }
 }

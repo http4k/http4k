@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * In-memory RequestContext store. Override the storeId to use multiple stores in one app.
  */
+@Deprecated("Replaced with RequestKey mechanism")
 class RequestContexts(storeId: String? = null) : Store<RequestContext> {
     private val requests = ConcurrentHashMap<UUID, RequestContext>()
 

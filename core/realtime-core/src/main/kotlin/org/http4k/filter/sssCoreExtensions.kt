@@ -36,6 +36,7 @@ private fun originalSseBehaviour(e: Throwable): SseResponse {
     return SseResponse(INTERNAL_SERVER_ERROR) { it.close() }
 }
 
+@Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
 fun ServerFilters.InitialiseSseRequestContext(contexts: Store<RequestContext>) = SseFilter { next ->
     {
         val context = RequestContext()
@@ -84,7 +85,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                             .joinToString("\n")
                     )
 
-                    response.copy(consumer = { sse ->
+                    response.withConsumer { sse ->
                         response.consumer(object : Sse by sse {
                             override fun send(message: SseMessage) = apply {
                                 sse.send(message)
@@ -97,7 +98,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                                 out.println("***** SSE CLOSED on ${req.method}: ${req.uri} *****")
                             }
                         })
-                    })
+                    }
                 }
             } catch (e: Exception) {
                 out.println("***** SSE RESPONSE FAILED to ${req.method}: ${req.uri} *****")
@@ -133,17 +134,27 @@ fun ResponseFilters.ReportSseTransaction(
 ) = SseFilter { next ->
     { request ->
         timeSource().let { start ->
-            next(request).apply {
-                recordFn(
-                    transactionLabeler.invoke(
-                        SseTransaction(
-                            request = request,
-                            response = this,
-                            start = start,
-                            duration = Duration.between(start, timeSource())
-                        )
-                    )
-                )
+            next(request).let { response ->
+                response.withConsumer { sse ->
+                    response.consumer(object : Sse by sse {
+                        override fun close() {
+                            try {
+                                sse.close()
+                            } finally {
+                                recordFn(
+                                    transactionLabeler(
+                                        SseTransaction(
+                                            request = request,
+                                            response = response,
+                                            start = start,
+                                            duration = Duration.between(start, timeSource())
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    })
+                }
             }
         }
     }

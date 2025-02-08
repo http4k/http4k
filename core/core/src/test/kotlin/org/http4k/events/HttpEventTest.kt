@@ -8,9 +8,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
+import org.http4k.events.HttpEvent.Incoming
 import org.http4k.events.HttpEvent.Outgoing
-import org.http4k.routing.RoutedRequest
-import org.http4k.routing.RoutedResponse
+import org.http4k.routing.RequestWithContext
+import org.http4k.routing.ResponseWithContext
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
 import java.time.Instant
@@ -41,7 +42,7 @@ class HttpEventTest {
         )).xUriTemplate, equalTo("bob"))
         assertThat(Outgoing(HttpTransaction(
             request = Request(GET, "/bob"),
-            response = RoutedResponse(Response(OK), UriTemplate.from("bar")),
+            response = ResponseWithContext(Response(OK), UriTemplate.from("bar")),
             start = startTime,
             duration = ZERO,
             labels = mapOf()
@@ -50,11 +51,11 @@ class HttpEventTest {
 
     @Test
     fun `incoming uses template if available`() {
-        assertThat(HttpEvent.Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
+        assertThat(Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
         assertThat(
-            HttpEvent.Incoming(
+            Incoming(
                 HttpTransaction(
-                    request = RoutedRequest(Request(GET, "/bob"), UriTemplate.from("bar")),
+                    request = RequestWithContext(Request(GET, "/bob"), UriTemplate.from("bar")),
                     response = Response(OK),
                     start = startTime,
                     duration = ZERO,
@@ -65,6 +66,12 @@ class HttpEventTest {
 
     @Test
     fun `incoming equals`() {
-        assertThat(HttpEvent.Incoming(tx), equalTo(HttpEvent.Incoming(tx)))
+        assertThat(Incoming(tx), equalTo(Incoming(tx)))
+    }
+
+    @Test
+    fun `toString is working as expected`() {
+        assertThat(Incoming(tx).toString(), equalTo("Incoming(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
+        assertThat(Outgoing(tx).toString(), equalTo("Outgoing(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
     }
 }

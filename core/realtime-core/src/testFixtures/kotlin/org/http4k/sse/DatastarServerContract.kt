@@ -2,8 +2,9 @@ package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -15,14 +16,15 @@ import org.http4k.datastar.Signal
 import org.http4k.filter.debug
 import org.http4k.lens.accept
 import org.http4k.lens.datastarFragments
+import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.server.Http4kServer
-import org.http4k.server.PolyHandler
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.sse.SseMessage.Event
+import org.http4k.testing.BlockingSseClient
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -30,9 +32,9 @@ import org.junit.jupiter.api.Test
 import org.http4k.routing.bind as hbind
 
 abstract class DatastarServerContract(
-    private val serverConfig: (Int) -> PolyServerConfig,
-    private val client: HttpHandler
+    private val serverConfig: (Int) -> PolyServerConfig
 ): PortBasedTest {
+    private val client = JavaHttpClient(responseBodyMode = Stream)
 
     private lateinit var server: Http4kServer
 
@@ -46,11 +48,11 @@ abstract class DatastarServerContract(
 
     @BeforeEach
     fun before() {
-        server = PolyHandler(
-            http = routes("/noStream" hbind {
+        server = poly(
+            routes("/noStream" hbind {
                 Response(OK).datastarFragments(DatastarEvent.MergeFragments("hello"))
             }),
-            sse = sse
+            sse
         ).asServer(serverConfig(0)).start()
     }
 

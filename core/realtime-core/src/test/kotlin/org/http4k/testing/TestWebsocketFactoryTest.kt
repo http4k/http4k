@@ -2,8 +2,8 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.routing.websocket.bind
 import org.http4k.routing.websockets
-import org.http4k.routing.ws.bind
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.blocking

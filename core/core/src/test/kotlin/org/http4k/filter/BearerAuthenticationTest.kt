@@ -5,14 +5,12 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.BearerAuth
-import org.http4k.filter.ServerFilters.InitialiseRequestContext
-import org.http4k.lens.RequestContextKey
+import org.http4k.lens.RequestKey
 import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.Test
 
@@ -55,7 +53,7 @@ class BearerAuthenticationTest {
     }
 
     @Test
-    fun when_no_credentials_return_unuathorised() {
+    fun when_no_credentials_return_unauthorised() {
         val handler = BearerAuth("token").then { Response(OK) }
         val response = ClientFilters.BearerAuth(CredentialsProvider { null }).then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
@@ -63,13 +61,10 @@ class BearerAuthenticationTest {
 
     @Test
     fun populates_request_context_for_later_retrieval() {
-        val contexts = RequestContexts()
-        val key = RequestContextKey.required<Credentials>(contexts)
+        val key = RequestKey.required<Credentials>("credentials")
 
-        val handler =
-            InitialiseRequestContext(contexts)
-                .then(BearerAuth(key) { Credentials(it, it) })
-                .then { req -> Response(OK).body(key(req).toString()) }
+        val handler = BearerAuth(key) { Credentials(it, it) }
+            .then { req -> Response(OK).body(key(req).toString()) }
 
         val response = ClientFilters.BearerAuth("token").then(handler)(Request(GET, "/"))
 

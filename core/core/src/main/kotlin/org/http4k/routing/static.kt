@@ -16,6 +16,9 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.RoutingResult.Matched
+import org.http4k.routing.RoutingResult.NotMatched
+
 
 /**
  * Serve static content using the passed ResourceLoader. Note that for security, by default ONLY mime-types registered in
@@ -24,31 +27,42 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 fun static(
     resourceLoader: ResourceLoader = Classpath(),
     vararg extraFileExtensionToContentTypes: Pair<String, ContentType>
-): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
+) = RoutingHttpHandler(
+    listOf(
+        StaticRouteMatcher(
+            "",
+            resourceLoader,
+            extraFileExtensionToContentTypes.asList().toMap()
+        )
+    )
+)
 
-data class StaticRoutingHttpHandler(
+data class StaticRouteMatcher(
     private val pathSegments: String,
     private val resourceLoader: ResourceLoader,
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
+    private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RoutingHttpHandler {
+) : RouteMatcher<Response, Filter>{
 
-    override val description = RouterDescription("Static files $pathSegments")
+    private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
+    override fun match(request: Request) = when (val result = router(request)) {
+        is Matched -> handler(request).let {
+            when {
+                it.status != NOT_FOUND -> RoutingMatch(0, result.description, filter.then { _: Request -> it })
+                else -> RoutingMatch(2, result.description, filter.then { _: Request -> Response(NOT_FOUND) })
+            }
+        }
 
-    override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)
+        is NotMatched -> RoutingMatch(2, result.description, filter.then { _: Request -> Response(NOT_FOUND) })
+    }
 
-    private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
-    private val handlerWithFilter = filter.then(handlerNoFilter)
+    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)
+    override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
+    override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
-    override fun match(request: Request): RouterMatch = handlerNoFilter(request).let {
-        if (it.status != NOT_FOUND) RouterMatch.MatchingHandler(filter.then { _: Request -> it }, description) else null
-    } ?: RouterMatch.Unmatched(description)
-
-    override fun invoke(request: Request): Response = handlerWithFilter(request)
-
-    override fun toString() = description.friendlyToString()
+    override fun toString() = "static files at $pathSegments"
 }
 
 internal class ResourceLoadingHandler(
