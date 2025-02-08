@@ -31,7 +31,7 @@ changes with their rationale when appropriate:
 - **http4k-realtime-core** : [Breaking] From above, repackaging of SSE and Websocket routing and filters.
 - **http4k-core** : [Breaking] `regex` lens now returns the entire matched string. To match groups, use `regexGroup` instead.
 - **http4k-contract** : [Breaking] `withPostSecurityFilter()` removed as is part of the contract DSL.
-- **http4k-** : [Breaking] Removal of all deprecations. See the migration guide for more details.
+- **http4k-*** : [Breaking] Removal of all deprecations. See the migration guide for more details.
 - **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey`lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
 - **http4k-connect-amazon-kms** : [Breaking] `CustomerKeySpec` removed and replaced with `KeySpec` (as per AWS deprecations)
 - **http4k-server** : [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted should be handled by user implementations.
