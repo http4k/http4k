@@ -14,7 +14,7 @@ dependencies {
             .asSequence()
             .filter { it.name != project.name }
             .filter { shouldBePublished(it) }
-            .filterNot { it.name == "http4k-mcp" }
+            .filterNot { it.name.contains("http4k-mcp") }
             .filterNot { it.name == "http4k-tools" }
             .sortedBy { it.name }
             .toList()
