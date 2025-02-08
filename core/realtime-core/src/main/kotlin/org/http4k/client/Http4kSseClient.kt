@@ -8,7 +8,6 @@ import org.http4k.lens.accept
 import org.http4k.sse.SseMessage
 import org.http4k.testing.SseClient
 import java.io.InputStream
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
@@ -24,7 +23,7 @@ class Http4kSseClient(
 ) : SseClient {
 
     private val running = AtomicBoolean(true)
-    private val messageQueue: BlockingQueue<SseMessage> = LinkedBlockingQueue()
+    private val messageQueue = LinkedBlockingQueue<SseMessage>()
 
     override fun received(): Sequence<SseMessage> = sequence {
         thread {
@@ -34,9 +33,7 @@ class Http4kSseClient(
 
                     when {
                         response.status.successful ->
-                            response.body.stream.chunkedSseSequence().forEach {
-                                messageQueue.put(it)
-                            }
+                            response.body.stream.chunkedSseSequence().forEach(messageQueue::put)
 
                         else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
                     }
