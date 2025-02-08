@@ -42,9 +42,9 @@ changes with their rationale when appropriate:
 - **http4k-***[Unlikely Break] Upgrades all dependencies to latest versions. This may involve API changes if you are reliant on APIs in previous versions.
 - **http4k-format-moshi** : [Unlikely break/Enhancement] Support for `MoshiLong` as well as `MoshiInteger`. This has improved the handling of longs when using the `MoshiNode` types.
 - **http4k-server-helidon** - [Fix] SSE implementation now cleans up SSE connections correctly on close.
-- **http4k-realtime-core* : [Enhancement] Added ability to use debugging filters for both SSE and WebSockets.
-- **http4k-realtime-core* : [Enhancement] New DSL for defining Polyhandlers for routing to different types of HTTP/SSE/Websocket protocols connections. Use `poly()`.
-- **http4k-realtime-core* : [Enhancement] SSE client for connecting to Server-sent events. Includes  configurable auto-reconnection modes.
+- **http4k-realtime-core** : [Enhancement] Added ability to use debugging filters for both SSE and WebSockets.
+- **http4k-realtime-core** : [Enhancement] New DSL for defining Polyhandlers for routing to different types of HTTP/SSE/Websocket protocols connections. Use `poly()`.
+- **http4k-realtime-core** : [Enhancement] SSE client for connecting to Server-sent events. Includes  configurable auto-reconnection modes.
 - **http4k-*** : [Enhancement] Unified the Events for HTTP, WS and SSE to use the same `ProtocolEvent` type for tracing and logging transactions.
 - **http4k-format-moshi** : [Enhancement] Support for Data4k containers for Moshi. This allows
 - **http4k-tools-hotreload** : [New Pro module!] Work with any http4k-based application without restarting the server. Includes browser reloading when working with web-based code, assets and templates. Extensible with custom rebuild logic - ships with Gradle support.
