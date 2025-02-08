@@ -28,7 +28,7 @@ changes with their rationale when appropriate:
 | http4k-resilience4j        | http4k-ops-resilience4j                                             |
 
 - **http4k-*** : [Breaking] Complete rewrite of the routing logic to work identically across HTTP, WS and SSE. Mostly backwards compatible, but some small may be required if you are referencing low level routing classes.
-- **http4k-realtime-core* : [Breaking] From above, repackaging of SSE and Websocket routing and filters.
+- **http4k-realtime-core** : [Breaking] From above, repackaging of SSE and Websocket routing and filters.
 - **http4k-core** : [Breaking] `regex` lens now returns the entire matched string. To match groups, use `regexGroup` instead.
 - **http4k-contract** : [Breaking] `withPostSecurityFilter()` removed as is part of the contract DSL.
 - **http4k-** : [Breaking] Removal of all deprecations. See the migration guide for more details.
