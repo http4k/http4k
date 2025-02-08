@@ -15,7 +15,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 
 /**
@@ -46,7 +46,7 @@ class WsMcpClient(
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
         requests[requestId] = latch to isComplete
-        messageQueues[requestId] = ConcurrentLinkedQueue()
+        messageQueues[requestId] = ArrayBlockingQueue(100)
 
         with(McpJson) {
             wsClient.send(

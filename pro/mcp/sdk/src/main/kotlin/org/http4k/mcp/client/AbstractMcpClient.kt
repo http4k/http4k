@@ -26,8 +26,8 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
@@ -40,7 +40,7 @@ abstract class AbstractMcpClient(
     private val running = AtomicBoolean(false)
     protected val requests = ConcurrentHashMap<RequestId, Pair<CountDownLatch, (McpNodeType) -> Boolean>>()
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
-    protected val messageQueues = ConcurrentHashMap<RequestId, ConcurrentLinkedQueue<McpNodeType>>()
+    protected val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
 
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
@@ -117,19 +117,15 @@ abstract class AbstractMcpClient(
 
     override fun completions(): McpClient.Completions = ClientCompletions(::findQueue, ::performRequest)
 
-    protected abstract fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit>
+    protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit>
 
     protected abstract fun performRequest(
-        method: McpRpc,
-        request: ClientMessage,
-        isComplete: (McpNodeType) -> Boolean = { true }
-    )
-        : Result<RequestId>
+        rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }
+    ): Result<RequestId>
 
     override fun close() {
         running.set(false)
     }
-
 
     protected abstract fun endpoint(it: Event)
     protected abstract fun received(): Sequence<SseMessage>

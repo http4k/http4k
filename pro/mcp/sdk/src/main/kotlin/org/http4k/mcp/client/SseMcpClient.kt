@@ -20,7 +20,7 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 
@@ -44,24 +44,24 @@ class SseMcpClient(
         endpoint.set(it.data)
     }
 
-    override fun notify(method: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
-        val response = http(mcp.toHttpRequest(method))
+    override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
+        val response = http(mcp.toHttpRequest(rpc))
         return when {
             response.status.successful -> runCatching { Unit }
             else -> runCatching { error("Failed HTTP ${response.status}") }
         }
     }
 
-    override fun performRequest(method: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean)
+    override fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean)
         : Result<RequestId> {
         val requestId = RequestId.random()
 
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
         requests[requestId] = latch to isComplete
-        messageQueues[requestId] = ConcurrentLinkedQueue()
+        messageQueues[requestId] = ArrayBlockingQueue(100)
 
-        val response = http(request.toHttpRequest(method, requestId))
+        val response = http(request.toHttpRequest(rpc, requestId))
         return when {
             response.status.successful -> {
                 latch.await()

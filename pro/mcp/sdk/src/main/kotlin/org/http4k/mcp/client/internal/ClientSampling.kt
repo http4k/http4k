@@ -7,39 +7,36 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.util.McpNodeType
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.BlockingQueue
 
 internal class ClientSampling(
-    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
+    private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
     override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {
-        fun hasStopReason(message: McpNodeType) = message.asAOrThrow<SamplingResponse>().stopReason != null
+        fun hasStopReason(message: McpNodeType) = runCatching {
+            message.asAOrThrow<McpSampling.Response>().stopReason != null
+        }.getOrDefault(false)
 
-        val requestId = AtomicReference<RequestId>(null)
-        val messages = sender(
-            McpSampling,
-            with(request) {
-                McpSampling.Request(
-                    messages,
-                    maxTokens,
-                    systemPrompt,
-                    includeContext,
-                    temperature,
-                    stopSequences,
-                    modelPreferences,
-                    metadata
-                )
-            },
-            ::hasStopReason
-        )
-            .mapCatching { reqId -> queueFor(reqId).also { requestId.set(reqId) } }
-            .getOrThrow()
-
-        return messages.asSequence().map { msg ->
-            runCatching {
-                val it = msg.asAOrThrow<McpSampling.Response>()
-                SamplingResponse(it.model, it.stopReason, it.role, it.content)
+        return sequence {
+            sender(
+                McpSampling,
+                with(request) {
+                    McpSampling.Request(
+                        messages, maxTokens, systemPrompt, includeContext,
+                        temperature, stopSequences, modelPreferences, metadata
+                    )
+                },
+                ::hasStopReason
+            ).onSuccess { reqId ->
+                while (true) {
+                    val message = queueFor(reqId).take()
+                    runCatching { message.asAOrThrow<McpSampling.Response>() }
+                        .onSuccess {
+                            yield(Result.success(SamplingResponse(it.model, it.stopReason, it.role, it.content)))
+                        }
+                    if (hasStopReason(message)) return@sequence
+                }
             }
         }
     }
