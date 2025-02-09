@@ -2,10 +2,12 @@ package org.http4k.mcp.client
 
 import org.http4k.core.Request
 import org.http4k.format.renderRequest
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -23,12 +25,13 @@ import kotlin.Result.Companion.success
  * Single connection MCP client.
  */
 class WsMcpClient(
+    name: McpEntity,
+    version: Version,
+    capabilities: ClientCapabilities,
     private val wsRequest: Request,
     private val websocketFactory: WebsocketFactory,
-    clientInfo: VersionedMcpEntity,
-    capabilities: ClientCapabilities,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
-) : AbstractMcpClient(clientInfo, capabilities, protocolVersion) {
+) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion) {
     private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
 
     override fun received() = wsClient.received().map { SseMessage.parse(it.bodyString()) }

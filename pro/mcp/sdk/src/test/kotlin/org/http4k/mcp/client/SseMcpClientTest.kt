@@ -10,7 +10,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.server.McpSseHandler
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
@@ -32,9 +31,9 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
     ) = RealtimeMcpProtocol(serverMetaData, prompts, tools, resources, completions, incomingSampling)
 
     override fun clientFor(port: Int) = SseMcpClient(
-        Request(GET, Uri.of("http://localhost:${port}/sse")),
-        VersionedMcpEntity(McpEntity.of("foobar"), Version.of("1.0.0")),
+        McpEntity.of("foobar"), Version.of("1.0.0"),
         ClientCapabilities(),
+        Request(GET, Uri.of("http://localhost:${port}/sse")),
         JavaHttpClient(responseBodyMode = Stream)
     )
 

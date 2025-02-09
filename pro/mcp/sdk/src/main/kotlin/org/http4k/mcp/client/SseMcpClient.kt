@@ -10,10 +10,12 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.format.renderRequest
 import org.http4k.lens.contentType
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -25,12 +27,13 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 
 class SseMcpClient(
-    sseRequest: Request,
-    clientInfo: VersionedMcpEntity,
+    name: McpEntity,
+    version: Version,
     capabilities: ClientCapabilities,
+    sseRequest: Request,
     http: HttpHandler,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
-) : AbstractMcpClient(clientInfo, capabilities, protocolVersion) {
+) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion) {
 
     private val http = ClientFilters.SetHostFrom(sseRequest.uri).then(http)
 

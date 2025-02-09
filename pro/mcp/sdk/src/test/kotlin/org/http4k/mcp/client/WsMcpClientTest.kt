@@ -9,7 +9,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.server.McpWsHandler
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
@@ -30,13 +29,15 @@ class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         resources: Resources,
         completions: Completions,
         incomingSampling: IncomingSampling
-    ) = RealtimeMcpProtocol(serverMetaData, prompts, tools, resources, completions, incomingSampling
+    ) = RealtimeMcpProtocol(
+        serverMetaData, prompts, tools, resources, completions, incomingSampling
     )
+
     override fun clientFor(port: Int) = WsMcpClient(
+        McpEntity.of("foobar"), Version.of("1.0.0"),
+        ClientCapabilities(),
         Request(GET, Uri.of("ws://localhost:${port}/ws")),
         WebsocketClient(Duration.ofSeconds(2), true),
-        VersionedMcpEntity(McpEntity.of("foobar"), Version.of("1.0.0")),
-        ClientCapabilities(),
     )
 
     override fun toPolyHandler(protocol: RealtimeMcpProtocol) = McpWsHandler(protocol).asServer(Helidon(0))

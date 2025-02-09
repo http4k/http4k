@@ -19,13 +19,12 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.protocol.VersionedMcpEntity
 
 fun main() {
     val mcpClient = SseMcpClient(
-        Request(GET, "http://localhost:3001/sse"),
-        VersionedMcpEntity(McpEntity.of("foobar"), Version.of("1.0.0")),
+        McpEntity.of("foobar"), Version.of("1.0.0"),
         ClientCapabilities(),
+        Request(GET, "http://localhost:3001/sse"),
         JavaHttpClient(responseBodyMode = Stream)
     )
 
