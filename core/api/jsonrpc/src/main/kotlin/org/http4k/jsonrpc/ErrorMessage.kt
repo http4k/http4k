@@ -11,6 +11,8 @@ open class ErrorMessage(val code: Int, val message: String) {
         json.obj(data?.let { fields + ("data" to it) } ?: fields)
     }
 
+    override fun toString() = "Error($code, $message)"
+
     companion object {
         val InvalidRequest = ErrorMessage(-32600, "Invalid Request")
         val MethodNotFound = ErrorMessage(-32601, "Method not found")

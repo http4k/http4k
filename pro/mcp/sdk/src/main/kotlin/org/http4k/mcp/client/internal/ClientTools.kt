@@ -2,7 +2,8 @@ package org.http4k.mcp.client.internal
 
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.ToolResponse.Error
+import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.ToolName
@@ -35,8 +36,8 @@ internal class ClientTools(
             .map { it.first().asAOrThrow<McpTool.Call.Response>() }
             .mapCatching {
                 when (it.isError) {
-                    true -> ToolResponse.Error(ErrorMessage(-1, it.content.joinToString()))
-                    else -> ToolResponse.Ok(it.content)
+                    true -> Error(ErrorMessage(-1, it.content.joinToString()))
+                    else -> Ok(it.content)
                 }
             }
 }
