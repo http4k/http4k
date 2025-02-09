@@ -43,7 +43,7 @@ abstract class AbstractMcpClient(
     override fun start(): Result<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
 
-        thread {
+        thread(isDaemon = true) {
             received().forEach {
                 when (it) {
                     is Event -> when (it.event) {
