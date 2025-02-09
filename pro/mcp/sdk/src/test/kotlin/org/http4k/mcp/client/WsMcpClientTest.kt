@@ -40,5 +40,5 @@ class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         WebsocketClient(Duration.ofSeconds(2), true),
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = McpWsHandler(protocol).asServer(Helidon(0))
+    override fun toServer(protocol: RealtimeMcpProtocol) = McpWsHandler(protocol).asServer(Helidon(0))
 }

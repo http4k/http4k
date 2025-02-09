@@ -37,5 +37,5 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = McpSseHandler(protocol).asServer(Helidon(0))
+    override fun toServer(protocol: RealtimeMcpProtocol) = McpSseHandler(protocol).asServer(Helidon(0))
 }

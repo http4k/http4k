@@ -69,7 +69,7 @@ abstract class AbstractMcpClient(
                                         val id = asA<RequestId>(compact(message.id ?: nullNode()))
                                         messageQueues[id]?.add(data) ?: error("no queue for $id: $data")
                                         val latch = requests[id] ?: error("no request found for $id: $data")
-                                        if (message.isError()) tidyUp(id)
+                                        if (message.isError()) requests.remove(id)
                                         latch.countDown()
                                     }
                                 }

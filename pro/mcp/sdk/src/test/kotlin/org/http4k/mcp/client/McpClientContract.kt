@@ -73,7 +73,8 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
                 samplingResponses.asSequence()
             })
         )
-        val server = toPolyHandler(protocol).start()
+        val server = toServer(protocol).start()
+
         protocol.start()
 
         val mcpClient = clientFor(server.port())
@@ -154,7 +155,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         incomingSampling: IncomingSampling
     ): P
 
-    fun toPolyHandler(protocol: P): Http4kServer
+    fun toServer(protocol: P): Http4kServer
 
     fun clientFor(port: Int): McpClient
 }
