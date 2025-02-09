@@ -17,6 +17,7 @@ import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role
@@ -107,7 +108,7 @@ fun templatedResource() = Resource.Templated(
 fun staticResource() =
     Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient())
 
-fun prompt1() = Prompt("prompt1", "description1") bind {
+fun prompt1() = Prompt(PromptName.of("prompt1"), "description1") bind {
     PromptResponse(listOf(Message(Role.assistant, Content.Text(it.toString()))), "description")
 }
 
@@ -115,7 +116,7 @@ fun prompt2(): PromptCapability {
     val arg1 = Prompt.Arg.required("a1", "d1")
     val arg2 = Prompt.Arg.int().optional("a2", "d2")
     return Prompt(
-        "prompt2", "description1",
+        PromptName.of("prompt2"), "description1",
         arg1,
         arg2
     ) bind {

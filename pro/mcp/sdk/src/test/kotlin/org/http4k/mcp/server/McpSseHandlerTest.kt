@@ -38,6 +38,7 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelScore.Companion.MAX
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
@@ -131,7 +132,7 @@ class McpSseHandlerTest {
     @Test
     fun `deal with prompts`() {
         val intArg = Prompt.Arg.int().required("name", "description")
-        val prompt = Prompt("prompt", "description", intArg)
+        val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
         val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, prompts = Prompts(
             listOf(
@@ -155,7 +156,7 @@ class McpSseHandlerTest {
                 McpPrompt.List.Response(
                     listOf(
                         McpPrompt(
-                            "prompt", "description",
+                            PromptName.of("prompt"), "description",
                             listOf(McpPrompt.Argument("name", "description", true))
                         )
                     )

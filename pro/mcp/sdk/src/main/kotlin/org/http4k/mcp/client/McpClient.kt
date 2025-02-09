@@ -11,6 +11,7 @@ import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.McpPrompt
@@ -39,7 +40,7 @@ interface McpClient : AutoCloseable {
     interface Prompts {
         fun onChange(fn: () -> Unit)
         fun list(): Result<List<McpPrompt>>
-        fun get(name: String, request: PromptRequest): Result<PromptResponse>
+        fun get(name: PromptName, request: PromptRequest): Result<PromptResponse>
     }
 
     interface Sampling {

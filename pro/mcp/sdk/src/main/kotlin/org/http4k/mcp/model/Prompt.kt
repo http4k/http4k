@@ -11,15 +11,15 @@ import org.http4k.mcp.PromptRequest
  * Spec of a Prompt capability.
  */
 class Prompt private constructor(
-    val name: String,
+    val name: PromptName,
     val description: String?,
     val args: List<BiDiLens<PromptRequest, *>>
 ) : CapabilitySpec {
-    constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>) :
+    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>) :
         this(name, description, args.toList())
 
     object Arg : BiDiLensSpec<PromptRequest, String>("promptRequest", StringParam,
-        LensGet { name, target -> listOfNotNull(target[name]?.toString()) },
+        LensGet { name, target -> listOfNotNull(target[name]) },
         LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m + (name to v)) } }
     )
 }

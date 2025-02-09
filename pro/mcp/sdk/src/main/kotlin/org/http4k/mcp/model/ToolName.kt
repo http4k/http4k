@@ -7,3 +7,4 @@ import dev.forkhandles.values.regex
 class ToolName private constructor(value: String) : StringValue(value) {
     companion object : StringValueFactory<ToolName>(::ToolName, "^[a-zA-Z0-9_-]{1,64}$".regex)
 }
+

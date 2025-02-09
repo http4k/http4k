@@ -19,6 +19,7 @@ import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.model.StopReason
@@ -52,6 +53,7 @@ object McpJson : ConfigurableMoshi(
         .value(MimeType)
         .value(ModelIdentifier)
         .value(ProtocolVersion)
+        .value(PromptName)
         .value(SessionId)
         .value(SpeedPriority)
         .value(StopReason)

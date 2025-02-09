@@ -3,6 +3,7 @@ package org.http4k.mcp.client.internal
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -23,7 +24,7 @@ internal class ClientPrompts(
         .map { it.first().asAOrThrow<McpPrompt.List.Response>() }
         .map { it.prompts }
 
-    override fun get(name: String, request: PromptRequest) =
+    override fun get(name: PromptName, request: PromptRequest) =
         sender(McpPrompt.Get, McpPrompt.Get.Request(name, request)) { true }
             .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .map { it.first().asAOrThrow<McpPrompt.Get.Response>() }

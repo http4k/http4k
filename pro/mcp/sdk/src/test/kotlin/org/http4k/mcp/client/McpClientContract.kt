@@ -22,6 +22,7 @@ import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Role.assistant
@@ -57,7 +58,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
 
         val protocol = protocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            Prompts(Prompt("prompt", "description1") bind {
+            Prompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             }),
             tools,
@@ -93,7 +94,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
 
         assertThat(mcpClient.prompts().list().getOrThrow().size, equalTo(1))
         assertThat(
-            mcpClient.prompts().get("prompt", PromptRequest(mapOf("a1" to "foo"))).getOrThrow().description,
+            mcpClient.prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo"))).getOrThrow().description,
             equalTo("description")
         )
 

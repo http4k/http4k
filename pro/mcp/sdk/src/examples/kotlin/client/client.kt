@@ -15,6 +15,7 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -31,7 +32,7 @@ fun main() {
     println(mcpClient.start())
 
     println(mcpClient.prompts().list().getOrThrow())
-    println(mcpClient.prompts().get("prompt2", PromptRequest(mapOf("a1" to "foo"))).getOrThrow())
+    println(mcpClient.prompts().get(PromptName.of("prompt2"), PromptRequest(mapOf("a1" to "foo"))).getOrThrow())
 
     println(mcpClient.resources().list().getOrThrow())
     println(mcpClient.resources().read(ResourceRequest(Uri.of("https://www.http4k.org"))).getOrThrow())
