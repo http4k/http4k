@@ -8,8 +8,6 @@ import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
-import org.http4k.core.Uri
-import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters
 import org.http4k.mcp.internal.pipeSseTraffic
@@ -23,7 +21,7 @@ object McpDesktop {
             pipeSseTraffic(
                 if (debug) DebuggingReader(System.`in`.reader()) else System.`in`.reader(),
                 if (debug) DebuggingWriter(System.out.writer()) else System.out.writer(),
-                Request(GET, Uri.of(url).extend(Uri.of("sse"))),
+                Request(GET, url),
                 (if (debug) DebuggingFilters.PrintRequestAndResponse(System.err, true) else Filter.NoOp)
                     .then(JavaHttpClient(responseBodyMode = Stream)),
                 Immediate
