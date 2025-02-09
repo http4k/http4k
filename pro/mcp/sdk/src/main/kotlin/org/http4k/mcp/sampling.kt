@@ -35,7 +35,7 @@ data class SamplingRequest(
 
 data class SamplingResponse(
     val model: ModelIdentifier,
-    val stopReason: StopReason?,
     val role: Role,
-    val content: Content
+    val content: Content,
+    val stopReason: StopReason? = null
 )

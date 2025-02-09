@@ -42,6 +42,7 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.StopReason
@@ -180,7 +181,7 @@ class McpSseHandlerTest {
 
     @Test
     fun `deal with static resources`() {
-        val resource = Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description")
+        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
@@ -198,7 +199,7 @@ class McpSseHandlerTest {
                         McpResource(
                             resource.uri,
                             null,
-                            "HTTP4K",
+                            ResourceName.of("HTTP4K"),
                             "description",
                             null
                         )
@@ -229,7 +230,7 @@ class McpSseHandlerTest {
 
     @Test
     fun `deal with templated resources`() {
-        val resource = Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), "HTTP4K", "description")
+        val resource = Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
@@ -250,7 +251,7 @@ class McpSseHandlerTest {
                         McpResource(
                             null,
                             resource.uriTemplate,
-                            "HTTP4K",
+                            ResourceName.of("HTTP4K"),
                             "description",
                             null
                         )
@@ -372,8 +373,8 @@ class McpSseHandlerTest {
         val sampling = IncomingSampling(listOf(
             ModelSelector(model) { MAX } bind {
                 listOf(
-                    SamplingResponse(model, null, Role.assistant, content1),
-                    SamplingResponse(model, StopReason.of("bored"), Role.assistant, content2)
+                    SamplingResponse(model, Role.assistant, content1, null),
+                    SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
                 ).asSequence()
             }
         ))
@@ -439,8 +440,8 @@ class McpSseHandlerTest {
             assertThat(
                 received, equalTo(
                     listOf(
-                        SamplingResponse(model, null, Role.assistant, content),
-                        SamplingResponse(model, StopReason.of("bored"), Role.assistant, content)
+                        SamplingResponse(model, Role.assistant, content, null),
+                        SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
                     )
                 )
             )

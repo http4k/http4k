@@ -21,6 +21,7 @@ import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
@@ -54,6 +55,7 @@ object McpJson : ConfigurableMoshi(
         .value(ModelIdentifier)
         .value(ProtocolVersion)
         .value(PromptName)
+        .value(ResourceName)
         .value(SessionId)
         .value(SpeedPriority)
         .value(StopReason)

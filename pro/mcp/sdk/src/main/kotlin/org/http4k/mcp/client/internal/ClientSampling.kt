@@ -42,7 +42,7 @@ internal class ClientSampling(
                 val message = queue.take()
                 yield(
                     runCatching { message.asAOrThrow<McpSampling.Response>() }
-                        .map { SamplingResponse(it.model, it.stopReason, it.role, it.content) }
+                        .map { SamplingResponse(it.model, it.role, it.content, it.stopReason) }
                 )
 
                 if (hasStopReason(message)) {

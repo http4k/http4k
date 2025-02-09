@@ -12,6 +12,6 @@ class OutgoingSamplingCapability(
     fun toEntity() = entity
 
     fun process(response: McpSampling.Response) = with(response) {
-        handler(SamplingResponse(model, stopReason, role, content))
+        handler(SamplingResponse(model, role, content, stopReason))
     }
 }

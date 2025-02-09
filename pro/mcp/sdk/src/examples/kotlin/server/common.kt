@@ -20,6 +20,7 @@ import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
@@ -101,12 +102,12 @@ fun liveWeatherTool(): ToolCapability {
 
 fun templatedResource() = Resource.Templated(
     Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"),
-    "HTTP4K ecosystem page",
+    ResourceName.of("HTTP4K ecosystem page"),
     "view ecosystem"
 ) bind LinksOnPage(JavaHttpClient())
 
 fun staticResource() =
-    Resource.Static(Uri.of("https://www.http4k.org"), "HTTP4K", "description") bind LinksOnPage(JavaHttpClient())
+    Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description") bind LinksOnPage(JavaHttpClient())
 
 fun prompt1() = Prompt(PromptName.of("prompt1"), "description1") bind {
     PromptResponse(listOf(Message(Role.assistant, Content.Text(it.toString()))), "description")
@@ -128,15 +129,15 @@ fun sampleFromModel() = ModelSelector(ModelIdentifier.of("my model")) bind {
     listOf(
         SamplingResponse(
             ModelIdentifier.of("my model"),
-            null,
             Role.assistant,
-            Content.Text("content1")
+            Content.Text("content1"),
+            null
         ),
         SamplingResponse(
             ModelIdentifier.of("my model"),
-            StopReason.of("end"),
             Role.assistant,
-            Content.Text("content2")
+            Content.Text("content2"),
+            StopReason.of("end")
         )
     ).asSequence()
 }

@@ -5,6 +5,7 @@ import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
@@ -14,7 +15,7 @@ import se.ansman.kotshi.JsonSerializable
 data class McpResource(
     val uri: Uri?,
     val uriTemplate: Uri?,
-    val name: String,
+    val name: ResourceName,
     val description: String?,
     val mimeType: MimeType?
 ) {

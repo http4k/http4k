@@ -9,13 +9,13 @@ import se.ansman.kotshi.PolymorphicLabel
 sealed class Resource : CapabilitySpec  {
     abstract fun matches(uri: Uri): Boolean
 
-    abstract val name: String
+    abstract val name: ResourceName
     abstract val description: String?
     abstract val mimeType: MimeType?
 
     data class Static(
         val uri: Uri,
-        override val name: String,
+        override val name: ResourceName,
         override val description: String? = null,
         override val mimeType: MimeType? = null
     ) : Resource() {
@@ -24,7 +24,7 @@ sealed class Resource : CapabilitySpec  {
 
     data class Templated(
         val uriTemplate: Uri,
-        override val name: String,
+        override val name: ResourceName,
         override val description: String? = null,
         override val mimeType: MimeType? = null,
         internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.authority == it.authority }

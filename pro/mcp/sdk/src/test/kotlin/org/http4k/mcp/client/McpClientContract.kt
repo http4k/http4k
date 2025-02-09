@@ -25,6 +25,7 @@ import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role.assistant
 import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
@@ -48,8 +49,8 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
     fun `can interact with server`() {
         val model = ModelIdentifier.of("my model")
         val samplingResponses = listOf(
-            SamplingResponse(model, null, assistant, Content.Text("hello")),
-            SamplingResponse(model, StopReason.of("foobar"), assistant, Content.Text("world"))
+            SamplingResponse(model, assistant, Content.Text("hello"), null),
+            SamplingResponse(model, assistant, Content.Text("world"), StopReason.of("foobar"))
         )
 
         val tools = Tools(Tool("reverse", "description", Tool.Arg.required("name")) bind {
@@ -62,7 +63,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             }),
             tools,
-            Resources(Resource.Static(Uri.of("https://http4k.org"), "HTTP4K", "description") bind {
+            Resources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             }),
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
@@ -94,7 +95,8 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
 
         assertThat(mcpClient.prompts().list().getOrThrow().size, equalTo(1))
         assertThat(
-            mcpClient.prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo"))).getOrThrow().description,
+            mcpClient.prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
+                .getOrThrow().description,
             equalTo("description")
         )
 
