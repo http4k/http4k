@@ -9,8 +9,8 @@ import org.http4k.core.Status
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.http4k.servlet.FakeHttpServletRequest
-import org.http4k.servlet.FakeHttpServletResponse
+import org.http4k.servlet.jakarta.FakeJakartaHttpServletRequest
+import org.http4k.servlet.jakarta.FakeJakartaHttpServletResponse
 import org.junit.jupiter.api.Test
 
 class SpringToHttp4kFallbackControllerTest {
@@ -19,11 +19,11 @@ class SpringToHttp4kFallbackControllerTest {
 
     @Test
     fun `passes requests through and adapts to servlet`() {
-        val response = FakeHttpServletResponse()
+        val response = FakeJakartaHttpServletResponse()
         val headers = listOf("header" to "value")
 
         TestController().fallback(
-            FakeHttpServletRequest(
+            FakeJakartaHttpServletRequest(
                 Request(Method.GET, "").headers(headers).body("helloworld")
             ), response)
 

@@ -1,7 +1,7 @@
 package org.http4k.bridge
 
 import org.http4k.core.HttpHandler
-import org.http4k.servlet.asServlet
+import org.http4k.servlet.jakarta.asServlet
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.DELETE
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod.PATCH
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.RequestMethod.PUT
 import org.springframework.web.bind.annotation.RequestMethod.TRACE
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 @Controller
 @RequestMapping("/")

@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-bridge-servlet"))
-    api("javax.servlet:javax.servlet-api:_")
+    api("jakarta.servlet:jakarta.servlet-api:_")
 
     implementation("org.springframework:spring-web:_")
     implementation("org.springframework:spring-context:_")
