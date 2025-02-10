@@ -29,24 +29,23 @@ changes with their rationale when appropriate:
 
 - **http4k-*** : [Breaking] Complete rewrite of the routing logic to work identically across HTTP, WS and SSE. Mostly backwards compatible, but some small may be required if you are referencing low level routing classes.
 - **http4k-*** : [Breaking] Removal of all deprecations. See the migration guide for more details.
-- **http4k-realtime-core** : [Breaking] From above, repackaging of SSE and Websocket routing and filters.
 - **http4k-core** : [Breaking] `regex` lens now returns the entire matched string. To match groups, use `regexGroup` instead.
 - **http4k-contract** : [Breaking] `withPostSecurityFilter()` removed as is part of the contract DSL.
-- **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey` lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
+- **http4k-realtime-core** : [Breaking] From above, repackaging of SSE and Websocket routing and filters.
 - **http4k-connect-amazon-kms** : [Breaking] `CustomerKeySpec` removed and replaced with `KeySpec` (as per AWS deprecations)
 - **http4k-server** : [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted should be handled by user implementations.
 - **http4k-api-contract** : [Breaking] Security implementations moved from contract to security-core. This has involved repackaging them, but the APIs remain the same.
 - **http4k-api-jsonrpc** : [Breaking] Repackaging of some classes - APIs remain the same.
 - **http4k-cloudnative** : [Breaking] Code has moved to a combination of `http4k-config`, `http4k-platform-core` and `http4k-platform-k8s` modules.
-- 
-- **http4k-serverless-*** : [Unlikely break] Replacement of serverless `Context` system to use new `RequestKey` mechanism.
 - **http4k-*** : [Unlikely Break] Upgrades all dependencies to latest versions. This may involve API changes if you are reliant on APIs in previous versions.
 - **http4k-format-moshi** : [Unlikely break/Enhancement] Support for `MoshiLong` as well as `MoshiInteger`. This has improved the handling of longs when using the `MoshiNode` types.
+- **http4k-serverless-*** : [Unlikely break] Replacement of serverless `Context` system to use new `RequestKey` mechanism.
+- **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey` lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
 - **http4k-server-helidon** : [Fix] SSE implementation now cleans up SSE connections correctly on close.
+- **http4k-*** : [Enhancement] Unified the Events for HTTP, WS and SSE to use the same `ProtocolEvent` type for tracing and logging transactions.
 - **http4k-realtime-core** : [Enhancement] Added ability to use debugging filters for both SSE and WebSockets.
 - **http4k-realtime-core** : [Enhancement] New DSL for defining Polyhandlers for routing to different types of HTTP/SSE/Websocket protocols connections. Use `poly()`.
 - **http4k-realtime-core** : [Enhancement] SSE client for connecting to Server-sent events. Includes  configurable auto-reconnection modes.
-- **http4k-*** : [Enhancement] Unified the Events for HTTP, WS and SSE to use the same `ProtocolEvent` type for tracing and logging transactions.
 - **http4k-format-moshi** : [Enhancement] Support for Data4k containers for Moshi. 
 - **http4k-tools-hotreload** : [New Pro module!] Work with any http4k-based application without restarting the server. Includes browser reloading when working with web-based code, assets and templates. Extensible with custom rebuild logic - ships with Gradle support.
 - **http4k-bridge-jakarta** : [New module!] Easy migrations from/to Jakarta-based servers.
