@@ -32,7 +32,7 @@ changes with their rationale when appropriate:
 - **http4k-core** : [Breaking] `regex` lens now returns the entire matched string. To match groups, use `regexGroup` instead.
 - **http4k-contract** : [Breaking] `withPostSecurityFilter()` removed as is part of the contract DSL.
 - **http4k-*** : [Breaking] Removal of all deprecations. See the migration guide for more details.
-- **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey`lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
+- **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey` lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
 - **http4k-connect-amazon-kms** : [Breaking] `CustomerKeySpec` removed and replaced with `KeySpec` (as per AWS deprecations)
 - **http4k-server** : [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted should be handled by user implementations.
 - **http4k-api-contract** : [Breaking] Security implementations moved from contract to security-core. This has involved repackaging them, but the APIs remain the same.
@@ -56,8 +56,6 @@ changes with their rationale when appropriate:
 - **http4k-bridge-ratpack** : [New module!] Easy migrations from/to Ratpack-based servers.
 - **http4k-web-datastar** : [New module!] Deep support for the super-powerful [Datastar](https://data-star.dev) Hypermedia library, which helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework..
 - **http4k-tools-traffic-capture** : [New module!] A set of tools to help the capture and replay of traffic from any HTTP server.
-
-
 
 ### v5.47.0.0
 - **http4k-*** : Upgrade some dependency versions.
