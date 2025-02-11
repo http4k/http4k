@@ -4,7 +4,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.hooks.*
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.header
@@ -14,6 +16,9 @@ import io.ktor.server.request.uri
 import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
 import io.ktor.server.response.respondOutputStream
+import io.ktor.server.routing.*
+import io.ktor.util.*
+import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -26,9 +31,18 @@ import org.http4k.server.supportedOrNull
 import java.io.InputStream
 import java.io.OutputStream
 
+@OptIn(InternalAPI::class)
 fun KtorToHttp4kApplicationPlugin(http: HttpHandler) = createApplicationPlugin(name = "http4k") {
-    onCall {
-        it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(Status.NOT_IMPLEMENTED))
+    val routingKey: AttributeKey<HttpStatusCode> = RoutingFailureStatusCode
+    val handledByHttp4kKey: AttributeKey<Unit> = AttributeKey("HandledByHttp4k")
+
+    on(ResponseBodyReadyForSend) { call, _ ->
+        if (!call.attributes.contains(handledByHttp4kKey)
+            && call.attributes.contains(routingKey) && call.attributes[routingKey] == NotFound
+        ) {
+            call.attributes.put(handledByHttp4kKey, Unit)
+            call.response.fromHttp4K(call.request.asHttp4k()?.let(http) ?: Response(Status.NOT_IMPLEMENTED))
+        }
     }
 }
 
