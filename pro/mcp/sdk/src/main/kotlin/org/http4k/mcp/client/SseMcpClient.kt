@@ -1,6 +1,8 @@
 package org.http4k.mcp.client
 
 import org.http4k.client.Http4kSseClient
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -31,7 +33,7 @@ class SseMcpClient(
     version: Version,
     capabilities: ClientCapabilities,
     sseRequest: Request,
-    http: HttpHandler,
+    http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion) {
 
