@@ -5,8 +5,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.http4k.bridge.KtorToHttp4kApplicationPlugin
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -29,6 +33,11 @@ class KtorToHttp4kApplicationPluginTest : PortBasedTest {
             install(
                 KtorToHttp4kApplicationPlugin { Response(OK).headers(it.headers).body(it.body) }
             )
+            routing {
+                get("/ktor") {
+                    call.respondText("hello from ktor")
+                }
+            }
         }
 
         engine.start()
@@ -37,9 +46,13 @@ class KtorToHttp4kApplicationPluginTest : PortBasedTest {
             val request = Request(POST, "http://localhost:$port")
                 .header("foo", "bar")
                 .body("hello")
-            val response = JavaHttpClient()(request)
+            val client = JavaHttpClient()
 
-            assertThat(response, hasStatus(OK).and(hasBody("hello")).and(hasHeader("foo", "bar")))
+            assertThat(client(request), hasStatus(OK).and(hasBody("hello")).and(hasHeader("foo", "bar")))
+            assertThat(
+                client(Request(GET, "http://localhost:$port/ktor")),
+                hasStatus(OK).and(hasBody("hello from ktor"))
+            )
         } finally {
             engine.stop()
         }
