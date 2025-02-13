@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ steps.tagName.outputs.tag }}
       - name: Grab tag name
         uses: olegtarasov/get-tag@v2.1.4
         id: tagName
