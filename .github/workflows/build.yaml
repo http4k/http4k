@@ -12,6 +12,9 @@ on:
       - '**/*.md'
 jobs:
   build:
+    env:
+      BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
+      BUILDNOTE_GITHUB_JOB_NAME: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
@@ -20,11 +23,6 @@ jobs:
           fetch-depth: 2
           # required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
           persist-credentials: false
-      - name: Buildnote report
-        uses: buildnote/action@v0.2.11
-        if: always()
-        env:
-          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
       - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
@@ -52,14 +50,8 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Buildnote
-        uses: buildnote/action@v0.2.11
+        uses: buildnote/action@main
         if: always()
-        env:
-          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
-        with:
-          collectOnly: true
-          command: collect
-          params: test-results --include="**/build/test-results/**/TEST-*.xml"
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v5.3.0
         if: always()
