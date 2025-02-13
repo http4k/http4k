@@ -9,13 +9,11 @@ jobs:
   run_tests:
     name: Run Shutdown Tests
     runs-on: ubuntu-latest
+    env:
+      BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
+      BUILDNOTE_GITHUB_JOB_NAME: run_tests
     steps:
       - uses: actions/checkout@v4.2.2
-      - name: Buildnote report
-        uses: buildnote/action@v0.2.11
-        if: always()
-        env:
-          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
       - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
@@ -38,13 +36,7 @@ jobs:
           HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
           HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
       - name: Buildnote
-        uses: buildnote/action@v0.2.11
+        uses: buildnote/action@main
         if: always()
-        env:
-          BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
-        with:
-          collectOnly: true
-          command: collect
-          params: test-results --include="**/build/test-results/**/TEST-*.xml"
 
 
