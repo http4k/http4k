@@ -3,6 +3,7 @@ package org.http4k.hotreload
 import org.http4k.hotreload.ProjectCompiler.Companion.Gradle
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
+import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitResult.CONTINUE
@@ -47,6 +48,12 @@ class ProjectCompilingPathWatcher(
 
     override fun start() {
         pathsToWatch
+            .map {
+                Path.of(it.toString()
+                    .replace('\\', File.pathSeparatorChar)
+                    .replace('/', File.pathSeparatorChar)
+                )
+            }
             .forEach {
                 Files.walkFileTree(it, object : SimpleFileVisitor<Path>() {
                     override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {

@@ -1,5 +1,7 @@
 package org.http4k.hotreload
 
+import org.http4k.hotreload.OperatingSystem.Linux
+import org.http4k.hotreload.OperatingSystem.Windows
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
 import java.io.ByteArrayOutputStream
@@ -22,9 +24,9 @@ fun interface ProjectCompiler {
         /**
          * Compile the project using Gradle. The default task is `compileKotlin`, which may need to be be overridden.
          */
-        fun Gradle(task: String = "compileKotlin") = ProjectCompiler {
+        fun Gradle(task: String = "compileKotlin", os: OperatingSystem = Linux) = ProjectCompiler {
             val process = ProcessBuilder()
-                .command("./gradlew", task)
+                .command(if (os == Windows) "cmd /c gradlew.bat" else "./gradlew", task)
                 .directory(File(".").absoluteFile)
                 .start()
 
