@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.1.0.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k=*** [Breaking] - support for Windows file watching.
+- **http4k-tools-hotreload** [Breaking] - support for Windows file watching.
+
 ### v6.0.0.0
 - **http4k-*** : [License update] Selected "Pro-tier" modules will start to be introduced under the new http4k [commercial license](https://github.com/http4k/http4k/blob/master/pro/LICENSE). These modules remain freely available for personal and academic purposes, and bear the new `org.http4k.pro` Maven coordinate group to distinguish them from the open-source modules.
 - **http4k-*** : [Breaking] Minimum Java version is now 21. Java versions 8-20 support is provided through our LTS programme available through the commercial version of http4k. Please see: https://www.http4k.org/enterprise/
