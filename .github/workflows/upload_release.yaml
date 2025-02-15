@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ steps.tagName.outputs.tag }}
       - name: Grab tag name
         uses: olegtarasov/get-tag@v2.1.4
         id: tagName
@@ -28,10 +30,5 @@ jobs:
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
           -PsigningKey="${{ secrets.SIGNING_KEY }}" \
           -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
-          -PltsPublishingUser="${{ secrets.LTS_PUBLISHING_USER }}" \
-          -PltsPublishingPassword="${{ secrets.LTS_PUBLISHING_PASSWORD }}" \
           -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
           -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
-      - run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}
-        env:
-          LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}

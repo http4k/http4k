@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.Http4kLicenseCheck
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
@@ -366,6 +367,10 @@ data class MemoryResponse(
     override val body: Body = EMPTY,
     override val version: String = HTTP_1_1
 ) : Response {
+    init {
+        Http4kLicenseCheck
+    }
+
     override fun header(name: String, value: String?) = copy(headers = headers + (name to value))
 
     override fun headers(headers: Headers) = copy(headers = this.headers + headers)

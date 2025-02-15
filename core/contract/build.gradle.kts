@@ -1,10 +1,10 @@
-import org.http4k.internal.ModuleLicense.Apache2
+import org.http4k.internal.ModuleLicense.Http4kCommercial
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 description = "DEPRECATED: use http4k-api-openapi instead"
 
-val license by project.extra { Apache2 }
+val license by project.extra { Http4kCommercial }
 
 plugins {
     id("org.http4k.community")

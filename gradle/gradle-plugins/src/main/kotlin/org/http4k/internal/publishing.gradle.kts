@@ -28,21 +28,6 @@ if (enableSigning) { // when added it expects signing keys to be configured
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "http4k"
-            url = URI("s3://http4k-maven")
-
-            val ltsPublishingUser: String? by project
-            val ltsPublishingPassword: String? by project
-
-            credentials(AwsCredentials::class.java) {
-                accessKey = ltsPublishingUser
-                secretKey = ltsPublishingPassword
-            }
-        }
-    }
-
     publications {
         val javaComponent = components["java"] as AdhocComponentWithVariants
 

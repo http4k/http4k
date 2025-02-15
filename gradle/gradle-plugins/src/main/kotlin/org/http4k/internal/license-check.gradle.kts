@@ -10,7 +10,7 @@ plugins {
 
 licenseReport {
     val groupsWeKnowArePermissivelyLicensed = listOf(
-        "io.netty",                       // apache2: https://github.com/netty/netty/blob/4.1/LICENSE.txt
+        "io.netty",                       // Http4kCommercial: https://github.com/netty/netty/blob/4.1/LICENSE.txt
     )
 
     val implementationDependenciesWhichWeDoNotDistribute =

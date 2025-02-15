@@ -1,8 +1,8 @@
-import org.http4k.internal.ModuleLicense.Apache2
+import org.http4k.internal.ModuleLicense.Http4kCommercial
 
 description = "http4k Datastar support utilities"
 
-val license by project.extra { Apache2 }
+val license by project.extra { Http4kCommercial }
 
 plugins {
     id("org.http4k.community")

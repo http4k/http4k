@@ -1,5 +1,8 @@
 package org.http4k
 
+import org.http4k.internal.ModuleLicense.Http4kCommercial
+import org.http4k.internal.addLicenseToJars
+
 plugins {
     id("org.http4k.internal.module")
     id("org.http4k.api-docs")
@@ -7,16 +10,4 @@ plugins {
 
 group = "org.http4k.pro"
 
-tasks.jar {
-    from(rootProject.file("pro").absolutePath) {
-        include("LICENSE")
-    }
-}
-
-tasks.named<Jar>("sourcesJar") {
-    from(sourceSets.main.get().allSource)
-    from(rootProject.file("pro").absolutePath) {
-        include("LICENSE")
-    }
-    archiveClassifier.set("sources")
-}
+addLicenseToJars(Http4kCommercial)
