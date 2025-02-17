@@ -65,9 +65,9 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
         register(JHolderHolder)
         register(JMyValueHolder)
         register(BiDiMapping(::BooleanHolder, BooleanHolder::value).asJConverter())
-        register(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value).asJConverter(JBigDecimal))
+        register(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value).asJConverter())
         register(bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value).asJConverter())
-        register(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value).asJConverter(JBigInteger))
+        register(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value).asJConverter())
     }
 
     override fun strictMarshaller() = throw UnsupportedOperationException()
@@ -276,7 +276,7 @@ private object JCommonJdkPrimitives : JAny<CommonJdkPrimitives>() {
     val uuid by str(uuid().asJConverter(), CommonJdkPrimitives::uuid)
     val uri by str(uri().asJConverter(), CommonJdkPrimitives::uri)
     val url by str(url().asJConverter(), CommonJdkPrimitives::url)
-    val status by JField(CommonJdkPrimitives::status, BiDiMapping({ Status(it, "") }, Status::code).asJConverter(JInt))
+    val status by JField(CommonJdkPrimitives::status, BiDiMapping({ Status(it, "") }, Status::code).asJConverter())
 
     override fun JsonNodeObject.deserializeOrThrow() =
         CommonJdkPrimitives(
