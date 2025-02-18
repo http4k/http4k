@@ -1,0 +1,1 @@
+{"latency" : 1000, "method" : "GET", "protocol" : "sse", "status" : 200, "uri" : "uri", "xUriTemplate" : "template"}
