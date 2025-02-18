@@ -3,17 +3,21 @@ package org.http4k.connect.util
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Uri
+import org.http4k.util.OperatingSystem
+import org.http4k.util.OperatingSystem.Linux
+import org.http4k.util.OperatingSystem.MacOS
+import org.http4k.util.OperatingSystem.Windows
 
 class WebBrowser(
     private val open: OpenBrowser = { Runtime.getRuntime().exec(it.split(" ").toTypedArray()) },
-    private val operatingSystemName: String = System.getProperty("os.name")
+    private val operatingSystem: OperatingSystem = OperatingSystem.detect()
 ) : Browser {
     override fun navigateTo(url: Uri) =
         try {
-            when {
-                operatingSystemName.startsWith("Mac OS") -> open("open $url")
-                operatingSystemName.startsWith("Windows") -> open("rundll32 url.dll,FileProtocolHandler $url")
-                else -> linuxBrowser(url)
+            when (operatingSystem) {
+                MacOS -> open("open $url")
+                Windows -> open("rundll32 url.dll,FileProtocolHandler $url")
+                Linux -> linuxBrowser(url)
             }
 
             Success(Unit)
