@@ -3,6 +3,7 @@ package org.http4k.hotreload
 import org.http4k.hotreload.ProjectCompiler.Companion.Gradle
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
+import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitResult.CONTINUE
@@ -25,9 +26,15 @@ import kotlin.io.path.exists
 class ProjectCompilingPathWatcher(
     private val projectCompiler: ProjectCompiler = Gradle(),
     // This is the default set of directories to watch for changes
-    private val watchedDirs: Set<String> = setOf("src/main", "src/test", "build/classes"),
+    watchedDirs: Set<String> = setOf("src/main", "src/test", "build/classes"),
     private val downtimeSleep: () -> Unit = { Thread.sleep(Duration.ofSeconds(1)) }
 ) : PathWatcher {
+
+    private val watchedDirs = watchedDirs.map {
+        it.replace('/', File.separatorChar)
+            .replace('\\', File.separatorChar)
+    }
+
     private val watchService = FileSystems.getDefault().newWatchService()
 
     private val pathsToWatch = mutableSetOf<Path>()

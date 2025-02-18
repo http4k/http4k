@@ -2,6 +2,8 @@ package org.http4k.hotreload
 
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Failed
 import org.http4k.hotreload.ProjectCompiler.Companion.Result.Ok
+import org.http4k.util.OperatingSystem.Companion.detect
+import org.http4k.util.OperatingSystem.Windows
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
@@ -24,7 +26,7 @@ fun interface ProjectCompiler {
          */
         fun Gradle(task: String = "compileKotlin") = ProjectCompiler {
             val process = ProcessBuilder()
-                .command("./gradlew", task)
+                .command(if (detect() == Windows) "gradlew.bat" else "./gradlew", task)
                 .directory(File(".").absoluteFile)
                 .start()
 

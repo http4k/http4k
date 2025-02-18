@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v6.0.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-moshi*** : [Fix #1291] Moshi + ProtocolStatus Serialization Exception 
+- **http4k-format-moshi** : [Fix #1291] Moshi + ProtocolStatus Serialization Exception 
+- **http4k-tools-hotreload** : [Fix #1290] Hot Reload Module does not work in Windows
 
 ### v6.0.0.0
 - **http4k-*** : [License update] Selected "Pro-tier" modules will start to be introduced under the new http4k [commercial license](https://github.com/http4k/http4k/blob/master/pro/LICENSE). These modules remain freely available for personal and academic purposes, and bear the new `org.http4k.pro` Maven coordinate group to distinguish them from the open-source modules.
@@ -818,6 +819,9 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 - **http4k-testing-tracerbullet**: [New Module] TracerBullet allows you to hook into the http4k `Events` implementation
   to visually document your applications through testing. See example in reference guide.
 - **http4k-contract**: Allow RouteMetaDsl to be marked as hidden H/T @oharaandrew314
+
+### v4.48.2.0
+- **http4k-*** : [Commercially licensed](https://http4k.org/commercial-license) LTS version of http4k v4. This is a marker release only and is covered by the [http4k Enterprise Edition](https://http4k.org/enterprise) subscription. Non-licensed parties should NOT use this version of http4k libraries. Either downgrade to the Apache2 licensed v4.48.0.0, or contact us to arrange an http4k Enterprise Edition subscription.
 
 ### v4.48.0.0
 
