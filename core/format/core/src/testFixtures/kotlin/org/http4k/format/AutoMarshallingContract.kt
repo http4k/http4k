@@ -13,9 +13,12 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.lens.IntBiDiMappings
 import org.http4k.lens.Query
 import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.protocolStatus
 import org.http4k.lens.string
+import org.http4k.lens.wsStatus
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -352,6 +355,8 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = bigDecimal(::BigDecimalHold
     .offsetTime({ it }, { it })
     .yearMonth({ it }, { it })
     .zonedDateTime({ it }, { it })
+    .int(IntBiDiMappings.wsStatus())
+    .int(IntBiDiMappings.protocolStatus())
     .value(MyValue)
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()

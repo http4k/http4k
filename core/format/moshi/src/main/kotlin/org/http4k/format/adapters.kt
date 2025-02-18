@@ -6,7 +6,9 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dev.forkhandles.values.AbstractValue
+import org.http4k.core.Status
 import org.http4k.events.Event
+import org.http4k.websocket.WsStatus
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
@@ -70,6 +72,15 @@ object SetAdapter : IsAnInstanceOfAdapter<Set<*>>(Set::class)
 object EventAdapter : JsonAdapter.Factory {
     override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) =
         if (p0.typeName == Event::class.java.typeName) p2.adapter(Any::class.java) else null
+}
+
+object ProtocolStatusAdapter : JsonAdapter.Factory {
+    override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) =
+        when (p0.typeName) {
+            WsStatus::class.java.typeName -> p2.adapter(WsStatus::class.java)
+            Status::class.java.typeName -> p2.adapter(Status::class.java)
+            else -> null
+        }
 }
 
 object ProhibitUnknownValuesAdapter : JsonAdapter.Factory {

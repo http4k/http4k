@@ -13,6 +13,7 @@ dependencies {
     api(project(":http4k-realtime-core"))
     api(Square.moshi)
     api(Square.moshi.kotlinReflect)
+
     implementation("dev.forkhandles:values4k:_")
     implementation("dev.forkhandles:data4k:_")
 

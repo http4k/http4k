@@ -1,8 +1,8 @@
 package org.http4k.format
 
-import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.IntBiDiMappings.status
 import org.http4k.lens.StringBiDiMappings.duration
 import org.http4k.lens.StringBiDiMappings.eventCategory
 import org.http4k.lens.StringBiDiMappings.instant
@@ -89,7 +89,7 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(samplingDecision())
     text(throwable())
     text(locale())
-    int({ Status(it, "") }, Status::code)
+    int(status())
 }
 
 /**
@@ -189,10 +189,12 @@ inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.zonedDateTim
  * Utility method for when only writing/serialization is required
  */
 @JvmName("textSerialize")
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (OUT) -> String): AutoMappingConfiguration<BUILDER> = text(BiDiMapping(OUT::class.java, { throw java.lang.IllegalArgumentException() }, mapping))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (OUT) -> String): AutoMappingConfiguration<BUILDER> =
+    text(BiDiMapping(OUT::class.java, { throw java.lang.IllegalArgumentException() }, mapping))
 
 /**
  * Utility method for when only reading/deserialization is required
  */
 @JvmName("textDeserialize")
-inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (String) -> OUT): AutoMappingConfiguration<BUILDER> = text(BiDiMapping(OUT::class.java, mapping, { throw java.lang.IllegalArgumentException() }))
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline mapping: (String) -> OUT): AutoMappingConfiguration<BUILDER> =
+    text(BiDiMapping(OUT::class.java, mapping, { throw java.lang.IllegalArgumentException() }))

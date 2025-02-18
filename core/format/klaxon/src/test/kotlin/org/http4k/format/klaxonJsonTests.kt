@@ -97,4 +97,6 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
 
 }
 
-class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon)
+class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon) {
+    override fun extendedMarshaller() = object : ConfigurableKlaxon(KKlaxon().asConfigurable().customise()) {}
+}

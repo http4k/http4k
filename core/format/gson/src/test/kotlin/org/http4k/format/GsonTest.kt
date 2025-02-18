@@ -104,4 +104,6 @@ class GsonTest : JsonContract<JsonElement>(Gson) {
 }"""
 }
 
-class GsonAutoEventsTest : AutoMarshallingEventsContract(Gson)
+class GsonAutoEventsTest : AutoMarshallingEventsContract(Gson) {
+    override fun extendedMarshaller() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
+}

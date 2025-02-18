@@ -2,8 +2,10 @@ package org.http4k.lens
 
 import org.http4k.asString
 import org.http4k.core.Body
+import org.http4k.events.ProtocolStatus
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
 
 internal val meta = Meta(true, "websocket", ObjectParam, "message", null, emptyMap())
 
@@ -36,7 +38,8 @@ open class BiDiWsMessageLensSpec<OUT>(
      * Create another BiDiWsMessageLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
      * used to extract or insert the final type from/into a WsMessage.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiWsMessageLensSpec(get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) =
+        BiDiWsMessageLensSpec(get.map(nextIn), set.map(nextOut))
 
     /**
      * Create a lens for this Spec
@@ -85,3 +88,7 @@ private val wsRoot =
 
 fun WsMessage.Companion.binary() = wsRoot.map(Body::payload) { Body(it) }
 fun WsMessage.Companion.string() = wsRoot.map({ it.payload.asString() }, { Body(it) })
+
+fun IntBiDiMappings.wsStatus() = BiDiMapping({ WsStatus(it, "") }, WsStatus::code)
+fun IntBiDiMappings.protocolStatus() =
+    BiDiMapping({ error("Cannot deserialise generic ProtocolStatus") }, ProtocolStatus::code)

@@ -250,4 +250,9 @@ class JacksonDataContainerTest {
     }
 }
 
-class JacksonAutoEventsTest : AutoMarshallingEventsContract(Jackson)
+class JacksonAutoEventsTest : AutoMarshallingEventsContract(Jackson) {
+    override fun extendedMarshaller() = object : ConfigurableJackson(
+        KotlinModule.Builder().build().asConfigurable().customise()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+    ) {}
+}

@@ -3,6 +3,7 @@ package org.http4k.lens
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
 import org.http4k.core.Credentials
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.events.EventCategory
 import org.http4k.filter.SamplingDecision
@@ -57,6 +58,13 @@ open class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, v
     companion object {
         inline operator fun <IN, reified T> invoke(noinline asOut: (IN) -> T, noinline asIn: (T) -> IN) = BiDiMapping(T::class.java, asOut, asIn)
     }
+}
+
+/**
+ * A set of standardised Int <-> Type conversions which are used throughout http4k
+ */
+object IntBiDiMappings {
+    fun status() = BiDiMapping({ Status(it, "") }, Status::code)
 }
 
 /**
