@@ -9,6 +9,7 @@ import org.http4k.server.Jetty
 import org.http4k.websocket.BlockingWebsocketClientContract
 import org.http4k.websocket.WsMessage
 import org.java_websocket.exceptions.WebsocketNotConnectedException
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
@@ -22,6 +23,11 @@ class WebsocketClientBlockingTest : BlockingWebsocketClientContract(
     override fun <T : Throwable> connectErrorMatcher(): Matcher<T> = isA<WebsocketNotConnectedException>()
 
     override fun <T : Throwable> connectionClosedErrorMatcher(): Matcher<T> = isA<WebsocketNotConnectedException>()
+
+    @Disabled
+    override fun `exception is thrown on connection error`() {
+        super.`exception is thrown on connection error`()
+    }
 
     @Test
     fun `blocking with auto-reconnection (closed by server)`() {

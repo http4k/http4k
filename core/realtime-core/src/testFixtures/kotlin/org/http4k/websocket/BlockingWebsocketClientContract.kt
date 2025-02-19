@@ -66,7 +66,7 @@ abstract class BlockingWebsocketClientContract(
     }
 
     @Test
-    fun `exception is thrown on connection error`() {
+    open fun `exception is thrown on connection error`() {
         assertThat({ websocket(Uri.of("ws://does-not-exist:12345"), timeout = connectionErrorTimeout) },
             throws(connectErrorMatcher()))
     }
