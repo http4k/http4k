@@ -1,5 +1,7 @@
 package org.http4k.mcp.client.internal
 
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.map
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
@@ -23,8 +25,8 @@ internal class ClientTools(
     }
 
     override fun list() = sender(McpTool.List, McpTool.List.Request()) { true }
-        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .map { it.first().asAOrThrow<McpTool.List.Response>() }
+        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .flatMap { it.first().asOrFailure<McpTool.List.Response>() }
         .map { it.tools }
 
     override fun call(name: ToolName, request: ToolRequest) =
@@ -32,9 +34,9 @@ internal class ClientTools(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         ) { true }
-            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .map { it.first().asAOrThrow<McpTool.Call.Response>() }
-            .mapCatching {
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }
+            .map {
                 when (it.isError) {
                     true -> Error(ErrorMessage(-1, it.content.joinToString()))
                     else -> Ok(it.content)

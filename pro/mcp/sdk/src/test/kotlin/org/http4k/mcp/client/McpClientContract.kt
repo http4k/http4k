@@ -2,6 +2,7 @@ package org.http4k.mcp.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.valueOrNull
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
@@ -91,23 +92,23 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             mcpClient.sampling().sample(
                 ModelIdentifier.of("asd"),
                 SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-            ).map { it.getOrThrow() }.toList(), equalTo(samplingResponses)
+            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
         )
 
-        assertThat(mcpClient.prompts().list().getOrThrow().size, equalTo(1))
+        assertThat(mcpClient.prompts().list().valueOrNull()!!.size, equalTo(1))
         assertThat(
             mcpClient.prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
-                .getOrThrow().description,
+                .valueOrNull()!!.description,
             equalTo("description")
         )
 
         assertThat(
-            mcpClient.resources().list().getOrThrow().size,
+            mcpClient.resources().list().valueOrNull()!!.size,
             equalTo(1)
         )
 
         assertThat(
-            mcpClient.resources().read(ResourceRequest(Uri.of("https://http4k.org"))).getOrThrow(),
+            mcpClient.resources().read(ResourceRequest(Uri.of("https://http4k.org"))).valueOrNull()!!,
             equalTo(ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of("")))))
         )
 
@@ -118,14 +119,14 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
                         Reference.Resource(Uri.of("https://http4k.org")),
                         CompletionArgument("foo", "bar")
                     )
-                ).getOrThrow(),
+                ).valueOrNull()!!,
             equalTo(CompletionResponse(Completion(listOf("1", "2"))))
         )
 
-        assertThat(mcpClient.tools().list().getOrThrow().size, equalTo(1))
+        assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(1))
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest()).getOrThrow(),
+            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest()).valueOrNull()!!,
             equalTo(ToolResponse.Ok(listOf(Content.Text("tseuqeRlooT"))))
         )
 
@@ -133,14 +134,14 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             mcpClient.sampling().sample(
                 ModelIdentifier.of("asd"),
                 SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-            ).map { it.getOrThrow() }.toList(), equalTo(samplingResponses)
+            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
         )
 
         tools.items = emptyList()
 
         latch.await()
 
-        assertThat(mcpClient.tools().list().getOrThrow().size, equalTo(0))
+        assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(0))
 
         mcpClient.stop()
         server.stop()

@@ -1,5 +1,7 @@
 package org.http4k.mcp.client.internal
 
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.map
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.client.McpClient
@@ -19,13 +21,13 @@ internal class ClientResources(
     }
 
     override fun list() = sender(McpResource.List, McpResource.List.Request()) { true }
-        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .map { it.first().asAOrThrow<McpResource.List.Response>() }
+        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .flatMap { it.first().asOrFailure<McpResource.List.Response>() }
         .map { it.resources }
 
     override fun read(request: ResourceRequest) =
         sender(McpResource.Read, McpResource.Read.Request(request.uri)) { true }
-            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .map { it.first().asAOrThrow<McpResource.Read.Response>() }
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpResource.Read.Response>() }
             .map { ResourceResponse(it.contents) }
 }

@@ -1,5 +1,6 @@
 package org.http4k.mcp.client
 
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
@@ -49,16 +50,16 @@ class SseMcpClient(
         endpoint.set(it.data)
     }
 
-    override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit> {
+    override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit> {
         val response = http(mcp.toHttpRequest(rpc))
         return when {
-            response.status.successful -> runCatching { Unit }
-            else -> runCatching { error("Failed HTTP ${response.status}") }
+            response.status.successful -> resultFrom { Unit }
+            else -> resultFrom { error("Failed HTTP ${response.status}") }
         }
     }
 
     override fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean)
-        : Result<RequestId> {
+        : McpResult<RequestId> {
         val requestId = RequestId.random()
 
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
@@ -67,7 +68,7 @@ class SseMcpClient(
         messageQueues[requestId] = ArrayBlockingQueue(100)
 
         val response = http(request.toHttpRequest(rpc, requestId))
-        return runCatching {
+        return resultFrom {
             when {
                 response.status.successful -> {
                     latch.await()

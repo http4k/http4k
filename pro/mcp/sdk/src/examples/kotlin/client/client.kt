@@ -1,5 +1,6 @@
 package client
 
+import dev.forkhandles.result4k.valueOrNull
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Method.GET
@@ -31,26 +32,26 @@ fun main() {
 
     println(mcpClient.start())
 
-    println(mcpClient.prompts().list().getOrThrow())
-    println(mcpClient.prompts().get(PromptName.of("prompt2"), PromptRequest(mapOf("a1" to "foo"))).getOrThrow())
+    println(mcpClient.prompts().list())
+    println(mcpClient.prompts().get(PromptName.of("prompt2"), PromptRequest(mapOf("a1" to "foo"))))
 
-    println(mcpClient.resources().list().getOrThrow())
-    println(mcpClient.resources().read(ResourceRequest(Uri.of("https://www.http4k.org"))).getOrThrow())
+    println(mcpClient.resources().list())
+    println(mcpClient.resources().read(ResourceRequest(Uri.of("https://www.http4k.org"))))
 
     println(
         mcpClient.completions()
-            .complete(CompletionRequest(Reference.Prompt("prompt2"), CompletionArgument("foo", "bar"))).getOrThrow()
+            .complete(CompletionRequest(Reference.Prompt("prompt2"), CompletionArgument("foo", "bar")))
     )
 
     println(
         mcpClient.sampling().sample(
             ModelIdentifier.of("asd"),
             SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-        ).map { it.getOrThrow() }.toList()
+        ).map { it }.toList()
     )
 
-    println(mcpClient.tools().list().getOrThrow())
-    println(mcpClient.tools().call(ToolName.of("weather"), ToolRequest(mapOf("city" to "london"))).getOrThrow())
+    println(mcpClient.tools().list().valueOrNull())
+    println(mcpClient.tools().call(ToolName.of("weather"), ToolRequest(mapOf("city" to "london"))))
 
     mcpClient.stop()
 }

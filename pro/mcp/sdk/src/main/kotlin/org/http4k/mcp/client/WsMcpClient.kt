@@ -1,5 +1,7 @@
 package org.http4k.mcp.client
 
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.format.renderRequest
 import org.http4k.mcp.model.McpEntity
@@ -19,7 +21,6 @@ import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
-import kotlin.Result.Companion.success
 
 /**
  * Single connection MCP client.
@@ -40,11 +41,11 @@ class WsMcpClient(
 
     override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification) = with(McpJson) {
         wsClient.send(WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(mcp), nullNode()))))
-        success(Unit)
+        Success(Unit)
     }
 
     override fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean) =
-        runCatching {
+        resultFrom {
             val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
             val requestId = RequestId.random()
@@ -54,7 +55,9 @@ class WsMcpClient(
 
             with(McpJson) {
                 wsClient.send(
-                    WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId))))
+                    WsMessage(
+                        compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId)))
+                    )
                 )
             }
             latch.await()

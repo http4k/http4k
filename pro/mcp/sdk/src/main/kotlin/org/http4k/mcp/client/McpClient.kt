@@ -22,7 +22,7 @@ import org.http4k.mcp.protocol.messages.McpTool
  * Client for the MCP protocol.
  */
 interface McpClient : AutoCloseable {
-    fun start(): Result<ServerCapabilities>
+    fun start(): McpResult<ServerCapabilities>
     fun stop() = close()
 
     fun tools(): Tools
@@ -33,27 +33,27 @@ interface McpClient : AutoCloseable {
 
     interface Tools {
         fun onChange(fn: () -> Unit)
-        fun list(): Result<List<McpTool>>
-        fun call(name: ToolName, request: ToolRequest): Result<ToolResponse>
+        fun list(): McpResult<List<McpTool>>
+        fun call(name: ToolName, request: ToolRequest): McpResult<ToolResponse>
     }
 
     interface Prompts {
         fun onChange(fn: () -> Unit)
-        fun list(): Result<List<McpPrompt>>
-        fun get(name: PromptName, request: PromptRequest): Result<PromptResponse>
+        fun list(): McpResult<List<McpPrompt>>
+        fun get(name: PromptName, request: PromptRequest): McpResult<PromptResponse>
     }
 
     interface Sampling {
-        fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>>
+        fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<McpResult<SamplingResponse>>
     }
 
     interface Resources {
         fun onChange(fn: () -> Unit)
-        fun list(): Result<List<McpResource>>
-        fun read(request: ResourceRequest): Result<ResourceResponse>
+        fun list(): McpResult<List<McpResource>>
+        fun read(request: ResourceRequest): McpResult<ResourceResponse>
     }
 
     interface Completions {
-        fun complete(request: CompletionRequest): Result<CompletionResponse>
+        fun complete(request: CompletionRequest): McpResult<CompletionResponse>
     }
 }

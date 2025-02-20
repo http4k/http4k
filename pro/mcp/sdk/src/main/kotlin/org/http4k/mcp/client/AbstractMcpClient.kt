@@ -1,5 +1,8 @@
 package org.http4k.mcp.client
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.map
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
@@ -9,7 +12,7 @@ import org.http4k.mcp.client.internal.ClientResources
 import org.http4k.mcp.client.internal.ClientSampling
 import org.http4k.mcp.client.internal.ClientTools
 import org.http4k.mcp.client.internal.NotificationCallback
-import org.http4k.mcp.client.internal.asAOrThrow
+import org.http4k.mcp.client.internal.asOrFailure
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.McpRpcMethod
@@ -40,7 +43,7 @@ abstract class AbstractMcpClient(
     private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
     protected val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
 
-    override fun start(): Result<ServerCapabilities> {
+    override fun start(): McpResult<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
 
         thread(isDaemon = true) {
@@ -86,14 +89,19 @@ abstract class AbstractMcpClient(
         startLatch.await()
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
-            .mapCatching { reqId ->
-                val response = findQueue(reqId).poll().asAOrThrow<McpInitialize.Response>()
-                notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
-                    .map { response.capabilities }
-                    .also { tidyUp(reqId) }
-                    .getOrThrow()
+            .flatMap { reqId ->
+                val result: McpResult<McpInitialize.Response> = findQueue(reqId).poll().asOrFailure<McpInitialize.Response>()
+                    .flatMap { input ->
+                        notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
+                            .map {
+                                tidyUp(reqId)
+                                input
+                            }
+                    }
+                if (result is Failure<*>) close()
+                result
             }
-            .onFailure { close() }
+            .map { it.capabilities }
     }
 
     override fun tools(): McpClient.Tools = ClientTools(::findQueue, ::tidyUp, ::performRequest) { rpc, callback ->
@@ -114,11 +122,11 @@ abstract class AbstractMcpClient(
 
     override fun completions(): McpClient.Completions = ClientCompletions(::findQueue, ::tidyUp, ::performRequest)
 
-    protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): Result<Unit>
+    protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit>
 
     protected abstract fun performRequest(
         rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean = { true }
-    ): Result<RequestId>
+    ): McpResult<RequestId>
 
     override fun close() {
         running.set(false)

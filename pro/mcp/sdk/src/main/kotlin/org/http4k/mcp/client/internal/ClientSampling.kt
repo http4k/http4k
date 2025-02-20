@@ -1,9 +1,13 @@
 package org.http4k.mcp.client.internal
 
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.result4k.valueOrNull
 import org.http4k.format.MoshiObject
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpSampling
@@ -18,8 +22,9 @@ internal class ClientSampling(
     private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
-    override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<Result<SamplingResponse>> {
-        fun hasStopReason(message: McpNodeType) = message.asAOrThrow<SamplingResponse>().stopReason != null
+    override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<McpResult<SamplingResponse>> {
+        fun hasStopReason(message: McpNodeType) =
+            message.asOrFailure<SamplingResponse>().valueOrNull()?.stopReason != null
 
         val queue = sender(
             McpSampling, with(request) {
@@ -35,13 +40,14 @@ internal class ClientSampling(
                 )
             },
             ::hasStopReason
-        ).map(queueFor).getOrThrow()
+        ).map(queueFor)
+            .onFailure { return emptySequence() }
 
         return sequence {
             while (true) {
                 val message = queue.take()
                 yield(
-                    runCatching { message.asAOrThrow<McpSampling.Response>() }
+                    message.asOrFailure<McpSampling.Response>()
                         .map { SamplingResponse(it.model, it.role, it.content, it.stopReason) }
                 )
 

@@ -1,5 +1,7 @@
 package org.http4k.mcp.client.internal
 
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.map
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
@@ -20,13 +22,13 @@ internal class ClientPrompts(
     }
 
     override fun list() = sender(McpPrompt.List, McpPrompt.List.Request()) { true }
-        .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .map { it.first().asAOrThrow<McpPrompt.List.Response>() }
+        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .flatMap { it.first().asOrFailure<McpPrompt.List.Response>() }
         .map { it.prompts }
 
     override fun get(name: PromptName, request: PromptRequest) =
         sender(McpPrompt.Get, McpPrompt.Get.Request(name, request)) { true }
-            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .map { it.first().asAOrThrow<McpPrompt.Get.Response>() }
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }
             .map { PromptResponse(it.messages, it.description) }
 }

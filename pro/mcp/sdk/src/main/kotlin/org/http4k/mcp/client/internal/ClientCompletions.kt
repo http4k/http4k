@@ -1,5 +1,7 @@
 package org.http4k.mcp.client.internal
 
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.map
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.client.McpClient
@@ -14,7 +16,7 @@ internal class ClientCompletions(
 ) : McpClient.Completions {
     override fun complete(request: CompletionRequest) =
         sender(McpCompletion, McpCompletion.Request(request.ref, request.argument)) { true }
-            .mapCatching { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .map { it.first().asAOrThrow<McpCompletion.Response>() }
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
             .map { CompletionResponse(it.completion) }
 }
