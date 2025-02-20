@@ -1,9 +1,12 @@
 package org.http4k.mcp.client
 
+import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.format.renderRequest
+import org.http4k.mcp.client.McpError.Internal
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -64,6 +67,7 @@ class WsMcpClient(
 
             requestId
         }
+            .flatMapFailure { Failure(Internal(it)) }
 
     override fun close() {
         super.close()

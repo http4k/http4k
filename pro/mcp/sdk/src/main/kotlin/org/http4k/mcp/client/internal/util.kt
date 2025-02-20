@@ -1,10 +1,12 @@
 package org.http4k.mcp.client.internal
 
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.mcp.protocol.McpException
+import org.http4k.mcp.client.McpError.Server
+import org.http4k.mcp.client.McpError.Internal
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 
@@ -13,7 +15,7 @@ internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) 
     val error = obj["error"]
     when {
         error != null -> Failure(
-            McpException(
+            Server(
                 when (error) {
                     is MoshiObject -> ErrorMessage(
                         error["code"]?.let { integer(it).toInt() } ?: -1,
@@ -22,10 +24,10 @@ internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) 
 
                     else -> ErrorMessage(-1, error.toString())
                 }
-            )
-        )
+            ))
 
         else -> resultFrom { asA<T>(compact(obj["result"] ?: nullNode())) }
+            .flatMapFailure { Failure(Internal(it)) }
     }
 }
 

@@ -1,6 +1,7 @@
 package org.http4k.mcp.client
 
-import dev.forkhandles.result4k.resultFrom
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
@@ -13,6 +14,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.format.renderRequest
 import org.http4k.lens.contentType
+import org.http4k.mcp.client.McpError.Http
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -53,8 +55,8 @@ class SseMcpClient(
     override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit> {
         val response = http(mcp.toHttpRequest(rpc))
         return when {
-            response.status.successful -> resultFrom { Unit }
-            else -> resultFrom { error("Failed HTTP ${response.status}") }
+            response.status.successful -> Success(Unit)
+            else -> Failure(Http(response))
         }
     }
 
@@ -68,18 +70,16 @@ class SseMcpClient(
         messageQueues[requestId] = ArrayBlockingQueue(100)
 
         val response = http(request.toHttpRequest(rpc, requestId))
-        return resultFrom {
-            when {
-                response.status.successful -> {
-                    latch.await()
-                    requestId
-                }
+        return when {
+            response.status.successful -> {
+                latch.await()
+                Success(requestId)
+            }
 
-                else -> {
-                    tidyUp(requestId)
-                    latch.await()
-                    error("Failed HTTP ${response.status}")
-                }
+            else -> {
+                tidyUp(requestId)
+                latch.await()
+                Failure(Http(response))
             }
         }
     }
