@@ -27,10 +27,8 @@ class RedirectTest {
 
     private val redirectingHandler = routes(
         finalUrl bind Method.GET to { req: Request ->
-            {
-                cookiesSentToFinalDestination = req.cookies()
-                Response(OK).body("You made it!")
-            }()
+            cookiesSentToFinalDestination = req.cookies()
+            Response(OK).body("You made it!")
         },
         startingUrl bind Method.GET to {
             Response(SEE_OTHER)
@@ -60,5 +58,5 @@ class RedirectTest {
         )
     }
 
-    private fun HCookie.toSeleniumCookie() = Cookie(name, value, path)
+    private fun HCookie.toSeleniumCookie() = Cookie(name, value, path!!)
 }
