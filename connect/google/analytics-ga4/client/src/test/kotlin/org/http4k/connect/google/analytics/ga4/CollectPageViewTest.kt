@@ -101,12 +101,12 @@ class CollectPageViewTest {
         assertNoPageView()
     }
 
-    fun assertPageView(title: String, path: String, host: String) {
+    private fun assertPageView(title: String, path: String, host: String) {
         assertThat(
             testHttpClient.captured, equalTo(
                 Request(Method.POST, "https://www.google-analytics.com/mp/collect")
-                    .header("User-Agent", UserAgent.Default.value)
                     .header("content-type", APPLICATION_JSON.toHeaderValue())
+                    .header("User-Agent", UserAgent.Default.value)
                     .header("Host", "www.google-analytics.com")
                     .query("measurement_id", measurementId)
                     .query("api_secret", apiSecret)

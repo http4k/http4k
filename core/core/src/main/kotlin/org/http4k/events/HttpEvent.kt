@@ -6,7 +6,6 @@ import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.events.ProtocolEvent.Incoming
 import org.http4k.events.ProtocolEvent.Outgoing
-import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
 
 object HttpEvent {
@@ -24,7 +23,8 @@ object HttpEvent {
         tx.request.method,
         tx.response.status,
         tx.duration.toMillis(),
-        if (tx.request is RequestWithContext) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+        if (tx.request is RoutedMessage && tx.request.xUriTemplate != null)
+            tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
     )
 
     fun Outgoing(
@@ -40,6 +40,7 @@ object HttpEvent {
         tx.request.method,
         tx.response.status,
         tx.duration.toMillis(),
-        if (tx.response is RoutedMessage) tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+        if (tx.response is RoutedMessage && tx.response.xUriTemplate != null)
+            tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
     )
 }
