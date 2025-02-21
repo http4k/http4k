@@ -37,7 +37,8 @@ fun ClientFilters.OpenTelemetryTracing(
 
     return Filter { next ->
         { req ->
-            with(tracer.spanBuilder(spanNamer(req))
+            with(
+                tracer.spanBuilder(spanNamer(req))
                 .setSpanKind(CLIENT)
                 .let { spanCreationMutator(it) }
                 .startSpan()) {
@@ -82,7 +83,8 @@ fun ServerFilters.OpenTelemetryTracing(
 
     return Filter { next ->
         { req ->
-            with(tracer.spanBuilder(spanNamer(req))
+            with(
+                tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
                 .let { spanCreationMutator(it, req) }
@@ -134,6 +136,6 @@ val defaultSpanNamer: (Request) -> String = {
 private fun Span.addStandardDataFrom(resp: Response, req: Request) {
     resp.body.length?.also { setAttribute(HTTP_RESPONSE_BODY_SIZE, it) }
     req.body.length?.also { setAttribute(HTTP_REQUEST_BODY_SIZE, it) }
-    setAttribute("http.status_code", resp.status.code.toString())
+    setAttribute("http.status_code", resp.status.code.toLong())
 }
 
