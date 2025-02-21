@@ -22,9 +22,12 @@ fun SES.Companion.Http(
     clock: Clock = Clock.systemUTC(),
     overrideEndpoint: Uri? = null,
 ) = object : SES {
-    private val signedHttp = signAwsRequests(region, credentialsProvider, clock, Signed, overrideEndpoint).then(http)
+    private val signedHttp = signAwsRequests(
+        region, credentialsProvider, clock, Signed,
+        overrideEndpoint ?: Uri.of("https://email.$region.amazonaws.com")
+    ).then(http)
 
-    override fun <R> invoke(action: SESAction<R>) = action.toResult(signedHttp(action.toRequest()))
+    override fun <R: Any> invoke(action: SESAction<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
 /**

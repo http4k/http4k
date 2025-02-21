@@ -1,26 +1,20 @@
 package org.http4k.connect.amazon.ses
 
-import dev.forkhandles.result4k.Result
-import org.http4k.connect.Action
-import org.http4k.connect.RemoteFailure
-import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.Method.POST
-import org.http4k.core.Request
+import org.http4k.connect.amazon.AwsJsonAction
+import org.http4k.core.ContentType
 import org.http4k.core.Uri
-import org.http4k.core.body.form
-import org.http4k.core.with
-import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.format.AutoMarshalling
+import kotlin.reflect.KClass
 
-abstract class SESAction<R>(
-    private val action: String,
-    private vararg val mappings: Pair<String, String>?
-) : Action<Result<R, RemoteFailure>> {
-    override fun toRequest() = (listOf("Action" to action) + mappings)
-        .filterNotNull()
-        .fold(
-            Request(
-                POST,
-                Uri.of("")
-            ).with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
-        ) { req, it -> req.form(it.first, it.second) }
+abstract class SESAction<R: Any>(
+    clazz: KClass<R>,
+    private val uri: Uri,
+    autoMarshalling: AutoMarshalling = SESMoshi
+) : AwsJsonAction<R>(
+    SES.awsService,
+    clazz,
+    autoMarshalling,
+    ContentType("application/x-amz-json-1.0")
+) {
+    override fun uri() = uri
 }

@@ -10,7 +10,7 @@ import org.http4k.connect.amazon.AwsServiceCompanion
  */
 @Http4kConnectApiClient
 interface SES {
-    operator fun <R> invoke(action: SESAction<R>): Result<R, RemoteFailure>
+    operator fun <R: Any> invoke(action: SESAction<R>): Result<R, RemoteFailure>
 
-    companion object : AwsServiceCompanion("email")
+    companion object : AwsServiceCompanion("ses")
 }
