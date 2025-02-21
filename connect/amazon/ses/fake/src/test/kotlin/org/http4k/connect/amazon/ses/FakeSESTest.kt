@@ -36,7 +36,7 @@ class FakeSESTest : SESContract, FakeAwsContract {
                 simple = Message(
                     subject = Content("important stuff"),
                     body = Body(
-                        text = Content("text stuff"),
+                        text = Content("text stuff", Charsets.UTF_8),
                         html = Content("html stuff")
                     )
                 )
@@ -53,8 +53,8 @@ class FakeSESTest : SESContract, FakeAwsContract {
             message = Message(
                 subject = Content("important stuff"),
                 body = Body(
+                    text = Content("text stuff", Charsets.UTF_8),
                     html = Content("html stuff"),
-                    text = Content("text stuff")
                 )
             ),
             rawMessage = null

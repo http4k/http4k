@@ -35,7 +35,7 @@ interface SESContract : AwsContract {
                 simple = Message(
                     subject = Content("important stuff"),
                     body = Body(
-                        text = Content("text stuff"),
+                        text = Content("text stuff", Charsets.UTF_8),
                         html = Content("html stuff")
                     )
                 )
