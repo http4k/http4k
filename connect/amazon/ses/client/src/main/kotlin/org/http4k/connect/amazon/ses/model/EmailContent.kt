@@ -11,14 +11,14 @@ import java.nio.charset.Charset
 data class EmailContent(
     @Json(name = "Raw") val raw: RawMessage? = null,
     @Json(name = "Simple") val simple: Message? = null,
-//    @Json(name = "Template") val template: Template? = null
+    @Json(name = "Template") val template: Template? = null
 )
 
-//@JsonSerializable
-//data class Template(
-//    @Json(name = "TemplateData") val templateData: String? = null,
-//    @Json(name = "TemplateName") val templateName: String? = null
-//)
+@JsonSerializable
+data class Template(
+    @Json(name = "TemplateData") val templateData: String? = null,
+    @Json(name = "TemplateName") val templateName: String? = null
+)
 
 @JsonSerializable
 data class Content(
