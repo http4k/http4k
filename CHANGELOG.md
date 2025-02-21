@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### uncut
+- **http4k-connect-amazon-ses***: [Breaking] Upgrade to SES V2 API. H/T @oharaandrew314
+
 ### v6.0.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-format-moshi** : [Fix #1291] Moshi + ProtocolStatus Serialization Exception 
