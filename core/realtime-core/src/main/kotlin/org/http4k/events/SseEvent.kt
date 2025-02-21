@@ -21,7 +21,8 @@ object SseEvent {
         tx.request.method,
         tx.response.status,
         tx.duration.toMillis(),
-        if (tx.request is RequestWithContext) tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+        if (tx.request is RoutedMessage && tx.request.xUriTemplate != null)
+            tx.request.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
     )
 
     fun Outgoing(
@@ -37,6 +38,7 @@ object SseEvent {
         tx.request.method,
         tx.response.status,
         tx.duration.toMillis(),
-        if (tx.response is RoutedMessage) tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
+        if (tx.response is RoutedMessage && tx.response.xUriTemplate != null)
+            tx.response.xUriTemplate.toString() else tx.request.uri.path.trimStart('/')
     )
 }
