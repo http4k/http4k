@@ -13,7 +13,7 @@ import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
 import java.io.InputStream
 
 interface RoutedMessage {
-    val xUriTemplate: UriTemplate
+    val xUriTemplate: UriTemplate?
 
     companion object {
         const val X_URI_TEMPLATE = "xUriTemplate"
@@ -29,11 +29,7 @@ data class RequestWithContext(val delegate: Request, val context: Map<String, An
         if (delegate is RequestWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(X_URI_TEMPLATE to uriTemplate)
     )
 
-    override val xUriTemplate: UriTemplate
-        get() {
-            return context[X_URI_TEMPLATE] as? UriTemplate
-                ?: throw IllegalStateException("Request was not routed, so no uri-template present")
-        }
+    override val xUriTemplate = context[X_URI_TEMPLATE] as? UriTemplate
 
     override fun equals(other: Any?): Boolean = delegate == other
 
@@ -81,14 +77,10 @@ data class ResponseWithContext(val delegate: Response, val context: Map<String, 
 
     constructor(delegate: Response, uriTemplate: UriTemplate) : this(
         if (delegate is ResponseWithContext) delegate.delegate else delegate,
-        if (delegate is ResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(
-            X_URI_TEMPLATE to uriTemplate
-        )
+        if (delegate is ResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(X_URI_TEMPLATE to uriTemplate)
     )
 
-    override val xUriTemplate: UriTemplate
-        get() = context["xUriTemplate"] as? UriTemplate
-            ?: throw IllegalStateException("Message was not routed, so no uri-template present")
+    override val xUriTemplate = context[X_URI_TEMPLATE] as? UriTemplate
 
     override fun equals(other: Any?): Boolean = delegate == other
 

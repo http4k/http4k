@@ -22,7 +22,9 @@ interface ProtocolTransaction<ProtocolResponse> {
 }
 
 fun <ProtocolResponse> defaultLabels(request: Request, response: ProtocolResponse) = when {
-    response is RoutedMessage -> mapOf(ROUTING_GROUP_LABEL to response.xUriTemplate.toString())
-    request is RoutedMessage -> mapOf(ROUTING_GROUP_LABEL to request.xUriTemplate.toString())
+    response is RoutedMessage ->
+        response.xUriTemplate?.let { mapOf(ROUTING_GROUP_LABEL to it.toString()) } ?: emptyMap()
+    request is RoutedMessage ->
+        request.xUriTemplate?.let { mapOf(ROUTING_GROUP_LABEL to it.toString()) } ?: emptyMap()
     else -> emptyMap()
 }
