@@ -8,8 +8,8 @@ class RealSESTest : SESContract, RealAwsContract {
     override val http = JavaHttpClient()
 
     // Need to be very careful which addresses you use with real ses
-    override val from = EmailAddress.of(System.getenv("http4k-development-ses-from"))
-    override val to = EmailAddress.of(System.getenv("http4k-development-ses-to"))
+    override val from = System.getenv("http4k-development-ses-from")?.let(EmailAddress::of) ?: super.from
+    override val to = (System.getenv("http4k-development-ses-to")?.let(EmailAddress::of) ?: super.to)
 
     override fun assertEmailSent() {
         // no-op
