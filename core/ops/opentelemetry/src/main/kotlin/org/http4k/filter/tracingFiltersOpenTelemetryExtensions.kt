@@ -37,8 +37,7 @@ fun ClientFilters.OpenTelemetryTracing(
 
     return Filter { next ->
         { req ->
-            with(
-                tracer.spanBuilder(spanNamer(req))
+            with(tracer.spanBuilder(spanNamer(req))
                 .setSpanKind(CLIENT)
                 .let { spanCreationMutator(it) }
                 .startSpan()) {
@@ -83,8 +82,7 @@ fun ServerFilters.OpenTelemetryTracing(
 
     return Filter { next ->
         { req ->
-            with(
-                tracer.spanBuilder(spanNamer(req))
+            with(tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
                 .let { spanCreationMutator(it, req) }
