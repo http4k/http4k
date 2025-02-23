@@ -1,0 +1,9 @@
+From: foo@bar.com
+To: toll@troll.com
+Message-ID: <message1337>
+Subject: hello
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+world
