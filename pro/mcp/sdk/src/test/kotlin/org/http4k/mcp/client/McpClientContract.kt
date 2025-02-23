@@ -3,6 +3,7 @@ package org.http4k.mcp.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
+import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.lens.with
 import org.http4k.mcp.CompletionRequest
@@ -41,7 +42,8 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
-import org.http4k.server.Http4kServer
+import org.http4k.server.Helidon
+import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
@@ -76,7 +78,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
                 samplingResponses.asSequence()
             })
         )
-        val server = toServer(protocol).start()
+        val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
 
         protocol.start()
 
@@ -149,8 +151,6 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         server.stop()
     }
 
-
-
     fun protocol(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
@@ -160,7 +160,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         incomingSampling: IncomingSampling
     ): P
 
-    fun toServer(protocol: P): Http4kServer
+    fun toPolyHandler(protocol: P): PolyHandler
 
     fun clientFor(port: Int): McpClient
 }

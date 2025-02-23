@@ -3,6 +3,7 @@ package org.http4k.mcp.client
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Method.GET
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -37,5 +38,5 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toServer(protocol: RealtimeMcpProtocol) = McpSseHandler(protocol).asServer(Helidon(0))
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = McpSseHandler(protocol)
 }

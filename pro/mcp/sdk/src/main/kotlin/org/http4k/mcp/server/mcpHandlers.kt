@@ -34,7 +34,8 @@ fun McpSseHandler(mcpProtocol: RealtimeMcpProtocol) = poly(
         )
     },
     CatchLensFailure()
-        .then(routes(
+        .then(
+            routes(
             "/message" bind POST to { req: Request ->
                 mcpProtocol(sessionId(req), Body.jsonRpcRequest(McpJson).toLens()(req), req)
             }
@@ -44,7 +45,7 @@ fun McpSseHandler(mcpProtocol: RealtimeMcpProtocol) = poly(
 /**
  * This is the main entry point for the MCP server.
  */
-fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol) =
+fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol) = poly(
     "/ws" bind websockets {
         val newSessionId = mcpProtocol.newSession(it)
         it.onMessage {
@@ -54,5 +55,6 @@ fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol) =
 
         it.send(WsMessage(Event("endpoint", "").toMessage()))
     }
+)
 
 private val sessionId = Query.value(SessionId).required("sessionId")
