@@ -138,7 +138,7 @@ abstract class McpProtocol<RSP : Any>(
                             }.getOrElse { error() }
                         }
                         .getOrElse {
-                            send(ErrorMessage.InvalidRequest.toJsonRpc(jsonReq.id), sId)
+                            send(InvalidRequest.toJsonRpc(jsonReq.id), sId)
                             error()
                         }
 
