@@ -1,6 +1,6 @@
 package org.http4k.mcp.server.sse
 
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.mcp.server.RealtimeMcpProtocol
@@ -15,7 +15,7 @@ fun McpSseHandler(mcpProtocol: RealtimeMcpProtocol) = sse {
     it.send(
         SseMessage.Event(
             "endpoint",
-            Request(Method.GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString()
+            Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString()
         )
     )
 }
