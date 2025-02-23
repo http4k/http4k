@@ -78,7 +78,6 @@ class SseMcpClient(
 
             else -> {
                 tidyUp(requestId)
-                latch.await()
                 Failure(Http(response))
             }
         }

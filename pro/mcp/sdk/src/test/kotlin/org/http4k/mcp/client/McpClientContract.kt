@@ -78,6 +78,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
                 samplingResponses.asSequence()
             })
         )
+
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
 
         protocol.start()
@@ -100,6 +101,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         )
 
         assertThat(mcpClient.prompts().list().valueOrNull()!!.size, equalTo(1))
+
         assertThat(
             mcpClient.prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
                 .valueOrNull()!!.description,

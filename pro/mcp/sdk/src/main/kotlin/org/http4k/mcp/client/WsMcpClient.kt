@@ -57,11 +57,12 @@ class WsMcpClient(
             messageQueues[requestId] = ArrayBlockingQueue(100)
 
             with(McpJson) {
-                wsClient.send(
-                    WsMessage(
-                        compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId)))
+                wsClient
+                    .send(
+                        WsMessage(
+                            compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId)))
+                        )
                     )
-                )
             }
             latch.await()
 
