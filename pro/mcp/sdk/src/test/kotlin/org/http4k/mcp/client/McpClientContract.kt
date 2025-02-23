@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.core.Uri
+import org.http4k.lens.with
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptRequest
@@ -54,8 +55,9 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             SamplingResponse(model, assistant, Content.Text("world"), StopReason.of("foobar"))
         )
 
-        val tools = Tools(Tool("reverse", "description", Tool.Arg.required("name")) bind {
-            ToolResponse.Ok(listOf(Content.Text(it.javaClass.simpleName.toString().reversed())))
+        val toolArg = Tool.Arg.required("name")
+        val tools = Tools(Tool("reverse", "description", toolArg) bind {
+            ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
         val protocol = protocol(
@@ -126,8 +128,8 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(1))
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest()).valueOrNull()!!,
-            equalTo(ToolResponse.Ok(listOf(Content.Text("tseuqeRlooT"))))
+            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).valueOrNull()!!,
+            equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
 
         assertThat(
@@ -146,6 +148,8 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         mcpClient.stop()
         server.stop()
     }
+
+
 
     fun protocol(
         serverMetaData: ServerMetaData,
