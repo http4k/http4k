@@ -101,15 +101,26 @@ abstract class AbstractMcpClient(
                     defaultTimeout
                 )
                     .flatMap { reqId ->
-                        val result =
-                            findQueue(reqId).poll().asOrFailure<McpInitialize.Response>()
+                        val next = findQueue(reqId)
+                            .poll(defaultTimeout.toMillis(), MILLISECONDS)
+                            ?.asOrFailure<McpInitialize.Response>()
+
+                        when (next) {
+                            null -> Failure(McpError.Timeout)
+                            else -> next
                                 .flatMap { input ->
-                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
+                                    notify(
+                                        McpInitialize.Initialized,
+                                        McpInitialize.Initialized.Notification
+                                    )
                                         .map { input }
                                         .also { tidyUp(reqId) }
                                 }
-                        if (result is Failure<*>) close()
-                        result
+                        }
+                            .mapFailure {
+                                close()
+                                it
+                            }
                     }
                     .map { it.capabilities }
             }

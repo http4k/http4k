@@ -6,7 +6,7 @@ import dev.forkhandles.result4k.resultFrom
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.client.McpError.Internal
-import org.http4k.mcp.client.McpError.Server
+import org.http4k.mcp.client.McpError.Protocol
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 
@@ -15,7 +15,7 @@ internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) 
     val error = obj["error"]
     when {
         error != null -> Failure(
-            Server(
+            Protocol(
                 when (error) {
                     is MoshiObject -> ErrorMessage(
                         error["code"]?.let { integer(it).toInt() } ?: -1,
