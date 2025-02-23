@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.sse
+package org.http4k.mcp.server
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.values.random
@@ -56,13 +56,16 @@ class RealtimeMcpProtocol(
     override fun ok() = Response(ACCEPTED)
 
     override fun send(message: McpNodeType, sessionId: SessionId) = when (val sse = sseSessions[sessionId]) {
-        null -> when(val wsSession = wsSessions[sessionId]) {
-            null -> Response(GONE)
-            else -> {
-                wsSession.send(WsMessage(Event("message", compact(message)).toMessage()))
-                Response(ACCEPTED)
+        null -> {
+            when (val wsSession = wsSessions[sessionId]) {
+                null -> Response(GONE)
+                else -> {
+                    wsSession.send(WsMessage(Event("message", compact(message)).toMessage()))
+                    Response(ACCEPTED)
+                }
             }
         }
+
         else -> {
             sse.send(Event("message", compact(message)))
             Response(ACCEPTED)

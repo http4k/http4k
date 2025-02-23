@@ -1,35 +1,26 @@
 package org.http4k.mcp.client
 
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.failureOrNull
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
-import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.lens.with
-import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
-import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
-import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Completion
-import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
@@ -46,18 +37,18 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.McpSseHandler
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.sse.RealtimeMcpProtocol
+import org.http4k.mcp.server.RealtimeMcpProtocol
+import org.http4k.mcp.server.sse.McpSseHandler
+import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
-import java.util.concurrent.CountDownLatch
 
 class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
     override fun protocol(
@@ -76,7 +67,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = McpSseHandler(protocol)
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = StandardMcpSse(protocol)
 
     @Test
     fun `deals with error`() {
