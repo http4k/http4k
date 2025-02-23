@@ -46,24 +46,13 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardMcpSse(realtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
+    StandardMcpSse(RealtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardMcpWs(realtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
-
-private fun realtimeMcpProtocol(serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>) =
-    RealtimeMcpProtocol(
-        serverMetaData,
-        Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-        IncomingSampling(capabilities.flatMap { it }.filterIsInstance<IncomingSamplingCapability>()),
-        OutgoingSampling(capabilities.flatMap { it }.filterIsInstance<OutgoingSamplingCapability>())
-    )
+    StandardMcpWs(RealtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

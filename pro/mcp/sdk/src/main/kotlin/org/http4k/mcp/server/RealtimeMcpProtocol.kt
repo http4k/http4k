@@ -7,13 +7,20 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.IncomingSamplingCapability
 import org.http4k.mcp.server.capability.Logger
 import org.http4k.mcp.server.capability.OutgoingSampling
+import org.http4k.mcp.server.capability.OutgoingSamplingCapability
+import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.ServerCapability
+import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.util.McpJson.compact
@@ -50,6 +57,21 @@ class RealtimeMcpProtocol(
     logger,
     random
 ) {
+
+    /**
+     * Constructor useful when only simple MCP protocol behaviours are required
+     */
+    constructor(serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>) :
+        this(
+            serverMetaData,
+            Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
+            Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
+            Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
+            Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+            IncomingSampling(capabilities.flatMap { it }.filterIsInstance<IncomingSamplingCapability>()),
+            OutgoingSampling(capabilities.flatMap { it }.filterIsInstance<OutgoingSamplingCapability>())
+        )
+
     private val sseSessions = ConcurrentHashMap<SessionId, Sse>()
     private val wsSessions = ConcurrentHashMap<SessionId, Websocket>()
 
