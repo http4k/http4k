@@ -1,7 +1,6 @@
 package org.http4k.mcp.client
 
 import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.resultFrom
 import dev.forkhandles.result4k.valueOrNull
@@ -14,7 +13,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
+import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.format.renderRequest
 import org.http4k.lens.contentType
 import org.http4k.mcp.client.McpError.Http
@@ -47,7 +46,7 @@ class SseMcpClient(
     defaultTimeout: Duration = Duration.ofSeconds(1)
 ) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout) {
 
-    private val http = ClientFilters.SetHostFrom(sseRequest.uri).then(http)
+    private val http = SetHostFrom(sseRequest.uri).then(http)
 
     private val endpoint = AtomicReference<String>()
 

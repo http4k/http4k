@@ -4,6 +4,8 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
@@ -32,6 +34,7 @@ import java.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -89,25 +92,27 @@ abstract class AbstractMcpClient(
             }
         }
 
-        startLatch.await()
-
-        return performRequest(
-            McpInitialize,
-            McpInitialize.Request(clientInfo, capabilities, protocolVersion),
-            defaultTimeout
-        )
-            .flatMap { reqId ->
-                val result =
-                    findQueue(reqId).poll().asOrFailure<McpInitialize.Response>()
-                        .flatMap { input ->
-                            notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
-                                .map { input }
-                                .also { tidyUp(reqId) }
-                        }
-                if (result is Failure<*>) close()
-                result
+        return resultFrom { startLatch.await(defaultTimeout.toMillis(), MILLISECONDS) }
+            .mapFailure { McpError.Timeout }
+            .flatMap {
+                performRequest(
+                    McpInitialize,
+                    McpInitialize.Request(clientInfo, capabilities, protocolVersion),
+                    defaultTimeout
+                )
+                    .flatMap { reqId ->
+                        val result =
+                            findQueue(reqId).poll().asOrFailure<McpInitialize.Response>()
+                                .flatMap { input ->
+                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
+                                        .map { input }
+                                        .also { tidyUp(reqId) }
+                                }
+                        if (result is Failure<*>) close()
+                        result
+                    }
+                    .map { it.capabilities }
             }
-            .map { it.capabilities }
     }
 
     override fun tools(): McpClient.Tools =
