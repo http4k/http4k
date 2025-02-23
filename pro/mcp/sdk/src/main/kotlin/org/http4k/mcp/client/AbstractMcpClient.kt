@@ -90,16 +90,12 @@ abstract class AbstractMcpClient(
 
         return performRequest(McpInitialize, McpInitialize.Request(clientInfo, capabilities, protocolVersion))
             .flatMap { reqId ->
-                val result: McpResult<McpInitialize.Response> =
+                val result =
                     findQueue(reqId).poll().asOrFailure<McpInitialize.Response>()
                         .flatMap { input ->
-                            val notify: McpResult<Unit> =
-                                notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
-                            notify
-                                .map {
-                                    tidyUp(reqId)
-                                    input
-                                }
+                            notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
+                                .map { input }
+                                .also { tidyUp(reqId) }
                         }
                 if (result is Failure<*>) close()
                 result
