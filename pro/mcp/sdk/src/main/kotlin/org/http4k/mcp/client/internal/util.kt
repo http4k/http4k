@@ -5,8 +5,8 @@ import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.mcp.client.McpError.Server
 import org.http4k.mcp.client.McpError.Internal
+import org.http4k.mcp.client.McpError.Server
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 

@@ -1,12 +1,16 @@
 package org.http4k.mcp.client
 
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.flatMapFailure
+import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.format.renderRequest
 import org.http4k.mcp.client.McpError.Internal
+import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -22,8 +26,10 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
+import java.time.Duration
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * Single connection MCP client.
@@ -35,7 +41,8 @@ class WsMcpClient(
     private val wsRequest: Request,
     private val websocketFactory: WebsocketFactory,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
-) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion) {
+    defaultTimeout: Duration = Duration.ofSeconds(1)
+) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout) {
     private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
 
     override fun received() = wsClient.received().map { SseMessage.parse(it.bodyString()) }
@@ -47,11 +54,17 @@ class WsMcpClient(
         Success(Unit)
     }
 
-    override fun performRequest(rpc: McpRpc, request: ClientMessage, isComplete: (McpNodeType) -> Boolean) =
-        resultFrom {
-            val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
+    override fun performRequest(
+        rpc: McpRpc,
+        request: ClientMessage,
+        timeout: Duration,
+        isComplete: (McpNodeType) -> Boolean
+    ): Result<RequestId, McpError> {
+        val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
 
-            val requestId = RequestId.random()
+        val requestId = RequestId.random()
+
+        return resultFrom {
 
             requests[requestId] = latch
             messageQueues[requestId] = ArrayBlockingQueue(100)
@@ -64,11 +77,15 @@ class WsMcpClient(
                         )
                     )
             }
-            latch.await()
-
             requestId
         }
             .flatMapFailure { Failure(Internal(it)) }
+            .flatMap { reqId ->
+                resultFrom { latch.await(timeout.toMillis(), MILLISECONDS) }
+                    .flatMapFailure { Timeout.failWith(requestId) }
+                    .map { reqId }
+            }
+    }
 
     override fun close() {
         super.close()

@@ -10,10 +10,12 @@ import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpNodeType
+import java.time.Duration
 
 internal class ClientPrompts(
     private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val tidyUp: (RequestId) -> Unit,
+    private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Prompts {
@@ -21,13 +23,16 @@ internal class ClientPrompts(
         register(McpPrompt.List, NotificationCallback(McpPrompt.List.Changed.Notification::class) { fn() })
     }
 
-    override fun list() = sender(McpPrompt.List, McpPrompt.List.Request()) { true }
+    override fun list(overrideDefaultTimeout: Duration?) = sender(
+        McpPrompt.List,
+        McpPrompt.List.Request(), overrideDefaultTimeout ?: defaultTimeout
+    ) { true }
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpPrompt.List.Response>() }
         .map { it.prompts }
 
-    override fun get(name: PromptName, request: PromptRequest) =
-        sender(McpPrompt.Get, McpPrompt.Get.Request(name, request)) { true }
+    override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =
+        sender(McpPrompt.Get, McpPrompt.Get.Request(name, request), overrideDefaultTimeout ?: defaultTimeout) { true }
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }
             .map { PromptResponse(it.messages, it.description) }

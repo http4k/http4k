@@ -10,4 +10,5 @@ sealed class McpError {
     data class Server(val error: ErrorMessage) : McpError()
     data class Internal(val e: Exception) : McpError()
     data class Http(val response: Response) : McpError()
+    data object Timeout : McpError()
 }

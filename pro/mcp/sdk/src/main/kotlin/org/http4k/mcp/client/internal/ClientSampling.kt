@@ -15,14 +15,20 @@ import org.http4k.mcp.util.McpJson.asA
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpJson.nullNode
 import org.http4k.mcp.util.McpNodeType
+import java.time.Duration
 import java.util.concurrent.BlockingQueue
 
 internal class ClientSampling(
     private val queueFor: (RequestId) -> BlockingQueue<McpNodeType>,
     private val tidyUp: (RequestId) -> Unit,
+    private val defaultTimeout: Duration,
     private val sender: McpRpcSender
 ) : McpClient.Sampling {
-    override fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<McpResult<SamplingResponse>> {
+    override fun sample(
+        name: ModelIdentifier,
+        request: SamplingRequest,
+        overrideDefaultTimeout: Duration?
+    ): Sequence<McpResult<SamplingResponse>> {
         fun hasStopReason(message: McpNodeType) =
             message.asOrFailure<SamplingResponse>().valueOrNull()?.stopReason != null
 
@@ -39,6 +45,7 @@ internal class ClientSampling(
                     metadata
                 )
             },
+            overrideDefaultTimeout ?: defaultTimeout,
             ::hasStopReason
         ).map(queueFor)
             .onFailure { return emptySequence() }
