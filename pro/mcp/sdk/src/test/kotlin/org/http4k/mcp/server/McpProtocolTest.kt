@@ -78,7 +78,7 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.sse.RealtimeMcpProtocol
+import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
@@ -89,8 +89,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.random.Random
 
-
-class McpSseHandlerTest {
+class McpProtocolTest {
     private val serverName = McpEntity.of("server")
     private val clientName = McpEntity.of("server")
 
@@ -98,7 +97,7 @@ class McpSseHandlerTest {
 
     @Test
     fun `performs init loop on startup`() {
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -113,7 +112,7 @@ class McpSseHandlerTest {
     fun `update roots`() {
         val roots = Roots()
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, roots = roots, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, roots = roots, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -135,18 +134,20 @@ class McpSseHandlerTest {
         val intArg = Prompt.Arg.int().required("name", "description")
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, prompts = Prompts(
-            listOf(
-                prompt bind {
-                    PromptResponse(
-                        listOf(
-                            Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
-                        ),
-                        "description",
+        val mcp = StandardMcpSse(
+            RealtimeMcpProtocol(
+                metadata, prompts = Prompts(
+                    listOf(
+                        prompt bind {
+                            PromptResponse(
+                                listOf(
+                                    Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
+                                ),
+                                "description",
+                            )
+                        }
                     )
-                }
-            )
-        ), random = Random(0)))
+                ), random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -186,7 +187,7 @@ class McpSseHandlerTest {
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, resources = resources, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, resources = resources, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -230,11 +231,12 @@ class McpSseHandlerTest {
 
     @Test
     fun `deal with templated resources`() {
-        val resource = Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
+        val resource =
+            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, resources = resources, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, resources = resources, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -278,7 +280,7 @@ class McpSseHandlerTest {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, tools = tools, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, tools = tools, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -326,7 +328,7 @@ class McpSseHandlerTest {
     @Test
     fun `deal with logger`() {
         val logger = Logger()
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, logger = logger, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, logger = logger, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -353,7 +355,7 @@ class McpSseHandlerTest {
             listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
         )
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, completions = completions, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, completions = completions, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -370,16 +372,17 @@ class McpSseHandlerTest {
         val content2 = Content.Text("this is the end!")
 
         val model = ModelIdentifier.of("name")
-        val sampling = IncomingSampling(listOf(
-            ModelSelector(model) { MAX } bind {
-                listOf(
-                    SamplingResponse(model, Role.assistant, content1, null),
-                    SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
-                ).asSequence()
-            }
-        ))
+        val sampling = IncomingSampling(
+            listOf(
+                ModelSelector(model) { MAX } bind {
+                    listOf(
+                        SamplingResponse(model, Role.assistant, content1, null),
+                        SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
+                    ).asSequence()
+                }
+            ))
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, incomingSampling = sampling, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, incomingSampling = sampling, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -399,11 +402,12 @@ class McpSseHandlerTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = OutgoingSampling(listOf(
-            clientName bind { received += it }
-        ))
+        val sampling = OutgoingSampling(
+            listOf(
+                clientName bind { received += it }
+            ))
 
-        val mcp = McpSseHandler(RealtimeMcpProtocol(metadata, outgoingSampling = sampling, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(metadata, outgoingSampling = sampling, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)

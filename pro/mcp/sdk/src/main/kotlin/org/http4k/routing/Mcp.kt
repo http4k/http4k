@@ -14,8 +14,7 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.server.McpSseHandler
-import org.http4k.mcp.server.McpWsHandler
+import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
@@ -30,35 +29,30 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.sse.RealtimeMcpProtocol
+import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.mcp.server.stdio.StdIoMcpProtocol
+import org.http4k.mcp.server.ws.StandardMcpWs
 import java.io.Reader
 import java.io.Writer
 
 /**
  * Create an SSE MCP app from a set of feature bindings.
+ *
+ * This is the main entry point for the MCP server. It sets up the SSE connection and then provides a
+ *  endpoint for the client to send messages to.
+ *
+ *  The standard paths used are:
+ *      /sse <-- setup the SSE connection to an MCP client
+ *      /messages <-- receive commands from connected MCP clients
  */
-fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) = McpSseHandler(
-    realtimeMcpProtocol(serverMetaData, capabilities).also { it.start() }
-)
+fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    StandardMcpSse(RealtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
-fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) = McpWsHandler(
-    realtimeMcpProtocol(serverMetaData, capabilities).also { it.start() }
-)
-
-private fun realtimeMcpProtocol(serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>) =
-    RealtimeMcpProtocol(
-        serverMetaData,
-        Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-        IncomingSampling(capabilities.flatMap { it }.filterIsInstance<IncomingSamplingCapability>()),
-        OutgoingSampling(capabilities.flatMap { it }.filterIsInstance<OutgoingSamplingCapability>())
-    )
+fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    StandardMcpWs(RealtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

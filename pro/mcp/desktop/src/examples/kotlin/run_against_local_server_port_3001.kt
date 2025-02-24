@@ -8,6 +8,6 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 
 fun main() {
-    val server = mcpSse(ServerMetaData(McpEntity.of("foo"), Version.of("bar"))).debug(System.err, true).asServer(Helidon(3001)).start()
-    McpDesktop.main("--url", "http://localhost:${server.port()}")
+    mcpSse(ServerMetaData(McpEntity.of("foo"), Version.of("bar"))).debug(System.err, true).asServer(Helidon(3001)).start()
+    McpDesktop.main("--url", "http://localhost:3001/sse")
 }

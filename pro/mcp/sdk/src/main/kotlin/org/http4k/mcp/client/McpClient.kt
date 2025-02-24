@@ -17,9 +17,10 @@ import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
+import java.time.Duration
 
 /**
- * Client for the MCP protocol.
+ * Client for the MCP protocol. Provides access to the various resources and tools on this MCP Server
  */
 interface McpClient : AutoCloseable {
     fun start(): McpResult<ServerCapabilities>
@@ -31,29 +32,47 @@ interface McpClient : AutoCloseable {
     fun resources(): Resources
     fun completions(): Completions
 
+    /**
+     * List and interact with Tools provided by this MCP server
+     */
     interface Tools {
         fun onChange(fn: () -> Unit)
-        fun list(): McpResult<List<McpTool>>
-        fun call(name: ToolName, request: ToolRequest): McpResult<ToolResponse>
+        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
+        fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration? = null): McpResult<ToolResponse>
     }
 
+    /**
+     * List and generate Prompts provided by this MCP server
+     */
     interface Prompts {
         fun onChange(fn: () -> Unit)
-        fun list(): McpResult<List<McpPrompt>>
-        fun get(name: PromptName, request: PromptRequest): McpResult<PromptResponse>
+        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpPrompt>>
+        fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration? = null): McpResult<PromptResponse>
     }
 
+    /**
+     * Perform Model Sampling by a model provided by this MCP server
+     */
     interface Sampling {
-        fun sample(name: ModelIdentifier, request: SamplingRequest): Sequence<McpResult<SamplingResponse>>
+        /**
+         * Note that the timeout defined here is applied between each message received by the model
+         */
+        fun sample(name: ModelIdentifier, request: SamplingRequest, fetchNextTimeout: Duration? = null): Sequence<McpResult<SamplingResponse>>
     }
 
+    /**
+     * List and interact with Resources provided by this MCP server
+     */
     interface Resources {
         fun onChange(fn: () -> Unit)
-        fun list(): McpResult<List<McpResource>>
-        fun read(request: ResourceRequest): McpResult<ResourceResponse>
+        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
+        fun read(request: ResourceRequest, overrideDefaultTimeout: Duration? = null): McpResult<ResourceResponse>
     }
 
+    /**
+     * Generate Prompt Completions provided by this MCP Server
+     */
     interface Completions {
-        fun complete(request: CompletionRequest): McpResult<CompletionResponse>
+        fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration? = null): McpResult<CompletionResponse>
     }
 }
