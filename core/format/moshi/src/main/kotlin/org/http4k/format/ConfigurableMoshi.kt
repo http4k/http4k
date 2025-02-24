@@ -97,7 +97,7 @@ open class ConfigurableMoshi(
     override fun <T : Any> asA(input: String, target: KClass<T>): T = adapterFor(target).fromJson(input)!!
 
     private fun <T : Any> adapterFor(target: KClass<T>) = when (strictness) {
-        Lenient -> moshi.adapter(target.java)
+        Lenient -> moshi.adapter(target.java).lenient()
         FailOnUnknown -> moshi.adapter(target.java).failOnUnknown()
     }
 
