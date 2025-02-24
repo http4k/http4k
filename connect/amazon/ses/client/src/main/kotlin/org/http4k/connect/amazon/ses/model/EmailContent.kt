@@ -1,9 +1,7 @@
 package org.http4k.connect.amazon.ses.model
 
 import com.squareup.moshi.Json
-import dev.forkhandles.values.Base64StringValueFactory
-import dev.forkhandles.values.StringValue
-import org.http4k.base64Decoded
+import org.http4k.connect.model.Base64Blob
 import se.ansman.kotshi.JsonSerializable
 import java.nio.charset.Charset
 
@@ -34,13 +32,8 @@ data class Body(
 
 @JsonSerializable
 data class RawMessage(
-    @Json(name = "Data") val data: RawMessageBase64
+    @Json(name = "Data") val data: Base64Blob
 )
-
-class RawMessageBase64 private constructor(encoded: String): StringValue(encoded) {
-    fun decode() = value.base64Decoded()
-    companion object: Base64StringValueFactory<RawMessageBase64>(::RawMessageBase64)
-}
 
 @JsonSerializable
 data class Message(

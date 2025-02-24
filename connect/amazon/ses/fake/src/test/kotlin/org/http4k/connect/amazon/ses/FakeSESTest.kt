@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.present
-import org.http4k.base64Encode
 import org.http4k.connect.amazon.FakeAwsContract
 import org.http4k.connect.amazon.ses.model.Body
 import org.http4k.connect.amazon.ses.model.Content
@@ -13,7 +12,7 @@ import org.http4k.connect.amazon.ses.model.EmailAddress
 import org.http4k.connect.amazon.ses.model.EmailContent
 import org.http4k.connect.amazon.ses.model.Message
 import org.http4k.connect.amazon.ses.model.RawMessage
-import org.http4k.connect.amazon.ses.model.RawMessageBase64
+import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.successValue
 import org.junit.jupiter.api.Test
 
@@ -73,7 +72,7 @@ class FakeSESTest : SESContract, FakeAwsContract {
             ),
             content = EmailContent(
                 raw = RawMessage(
-                    data = RawMessageBase64.of(sampleMimeMessage(from).base64Encode())
+                    data = Base64Blob.encode(sampleMimeMessage(from))
                 )
             )
         )
@@ -88,7 +87,7 @@ class FakeSESTest : SESContract, FakeAwsContract {
             ),
             message = null,
             rawMessage = RawMessage(
-                RawMessageBase64.of(sampleMimeMessage(from).base64Encode())
+                Base64Blob.encode(sampleMimeMessage(from))
             )
         )))
     }

@@ -2,11 +2,7 @@ package org.http4k.connect.amazon.ses
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
-import dev.forkhandles.result4k.Failure
-import org.http4k.base64Encode
-import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.ses.model.Body
 import org.http4k.connect.amazon.ses.model.Content
@@ -15,8 +11,8 @@ import org.http4k.connect.amazon.ses.model.EmailAddress
 import org.http4k.connect.amazon.ses.model.EmailContent
 import org.http4k.connect.amazon.ses.model.Message
 import org.http4k.connect.amazon.ses.model.RawMessage
-import org.http4k.connect.amazon.ses.model.RawMessageBase64
 import org.http4k.connect.failureValue
+import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.successValue
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -64,7 +60,7 @@ interface SESContract : AwsContract {
             ),
             content = EmailContent(
                 raw = RawMessage(
-                    data = RawMessageBase64.of(sampleMimeMessage(from).base64Encode())
+                    data = Base64Blob.encode(sampleMimeMessage(from))
                 )
             )
         )

@@ -3,8 +3,8 @@ package org.http4k.connect.amazon.ses
 import jakarta.mail.Message
 import jakarta.mail.Session
 import jakarta.mail.internet.MimeMessage
-import org.http4k.connect.amazon.ses.model.RawMessageBase64
 import org.http4k.connect.amazon.ses.model.of
+import org.http4k.connect.model.Base64Blob
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -30,8 +30,8 @@ class JakartaMailExtensionsTest {
             setText("world")
         }
 
-        val raw = RawMessageBase64.of(message)
-        approver.assertApproved(raw.decode())
+        val raw = Base64Blob.of(message)
+        approver.assertApproved(raw.decoded())
     }
 }
 
