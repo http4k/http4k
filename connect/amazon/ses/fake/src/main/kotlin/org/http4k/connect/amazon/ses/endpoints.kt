@@ -2,62 +2,26 @@
 
 package org.http4k.connect.amazon.ses
 
-import org.http4k.connect.amazon.ses.model.EmailAddress
-import org.http4k.connect.amazon.ses.model.Message
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
+import org.http4k.connect.amazon.AwsRestJsonFake
+import org.http4k.connect.amazon.ses.action.SendEmail
 import org.http4k.connect.amazon.ses.model.SESMessageId
-import org.http4k.connect.amazon.ses.model.Subject
 import org.http4k.connect.storage.Storage
-import org.http4k.core.Body
-import org.http4k.core.ContentType.Companion.APPLICATION_XML
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.body.form
-import org.http4k.core.with
-import org.http4k.lens.FormField
-import org.http4k.lens.Validator
-import org.http4k.lens.WebForm
-import org.http4k.lens.value
-import org.http4k.lens.webForm
-import org.http4k.routing.asRouter
-import org.http4k.routing.bind
-import org.http4k.template.PebbleTemplates
-import org.http4k.template.viewModel
-import org.http4k.connect.amazon.ses.model.Body as SESBody
+import org.http4k.connect.amazon.ses.action.SendEmailResponse as SendEmailResponseDto
 
-private val source = FormField.value(EmailAddress).required("Source")
-private val sendForm = Body.webForm(Validator.Strict, source).toLens()
-
-fun SendEmail(messagesBySender: Storage<List<EmailMessage>>) = { r: Request -> r.form("Action") == "SendEmail" }
-    .asRouter() bind {
-
-    val webform = sendForm(it)
-
-    val existing = messagesBySender[source(webform).value] ?: emptyList()
+fun AwsRestJsonFake.SendEmail(messagesBySender: Storage<List<EmailMessage>>) = route<SendEmail> fn@{ data ->
+    val source = data.fromEmailAddress ?: return@fn Failure(SESError(null))
+    val existing = messagesBySender[source.value] ?: emptyList()
 
     val emailMessage = EmailMessage(
-        source(webform),
-        webform.valuesFrom("Destination.ToAddresses.member", EmailAddress::of),
-        webform.valuesFrom("Destination.CcAddresses.member", EmailAddress::of),
-        webform.valuesFrom("Destination.BccAddresses.member", EmailAddress::of),
-        Message(
-            webform.valuesFrom("Message.Subject.Data", Subject::of).first(),
-            webform.valuesFrom("Message.Body.Html.Data", SESBody::of).firstOrNull(),
-            webform.valuesFrom("Message.Body.Text.Data", SESBody::of).firstOrNull()
-        )
+        source = source,
+        destination = data.destination ?: return@fn Failure(SESError(null)),
+        message = data.content.simple,
+        rawMessage = data.content.raw
     )
 
-    messagesBySender[source(webform).value] = existing + emailMessage
+    messagesBySender[source.value] = existing + emailMessage
 
-    Response(OK).with(viewModelLens of SendEmailResponse(SESMessageId.of(emailMessage.toString())))
-}
-
-private fun <T> WebForm.valuesFrom(prefix: String, transform: (String) -> T) = fields
-    .filterKeys { it.startsWith(prefix) }
-    .values
-    .flatMap { it.map(transform) }
-    .toSet()
-
-val viewModelLens by lazy {
-    Body.viewModel(PebbleTemplates().CachingClasspath(), APPLICATION_XML).toLens()
+    Success(SendEmailResponseDto(SESMessageId.of(emailMessage.toString())))
 }
