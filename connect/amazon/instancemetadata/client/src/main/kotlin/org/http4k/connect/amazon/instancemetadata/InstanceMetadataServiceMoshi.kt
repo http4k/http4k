@@ -14,6 +14,7 @@ import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object InstanceMetadataServiceMoshi : ConfigurableMoshi(
     AwsMoshiBuilder(InstanceMetadataServiceJsonAdapterFactory)
+        .withInstanceMetadataServiceMappings()
         .done()
 )
 
