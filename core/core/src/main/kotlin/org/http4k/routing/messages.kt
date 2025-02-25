@@ -9,27 +9,35 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.lens.RequestKey
 import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
 import java.io.InputStream
 
+
+
+@Deprecated("Use RequestWithContext or ResponseWithContext instead", ReplaceWith("RequestWithContext"))
 interface RoutedMessage {
-    val xUriTemplate: UriTemplate?
 
     companion object {
         const val X_URI_TEMPLATE = "xUriTemplate"
+         val uriTemplateLensRequestKey = RequestKey.optional<UriTemplate>(X_URI_TEMPLATE)
     }
 }
 
+fun Request.uriTemplate(): UriTemplate? = (this as? RequestWithContext)?.context?.get(X_URI_TEMPLATE) as? UriTemplate
+fun Response.uriTemplate(): UriTemplate? = (this as? ResponseWithContext)?.context?.get(X_URI_TEMPLATE) as? UriTemplate
+
+fun Request.uriTemplate(uriTemplate: UriTemplate) = when(this){
+        is RequestWithContext -> RequestWithContext(delegate, context + (X_URI_TEMPLATE to uriTemplate))
+        else -> RequestWithContext(this, mapOf(X_URI_TEMPLATE to uriTemplate))
+}
+fun Response.uriTemplate(uriTemplate: UriTemplate) = when(this){
+    is ResponseWithContext -> ResponseWithContext(delegate, context + (X_URI_TEMPLATE to uriTemplate))
+    else -> ResponseWithContext(this, mapOf(X_URI_TEMPLATE to uriTemplate))
+}
+
 data class RequestWithContext(val delegate: Request, val context: Map<String, Any?> = emptyMap()) :
-    Request by delegate,
-    RoutedMessage {
-
-    constructor(delegate: Request, uriTemplate: UriTemplate) : this(
-        if (delegate is RequestWithContext) delegate.delegate else delegate,
-        if (delegate is RequestWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(X_URI_TEMPLATE to uriTemplate)
-    )
-
-    override val xUriTemplate = context[X_URI_TEMPLATE] as? UriTemplate
+    Request by delegate {
 
     override fun equals(other: Any?): Boolean = delegate == other
 
@@ -72,15 +80,7 @@ data class RequestWithContext(val delegate: Request, val context: Map<String, An
 }
 
 data class ResponseWithContext(val delegate: Response, val context: Map<String, Any> = emptyMap()) :
-    Response by delegate,
-    RoutedMessage {
-
-    constructor(delegate: Response, uriTemplate: UriTemplate) : this(
-        if (delegate is ResponseWithContext) delegate.delegate else delegate,
-        if (delegate is ResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate) else mapOf(X_URI_TEMPLATE to uriTemplate)
-    )
-
-    override val xUriTemplate = context[X_URI_TEMPLATE] as? UriTemplate
+    Response by delegate {
 
     override fun equals(other: Any?): Boolean = delegate == other
 

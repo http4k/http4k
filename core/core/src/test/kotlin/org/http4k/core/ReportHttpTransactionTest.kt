@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 class ReportHttpTransactionTest {
 
     @Test
-    @Disabled
     fun `unable to set request key before transaction logger`() {
         val lens = RequestKey.optional<String>("foo")
 
@@ -31,6 +30,6 @@ class ReportHttpTransactionTest {
 
         //this request fails
         val notFoundResponse = stack(Request(GET, "/notfound"))
-        assertThat(notFoundResponse.bodyString(), equalTo(NOT_FOUND))
+        assertThat(notFoundResponse.status, equalTo(NOT_FOUND))
     }
 }

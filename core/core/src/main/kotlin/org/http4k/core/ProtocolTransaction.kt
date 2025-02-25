@@ -1,7 +1,7 @@
 package org.http4k.core
 
 import org.http4k.core.ProtocolTransaction.Companion.ROUTING_GROUP_LABEL
-import org.http4k.routing.RoutedMessage
+import org.http4k.routing.uriTemplate
 import java.time.Duration
 import java.time.Instant
 
@@ -21,10 +21,10 @@ interface ProtocolTransaction<ProtocolResponse> {
     }
 }
 
-fun <ProtocolResponse> defaultLabels(request: Request, response: ProtocolResponse) = when {
-    response is RoutedMessage ->
-        response.xUriTemplate?.let { mapOf(ROUTING_GROUP_LABEL to it.toString()) } ?: emptyMap()
-    request is RoutedMessage ->
-        request.xUriTemplate?.let { mapOf(ROUTING_GROUP_LABEL to it.toString()) } ?: emptyMap()
+fun defaultLabels(request: Request, responseUriTemplate: UriTemplate?) = when {
+    responseUriTemplate != null ->
+        mapOf(ROUTING_GROUP_LABEL to responseUriTemplate.toString())
+    request.uriTemplate() != null ->
+        request.uriTemplate()?.let { mapOf(ROUTING_GROUP_LABEL to it.toString()) } ?: emptyMap()
     else -> emptyMap()
 }

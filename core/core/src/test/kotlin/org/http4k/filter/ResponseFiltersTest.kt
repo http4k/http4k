@@ -30,6 +30,7 @@ import org.http4k.routing.RequestWithContext
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.routing.uriTemplate
 import org.http4k.toHttpHandler
 import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -77,8 +78,8 @@ class ResponseFiltersTest {
     @Test
     fun `prioritises routed response when reporting a transaction`() {
         var called = false
-        val request = RequestWithContext(Request(GET, ""), UriTemplate.from("foo"))
-        val response = ResponseWithContext(Response(OK), UriTemplate.from("bar"))
+        val request = Request(GET, "").uriTemplate(UriTemplate.from("foo"))
+        val response = Response(OK).uriTemplate(UriTemplate.from("bar"))
 
         ReportHttpTransaction(TickingClock()) { tx ->
             called = true

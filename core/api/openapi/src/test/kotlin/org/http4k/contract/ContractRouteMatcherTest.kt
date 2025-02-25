@@ -37,6 +37,7 @@ import org.http4k.lens.int
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.routing.uriTemplate
 import org.http4k.security.ApiKeySecurity
 import org.http4k.security.BasicAuthSecurity
 import org.junit.jupiter.api.Test
@@ -130,7 +131,7 @@ class ContractRouteMatcherTest {
         val response = root(Request(GET, "/root/bar/foo/bar/hello")) as ResponseWithContext
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/bar/foo/bar/{world}")))
+        assertThat(response.uriTemplate(), equalTo(UriTemplate.from("/root/bar/foo/bar/{world}")))
     }
 
     @Test
@@ -201,7 +202,7 @@ class ContractRouteMatcherTest {
         val response: ResponseWithContext = root(Request(GET, "/root/hello/planet")) as ResponseWithContext
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/hello/{world}")))
+        assertThat(response.uriTemplate(), equalTo(UriTemplate.from("/root/hello/{world}")))
     }
 
     @Test

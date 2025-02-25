@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.routing.uriTemplate
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
 import org.http4k.sse.then
@@ -10,7 +11,7 @@ data class SseTransaction(
     override val request: Request,
     override val response: SseResponse,
     override val duration: Duration,
-    override val labels: Map<String, String> = defaultLabels(request, response),
+    override val labels: Map<String, String> = defaultLabels(request, response.uriTemplate()),
     override val start: Instant
 ) : ProtocolTransaction<SseResponse> {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))

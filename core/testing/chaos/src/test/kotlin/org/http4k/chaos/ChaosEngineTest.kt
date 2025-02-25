@@ -21,6 +21,7 @@ import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import org.http4k.routing.uriTemplate
 import org.http4k.security.ApiKeySecurity
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -125,7 +126,7 @@ class ChaosEngineTest {
 
         val routed = appWithChaos(Request(GET, "/foo/bob"))
         assertThat(routed, hasStatus(I_M_A_TEAPOT).and(hasBody("foobob")))
-        assertThat((routed as ResponseWithContext).xUriTemplate, equalTo(UriTemplate.from("{bib}/{bar}")))
+        assertThat((routed as ResponseWithContext).uriTemplate(), equalTo(UriTemplate.from("{bib}/{bar}")))
     }
 
     @Test
@@ -138,7 +139,7 @@ class ChaosEngineTest {
 
         val routed = appWithChaos(Request(GET, "/foo/bob"))
         assertThat(routed, hasStatus(I_M_A_TEAPOT))
-        assertThat((routed as ResponseWithContext).xUriTemplate, equalTo(UriTemplate.from("{path:.*}")))
+        assertThat((routed as ResponseWithContext).uriTemplate(), equalTo(UriTemplate.from("{path:.*}")))
     }
 
     @Test

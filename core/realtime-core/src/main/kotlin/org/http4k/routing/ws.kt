@@ -16,32 +16,26 @@ fun websockets(routers: List<RoutingWsHandler>) = RoutingWsHandler(routers.flatM
 
 fun websockets(ws: WsConsumer): WsHandler = { WsResponse(ws) }
 
+fun WsResponse.uriTemplate() = (this as? WsResponseWithContext)?.context?.get(X_URI_TEMPLATE) as? UriTemplate
+fun WsResponse.uriTemplate(uriTemplate: UriTemplate) = when (this) {
+    is WsResponseWithContext -> WsResponseWithContext(delegate, context + (X_URI_TEMPLATE to uriTemplate))
+    else -> WsResponseWithContext(this, mapOf(X_URI_TEMPLATE to uriTemplate))
+}
+
 class WsResponseWithContext(
     val delegate: WsResponse,
     val context: Map<String, Any> = emptyMap()
-) : WsResponse by delegate, RoutedMessage {
-
-    constructor(delegate: WsResponse, uriTemplate: UriTemplate) : this(
-        if (delegate is WsResponseWithContext) delegate.delegate else delegate,
-        if (delegate is WsResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate)
-        else mapOf(X_URI_TEMPLATE to uriTemplate)
-    )
-
-    override val xUriTemplate: UriTemplate
-        get() {
-            return context[X_URI_TEMPLATE] as? UriTemplate
-                ?: throw IllegalStateException("Message was not routed, so no uri-template present")
-        }
+) : WsResponse by delegate {
 
     override fun equals(other: Any?): Boolean = delegate == other
 
     override fun hashCode(): Int = delegate.hashCode()
 
     override fun withConsumer(consumer: WsConsumer): WsResponse =
-        WsResponseWithContext(delegate.withConsumer(consumer), xUriTemplate)
+        WsResponseWithContext(delegate.withConsumer(consumer))
 
     override fun withSubprotocol(subprotocol: String?): WsResponse =
-        WsResponseWithContext(delegate.withSubprotocol(subprotocol), xUriTemplate)
+        WsResponseWithContext(delegate.withSubprotocol(subprotocol))
 }
 
 class RoutingWsHandler(
@@ -59,7 +53,7 @@ class TemplatedWsRoute(
     router = router,
     filter = filter,
     responseFor = { WsResponse { it.close(REFUSE) } },
-    addUriTemplateFilter = { next -> { WsResponseWithContext(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
+    addUriTemplateFilter = { next -> { WsResponseWithContext(next(it.uriTemplate(uriTemplate))).uriTemplate(uriTemplate) } }
 ) {
     override fun withBasePath(prefix: String) = TemplatedWsRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 

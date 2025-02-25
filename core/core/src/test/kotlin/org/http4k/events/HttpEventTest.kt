@@ -12,6 +12,7 @@ import org.http4k.events.HttpEvent.Incoming
 import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.ResponseWithContext
+import org.http4k.routing.uriTemplate
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
 import java.time.Instant
@@ -42,7 +43,7 @@ class HttpEventTest {
         )).xUriTemplate, equalTo("bob"))
         assertThat(Outgoing(HttpTransaction(
             request = Request(GET, "/bob"),
-            response = ResponseWithContext(Response(OK), UriTemplate.from("bar")),
+            response = Response(OK).uriTemplate(UriTemplate.from("bar")),
             start = startTime,
             duration = ZERO,
             labels = mapOf()
@@ -55,7 +56,7 @@ class HttpEventTest {
         assertThat(
             Incoming(
                 HttpTransaction(
-                    request = RequestWithContext(Request(GET, "/bob"), UriTemplate.from("bar")),
+                    request = Request(GET, "/bob").uriTemplate(UriTemplate.from("bar")),
                     response = Response(OK),
                     start = startTime,
                     duration = ZERO,

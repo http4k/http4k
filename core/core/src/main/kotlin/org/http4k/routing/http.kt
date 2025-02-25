@@ -30,7 +30,7 @@ class TemplatedHttpRoute(
     router = router,
     filter = filter,
     responseFor = { Response(it) },
-    addUriTemplateFilter = { next -> { ResponseWithContext(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
+    addUriTemplateFilter = { next -> { next(it.uriTemplate(uriTemplate)).uriTemplate(uriTemplate) } }
 ) {
     override fun withBasePath(prefix: String) = TemplatedHttpRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 

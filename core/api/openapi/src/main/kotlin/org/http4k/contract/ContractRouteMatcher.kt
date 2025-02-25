@@ -21,6 +21,7 @@ import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingMatch
 import org.http4k.routing.and
+import org.http4k.routing.uriTemplate
 import org.http4k.security.NoSecurity.filter
 import org.http4k.security.Security
 
@@ -127,7 +128,7 @@ data class ContractRouteMatcher(
             Filter { next ->
                 {
                     val xUriTemplate = UriTemplate.from(routeIdentity.ifEmpty { "/" })
-                    ResponseWithContext(next(RequestWithContext(it, xUriTemplate)), xUriTemplate)
+                    ResponseWithContext(next(it.uriTemplate(xUriTemplate))).uriTemplate(xUriTemplate)
                 }
             }
         }

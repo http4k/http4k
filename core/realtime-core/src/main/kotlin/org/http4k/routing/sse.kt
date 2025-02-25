@@ -22,25 +22,19 @@ fun sse(vararg list: RoutingSseHandler): RoutingSseHandler = sse(list.toList())
 fun sse(routers: List<RoutingSseHandler>) =
     RoutingSseHandler(routers.flatMap { it.routes })
 
+fun SseResponse.uriTemplate() = (this as? SseResponseWithContext)?.context?.get(X_URI_TEMPLATE) as? UriTemplate
+fun SseResponse.uriTemplate(uriTemplate: UriTemplate) = when (this) {
+    is SseResponseWithContext -> SseResponseWithContext(delegate, context + (X_URI_TEMPLATE to uriTemplate))
+    else -> SseResponseWithContext(this, mapOf(X_URI_TEMPLATE to uriTemplate))
+}
+
 data class SseResponseWithContext(
     val delegate: SseResponse,
     val context: Map<String, Any> = emptyMap()
-) : SseResponse by delegate, RoutedMessage {
-
-    constructor(delegate: SseResponse, uriTemplate: UriTemplate) : this(
-        if (delegate is SseResponseWithContext) delegate.delegate else delegate,
-        if (delegate is SseResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate)
-        else mapOf(X_URI_TEMPLATE to uriTemplate)
-    )
-
-    override val xUriTemplate: UriTemplate
-        get() {
-            return context[X_URI_TEMPLATE] as? UriTemplate
-                ?: throw IllegalStateException("Message was not routed, so no uri-template present")
-        }
+) : SseResponse by delegate {
 
     override fun withConsumer(consumer: SseConsumer) =
-        SseResponseWithContext(delegate.withConsumer(consumer), xUriTemplate)
+        SseResponseWithContext(delegate.withConsumer(consumer))
 
     override fun equals(other: Any?): Boolean = delegate == other
 
@@ -67,7 +61,11 @@ class TemplatedSseRoute(
     router = router,
     filter = filter,
     responseFor = { SseResponse(it, emptyList(), false, Sse::close) },
-    addUriTemplateFilter = { next -> { SseResponseWithContext(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
+    addUriTemplateFilter = { next ->
+        {
+            next(it.uriTemplate(uriTemplate)).uriTemplate(uriTemplate)
+        }
+    }
 ) {
     override fun withBasePath(prefix: String) = TemplatedSseRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 

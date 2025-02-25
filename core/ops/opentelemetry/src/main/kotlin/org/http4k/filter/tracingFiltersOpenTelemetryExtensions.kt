@@ -23,6 +23,7 @@ import org.http4k.core.Response
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
+import org.http4k.routing.uriTemplate
 import java.util.concurrent.atomic.AtomicReference
 
 fun ClientFilters.OpenTelemetryTracing(
@@ -92,8 +93,8 @@ fun ServerFilters.OpenTelemetryTracing(
                 .startSpan()) {
                 makeCurrent().use {
                     try {
-                        if (req is RoutedMessage && req.xUriTemplate != null)
-                            setAttribute("http.route", req.xUriTemplate.toString())
+                        if (req.uriTemplate() != null)
+                            setAttribute("http.route", req.uriTemplate().toString())
 
                         setAttribute("http.method", req.method.name)
                         setAttribute("http.url", req.uri.toString())
@@ -131,7 +132,7 @@ internal fun <T : HttpMessage> getter(textMapPropagator: TextMapPropagator) = ob
 
 val defaultSpanNamer: (Request) -> String = {
     when (it) {
-        is RequestWithContext -> it.method.name + it.xUriTemplate?.let { " $it" }
+        is RequestWithContext -> it.method.name + it.uriTemplate()?.let { " $it" }
         else -> it.method.name
     }
 }

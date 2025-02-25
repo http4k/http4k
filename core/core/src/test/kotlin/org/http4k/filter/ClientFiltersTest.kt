@@ -40,6 +40,7 @@ import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
 import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
+import org.http4k.routing.uriTemplate
 import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -94,7 +95,7 @@ class ClientFiltersTest {
 
         val response = redirectingClient(Request(GET, "/r1")) as ResponseWithContext
 
-        assertThat(response.xUriTemplate, equalTo(UriTemplate.from("r1")))
+        assertThat(response.uriTemplate(), equalTo(UriTemplate.from("r1")))
     }
 
     @Test
@@ -536,10 +537,10 @@ class ClientFiltersTest {
 
         val app = ClientFilters.CleanProxy().then { r: Request ->
             captured.set(r)
-            ResponseWithContext(resp, UriTemplate.from("foo"))
+            resp.uriTemplate(UriTemplate.from("foo"))
         }
 
-        val output = app(RequestWithContext(req, UriTemplate.from("foo")))
+        val output = app(req.uriTemplate(UriTemplate.from("foo")))
 
         assertThat(captured.get(), equalTo(req).and(isA<MemoryRequest>()))
         assertThat(output, equalTo(resp).and(isA<MemoryResponse>()))

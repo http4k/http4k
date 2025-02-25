@@ -12,6 +12,7 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.with
 import org.http4k.routing.RequestWithContext
+import org.http4k.routing.uriTemplate
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -53,7 +54,7 @@ class PathTest {
 
     @Test
     fun `value present in request when it has been pre-parsed`() {
-        val target = RequestWithContext(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}"))
+        val target = Request(GET, "/some/world").uriTemplate(UriTemplate.from("/some/{hello}"))
 
         assertThat(Path.of("hello")(target), equalTo("world"))
         assertThat(Path.of("hello").extract(target), equalTo("world"))
@@ -90,14 +91,14 @@ class PathTest {
     fun `sets value on request uri with proper encoding`() {
         fun checkEncodeDecode(unencoded: String, encoded: String) {
             val pathParam = Path.of("bob")
-            val updated = RequestWithContext(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of unencoded), UriTemplate.from("/first/{bob}/second"))
+            val updated = Request(GET, Uri.of("http://bob.com/first/{bob}/second")).uriTemplate(UriTemplate.from("/first/{bob}/second")).with(pathParam of unencoded)
             assertThat(updated, equalTo(Request(GET, "http://bob.com/first/$encoded/second")))
             assertThat(pathParam(updated), equalTo(unencoded))
         }
 
         fun checkDecode(encoded: String, unencoded: String) {
             val pathParam = Path.of("bob")
-            val updated = RequestWithContext(Request(GET, Uri.of("http://bob.com/first/$encoded/second")), UriTemplate.from("/first/{bob}/second"))
+            val updated = Request(GET, Uri.of("http://bob.com/first/$encoded/second")).uriTemplate(UriTemplate.from("/first/{bob}/second"))
             assertThat(pathParam(updated), equalTo(unencoded))
         }
 

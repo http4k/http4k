@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.routing.uriTemplate
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus
@@ -12,7 +13,7 @@ data class WsTransaction(
     override val response: WsResponse,
     val status: WsStatus,
     override val duration: Duration,
-    override val labels: Map<String, String> = defaultLabels(request, response),
+    override val labels: Map<String, String> = defaultLabels(request, response.uriTemplate()),
     override val start: Instant
 ) : ProtocolTransaction<WsResponse> {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))

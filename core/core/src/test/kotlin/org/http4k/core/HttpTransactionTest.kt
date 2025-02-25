@@ -7,6 +7,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.RoutedMessage
+import org.http4k.routing.uriTemplate
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
 import java.time.Instant
@@ -28,7 +29,7 @@ class HttpTransactionTest {
 
     @Test
     fun `can get the routing group from a RoutedResponse`() {
-        val response = ResponseWithContext(Response(OK), UriTemplate.from("hello"))
+        val response = Response(OK).uriTemplate(UriTemplate.from("hello"))
         assertThat(
             HttpTransaction(
                 request = Request(GET, Uri.of("/")),
@@ -41,11 +42,11 @@ class HttpTransactionTest {
 
     @Test
     fun `can create with request and response extensions`() {
-        class ExtendedRequest(val delegate: RequestWithContext) : Request by delegate, RoutedMessage by delegate
+        class ExtendedRequest(val delegate: RequestWithContext) : Request by delegate
 
-        class ExtendedResponse(val delegate: ResponseWithContext) : Response by delegate, RoutedMessage by delegate
+        class ExtendedResponse(val delegate: ResponseWithContext) : Response by delegate
 
-        val request = ExtendedRequest(RequestWithContext(Request(GET, "/the-path"), UriTemplate.from("request")))
+        val request = ExtendedRequest(RequestWithContext(Request(GET, "/the-path"), emptyMap())).uriTemplate(UriTemplate.from("request"))
         assertThat(
             HttpTransaction(
                 request = request,
@@ -55,7 +56,7 @@ class HttpTransactionTest {
             ).labels, equalTo(mapOf("routingGroup" to "request"))
         )
 
-        val response = ExtendedResponse(ResponseWithContext(Response(OK, "/the-path"), UriTemplate.from("response")))
+        val response = ExtendedResponse(ResponseWithContext(Response(OK, "/the-path"), emptyMap())).uriTemplate(UriTemplate.from("response"))
         assertThat(
             HttpTransaction(
                 request = request,

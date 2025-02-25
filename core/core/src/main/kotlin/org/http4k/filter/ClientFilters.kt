@@ -27,6 +27,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.uriTemplate
 import org.http4k.security.CredentialsProvider
 import java.time.Clock
 import java.time.Instant
@@ -194,7 +195,7 @@ object ClientFilters {
             when {
                 attempt > 1 -> previousValue
                 else -> when (this) {
-                    is ResponseWithContext -> xUriTemplate
+                    is ResponseWithContext -> uriTemplate()
                     else -> null
                 }
             }
@@ -202,7 +203,7 @@ object ClientFilters {
         private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when (uriTemplate) {
             null -> this
             //FIXME
-            else -> ResponseWithContext(this, uriTemplate)
+            else -> this.uriTemplate(uriTemplate)
         }
 
         private fun Request.toNewLocation(location: String): Request {

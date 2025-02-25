@@ -23,8 +23,8 @@ import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.postbox.RequestProcessingStatus.Dead
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
-import org.http4k.routing.RoutedMessage
 import org.http4k.routing.path
+import org.http4k.routing.uriTemplate
 
 typealias RequestIdResolver = (Request) -> RequestId?
 
@@ -97,9 +97,9 @@ object RequestIdResolvers {
 
     fun fromPath(pathName: String, uriTemplate: UriTemplate = UriTemplate.from("{$pathName}")) =
         { request: Request ->
-            when (request) {
-                is RoutedMessage -> request.path(pathName)
-                else -> uriTemplate.extract(request.uri.path)[pathName]
+            when (request.uriTemplate()) {
+                null -> uriTemplate.extract(request.uri.path)[pathName]
+                else -> request.path(pathName)
             }?.let(RequestId.Companion::of)
         }
 
