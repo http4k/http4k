@@ -9,8 +9,12 @@ import org.http4k.websocket.WsMessage
  * Websocket session connection.
  */
 fun McpSession.Companion.Websocket() = object : McpSession<Websocket> {
-    override fun send(transport: Websocket, event: Event) {
-        transport.send(WsMessage(event.toMessage()))
+    override fun ping(transport: Websocket) {
+        transport.send(WsMessage(Event("ping", "").toMessage()))
+    }
+
+    override fun event(transport: Websocket, data: String) {
+        transport.send(WsMessage(Event("message", data).toMessage()))
     }
 
     override fun onClose(transport: Websocket, fn: () -> Unit) {

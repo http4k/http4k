@@ -27,7 +27,6 @@ import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.session.SessionIdProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
-import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -83,7 +82,7 @@ class RealtimeMcpProtocol<Transport>(
     override fun send(message: McpNodeType, sessionId: SessionId) = when (val sink = sessions[sessionId]) {
         null -> Response(GONE)
         else -> {
-            mcpSession.send(sink, Event("message", compact(message)))
+            mcpSession.event(sink, compact(message))
             Response(ACCEPTED)
         }
     }
@@ -103,7 +102,7 @@ class RealtimeMcpProtocol<Transport>(
     private fun pruneDeadConnections() =
         sessions.toList().forEach { (sessionId, sink) ->
             try {
-                mcpSession.send(sink, Event("ping", ""))
+                mcpSession.ping(sink)
             } catch (e: Exception) {
                 sessions.remove(sessionId)
                 mcpSession.close(sink)
