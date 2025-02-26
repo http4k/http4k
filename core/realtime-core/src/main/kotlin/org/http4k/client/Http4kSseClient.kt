@@ -18,7 +18,8 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
 /**
- * Simple SSE client leveraging standard HttpHandlers. Tracks a single connection only
+ * Simple SSE client leveraging standard HttpHandlers. Tracks a single connection only and sends reconnection
+ * requests including the last event id.
  */
 class Http4kSseClient(
     private val sseRequest: Request,
