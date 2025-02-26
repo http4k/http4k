@@ -23,17 +23,17 @@ import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.session.SessionIdProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
-import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
-import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class RealtimeMcpProtocol(
+class RealtimeMcpProtocol<Transport>(
+    private val mcpSession: McpSession<Transport>,
     metaData: ServerMetaData,
     prompts: Prompts = Prompts(emptyList()),
     tools: Tools = Tools(emptyList()),
@@ -45,7 +45,7 @@ class RealtimeMcpProtocol(
     logger: Logger = Logger(),
     random: Random = Random,
     private val sessionIdFactory: SessionIdProvider = SessionIdProvider.Random(random),
-    private val keepAliveDelay: Duration = Duration.ofSeconds(2)
+    private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : McpProtocol<Response>(
     metaData,
     tools,
@@ -58,12 +58,15 @@ class RealtimeMcpProtocol(
     logger,
     random
 ) {
-
     /**
      * Constructor useful when only simple MCP protocol behaviours are required
      */
-    constructor(serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>) :
+    constructor(
+        mcpSession: McpSession<Transport>,
+        serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>
+    ) :
         this(
+            mcpSession,
             serverMetaData,
             Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
             Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
@@ -73,24 +76,14 @@ class RealtimeMcpProtocol(
             OutgoingSampling(capabilities.flatMap { it }.filterIsInstance<OutgoingSamplingCapability>())
         )
 
-    private val sseSessions = ConcurrentHashMap<SessionId, Sse>()
-    private val wsSessions = ConcurrentHashMap<SessionId, Websocket>()
+    private val sessions = ConcurrentHashMap<SessionId, Transport>()
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun send(message: McpNodeType, sessionId: SessionId) = when (val sse = sseSessions[sessionId]) {
-        null -> {
-            when (val wsSession = wsSessions[sessionId]) {
-                null -> Response(GONE)
-                else -> {
-                    wsSession.send(WsMessage(Event("message", compact(message)).toMessage()))
-                    Response(ACCEPTED)
-                }
-            }
-        }
-
+    override fun send(message: McpNodeType, sessionId: SessionId) = when (val sink = sessions[sessionId]) {
+        null -> Response(GONE)
         else -> {
-            sse.send(Event("message", compact(message)))
+            mcpSession.send(sink, Event("message", compact(message)))
             Response(ACCEPTED)
         }
     }
@@ -98,28 +91,22 @@ class RealtimeMcpProtocol(
     override fun error() = Response(GONE)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
-        sseSessions[sessionId]?.onClose(fn)
+        sessions[sessionId]?.also { mcpSession.onClose(it, fn) }
     }
 
-    fun newSession(connectRequest: Request, sse: Sse): SessionId {
-        val sessionId = sessionIdFactory(sse.connectRequest)
-        sseSessions[sessionId] = sse
-        return sessionId
-    }
-
-    fun newSession(upgradeRequest: Request, websocket: Websocket): SessionId {
-        val sessionId = sessionIdFactory(upgradeRequest)
-        wsSessions[sessionId] = websocket
+    fun newSession(connectRequest: Request, eventSink: Transport): SessionId {
+        val sessionId = sessionIdFactory(connectRequest)
+        sessions[sessionId] = eventSink
         return sessionId
     }
 
     private fun pruneDeadConnections() =
-        sseSessions.toList().forEach { (sessionId, sse) ->
+        sessions.toList().forEach { (sessionId, sink) ->
             try {
-                sse.send(Event("ping", ""))
+                mcpSession.send(sink, Event("ping", ""))
             } catch (e: Exception) {
-                sseSessions.remove(sessionId)
-                sse.close()
+                sessions.remove(sessionId)
+                mcpSession.close(sink)
             }
         }
 
