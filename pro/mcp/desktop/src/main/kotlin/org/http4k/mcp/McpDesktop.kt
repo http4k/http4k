@@ -19,7 +19,7 @@ object McpDesktop {
                 if (debug) DebuggingReader(System.`in`.reader()) else System.`in`.reader(),
                 if (debug) DebuggingWriter(System.out.writer()) else System.out.writer(),
                 Request(GET, url),
-                McpDesktopHttpClient(clock, debug),
+                McpDesktopHttpClient(clock, this),
                 Immediate
             )
         }

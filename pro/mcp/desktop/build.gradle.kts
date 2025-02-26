@@ -25,6 +25,7 @@ graalvmNative {
 dependencies {
     api("dev.forkhandles:bunting4k")
     api(project(":http4k-mcp-sdk"))
+    api(project(":http4k-security-core"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-helidon"))
