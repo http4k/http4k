@@ -1,3 +1,5 @@
 package org.http4k.lens
 
-val Header.LAST_EVENT_ID get() = Header.optional("Last-Event-ID")
+import org.http4k.sse.SseEventId
+
+val Header.LAST_EVENT_ID get() = Header.map(::SseEventId, SseEventId::value).optional("Last-Event-ID")
