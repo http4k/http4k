@@ -15,10 +15,13 @@ import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.ws.StandardMcpWs
+import org.http4k.mcp.server.ws.Websocket
+import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
+class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Websocket>> {
 
     override fun protocol(
         serverMetaData: ServerMetaData,
@@ -28,6 +31,7 @@ class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         completions: Completions,
         incomingSampling: IncomingSampling
     ) = RealtimeMcpProtocol(
+        McpSession.Websocket(),
         serverMetaData, prompts, tools, resources, completions, incomingSampling
     )
 
@@ -38,5 +42,5 @@ class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         WebsocketClient(Duration.ofSeconds(2), true),
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = StandardMcpWs(protocol)
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Websocket>) = StandardMcpWs(protocol)
 }

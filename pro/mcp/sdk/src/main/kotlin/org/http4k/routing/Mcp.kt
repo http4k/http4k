@@ -20,7 +20,6 @@ import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.IncomingSamplingCapability
-import org.http4k.mcp.server.capability.OutgoingSampling
 import org.http4k.mcp.server.capability.OutgoingSamplingCapability
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
@@ -29,9 +28,12 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.mcp.server.stdio.StdIoMcpProtocol
 import org.http4k.mcp.server.ws.StandardMcpWs
+import org.http4k.mcp.server.ws.Websocket
 import java.io.Reader
 import java.io.Writer
 
@@ -46,13 +48,13 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardMcpSse(RealtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
+    StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardMcpWs(RealtimeMcpProtocol(serverMetaData, capabilities).also { it.start() })
+    StandardMcpWs(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

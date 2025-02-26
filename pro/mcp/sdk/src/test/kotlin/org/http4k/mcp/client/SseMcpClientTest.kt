@@ -37,20 +37,22 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.RealtimeMcpProtocol
-import org.http4k.mcp.server.sse.McpSseHandler
+import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
+import org.http4k.sse.Sse
 import org.junit.jupiter.api.Test
 
-class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
+class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
     override fun protocol(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
@@ -58,7 +60,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         resources: Resources,
         completions: Completions,
         incomingSampling: IncomingSampling
-    ) = RealtimeMcpProtocol(serverMetaData, prompts, tools, resources, completions, incomingSampling)
+    ) = RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, prompts, tools, resources, completions, incomingSampling)
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -67,7 +69,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol) = StandardMcpSse(protocol)
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardMcpSse(protocol)
 
     @Test
     fun `deals with error`() {

@@ -6,11 +6,12 @@ import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.routing.bind
 import org.http4k.routing.poly
 import org.http4k.routing.sse.bind
+import org.http4k.sse.Sse
 
 /**
  * Standard MCP server setup for SSE-based MCP Servers
  */
-fun StandardMcpSse(mcpProtocol: RealtimeMcpProtocol) = poly(
+fun StandardMcpSse(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
     "/sse" bind McpSseHandler(mcpProtocol),
     CatchLensFailure().then("/message" bind McpHttpHandler(mcpProtocol))
 )

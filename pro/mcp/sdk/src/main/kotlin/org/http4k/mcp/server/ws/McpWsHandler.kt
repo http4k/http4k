@@ -9,6 +9,7 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.routing.bindWs
 import org.http4k.routing.websockets
 import org.http4k.sse.SseMessage
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
 
@@ -16,7 +17,7 @@ import org.http4k.websocket.WsResponse
  * This Websocket handler can be bound to whatever path is required by the server with
  * ws("/path" bind <McpWsHandler>
  */
-fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol) = websockets("" bindWs { req ->
+fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol<Websocket>) = websockets("" bindWs { req ->
     WsResponse {
         val newSessionId = mcpProtocol.newSession(req, it)
         it.onMessage {
