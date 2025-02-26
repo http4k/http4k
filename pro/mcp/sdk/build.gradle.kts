@@ -30,5 +30,6 @@ dependencies {
     testImplementation("org.jsoup:jsoup:_")
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-helidon"))
+    testImplementation(project(":http4k-security-core"))
     testImplementation(project(":http4k-testing-approval"))
 }
