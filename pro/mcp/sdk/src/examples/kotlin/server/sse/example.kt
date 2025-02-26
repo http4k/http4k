@@ -1,4 +1,4 @@
-package server
+package server.sse
 
 import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
@@ -8,6 +8,11 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpSse
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
+import server.completions
+import server.prompts
+import server.resources
+import server.sampling
+import server.tools
 
 fun main() {
     val mcpServer = mcpSse(

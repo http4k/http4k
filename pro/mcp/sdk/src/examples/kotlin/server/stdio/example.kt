@@ -1,4 +1,4 @@
-package server
+package server.stdio
 
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolCapability
@@ -7,6 +7,10 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.util.DebuggingReader
 import org.http4k.mcp.util.DebuggingWriter
 import org.http4k.routing.mcpStdIo
+import server.prompts
+import server.resources
+import server.sampling
+import server.tools
 
 fun main() {
     mcpStdIo(
