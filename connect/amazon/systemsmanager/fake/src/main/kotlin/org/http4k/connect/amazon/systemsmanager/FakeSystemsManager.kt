@@ -23,6 +23,7 @@ class FakeSystemsManager(
     override val app = routes(
         api.deleteParameter(parameters),
         api.getParameter(parameters),
+        api.getParameters(parameters),
         api.putParameter(parameters)
     )
 
