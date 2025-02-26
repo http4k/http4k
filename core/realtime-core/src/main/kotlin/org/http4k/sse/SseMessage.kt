@@ -25,7 +25,7 @@ sealed interface SseMessage {
         constructor(event: String, data: InputStream, id: SseEventId? = null) : this(event, data.readAllBytes(), id)
 
         override fun toMessage() = (listOf("event: $event") + data.split("\n")
-            .map { "data: $it" } + listOfNotNull(id?.let { "id: $it" }))
+            .map { "data: $it" } + listOfNotNull(id?.let { "id: ${it.value}" }))
             .joinToString("\n") + "\n\n"
     }
 
@@ -44,7 +44,7 @@ sealed interface SseMessage {
                 parts.any { it.startsWith("event:") } -> Event(
                     parts.first { it.startsWith("event:") }.removePrefix("event:").trim(),
                     parts.filter { it.startsWith("data:") }.joinToString("\n") { it.removePrefix("data:").trim() },
-                    parts.find { it.startsWith("id:") }?.removePrefix("id:")?.trim()?.let { SseEventId(it) }
+                    parts.find { it.startsWith("id:") }?.removePrefix("id:")?.trim()?.let(::SseEventId)
                 )
 
                 parts.first().startsWith("data:") -> Data(parts.first().removePrefix("data:").trim())
