@@ -66,7 +66,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
                         is Ping -> builder().data("")
                         is Data -> builder().data(message.sanitizeForMultipleRecords())
                         is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
-                            .let { if (message.id == null) it else it.id(message.id) }
+                            .let { if (message.id == null) it else it.id(message.id?.value) }
                     }.build()
                 )
             } catch (e: IllegalStateException) {

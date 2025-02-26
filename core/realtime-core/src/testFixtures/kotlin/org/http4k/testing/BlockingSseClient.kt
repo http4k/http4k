@@ -5,6 +5,7 @@ import com.launchdarkly.eventsource.MessageEvent
 import com.launchdarkly.eventsource.background.BackgroundEventHandler
 import com.launchdarkly.eventsource.background.BackgroundEventSource
 import org.http4k.core.Uri
+import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import java.net.URI
 import java.util.concurrent.LinkedBlockingQueue
@@ -27,7 +28,6 @@ class BlockingSseClient(
     }
 }
 
-
 private class Handler(private val queue: LinkedBlockingQueue<() -> SseMessage?>) : BackgroundEventHandler {
     override fun onOpen() {
     }
@@ -39,7 +39,7 @@ private class Handler(private val queue: LinkedBlockingQueue<() -> SseMessage?>)
     override fun onMessage(event: String?, messageEvent: MessageEvent) {
         val sseEvent = when (event) {
             null, "message" -> SseMessage.Data(messageEvent.data)
-            else -> SseMessage.Event(event, messageEvent.data, messageEvent.lastEventId)
+            else -> SseMessage.Event(event, messageEvent.data, messageEvent.lastEventId?.let(::SseEventId))
         }
         queue += { sseEvent }
     }

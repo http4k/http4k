@@ -1,7 +1,7 @@
 package org.http4k.mcp.server
 
 import dev.forkhandles.time.executors.SimpleScheduler
-import dev.forkhandles.values.random
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
@@ -43,6 +43,7 @@ class RealtimeMcpProtocol(
     outgoingSampling: OutgoingSampling = OutgoingSampling(emptyList()),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
+    private val sessionIdFactory: SessionIdProvider = SessionIdProvider.Random,
     private val random: Random = Random,
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : McpProtocol<Response>(
@@ -101,13 +102,13 @@ class RealtimeMcpProtocol(
     }
 
     fun newSession(sse: Sse): SessionId {
-        val sessionId = SessionId.random(random)
+        val sessionId = sessionIdFactory(sse.connectRequest)
         sseSessions[sessionId] = sse
         return sessionId
     }
 
-    fun newSession(websocket: Websocket): SessionId {
-        val sessionId = SessionId.random(random)
+    fun newSession(upgradeRequest: Request, websocket: Websocket): SessionId {
+        val sessionId = sessionIdFactory(upgradeRequest)
         wsSessions[sessionId] = websocket
         return sessionId
     }

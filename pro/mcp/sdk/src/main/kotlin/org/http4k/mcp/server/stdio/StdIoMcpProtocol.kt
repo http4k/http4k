@@ -65,7 +65,7 @@ class StdIoMcpProtocol(
         executor.readLines(reader) {
             try {
                 val req = Request(POST, "").body(it)
-                this(SessionId.of(UUID(0, 0)), Body.jsonRpcRequest(McpJson).toLens()(req), req)
+                this(SessionId.of(UUID(0, 0).toString()), Body.jsonRpcRequest(McpJson).toLens()(req), req)
             } catch (e: Exception) {
                 e.printStackTrace(System.err)
             }

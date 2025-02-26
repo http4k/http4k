@@ -67,7 +67,7 @@ abstract class SseServerContract(
     private val sse = sse(
         "/noclose" bind {
             SseResponse(OK) { sse ->
-                sse.send(Event("event", "hello\nworld!", "456"))
+                sse.send(Event("event", "hello\nworld!", SseEventId("456")))
             }
         },
         "/modify" bind {
@@ -102,8 +102,8 @@ abstract class SseServerContract(
                 when {
                     req.query("reject") == null -> SseResponse(OK, listOf("foo" to "bar")) { sse ->
                         val name = req.path("name")!!
-                        sse.send(Event("event1", "hello $name", "123"))
-                        sse.send(Event("event2", "again $name", "456"))
+                        sse.send(Event("event1", "hello $name", SseEventId("123")))
+                        sse.send(Event("event2", "again $name", SseEventId("456")))
                         sse.send(Data("goodbye $name".byteInputStream()))
                         sse.close()
                     }
@@ -116,7 +116,7 @@ abstract class SseServerContract(
         ),
         "/newline" bind {
             SseResponse(OK) { sse ->
-                sse.send(Event("event", "hello\nworld!", "456"))
+                sse.send(Event("event", "hello\nworld!", SseEventId("456")))
                 sse.close()
             }
         }
@@ -163,7 +163,7 @@ abstract class SseServerContract(
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/noclose"))
         assertThat(
             client.received().take(1).toList(),
-            equalTo(listOf(Event("event", "hello\nworld!", "456")))
+            equalTo(listOf(Event("event", "hello\nworld!", SseEventId("456"))))
         )
         val syserr = String(err.toByteArray()).lowercase()
         assertThat(syserr, !containsSubstring("exception"))
@@ -179,8 +179,8 @@ abstract class SseServerContract(
             client.received().take(3).toList(),
             equalTo(
                 listOf(
-                    Event("event1", "hello bob", "123"),
-                    Event("event2", "again bob", "456"),
+                    Event("event1", "hello bob", SseEventId("123")),
+                    Event("event2", "again bob", SseEventId("456")),
                     Data("goodbye bob".base64Encode())
                 )
             )
@@ -316,8 +316,8 @@ abstract class SseServerContract(
             client1.received().take(3).toList(),
             equalTo(
                 listOf(
-                    Event("event1", "hello leia", "123"),
-                    Event("event2", "again leia", "456"),
+                    Event("event1", "hello leia", SseEventId("123")),
+                    Event("event2", "again leia", SseEventId("456")),
                     Data("goodbye leia".base64Encode())
                 )
             )
@@ -328,8 +328,8 @@ abstract class SseServerContract(
             client2.received().take(3).toList(),
             equalTo(
                 listOf(
-                    Event("event1", "hello luke", "123"),
-                    Event("event2", "again luke", "456"),
+                    Event("event1", "hello luke", SseEventId("123")),
+                    Event("event2", "again luke", SseEventId("456")),
                     Data("goodbye luke".base64Encode())
                 )
             )
@@ -339,8 +339,8 @@ abstract class SseServerContract(
             client3.received().take(3).toList(),
             equalTo(
                 listOf(
-                    Event("event1", "hello anakin", "123"),
-                    Event("event2", "again anakin", "456"),
+                    Event("event1", "hello anakin", SseEventId("123")),
+                    Event("event2", "again anakin", SseEventId("456")),
                     Data("goodbye anakin".base64Encode())
                 )
             )

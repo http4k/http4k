@@ -15,14 +15,14 @@ sealed interface SseMessage {
         override fun toMessage() = "data: $data\n\n"
     }
 
-    data class Event(val event: String, val data: String, val id: String? = null) : SseMessage {
-        constructor(event: String, data: ByteArray, id: String? = null) : this(
+    data class Event(val event: String, val data: String, val id: SseEventId? = null) : SseMessage {
+        constructor(event: String, data: ByteArray, id: SseEventId? = null) : this(
             event,
             data.base64Encode(),
             id
         )
 
-        constructor(event: String, data: InputStream, id: String? = null) : this(event, data.readAllBytes(), id)
+        constructor(event: String, data: InputStream, id: SseEventId? = null) : this(event, data.readAllBytes(), id)
 
         override fun toMessage() = (listOf("event: $event") + data.split("\n")
             .map { "data: $it" } + listOfNotNull(id?.let { "id: $it" }))
@@ -44,7 +44,7 @@ sealed interface SseMessage {
                 parts.any { it.startsWith("event:") } -> Event(
                     parts.first { it.startsWith("event:") }.removePrefix("event:").trim(),
                     parts.filter { it.startsWith("data:") }.joinToString("\n") { it.removePrefix("data:").trim() },
-                    parts.find { it.startsWith("id:") }?.removePrefix("id:")?.trim()
+                    parts.find { it.startsWith("id:") }?.removePrefix("id:")?.trim()?.let { SseEventId(it) }
                 )
 
                 parts.first().startsWith("data:") -> Data(parts.first().removePrefix("data:").trim())

@@ -3,10 +3,11 @@ package org.http4k.datastar
 import org.http4k.datastar.Fragment.Companion.of
 import org.http4k.datastar.MergeMode.morph
 import org.http4k.datastar.SettleDuration.Companion.DEFAULT
+import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 
-sealed class DatastarEvent(val name: String, val data: List<String>, open val id: String?) {
+sealed class DatastarEvent(val name: String, val data: List<String>, open val id: SseEventId?) {
 
     fun toSseEvent() = Event(name, data.joinToString("\n"), id)
 
@@ -23,7 +24,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         val selector: Selector? = null,
         val useViewTransition: Boolean = false,
         val settleDuration: SettleDuration? = DEFAULT,
-        override val id: String? = null,
+        override val id: SseEventId? = null,
     ) : DatastarEvent(
         "datastar-merge-fragments",
         run {
@@ -45,7 +46,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
             selector: Selector? = null,
             useViewTransition: Boolean = false,
             settleDuration: SettleDuration? = DEFAULT,
-            id: String? = null,
+            id: SseEventId? = null,
         ) : this(fragment.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
 
         constructor(
@@ -54,7 +55,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
             selector: Selector? = null,
             useViewTransition: Boolean = false,
             settleDuration: SettleDuration? = DEFAULT,
-            id: String? = null,
+            id: SseEventId? = null,
         ) : this(fragment.map { of(it) }.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
     }
 
@@ -66,14 +67,14 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
     data class MergeSignals(
         val signals: List<Signal>,
         val onlyIfMissing: Boolean? = false,
-        override val id: String? = null,
+        override val id: SseEventId? = null,
     ) : DatastarEvent("datastar-merge-signals", run {
         signals.map { "signals $it" } + listOfNotNull(onlyIfMissing?.let { "onlyIfMissing $it" })
     }, id) {
         constructor(
             vararg signal: Signal,
             onlyIfMissing: Boolean? = false,
-            id: String? = null,
+            id: SseEventId? = null,
         ) : this(signal.toList(), onlyIfMissing, id)
     }
 
@@ -83,7 +84,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
      */
     data class RemoveFragments(
         val selector: Selector,
-        override val id: String? = null,
+        override val id: SseEventId? = null,
     ) : DatastarEvent("datastar-remove-fragments", listOf("selector $selector"), id)
 
     /**
@@ -92,11 +93,11 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
      */
     data class RemoveSignals(
         val paths: List<SignalPath>,
-        override val id: String? = null,
+        override val id: SseEventId? = null,
     ) : DatastarEvent("datastar-remove-signals", paths.map { "paths $it" }, id) {
         constructor(
             vararg path: SignalPath,
-            id: String? = null,
+            id: SseEventId? = null,
         ) : this(path.toList(), id)
     }
 
@@ -110,7 +111,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         val script: Script,
         val autoRemove: Boolean = true,
         val attributes: List<Pair<String, String>> = emptyList(),
-        override val id: String? = null,
+        override val id: SseEventId? = null,
     ) : DatastarEvent("datastar-execute-script", run {
         listOf("script $script", "autoRemove $autoRemove") + attributes.map { "attributes ${it.first} ${it.second}" }
     }, id)

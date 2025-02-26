@@ -21,7 +21,7 @@ fun Sse.sendMergeFragments(
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
-    id: String? = null,
+    id: SseEventId? = null,
 ) = sendMergeFragments(fragments.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
 
 fun Sse.sendMergeFragments(
@@ -30,21 +30,21 @@ fun Sse.sendMergeFragments(
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
-    id: String? = null,
+    id: SseEventId? = null,
 ) = send(
     MergeFragments(fragments, mergeMode, selector, useViewTransition, settleDuration, id).toSseEvent()
 )
 
-fun Sse.sendMergeSignals(vararg signals: Signal, onlyIfMissing: Boolean? = false, id: String? = null) =
+fun Sse.sendMergeSignals(vararg signals: Signal, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
     sendMergeSignals(signals.toList(), onlyIfMissing, id)
 
-fun Sse.sendMergeSignals(signals: List<Signal>, onlyIfMissing: Boolean? = false, id: String? = null) =
+fun Sse.sendMergeSignals(signals: List<Signal>, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
     send(MergeSignals(signals, onlyIfMissing, id).toSseEvent())
 
-fun Sse.sendRemoveSignals(vararg paths: SignalPath, id: String? = null) = sendRemoveSignals(paths.toList(), id)
-fun Sse.sendRemoveSignals(paths: List<SignalPath>, id: String? = null) = send(RemoveSignals(paths, id).toSseEvent())
+fun Sse.sendRemoveSignals(vararg paths: SignalPath, id: SseEventId? = null) = sendRemoveSignals(paths.toList(), id)
+fun Sse.sendRemoveSignals(paths: List<SignalPath>, id: SseEventId? = null) = send(RemoveSignals(paths, id).toSseEvent())
 
-fun Sse.sendRemoveFragments(selector: Selector, id: String? = null) = send(RemoveFragments(selector, id).toSseEvent())
+fun Sse.sendRemoveFragments(selector: Selector, id: SseEventId? = null) = send(RemoveFragments(selector, id).toSseEvent())
 
 fun Sse.sendExecuteScript(
     script: Script, autoRemove: Boolean = true, attributes: List<Pair<String, String>> = emptyList(),

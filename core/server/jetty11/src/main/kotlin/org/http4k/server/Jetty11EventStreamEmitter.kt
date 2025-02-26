@@ -6,6 +6,10 @@ import org.eclipse.jetty.util.thread.Scheduler
 import org.http4k.core.Request
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseMessage
+import org.http4k.sse.SseMessage.Data
+import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.SseMessage.Ping
+import org.http4k.sse.SseMessage.Retry
 import java.io.IOException
 import java.io.OutputStream
 import java.time.Duration
@@ -26,12 +30,12 @@ class Jetty11EventStreamEmitter(
         scheduleHeartBeat()
     }
 
-    override fun send(message: SseMessage)  = apply {
+    override fun send(message: SseMessage) = apply {
         when (message) {
-            is SseMessage.Event -> sendEvent(message.event, message.data, message.id)
-            is SseMessage.Data -> sendData(message.data)
-            is SseMessage.Retry -> sendRetry(message.backoff)
-            is SseMessage.Ping -> sendPing()
+            is Event -> sendEvent(message.event, message.data, message.id?.value)
+            is Data -> sendData(message.data)
+            is Retry -> sendRetry(message.backoff)
+            is Ping -> sendPing()
         }
     }
 

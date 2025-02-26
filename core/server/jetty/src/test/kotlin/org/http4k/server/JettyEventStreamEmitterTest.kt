@@ -10,6 +10,7 @@ import org.eclipse.jetty.util.component.AbstractLifeCycle
 import org.eclipse.jetty.util.thread.Scheduler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.util.InMemoryTest
 import org.junit.jupiter.api.Test
@@ -68,7 +69,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
-        emitter.send(SseMessage.Event("event name", "some data", "an id"))
+        emitter.send(SseMessage.Event("event name", "some data", SseEventId("an id")))
 
         assertThat(output.toString(), equalTo("id:an id\nevent:event name\ndata:some data\n\n"))
         assertThat(output.flushCalls, equalTo(1))

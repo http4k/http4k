@@ -113,7 +113,7 @@ internal class JettyEventStreamEmitter(
 
     override fun send(message: SseMessage) = apply {
         when (message) {
-            is SseMessage.Event -> sendEvent(message.event, message.data, message.id)
+            is SseMessage.Event -> sendEvent(message.event, message.data, message.id?.value)
             is SseMessage.Data -> sendData(message.data)
             is SseMessage.Retry -> sendRetry(message.backoff)
             is SseMessage.Ping -> sendPing()

@@ -14,6 +14,7 @@ import org.http4k.datastar.MergeMode.morph
 import org.http4k.datastar.Selector
 import org.http4k.datastar.SettleDuration
 import org.http4k.datastar.SettleDuration.Companion.DEFAULT
+import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import org.http4k.urlDecoded
@@ -26,7 +27,7 @@ val Header.DATASTAR_REQUEST get() = Header.boolean().defaulted("datastar_request
 val Header.DATASTAR_CONTENT_TYPE
     get() = Header.map(::ContentType, ContentType::toHeaderValue).required("content_type")
 
-// Used for Datastae model data when a request is a GET
+// Used for Datastar model data when a request is a GET
 val Query.DATASTAR_MODEL get() = Query.map(String::urlDecoded, String::urlEncoded).optional("datastar")
 
 /**
@@ -38,7 +39,7 @@ fun Response.datastarFragments(
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
-    id: String? = null,
+    id: SseEventId? = null,
 ): Response = datastarFragments(fragments.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
 
 /**
@@ -51,7 +52,7 @@ fun Response.datastarFragments(
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
-    id: String? = null,
+    id: SseEventId? = null,
 ): Response =
     datastarFragments(fragments.map { Fragment.of(it) }, mergeMode, selector, useViewTransition, settleDuration, id)
 
@@ -64,7 +65,7 @@ fun Response.datastarFragments(
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
-    id: String? = null,
+    id: SseEventId? = null,
 ): Response = datastarFragments(
     MergeFragments(
         fragments.toList(),
@@ -86,7 +87,7 @@ fun Response.datastarFragments(
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     settleDuration: SettleDuration? = DEFAULT,
-    id: String? = null,
+    id: SseEventId? = null,
 ): Response = datastarFragments(
     MergeFragments(
         fragments.toList(),

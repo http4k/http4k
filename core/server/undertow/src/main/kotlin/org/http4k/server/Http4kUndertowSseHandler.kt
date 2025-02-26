@@ -22,7 +22,7 @@ fun Http4kUndertowSseHandler(request: Request, consumer: SseConsumer) =
                 when (message) {
                     is Retry -> connection.sendRetry(message.backoff.toMillis(), CloseOnFailure)
                     is Data -> connection.send(message.data, CloseOnFailure)
-                    is Event -> connection.send(message.data, message.event, message.id, CloseOnFailure)
+                    is Event -> connection.send(message.data, message.event, message.id?.value, CloseOnFailure)
                     is Ping -> connection.send("", "ping", "", CloseOnFailure)
                 }
             }
