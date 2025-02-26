@@ -101,7 +101,7 @@ class RealtimeMcpProtocol(
         sseSessions[sessionId]?.onClose(fn)
     }
 
-    fun newSession(sse: Sse): SessionId {
+    fun newSession(connectRequest: Request, sse: Sse): SessionId {
         val sessionId = sessionIdFactory(sse.connectRequest)
         sseSessions[sessionId] = sse
         return sessionId
