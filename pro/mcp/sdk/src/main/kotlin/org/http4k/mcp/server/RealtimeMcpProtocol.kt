@@ -43,8 +43,8 @@ class RealtimeMcpProtocol(
     outgoingSampling: OutgoingSampling = OutgoingSampling(emptyList()),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
-    private val sessionIdFactory: SessionIdProvider = SessionIdProvider.Random,
-    private val random: Random = Random,
+    random: Random = Random,
+    private val sessionIdFactory: SessionIdProvider = SessionIdProvider.Random(random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : McpProtocol<Response>(
     metaData,
