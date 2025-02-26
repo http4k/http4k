@@ -15,7 +15,7 @@ fun McpSseHandler(mcpProtocol: RealtimeMcpProtocol) = sse {
     it.send(
         SseMessage.Event(
             "endpoint",
-            Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it)).uri.toString()
+            Request(GET, "/message").with(sessionId of mcpProtocol.newSession(it.connectRequest, it)).uri.toString()
         )
     )
 }
