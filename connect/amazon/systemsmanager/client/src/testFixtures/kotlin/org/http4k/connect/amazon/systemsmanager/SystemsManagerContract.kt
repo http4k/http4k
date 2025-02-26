@@ -29,7 +29,11 @@ interface SystemsManagerContract : AwsContract {
         )
         assertThat(sm.getParameter(name).successValue().Parameter.Value, equalTo("value2"))
 
+        assertThat(sm.getParameters(listOf(name)).successValue().Parameters.map { it.Value }, equalTo(listOf("value2")))
+
         sm.deleteParameter(name).successValue()
+
+        assertThat(sm.getParameters(listOf(name)).successValue().Parameters.map { it.Value }, equalTo(emptyList()))
 
         assertThat(sm.deleteParameter(name).failureOrNull()!!.status, equalTo(BAD_REQUEST))
     }
