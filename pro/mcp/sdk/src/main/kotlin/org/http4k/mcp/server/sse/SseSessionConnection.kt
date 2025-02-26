@@ -8,8 +8,12 @@ import org.http4k.sse.SseMessage
  * SSE session connection.
  */
 fun McpSession.Companion.Sse() = object : McpSession<Sse> {
-    override fun send(transport: Sse, event: SseMessage.Event) {
-        transport.send(event)
+    override fun ping(transport: Sse) {
+        transport.send(SseMessage.Event("ping", ""))
+    }
+
+    override fun event(transport: Sse, data: String) {
+        transport.send(SseMessage.Event("message", data))
     }
 
     override fun onClose(transport: Sse, fn: () -> Unit) {
