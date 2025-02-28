@@ -47,11 +47,11 @@ sealed interface McpClientSecurity : Security {
             oauthCredentials,
             tokenUri,
             backend,
-            ClientFilters.OAuthClientCredentials(oauthCredentials, scopes),
             Duration.ofSeconds(30),
             clock,
             ContentTypeJsonOrForm(),
             scopes,
+            ClientFilters.OAuthClientCredentials(oauthCredentials, scopes),
         )
     }
 

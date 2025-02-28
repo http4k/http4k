@@ -118,7 +118,6 @@ class AutoDiscoveryOAuthTokenTest {
             equalTo("/token")
         )
 
-
         assertThat(
             Body.webForm(Validator.Ignore).toLens().extract(requests[1]),
             equalTo(

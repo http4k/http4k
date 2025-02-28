@@ -42,10 +42,10 @@ class RefreshingOAuthTokenTest {
         val app = ClientFilters.RefreshingOAuthToken(
             config,
             backend,
-            { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
             clock,
             scopes = emptyList(),
+            { next -> { next(it.body("auth")) } },
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
@@ -82,10 +82,10 @@ class RefreshingOAuthTokenTest {
         val app = ClientFilters.RefreshingOAuthToken(
             config,
             backend,
-            { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
             clock,
             listOf("someactivity.read", "someactivity.write"),
+            { next -> { next(it.body("auth")) } },
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
@@ -127,10 +127,10 @@ class RefreshingOAuthTokenTest {
         val app = ClientFilters.RefreshingOAuthToken(
             config,
             backend,
-            { next -> { next(it.body("auth")) } },
             Duration.ofSeconds(10),
             clock,
             scopes = emptyList(),
+            { next -> { next(it.body("auth")) } },
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))

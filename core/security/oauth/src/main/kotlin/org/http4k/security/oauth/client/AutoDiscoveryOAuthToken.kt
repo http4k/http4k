@@ -21,8 +21,8 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     credentials: Credentials,
     backend: HttpHandler,
     clock: Clock = Clock.systemUTC(),
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(credentials, emptyList()),
     scopes: List<String> = emptyList(),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(credentials, scopes),
     gracePeriod: Duration = Duration.ofSeconds(10)
 ) = when (val discoveryResult = backend.discoverEndpoints(serverUri)) {
     is Success -> {

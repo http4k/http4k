@@ -36,10 +36,10 @@ import java.time.Instant.MAX
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials, emptyList()),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     scopes: List<String> = emptyList(),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials, scopes),
 ) = ClientFilters.RefreshingOAuthToken(
     oauthCredentials = config.credentials,
     tokenUri = config.tokenUri,
@@ -58,11 +58,11 @@ fun ClientFilters.RefreshingOAuthToken(
     oauthCredentials: Credentials,
     tokenUri: Uri,
     backend: HttpHandler,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = emptyList()),
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
     scopes: List<String> = emptyList(),
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = scopes),
 ): Filter {
     val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) { token ->
         val filter = token?.refreshToken

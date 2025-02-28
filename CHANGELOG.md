@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.1.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-security-oauth** :[Breaking] Reorganised filter argument order for OAuth filters
 - **http4k-realtime-core** :[Breaking] SseEventId is now a type instead of just a string
 - **http4k-connect-amazon-ses***: [Breaking] Upgrade to SES V2 API. H/T @oharaandrew314
 
