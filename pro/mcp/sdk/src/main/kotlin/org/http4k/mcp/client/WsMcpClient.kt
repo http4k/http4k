@@ -8,12 +8,14 @@ import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.format.renderRequest
 import org.http4k.mcp.client.McpError.Internal
 import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.MCP_PROTOCOL_VERSION
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.Version
@@ -43,7 +45,12 @@ class WsMcpClient(
     protocolVersion: ProtocolVersion = LATEST_VERSION,
     defaultTimeout: Duration = Duration.ofSeconds(1)
 ) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout) {
-    private val wsClient by lazy { websocketFactory.blocking(wsRequest.uri, wsRequest.headers) }
+    private val wsClient by lazy {
+        websocketFactory.blocking(
+            wsRequest.uri,
+            wsRequest.with(MCP_PROTOCOL_VERSION of version).headers
+        )
+    }
 
     override fun received() = wsClient.received().map { SseMessage.parse(it.bodyString()) }
 

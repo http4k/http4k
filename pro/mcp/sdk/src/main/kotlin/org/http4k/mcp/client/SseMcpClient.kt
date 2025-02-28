@@ -13,6 +13,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.format.renderRequest
 import org.http4k.lens.contentType
@@ -21,6 +22,7 @@ import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.MCP_PROTOCOL_VERSION
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.Version
@@ -50,7 +52,7 @@ class SseMcpClient(
 
     private val endpoint = AtomicReference<String>()
 
-    private val sseClient = Http4kSseClient(sseRequest, http)
+    private val sseClient = Http4kSseClient(sseRequest.with(MCP_PROTOCOL_VERSION of version), http)
 
     override fun received() = sseClient.received()
 
