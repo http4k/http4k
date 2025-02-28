@@ -4,7 +4,7 @@ import org.http4k.core.Uri
 import org.http4k.security.ResponseType
 import java.util.Locale
 
-class ServerMetadata(
+data class ServerMetadata(
     val issuer: String,
     val authorization_endpoint: Uri,
     val token_endpoint: Uri,
@@ -19,4 +19,3 @@ class ServerMetadata(
     val service_documentation: Uri? = null,
     val signed_metadata: String? = null
 )
-
