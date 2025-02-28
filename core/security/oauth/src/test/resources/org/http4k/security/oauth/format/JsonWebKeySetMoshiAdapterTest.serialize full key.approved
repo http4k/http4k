@@ -1,0 +1,18 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "use": "sig",
+      "kid": "2011-04-29",
+      "alg": "RS256",
+      "n": "n-value",
+      "e": "AQAB",
+      "x5c": [
+        "cert1",
+        "cert2"
+      ],
+      "x5t": "thumb1",
+      "x5t#S256": "thumb256"
+    }
+  ]
+}

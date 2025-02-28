@@ -1,0 +1,19 @@
+{
+  "issuer": "https://example.com",
+  "authorization_endpoint": "https://example.com/auth",
+  "token_endpoint": "https://example.com/token",
+  "token_endpoint_auth_methods_supported": [
+    "client_secret_basic"
+  ],
+  "token_endpoint_auth_signing_alg_values_supported": [
+    "RS256"
+  ],
+  "response_types_supported": [
+    "Code"
+  ],
+  "scopes_supported": [
+  ],
+  "ui_locales_supported": [
+    "en-GB"
+  ]
+}
