@@ -3,6 +3,7 @@ package org.http4k.mcp.server.capability
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
@@ -32,7 +33,7 @@ class ToolCapability(private val tool: Tool, private val handler: ToolHandler) :
 
     fun call(mcp: McpTool.Call.Request, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), http) }
-            .mapFailure { Error(InvalidParams) }
+            .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
                     handler(it)

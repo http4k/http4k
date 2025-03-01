@@ -7,21 +7,31 @@ import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
+import org.http4k.core.Uri
 import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
+import org.http4k.mcp.CompletionRequest
+import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.ResourceRequest
+import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpError
+import org.http4k.mcp.model.Completion
+import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
+import org.http4k.mcp.model.Reference
+import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
@@ -32,9 +42,12 @@ import org.http4k.mcp.protocol.ServerCapabilities.PromptCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
+import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.RealtimeMcpProtocol
+import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.Sse
@@ -71,26 +84,6 @@ class TestMcpClientTest {
 
     private val metadata = ServerMetaData(McpEntity.of("server"), Version.of("1"))
 
-    //    @Test
-//    fun `update roots`() {
-//        val roots = Roots()
-//
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, roots = roots, random = Random(0)))
-//
-//        mcp.useClient {
-//            roots.update(listOf(Root(Uri.of("asd"), "name")))
-//            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification)
-//
-//            assertNextMessage(McpRoot.List, McpRoot.List.Request(), RequestId.of(8299741232644920))
-//
-//            val newRoots = listOf(Root(Uri.of("asd"), "name"))
-//
-//            mcp.sendToMcp(McpRoot.List.Response(newRoots), RequestId.of(8299741232644920))
-//
-//            assertThat(roots.toList(), equalTo(newRoots))
-//        }
-//    }
-//
     @Test
     fun `deal with prompts`() {
         val intArg = Prompt.Arg.int().required("name", "description")
@@ -146,94 +139,78 @@ class TestMcpClientTest {
         }
     }
 
-    //
-//    @Test
-//    fun `deal with static resources`() {
-//        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
-//        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
-//
-//        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
-//
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//
-//            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
-//
-//            assertNextMessage(
-//                McpResource.List.Response(
-//                    listOf(
-//                        McpResource(
-//                            resource.uri,
-//                            null,
-//                            ResourceName.of("HTTP4K"),
-//                            "description",
-//                            null
-//                        )
-//                    )
-//                )
-//            )
-//
-//            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
-//
-//            assertNextMessage(McpResource.Read.Response(listOf(content)))
-//
-//            mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
-//
-//            resources.triggerUpdated(resource.uri)
-//
-//            assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
-//
-//            mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
-//
-//            resources.triggerUpdated(resource.uri)
-//
-//            assertNoResponse()
-//        }
-//    }
-//
-//    private fun TestSseClient.assertNoResponse() =
-//        assertThrows<NoSuchElementException> { received().first() }
-//
-//    @Test
-//    fun `deal with templated resources`() {
-//        val resource =
-//            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
-//        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
-//
-//        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//
-//            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
-//
-//            assertNextMessage(McpResource.List.Response(listOf()))
-//
-//            mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
-//
-//            assertNextMessage(
-//                McpResource.Template.List.Response(
-//                    listOf(
-//                        McpResource(
-//                            null,
-//                            resource.uriTemplate,
-//                            ResourceName.of("HTTP4K"),
-//                            "description",
-//                            null
-//                        )
-//                    )
-//                )
-//            )
-//
-//            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
-//
-//            assertNextMessage(McpResource.Read.Response(listOf(content)))
-//        }
-//    }
-//
+
+    @Test
+    fun `deal with static resources`() {
+        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
+        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
+
+        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+
+        val mcp =
+            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
+
+        mcp.useClient {
+            assertThat(
+                resources().list(), equalTo(
+                    Success(
+                        listOf(
+                            McpResource(
+                                resource.uri,
+                                null,
+                                ResourceName.of("HTTP4K"),
+                                "description",
+                                null
+                            )
+                        )
+                    )
+                )
+            )
+
+            assertThat(
+                resources().read(ResourceRequest(resource.uri)),
+                equalTo(Success(ResourceResponse(listOf(content))))
+            )
+            /**
+             *
+             *             mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
+             *
+             *             resources.triggerUpdated(resource.uri)
+             *
+             *             assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
+             *
+             *             mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
+             *
+             *             resources.triggerUpdated(resource.uri)
+             *
+             *             assertNoResponse()
+             *
+             */
+        }
+    }
+
+
+    @Test
+    fun `deal with templated resources`() {
+        val resource =
+            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
+        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
+
+        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+
+        val mcp =
+            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
+
+        mcp.debug().useClient {
+            assertThat(resources().list(), equalTo(Success(emptyList())))
+
+            assertThat(
+                resources().read(ResourceRequest(resource.uriTemplate)),
+                equalTo(Success(ResourceResponse(listOf(content))))
+            )
+        }
+    }
+
     @Test
     fun `deal with tools`() {
         val stringArg = Tool.Arg.required("foo", "description1")
@@ -286,48 +263,30 @@ class TestMcpClientTest {
 //
 //        assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
     }
-}
-//
-//    @Test
-//    fun `deal with logger`() {
-//        val logger = Logger()
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, logger = logger, random = Random(0)))
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//            logger.log(sessionId, LogLevel.info, "message", emptyMap())
-//
-//            assertNoResponse()
-//
-//            mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
-//
-//            logger.log(sessionId, LogLevel.info, "message", emptyMap())
-//
-//            assertNextMessage(
-//                McpLogging.LoggingMessage,
-//                McpLogging.LoggingMessage.Notification(LogLevel.info, "message", emptyMap())
-//            )
-//        }
-//    }
-//
-//
-//    @Test
-//    fun `deal with completions`() {
-//        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
-//        val completions = Completions(
-//            listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
-//        )
-//
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, completions = completions, random = Random(0)))
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//
-//            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value")))
-//
-//            assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
-//        }
-//    }
+
+    @Test
+    fun `deal with completions`() {
+        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val completions = Completions(
+            listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
+        )
+
+        val mcp = StandardMcpSse(
+            RealtimeMcpProtocol(
+                McpSession.Sse(),
+                metadata,
+                completions = completions,
+                random = Random(0)
+            )
+        )
+
+        mcp.useClient {
+            assertThat(
+                completions().complete(CompletionRequest(ref, CompletionArgument("arg", "value"))),
+                equalTo(Success(CompletionResponse(Completion(listOf("values"), 1, true))))
+            )
+        }
+    }
 //
 //    @Test
 //    fun `deal with incoming sampling`() {
@@ -415,9 +374,10 @@ class TestMcpClientTest {
 //        }
 //    }
 
-private fun PolyHandler.useClient(fn: McpClient.() -> Unit) {
-    testMcpClient().use {
-        it.start()
-        it.fn()
+    private fun PolyHandler.useClient(fn: McpClient.() -> Unit) {
+        testMcpClient().use {
+            it.start()
+            it.fn()
+        }
     }
 }
