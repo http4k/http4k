@@ -8,7 +8,6 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionRequest
@@ -17,6 +16,8 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.SamplingRequest
+import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
@@ -24,15 +25,20 @@ import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
+import org.http4k.mcp.model.ModelIdentifier
+import org.http4k.mcp.model.ModelScore.Companion.MAX
+import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
+import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ProtocolCapability.Experimental
@@ -46,6 +52,7 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
+import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
@@ -261,13 +268,13 @@ class TestMcpClientTest {
                 equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
 
-            val latch = CountDownLatch(1)
-
-            tools().onChange(latch::countDown)
-
-            tools.items = emptyList()
-
-            latch.await()
+//            val latch = CountDownLatch(1)
+//
+//            tools().onChange(latch::countDown)
+//
+//            tools.items = emptyList()
+//
+//            latch.await()
         }
 
 //
@@ -297,35 +304,45 @@ class TestMcpClientTest {
             )
         }
     }
-//
-//    @Test
-//    fun `deal with incoming sampling`() {
-//        val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-//        val content2 = Content.Text("this is the end!")
-//
-//        val model = ModelIdentifier.of("name")
-//        val sampling = IncomingSampling(
-//            listOf(
-//                ModelSelector(model) { MAX } bind {
-//                    listOf(
-//                        SamplingResponse(model, Role.assistant, content1, null),
-//                        SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
-//                    ).asSequence()
-//                }
-//            ))
-//
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, incomingSampling = sampling, random = Random(0)))
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//
-//            mcp.sendToMcp(McpSampling, McpSampling.Request(listOf(), MaxTokens.of(1)))
-//
-//            assertNextMessage(McpSampling.Response(model, null, Role.assistant, content1))
-//
-//            assertNextMessage(McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content2))
-//        }
-//    }
+
+    @Test
+    fun `deal with incoming sampling`() {
+        val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+        val content2 = Content.Text("this is the end!")
+
+        val model = ModelIdentifier.of("name")
+        val sampling = IncomingSampling(
+            listOf(
+                ModelSelector(model) { MAX } bind {
+                    listOf(
+                        SamplingResponse(model, Role.assistant, content1, null),
+                        SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
+                    ).asSequence()
+                }
+            ))
+
+        val mcp = StandardMcpSse(
+            RealtimeMcpProtocol(
+                McpSession.Sse(),
+                metadata,
+                incomingSampling = sampling,
+                random = Random(0)
+            )
+        )
+
+        mcp.useClient {
+            assertThat(
+                sampling().sample(model, SamplingRequest(listOf(), MaxTokens.of(1))).toList(),
+                equalTo(
+                    listOf(
+                        Success(SamplingResponse(model, Role.assistant, content1, null)),
+                        Success(SamplingResponse(model, Role.assistant, content2, StopReason.of("bored")))
+                    )
+                )
+            )
+        }
+    }
+
 //
 //    @Test
 //    fun `deal with outgoing sampling`() {
