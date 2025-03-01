@@ -9,7 +9,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("org.junit.jupiter:junit-jupiter-api:_")
+    compileOnly(platform("org.junit:junit-bom:_"))
+    compileOnly("org.junit.jupiter:junit-jupiter-api")
     api(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
 
