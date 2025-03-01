@@ -2,18 +2,35 @@ package org.http4k.mcp.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.core.PolyHandler
+import org.http4k.lens.int
+import org.http4k.mcp.PromptRequest
+import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.PromptName
+import org.http4k.mcp.model.Role
 import org.http4k.mcp.protocol.ProtocolCapability.Experimental
 import org.http4k.mcp.protocol.ProtocolCapability.PromptsChanged
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.ServerCapabilities.PromptCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.protocol.messages.McpPrompt
+import org.http4k.mcp.server.RealtimeMcpProtocol
+import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.sse.Sse
+import org.http4k.mcp.server.sse.StandardMcpSse
+import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 class TestMcpClientTest {
 
@@ -28,11 +45,370 @@ class TestMcpClientTest {
         )
             .testMcpClient().start()
 
-        assertThat(capabilities, equalTo(Success(ServerCapabilities(
-            prompts = PromptCapabilities(true),
-            experimental = Unit)))
+        assertThat(
+            capabilities, equalTo(
+                Success(
+                    ServerCapabilities(
+                        prompts = PromptCapabilities(true),
+                        experimental = Unit
+                    )
+                )
+            )
         )
     }
+
+
+    private val serverName = McpEntity.of("server")
+    private val clientName = McpEntity.of("server")
+
+    private val metadata = ServerMetaData(serverName, Version.of("1"))
+
+    //    @Test
+//    fun `update roots`() {
+//        val roots = Roots()
+//
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, roots = roots, random = Random(0)))
+//
+//        mcp.useClient {
+//            roots.update(listOf(Root(Uri.of("asd"), "name")))
+//            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification)
+//
+//            assertNextMessage(McpRoot.List, McpRoot.List.Request(), RequestId.of(8299741232644920))
+//
+//            val newRoots = listOf(Root(Uri.of("asd"), "name"))
+//
+//            mcp.sendToMcp(McpRoot.List.Response(newRoots), RequestId.of(8299741232644920))
+//
+//            assertThat(roots.toList(), equalTo(newRoots))
+//        }
+//    }
+//
+    @Test
+    fun `deal with prompts`() {
+        val intArg = Prompt.Arg.int().required("name", "description")
+        val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
+
+        val mcp = StandardMcpSse(
+            RealtimeMcpProtocol(
+                McpSession.Sse(),
+                metadata, prompts = Prompts(
+                    listOf(
+                        prompt bind {
+                            PromptResponse(
+                                listOf(
+                                    Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
+                                ),
+                                "description",
+                            )
+                        }
+                    )
+                ), random = Random(0)))
+
+        mcp.useClient {
+            assertThat(
+                prompts().list(),
+                equalTo(
+                    Success(
+                        listOf(
+                            McpPrompt(
+                                PromptName.of("prompt"), "description",
+                                listOf(McpPrompt.Argument("name", "description", true))
+                            )
+                        )
+                    )
+                )
+            )
+
+            assertThat(
+                prompts().get(prompt.name, PromptRequest(mapOf("name" to "123"))),
+                equalTo(
+                    Success(
+                        PromptResponse(
+                            listOf(Message(Role.assistant, Content.Text("321"))),
+                            "description"
+                        )
+                    )
+                )
+            )
+
+            assertThat(
+                prompts().get(prompt.name, PromptRequest(mapOf("name" to "asd"))),
+                equalTo(Failure("description"))
+            )
+        }
+    }
+//
+//    @Test
+//    fun `deal with static resources`() {
+//        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
+//        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
+//
+//        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+//
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//
+//            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
+//
+//            assertNextMessage(
+//                McpResource.List.Response(
+//                    listOf(
+//                        McpResource(
+//                            resource.uri,
+//                            null,
+//                            ResourceName.of("HTTP4K"),
+//                            "description",
+//                            null
+//                        )
+//                    )
+//                )
+//            )
+//
+//            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
+//
+//            assertNextMessage(McpResource.Read.Response(listOf(content)))
+//
+//            mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
+//
+//            resources.triggerUpdated(resource.uri)
+//
+//            assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
+//
+//            mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
+//
+//            resources.triggerUpdated(resource.uri)
+//
+//            assertNoResponse()
+//        }
+//    }
+//
+//    private fun TestSseClient.assertNoResponse() =
+//        assertThrows<NoSuchElementException> { received().first() }
+//
+//    @Test
+//    fun `deal with templated resources`() {
+//        val resource =
+//            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
+//        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
+//
+//        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//
+//            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
+//
+//            assertNextMessage(McpResource.List.Response(listOf()))
+//
+//            mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
+//
+//            assertNextMessage(
+//                McpResource.Template.List.Response(
+//                    listOf(
+//                        McpResource(
+//                            null,
+//                            resource.uriTemplate,
+//                            ResourceName.of("HTTP4K"),
+//                            "description",
+//                            null
+//                        )
+//                    )
+//                )
+//            )
+//
+//            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
+//
+//            assertNextMessage(McpResource.Read.Response(listOf(content)))
+//        }
+//    }
+//
+//    @Test
+//    fun `deal with tools`() {
+//        val stringArg = Tool.Arg.required("foo", "description1")
+//        val intArg = Tool.Arg.int().optional("bar", "description2")
+//
+//        val tool = Tool("name", "description", stringArg, intArg)
+//
+//        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+//
+//        val tools = Tools(listOf(tool bind {
+//            ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
+//        }))
+//
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = tools, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//
+//            mcp.sendToMcp(McpTool.List, McpTool.List.Request())
+//
+//            assertNextMessage(
+//                McpTool.List.Response(
+//                    listOf(
+//                        McpTool(
+//                            ToolName.of("name"), "description",
+//                            mapOf(
+//                                "type" to "object",
+//                                "required" to listOf("foo"),
+//                                "properties" to mapOf(
+//                                    "foo" to mapOf("type" to "string", "description" to "description1"),
+//                                    "bar" to mapOf("type" to "integer", "description" to "description2")
+//                                )
+//                            )
+//                        )
+//                    )
+//                )
+//            )
+//
+//            mcp.sendToMcp(
+//                McpTool.Call,
+//                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)))
+//            )
+//
+//            assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
+//
+//            mcp.sendToMcp(
+//                McpTool.Call,
+//                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")))
+//            )
+//
+//            assertNextMessage(McpTool.Call.Response(listOf(Content.Text("ERROR: -32602 Invalid params")), true))
+//
+//            tools.items = emptyList()
+//
+//            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
+//        }
+//    }
+//
+//    @Test
+//    fun `deal with logger`() {
+//        val logger = Logger()
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, logger = logger, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//            logger.log(sessionId, LogLevel.info, "message", emptyMap())
+//
+//            assertNoResponse()
+//
+//            mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
+//
+//            logger.log(sessionId, LogLevel.info, "message", emptyMap())
+//
+//            assertNextMessage(
+//                McpLogging.LoggingMessage,
+//                McpLogging.LoggingMessage.Notification(LogLevel.info, "message", emptyMap())
+//            )
+//        }
+//    }
+//
+//
+//    @Test
+//    fun `deal with completions`() {
+//        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+//        val completions = Completions(
+//            listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
+//        )
+//
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, completions = completions, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//
+//            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value")))
+//
+//            assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
+//        }
+//    }
+//
+//    @Test
+//    fun `deal with incoming sampling`() {
+//        val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+//        val content2 = Content.Text("this is the end!")
+//
+//        val model = ModelIdentifier.of("name")
+//        val sampling = IncomingSampling(
+//            listOf(
+//                ModelSelector(model) { MAX } bind {
+//                    listOf(
+//                        SamplingResponse(model, Role.assistant, content1, null),
+//                        SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
+//                    ).asSequence()
+//                }
+//            ))
+//
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, incomingSampling = sampling, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//
+//            mcp.sendToMcp(McpSampling, McpSampling.Request(listOf(), MaxTokens.of(1)))
+//
+//            assertNextMessage(McpSampling.Response(model, null, Role.assistant, content1))
+//
+//            assertNextMessage(McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content2))
+//        }
+//    }
+//
+//    @Test
+//    fun `deal with outgoing sampling`() {
+//        val received = mutableListOf<SamplingResponse>()
+//
+//        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+//
+//        val model = ModelIdentifier.of("name")
+//        val sampling = OutgoingSampling(
+//            listOf(
+//                clientName bind { received += it }
+//            ))
+//
+//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, outgoingSampling = sampling, random = Random(0)))
+//
+//        with(mcp.testSseClient(Request(GET, "/sse"))) {
+//            assertInitializeLoop(mcp)
+//
+//            sampling.sample(
+//                serverName, SamplingRequest(
+//                    listOf(), MaxTokens.of(1),
+//                    connectRequest = Request(GET, "")
+//                ), RequestId.of(1)
+//            )
+//
+//            assertNextMessage(
+//                McpSampling,
+//                McpSampling.Request(listOf(), MaxTokens.of(1)),
+//                RequestId.of(1)
+//            )
+//
+//            mcp.sendToMcp(
+//                McpSampling.Response(model, null, Role.assistant, content),
+//                RequestId.of(1)
+//            )
+//
+//            mcp.sendToMcp(
+//                McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
+//                RequestId.of(1)
+//            )
+//
+//            // this is ignored!
+//            mcp.sendToMcp(
+//                McpSampling.Response(model, StopReason.of("another stop reason"), Role.assistant, content),
+//                RequestId.of(1)
+//            )
+//
+//            assertThat(
+//                received, equalTo(
+//                    listOf(
+//                        SamplingResponse(model, Role.assistant, content, null),
+//                        SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
+//                    )
+//                )
+//            )
+//        }
+//    }
 
     private fun PolyHandler.useClient(fn: McpClient.() -> Unit) {
         testMcpClient().use {
