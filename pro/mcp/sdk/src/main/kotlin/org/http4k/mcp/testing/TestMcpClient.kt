@@ -29,6 +29,7 @@ import org.http4k.mcp.client.McpClient.Resources
 import org.http4k.mcp.client.McpClient.Tools
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpResult
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.PromptName
@@ -107,7 +108,11 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
             )
             return nextEvent<McpTool.Call.Response, ToolResponse>() {
                 when (isError) {
-                    true -> ToolResponse.Error(ErrorMessage.InternalError)
+                    true -> {
+                        val input = (content.first() as Content.Text).text
+                        System.err.println(input)
+                        ToolResponse.Error(McpJson.asA<ErrorMessage>(input))
+                    }
                     else -> ToolResponse.Ok(content)
                 }
             }

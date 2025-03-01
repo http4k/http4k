@@ -23,6 +23,7 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 
 class ToolCapability(private val tool: Tool, private val handler: ToolHandler) : ServerCapability {
@@ -36,7 +37,7 @@ class ToolCapability(private val tool: Tool, private val handler: ToolHandler) :
                 try {
                     handler(it)
                 } catch (e: LensFailure) {
-                    Error(InvalidParams)
+                    throw McpException(InvalidParams)
                 } catch (e: Exception) {
                     Error(InternalError)
                 }

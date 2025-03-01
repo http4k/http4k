@@ -4,19 +4,27 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.connect.model.Base64Blob
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
+import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Role
+import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ProtocolCapability.Experimental
 import org.http4k.mcp.protocol.ProtocolCapability.PromptsChanged
 import org.http4k.mcp.protocol.ServerCapabilities
@@ -24,8 +32,10 @@ import org.http4k.mcp.protocol.ServerCapabilities.PromptCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
+import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardMcpSse
@@ -135,7 +145,8 @@ class TestMcpClientTest {
             )
         }
     }
-//
+
+    //
 //    @Test
 //    fun `deal with static resources`() {
 //        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
@@ -223,63 +234,59 @@ class TestMcpClientTest {
 //        }
 //    }
 //
-//    @Test
-//    fun `deal with tools`() {
-//        val stringArg = Tool.Arg.required("foo", "description1")
-//        val intArg = Tool.Arg.int().optional("bar", "description2")
+    @Test
+    fun `deal with tools`() {
+        val stringArg = Tool.Arg.required("foo", "description1")
+        val intArg = Tool.Arg.int().optional("bar", "description2")
+
+        val tool = Tool("name", "description", stringArg, intArg)
+
+        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+
+        val tools = Tools(listOf(tool bind {
+            ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
+        }))
+
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = tools, random = Random(0)))
+
+        mcp.debug().useClient {
+            assertThat(
+                tools().list(),
+                equalTo(
+                    Success(
+                        listOf(
+                            McpTool(
+                                ToolName.of("name"), "description",
+                                mapOf(
+                                    "type" to "object",
+                                    "required" to listOf("foo"),
+                                    "properties" to mapOf(
+                                        "foo" to mapOf("type" to "string", "description" to "description1"),
+                                        "bar" to mapOf("type" to "integer", "description" to "description2")
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+
+            assertThat(
+                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123))),
+                equalTo(Success(ToolResponse.Ok(listOf(content, Content.Text("foo123")))))
+            )
+
+            assertThat(
+                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to "notAnInt"))),
+                equalTo(Failure(McpError.Protocol(InvalidParams)))
+            )
+        }
+
+        tools.items = emptyList()
 //
-//        val tool = Tool("name", "description", stringArg, intArg)
-//
-//        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-//
-//        val tools = Tools(listOf(tool bind {
-//            ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
-//        }))
-//
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = tools, random = Random(0)))
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//
-//            mcp.sendToMcp(McpTool.List, McpTool.List.Request())
-//
-//            assertNextMessage(
-//                McpTool.List.Response(
-//                    listOf(
-//                        McpTool(
-//                            ToolName.of("name"), "description",
-//                            mapOf(
-//                                "type" to "object",
-//                                "required" to listOf("foo"),
-//                                "properties" to mapOf(
-//                                    "foo" to mapOf("type" to "string", "description" to "description1"),
-//                                    "bar" to mapOf("type" to "integer", "description" to "description2")
-//                                )
-//                            )
-//                        )
-//                    )
-//                )
-//            )
-//
-//            mcp.sendToMcp(
-//                McpTool.Call,
-//                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)))
-//            )
-//
-//            assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
-//
-//            mcp.sendToMcp(
-//                McpTool.Call,
-//                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")))
-//            )
-//
-//            assertNextMessage(McpTool.Call.Response(listOf(Content.Text("ERROR: -32602 Invalid params")), true))
-//
-//            tools.items = emptyList()
-//
-//            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
-//        }
-//    }
+//        assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
+    }
+}
 //
 //    @Test
 //    fun `deal with logger`() {
@@ -408,10 +415,9 @@ class TestMcpClientTest {
 //        }
 //    }
 
-    private fun PolyHandler.useClient(fn: McpClient.() -> Unit) {
-        testMcpClient().use {
-            it.start()
-            it.fn()
-        }
+private fun PolyHandler.useClient(fn: McpClient.() -> Unit) {
+    testMcpClient().use {
+        it.start()
+        it.fn()
     }
 }

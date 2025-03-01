@@ -319,7 +319,7 @@ class McpProtocolTest {
                 McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")))
             )
 
-            assertNextMessage(McpTool.Call.Response(listOf(Content.Text("ERROR: -32602 Invalid params")), true))
+            assertNextMessage(InvalidParams)
 
             tools.items = emptyList()
 
