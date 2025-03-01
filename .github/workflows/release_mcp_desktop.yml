@@ -60,7 +60,7 @@ jobs:
       - name: Build
         run: ./gradlew -PVERSION="${{ github.event.client_payload.VERSION }}" :http4k-mcp-desktop:nativeCompile
       - name: Get Release URL
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.9
         with:
           name: upload_url.txt
       - name: Get Upload URL
