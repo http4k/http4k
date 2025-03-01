@@ -55,6 +55,7 @@ import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
 class TestMcpClientTest {
@@ -171,6 +172,8 @@ class TestMcpClientTest {
                 resources().read(ResourceRequest(resource.uri)),
                 equalTo(Success(ResourceResponse(listOf(content))))
             )
+
+
             /**
              *
              *             mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
@@ -201,7 +204,7 @@ class TestMcpClientTest {
         val mcp =
             StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
 
-        mcp.debug().useClient {
+        mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
 
             assertThat(
@@ -226,7 +229,7 @@ class TestMcpClientTest {
 
         val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = tools, random = Random(0)))
 
-        mcp.debug().useClient {
+        mcp.useClient {
             assertThat(
                 tools().list(),
                 equalTo(
@@ -257,9 +260,16 @@ class TestMcpClientTest {
                 tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to "notAnInt"))),
                 equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
+
+            val latch = CountDownLatch(1)
+
+            tools().onChange(latch::countDown)
+
+            tools.items = emptyList()
+
+            latch.await()
         }
 
-        tools.items = emptyList()
 //
 //        assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
     }

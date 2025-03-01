@@ -20,11 +20,7 @@ inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T
 
     return when {
         jsonRpcResult.isError() -> Failure(
-            McpError.Protocol(
-                McpJson.convert<McpNodeType, ErrorMessage>(
-                    jsonRpcResult.error!!
-                )
-            )
+            McpError.Protocol(McpJson.convert<McpNodeType, ErrorMessage>(jsonRpcResult.error!!))
         )
 
         else -> Success(fn(McpJson.convert<McpNodeType, T>(jsonRpcResult.result!!)))

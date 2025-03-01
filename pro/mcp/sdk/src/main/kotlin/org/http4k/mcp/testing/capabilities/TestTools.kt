@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicReference
 
 class TestTools(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Tools {
+
+
     override fun onChange(fn: () -> Unit) {
         TODO()
     }
