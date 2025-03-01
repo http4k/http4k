@@ -15,7 +15,6 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-params")
 
-    testFixturesImplementation("org.junit.platform:junit-platform-launcher:_")
     testFixturesImplementation(platform("io.opentelemetry:opentelemetry-bom:_"))
     testFixturesImplementation("io.opentelemetry:opentelemetry-sdk")
     testFixturesImplementation("io.opentelemetry:opentelemetry-exporter-otlp")

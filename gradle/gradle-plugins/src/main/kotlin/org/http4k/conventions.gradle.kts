@@ -1,5 +1,6 @@
 package org.http4k
 
+import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testFixturesApi
 import org.gradle.api.JavaVersion.VERSION_21
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -87,11 +88,14 @@ tasks {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:_")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:_")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("com.natpryce:hamkrest:_")
 
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:_")
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:_")
+    testFixturesApi(platform("org.junit:junit-bom:_"))
+    testFixturesImplementation("org.junit.platform:junit-platform-launcher")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine")
     testFixturesImplementation("com.natpryce:hamkrest:_")
 }

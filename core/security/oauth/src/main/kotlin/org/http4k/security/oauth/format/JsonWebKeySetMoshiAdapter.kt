@@ -107,5 +107,6 @@ object JsonWebKeySetMoshiAdapter : JsonAdapter<JsonWebKeySet>() {
     }
 
     private fun Map<String, Any?>.string(name: String): String? = this[name] as? String
+    @Suppress("UNCHECKED_CAST")
     private fun Map<String, Any?>.list(name: String): List<String>? = this[name] as? List<String>
 }
