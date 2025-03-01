@@ -5,10 +5,12 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.core.PolyHandler
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
@@ -57,11 +59,7 @@ class TestMcpClientTest {
         )
     }
 
-
-    private val serverName = McpEntity.of("server")
-    private val clientName = McpEntity.of("server")
-
-    private val metadata = ServerMetaData(serverName, Version.of("1"))
+    private val metadata = ServerMetaData(McpEntity.of("server"), Version.of("1"))
 
     //    @Test
 //    fun `update roots`() {
@@ -133,7 +131,7 @@ class TestMcpClientTest {
 
             assertThat(
                 prompts().get(prompt.name, PromptRequest(mapOf("name" to "asd"))),
-                equalTo(Failure("description"))
+                equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
         }
     }

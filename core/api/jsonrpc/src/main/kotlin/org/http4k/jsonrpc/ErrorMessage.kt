@@ -13,6 +13,24 @@ open class ErrorMessage(val code: Int, val message: String) {
 
     override fun toString() = "Error($code, $message)"
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ErrorMessage
+
+        if (code != other.code) return false
+        if (message != other.message) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = code
+        result = 31 * result + message.hashCode()
+        return result
+    }
+
     companion object {
         val InvalidRequest = ErrorMessage(-32600, "Invalid Request")
         val MethodNotFound = ErrorMessage(-32601, "Method not found")

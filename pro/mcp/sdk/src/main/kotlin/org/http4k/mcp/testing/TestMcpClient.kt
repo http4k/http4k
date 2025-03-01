@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing
 
+import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -26,6 +27,7 @@ import org.http4k.mcp.client.McpClient.Completions
 import org.http4k.mcp.client.McpClient.Prompts
 import org.http4k.mcp.client.McpClient.Resources
 import org.http4k.mcp.client.McpClient.Tools
+import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.ModelIdentifier
@@ -80,9 +82,7 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
         )
         sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
 
-        return Success(nextEvent<McpInitialize.Response, ServerCapabilities> {
-            capabilities
-        })
+        return nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }
     }
 
     override fun tools() = object : Tools {
@@ -92,7 +92,7 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
 
         override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {
             sendToMcp(McpTool.List, McpTool.List.Request())
-            return Success(nextEvent<McpTool.List.Response, List<McpTool>> { tools })
+            return nextEvent<McpTool.List.Response, List<McpTool>> { tools }
         }
 
         override fun call(
@@ -105,10 +105,10 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
                     name,
                     request.mapValues { McpJson.asJsonObject(it.value) })
             )
-            return nextEvent<McpTool.Call.Response, McpResult<ToolResponse>>() {
+            return nextEvent<McpTool.Call.Response, ToolResponse>() {
                 when (isError) {
-                    true -> Success(ToolResponse.Error(ErrorMessage.InternalError))
-                    else -> Success(ToolResponse.Ok(content))
+                    true -> ToolResponse.Error(ErrorMessage.InternalError)
+                    else -> ToolResponse.Ok(content)
                 }
             }
         }
@@ -121,7 +121,7 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
 
         override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpPrompt>> {
             sendToMcp(McpPrompt.List, McpPrompt.List.Request())
-            return Success(nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts })
+            return nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }
         }
 
         override fun get(
@@ -130,9 +130,9 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
             overrideDefaultTimeout: Duration?
         ): McpResult<PromptResponse> {
             sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(name, request))
-            return Success(nextEvent<McpPrompt.Get.Response, PromptResponse> {
+            return nextEvent<McpPrompt.Get.Response, PromptResponse> {
                 PromptResponse(messages, description)
-            })
+            }
         }
     }
 
@@ -153,12 +153,12 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
 
         override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpResource>> {
             sendToMcp(McpResource.List, McpResource.List.Request())
-            return Success(nextEvent<McpResource.List.Response, List<McpResource>> { resources })
+            return nextEvent<McpResource.List.Response, List<McpResource>> { resources }
         }
 
         override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?): McpResult<ResourceResponse> {
             sendToMcp(McpResource.Read, McpResource.Read.Request(request.uri))
-            return Success(nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) })
+            return nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
         }
     }
 
@@ -168,7 +168,7 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
             overrideDefaultTimeout: Duration?
         ): McpResult<CompletionResponse> {
             sendToMcp(McpCompletion, McpCompletion.Request(request.ref, request.argument))
-            return Success(nextEvent<McpCompletion.Response, CompletionResponse> { CompletionResponse(completion) })
+            return nextEvent<McpCompletion.Response, CompletionResponse> { CompletionResponse(completion) }
         }
     }
 
@@ -181,14 +181,24 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
         })
     }
 
-    private inline fun <reified T : Any, OUT> nextEvent(fn: T.() -> OUT) = fn(
-        McpJson.convert<McpNodeType, T>(
-            JsonRpcResult(
-                McpJson,
-                McpJson.fields(McpJson.parse((client.get().received().first() as SseMessage.Event).data)).toMap()
-            ).result!!
+    private inline fun <reified T : Any, OUT> nextEvent(fn: T.() -> OUT): McpResult<OUT> {
+        val jsonRpcResult = JsonRpcResult(
+            McpJson,
+            McpJson.fields(McpJson.parse((client.get().received().first() as SseMessage.Event).data)).toMap()
         )
-    )
+
+        return when {
+            jsonRpcResult.isError() -> Failure(
+                McpError.Protocol(
+                    McpJson.convert<McpNodeType, ErrorMessage>(
+                        jsonRpcResult.error!!
+                    )
+                )
+            )
+
+            else -> Success(fn(McpJson.convert<McpNodeType, T>(jsonRpcResult.result!!)))
+        }
+    }
 
     private fun sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) {
         sendToMcp(with(McpJson) {
