@@ -20,7 +20,6 @@ import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
@@ -268,17 +267,16 @@ class TestMcpClientTest {
                 equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
 
-//            val latch = CountDownLatch(1)
-//
-//            tools().onChange(latch::countDown)
-//
-//            tools.items = emptyList()
-//
-//            latch.await()
-        }
+            val latch = CountDownLatch(1)
 
-//
-//        assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
+            tools().onChange(latch::countDown)
+
+            tools.items = emptyList()
+
+            tools().expectNotification()
+
+            latch.await()
+        }
     }
 
     @Test
@@ -401,7 +399,7 @@ class TestMcpClientTest {
 //        }
 //    }
 
-    private fun PolyHandler.useClient(fn: McpClient.() -> Unit) {
+    private fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
         testMcpClient().use {
             it.start()
             it.fn()

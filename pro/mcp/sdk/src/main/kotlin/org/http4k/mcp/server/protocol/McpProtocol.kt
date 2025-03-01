@@ -96,12 +96,7 @@ abstract class McpProtocol<RSP : Any>(
                 McpResource.Subscribe.Method -> {
                     val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
                     resources.subscribe(sId, subscribeRequest) {
-                        send(
-                            McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(
-                                McpResource.Updated
-                            ),
-                            sId
-                        )
+                        send(McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated), sId)
                     }
                     ok()
                 }

@@ -10,6 +10,7 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
+import org.http4k.mcp.testing.nextNotification
 import org.http4k.mcp.util.McpJson
 import org.http4k.testing.TestSseClient
 import java.time.Duration
@@ -18,9 +19,15 @@ import java.util.concurrent.atomic.AtomicReference
 class TestTools(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Tools {
 
+    private val notifications = mutableListOf<() -> Unit>()
+
     override fun onChange(fn: () -> Unit) {
-        TODO()
+        notifications += fn
     }
+
+    fun expectNotification() =
+        client.nextNotification<McpTool.List.Changed.Notification>(McpTool.List.Changed)
+            .also { notifications.forEach { it() } }
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {
         sender(McpTool.List, McpTool.List.Request())

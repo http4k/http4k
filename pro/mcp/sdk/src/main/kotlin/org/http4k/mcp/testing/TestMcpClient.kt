@@ -34,10 +34,13 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
 class TestMcpClient(private val poly: PolyHandler, private val connectRequest: Request) : McpClient {
 
     private val messageRequest = AtomicReference<Request>()
-
     private val sender = TestMcpSender(poly, messageRequest)
-
     private val client = AtomicReference<TestSseClient>()
+    private val tools = TestTools(sender, client)
+    private val prompts = TestPrompts(sender, client)
+    private val sampling = TestSampling(sender, client)
+    private val resources = TestResources(sender, client)
+    private val completions = TestCompletions(sender, client)
 
     override fun start(): McpResult<ServerCapabilities> {
         val mcpResponse = poly.sse!!.testSseClient(connectRequest)
@@ -61,15 +64,15 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
         return client.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }
     }
 
-    override fun tools() = TestTools(sender, client)
+    override fun tools(): TestTools = tools
 
-    override fun prompts() = TestPrompts(sender, client)
+    override fun prompts(): TestPrompts = prompts
 
-    override fun sampling() = TestSampling(sender, client)
+    override fun sampling(): TestSampling = sampling
 
-    override fun resources() = TestResources(sender, client)
+    override fun resources(): TestResources = resources
 
-    override fun completions() = TestCompletions(sender, client)
+    override fun completions(): TestCompletions = completions
 
     override fun close() {
     }

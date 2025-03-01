@@ -8,15 +8,23 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
+import org.http4k.mcp.testing.nextNotification
 import org.http4k.testing.TestSseClient
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
 
 class TestPrompts(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Prompts {
+
+    private val notifications = mutableListOf<() -> Unit>()
+
     override fun onChange(fn: () -> Unit) {
-        TODO()
+        notifications += fn
     }
+
+    fun expectNotification() =
+        client.nextNotification<McpPrompt.List.Changed.Notification>(McpPrompt.List.Changed)
+            .also { notifications.forEach { it() } }
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpPrompt>> {
         sender(McpPrompt.List, McpPrompt.List.Request())

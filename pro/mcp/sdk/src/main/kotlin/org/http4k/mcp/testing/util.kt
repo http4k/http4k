@@ -3,9 +3,11 @@ package org.http4k.mcp.testing
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpResult
+import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
@@ -25,4 +27,17 @@ inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T
 
         else -> Success(fn(McpJson.convert<McpNodeType, T>(jsonRpcResult.result!!)))
     }
+}
+
+inline fun <reified T : Any> AtomicReference<TestSseClient>.nextNotification(mcpRpc: McpRpc): T {
+    val jsonRpcRequest = JsonRpcRequest(
+        McpJson,
+        McpJson.fields(McpJson.parse((get().received().first() as SseMessage.Event).data)).toMap()
+    )
+
+    require(mcpRpc.Method.value == jsonRpcRequest.method) {
+        "Expected ${mcpRpc.Method.value} but got ${jsonRpcRequest.method}"
+    }
+
+    return McpJson.convert<McpNodeType, T>(jsonRpcRequest.params ?: McpJson.nullNode())
 }
