@@ -70,7 +70,7 @@ object HotReloadServer {
 
         private val classpathRoots = System.getProperty("java.class.path")
             .split(File.pathSeparator)
-            .filter { it.contains("build/classes") }
+            .filter { it.contains("build${File.separatorChar}classes") }
 
         init {
             watcher
@@ -81,7 +81,8 @@ object HotReloadServer {
                     log("\uD83D\uDEAB Rebuilding failed... \uD83D\uDEAB")
                 }
                 .watch(classpathRoots
-                    .map { get(it.substringBefore("build/classes")).resolve("src") })
+                    .map { get(it.substringBefore("build${File.separatorChar}classes")).resolve("src") }
+                )
         }
 
         override fun start(): Http4kServer = apply {
@@ -107,4 +108,3 @@ object HotReloadServer {
         }
     }
 }
-
