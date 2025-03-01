@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing.capabilities
 
+import org.http4k.core.Uri
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.client.McpClient
@@ -15,15 +16,24 @@ import java.util.concurrent.atomic.AtomicReference
 class TestResources(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Resources {
 
-    private val notifications = mutableListOf<() -> Unit>()
+    private val changeNotifications = mutableListOf<() -> Unit>()
+
+    private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
 
     override fun onChange(fn: () -> Unit) {
-        notifications += fn
+        changeNotifications += fn
     }
 
     fun expectNotification() =
         client.nextNotification<McpResource.List.Changed.Notification>(McpResource.List.Changed)
-            .also { notifications.forEach { it() } }
+            .also { changeNotifications.forEach { it() } }
+
+    fun expectSubscriptionNotification(uri: Uri) =
+        client.nextNotification<McpResource.Updated.Notification>(McpResource.Updated)
+            .also {
+                require(it.uri == uri) { "Expected notification for $uri, but got ${it.uri}" }
+                subscriptions[it.uri]?.forEach { it() }
+            }
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpResource>> {
         sender(McpResource.List, McpResource.List.Request())
@@ -33,5 +43,16 @@ class TestResources(private val sender: TestMcpSender, private val client: Atomi
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?): McpResult<ResourceResponse> {
         sender(McpResource.Read, McpResource.Read.Request(request.uri))
         return client.nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
+    }
+
+
+    override fun subscribe(uri: Uri, fn: () -> Unit) {
+        sender(McpResource.Subscribe, McpResource.Subscribe.Request(uri))
+        subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
+    }
+
+    override fun unsubscribe(uri: Uri) {
+        sender(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(uri))
+        subscriptions -= uri
     }
 }

@@ -179,25 +179,21 @@ class TestMcpClientTest {
                 equalTo(Success(ResourceResponse(listOf(content))))
             )
 
+            var calls = 0
 
-            /**
-             *
-             *             mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
-             *
-             *             resources.triggerUpdated(resource.uri)
-             *
-             *             assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
-             *
-             *             mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
-             *
-             *             resources.triggerUpdated(resource.uri)
-             *
-             *             assertNoResponse()
-             *
-             */
+            resources().subscribe(resource.uri) { calls++ }
+
+            resources.triggerUpdated(resource.uri)
+
+            resources().expectSubscriptionNotification(resource.uri)
+
+            assertThat(calls, equalTo(1))
+
+            resources().unsubscribe(resource.uri)
+            resources.triggerUpdated(resource.uri)
+            assertThat(calls, equalTo(1))
         }
     }
-
 
     @Test
     fun `deal with templated resources`() {

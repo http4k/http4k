@@ -2,6 +2,7 @@ package org.http4k.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
+import org.http4k.core.Uri
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.client.McpClient
@@ -18,8 +19,22 @@ internal class ClientResources(
     private val sender: McpRpcSender,
     private val register: (McpRpc, NotificationCallback<*>) -> Any
 ) : McpClient.Resources {
+
+    private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
+
     override fun onChange(fn: () -> Unit) {
         register(McpResource.List, NotificationCallback(McpResource.List.Changed.Notification::class) { fn() })
+    }
+
+    override fun subscribe(uri: Uri, fn: () -> Unit) {
+        register(McpResource.Updated, NotificationCallback(McpResource.Updated.Notification::class) {
+            subscriptions[uri]?.forEach { it() }
+        })
+        subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
+    }
+
+    override fun unsubscribe(uri: Uri) {
+        subscriptions -= uri
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(

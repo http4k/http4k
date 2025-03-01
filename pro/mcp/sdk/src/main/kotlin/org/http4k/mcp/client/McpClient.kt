@@ -1,5 +1,6 @@
 package org.http4k.mcp.client
 
+import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptRequest
@@ -67,6 +68,8 @@ interface McpClient : AutoCloseable {
         fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
         fun read(request: ResourceRequest, overrideDefaultTimeout: Duration? = null): McpResult<ResourceResponse>
+        fun subscribe(uri: Uri, fn: () -> Unit)
+        fun unsubscribe(uri: Uri)
     }
 
     /**
