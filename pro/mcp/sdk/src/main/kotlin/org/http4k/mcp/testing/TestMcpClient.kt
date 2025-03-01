@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.renderRequest
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptRequest
@@ -44,7 +45,9 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
+import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
@@ -56,15 +59,17 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
 
     private val messageRequest = AtomicReference<Request>()
 
-    private val messages = AtomicReference<Sequence<SseMessage>>()
+    private val client = AtomicReference<TestSseClient>()
 
     override fun start(): McpResult<ServerCapabilities> {
-        val mcpClient = sse!!.testSseClient(connectRequest)
+        val mcpResponse = sse!!.testSseClient(connectRequest)
 
-        messages.set(mcpClient.received())
+        client.set(mcpResponse)
 
-        require(mcpClient.status == OK)
-        val endpointEvent = messages.get().nextEvent() as SseMessage.Event
+        require(mcpResponse.status == OK)
+
+        val endpointEvent = mcpResponse.received().first() as SseMessage.Event
+
         require(endpointEvent.event == "endpoint") { "no endpoint event" }
         messageRequest.set(Request(POST, Uri.of(endpointEvent.data)))
         sendToMcp(
@@ -75,7 +80,7 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
         )
         sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
 
-        return Success(nextEvent<McpInitialize.Response, ServerCapabilities>() {
+        return Success(nextEvent<McpInitialize.Response, ServerCapabilities> {
             capabilities
         })
     }
@@ -176,10 +181,14 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = 
         })
     }
 
-    private inline fun <reified T : Any, OUT> nextEvent(fn: T.() -> OUT) = fn(messages.get().nextEvent<T>())
-
-    private inline fun <reified T : Any> Sequence<SseMessage>.nextEvent() =
-        McpJson.asA<T>((first() as SseMessage.Event).data)
+    private inline fun <reified T : Any, OUT> nextEvent(fn: T.() -> OUT) = fn(
+        McpJson.convert<McpNodeType, T>(
+            JsonRpcResult(
+                McpJson,
+                McpJson.fields(McpJson.parse((client.get().received().first() as SseMessage.Event).data)).toMap()
+            ).result!!
+        )
+    )
 
     private fun sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) {
         sendToMcp(with(McpJson) {
