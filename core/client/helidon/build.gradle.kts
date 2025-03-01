@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("io.helidon.webclient:helidon-webclient:_")
+    api(platform("io.helidon:helidon-bom:_"))
+    api("io.helidon.webclient:helidon-webclient")
     testImplementation(testFixtures(project(":http4k-core")))
 }

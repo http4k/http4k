@@ -12,9 +12,10 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
 
-    api("io.helidon.webserver:helidon-webserver:_")
-    api("io.helidon.webserver:helidon-webserver-sse:_")
-    api("io.helidon.webserver:helidon-webserver-websocket:_")
+    api(platform("io.helidon:helidon-bom:_"))
+    api("io.helidon.webserver:helidon-webserver")
+    api("io.helidon.webserver:helidon-webserver-sse")
+    api("io.helidon.webserver:helidon-webserver-websocket")
 
     testFixturesApi(testFixtures(project(":http4k-core")))
 }
