@@ -9,6 +9,7 @@ changes with their rationale when appropriate:
 - **http4k-security-oauth** :[Breaking] Reorganised filter argument order for OAuth filters to pass scopes through to token endpoint.
 - **http4k-realtime-core** :[Breaking] SseEventId is now a type instead of just a string
 - **http4k-connect-amazon-ses***: [Breaking] Upgrade to SES V2 API. H/T @oharaandrew314
+- **http4k-realtime-core** : Added PolyHandlerTestClient for testing poly servers in a single place
 
 ### v6.0.1.0
 - **http4k-*** : Upgrade some dependency versions.
