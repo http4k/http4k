@@ -40,14 +40,13 @@ internal class ClientResources(
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpResource.List, McpResource.List.Request(),
         overrideDefaultTimeout ?: defaultTimeout
-    ) { true }
+    )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpResource.List.Response>() }
         .map { it.resources }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(McpResource.Read, McpResource.Read.Request(request.uri), overrideDefaultTimeout ?: defaultTimeout)
-        { true }
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpResource.Read.Response>() }
             .map { ResourceResponse(it.contents) }

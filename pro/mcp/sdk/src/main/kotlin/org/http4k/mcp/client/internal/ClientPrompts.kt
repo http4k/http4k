@@ -26,13 +26,13 @@ internal class ClientPrompts(
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpPrompt.List,
         McpPrompt.List.Request(), overrideDefaultTimeout ?: defaultTimeout
-    ) { true }
+    )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpPrompt.List.Response>() }
         .map { it.prompts }
 
     override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =
-        sender(McpPrompt.Get, McpPrompt.Get.Request(name, request), overrideDefaultTimeout ?: defaultTimeout) { true }
+        sender(McpPrompt.Get, McpPrompt.Get.Request(name, request), overrideDefaultTimeout ?: defaultTimeout)
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }
             .map { PromptResponse(it.messages, it.description) }

@@ -29,7 +29,7 @@ internal class ClientTools(
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpTool.List, McpTool.List.Request(),
         overrideDefaultTimeout ?: defaultTimeout
-    ) { true }
+    )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTool.List.Response>() }
         .map { it.tools }
@@ -39,7 +39,7 @@ internal class ClientTools(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) }),
             overrideDefaultTimeout ?: defaultTimeout
-        ) { true }
+        )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }
             .map {

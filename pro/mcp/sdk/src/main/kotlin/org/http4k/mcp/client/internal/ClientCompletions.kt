@@ -20,7 +20,7 @@ internal class ClientCompletions(
         sender(
             McpCompletion, McpCompletion.Request(request.ref, request.argument),
             overrideDefaultTimeout ?: defaultTimeout
-        ) { true }
+        )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
             .map { CompletionResponse(it.completion) }

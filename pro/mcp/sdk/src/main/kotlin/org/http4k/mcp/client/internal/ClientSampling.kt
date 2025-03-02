@@ -52,7 +52,6 @@ internal class ClientSampling(
                 )
             },
             fetchNextTimeout ?: defaultTimeout,
-            ::hasStopReason
         ).map(queueFor)
             .onFailure { return emptySequence() }
 
@@ -96,7 +95,7 @@ internal class ClientSampling(
                 sender(
                     McpSampling, McpSampling.Response(sr.model, sr.stopReason, sr.role, sr.content),
                     overrideDefaultTimeout ?: defaultTimeout
-                ) { true }
+                )
             }
         })
     }
