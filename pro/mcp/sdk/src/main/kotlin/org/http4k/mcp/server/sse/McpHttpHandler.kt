@@ -2,7 +2,6 @@ package org.http4k.mcp.server.sse
 
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
 import org.http4k.format.jsonRpcRequest
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.util.McpJson
