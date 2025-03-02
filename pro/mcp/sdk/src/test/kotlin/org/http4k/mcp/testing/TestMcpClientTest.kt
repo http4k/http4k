@@ -8,6 +8,7 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionRequest

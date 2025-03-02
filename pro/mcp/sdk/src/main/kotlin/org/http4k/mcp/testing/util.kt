@@ -4,7 +4,6 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -15,17 +14,21 @@ import org.http4k.testing.TestSseClient
 import java.util.concurrent.atomic.AtomicReference
 
 inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T.() -> OUT): McpResult<OUT> {
-    val jsonRpcResult = JsonRpcResult(
-        McpJson,
-        McpJson.fields(McpJson.parse((get().received().first() as SseMessage.Event).data)).toMap()
-    )
+
+    val fields = McpJson.fields(McpJson.parse((get().received().first() as SseMessage.Event).data)).toMap()
 
     return when {
-        jsonRpcResult.isError() -> Failure(
-            McpError.Protocol(McpJson.convert<McpNodeType, ErrorMessage>(jsonRpcResult.error!!))
+        fields["error"] != null -> Failure(
+            McpError.Protocol(McpJson.convert<McpNodeType, ErrorMessage>(fields["error"]!!))
         )
 
-        else -> Success(fn(McpJson.convert<McpNodeType, T>(jsonRpcResult.result!!)))
+        else -> Success(
+            fn(
+                McpJson.convert<McpNodeType, T>(
+                    fields["result"] ?: fields["params"] ?: error("No result or params in $fields")
+                )
+            )
+        )
     }
 }
 

@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicReference
 class TestMcpClientSampling(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Sampling {
 
+    private val onSampling = mutableListOf<SamplingHandler>()
+
     override fun sample(
         name: ModelIdentifier, request: SamplingRequest, fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
@@ -45,8 +47,6 @@ class TestMcpClientSampling(private val sender: TestMcpSender, private val clien
         }
     }
 
-    private val onSampling = mutableListOf<SamplingHandler>()
-
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
         onSampling.add(fn)
     }
@@ -63,9 +63,11 @@ class TestMcpClientSampling(private val sender: TestMcpSender, private val clien
                 modelPreferences, metadata
             )
         }.map { next ->
-            println("Processing sampling request")
             onSampling.forEach {
-                it(next) }
+                it(next).forEach {
+                    sender(with(it) { McpSampling.Response(model, stopReason, role, content) })
+                }
+            }
         }
     }
 }

@@ -82,8 +82,6 @@ class Sampling(private val list: List<SamplingCapability>) {
 
         return sequence {
             while (true) {
-                println("POLL " + fetchNextTimeout)
-
                 val nextMessage: SamplingResponse? = when (fetchNextTimeout) {
                     null -> queue.take()
                     else -> queue.poll(fetchNextTimeout.toMillis(), MILLISECONDS)
