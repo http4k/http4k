@@ -2,10 +2,7 @@ package org.http4k.mcp.server.protocol
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
-import org.http4k.core.Body
 import org.http4k.core.Request
-import org.http4k.format.jsonRpcRequest
-import org.http4k.format.jsonRpcResult
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
@@ -162,15 +159,15 @@ abstract class McpProtocol<RSP : Any>(
             }
 
             else -> {
-                val result = JsonRpcResult(McpJson, payload)
+                val jsonResult = JsonRpcResult(McpJson, payload)
 
                 when {
-                    result.isError() -> ok()
+                    jsonResult.isError() -> ok()
                     else -> with(McpJson) {
-                        val id = result.id?.let { RequestId.parse(compact(it)) }
+                        val id = jsonResult.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
                             null -> ok()
-                            else -> clients[sId]?.processResult(id, result)?.let { ok() } ?: error()
+                            else -> clients[sId]?.processResult(id, jsonResult)?.let { ok() } ?: error()
                         }
                     }
                 }
