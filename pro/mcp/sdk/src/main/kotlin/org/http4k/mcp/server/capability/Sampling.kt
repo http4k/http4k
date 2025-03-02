@@ -42,10 +42,8 @@ class Sampling(private val list: List<SamplingCapability>) {
     }
 
     fun process(id: RequestId, response: McpSampling.Response): CompletionStatus {
-        println("RESPONSE$id")
-        println(subscriptions)
         val samplingResponse = SamplingResponse(response.model, response.role, response.content, response.stopReason)
-        println(responseQueues[id])
+
         responseQueues[id]?.put(samplingResponse)
 
         return when {
