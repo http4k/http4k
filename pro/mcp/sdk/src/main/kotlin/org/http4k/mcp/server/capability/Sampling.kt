@@ -41,7 +41,7 @@ class Sampling(private val list: List<SamplingCapability>) {
         else -> list.maxByOrNull { it.toModelSelector().score(modelPreferences) }
     }
 
-    fun process(id: RequestId, response: McpSampling.Response): CompletionStatus {
+    fun receive(id: RequestId, response: McpSampling.Response): CompletionStatus {
         val samplingResponse = SamplingResponse(response.model, response.role, response.content, response.stopReason)
 
         responseQueues[id]?.put(samplingResponse)
