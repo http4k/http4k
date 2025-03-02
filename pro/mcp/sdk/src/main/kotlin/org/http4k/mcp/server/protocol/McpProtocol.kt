@@ -146,7 +146,7 @@ abstract class McpProtocol<RSP : Any>(
 
                     McpRoot.Changed.Method -> {
                         val requestId = RequestId.random(random)
-                        clients[sId]?.addCall(requestId) { roots.update(it.fromJsonRpc()) }
+                        clients[sId]?.addCallback(requestId) { roots.update(it.fromJsonRpc()) }
                         send(McpRoot.List.Request().toJsonRpc(McpRoot.List, McpJson.asJsonObject(requestId)), sId)
                         ok()
                     }
@@ -183,7 +183,7 @@ abstract class McpProtocol<RSP : Any>(
     }
 
     private fun handleInitialize(request: McpInitialize.Request, sId: SessionId): McpInitialize.Response {
-        val session = ClientSession(request.clientInfo, request.capabilities)
+        val session = ClientSession()
 
         clients[sId] = session
         logger.subscribe(sId, LogLevel.error) { level, logger, data ->
@@ -199,7 +199,7 @@ abstract class McpProtocol<RSP : Any>(
         tools.onChange(sId) { send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
-            clients[sId]?.addCall(id) { sampling.receive(id, it.fromJsonRpc()) }
+            clients[sId]?.addCallback(id) { sampling.receive(id, it.fromJsonRpc()) }
             send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
         }
 

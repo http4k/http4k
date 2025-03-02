@@ -22,7 +22,7 @@ import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.session.SessionIdProvider
+import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
@@ -40,7 +40,7 @@ class RealtimeMcpProtocol<Transport>(
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
-    private val sessionIdFactory: SessionIdProvider = SessionIdProvider.Random(random),
+    private val sessionProvider: SessionProvider = SessionProvider.Random(random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : McpProtocol<Response>(
     metaData,
@@ -89,7 +89,7 @@ class RealtimeMcpProtocol<Transport>(
     }
 
     fun newSession(connectRequest: Request, eventSink: Transport): SessionId {
-        val sessionId = sessionIdFactory(connectRequest)
+        val sessionId = sessionProvider.assign(connectRequest)
         sessions[sessionId] = eventSink
         return sessionId
     }

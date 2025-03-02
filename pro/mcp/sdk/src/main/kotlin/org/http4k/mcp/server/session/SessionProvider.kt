@@ -9,14 +9,20 @@ import kotlin.random.Random
  * Provides a session identifier for a given connection request. This can be used to allocate a particular session
  * which can be used to track the connection.
  */
-fun interface SessionIdProvider {
-    operator fun invoke(connectRequest: Request): SessionId
+interface SessionProvider {
+    fun assign(connectRequest: Request): SessionId
+    fun check(connectRequest: Request): Boolean
 
     companion object {
         /**
          * Provides a totally random session identifier.
          */
         fun Random(random: Random) =
-            SessionIdProvider { SessionId.of(UUID(random.nextLong(), random.nextLong()).toString()) }
+            object : SessionProvider {
+                override fun assign(connectRequest: Request) =
+                    SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())
+
+                override fun check(connectRequest: Request) = true
+            }
     }
 }
