@@ -17,17 +17,17 @@ internal class ClientResources(
     private val tidyUp: (RequestId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
-    private val register: (McpRpc, NotificationCallback<*>) -> Any
+    private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Resources {
 
     private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
 
     override fun onChange(fn: () -> Unit) {
-        register(McpResource.List, NotificationCallback(McpResource.List.Changed.Notification::class) { fn() })
+        register(McpResource.List, McpCallback(McpResource.List.Changed.Notification::class) { fn() })
     }
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
-        register(McpResource.Updated, NotificationCallback(McpResource.Updated.Notification::class) {
+        register(McpResource.Updated, McpCallback(McpResource.Updated.Notification::class) {
             subscriptions[uri]?.forEach { it() }
         })
         subscriptions.getOrPut(uri, ::mutableListOf).add(fn)

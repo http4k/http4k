@@ -14,7 +14,7 @@ import org.http4k.mcp.client.internal.ClientPrompts
 import org.http4k.mcp.client.internal.ClientResources
 import org.http4k.mcp.client.internal.ClientSampling
 import org.http4k.mcp.client.internal.ClientTools
-import org.http4k.mcp.client.internal.NotificationCallback
+import org.http4k.mcp.client.internal.McpCallback
 import org.http4k.mcp.client.internal.asOrFailure
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -46,7 +46,7 @@ abstract class AbstractMcpClient(
 ) : McpClient {
     private val running = AtomicBoolean(false)
     protected val requests = ConcurrentHashMap<RequestId, CountDownLatch>()
-    private val notificationCallbacks = mutableMapOf<McpRpcMethod, MutableList<NotificationCallback<*>>>()
+    private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
     protected val messageQueues = ConcurrentHashMap<RequestId, BlockingQueue<McpNodeType>>()
 
     override fun start(): McpResult<ServerCapabilities> {
@@ -68,9 +68,9 @@ abstract class AbstractMcpClient(
                                 val data = parse(it.data) as MoshiObject
 
                                 when {
-                                    data["id"] == null -> {
+                                    data["method"] != null -> {
                                         val message = JsonRpcRequest(this, data.attributes)
-                                        notificationCallbacks[McpRpcMethod.of(message.method)]?.forEach { it(message) }
+                                        callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message) }
                                     }
 
                                     else -> {
@@ -128,20 +128,22 @@ abstract class AbstractMcpClient(
 
     override fun tools(): McpClient.Tools =
         ClientTools(::findQueue, ::tidyUp, ::performRequest, defaultTimeout) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): McpClient.Prompts =
         ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(::findQueue, ::tidyUp, defaultTimeout, ::performRequest)
+        ClientSampling(::findQueue, ::tidyUp, defaultTimeout, ::performRequest) { rpc, callback ->
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+        }
 
     override fun resources(): McpClient.Resources =
         ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::performRequest) { rpc, callback ->
-            notificationCallbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): McpClient.Completions =

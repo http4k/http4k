@@ -20,10 +20,10 @@ internal class ClientTools(
     private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender,
     private val defaultTimeout: Duration,
-    private val register: (McpRpc, NotificationCallback<*>) -> Any
+    private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Tools {
     override fun onChange(fn: () -> Unit) {
-        register(McpTool.List.Changed, NotificationCallback(McpTool.List.Changed.Notification::class) { fn() })
+        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification::class) { fn() })
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(

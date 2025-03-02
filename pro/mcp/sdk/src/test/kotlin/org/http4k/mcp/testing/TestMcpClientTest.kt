@@ -34,6 +34,7 @@ import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
@@ -52,6 +53,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.OutgoingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
@@ -60,17 +62,21 @@ import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
 class TestMcpClientTest {
 
+    private val serverName = McpEntity.of("server")
+    private val clientName = McpEntity.of("server")
+
     @Test
     fun `can use mcp client to connect and get responses`() {
         val capabilities = mcpSse(
             ServerMetaData(
-                McpEntity.of("my mcp server"), Version.of("1"),
+                serverName, Version.of("1"),
                 PromptsChanged,
                 Experimental,
             ),
@@ -89,7 +95,7 @@ class TestMcpClientTest {
         )
     }
 
-    private val metadata = ServerMetaData(McpEntity.of("server"), Version.of("1"))
+    private val metadata = ServerMetaData(serverName, Version.of("1"))
 
     @Test
     fun `deal with prompts`() {
@@ -337,30 +343,50 @@ class TestMcpClientTest {
         }
     }
 
-//
-//    @Test
-//    fun `deal with outgoing sampling`() {
-//        val received = mutableListOf<SamplingResponse>()
-//
-//        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-//
-//        val model = ModelIdentifier.of("name")
-//        val sampling = OutgoingSampling(
-//            listOf(
-//                clientName bind { received += it }
-//            ))
-//
-//        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, outgoingSampling = sampling, random = Random(0)))
+    @Test
+    @Disabled
+    fun `deal with outgoing sampling`() {
+        val received = mutableListOf<SamplingResponse>()
+
+        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+
+        val model = ModelIdentifier.of("name")
+        val sampling = OutgoingSampling(
+            listOf(clientName bind { received += it }))
+
+        val mcp = StandardMcpSse(
+            RealtimeMcpProtocol(
+                McpSession.Sse(),
+                metadata,
+                outgoingSampling = sampling,
+                random = Random(0)
+            )
+        )
+
+        mcp.useClient {
+            sampling().onSampled {
+                sequenceOf(
+                    SamplingResponse(model, Role.assistant, content, null),
+                    SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
+                )
+            }
+
+            sampling.sample(serverName, SamplingRequest(listOf(), MaxTokens.of(1)), RequestId.of(1))
+
+            assertThat(
+                received, equalTo(
+                    listOf(
+                        SamplingResponse(model, Role.assistant, content, null),
+                        SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
+                    )
+                )
+            )
+        }
+    }
 //
 //        with(mcp.testSseClient(Request(GET, "/sse"))) {
 //            assertInitializeLoop(mcp)
 //
-//            sampling.sample(
-//                serverName, SamplingRequest(
-//                    listOf(), MaxTokens.of(1),
-//                    connectRequest = Request(GET, "")
-//                ), RequestId.of(1)
-//            )
 //
 //            assertNextMessage(
 //                McpSampling,

@@ -3,6 +3,7 @@ package org.http4k.mcp.client
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.IncomingSamplingHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
@@ -39,7 +40,11 @@ interface McpClient : AutoCloseable {
     interface Tools {
         fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
-        fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration? = null): McpResult<ToolResponse>
+        fun call(
+            name: ToolName,
+            request: ToolRequest,
+            overrideDefaultTimeout: Duration? = null
+        ): McpResult<ToolResponse>
     }
 
     /**
@@ -48,7 +53,11 @@ interface McpClient : AutoCloseable {
     interface Prompts {
         fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpPrompt>>
-        fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration? = null): McpResult<PromptResponse>
+        fun get(
+            name: PromptName,
+            request: PromptRequest,
+            overrideDefaultTimeout: Duration? = null
+        ): McpResult<PromptResponse>
     }
 
     /**
@@ -58,7 +67,16 @@ interface McpClient : AutoCloseable {
         /**
          * Note that the timeout defined here is applied between each message received by the model
          */
-        fun sample(name: ModelIdentifier, request: SamplingRequest, fetchNextTimeout: Duration? = null): Sequence<McpResult<SamplingResponse>>
+        fun sample(
+            name: ModelIdentifier,
+            request: SamplingRequest,
+            fetchNextTimeout: Duration? = null
+        ): Sequence<McpResult<SamplingResponse>>
+
+        /**
+         * Note that the timeout defined here is applied between each message received by the model
+         */
+        fun onSampled(overrideDefaultTimeout: Duration? = null, fn: IncomingSamplingHandler)
     }
 
     /**
@@ -76,6 +94,9 @@ interface McpClient : AutoCloseable {
      * Generate Prompt Completions provided by this MCP Server
      */
     interface Completions {
-        fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration? = null): McpResult<CompletionResponse>
+        fun complete(
+            request: CompletionRequest,
+            overrideDefaultTimeout: Duration? = null
+        ): McpResult<CompletionResponse>
     }
 }

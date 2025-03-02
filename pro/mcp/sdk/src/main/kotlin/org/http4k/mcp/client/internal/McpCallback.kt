@@ -5,7 +5,7 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import kotlin.reflect.KClass
 
-internal class NotificationCallback<T : Any>(
+internal class McpCallback<T : Any>(
     private val clazz: KClass<T>,
     private val callback: (T) -> Unit
 ) {

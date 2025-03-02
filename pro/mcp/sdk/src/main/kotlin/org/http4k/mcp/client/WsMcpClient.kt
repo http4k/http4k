@@ -72,7 +72,6 @@ class WsMcpClient(
         val requestId = RequestId.random()
 
         return resultFrom {
-
             requests[requestId] = latch
             messageQueues[requestId] = ArrayBlockingQueue(100)
 

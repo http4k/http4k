@@ -17,10 +17,10 @@ internal class ClientPrompts(
     private val tidyUp: (RequestId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
-    private val register: (McpRpc, NotificationCallback<*>) -> Any
+    private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Prompts {
     override fun onChange(fn: () -> Unit) {
-        register(McpPrompt.List, NotificationCallback(McpPrompt.List.Changed.Notification::class) { fn() })
+        register(McpPrompt.List, McpCallback(McpPrompt.List.Changed.Notification::class) { fn() })
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(

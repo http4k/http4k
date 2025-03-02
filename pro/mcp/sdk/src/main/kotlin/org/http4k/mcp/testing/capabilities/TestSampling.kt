@@ -1,6 +1,7 @@
 package org.http4k.mcp.testing.capabilities
 
 import dev.forkhandles.result4k.Success
+import org.http4k.mcp.IncomingSamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.client.McpClient
@@ -15,10 +16,9 @@ import java.util.concurrent.atomic.AtomicReference
 
 class TestSampling(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Sampling {
+
     override fun sample(
-        name: ModelIdentifier,
-        request: SamplingRequest,
-        fetchNextTimeout: Duration?
+        name: ModelIdentifier, request: SamplingRequest, fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
         sender(
             McpSampling, McpSampling.Request(
@@ -40,4 +40,9 @@ class TestSampling(private val sender: TestMcpSender, private val client: Atomic
             }
         }
     }
+
+    override fun onSampled(overrideDefaultTimeout: Duration?, fn: IncomingSamplingHandler) {
+        TODO("Not yet implemented")
+    }
+
 }
