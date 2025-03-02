@@ -3,7 +3,7 @@ package org.http4k.mcp.client
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
-import org.http4k.mcp.IncomingSamplingHandler
+import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
@@ -76,7 +76,7 @@ interface McpClient : AutoCloseable {
         /**
          * Note that the timeout defined here is applied between each message received by the model
          */
-        fun onSampled(overrideDefaultTimeout: Duration? = null, fn: IncomingSamplingHandler)
+        fun onSampled(overrideDefaultTimeout: Duration? = null, fn: SamplingHandler)
     }
 
     /**

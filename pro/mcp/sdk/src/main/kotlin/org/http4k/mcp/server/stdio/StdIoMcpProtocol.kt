@@ -6,12 +6,11 @@ import org.http4k.core.Request
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Logger
-import org.http4k.mcp.server.capability.OutgoingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.util.McpJson.compact
@@ -30,8 +29,7 @@ class StdIoMcpProtocol(
     tools: Tools = Tools(emptyList()),
     resources: Resources = Resources(emptyList()),
     completions: Completions = Completions(emptyList()),
-    incomingSampling: IncomingSampling = IncomingSampling(emptyList()),
-    outgoingSampling: OutgoingSampling = OutgoingSampling(emptyList()),
+    incomingSampling: Sampling = Sampling(emptyList()),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
@@ -42,7 +40,6 @@ class StdIoMcpProtocol(
     resources,
     roots,
     incomingSampling,
-    outgoingSampling,
     prompts,
     logger,
     random
@@ -61,8 +58,7 @@ class StdIoMcpProtocol(
     override fun start(executor: SimpleScheduler) =
         executor.readLines(reader) {
             try {
-                val req = Request(POST, "").body(it)
-                this(SessionId.of(UUID(0, 0).toString()), req)
+                this(SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
             } catch (e: Exception) {
                 e.printStackTrace(System.err)
             }

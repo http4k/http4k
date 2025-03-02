@@ -11,7 +11,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
@@ -29,7 +29,7 @@ class WsMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Websocke
         tools: Tools,
         resources: Resources,
         completions: Completions,
-        incomingSampling: IncomingSampling
+        incomingSampling: Sampling
     ) = RealtimeMcpProtocol(
         McpSession.Websocket(),
         serverMetaData, prompts, tools, resources, completions, incomingSampling

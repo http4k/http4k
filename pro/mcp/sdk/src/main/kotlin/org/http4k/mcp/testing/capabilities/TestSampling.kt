@@ -2,7 +2,7 @@ package org.http4k.mcp.testing.capabilities
 
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
-import org.http4k.mcp.IncomingSamplingHandler
+import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.client.McpClient
@@ -42,9 +42,9 @@ class TestSampling(private val sender: TestMcpSender, private val client: Atomic
         }
     }
 
-    private val onSampling = mutableListOf<IncomingSamplingHandler>()
+    private val onSampling = mutableListOf<SamplingHandler>()
 
-    override fun onSampled(overrideDefaultTimeout: Duration?, fn: IncomingSamplingHandler) {
+    override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
         onSampling.add(fn)
     }
 

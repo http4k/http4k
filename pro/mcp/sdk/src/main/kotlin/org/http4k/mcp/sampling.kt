@@ -12,14 +12,9 @@ import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Temperature
 
 /**
- *  Processes a sampling request from an MCP client
+ *  Processes a sampling request from an MCP client/server
  */
-typealias IncomingSamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
-
-/**
- * Processes a sampling response from an MCP client
- */
-typealias OutgoingSamplingHandler = (SamplingResponse) -> Unit
+typealias SamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
 
 data class SamplingRequest(
     val messages: List<Message>,

@@ -36,7 +36,7 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
@@ -74,7 +74,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
             }),
-            IncomingSampling(ModelSelector(model) bind {
+            Sampling(ModelSelector(model) bind {
                 samplingResponses.asSequence()
             })
         )
@@ -159,7 +159,7 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-        incomingSampling: IncomingSampling
+        incomingSampling: Sampling
     ): P
 
     fun toPolyHandler(protocol: P): PolyHandler

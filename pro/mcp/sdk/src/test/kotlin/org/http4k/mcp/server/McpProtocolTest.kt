@@ -71,9 +71,8 @@ import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Logger
-import org.http4k.mcp.server.capability.OutgoingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
@@ -374,7 +373,7 @@ class McpProtocolTest {
         val content2 = Content.Text("this is the end!")
 
         val model = ModelIdentifier.of("name")
-        val sampling = IncomingSampling(
+        val sampling = Sampling(
             listOf(
                 ModelSelector(model) { MAX } bind {
                     listOf(
@@ -384,7 +383,7 @@ class McpProtocolTest {
                 }
             ))
 
-        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, incomingSampling = sampling, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, sampling = sampling, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -399,22 +398,18 @@ class McpProtocolTest {
 
     @Test
     fun `deal with outgoing sampling`() {
-        val received = mutableListOf<SamplingResponse>()
-
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = OutgoingSampling(
-            listOf(
-                clientName bind { received += it }
-            ))
+        val sampling = Sampling()
 
-        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, outgoingSampling = sampling, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, sampling = sampling, random = Random(0)))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
+
             assertInitializeLoop(mcp)
 
-            sampling.sample(
+            val received = sampling.sampleClient(
                 serverName, SamplingRequest(
                     listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")
@@ -444,7 +439,7 @@ class McpProtocolTest {
             )
 
             assertThat(
-                received, equalTo(
+                received.toList(), equalTo(
                     listOf(
                         SamplingResponse(model, Role.assistant, content, null),
                         SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))

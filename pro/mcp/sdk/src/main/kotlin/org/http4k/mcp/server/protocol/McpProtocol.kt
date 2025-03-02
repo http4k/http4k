@@ -30,12 +30,11 @@ import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.protocol.messages.fromJsonRpc
 import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
 import org.http4k.mcp.server.capability.Logger
-import org.http4k.mcp.server.capability.OutgoingSampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -52,8 +51,7 @@ abstract class McpProtocol<RSP : Any>(
     private val completions: Completions,
     private val resources: Resources,
     private val roots: Roots,
-    private val incomingSampling: IncomingSampling,
-    private val outgoingSampling: OutgoingSampling,
+    private val sampling: Sampling,
     private val prompts: Prompts,
     private val logger: Logger,
     private val random: Random
@@ -100,7 +98,10 @@ abstract class McpProtocol<RSP : Any>(
                     McpResource.Subscribe.Method -> {
                         val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
                         resources.subscribe(sId, subscribeRequest) {
-                            send(McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated), sId)
+                            send(
+                                McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated),
+                                sId
+                            )
                         }
                         ok()
                     }
@@ -123,7 +124,7 @@ abstract class McpProtocol<RSP : Any>(
                         runCatching { jsonReq.fromJsonRpc<McpSampling.Request>() }
                             .map {
                                 runCatching {
-                                    incomingSampling.sample(it, httpReq)
+                                    sampling.sampleServer(it, httpReq)
                                         .forEach { send(it.toJsonRpc(jsonReq.id), sId) }
                                     ok()
                                 }.recover {
@@ -150,9 +151,15 @@ abstract class McpProtocol<RSP : Any>(
                         ok()
                     }
 
-                    McpTool.Call.Method -> send(jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, httpReq) }, sId)
+                    McpTool.Call.Method -> send(
+                        jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, httpReq) },
+                        sId
+                    )
 
-                    McpTool.List.Method -> send(jsonReq.respondTo<McpTool.List.Request> { tools.list(it, httpReq) }, sId)
+                    McpTool.List.Method -> send(
+                        jsonReq.respondTo<McpTool.List.Request> { tools.list(it, httpReq) },
+                        sId
+                    )
 
                     else -> send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
                 }
@@ -191,8 +198,8 @@ abstract class McpProtocol<RSP : Any>(
         resources.onChange(sId) { send(McpResource.List.Changed.Notification.toJsonRpc(McpResource.List), sId) }
         tools.onChange(sId) { send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 
-        outgoingSampling.onRequest(sId, session.entity) { req, id ->
-            clients[sId]?.addCall(id) { outgoingSampling.respond(session.entity, it.fromJsonRpc()) }
+        sampling.onSampleClient(request.clientInfo.name, sId) { req, id ->
+            clients[sId]?.addCall(id) { sampling.process(id, it.fromJsonRpc()) }
             send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
         }
 
@@ -201,7 +208,7 @@ abstract class McpProtocol<RSP : Any>(
             prompts.remove(sId)
             resources.remove(sId)
             tools.remove(sId)
-            outgoingSampling.remove(sId, session.entity)
+            sampling.remove(request.clientInfo.name, sId)
             logger.unsubscribe(sId)
         }
 

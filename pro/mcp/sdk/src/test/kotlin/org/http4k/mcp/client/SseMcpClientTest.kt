@@ -39,7 +39,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
@@ -59,7 +59,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-        incomingSampling: IncomingSampling
+        incomingSampling: Sampling
     ) = RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, prompts, tools, resources, completions, incomingSampling)
 
     override fun clientFor(port: Int) = SseMcpClient(
@@ -96,7 +96,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
             }),
-            IncomingSampling(ModelSelector(model) bind {
+            Sampling(ModelSelector(model) bind {
                 samplingResponses.asSequence()
             })
         )

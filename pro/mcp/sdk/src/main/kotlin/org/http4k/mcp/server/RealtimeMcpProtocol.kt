@@ -9,16 +9,14 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
-import org.http4k.mcp.server.capability.IncomingSamplingCapability
+import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.Logger
-import org.http4k.mcp.server.capability.OutgoingSampling
-import org.http4k.mcp.server.capability.OutgoingSamplingCapability
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
@@ -38,8 +36,7 @@ class RealtimeMcpProtocol<Transport>(
     tools: Tools = Tools(emptyList()),
     resources: Resources = Resources(emptyList()),
     completions: Completions = Completions(emptyList()),
-    incomingSampling: IncomingSampling = IncomingSampling(emptyList()),
-    outgoingSampling: OutgoingSampling = OutgoingSampling(emptyList()),
+    sampling: Sampling = Sampling(emptyList()),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
@@ -51,8 +48,7 @@ class RealtimeMcpProtocol<Transport>(
     completions,
     resources,
     roots,
-    incomingSampling,
-    outgoingSampling,
+    sampling,
     prompts,
     logger,
     random
@@ -71,8 +67,7 @@ class RealtimeMcpProtocol<Transport>(
             Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
             Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
             Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-            IncomingSampling(capabilities.flatMap { it }.filterIsInstance<IncomingSamplingCapability>()),
-            OutgoingSampling(capabilities.flatMap { it }.filterIsInstance<OutgoingSamplingCapability>())
+            Sampling(capabilities.flatMap { it }.filterIsInstance<SamplingCapability>())
         )
 
     private val sessions = ConcurrentHashMap<SessionId, Transport>()

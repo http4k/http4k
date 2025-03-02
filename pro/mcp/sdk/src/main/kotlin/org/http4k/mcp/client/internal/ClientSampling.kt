@@ -5,7 +5,7 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.format.MoshiObject
-import org.http4k.mcp.IncomingSamplingHandler
+import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.client.McpClient
@@ -30,6 +30,7 @@ internal class ClientSampling(
     private val sender: McpRpcSender,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Sampling {
+
     override fun sample(
         name: ModelIdentifier,
         request: SamplingRequest,
@@ -83,7 +84,7 @@ internal class ClientSampling(
         }
     }
 
-    override fun onSampled(overrideDefaultTimeout: Duration?, fn: IncomingSamplingHandler) {
+    override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
         register(McpSampling, McpCallback(McpSampling.Request::class) {
             val responses = fn(
                 SamplingRequest(

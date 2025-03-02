@@ -2,12 +2,10 @@ package org.http4k.routing
 
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.mcp.CompletionHandler
-import org.http4k.mcp.IncomingSamplingHandler
-import org.http4k.mcp.OutgoingSamplingHandler
+import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
-import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
@@ -18,9 +16,8 @@ import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
-import org.http4k.mcp.server.capability.IncomingSamplingCapability
-import org.http4k.mcp.server.capability.OutgoingSamplingCapability
+import org.http4k.mcp.server.capability.Sampling
+import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
@@ -73,7 +70,7 @@ fun mcpStdIo(
         Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-        IncomingSampling(capabilities.flatMap { it }.filterIsInstance<IncomingSamplingCapability>()),
+        Sampling(capabilities.flatMap { it }.filterIsInstance<SamplingCapability>()),
     ).start(SimpleSchedulerService(1))
 }
 
@@ -84,7 +81,6 @@ infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this, handler)
-infix fun McpEntity.bind(handler: OutgoingSamplingHandler) = OutgoingSamplingCapability(this, handler)
-infix fun ModelSelector.bind(handler: IncomingSamplingHandler) = IncomingSamplingCapability(this, handler)
+infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingCapability(this, handler)
 
 fun compose(vararg bindings: ServerCapability) = CapabilityPack(bindings = bindings)

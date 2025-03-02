@@ -34,7 +34,6 @@ import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
@@ -52,8 +51,7 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.IncomingSampling
-import org.http4k.mcp.server.capability.OutgoingSampling
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
@@ -310,7 +308,7 @@ class TestMcpClientTest {
         val content2 = Content.Text("this is the end!")
 
         val model = ModelIdentifier.of("name")
-        val sampling = IncomingSampling(
+        val sampling = Sampling(
             listOf(
                 ModelSelector(model) { MAX } bind {
                     listOf(
@@ -324,7 +322,7 @@ class TestMcpClientTest {
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
-                incomingSampling = sampling,
+                sampling = sampling,
                 random = Random(0)
             )
         )
@@ -349,15 +347,13 @@ class TestMcpClientTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = OutgoingSampling(
-            listOf(clientName bind { received += it })
-        )
+        val sampling = Sampling()
 
         val mcp = StandardMcpSse(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
-                outgoingSampling = sampling,
+                sampling = sampling,
                 random = Random(0)
             )
         )
