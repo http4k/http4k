@@ -16,11 +16,11 @@ import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.testing.capabilities.TestCompletions
-import org.http4k.mcp.testing.capabilities.TestPrompts
-import org.http4k.mcp.testing.capabilities.TestResources
-import org.http4k.mcp.testing.capabilities.TestSampling
-import org.http4k.mcp.testing.capabilities.TestTools
+import org.http4k.mcp.testing.capabilities.TestMcpClientCompletions
+import org.http4k.mcp.testing.capabilities.TestMcpClientPrompts
+import org.http4k.mcp.testing.capabilities.TestMcpClientResources
+import org.http4k.mcp.testing.capabilities.TestMcpClientSampling
+import org.http4k.mcp.testing.capabilities.TestMcpClientTools
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
@@ -36,11 +36,11 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
     private val messageRequest = AtomicReference<Request>()
     private val sender = TestMcpSender(poly, messageRequest)
     private val client = AtomicReference<TestSseClient>()
-    private val tools = TestTools(sender, client)
-    private val prompts = TestPrompts(sender, client)
-    private val sampling = TestSampling(sender, client)
-    private val resources = TestResources(sender, client)
-    private val completions = TestCompletions(sender, client)
+    private val tools = TestMcpClientTools(sender, client)
+    private val prompts = TestMcpClientPrompts(sender, client)
+    private val sampling = TestMcpClientSampling(sender, client)
+    private val resources = TestMcpClientResources(sender, client)
+    private val completions = TestMcpClientCompletions(sender, client)
 
     override fun start(): McpResult<ServerCapabilities> {
         val mcpResponse = poly.sse!!.testSseClient(connectRequest)
@@ -64,15 +64,15 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
         return client.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }
     }
 
-    override fun tools(): TestTools = tools
+    override fun tools(): TestMcpClientTools = tools
 
-    override fun prompts(): TestPrompts = prompts
+    override fun prompts(): TestMcpClientPrompts = prompts
 
-    override fun sampling(): TestSampling = sampling
+    override fun sampling(): TestMcpClientSampling = sampling
 
-    override fun resources(): TestResources = resources
+    override fun resources(): TestMcpClientResources = resources
 
-    override fun completions(): TestCompletions = completions
+    override fun completions(): TestMcpClientCompletions = completions
 
     override fun close() {
     }

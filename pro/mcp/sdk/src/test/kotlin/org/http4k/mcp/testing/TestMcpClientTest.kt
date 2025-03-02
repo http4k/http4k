@@ -34,6 +34,7 @@ import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
@@ -67,7 +68,7 @@ import kotlin.random.Random
 class TestMcpClientTest {
 
     private val serverName = McpEntity.of("server")
-    private val clientName = McpEntity.of("server")
+    private val clientName = McpEntity.of("client")
 
     @Test
     fun `can use mcp client to connect and get responses`() {
@@ -303,7 +304,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with incoming sampling`() {
+    fun `deal with server sampling`() {
         val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
         val content2 = Content.Text("this is the end!")
 
@@ -341,7 +342,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with outgoing sampling`() {
+    fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
@@ -360,11 +361,16 @@ class TestMcpClientTest {
             sampling().onSampled {
                 sequenceOf(
                     SamplingResponse(model, Role.assistant, content, null),
-                    SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
+                    SamplingResponse(model, Role.assistant, content, StopReason.of("bored")),
+                    SamplingResponse(model, Role.assistant, content, StopReason.of("this should not be processed"))
                 )
             }
 
-            val received = sampling().sample(model, SamplingRequest(listOf(), MaxTokens.of(1)))
+            val received = sampling
+                .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), RequestId.of(1)).toList()
+
+            sampling().processSamplingRequest()
+
             assertThat(
                 received.toList(), equalTo(
                     listOf(
@@ -375,43 +381,6 @@ class TestMcpClientTest {
             )
         }
     }
-//
-//        with(mcp.testSseClient(Request(GET, "/sse"))) {
-//            assertInitializeLoop(mcp)
-//
-//
-//            assertNextMessage(
-//                McpSampling,
-//                McpSampling.Request(listOf(), MaxTokens.of(1)),
-//                RequestId.of(1)
-//            )
-//
-//            mcp.sendToMcp(
-//                McpSampling.Response(model, null, Role.assistant, content),
-//                RequestId.of(1)
-//            )
-//
-//            mcp.sendToMcp(
-//                McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
-//                RequestId.of(1)
-//            )
-//
-//            // this is ignored!
-//            mcp.sendToMcp(
-//                McpSampling.Response(model, StopReason.of("another stop reason"), Role.assistant, content),
-//                RequestId.of(1)
-//            )
-//
-//            assertThat(
-//                received, equalTo(
-//                    listOf(
-//                        SamplingResponse(model, Role.assistant, content, null),
-//                        SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
-//                    )
-//                )
-//            )
-//        }
-//    }
 
     private fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
         testMcpClient().use {

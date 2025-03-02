@@ -11,7 +11,7 @@ import org.http4k.testing.TestSseClient
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
 
-class TestCompletions(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
+class TestMcpClientCompletions(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Completions {
     override fun complete(
         request: CompletionRequest,

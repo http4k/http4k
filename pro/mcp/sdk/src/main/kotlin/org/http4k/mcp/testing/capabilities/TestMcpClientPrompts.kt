@@ -13,7 +13,7 @@ import org.http4k.testing.TestSseClient
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
 
-class TestPrompts(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
+class TestMcpClientPrompts(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Prompts {
 
     private val notifications = mutableListOf<() -> Unit>()

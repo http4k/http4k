@@ -15,7 +15,7 @@ import org.http4k.testing.TestSseClient
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
 
-class TestSampling(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
+class TestMcpClientSampling(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Sampling {
 
     override fun sample(

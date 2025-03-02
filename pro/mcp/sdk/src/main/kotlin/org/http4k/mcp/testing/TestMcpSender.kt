@@ -24,6 +24,6 @@ class TestMcpSender(private val poly: PolyHandler, private val messageRequest: A
 
     operator fun invoke(body: String) {
         val response = poly.http!!(messageRequest.get().body(body))
-        require(response.status == ACCEPTED, { "Failed to send message ${response.status}" })
+        require(response.status == ACCEPTED, { "Failed to send MCP request: ${response.status}" })
     }
 }

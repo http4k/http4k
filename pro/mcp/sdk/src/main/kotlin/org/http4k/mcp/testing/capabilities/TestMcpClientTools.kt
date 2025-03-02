@@ -16,7 +16,7 @@ import org.http4k.testing.TestSseClient
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
 
-class TestTools(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
+class TestMcpClientTools(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Tools {
 
     private val notifications = mutableListOf<() -> Unit>()
