@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class TestMcpClientCompletions(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Completions {
+        
     override fun complete(
         request: CompletionRequest,
         overrideDefaultTimeout: Duration?

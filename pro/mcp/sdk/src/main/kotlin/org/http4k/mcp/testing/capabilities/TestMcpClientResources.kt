@@ -24,10 +24,16 @@ class TestMcpClientResources(private val sender: TestMcpSender, private val clie
         changeNotifications += fn
     }
 
+    /**
+     * Expect a resource list notification to be made and process it
+     */
     fun expectNotification() =
         client.nextNotification<McpResource.List.Changed.Notification>(McpResource.List.Changed)
             .also { changeNotifications.forEach { it() } }
 
+    /**
+     * Expect a resource updated notification to be made and process it
+     */
     fun expectSubscriptionNotification(uri: Uri) =
         client.nextNotification<McpResource.Updated.Notification>(McpResource.Updated)
             .also {

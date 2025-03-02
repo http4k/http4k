@@ -25,6 +25,9 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
         notifications += fn
     }
 
+    /**
+     * Force a list changed notification to be received and process it
+     */
     fun expectNotification() =
         client.nextNotification<McpTool.List.Changed.Notification>(McpTool.List.Changed)
             .also { notifications.forEach { it() } }

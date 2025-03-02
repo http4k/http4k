@@ -22,6 +22,9 @@ class TestMcpClientPrompts(private val sender: TestMcpSender, private val client
         notifications += fn
     }
 
+    /**
+     * Expected a list changed notification to be received and process it
+     */
     fun expectNotification() =
         client.nextNotification<McpPrompt.List.Changed.Notification>(McpPrompt.List.Changed)
             .also { notifications.forEach { it() } }

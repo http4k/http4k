@@ -51,7 +51,10 @@ class TestMcpClientSampling(private val sender: TestMcpSender, private val clien
         onSampling.add(fn)
     }
 
-    fun processSamplingRequest() {
+    /**
+     * Expect a sampling request to be made and process it
+     */
+    fun expectSamplingRequest() {
         client.nextEvent<McpSampling.Request, SamplingRequest> {
             SamplingRequest(
                 messages, maxTokens,

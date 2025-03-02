@@ -369,7 +369,7 @@ class TestMcpClientTest {
             val received = sampling
                 .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), RequestId.of(1)).toList()
 
-            sampling().processSamplingRequest()
+            sampling().expectSamplingRequest()
 
             assertThat(
                 received.toList(), equalTo(
