@@ -109,10 +109,7 @@ abstract class AbstractMcpClient(
                             null -> Failure(McpError.Timeout)
                             else -> next
                                 .flatMap { input ->
-                                    notify(
-                                        McpInitialize.Initialized,
-                                        McpInitialize.Initialized.Notification
-                                    )
+                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
                                         .map { input }
                                         .also { tidyUp(reqId) }
                                 }
