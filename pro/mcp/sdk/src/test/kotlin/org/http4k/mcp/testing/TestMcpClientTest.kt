@@ -8,7 +8,6 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionRequest
@@ -101,21 +100,22 @@ class TestMcpClientTest {
         val intArg = Prompt.Arg.int().required("name", "description")
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
+        val serverPrompts = Prompts(
+            listOf(
+                prompt bind {
+                    PromptResponse(
+                        listOf(
+                            Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
+                        ),
+                        "description",
+                    )
+                }
+            )
+        )
         val mcp = StandardMcpSse(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
-                metadata, prompts = Prompts(
-                    listOf(
-                        prompt bind {
-                            PromptResponse(
-                                listOf(
-                                    Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
-                                ),
-                                "description",
-                            )
-                        }
-                    )
-                ), random = Random(0)))
+                metadata, prompts = serverPrompts, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -148,6 +148,8 @@ class TestMcpClientTest {
                 prompts().get(prompt.name, PromptRequest(mapOf("name" to "asd"))),
                 equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
+
+            serverPrompts.items = emptyList()
         }
     }
 
@@ -157,10 +159,10 @@ class TestMcpClientTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp =
-            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
+            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -188,14 +190,14 @@ class TestMcpClientTest {
 
             resources().subscribe(resource.uri) { calls++ }
 
-            resources.triggerUpdated(resource.uri)
+            serverResources.triggerUpdated(resource.uri)
 
             resources().expectSubscriptionNotification(resource.uri)
 
             assertThat(calls, equalTo(1))
 
             resources().unsubscribe(resource.uri)
-            resources.triggerUpdated(resource.uri)
+            serverResources.triggerUpdated(resource.uri)
             assertThat(calls, equalTo(1))
         }
     }
@@ -206,10 +208,10 @@ class TestMcpClientTest {
             Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
-        val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp =
-            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = resources, random = Random(0)))
+            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
 
         mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
@@ -230,11 +232,11 @@ class TestMcpClientTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = Tools(listOf(tool bind {
+        val serverTools = Tools(listOf(tool bind {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = tools, random = Random(0)))
+        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = serverTools, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -272,7 +274,7 @@ class TestMcpClientTest {
 
             tools().onChange(latch::countDown)
 
-            tools.items = emptyList()
+            serverTools.items = emptyList()
 
             tools().expectNotification()
 
@@ -283,7 +285,7 @@ class TestMcpClientTest {
     @Test
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
-        val completions = Completions(
+        val serverCompletions = Completions(
             listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
         )
 
@@ -291,7 +293,7 @@ class TestMcpClientTest {
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
-                completions = completions,
+                completions = serverCompletions,
                 random = Random(0)
             )
         )
@@ -310,7 +312,7 @@ class TestMcpClientTest {
         val content2 = Content.Text("this is the end!")
 
         val model = ModelIdentifier.of("name")
-        val sampling = Sampling(
+        val serverSampling = Sampling(
             listOf(
                 ModelSelector(model) { MAX } bind {
                     listOf(
@@ -324,7 +326,7 @@ class TestMcpClientTest {
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
-                sampling = sampling,
+                sampling = serverSampling,
                 random = Random(0)
             )
         )
@@ -347,13 +349,13 @@ class TestMcpClientTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = Sampling()
+        val serverSampling = Sampling()
 
         val mcp = StandardMcpSse(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
-                sampling = sampling,
+                sampling = serverSampling,
                 random = Random(0)
             )
         )
@@ -367,7 +369,7 @@ class TestMcpClientTest {
                 )
             }
 
-            val received = sampling
+            val received = serverSampling
                 .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), RequestId.of(1))
 
             sampling().expectSamplingRequest()
