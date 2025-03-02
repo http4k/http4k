@@ -1,10 +1,8 @@
 package org.http4k.mcp.server.stdio
 
 import dev.forkhandles.time.executors.SimpleScheduler
-import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.format.jsonRpcRequest
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.Completions
@@ -16,7 +14,6 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.mcp.util.readLines
@@ -65,7 +62,7 @@ class StdIoMcpProtocol(
         executor.readLines(reader) {
             try {
                 val req = Request(POST, "").body(it)
-                this(SessionId.of(UUID(0, 0).toString()), Body.jsonRpcRequest(McpJson).toLens()(req), req)
+                this(SessionId.of(UUID(0, 0).toString()), req)
             } catch (e: Exception) {
                 e.printStackTrace(System.err)
             }
