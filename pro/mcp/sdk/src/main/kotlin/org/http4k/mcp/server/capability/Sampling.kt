@@ -106,7 +106,7 @@ class Sampling(private val list: List<SamplingCapability>) {
         }
     }
 
-    fun onSampleClient(entity: McpEntity, sessionId: SessionId, fn: (McpSampling.Request, RequestId) -> Unit) {
+    fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, RequestId) -> Unit) {
         subscriptions[entity to sessionId] = fn
     }
 

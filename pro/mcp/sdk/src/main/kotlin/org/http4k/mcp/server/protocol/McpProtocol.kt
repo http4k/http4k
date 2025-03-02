@@ -198,7 +198,7 @@ abstract class McpProtocol<RSP : Any>(
         resources.onChange(sId) { send(McpResource.List.Changed.Notification.toJsonRpc(McpResource.List), sId) }
         tools.onChange(sId) { send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 
-        sampling.onSampleClient(request.clientInfo.name, sId) { req, id ->
+        sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
             clients[sId]?.addCall(id) { sampling.receive(id, it.fromJsonRpc()) }
             send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
         }

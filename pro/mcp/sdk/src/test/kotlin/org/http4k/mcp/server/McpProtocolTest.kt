@@ -2,6 +2,7 @@ package org.http4k.mcp.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
@@ -441,8 +442,8 @@ class McpProtocolTest {
             assertThat(
                 received.toList(), equalTo(
                     listOf(
-                        SamplingResponse(model, Role.assistant, content, null),
-                        SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
+                        Success(SamplingResponse(model, Role.assistant, content, null)),
+                        Success(SamplingResponse(model, Role.assistant, content, StopReason.of("bored")))
                     )
                 )
             )
