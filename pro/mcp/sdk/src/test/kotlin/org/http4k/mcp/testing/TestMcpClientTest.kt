@@ -150,6 +150,8 @@ class TestMcpClientTest {
             )
 
             serverPrompts.items = emptyList()
+
+            prompts().expectNotification()
         }
     }
 
@@ -199,6 +201,10 @@ class TestMcpClientTest {
             resources().unsubscribe(resource.uri)
             serverResources.triggerUpdated(resource.uri)
             assertThat(calls, equalTo(1))
+
+            serverResources.items = emptyList()
+
+            resources().expectNotification()
         }
     }
 
