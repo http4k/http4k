@@ -13,9 +13,11 @@ dependencies {
     api(project(":http4k-bridge-servlet"))
     api("jakarta.servlet:jakarta.servlet-api:_")
 
-    implementation("org.springframework:spring-web:_")
+    implementation("org.springframework:spring-webmvc:_")
     implementation("org.springframework:spring-context:_")
-
+    
     testImplementation(project(":http4k-testing-hamkrest"))
+    testImplementation("org.springframework:spring-test:_")
     testFixturesApi(testFixtures(project(":http4k-bridge-servlet")))
+    testRuntimeOnly("com.fasterxml.jackson.core:jackson-databind:_")
 }
