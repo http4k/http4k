@@ -369,7 +369,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `deal with incoming sampling`() {
+    fun `deal with server sampling`() {
         val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
         val content2 = Content.Text("this is the end!")
 
@@ -398,7 +398,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `deal with outgoing sampling`() {
+    fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")

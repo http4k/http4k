@@ -63,7 +63,9 @@ class TestMcpClientSampling(private val sender: TestMcpSender, private val clien
                 modelPreferences, metadata
             )
         }.map { next ->
-            onSampling.forEach { it(next) }
+            println("Processing sampling request")
+            onSampling.forEach {
+                it(next) }
         }
     }
 }
