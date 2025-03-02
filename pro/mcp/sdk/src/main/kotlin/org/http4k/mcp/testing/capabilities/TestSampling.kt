@@ -1,6 +1,7 @@
 package org.http4k.mcp.testing.capabilities
 
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.map
 import org.http4k.mcp.IncomingSamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
@@ -31,7 +32,7 @@ class TestSampling(private val sender: TestMcpSender, private val client: Atomic
         return sequence {
             while (true) {
                 val nextEvent = client.nextEvent<McpSampling.Response, SamplingResponse> {
-                    SamplingResponse(this.model, this.role, this.content, this.stopReason)
+                    SamplingResponse(model, role, content, stopReason)
                 }
                 yield(nextEvent)
                 when {
@@ -41,8 +42,22 @@ class TestSampling(private val sender: TestMcpSender, private val client: Atomic
         }
     }
 
+    private val onSampling = mutableListOf<IncomingSamplingHandler>()
+
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: IncomingSamplingHandler) {
-        TODO("Not yet implemented")
+        onSampling.add(fn)
     }
 
+    fun processSamplingRequest() {
+        client.nextEvent<McpSampling.Request, SamplingRequest> {
+            SamplingRequest(
+                messages, maxTokens,
+                systemPrompt, includeContext,
+                temperature, stopSequences,
+                modelPreferences, metadata
+            )
+        }.map { next ->
+            onSampling.forEach { it(next) }
+        }
+    }
 }
