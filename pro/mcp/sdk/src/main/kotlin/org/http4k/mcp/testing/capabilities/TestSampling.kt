@@ -21,13 +21,16 @@ class TestSampling(private val sender: TestMcpSender, private val client: Atomic
     override fun sample(
         name: ModelIdentifier, request: SamplingRequest, fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
-        sender(
-            McpSampling, McpSampling.Request(
-                request.messages, request.maxTokens,
-                request.systemPrompt, request.includeContext,
-                request.temperature, request.stopSequences, request.modelPreferences, request.metadata
+        with(request) {
+            sender(
+                McpSampling, McpSampling.Request(
+                    messages, maxTokens,
+                    systemPrompt, includeContext,
+                    temperature, stopSequences,
+                    modelPreferences, metadata
+                )
             )
-        )
+        }
 
         return sequence {
             while (true) {

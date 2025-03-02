@@ -2,7 +2,7 @@ package org.http4k.mcp.testing
 
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.format.renderRequest
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -23,6 +23,7 @@ class TestMcpSender(private val poly: PolyHandler, private val messageRequest: A
     }
 
     operator fun invoke(body: String) {
-        require(poly.http!!(messageRequest.get().body(body)).status == Status.ACCEPTED)
+        val response = poly.http!!(messageRequest.get().body(body))
+        require(response.status == ACCEPTED, { "Failed to send message ${response.status}" })
     }
 }

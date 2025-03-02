@@ -51,9 +51,9 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.Sse
@@ -342,8 +342,6 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with outgoing sampling`() {
-        val received = mutableListOf<SamplingResponse>()
-
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
@@ -366,16 +364,15 @@ class TestMcpClientTest {
                 )
             }
 
-//            sampling.sample(serverName, SamplingRequest(listOf(), MaxTokens.of(1)), RequestId.of(1))
-//
-//            assertThat(
-//                received, equalTo(
-//                    listOf(
-//                        SamplingResponse(model, Role.assistant, content, null),
-//                        SamplingResponse(model, Role.assistant, content, StopReason.of("bored"))
-//                    )
-//                )
-//            )
+            val received = sampling().sample(model, SamplingRequest(listOf(), MaxTokens.of(1)))
+            assertThat(
+                received.toList(), equalTo(
+                    listOf(
+                        Success(SamplingResponse(model, Role.assistant, content, null)),
+                        Success(SamplingResponse(model, Role.assistant, content, StopReason.of("bored")))
+                    )
+                )
+            )
         }
     }
 //
