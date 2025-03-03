@@ -78,11 +78,11 @@ fun mcpStdIo(
         serverMetaData,
         reader,
         writer,
-        Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-        Sampling(capabilities.flatMap { it }.filterIsInstance<SamplingCapability>()),
+        Prompts(capabilities.filterIsInstance<PromptCapability>()),
+        Tools(capabilities.filterIsInstance<ToolCapability>()),
+        Resources(capabilities.filterIsInstance<ResourceCapability>()),
+        Completions(capabilities.filterIsInstance<CompletionCapability>()),
+        Sampling(capabilities.filterIsInstance<SamplingCapability>()),
     ).start(SimpleSchedulerService(1))
 }
 
