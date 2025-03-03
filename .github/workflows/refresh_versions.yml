@@ -21,14 +21,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.3.0
       - name: create-branch
         uses: peterjgrainger/action-create-branch@v3.0.0
         with:
           branch: dependency-update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: gradle/actions/setup-gradle@v4.3.0
       - name: Run Gradle
         run: ./gradlew refreshVersions
       - name: Commit
