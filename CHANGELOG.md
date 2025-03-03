@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.1.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-bridge-spring** : Translates LensFailure exceptions to 400 HTTP status codes. H/T @npryce
 - **http4k-tools-hotreload** :[Fix] Hot Reload Module does not work in Windows - again :) H/T @haaloworld
 - **http4k-security-oauth** :[Breaking] Reorganised filter argument order for OAuth filters to pass scopes through to token endpoint.
 - **http4k-realtime-core** :[Breaking] SseEventId is now a type instead of just a string
