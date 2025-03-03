@@ -27,28 +27,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: gradle
-      - name: Cache Gradle packages
-        uses: actions/cache@v4.2.2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build
         timeout-minutes: 120
         run: bin/build_ci.sh
         env:
           HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
           HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
-      - name: Cleanup Gradle Cache
-          # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
-        # Restoring these files from a GitHub Actions cache might cause problems for future builds.
-        run: |
-          rm -f ~/.gradle/caches/modules-2/modules-2.lock
-          rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Buildnote
         uses: buildnote/action@main
         if: always()
