@@ -6,12 +6,14 @@ import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolHandler
+import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
@@ -58,8 +60,10 @@ fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability)
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
-fun mcpHttp(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardHttpMcpHandler(RealtimeMcpProtocol(McpSession.Http(), serverMetaData, capabilities))
+fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
+    StandardHttpMcpHandler(
+        RealtimeMcpProtocol(McpSession.Http(), ServerMetaData(mcpEntity, version), capabilities)
+    )
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

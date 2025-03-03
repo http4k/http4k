@@ -11,6 +11,9 @@ import org.http4k.security.then
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 
+/**
+ * This example demonstrates how to secure an MCP server with basic auth built into the server.
+ */
 fun main() {
     val baseMcpServer = mcpSse(
         ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0"))

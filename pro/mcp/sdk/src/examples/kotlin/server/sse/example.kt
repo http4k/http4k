@@ -14,6 +14,9 @@ import server.resources
 import server.sampling
 import server.tools
 
+/**
+ * This example demonstrates how to create an MCP server using the standard SSE protocol.
+ */
 fun main() {
     val mcpServer = mcpSse(
         ServerMetaData(

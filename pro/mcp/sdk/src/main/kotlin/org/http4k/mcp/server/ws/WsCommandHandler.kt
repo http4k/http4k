@@ -9,7 +9,7 @@ import org.http4k.websocket.WsResponse
 
 /**
  * This Websocket handler can be bound to whatever path is required by the server with
- * ws("/path" bind <McpWsHandler>
+ * ws("/path" bind <WsCommandHandler>
  */
 fun WsCommandHandler(mcpProtocol: RealtimeMcpProtocol<Websocket>) = { req: Request ->
     WsResponse {

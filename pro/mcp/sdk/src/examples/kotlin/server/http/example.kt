@@ -1,7 +1,6 @@
 package server.http
 
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpHttp
@@ -13,12 +12,12 @@ import server.resources
 import server.sampling
 import server.tools
 
+/**
+ * This example demonstrates how to create an MCP server using the HTTP-only protocol.
+ */
 fun main() {
     val mcpServer = mcpHttp(
-        ServerMetaData(
-            McpEntity.of("http4k mcp via HTTP"), Version.of("0.1.0"),
-            *ProtocolCapability.entries.toTypedArray()
-        ),
+        McpEntity.of("http4k mcp via HTTP"), Version.of("0.1.0"),
         prompts(),
         resources(),
         tools(),
