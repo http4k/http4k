@@ -37,5 +37,5 @@ fun <NODE> Body.Companion.jsonRpcRequest(json: Json<NODE>) =
 
 
 fun <NODE> Body.Companion.jsonRpcResult(json: Json<NODE>) =
-    json.body("body", None).map { JsonRpcResult(json, json.fields(it).toMap()) }
+    json.body("body", None).map({ JsonRpcResult(json, json.fields(it).toMap()) }, { it.result ?: json.nullNode()})
 
