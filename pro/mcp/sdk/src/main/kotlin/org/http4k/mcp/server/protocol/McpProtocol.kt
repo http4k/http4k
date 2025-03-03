@@ -8,6 +8,9 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.model.CompletionStatus
+import org.http4k.mcp.model.CompletionStatus.Finished
+import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.McpException
@@ -60,9 +63,9 @@ abstract class McpProtocol<RSP : Any>(
 
     protected abstract fun ok(): RSP
     protected abstract fun error(): RSP
-    protected abstract fun send(message: McpNodeType, sessionId: SessionId): RSP
+    protected abstract fun send(message: McpNodeType, sessionId: SessionId, status: CompletionStatus = Finished): RSP
 
-    operator fun invoke(sId: SessionId, httpReq: Request): RSP {
+    fun receive(sId: SessionId, httpReq: Request): RSP {
         val payload = McpJson.fields(McpJson.parse(httpReq.bodyString())).toMap()
 
         return when {
@@ -125,7 +128,12 @@ abstract class McpProtocol<RSP : Any>(
                             .map {
                                 runCatching {
                                     sampling.sampleServer(it, httpReq)
-                                        .forEach { send(it.toJsonRpc(jsonReq.id), sId) }
+                                        .forEach {
+                                            send(
+                                                it.toJsonRpc(jsonReq.id), sId,
+                                                if (it.stopReason == null) InProgress else Finished
+                                            )
+                                        }
                                     ok()
                                 }.recover {
                                     send(
@@ -182,7 +190,7 @@ abstract class McpProtocol<RSP : Any>(
         }
     }
 
-    private fun handleInitialize(request: McpInitialize.Request, sId: SessionId): McpInitialize.Response {
+    fun handleInitialize(request: McpInitialize.Request, sId: SessionId): McpInitialize.Response {
         val session = ClientSession()
 
         clients[sId] = session

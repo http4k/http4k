@@ -15,7 +15,7 @@ fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol<Websocket>) = { req: Request -
     WsResponse {
         val newSessionId = mcpProtocol.newSession(req, it)
         it.onMessage {
-            mcpProtocol(newSessionId, req.body(it.bodyString()))
+            mcpProtocol.receive(newSessionId, req.body(it.bodyString()))
         }
 
         it.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))

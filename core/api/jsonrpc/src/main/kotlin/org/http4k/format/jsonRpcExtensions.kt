@@ -33,7 +33,7 @@ fun <NODE> Json<NODE>.renderError(errorMessage: ErrorMessage, id: NODE? = null) 
 }
 
 fun <NODE> Body.Companion.jsonRpcRequest(json: Json<NODE>) =
-    json.body("body", None).map { JsonRpcRequest(json, json.fields(it).toMap()) }
+    json.body("body", None).map({ JsonRpcRequest(json, json.fields(it).toMap()) }, { it.params ?: json.nullNode()})
 
 
 fun <NODE> Body.Companion.jsonRpcResult(json: Json<NODE>) =

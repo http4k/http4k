@@ -2,9 +2,9 @@ package org.http4k.routing
 
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.mcp.CompletionHandler
-import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
+import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
@@ -16,16 +16,18 @@ import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Sampling
-import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.Resources
+import org.http4k.mcp.server.capability.Sampling
+import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.sse.PureMcpSse
+import org.http4k.mcp.server.sse.PureSse
 import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardMcpSse
 import org.http4k.mcp.server.stdio.StdIoMcpProtocol
@@ -52,6 +54,12 @@ fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardMcpWs(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
+
+/**
+ * Create an HTTP MCP app from a set of feature bindings.
+ */
+fun mcpPureSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    PureMcpSse(RealtimeMcpProtocol(McpSession.PureSse(), serverMetaData, capabilities))
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

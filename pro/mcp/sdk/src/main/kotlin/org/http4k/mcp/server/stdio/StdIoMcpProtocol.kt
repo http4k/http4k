@@ -3,6 +3,7 @@ package org.http4k.mcp.server.stdio
 import dev.forkhandles.time.executors.SimpleScheduler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.Completions
@@ -46,7 +47,7 @@ class StdIoMcpProtocol(
 ) {
     override fun ok() {}
 
-    override fun send(message: McpNodeType, sessionId: SessionId) = with(writer) {
+    override fun send(message: McpNodeType, sessionId: SessionId, status: CompletionStatus) = with(writer) {
         write(compact(message) + "\n")
         flush()
     }
@@ -58,7 +59,7 @@ class StdIoMcpProtocol(
     override fun start(executor: SimpleScheduler) =
         executor.readLines(reader) {
             try {
-                this(SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
+                receive(SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
             } catch (e: Exception) {
                 e.printStackTrace(System.err)
             }

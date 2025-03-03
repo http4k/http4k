@@ -10,6 +10,6 @@ import org.http4k.routing.routes
  */
 fun McpHttpHandler(mcpProtocol: RealtimeMcpProtocol<*>) =
     routes(POST to { req ->
-        mcpProtocol(sessionId(req), req)
+        mcpProtocol.receive(sessionId(req), req)
     })
 
