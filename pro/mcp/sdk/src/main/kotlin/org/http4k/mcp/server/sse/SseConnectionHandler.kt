@@ -12,7 +12,7 @@ import org.http4k.sse.SseMessage
  * This SSE handler can be bound to whatever path is required by the server with
  * routes("/path" bind <McpSseHandler?
  */
-fun McpSseHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = sse {
+fun SseConnectionHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = sse {
     it.send(
         SseMessage.Event(
             "endpoint",

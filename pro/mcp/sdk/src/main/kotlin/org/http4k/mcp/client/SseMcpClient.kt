@@ -73,8 +73,7 @@ class SseMcpClient(
         request: ClientMessage,
         timeout: Duration,
         isComplete: (McpNodeType) -> Boolean
-    )
-        : McpResult<RequestId> {
+    ): McpResult<RequestId> {
         val requestId = RequestId.random()
 
         val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)

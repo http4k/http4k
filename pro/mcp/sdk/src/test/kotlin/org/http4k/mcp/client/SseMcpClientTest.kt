@@ -45,7 +45,7 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.Sse
-import org.http4k.mcp.server.sse.StandardMcpSse
+import org.http4k.mcp.server.sse.StandardSseMcpHandler
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -69,7 +69,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardMcpSse(protocol)
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardSseMcpHandler(protocol)
 
     @Test
     fun `deals with error`() {

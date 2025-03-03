@@ -25,13 +25,13 @@ import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.http.Http
+import org.http4k.mcp.server.http.StandardHttpMcpHandler
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.PureMcpSse
-import org.http4k.mcp.server.sse.PureSse
 import org.http4k.mcp.server.sse.Sse
-import org.http4k.mcp.server.sse.StandardMcpSse
+import org.http4k.mcp.server.sse.StandardSseMcpHandler
 import org.http4k.mcp.server.stdio.StdIoMcpProtocol
-import org.http4k.mcp.server.ws.StandardMcpWs
+import org.http4k.mcp.server.ws.StandardWsMcpHandler
 import org.http4k.mcp.server.ws.Websocket
 import java.io.Reader
 import java.io.Writer
@@ -47,19 +47,19 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, capabilities).also { it.start() })
+    StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardMcpWs(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
+    StandardWsMcpHandler(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
-fun mcpPureSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    PureMcpSse(RealtimeMcpProtocol(McpSession.PureSse(), serverMetaData, capabilities))
+fun mcpHttp(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    StandardHttpMcpHandler(RealtimeMcpProtocol(McpSession.Http(), serverMetaData, capabilities))
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

@@ -17,7 +17,7 @@ import server.tools
 fun main() {
     val mcpServer = mcpSse(
         ServerMetaData(
-            McpEntity.of("http4k mcp server"), Version.of("0.1.0"),
+            McpEntity.of("http4k mcp via SSE"), Version.of("0.1.0"),
             *ProtocolCapability.entries.toTypedArray()
         ),
         prompts(),

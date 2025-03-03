@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.sse
+package org.http4k.mcp.server.http
 
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -13,7 +13,7 @@ import org.http4k.sse.Sse
  * This SSE handler can be bound to whatever path is required by the server with
  * routes("/path" bind <McpSseHandler?
  */
-fun McpPureSseHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = sse {
+fun HttpCommandHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = sse {
     val newSession = mcpProtocol.newSession(it.connectRequest, it)
 
     mcpProtocol.handleInitialize(

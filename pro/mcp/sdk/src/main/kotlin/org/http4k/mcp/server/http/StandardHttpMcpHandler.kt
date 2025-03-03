@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.sse
+package org.http4k.mcp.server.http
 
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.routing.poly
@@ -8,6 +8,6 @@ import org.http4k.sse.Sse
 /**
  * Standard MCP server setup for Pure SSE-based MCP Servers
  */
-fun PureMcpSse(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
-    "/sse" bind McpPureSseHandler(mcpProtocol),
+fun StandardHttpMcpHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
+    "/sse" bind HttpCommandHandler(mcpProtocol),
 )

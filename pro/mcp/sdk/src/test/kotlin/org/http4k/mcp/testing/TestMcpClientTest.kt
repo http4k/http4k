@@ -58,7 +58,7 @@ import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.Sse
-import org.http4k.mcp.server.sse.StandardMcpSse
+import org.http4k.mcp.server.sse.StandardSseMcpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
@@ -112,7 +112,7 @@ class TestMcpClientTest {
                 }
             )
         )
-        val mcp = StandardMcpSse(
+        val mcp = StandardSseMcpHandler(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata, prompts = serverPrompts, random = Random(0)))
@@ -164,7 +164,7 @@ class TestMcpClientTest {
         val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp =
-            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
+            StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -217,7 +217,7 @@ class TestMcpClientTest {
         val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp =
-            StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
+            StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
 
         mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
@@ -242,7 +242,7 @@ class TestMcpClientTest {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = StandardMcpSse(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = serverTools, random = Random(0)))
+        val mcp = StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = serverTools, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -295,7 +295,7 @@ class TestMcpClientTest {
             listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
         )
 
-        val mcp = StandardMcpSse(
+        val mcp = StandardSseMcpHandler(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
@@ -328,7 +328,7 @@ class TestMcpClientTest {
                 }
             ))
 
-        val mcp = StandardMcpSse(
+        val mcp = StandardSseMcpHandler(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,
@@ -357,7 +357,7 @@ class TestMcpClientTest {
         val model = ModelIdentifier.of("name")
         val serverSampling = Sampling()
 
-        val mcp = StandardMcpSse(
+        val mcp = StandardSseMcpHandler(
             RealtimeMcpProtocol(
                 McpSession.Sse(),
                 metadata,

@@ -1,28 +1,31 @@
-package server.stdio
+package server.ws
 
+import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.util.DebuggingReader
-import org.http4k.mcp.util.DebuggingWriter
-import org.http4k.routing.mcpStdIo
+import org.http4k.routing.mcpWs
+import org.http4k.server.Helidon
+import org.http4k.server.asServer
+import server.completions
 import server.prompts
 import server.resources
 import server.sampling
 import server.tools
 
 fun main() {
-    mcpStdIo(
+    val mcpServer = mcpWs(
         ServerMetaData(
-            McpEntity.of("stdio mcp via STDIO"), Version.of("0.1.0"),
+            McpEntity.of("http4k mcp via WS"), Version.of("0.1.0"),
             *ProtocolCapability.entries.toTypedArray()
         ),
         prompts(),
         resources(),
         tools(),
         sampling(),
-        reader = DebuggingReader(System.`in`.reader()),
-        writer = DebuggingWriter(System.out.writer())
+        completions()
     )
+
+    mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
 }
