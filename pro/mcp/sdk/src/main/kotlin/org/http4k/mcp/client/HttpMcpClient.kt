@@ -49,24 +49,22 @@ import java.time.Duration
 /**
  * HTTP connection MCP client.
  */
-class HttpMcpClient(
-    private val uri: Uri,
-    private val http: HttpHandler = JavaHttpClient()
-) : McpClient {
+class HttpMcpClient(private val baseUri: Uri, private val http: HttpHandler = JavaHttpClient()) : McpClient {
+
     override fun start() = Success(ServerCapabilities())
 
     override fun tools() = object : McpClient.Tools {
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            send<McpTool.List.Response>(McpTool.List, McpTool.List.Request())
+            http.send<McpTool.List.Response>(McpTool.List, McpTool.List.Request())
                 .flatMap { it.first().map { it.tools } }
 
         override fun call(
             name: ToolName,
             request: ToolRequest,
             overrideDefaultTimeout: Duration?
-        ) = send<McpTool.Call.Response>(
+        ) = http.send<McpTool.Call.Response>(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         )
@@ -83,14 +81,14 @@ class HttpMcpClient(
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            send<McpPrompt.List.Response>(McpPrompt.List, McpPrompt.List.Request())
+            http.send<McpPrompt.List.Response>(McpPrompt.List, McpPrompt.List.Request())
                 .flatMap { it.first().map { it.prompts } }
 
         override fun get(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
+        ) = http.send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
             .flatMap { it.first().map { PromptResponse(it.messages, it.description) } }
     }
 
@@ -99,7 +97,7 @@ class HttpMcpClient(
             name: ModelIdentifier,
             request: SamplingRequest,
             fetchNextTimeout: Duration?
-        ) = send<McpSampling.Response>(
+        ) = http.send<McpSampling.Response>(
             McpSampling,
             with(request) {
                 McpSampling.Request(
@@ -125,13 +123,13 @@ class HttpMcpClient(
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            send<McpResource.List.Response>(McpResource.List, McpResource.List.Request())
+            http.send<McpResource.List.Response>(McpResource.List, McpResource.List.Request())
                 .flatMap { it.first().map { it.resources } }
 
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
-        ) = send<McpResource.Read.Response>(McpResource.Read, McpResource.Read.Request(request.uri))
+        ) = http.send<McpResource.Read.Response>(McpResource.Read, McpResource.Read.Request(request.uri))
             .flatMap { it.first().map { ResourceResponse(it.contents) } }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) = throw UnsupportedOperationException()
@@ -140,42 +138,41 @@ class HttpMcpClient(
     }
 
     override fun completions() = object : McpClient.Completions {
-        override fun complete(
-            request: CompletionRequest,
-            overrideDefaultTimeout: Duration?
-        ) = send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(request.ref, request.argument))
-            .flatMap { it.first().map { CompletionResponse(it.completion) } }
+        override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
+            http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(request.ref, request.argument))
+                .flatMap { it.first().map { CompletionResponse(it.completion) } }
     }
 
     override fun close() {
     }
 
-    private inline fun <reified T : ServerMessage> send(list: McpRpc, msg: ClientMessage)
+    private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage)
         : McpResult<Sequence<McpResult<T>>> {
-        val response = http(msg.toHttpRequest(uri, list).accept(TEXT_EVENT_STREAM))
+
+        val response = this(message.toHttpRequest(baseUri, rpc).accept(TEXT_EVENT_STREAM))
         return when {
             response.status.successful ->
                 Success(response.body.stream.chunkedSseSequence().mapNotNull {
                     when (it) {
-                        is Event ->
-                            with(McpJson) {
-                                val data = parse(it.data) as MoshiObject
-
-                                when {
-                                    data["method"] != null -> null
-                                    else -> {
-                                        resultFrom {
-                                            McpJson.convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())
-                                        }.mapFailure { McpError.Protocol(ParseError) }
-                                    }
-                                }
-                            }
-
+                        is Event -> it.asAOrFailure<T>()
                         else -> null
                     }
                 })
 
             else -> Failure(Http(response))
+        }
+    }
+}
+
+private inline fun <reified T : ServerMessage> Event.asAOrFailure() = with(McpJson) {
+    val data = parse(data) as MoshiObject
+
+    when {
+        data["method"] != null -> null
+        else -> {
+            resultFrom {
+                convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())
+            }.mapFailure { McpError.Protocol(ParseError) }
         }
     }
 }
