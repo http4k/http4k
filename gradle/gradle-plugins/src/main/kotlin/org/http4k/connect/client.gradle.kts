@@ -7,12 +7,6 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-tasks {
-    withType<KspTask> {
-        outputs.upToDateWhen { false }
-    }
-}
-
 dependencies {
     api(project(":http4k-connect-core"))
     api(project(":http4k-config"))
