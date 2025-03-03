@@ -1,6 +1,5 @@
 package org.http4k.mcp.server.ws
 
-import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.sse.SseMessage
@@ -16,7 +15,6 @@ fun McpWsHandler(mcpProtocol: RealtimeMcpProtocol<Websocket>) = { req: Request -
     WsResponse {
         val newSessionId = mcpProtocol.newSession(req, it)
         it.onMessage {
-            val newReq = Request(POST, "/ws").body(it.bodyString())
             mcpProtocol(newSessionId, req.body(it.bodyString()))
         }
 
