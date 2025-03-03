@@ -68,7 +68,7 @@ class Http4kSseClient(
     }
 }
 
-internal fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
+fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
     use {
         val buffer = StringBuilder()
         var lastChar: Int = -1

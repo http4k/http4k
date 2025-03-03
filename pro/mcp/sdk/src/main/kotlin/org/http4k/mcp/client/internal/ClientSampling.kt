@@ -40,7 +40,8 @@ internal class ClientSampling(
             message.asOrFailure<SamplingResponse>().valueOrNull()?.stopReason != null
 
         val queue = sender(
-            McpSampling, with(request) {
+            McpSampling,
+            with(request) {
                 McpSampling.Request(
                     messages,
                     maxTokens,
@@ -92,11 +93,14 @@ internal class ClientSampling(
                     it.temperature, it.stopSequences, it.modelPreferences, it.metadata
                 )
             )
-            responses.forEach { sr ->
-                sender(
-                    McpSampling, McpSampling.Response(sr.model, sr.stopReason, sr.role, sr.content),
-                    overrideDefaultTimeout ?: defaultTimeout
-                )
+            responses.forEach {
+                with(it) {
+                    sender(
+                        McpSampling, McpSampling.Response(model, stopReason, role, content),
+                        overrideDefaultTimeout ?: defaultTimeout
+                    )
+                }
+
             }
         })
     }

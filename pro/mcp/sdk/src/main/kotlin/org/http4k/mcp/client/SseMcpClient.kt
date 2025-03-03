@@ -38,6 +38,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
 
+/**
+ * SSE connection MCP client.
+ */
 class SseMcpClient(
     name: McpEntity,
     version: Version,
@@ -61,7 +64,7 @@ class SseMcpClient(
     }
 
     override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit> {
-        val response = http(mcp.toHttpRequest(rpc))
+        val response = http(mcp.toHttpRequest(Uri.of(endpoint.get()), rpc))
         return when {
             response.status.successful -> Success(Unit)
             else -> Failure(Http(response))
@@ -81,7 +84,7 @@ class SseMcpClient(
         requests[requestId] = latch
         messageQueues[requestId] = ArrayBlockingQueue(1000)
 
-        val response = http(request.toHttpRequest(rpc, requestId))
+        val response = http(request.toHttpRequest(Uri.of(endpoint.get()), rpc, requestId))
         return when {
             response.status.successful -> {
                 resultFrom {
@@ -94,20 +97,20 @@ class SseMcpClient(
         }
     }
 
-    private fun ClientMessage.toHttpRequest(rpc: McpRpc, requestId: RequestId? = null) =
-        Request(POST, Uri.of(endpoint.get()))
-            .contentType(APPLICATION_JSON)
-            .body(with(McpJson) {
-                compact(
-                    renderRequest(
-                        rpc.Method.value,
-                        asJsonObject(this@toHttpRequest),
-                        requestId?.let { asJsonObject(it) } ?: nullNode())
-                )
-            })
-
     override fun close() {
         super.close()
         sseClient.close()
     }
 }
+
+internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, requestId: RequestId? = null) =
+    Request(POST, endpoint)
+        .contentType(APPLICATION_JSON)
+        .body(with(McpJson) {
+            compact(
+                renderRequest(
+                    rpc.Method.value,
+                    asJsonObject(this@toHttpRequest),
+                    requestId?.let { asJsonObject(it) } ?: nullNode())
+            )
+        })

@@ -63,24 +63,22 @@ abstract class AbstractMcpClient(
                         }
 
                         "ping" -> {}
-                        else -> {
-                            with(McpJson) {
-                                val data = parse(it.data) as MoshiObject
+                        else -> with(McpJson) {
+                            val data = parse(it.data) as MoshiObject
 
-                                when {
-                                    data["method"] != null -> {
-                                        val message = JsonRpcRequest(this, data.attributes)
-                                        callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message) }
-                                    }
+                            when {
+                                data["method"] != null -> {
+                                    val message = JsonRpcRequest(this, data.attributes)
+                                    callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message) }
+                                }
 
-                                    else -> {
-                                        val message = JsonRpcResult(this, data.attributes)
-                                        val id = asA<RequestId>(compact(message.id ?: nullNode()))
-                                        messageQueues[id]?.add(data) ?: error("no queue for $id: $data")
-                                        val latch = requests[id] ?: error("no request found for $id: $data")
-                                        if (message.isError()) requests.remove(id)
-                                        latch.countDown()
-                                    }
+                                else -> {
+                                    val message = JsonRpcResult(this, data.attributes)
+                                    val id = asA<RequestId>(compact(message.id ?: nullNode()))
+                                    messageQueues[id]?.add(data) ?: error("no queue for $id: $data")
+                                    val latch = requests[id] ?: error("no request found for $id: $data")
+                                    if (message.isError()) requests.remove(id)
+                                    latch.countDown()
                                 }
                             }
                         }

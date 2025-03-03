@@ -36,9 +36,9 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
@@ -49,6 +49,9 @@ import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
 interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
+
+    val notifications: Boolean
+
     @Test
     fun `can interact with server`() {
         val model = ModelIdentifier.of("my model")
@@ -87,18 +90,13 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
 
         val latch = CountDownLatch(1)
 
-        mcpClient.tools().onChange {
-            latch.countDown()
+        if (notifications) {
+            mcpClient.tools().onChange {
+                latch.countDown()
+            }
         }
 
         mcpClient.start()
-
-        assertThat(
-            mcpClient.sampling().sample(
-                ModelIdentifier.of("asd"),
-                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
-        )
 
         assertThat(mcpClient.prompts().list().valueOrNull()!!.size, equalTo(1))
 
@@ -143,11 +141,13 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
         )
 
-        tools.items = emptyList()
+        if(notifications) {
+            tools.items = emptyList()
 
-        latch.await()
+            latch.await()
 
-        assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(0))
+            assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(0))
+        }
 
         mcpClient.stop()
         server.stop()

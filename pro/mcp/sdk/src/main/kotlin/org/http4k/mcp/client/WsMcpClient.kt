@@ -34,7 +34,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * Single connection MCP client.
+ * WS connection MCP client.
  */
 class WsMcpClient(
     name: McpEntity,

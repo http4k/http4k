@@ -53,6 +53,9 @@ import org.http4k.sse.Sse
 import org.junit.jupiter.api.Test
 
 class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
+
+    override val notifications = true
+
     override fun protocol(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
