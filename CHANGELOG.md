@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.1.0.0 (uncut)
+### v6.1.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-tools-hotreload** :[Fix] Hot Reload Module does not work in Windows - again :) H/T @haaloworld
 - **http4k-security-oauth** :[Breaking] Reorganised filter argument order for OAuth filters to pass scopes through to token endpoint.
