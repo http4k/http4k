@@ -14,6 +14,7 @@ import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Disabled
@@ -239,9 +240,10 @@ class RoutingTest {
 
     @Test
     fun `group router shortcuts if parent prefix does not match`() {
-        val app = routes("/prefix" bind routes(
-            "/{.*}" bind GET to { Response(OK).body("matched") }
-        ))
+        val app = routes(
+            "/prefix" bind routes(
+                "/{.*}" bind GET to { Response(OK).body("matched") }
+            ))
 
         assertThat(app(Request(GET, "/prefix/foo")).status, equalTo(OK))
         assertThat(app(Request(GET, "/prefix/foo/something")).status, equalTo(NOT_FOUND))
@@ -310,9 +312,10 @@ class RoutingTest {
     fun `RoutingHttpHandler with filters also applies when route is not found`() {
         val filter = Filter { next -> { next(it).body("value") } }
 
-        val routingHttpHandler = filter.then(routes(
-            "/a/thing" bind GET to { Response(OK) }
-        ))
+        val routingHttpHandler = filter.then(
+            routes(
+                "/a/thing" bind GET to { Response(OK) }
+            ))
 
         assertThat(routingHttpHandler(Request(GET, "/not-found")).bodyString(), equalTo("value"))
     }
@@ -320,10 +323,47 @@ class RoutingTest {
     @Test
     fun `can apply a filter to a Router`() {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
-            .then(routes(
-                "/a/thing" bind GET to { Response(OK).body(it.header("name")!!) }
-            ))
+            .then(
+                routes(
+                    "/a/thing" bind GET to { Response(OK).body(it.header("name")!!) }
+                ))
 
         assertThat(routes(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
+    }
+
+    @Test
+    fun `can get path from routed message`() {
+        assertThat(
+            RequestWithContext(Request(GET, "/foo/bar"), UriTemplate.from("/foo/{name}")).path("name"),
+            equalTo("bar")
+        )
+    }
+
+    @Test
+    fun `can get null path from routed message`() {
+        assertThat(
+            RequestWithContext(Request(GET, "/foo/bar"), UriTemplate.from("/foo/{name}")).path("non-existing"),
+            equalTo(null)
+        )
+    }
+
+    @Test
+    fun `cannot get path from non-routed message`() {
+        try {
+            Request(GET, "/foo/bar").path("name")
+            fail("Expected exception")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message, equalTo("Request was not routed, so no uri-template present"))
+        }
+    }
+
+    @Test
+    fun `cannot get path from routed message without uri template`() {
+        try {
+            RequestWithContext(Request(GET, "/foo/bar"), emptyMap()).path("name")
+            fail("Expected exception")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message, equalTo("Request was not routed, so no uri-template present"))
+        }
     }
 }
