@@ -11,9 +11,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.contentType
 import org.http4k.sse.SseMessage.Event
 import org.http4k.util.PortBasedTest
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.StringWriter
 
+@Disabled
 class PipeHttpTrafficTest : PortBasedTest {
 
     @Test

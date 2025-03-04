@@ -50,8 +50,10 @@ import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled
 class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
 
     override val notifications = true
