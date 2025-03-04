@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.1.0.1
+- **http4k-core** : Return null value rather than throw exception if `Request.path(name)` cannot find a path parameter in a valid (routed) request.
+- 
 ### v6.1.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-tools-hotreload** :[Fix] Hot Reload Module does not work in Windows - again :) H/T @haaloworld
