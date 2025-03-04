@@ -30,7 +30,8 @@ class Sampling(private val list: List<SamplingCapability>) {
     constructor(vararg list: SamplingCapability) : this(list.toList())
 
     private val subscriptions =
-        ConcurrentHashMap<Pair<McpEntity, SessionId>, (McpSampling.Request, RequestId) -> Unit>()
+        ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
+
     private val responseQueues = ConcurrentHashMap<RequestId, BlockingQueue<SamplingResponse>>()
 
     fun sampleServer(mcp: McpSampling.Request, http: Request) =
@@ -65,19 +66,20 @@ class Sampling(private val list: List<SamplingCapability>) {
         responseQueues[id] = queue
 
         with(request) {
-            subscriptions[subscriptions.keys.filter { it.first == entity }.random()]?.invoke(
-                McpSampling.Request(
-                    messages,
-                    maxTokens,
-                    systemPrompt,
-                    includeContext,
-                    temperature,
-                    stopSequences,
-                    modelPreferences,
-                    metadata
-                ),
-                id
-            )
+            subscriptions.values.filter { it.first == entity }
+                .random().second.invoke(
+                    McpSampling.Request(
+                        messages,
+                        maxTokens,
+                        systemPrompt,
+                        includeContext,
+                        temperature,
+                        stopSequences,
+                        modelPreferences,
+                        metadata
+                    ),
+                    id
+                )
         }
 
         return sequence {
@@ -107,10 +109,10 @@ class Sampling(private val list: List<SamplingCapability>) {
     }
 
     fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, RequestId) -> Unit) {
-        subscriptions[entity to sessionId] = fn
+        subscriptions[sessionId] = entity to fn
     }
 
-    fun remove(entity: McpEntity, sessionId: SessionId) {
-        subscriptions.remove(entity to sessionId)
+    fun remove(sessionId: SessionId) {
+        subscriptions.remove(sessionId)
     }
 }

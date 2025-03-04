@@ -216,7 +216,7 @@ abstract class McpProtocol<RSP : Any>(
             prompts.remove(sId)
             resources.remove(sId)
             tools.remove(sId)
-            sampling.remove(request.clientInfo.name, sId)
+            sampling.remove(sId)
             logger.unsubscribe(sId)
         }
 
