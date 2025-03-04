@@ -152,12 +152,16 @@ class HttpMcpClient(private val baseUri: Uri, private val http: HttpHandler = Ja
         val response = this(message.toHttpRequest(baseUri, rpc).accept(TEXT_EVENT_STREAM))
         return when {
             response.status.successful ->
-                Success(response.body.stream.chunkedSseSequence().mapNotNull {
-                    when (it) {
-                        is Event -> it.asAOrFailure<T>()
-                        else -> null
-                    }
-                })
+                Success(
+                    response.body.stream.chunkedSseSequence()
+                        .filterIsInstance<Event>()
+                        .mapNotNull {
+                            when (it.event) {
+                                "ping" -> null
+                                else -> it.asAOrFailure<T>()
+                            }
+                        }
+                )
 
             else -> Failure(Http(response))
         }
