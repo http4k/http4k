@@ -4,17 +4,18 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.server.RealtimeMcpProtocol
+import org.http4k.mcp.server.RealtimeMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.http.Http
 import org.http4k.mcp.server.http.StandardHttpMcp
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.sse.Sse
 
-class HttpMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
+class HttpMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, Sse>> {
 
     override val notifications = false
 
@@ -24,9 +25,10 @@ class HttpMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> 
         tools: Tools,
         resources: Resources,
         completions: Completions
-    ) = RealtimeMcpProtocol(
-        McpSession.Http(),
-        serverMetaData, prompts, tools, resources, completions
+    ) = McpProtocol(
+        RealtimeMcpTransport(McpSession.Http()).also { it.start() },
+        serverMetaData,
+        tools, resources, prompts, completions
     )
 
     override fun clientFor(port: Int) = HttpMcpClient(
@@ -34,5 +36,5 @@ class HttpMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> 
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardHttpMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Response, Sse>) = StandardHttpMcp(protocol)
 }

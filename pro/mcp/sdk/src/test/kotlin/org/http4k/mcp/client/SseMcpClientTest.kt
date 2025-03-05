@@ -33,11 +33,12 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.RealtimeMcpProtocol
+import org.http4k.mcp.server.RealtimeMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.SseSession
 import org.http4k.mcp.server.sse.StandardSseMcp
@@ -49,7 +50,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Disabled
-class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
+class SseMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, Sse>> {
 
     override val notifications = true
 
@@ -59,7 +60,10 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = RealtimeMcpProtocol(McpSession.SseSession(), serverMetaData, prompts, tools, resources, completions)
+    ) = McpProtocol(
+        RealtimeMcpTransport(McpSession.SseSession()),
+        serverMetaData, tools, resources, prompts, completions
+    )
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -68,7 +72,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardSseMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Response, Sse>) = StandardSseMcp(protocol)
 
     @Test
     fun `deals with error`() {
@@ -94,7 +98,8 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         val server = blowUpWhenBoom().then(toPolyHandler(protocol))
             .asServer(Helidon(0)).start()
 
-        protocol.start()
+        // TODO -= start this
+//        protocol.start()
 
         val mcpClient = clientFor(server.port())
 

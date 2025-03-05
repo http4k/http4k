@@ -70,13 +70,15 @@ import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Logger
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.server.sse.SseSession
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.util.McpJson
@@ -95,9 +97,17 @@ class McpProtocolTest {
 
     private val metadata = ServerMetaData(serverName, Version.of("1"))
 
+    private val random = Random(0)
+
     @Test
     fun `performs init loop on startup`() {
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -112,7 +122,14 @@ class McpProtocolTest {
     fun `update roots`() {
         val roots = Roots()
 
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, roots = roots, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                roots = roots,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -135,7 +152,8 @@ class McpProtocolTest {
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
         val mcp = StandardSseMcp(
-            RealtimeMcpProtocol(McpSession.SseSession(),
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
                 metadata, prompts = Prompts(
                     listOf(
                         prompt bind {
@@ -147,7 +165,7 @@ class McpProtocolTest {
                             )
                         }
                     )
-                ), random = Random(0)))
+                ), random = random))
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -187,7 +205,14 @@ class McpProtocolTest {
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, resources = resources, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                resources = resources,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -236,7 +261,14 @@ class McpProtocolTest {
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, resources = resources, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                resources = resources,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -280,7 +312,14 @@ class McpProtocolTest {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, tools = tools, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                tools = tools,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -328,7 +367,14 @@ class McpProtocolTest {
     @Test
     fun `deal with logger`() {
         val logger = Logger()
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, logger = logger, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                logger = logger,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -355,7 +401,14 @@ class McpProtocolTest {
             listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
         )
 
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, completions = completions, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                completions = completions,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
@@ -373,7 +426,14 @@ class McpProtocolTest {
         val model = ModelIdentifier.of("name")
         val sampling = Sampling()
 
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, sampling = sampling, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                RealtimeMcpTransport(McpSession.SseSession(), SessionProvider.Random(random)),
+                metadata,
+                sampling = sampling,
+                random = random
+            )
+        )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
 

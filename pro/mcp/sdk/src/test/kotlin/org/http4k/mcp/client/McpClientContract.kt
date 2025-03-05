@@ -12,18 +12,15 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
-import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -38,7 +35,6 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
@@ -48,7 +44,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
+interface McpClientContract<Sink, R : Any, P : McpProtocol<R, Sink>> : PortBasedTest {
 
     val notifications: Boolean
 
@@ -81,7 +77,8 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
 
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
 
-        protocol.start()
+        // TODO -= start this
+//        protocol.start()
 
         val mcpClient = clientFor(server.port())
 
