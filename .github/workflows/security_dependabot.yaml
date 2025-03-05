@@ -22,9 +22,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: gradle
 
-      - name: Run snapshot action
-        uses: mikepenz/gradle-dependency-submission@v1.0.0
+      - name: Setup Gradle to generate and submit dependency graphs
+        uses: gradle/actions/setup-gradle@v3
         with:
-          sub-module-mode: COMBINED
+          dependency-graph: generate-and-submit
