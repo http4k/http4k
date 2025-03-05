@@ -9,18 +9,18 @@ import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.McpTransport
-import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
+import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 class WsMcpTransport(
     private val protocol: McpProtocol<Response>,
-    private val mcpSession: McpSession<Websocket>,
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : McpTransport<Response, Websocket> {
@@ -32,7 +32,7 @@ class WsMcpTransport(
         when (val sink = sessions[sessionId]) {
             null -> Response(GONE)
             else -> {
-                mcpSession.event(sink, compact(message), status)
+                sink.send(WsMessage(Event("message", compact(message)).toMessage()))
                 Response(ACCEPTED)
             }
         }
@@ -45,7 +45,9 @@ class WsMcpTransport(
     override fun error() = Response(GONE)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
-        sessions[sessionId]?.also { mcpSession.onClose(it, fn) }
+        sessions[sessionId]?.also {
+            it.onClose { fn() }
+        }
     }
 
     override fun newSession(connectRequest: Request, sink: Websocket): SessionId {
@@ -58,10 +60,10 @@ class WsMcpTransport(
         executor.scheduleWithFixedDelay({
             sessions.toList().forEach { (sessionId, sink) ->
                 try {
-                    mcpSession.ping(sink)
+                    sink.send(WsMessage(Event("ping", "").toMessage()))
                 } catch (e: Exception) {
                     sessions.remove(sessionId)
-                    mcpSession.close(sink)
+                    sink.close()
                 }
             }
         }, keepAliveDelay, keepAliveDelay)

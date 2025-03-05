@@ -26,7 +26,6 @@ import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpTransport
 import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.Websocket
 import org.http4k.mcp.server.ws.WsMcpTransport
 import java.io.Reader
 import java.io.Writer
@@ -49,7 +48,7 @@ fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardWsMcp(
-        WsMcpTransport(McpProtocol(serverMetaData, capabilities), McpSession.Websocket()).also { it.start() },
+        WsMcpTransport(McpProtocol(serverMetaData, capabilities)).also { it.start() },
     )
 
 /**
