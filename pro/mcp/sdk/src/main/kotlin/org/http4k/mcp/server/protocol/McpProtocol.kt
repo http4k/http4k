@@ -47,8 +47,7 @@ import kotlin.random.Random
 /**
  * Models the MCP protocol in terms of message handling and session management.
  */
-open class McpProtocol<RSP : Any, Sink>(
-    private val transport: McpTransport<RSP, Sink>,
+open class McpProtocol<RSP : Any>(
     private val metaData: ServerMetaData,
     private val tools: Tools = Tools(),
     private val resources: Resources = Resources(),
@@ -60,11 +59,9 @@ open class McpProtocol<RSP : Any, Sink>(
     private val random: Random = Random
 ) {
     constructor(
-        transport: McpTransport<RSP, Sink>,
         serverMetaData: ServerMetaData,
         capabilities: Array<out ServerCapability>
     ) : this(
-        transport,
         serverMetaData,
         Tools(capabilities.filterIsInstance<ToolCapability>()),
         Resources(capabilities.filterIsInstance<ResourceCapability>()),
@@ -74,11 +71,7 @@ open class McpProtocol<RSP : Any, Sink>(
 
     private val clients = ConcurrentHashMap<SessionId, ClientSession>()
 
-    fun newSession(connectRequest: Request, sink: Sink) = transport.newSession(connectRequest, sink)
-
-    fun receive(sId: SessionId, request: Request): RSP {
-        if (!transport.verify(sId, request)) return transport.error()
-
+    fun receive(sId: SessionId, request: Request, responder: McpResponder<RSP>): RSP {
         val payload = McpJson.fields(McpJson.parse(request.bodyString())).toMap()
 
         return when {
@@ -87,32 +80,32 @@ open class McpProtocol<RSP : Any, Sink>(
 
                 when (McpRpcMethod.of(jsonReq.method)) {
                     McpInitialize.Method ->
-                        transport.send(jsonReq.respondTo<McpInitialize.Request> { handleInitialize(it, sId) }, sId)
+                        responder.send(jsonReq.respondTo<McpInitialize.Request> { handleInitialize(it, sId, responder) }, sId)
 
                     McpCompletion.Method ->
-                        transport.send(
+                        responder.send(
                             jsonReq.respondTo<McpCompletion.Request> { completions.complete(it, request) },
                             sId
                         )
 
-                    McpPing.Method -> transport.send(
+                    McpPing.Method -> responder.send(
                         jsonReq.respondTo<McpPing.Request> { ServerMessage.Response.Empty },
                         sId
                     )
 
                     McpPrompt.Get.Method ->
-                        transport.send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, request) }, sId)
+                        responder.send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, request) }, sId)
 
                     McpPrompt.List.Method ->
-                        transport.send(jsonReq.respondTo<McpPrompt.List.Request> { prompts.list(it, request) }, sId)
+                        responder.send(jsonReq.respondTo<McpPrompt.List.Request> { prompts.list(it, request) }, sId)
 
                     McpResource.Template.List.Method ->
-                        transport.send(jsonReq.respondTo<McpResource.Template.List.Request> {
+                        responder.send(jsonReq.respondTo<McpResource.Template.List.Request> {
                             resources.listTemplates(it, request)
                         }, sId)
 
                     McpResource.List.Method ->
-                        transport.send(jsonReq.respondTo<McpResource.List.Request> {
+                        responder.send(jsonReq.respondTo<McpResource.List.Request> {
                             resources.listResources(
                                 it,
                                 request
@@ -120,55 +113,55 @@ open class McpProtocol<RSP : Any, Sink>(
                         }, sId)
 
                     McpResource.Read.Method ->
-                        transport.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) }, sId)
+                        responder.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) }, sId)
 
                     McpResource.Subscribe.Method -> {
                         val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
                         resources.subscribe(sId, subscribeRequest) {
-                            transport.send(
+                            responder.send(
                                 McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated),
                                 sId
                             )
                         }
-                        transport.ok()
+                        responder.ok()
                     }
 
                     McpLogging.SetLevel.Method -> {
                         logger.setLevel(sId, jsonReq.fromJsonRpc<McpLogging.SetLevel.Request>().level)
-                        transport.ok()
+                        responder.ok()
                     }
 
                     McpResource.Unsubscribe.Method -> {
                         resources.unsubscribe(sId, jsonReq.fromJsonRpc())
-                        transport.ok()
+                        responder.ok()
                     }
 
-                    McpInitialize.Initialized.Method -> transport.ok()
+                    McpInitialize.Initialized.Method -> responder.ok()
 
-                    Cancelled.Method -> transport.ok()
+                    Cancelled.Method -> responder.ok()
 
-                    McpProgress.Method -> transport.ok()
+                    McpProgress.Method -> responder.ok()
 
                     McpRoot.Changed.Method -> {
                         val requestId = RequestId.random(random)
                         clients[sId]?.addCallback(requestId) { roots.update(it.fromJsonRpc()) }
-                        transport.send(
+                        responder.send(
                             McpRoot.List.Request().toJsonRpc(McpRoot.List, McpJson.asJsonObject(requestId)),
                             sId
                         )
                     }
 
-                    McpTool.Call.Method -> transport.send(
+                    McpTool.Call.Method -> responder.send(
                         jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, request) },
                         sId
                     )
 
-                    McpTool.List.Method -> transport.send(
+                    McpTool.List.Method -> responder.send(
                         jsonReq.respondTo<McpTool.List.Request> { tools.list(it, request) },
                         sId
                     )
 
-                    else -> transport.send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
+                    else -> responder.send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
                 }
             }
 
@@ -176,13 +169,13 @@ open class McpProtocol<RSP : Any, Sink>(
                 val jsonResult = JsonRpcResult(McpJson, payload)
 
                 when {
-                    jsonResult.isError() -> transport.ok()
+                    jsonResult.isError() -> responder.ok()
                     else -> with(McpJson) {
                         val id = jsonResult.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
-                            null -> transport.ok()
-                            else -> clients[sId]?.processResult(id, jsonResult)?.let { transport.ok() }
-                                ?: transport.error()
+                            null -> responder.ok()
+                            else -> clients[sId]?.processResult(id, jsonResult)?.let { responder.ok() }
+                                ?: responder.error()
                         }
                     }
                 }
@@ -190,33 +183,33 @@ open class McpProtocol<RSP : Any, Sink>(
         }
     }
 
-    fun handleInitialize(request: McpInitialize.Request, sId: SessionId): McpInitialize.Response {
+    fun handleInitialize(request: McpInitialize.Request, sId: SessionId, responder: McpResponder<RSP>): McpInitialize.Response {
         val session = ClientSession()
 
         clients[sId] = session
         logger.subscribe(sId, LogLevel.error) { level, logger, data ->
-            transport.send(
+            responder.send(
                 McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage),
                 sId
             )
         }
         prompts.onChange(sId) {
-            transport.send(McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed), sId)
+            responder.send(McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed), sId)
         }
         resources.onChange(sId) {
-            transport.send(
+            responder.send(
                 McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed),
                 sId
             )
         }
-        tools.onChange(sId) { transport.send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
+        tools.onChange(sId) { responder.send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
             clients[sId]?.addCallback(id) { sampling.receive(id, it.fromJsonRpc()) }
-            transport.send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
+            responder.send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
         }
 
-        transport.onClose(sId) {
+        responder.onClose(sId) {
             clients.remove(sId)
             prompts.remove(sId)
             resources.remove(sId)

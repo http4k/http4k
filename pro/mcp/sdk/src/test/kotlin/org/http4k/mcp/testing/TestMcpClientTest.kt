@@ -48,7 +48,6 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -56,7 +55,9 @@ import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.server.sse.Sse
+import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
@@ -112,11 +113,10 @@ class TestMcpClientTest {
             )
         )
         val mcp = StandardSseMcp(
-            McpProtocol(
-                RemoteMcpTransport(
-                    McpSession.Sse()
-                ),
-                metadata, prompts = serverPrompts, random = Random(0)
+            SseMcpTransport(
+                McpProtocol(metadata, prompts = serverPrompts, random = Random(0)),
+                McpSession.Sse(),
+                SessionProvider.Random(Random(0))
             )
         )
 
@@ -168,13 +168,10 @@ class TestMcpClientTest {
 
         val mcp =
             StandardSseMcp(
-                McpProtocol(
-                    RemoteMcpTransport(
-                        McpSession.Sse()
-                    ),
-                    metadata,
-                    resources = serverResources,
-                    random = Random(0)
+                SseMcpTransport(
+                    McpProtocol(metadata, resources = serverResources, random = Random(0)),
+                    McpSession.Sse(),
+                    SessionProvider.Random(Random(0))
                 )
             )
 
@@ -230,13 +227,10 @@ class TestMcpClientTest {
 
         val mcp =
             StandardSseMcp(
-                McpProtocol(
-                      RemoteMcpTransport(
-                    McpSession.Sse()
-                ),
-                    metadata,
-                    resources = serverResources,
-                    random = Random(0)
+                SseMcpTransport(
+                    McpProtocol(metadata, resources = serverResources, random = Random(0)),
+                    McpSession.Sse(),
+                    SessionProvider.Random(Random(0))
                 )
             )
 
@@ -264,9 +258,13 @@ class TestMcpClientTest {
         }))
 
         val mcp =
-            StandardSseMcp(McpProtocol(  RemoteMcpTransport(
-                    McpSession.Sse()
-                ), metadata, tools = serverTools, random = Random(0)))
+            StandardSseMcp(
+                SseMcpTransport(
+                    McpProtocol(metadata, tools = serverTools, random = Random(0)),
+                    McpSession.Sse(),
+                    SessionProvider.Random(Random(0))
+                )
+            )
 
         mcp.useClient {
             assertThat(
@@ -320,13 +318,10 @@ class TestMcpClientTest {
         )
 
         val mcp = StandardSseMcp(
-            McpProtocol(
-                  RemoteMcpTransport(
-                    McpSession.Sse()
-                ),
-                metadata,
-                completions = serverCompletions,
-                random = Random(0)
+            SseMcpTransport(
+                McpProtocol(metadata, completions = serverCompletions, random = Random(0)),
+                McpSession.Sse(),
+                SessionProvider.Random(Random(0))
             )
         )
 
@@ -346,13 +341,10 @@ class TestMcpClientTest {
         val serverSampling = Sampling()
 
         val mcp = StandardSseMcp(
-            McpProtocol(
-                  RemoteMcpTransport(
-                    McpSession.Sse()
-                ),
-                metadata,
-                sampling = serverSampling,
-                random = Random(0)
+            SseMcpTransport(
+                McpProtocol(metadata, sampling = serverSampling, random = Random(0)),
+                McpSession.Sse(),
+                SessionProvider.Random(Random(0))
             )
         )
 

@@ -1,14 +1,11 @@
 package org.http4k.mcp.server.ws
 
-import org.http4k.core.Response
-import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.poly
 import org.http4k.routing.websocket.bind
-import org.http4k.websocket.Websocket
 
 /**
  * Standard MCP server setup for WS-based MCP Servers
  */
-fun StandardWsMcp(mcpProtocol: McpProtocol<Response, Websocket>) = poly(
-    "/ws" bind WsCommandHandler(mcpProtocol)
+fun StandardWsMcp(transport: WsMcpTransport) = poly(
+    "/ws" bind WsCommandHandler(transport)
 )

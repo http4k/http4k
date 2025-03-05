@@ -36,7 +36,7 @@ import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.McpTransport
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -44,7 +44,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-interface McpClientContract<Sink, R : Any, P : McpProtocol<R, Sink>> : PortBasedTest {
+interface McpClientContract<Sink, R : Any, Transport : McpTransport<R, Sink>> : PortBasedTest {
 
     val notifications: Boolean
 
@@ -61,7 +61,7 @@ interface McpClientContract<Sink, R : Any, P : McpProtocol<R, Sink>> : PortBased
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
-        val protocol = protocol(
+        val transport = transport(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             Prompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
@@ -75,10 +75,9 @@ interface McpClientContract<Sink, R : Any, P : McpProtocol<R, Sink>> : PortBased
             })
         )
 
-        val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
+        val server = toPolyHandler(transport).asServer(Helidon(0)).start()
 
-        // TODO -= start this
-//        protocol.start()
+        transport.start()
 
         val mcpClient = clientFor(server.port())
 
@@ -136,7 +135,7 @@ interface McpClientContract<Sink, R : Any, P : McpProtocol<R, Sink>> : PortBased
 //            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
 //        )
 
-        if(notifications) {
+        if (notifications) {
             tools.items = emptyList()
 
             latch.await()
@@ -148,15 +147,15 @@ interface McpClientContract<Sink, R : Any, P : McpProtocol<R, Sink>> : PortBased
         server.stop()
     }
 
-    fun protocol(
+    fun transport(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ): P
+    ): Transport
 
-    fun toPolyHandler(protocol: P): PolyHandler
+    fun toPolyHandler(transport: Transport): PolyHandler
 
     fun clientFor(port: Int): McpClient
 }

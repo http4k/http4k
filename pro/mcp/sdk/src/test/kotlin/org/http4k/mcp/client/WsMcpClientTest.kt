@@ -9,7 +9,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -18,23 +17,21 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.ws.StandardWsMcp
 import org.http4k.mcp.server.ws.Websocket
+import org.http4k.mcp.server.ws.WsMcpTransport
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WsMcpClientTest : McpClientContract<Websocket, Response, McpProtocol<Response, Websocket>> {
+class WsMcpClientTest : McpClientContract<Websocket, Response, WsMcpTransport> {
 
     override val notifications = true
 
-    override fun protocol(
+    override fun transport(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = McpProtocol(
-        RemoteMcpTransport(McpSession.Websocket()),
-        serverMetaData, tools, resources, prompts, completions
-    )
+    ) = WsMcpTransport(McpProtocol(serverMetaData, tools, resources, prompts, completions), McpSession.Websocket())
 
     override fun clientFor(port: Int) = WsMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -43,5 +40,5 @@ class WsMcpClientTest : McpClientContract<Websocket, Response, McpProtocol<Respo
         WebsocketClient(Duration.ofSeconds(2), true),
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Response, Websocket>) = StandardWsMcp(protocol)
+    override fun toPolyHandler(transport: WsMcpTransport) = StandardWsMcp(transport)
 }

@@ -25,5 +25,5 @@ fun main() {
         tools(),
         reader = DebuggingReader(System.`in`.reader()),
         writer = DebuggingWriter(System.out.writer())
-    ).start()
+    )
 }

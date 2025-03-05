@@ -33,7 +33,6 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -41,6 +40,7 @@ import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.Sse
+import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -50,20 +50,17 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Disabled
-class SseMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, Sse>> {
+class SseMcpClientTest : McpClientContract<Sse, Response, SseMcpTransport> {
 
     override val notifications = true
 
-    override fun protocol(
+    override fun transport(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = McpProtocol(
-        RemoteMcpTransport(McpSession.Sse()),
-        serverMetaData, tools, resources, prompts, completions
-    )
+    ) = SseMcpTransport(McpProtocol(serverMetaData, tools, resources, prompts, completions), McpSession.Sse())
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -72,7 +69,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, 
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Response, Sse>) = StandardSseMcp(protocol)
+    override fun toPolyHandler(transport: SseMcpTransport) = StandardSseMcp(transport)
 
     @Test
     fun `deals with error`() {
@@ -81,32 +78,37 @@ class SseMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, 
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
-        val protocol = protocol(
+        val transport = transport(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             Prompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             }),
             tools,
-            Resources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
-                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-            }),
+            Resources(
+                Resource.Static(
+                    Uri.of("https://http4k.org"),
+                    ResourceName.of("HTTP4K"),
+                    "description"
+                ) bind {
+                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                }),
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
             })
         )
 
-        val server = blowUpWhenBoom().then(toPolyHandler(protocol))
+        val server = blowUpWhenBoom().then(toPolyHandler(transport))
             .asServer(Helidon(0)).start()
 
-        // TODO -= start this
-//        protocol.start()
+        transport.start()
 
         val mcpClient = clientFor(server.port())
 
         mcpClient.start()
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom")).failureOrNull(),
+            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
+                .failureOrNull(),
             present()
         )
 
@@ -120,5 +122,4 @@ class SseMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, 
             else next(it)
         }
     }
-
 }
