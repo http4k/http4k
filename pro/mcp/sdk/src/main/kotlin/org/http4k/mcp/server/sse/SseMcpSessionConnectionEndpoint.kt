@@ -11,7 +11,7 @@ import org.http4k.sse.SseMessage
 
 /**
  * This SSE connection handler can be bound to whatever path is required by the server with
- * routes("/path" bind <SseConnectionHandle>
+ * routes("/path" bind <SseMcpSessionConnectionEndpoint>
  */
 fun SseMcpSessionConnectionEndpoint(mcpProtocol: McpProtocol<Response, Sse>) = sse {
     it.send(

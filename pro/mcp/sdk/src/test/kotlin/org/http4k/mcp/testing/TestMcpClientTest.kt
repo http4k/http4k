@@ -56,7 +56,7 @@ import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
@@ -114,7 +114,7 @@ class TestMcpClientTest {
         val mcp = StandardSseMcp(
             McpProtocol(
                 RealtimeMcpTransport(
-                    McpSession.SseSession()
+                    McpSession.Sse()
                 ),
                 metadata, prompts = serverPrompts, random = Random(0)
             )
@@ -170,7 +170,7 @@ class TestMcpClientTest {
             StandardSseMcp(
                 McpProtocol(
                     RealtimeMcpTransport(
-                        McpSession.SseSession()
+                        McpSession.Sse()
                     ),
                     metadata,
                     resources = serverResources,
@@ -232,7 +232,7 @@ class TestMcpClientTest {
             StandardSseMcp(
                 McpProtocol(
                       RealtimeMcpTransport(
-                    McpSession.SseSession()
+                    McpSession.Sse()
                 ),
                     metadata,
                     resources = serverResources,
@@ -265,7 +265,7 @@ class TestMcpClientTest {
 
         val mcp =
             StandardSseMcp(McpProtocol(  RealtimeMcpTransport(
-                    McpSession.SseSession()
+                    McpSession.Sse()
                 ), metadata, tools = serverTools, random = Random(0)))
 
         mcp.useClient {
@@ -322,7 +322,7 @@ class TestMcpClientTest {
         val mcp = StandardSseMcp(
             McpProtocol(
                   RealtimeMcpTransport(
-                    McpSession.SseSession()
+                    McpSession.Sse()
                 ),
                 metadata,
                 completions = serverCompletions,
@@ -348,7 +348,7 @@ class TestMcpClientTest {
         val mcp = StandardSseMcp(
             McpProtocol(
                   RealtimeMcpTransport(
-                    McpSession.SseSession()
+                    McpSession.Sse()
                 ),
                 metadata,
                 sampling = serverSampling,

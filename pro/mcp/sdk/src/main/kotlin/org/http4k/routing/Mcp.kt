@@ -22,7 +22,7 @@ import org.http4k.mcp.server.http.Http
 import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpTransport
 import org.http4k.mcp.server.ws.StandardWsMcp
@@ -43,7 +43,7 @@ import java.io.Writer
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardSseMcp(
         McpProtocol(
-            RealtimeMcpTransport(McpSession.SseSession()).also { it.start() },
+            RealtimeMcpTransport(McpSession.Sse()).also { it.start() },
             serverMetaData,
             capabilities
         )

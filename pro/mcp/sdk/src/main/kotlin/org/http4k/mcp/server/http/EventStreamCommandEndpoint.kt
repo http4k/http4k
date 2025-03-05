@@ -12,7 +12,7 @@ import org.http4k.sse.Sse
 
 /**
  * This SSE handler can be bound to whatever path is required by the server with
- * routes("/path" bind <HttpCommandHandler>
+ * routes("/path" bind <EventStreamCommandEndpoint>
  */
 fun EventStreamCommandEndpoint(mcpProtocol: McpProtocol<Response, Sse>) = sse {
     val newSession = mcpProtocol.newSession(it.connectRequest, it)

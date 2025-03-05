@@ -7,7 +7,7 @@ import org.http4k.routing.routes
 
 /**
  * This HTTP handler can be bound to whatever path is required by the server with
- * routes("/path" bind <SseCommandHandler>
+ * routes("/path" bind <SseMcpSessionCommandEndpoint>
  */
 fun SseMcpSessionCommandEndpoint(mcpProtocol: McpProtocol<Response, *>) =
     routes(POST to { mcpProtocol.receive(sessionId(it), it) })
