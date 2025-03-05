@@ -41,6 +41,7 @@ import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpConnection
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -156,7 +157,7 @@ open class McpProtocol<RSP : Any>(
                         val requestId = RequestId.random(random)
                         clients[sId]?.addCallback(requestId) { roots.update(it.fromJsonRpc()) }
                         connection.send(
-                            McpRoot.List.Request().toJsonRpc(McpRoot.List, McpJson.asJsonObject(requestId)),
+                            McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(requestId)),
                             sId
                         )
                     }
@@ -216,7 +217,7 @@ open class McpProtocol<RSP : Any>(
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
             clients[sId]?.addCallback(id) { sampling.receive(id, it.fromJsonRpc()) }
-            connection.send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
+            connection.send(req.toJsonRpc(McpSampling, asJsonObject(id)), sId)
         }
 
         connection.onClose(sId) {
