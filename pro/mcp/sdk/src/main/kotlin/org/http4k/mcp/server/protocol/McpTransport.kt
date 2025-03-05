@@ -9,6 +9,7 @@ import org.http4k.mcp.util.McpNodeType
 interface McpTransport<RSP : Any, Sink> {
     fun ok(): RSP
     fun error(): RSP
+    fun verify(sessionId: SessionId, request: Request): Boolean
     fun send(message: McpNodeType, sessionId: SessionId, status: CompletionStatus = Finished): RSP
     fun newSession(connectRequest: Request, sink: Sink): SessionId
     fun onClose(sessionId: SessionId, fn: () -> Unit)

@@ -48,7 +48,7 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.server.RealtimeMcpTransport
+import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -113,7 +113,7 @@ class TestMcpClientTest {
         )
         val mcp = StandardSseMcp(
             McpProtocol(
-                RealtimeMcpTransport(
+                RemoteMcpTransport(
                     McpSession.Sse()
                 ),
                 metadata, prompts = serverPrompts, random = Random(0)
@@ -169,7 +169,7 @@ class TestMcpClientTest {
         val mcp =
             StandardSseMcp(
                 McpProtocol(
-                    RealtimeMcpTransport(
+                    RemoteMcpTransport(
                         McpSession.Sse()
                     ),
                     metadata,
@@ -231,7 +231,7 @@ class TestMcpClientTest {
         val mcp =
             StandardSseMcp(
                 McpProtocol(
-                      RealtimeMcpTransport(
+                      RemoteMcpTransport(
                     McpSession.Sse()
                 ),
                     metadata,
@@ -264,7 +264,7 @@ class TestMcpClientTest {
         }))
 
         val mcp =
-            StandardSseMcp(McpProtocol(  RealtimeMcpTransport(
+            StandardSseMcp(McpProtocol(  RemoteMcpTransport(
                     McpSession.Sse()
                 ), metadata, tools = serverTools, random = Random(0)))
 
@@ -321,7 +321,7 @@ class TestMcpClientTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                  RealtimeMcpTransport(
+                  RemoteMcpTransport(
                     McpSession.Sse()
                 ),
                 metadata,
@@ -347,7 +347,7 @@ class TestMcpClientTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                  RealtimeMcpTransport(
+                  RemoteMcpTransport(
                     McpSession.Sse()
                 ),
                 metadata,

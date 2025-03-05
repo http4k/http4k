@@ -33,7 +33,7 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.RealtimeMcpTransport
+import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -61,7 +61,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response, 
         resources: Resources,
         completions: Completions,
     ) = McpProtocol(
-        RealtimeMcpTransport(McpSession.Sse()),
+        RemoteMcpTransport(McpSession.Sse()),
         serverMetaData, tools, resources, prompts, completions
     )
 

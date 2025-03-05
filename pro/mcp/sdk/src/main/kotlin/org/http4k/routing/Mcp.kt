@@ -1,5 +1,8 @@
 package org.http4k.routing
 
+import dev.forkhandles.time.executors.SimpleScheduler
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
@@ -10,8 +13,9 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.RealtimeMcpTransport
+import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.PromptCapability
@@ -27,8 +31,11 @@ import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpTransport
 import org.http4k.mcp.server.ws.StandardWsMcp
 import org.http4k.mcp.server.ws.Websocket
+import org.http4k.mcp.util.Startable
+import org.http4k.mcp.util.readLines
 import java.io.Reader
 import java.io.Writer
+import java.util.UUID
 
 /**
  * Create an SSE MCP app from a set of feature bindings.
@@ -43,7 +50,7 @@ import java.io.Writer
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardSseMcp(
         McpProtocol(
-            RealtimeMcpTransport(McpSession.Sse()).also { it.start() },
+            RemoteMcpTransport(McpSession.Sse()).also { it.start() },
             serverMetaData,
             capabilities
         )
@@ -55,7 +62,7 @@ fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardWsMcp(
         McpProtocol(
-            RealtimeMcpTransport(McpSession.Websocket()).also { it.start() },
+            RemoteMcpTransport(McpSession.Websocket()).also { it.start() },
             serverMetaData,
             capabilities
         )
@@ -67,7 +74,7 @@ fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability)
 fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
     StandardHttpMcp(
         McpProtocol(
-            RealtimeMcpTransport(McpSession.Http()).also { it.start() },
+            RemoteMcpTransport(McpSession.Http()).also { it.start() },
             ServerMetaData(mcpEntity, version),
             capabilities
         )
@@ -81,16 +88,20 @@ fun mcpStdIo(
     vararg capabilities: ServerCapability,
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
-) = McpProtocol(
-    StdIoMcpTransport(
-        reader,
-        writer
-    ),
-    // TODO START THIS!
-//        .also { it.start() },
-    serverMetaData,
-    capabilities
-)
+): Startable {
+    val protocol = McpProtocol(StdIoMcpTransport(writer), serverMetaData, capabilities)
+    return object : Startable {
+        override fun start(executor: SimpleScheduler) {
+            executor.readLines(reader) {
+                try {
+                    protocol.receive(SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
+                } catch (e: Exception) {
+                    e.printStackTrace(System.err)
+                }
+            }
+        }
+    }
+}
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)

@@ -10,8 +10,16 @@ import kotlin.random.Random
  * which can be used to track the connection.
  */
 interface SessionProvider {
+    /**
+     * Assign a session identifier to the given connection request.
+     */
     fun assign(connectRequest: Request): SessionId
-    fun check(connectRequest: Request): Boolean
+
+    /**
+     * Verify the connection request against the session
+     *
+     */
+    fun verify(sessionId: SessionId, request: Request): Boolean
 
     companion object {
         /**
@@ -22,7 +30,7 @@ interface SessionProvider {
                 override fun assign(connectRequest: Request) =
                     SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())
 
-                override fun check(connectRequest: Request) = true
+                override fun verify(sessionId: SessionId, request: Request) = true
             }
     }
 }

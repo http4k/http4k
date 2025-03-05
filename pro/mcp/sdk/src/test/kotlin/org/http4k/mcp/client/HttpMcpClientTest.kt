@@ -4,7 +4,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.server.RealtimeMcpTransport
+import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -26,7 +26,7 @@ class HttpMcpClientTest : McpClientContract<Sse, Response, McpProtocol<Response,
         resources: Resources,
         completions: Completions
     ) = McpProtocol(
-        RealtimeMcpTransport(McpSession.Http()).also { it.start() },
+        RemoteMcpTransport(McpSession.Http()).also { it.start() },
         serverMetaData,
         tools, resources, prompts, completions
     )

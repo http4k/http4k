@@ -47,7 +47,7 @@ import kotlin.random.Random
 /**
  * Models the MCP protocol in terms of message handling and session management.
  */
-class McpProtocol<RSP : Any, Sink>(
+open class McpProtocol<RSP : Any, Sink>(
     private val transport: McpTransport<RSP, Sink>,
     private val metaData: ServerMetaData,
     private val tools: Tools = Tools(),
@@ -76,8 +76,10 @@ class McpProtocol<RSP : Any, Sink>(
 
     fun newSession(connectRequest: Request, sink: Sink) = transport.newSession(connectRequest, sink)
 
-    fun receive(sId: SessionId, httpReq: Request): RSP {
-        val payload = McpJson.fields(McpJson.parse(httpReq.bodyString())).toMap()
+    fun receive(sId: SessionId, request: Request): RSP {
+        if (!transport.verify(sId, request)) return transport.error()
+
+        val payload = McpJson.fields(McpJson.parse(request.bodyString())).toMap()
 
         return when {
             payload["method"] != null -> {
@@ -89,7 +91,7 @@ class McpProtocol<RSP : Any, Sink>(
 
                     McpCompletion.Method ->
                         transport.send(
-                            jsonReq.respondTo<McpCompletion.Request> { completions.complete(it, httpReq) },
+                            jsonReq.respondTo<McpCompletion.Request> { completions.complete(it, request) },
                             sId
                         )
 
@@ -99,26 +101,26 @@ class McpProtocol<RSP : Any, Sink>(
                     )
 
                     McpPrompt.Get.Method ->
-                        transport.send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, httpReq) }, sId)
+                        transport.send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, request) }, sId)
 
                     McpPrompt.List.Method ->
-                        transport.send(jsonReq.respondTo<McpPrompt.List.Request> { prompts.list(it, httpReq) }, sId)
+                        transport.send(jsonReq.respondTo<McpPrompt.List.Request> { prompts.list(it, request) }, sId)
 
                     McpResource.Template.List.Method ->
                         transport.send(jsonReq.respondTo<McpResource.Template.List.Request> {
-                            resources.listTemplates(it, httpReq)
+                            resources.listTemplates(it, request)
                         }, sId)
 
                     McpResource.List.Method ->
                         transport.send(jsonReq.respondTo<McpResource.List.Request> {
                             resources.listResources(
                                 it,
-                                httpReq
+                                request
                             )
                         }, sId)
 
                     McpResource.Read.Method ->
-                        transport.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, httpReq) }, sId)
+                        transport.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) }, sId)
 
                     McpResource.Subscribe.Method -> {
                         val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
@@ -157,12 +159,12 @@ class McpProtocol<RSP : Any, Sink>(
                     }
 
                     McpTool.Call.Method -> transport.send(
-                        jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, httpReq) },
+                        jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, request) },
                         sId
                     )
 
                     McpTool.List.Method -> transport.send(
-                        jsonReq.respondTo<McpTool.List.Request> { tools.list(it, httpReq) },
+                        jsonReq.respondTo<McpTool.List.Request> { tools.list(it, request) },
                         sId
                     )
 

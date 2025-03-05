@@ -9,7 +9,7 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.RealtimeMcpTransport
+import org.http4k.mcp.server.sse.RemoteMcpTransport
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
@@ -32,7 +32,7 @@ class WsMcpClientTest : McpClientContract<Websocket, Response, McpProtocol<Respo
         resources: Resources,
         completions: Completions,
     ) = McpProtocol(
-        RealtimeMcpTransport(McpSession.Websocket()),
+        RemoteMcpTransport(McpSession.Websocket()),
         serverMetaData, tools, resources, prompts, completions
     )
 
