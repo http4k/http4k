@@ -54,9 +54,7 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.session.SessionProvider
-import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
@@ -115,7 +113,6 @@ class TestMcpClientTest {
         val mcp = StandardSseMcp(
             SseMcpTransport(
                 McpProtocol(metadata, prompts = serverPrompts, random = Random(0)),
-                McpSession.Sse(),
                 SessionProvider.Random(Random(0))
             )
         )
@@ -170,7 +167,6 @@ class TestMcpClientTest {
             StandardSseMcp(
                 SseMcpTransport(
                     McpProtocol(metadata, resources = serverResources, random = Random(0)),
-                    McpSession.Sse(),
                     SessionProvider.Random(Random(0))
                 )
             )
@@ -229,7 +225,6 @@ class TestMcpClientTest {
             StandardSseMcp(
                 SseMcpTransport(
                     McpProtocol(metadata, resources = serverResources, random = Random(0)),
-                    McpSession.Sse(),
                     SessionProvider.Random(Random(0))
                 )
             )
@@ -261,7 +256,6 @@ class TestMcpClientTest {
             StandardSseMcp(
                 SseMcpTransport(
                     McpProtocol(metadata, tools = serverTools, random = Random(0)),
-                    McpSession.Sse(),
                     SessionProvider.Random(Random(0))
                 )
             )
@@ -320,7 +314,6 @@ class TestMcpClientTest {
         val mcp = StandardSseMcp(
             SseMcpTransport(
                 McpProtocol(metadata, completions = serverCompletions, random = Random(0)),
-                McpSession.Sse(),
                 SessionProvider.Random(Random(0))
             )
         )
@@ -343,7 +336,6 @@ class TestMcpClientTest {
         val mcp = StandardSseMcp(
             SseMcpTransport(
                 McpProtocol(metadata, sampling = serverSampling, random = Random(0)),
-                McpSession.Sse(),
                 SessionProvider.Random(Random(0))
             )
         )

@@ -9,18 +9,17 @@ import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.McpTransport
-import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 class SseMcpTransport(
     private val protocol: McpProtocol<Response>,
-    private val mcpSession: McpSession<Sse>,
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : McpTransport<Response, Sse> {
@@ -32,7 +31,7 @@ class SseMcpTransport(
         when (val sink = sessions[sessionId]) {
             null -> Response(GONE)
             else -> {
-                mcpSession.event(sink, compact(message), status)
+                sink.send(SseMessage.Event("message", compact(message)))
                 Response(ACCEPTED)
             }
         }
@@ -45,7 +44,7 @@ class SseMcpTransport(
     override fun error() = Response(GONE)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
-        sessions[sessionId]?.also { mcpSession.onClose(it, fn) }
+        sessions[sessionId]?.also { it.onClose(fn) }
     }
 
 
@@ -59,10 +58,10 @@ class SseMcpTransport(
         executor.scheduleWithFixedDelay({
             sessions.toList().forEach { (sessionId, sink) ->
                 try {
-                    mcpSession.ping(sink)
+                    sink.send(SseMessage.Event("ping", ""))
                 } catch (e: Exception) {
                     sessions.remove(sessionId)
-                    mcpSession.close(sink)
+                    sink.close()
                 }
             }
         }, keepAliveDelay, keepAliveDelay)

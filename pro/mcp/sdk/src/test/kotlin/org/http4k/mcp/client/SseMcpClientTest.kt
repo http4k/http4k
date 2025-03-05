@@ -38,8 +38,6 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
@@ -60,7 +58,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response, SseMcpTransport> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = SseMcpTransport(McpProtocol(serverMetaData, tools, resources, prompts, completions), McpSession.Sse())
+    ) = SseMcpTransport(McpProtocol(serverMetaData, tools, resources, prompts, completions))
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),

@@ -22,7 +22,6 @@ import org.http4k.mcp.server.http.Http
 import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.Sse
 import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpTransport
@@ -43,7 +42,7 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardSseMcp(SseMcpTransport(McpProtocol(serverMetaData, capabilities), McpSession.Sse()).also { it.start() })
+    StandardSseMcp(SseMcpTransport(McpProtocol(serverMetaData, capabilities)).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
