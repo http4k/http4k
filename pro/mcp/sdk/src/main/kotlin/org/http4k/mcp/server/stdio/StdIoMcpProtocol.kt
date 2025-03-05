@@ -30,7 +30,7 @@ class StdIoMcpProtocol(
     tools: Tools = Tools(emptyList()),
     resources: Resources = Resources(emptyList()),
     completions: Completions = Completions(emptyList()),
-    incomingSampling: Sampling = Sampling(emptyList()),
+    sampling: Sampling = Sampling(),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
@@ -40,7 +40,7 @@ class StdIoMcpProtocol(
     completions,
     resources,
     roots,
-    incomingSampling,
+    sampling,
     prompts,
     logger,
     random

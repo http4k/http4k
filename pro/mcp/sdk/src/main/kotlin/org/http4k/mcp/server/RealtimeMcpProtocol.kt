@@ -10,7 +10,6 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.Logger
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
@@ -37,7 +36,7 @@ class RealtimeMcpProtocol<Transport>(
     tools: Tools = Tools(emptyList()),
     resources: Resources = Resources(emptyList()),
     completions: Completions = Completions(emptyList()),
-    sampling: Sampling = Sampling(emptyList()),
+    sampling: Sampling = Sampling(),
     roots: Roots = Roots(),
     logger: Logger = Logger(),
     random: Random = Random,
@@ -68,7 +67,6 @@ class RealtimeMcpProtocol<Transport>(
             Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
             Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
             Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-            Sampling(capabilities.flatMap { it }.filterIsInstance<SamplingCapability>())
         )
 
     private val sessions = ConcurrentHashMap<SessionId, Transport>()

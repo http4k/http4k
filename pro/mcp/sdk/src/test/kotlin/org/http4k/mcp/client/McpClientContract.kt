@@ -76,9 +76,6 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             }),
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
-            }),
-            Sampling(ModelSelector(model) bind {
-                samplingResponses.asSequence()
             })
         )
 
@@ -134,12 +131,13 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
             equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
 
-        assertThat(
-            mcpClient.sampling().sample(
-                ModelIdentifier.of("asd"),
-                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
-        )
+        // TODO test client sampling
+//        assertThat(
+//            mcpClient.sampling().sample(
+//                ModelIdentifier.of("asd"),
+//                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
+//            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
+//        )
 
         if(notifications) {
             tools.items = emptyList()
@@ -159,7 +157,6 @@ interface McpClientContract<R : Any, P : McpProtocol<R>> : PortBasedTest {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-        incomingSampling: Sampling
     ): P
 
     fun toPolyHandler(protocol: P): PolyHandler

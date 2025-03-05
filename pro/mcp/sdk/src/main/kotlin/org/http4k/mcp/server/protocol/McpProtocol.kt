@@ -123,33 +123,6 @@ abstract class McpProtocol<RSP : Any>(
 
                     Cancelled.Method -> ok()
 
-                    McpSampling.Method ->
-                        runCatching { jsonReq.fromJsonRpc<McpSampling.Request>() }
-                            .map {
-                                runCatching {
-                                    sampling.sampleServer(it, httpReq)
-                                        .forEach {
-                                            send(
-                                                it.toJsonRpc(jsonReq.id), sId,
-                                                if (it.stopReason == null) InProgress else Finished
-                                            )
-                                        }
-                                    ok()
-                                }.recover {
-                                    send(
-                                        when (it) {
-                                            is McpException -> it.error
-                                            else -> InternalError
-                                        }.toJsonRpc(jsonReq.id), sId
-                                    )
-                                    error()
-                                }.getOrElse { error() }
-                            }
-                            .getOrElse {
-                                send(InvalidRequest.toJsonRpc(jsonReq.id), sId)
-                                error()
-                            }
-
                     McpProgress.Method -> ok()
 
                     McpRoot.Changed.Method -> {

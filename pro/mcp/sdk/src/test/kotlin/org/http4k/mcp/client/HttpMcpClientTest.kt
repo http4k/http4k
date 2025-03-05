@@ -24,11 +24,10 @@ class HttpMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> 
         prompts: Prompts,
         tools: Tools,
         resources: Resources,
-        completions: Completions,
-        incomingSampling: Sampling
+        completions: Completions
     ) = RealtimeMcpProtocol(
         McpSession.Http(),
-        serverMetaData, prompts, tools, resources, completions, incomingSampling
+        serverMetaData, prompts, tools, resources, completions
     )
 
     override fun clientFor(port: Int) = HttpMcpClient(

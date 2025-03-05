@@ -23,24 +23,14 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * Handles protocol traffic for sampling. Selects the best model to serve a request.
+ * Handles protocol traffic for sampling
  */
-class Sampling(private val list: List<SamplingCapability>) {
-
-    constructor(vararg list: SamplingCapability) : this(list.toList())
+class Sampling {
 
     private val subscriptions =
         ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
 
     private val responseQueues = ConcurrentHashMap<RequestId, BlockingQueue<SamplingResponse>>()
-
-    fun sampleServer(mcp: McpSampling.Request, http: Request) =
-        mcp.selectModel()?.sample(mcp, http) ?: throw McpException(MethodNotFound)
-
-    private fun McpSampling.Request.selectModel() = when {
-        modelPreferences == null -> list.firstOrNull()
-        else -> list.maxByOrNull { it.toModelSelector().score(modelPreferences) }
-    }
 
     fun receive(id: RequestId, response: McpSampling.Response): CompletionStatus {
         val samplingResponse = SamplingResponse(response.model, response.role, response.content, response.stopReason)

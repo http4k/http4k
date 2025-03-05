@@ -4,10 +4,8 @@ import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
-import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
@@ -22,8 +20,6 @@ import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.Resources
-import org.http4k.mcp.server.capability.Sampling
-import org.http4k.mcp.server.capability.SamplingCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
@@ -82,17 +78,12 @@ fun mcpStdIo(
         Tools(capabilities.filterIsInstance<ToolCapability>()),
         Resources(capabilities.filterIsInstance<ResourceCapability>()),
         Completions(capabilities.filterIsInstance<CompletionCapability>()),
-        Sampling(capabilities.filterIsInstance<SamplingCapability>()),
     ).start(SimpleSchedulerService(1))
 }
 
-/**
- * Create Tool capability by binding the Spec to the Handler.
- */
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this, handler)
-infix fun ModelSelector.bind(handler: SamplingHandler) = SamplingCapability(this, handler)
 
 fun compose(vararg bindings: ServerCapability) = CapabilityPack(bindings = bindings)

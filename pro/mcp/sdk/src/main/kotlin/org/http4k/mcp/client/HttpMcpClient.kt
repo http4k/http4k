@@ -5,7 +5,6 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
-import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.chunkedSseSequence
@@ -24,13 +23,10 @@ import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SamplingHandler
-import org.http4k.mcp.SamplingRequest
-import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpError.Http
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerCapabilities
@@ -39,7 +35,6 @@ import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpRpc
-import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.util.McpJson
@@ -93,28 +88,6 @@ class HttpMcpClient(private val baseUri: Uri, private val http: HttpHandler = Ja
     }
 
     override fun sampling() = object : McpClient.Sampling {
-        override fun sample(
-            name: ModelIdentifier,
-            request: SamplingRequest,
-            fetchNextTimeout: Duration?
-        ) = http.send<McpSampling.Response>(
-            McpSampling,
-            with(request) {
-                McpSampling.Request(
-                    messages,
-                    maxTokens,
-                    systemPrompt,
-                    includeContext,
-                    temperature,
-                    stopSequences,
-                    modelPreferences,
-                    metadata
-                )
-            }
-        )
-            .map { it.map { it.map { SamplingResponse(it.model, it.role, it.content, it.stopReason) } } }
-            .onFailure { return listOf(Failure(it.reason)).asSequence() }
-
         override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) =
             throw UnsupportedOperationException()
     }

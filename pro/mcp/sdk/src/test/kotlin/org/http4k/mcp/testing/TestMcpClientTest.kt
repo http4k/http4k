@@ -313,44 +313,6 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with server sampling`() {
-        val content1 = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-        val content2 = Content.Text("this is the end!")
-
-        val model = ModelIdentifier.of("name")
-        val serverSampling = Sampling(
-            listOf(
-                ModelSelector(model) { MAX } bind {
-                    listOf(
-                        SamplingResponse(model, Role.assistant, content1, null),
-                        SamplingResponse(model, Role.assistant, content2, StopReason.of("bored"))
-                    ).asSequence()
-                }
-            ))
-
-        val mcp = StandardSseMcpHandler(
-            RealtimeMcpProtocol(
-                McpSession.Sse(),
-                metadata,
-                sampling = serverSampling,
-                random = Random(0)
-            )
-        )
-
-        mcp.useClient {
-            assertThat(
-                sampling().sample(model, SamplingRequest(listOf(), MaxTokens.of(1))).toList(),
-                equalTo(
-                    listOf(
-                        Success(SamplingResponse(model, Role.assistant, content1, null)),
-                        Success(SamplingResponse(model, Role.assistant, content2, StopReason.of("bored")))
-                    )
-                )
-            )
-        }
-    }
-
-    @Test
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 

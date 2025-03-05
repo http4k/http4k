@@ -64,8 +64,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-        incomingSampling: Sampling
-    ) = RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, prompts, tools, resources, completions, incomingSampling)
+    ) = RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, prompts, tools, resources, completions)
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -78,12 +77,6 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
 
     @Test
     fun `deals with error`() {
-        val model = ModelIdentifier.of("my model")
-        val samplingResponses = listOf(
-            SamplingResponse(model, assistant, Content.Text("hello"), null),
-            SamplingResponse(model, assistant, Content.Text("world"), StopReason.of("foobar"))
-        )
-
         val toolArg = Tool.Arg.required("name")
         val tools = Tools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
@@ -100,9 +93,6 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
             }),
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
-            }),
-            Sampling(ModelSelector(model) bind {
-                samplingResponses.asSequence()
             })
         )
 

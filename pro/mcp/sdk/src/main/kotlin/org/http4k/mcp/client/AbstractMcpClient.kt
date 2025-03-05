@@ -132,7 +132,7 @@ abstract class AbstractMcpClient(
         }
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(::findQueue, ::tidyUp, defaultTimeout, ::performRequest) { rpc, callback ->
+        ClientSampling(defaultTimeout, ::performRequest) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 

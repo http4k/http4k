@@ -46,10 +46,6 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
     ResourceResponse(links)
 }
 
-fun sampling() = compose(
-    sampleFromModel()
-)
-
 fun tools() = compose(
     liveWeatherTool(),
     reverseTool(),
@@ -123,21 +119,4 @@ fun prompt2(): PromptCapability {
     ) bind {
         PromptResponse(listOf(Message(Role.assistant, Content.Text(arg1(it) + arg2(it)))), "description")
     }
-}
-
-fun sampleFromModel() = ModelSelector(ModelIdentifier.of("my model")) bind {
-    listOf(
-        SamplingResponse(
-            ModelIdentifier.of("my model"),
-            Role.assistant,
-            Content.Text("content1"),
-            null
-        ),
-        SamplingResponse(
-            ModelIdentifier.of("my model"),
-            Role.assistant,
-            Content.Text("content2"),
-            StopReason.of("end")
-        )
-    ).asSequence()
 }
