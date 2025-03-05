@@ -11,7 +11,6 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.lens.accept
 import org.http4k.lens.contentType
-import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import java.io.Reader
 import java.io.Writer
@@ -33,19 +32,11 @@ fun pipeSseTraffic(
     Http4kSseClient(sseRequest.accept(TEXT_EVENT_STREAM), http, reconnectionMode).received().forEach { msg ->
         when (msg) {
             is Event -> when (msg.event) {
-                "endpoint" -> {
-                    thread {
-                        incomingMessages
-                            .forEach {
-                                require(
-                                    httpWithHost(
-                                        Request(POST, msg.data)
-                                            .contentType(APPLICATION_JSON)
-                                            .body(it)
-                                    ).status.successful
-                                )
-                            }
-                    }
+                "endpoint" -> thread {
+                    incomingMessages
+                        .forEach {
+                            httpWithHost(Request(POST, msg.data).contentType(APPLICATION_JSON).body(it))
+                        }
                 }
 
                 "ping" -> {}
@@ -53,7 +44,6 @@ fun pipeSseTraffic(
                 else -> output.write("${msg.data}\n")
             }
 
-            is Data -> output.write("${msg.data}\n")
             else -> {}
         }
         output.flush()

@@ -25,10 +25,12 @@ fun pipeHttpTraffic(input: Reader, output: Writer, sseRequest: Request, http: Ht
                     .contentType(APPLICATION_JSON)
                     .body(next)
             )
-            if (response.bodyString().isNotEmpty()) {
-                response.bodyString().byteInputStream().chunkedSseSequence()
-                    .filterIsInstance<Event>()
-                    .forEach { output.apply { write("${it.data}\n") }.flush() }
+            with(response.bodyString()) {
+                if (isNotEmpty()) {
+                    byteInputStream().chunkedSseSequence()
+                        .filterIsInstance<Event>()
+                        .forEach { output.apply { write("${it.data}\n") }.flush() }
+                }
             }
         }
     }
