@@ -11,7 +11,7 @@ import org.http4k.sse.Sse
 /**
  * Standard MCP server setup for SSE-based MCP Servers
  */
-fun StandardSseMcpHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
-    "/sse" bind SseConnectionHandler(mcpProtocol),
-    CatchLensFailure().then("/message" bind SseCommandHandler(mcpProtocol))
+fun StandardSseMcp(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
+    "/sse" bind SseMcpSessionConnectionEndpoint(mcpProtocol),
+    CatchLensFailure().then("/message" bind SseMcpSessionCommandEndpoint(mcpProtocol))
 )

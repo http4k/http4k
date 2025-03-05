@@ -8,6 +8,7 @@ import org.http4k.sse.Sse
 /**
  * Standard MCP server setup for Pure SSE-based MCP Servers
  */
-fun StandardHttpMcpHandler(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
-    "/sse" bind HttpCommandHandler(mcpProtocol),
+fun StandardHttpMcp(mcpProtocol: RealtimeMcpProtocol<Sse>) = poly(
+    "/sse" bind EventStreamCommandEndpoint(mcpProtocol),
+    // TODO insert handler here for messages
 )

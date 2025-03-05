@@ -16,22 +16,18 @@ import org.http4k.lens.with
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
-import org.http4k.mcp.model.ModelIdentifier
-import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role.assistant
-import org.http4k.mcp.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -39,13 +35,12 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.Sse
-import org.http4k.mcp.server.sse.StandardSseMcpHandler
+import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -64,7 +59,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, prompts, tools, resources, completions)
+    ) = RealtimeMcpProtocol(McpSession.SseSession(), serverMetaData, prompts, tools, resources, completions)
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -73,7 +68,7 @@ class SseMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardSseMcpHandler(protocol)
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardSseMcp(protocol)
 
     @Test
     fun `deals with error`() {

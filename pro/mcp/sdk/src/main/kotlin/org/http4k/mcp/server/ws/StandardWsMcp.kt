@@ -8,6 +8,6 @@ import org.http4k.websocket.Websocket
 /**
  * Standard MCP server setup for WS-based MCP Servers
  */
-fun StandardWsMcpHandler(mcpProtocol: RealtimeMcpProtocol<Websocket>) = poly(
+fun StandardWsMcp(mcpProtocol: RealtimeMcpProtocol<Websocket>) = poly(
     "/ws" bind WsCommandHandler(mcpProtocol)
 )

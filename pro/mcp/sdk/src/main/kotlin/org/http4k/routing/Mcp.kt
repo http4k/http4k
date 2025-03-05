@@ -24,12 +24,12 @@ import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.http.Http
-import org.http4k.mcp.server.http.StandardHttpMcpHandler
+import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.Sse
-import org.http4k.mcp.server.sse.StandardSseMcpHandler
+import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpProtocol
-import org.http4k.mcp.server.ws.StandardWsMcpHandler
+import org.http4k.mcp.server.ws.StandardWsMcp
 import org.http4k.mcp.server.ws.Websocket
 import java.io.Reader
 import java.io.Writer
@@ -45,19 +45,19 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), serverMetaData, capabilities).also { it.start() })
+    StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWsMcpHandler(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
+    StandardWsMcp(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
-    StandardHttpMcpHandler(
+    StandardHttpMcp(
         RealtimeMcpProtocol(McpSession.Http(), ServerMetaData(mcpEntity, version), capabilities)
     )
 

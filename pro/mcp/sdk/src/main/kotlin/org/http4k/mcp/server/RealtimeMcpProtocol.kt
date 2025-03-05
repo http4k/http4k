@@ -63,10 +63,10 @@ class RealtimeMcpProtocol<Transport>(
         this(
             mcpSession,
             serverMetaData,
-            Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-            Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-            Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-            Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+            Prompts(capabilities.filterIsInstance<PromptCapability>()),
+            Tools(capabilities.filterIsInstance<ToolCapability>()),
+            Resources(capabilities.filterIsInstance<ResourceCapability>()),
+            Completions(capabilities.filterIsInstance<CompletionCapability>()),
         )
 
     private val sessions = ConcurrentHashMap<SessionId, Transport>()

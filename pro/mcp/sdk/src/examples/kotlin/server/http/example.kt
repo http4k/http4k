@@ -2,7 +2,6 @@ package server.http
 
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.Version
-import org.http4k.routing.compose
 import org.http4k.routing.mcpHttp
 import org.http4k.server.Helidon
 import org.http4k.server.asServer

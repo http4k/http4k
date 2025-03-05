@@ -29,8 +29,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.ModelIdentifier
-import org.http4k.mcp.model.ModelScore.Companion.MAX
-import org.http4k.mcp.model.ModelSelector
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -57,8 +55,8 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.Sse
-import org.http4k.mcp.server.sse.StandardSseMcpHandler
+import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
@@ -112,9 +110,9 @@ class TestMcpClientTest {
                 }
             )
         )
-        val mcp = StandardSseMcpHandler(
+        val mcp = StandardSseMcp(
             RealtimeMcpProtocol(
-                McpSession.Sse(),
+                McpSession.SseSession(),
                 metadata, prompts = serverPrompts, random = Random(0)))
 
         mcp.useClient {
@@ -164,7 +162,7 @@ class TestMcpClientTest {
         val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp =
-            StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
+            StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, resources = serverResources, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -217,7 +215,7 @@ class TestMcpClientTest {
         val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp =
-            StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), metadata, resources = serverResources, random = Random(0)))
+            StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, resources = serverResources, random = Random(0)))
 
         mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
@@ -242,7 +240,7 @@ class TestMcpClientTest {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = StandardSseMcpHandler(RealtimeMcpProtocol(McpSession.Sse(), metadata, tools = serverTools, random = Random(0)))
+        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, tools = serverTools, random = Random(0)))
 
         mcp.useClient {
             assertThat(
@@ -295,9 +293,9 @@ class TestMcpClientTest {
             listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
         )
 
-        val mcp = StandardSseMcpHandler(
+        val mcp = StandardSseMcp(
             RealtimeMcpProtocol(
-                McpSession.Sse(),
+                McpSession.SseSession(),
                 metadata,
                 completions = serverCompletions,
                 random = Random(0)
@@ -319,9 +317,9 @@ class TestMcpClientTest {
         val model = ModelIdentifier.of("name")
         val serverSampling = Sampling()
 
-        val mcp = StandardSseMcpHandler(
+        val mcp = StandardSseMcp(
             RealtimeMcpProtocol(
-                McpSession.Sse(),
+                McpSession.SseSession(),
                 metadata,
                 sampling = serverSampling,
                 random = Random(0)

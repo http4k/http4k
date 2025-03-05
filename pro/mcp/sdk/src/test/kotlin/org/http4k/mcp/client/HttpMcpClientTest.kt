@@ -8,10 +8,9 @@ import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.http.Http
-import org.http4k.mcp.server.http.StandardHttpMcpHandler
+import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.session.McpSession
 import org.http4k.sse.Sse
 
@@ -35,5 +34,5 @@ class HttpMcpClientTest : McpClientContract<Response, RealtimeMcpProtocol<Sse>> 
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardHttpMcpHandler(protocol)
+    override fun toPolyHandler(protocol: RealtimeMcpProtocol<Sse>) = StandardHttpMcp(protocol)
 }
