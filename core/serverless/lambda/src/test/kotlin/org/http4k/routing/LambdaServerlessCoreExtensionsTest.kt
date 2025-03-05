@@ -14,7 +14,7 @@ import org.junit.jupiter.api.assertThrows
 class LambdaServerlessCoreExtensionsTest {
 
     @Test
-    fun `can compose many functions into a single function and routes function name according to environment`() {
+    fun `compose many functions`() {
         val functions = functions(
             "function1" bind FnLoader {
                 FnHandler { _: ScheduledEvent, _: Context ->
