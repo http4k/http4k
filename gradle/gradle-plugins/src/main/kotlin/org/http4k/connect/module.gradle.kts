@@ -1,13 +1,13 @@
 package org.http4k.connect
 
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.api
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.kotlin
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.main
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.sourceSets
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.test
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testFixtures
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testFixturesApi
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testImplementation
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.api
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.kotlin
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.main
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.sourceSets
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.test
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testFixtures
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testFixturesApi
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testImplementation
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.`java-test-fixtures`

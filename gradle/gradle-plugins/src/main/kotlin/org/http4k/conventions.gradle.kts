@@ -1,6 +1,12 @@
 package org.http4k
 
-import gradle.kotlin.dsl.accessors._e5ae26700a26e172740719aa2f29fd91.testFixturesApi
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.java
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.kotlin
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.sourceSets
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.test
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testFixturesApi
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testFixturesImplementation
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testImplementation
 import org.gradle.api.JavaVersion.VERSION_21
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile

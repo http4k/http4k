@@ -1,8 +1,8 @@
 package org.http4k.internal
 
-import gradle.kotlin.dsl.accessors._39e284271b7eee8a4fbb4c6cbae1df14.jar
-import gradle.kotlin.dsl.accessors._39e284271b7eee8a4fbb4c6cbae1df14.main
-import gradle.kotlin.dsl.accessors._39e284271b7eee8a4fbb4c6cbae1df14.sourceSets
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.jar
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.main
+import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.sourceSets
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.invoke
