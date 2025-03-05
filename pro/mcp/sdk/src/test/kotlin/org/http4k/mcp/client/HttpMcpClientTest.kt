@@ -8,12 +8,12 @@ import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.http.EventStreamMcpSession
+import org.http4k.mcp.server.http.EventStreamMcpConnection
 import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.sse.Sse
 
-class HttpMcpClientTest : McpClientContract<Sse, Response, EventStreamMcpSession> {
+class HttpMcpClientTest : McpClientContract<Sse, Response, EventStreamMcpConnection> {
 
     override val notifications = false
 
@@ -23,7 +23,7 @@ class HttpMcpClientTest : McpClientContract<Sse, Response, EventStreamMcpSession
         tools: Tools,
         resources: Resources,
         completions: Completions
-    ) = EventStreamMcpSession(
+    ) = EventStreamMcpConnection(
         McpProtocol(serverMetaData, tools, resources, prompts, completions)
     ).also { it.start() }
 
@@ -32,5 +32,5 @@ class HttpMcpClientTest : McpClientContract<Sse, Response, EventStreamMcpSession
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(transport: EventStreamMcpSession) = StandardHttpMcp(transport)
+    override fun toPolyHandler(transport: EventStreamMcpConnection) = StandardHttpMcp(transport)
 }

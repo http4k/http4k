@@ -15,11 +15,11 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.WsMcpSession
+import org.http4k.mcp.server.ws.WsMcpConnection
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WsMcpClientTest : McpClientContract<Websocket, Response, WsMcpSession> {
+class WsMcpClientTest : McpClientContract<Websocket, Response, WsMcpConnection> {
 
     override val notifications = true
 
@@ -29,7 +29,7 @@ class WsMcpClientTest : McpClientContract<Websocket, Response, WsMcpSession> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = WsMcpSession(McpProtocol(serverMetaData, tools, resources, prompts, completions))
+    ) = WsMcpConnection(McpProtocol(serverMetaData, tools, resources, prompts, completions))
 
     override fun clientFor(port: Int) = WsMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -38,5 +38,5 @@ class WsMcpClientTest : McpClientContract<Websocket, Response, WsMcpSession> {
         WebsocketClient(Duration.ofSeconds(2), true),
     )
 
-    override fun toPolyHandler(transport: WsMcpSession) = StandardWsMcp(transport)
+    override fun toPolyHandler(transport: WsMcpConnection) = StandardWsMcp(transport)
 }

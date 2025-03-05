@@ -10,11 +10,11 @@ import org.http4k.sse.SseMessage
  * This SSE connection handler can be bound to whatever path is required by the server with
  * routes("/path" bind <SseMcpSessionConnectionEndpoint>
  */
-fun SseMcpSessionConnectionEndpoint(session: SseMcpSession) = sse {
+fun SseMcpSessionConnectionEndpoint(connection: SseMcpConnection) = sse {
     it.send(
         SseMessage.Event(
             "endpoint",
-            Request(GET, "/message").with(sessionId of session.new(it.connectRequest, it)).uri.toString()
+            Request(GET, "/message").with(sessionId of connection.new(it.connectRequest, it)).uri.toString()
         )
     )
 }

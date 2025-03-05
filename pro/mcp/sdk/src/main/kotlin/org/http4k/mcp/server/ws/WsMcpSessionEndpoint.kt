@@ -9,10 +9,10 @@ import org.http4k.websocket.WsResponse
  * This Websocket handler can be bound to whatever path is required by the server with
  * ws("/path" bind <WsCommandHandler>
  */
-fun WsCommandHandler(session: WsMcpSession) = { req: Request ->
+fun WsCommandHandler(connection: WsMcpConnection) = { req: Request ->
     WsResponse {
-        val newSessionId = session.new(req, it)
-        it.onMessage { session.receive(newSessionId, req.body(it.bodyString())) }
+        val newSessionId = connection.new(req, it)
+        it.onMessage { connection.receive(newSessionId, req.body(it.bodyString())) }
         it.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
     }
 }

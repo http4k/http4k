@@ -36,7 +36,7 @@ import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.session.McpConnection
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -44,7 +44,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-interface McpClientContract<Sink, R : Any, Transport : McpSession<R, Sink>> : PortBasedTest {
+interface McpClientContract<Sink, R : Any, Transport : McpConnection<R, Sink>> : PortBasedTest {
 
     val notifications: Boolean
 

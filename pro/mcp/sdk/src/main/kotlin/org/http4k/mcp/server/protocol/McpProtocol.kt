@@ -39,7 +39,7 @@ import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.session.McpSession
+import org.http4k.mcp.server.session.McpConnection
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
@@ -72,7 +72,7 @@ open class McpProtocol<RSP : Any>(
 
     private val clients = ConcurrentHashMap<SessionId, McpClient>()
 
-    fun receive(sId: SessionId, request: Request, session: McpSession<RSP, *>): RSP {
+    fun receive(sId: SessionId, request: Request, session: McpConnection<RSP, *>): RSP {
         val payload = McpJson.fields(McpJson.parse(request.bodyString())).toMap()
 
         return when {
@@ -187,33 +187,33 @@ open class McpProtocol<RSP : Any>(
     fun handleInitialize(
         request: McpInitialize.Request,
         sId: SessionId,
-        session: McpSession<RSP, *>
+        connection: McpConnection<RSP, *>
     ): McpInitialize.Response {
 
         clients[sId] = McpClient()
         logger.subscribe(sId, LogLevel.error) { level, logger, data ->
-            session.send(
+            connection.send(
                 McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage),
                 sId
             )
         }
         prompts.onChange(sId) {
-            session.send(McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed), sId)
+            connection.send(McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed), sId)
         }
         resources.onChange(sId) {
-            session.send(
+            connection.send(
                 McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed),
                 sId
             )
         }
-        tools.onChange(sId) { session.send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
+        tools.onChange(sId) { connection.send(McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed), sId) }
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
             clients[sId]?.addCallback(id) { sampling.receive(id, it.fromJsonRpc()) }
-            session.send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
+            connection.send(req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)), sId)
         }
 
-        session.onClose(sId) {
+        connection.onClose(sId) {
             clients.remove(sId)
             prompts.remove(sId)
             resources.remove(sId)

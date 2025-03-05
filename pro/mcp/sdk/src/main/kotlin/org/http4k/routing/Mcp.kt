@@ -17,14 +17,14 @@ import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.http.EventStreamMcpSession
+import org.http4k.mcp.server.http.EventStreamMcpConnection
 import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.sse.SseMcpSession
+import org.http4k.mcp.server.sse.SseMcpConnection
 import org.http4k.mcp.server.sse.StandardSseMcp
-import org.http4k.mcp.server.stdio.StdIoMcpSession
+import org.http4k.mcp.server.stdio.StdIoMcpConnection
 import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.WsMcpSession
+import org.http4k.mcp.server.ws.WsMcpConnection
 import java.io.Reader
 import java.io.Writer
 
@@ -39,14 +39,14 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardSseMcp(SseMcpSession(McpProtocol(serverMetaData, capabilities)).also { it.start() })
+    StandardSseMcp(SseMcpConnection(McpProtocol(serverMetaData, capabilities)).also { it.start() })
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardWsMcp(
-        WsMcpSession(McpProtocol(serverMetaData, capabilities)).also { it.start() },
+        WsMcpConnection(McpProtocol(serverMetaData, capabilities)).also { it.start() },
     )
 
 /**
@@ -54,7 +54,7 @@ fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability)
  */
 fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
     StandardHttpMcp(
-        EventStreamMcpSession(McpProtocol(ServerMetaData(mcpEntity, version), capabilities)).also { it.start() }
+        EventStreamMcpConnection(McpProtocol(ServerMetaData(mcpEntity, version), capabilities)).also { it.start() }
     )
 
 /**
@@ -65,7 +65,7 @@ fun mcpStdIo(
     vararg capabilities: ServerCapability,
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
-) = StdIoMcpSession(McpProtocol(serverMetaData, capabilities), reader, writer).start()
+) = StdIoMcpConnection(McpProtocol(serverMetaData, capabilities), reader, writer).start()
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)

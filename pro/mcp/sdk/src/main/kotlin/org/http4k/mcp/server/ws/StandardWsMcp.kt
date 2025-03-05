@@ -6,6 +6,6 @@ import org.http4k.routing.websocket.bind
 /**
  * Standard MCP server setup for WS-based MCP Servers
  */
-fun StandardWsMcp(session: WsMcpSession) = poly(
-    "/ws" bind WsCommandHandler(session)
+fun StandardWsMcp(connection: WsMcpConnection) = poly(
+    "/ws" bind WsCommandHandler(connection)
 )
