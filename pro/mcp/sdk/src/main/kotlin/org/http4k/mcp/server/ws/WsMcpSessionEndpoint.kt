@@ -11,7 +11,7 @@ import org.http4k.websocket.WsResponse
  */
 fun WsCommandHandler(session: WsMcpSession) = { req: Request ->
     WsResponse {
-        val newSessionId = session.newSession(req, it)
+        val newSessionId = session.new(req, it)
         it.onMessage { session.receive(newSessionId, req.body(it.bodyString())) }
         it.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
     }

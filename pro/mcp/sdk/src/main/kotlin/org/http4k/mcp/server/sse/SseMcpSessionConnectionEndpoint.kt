@@ -14,7 +14,7 @@ fun SseMcpSessionConnectionEndpoint(session: SseMcpSession) = sse {
     it.send(
         SseMessage.Event(
             "endpoint",
-            Request(GET, "/message").with(sessionId of session.newSession(it.connectRequest, it)).uri.toString()
+            Request(GET, "/message").with(sessionId of session.new(it.connectRequest, it)).uri.toString()
         )
     )
 }

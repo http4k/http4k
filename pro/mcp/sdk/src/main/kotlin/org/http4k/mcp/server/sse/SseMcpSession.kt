@@ -48,7 +48,7 @@ class SseMcpSession(
     }
 
 
-    override fun newSession(connectRequest: Request, sink: Sse): SessionId {
+    override fun new(connectRequest: Request, sink: Sse): SessionId {
         val sessionId = sessionProvider.assign(connectRequest)
         sessions[sessionId] = sink
         return sessionId

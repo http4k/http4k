@@ -67,7 +67,7 @@ class EventStreamMcpSession(
         sessions[sessionId]?.also { it.onClose(fn) }
     }
 
-    override fun newSession(connectRequest: Request, sink: Sse): SessionId {
+    override fun new(connectRequest: Request, sink: Sse): SessionId {
         val sessionId = sessionProvider.assign(connectRequest)
         sessions[sessionId] = sink
         return sessionId

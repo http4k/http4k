@@ -50,7 +50,7 @@ class WsMcpSession(
         }
     }
 
-    override fun newSession(connectRequest: Request, sink: Websocket): SessionId {
+    override fun new(connectRequest: Request, sink: Websocket): SessionId {
         val sessionId = sessionProvider.assign(connectRequest)
         sessions[sessionId] = sink
         return sessionId

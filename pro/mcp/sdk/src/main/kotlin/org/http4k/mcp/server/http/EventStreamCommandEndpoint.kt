@@ -7,7 +7,7 @@ import org.http4k.routing.sse
  * routes("/path" bind <EventStreamCommandEndpoint>
  */
 fun EventStreamCommandEndpoint(session: EventStreamMcpSession) = sse {
-    val newSession = session.newSession(it.connectRequest, it)
+    val newSession = session.new(it.connectRequest, it)
 
     session.receive(newSession, it.connectRequest)
 }

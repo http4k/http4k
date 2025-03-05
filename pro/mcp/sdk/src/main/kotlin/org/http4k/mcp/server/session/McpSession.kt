@@ -7,6 +7,6 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.McpResponder
 
 interface McpSession<RSP : Any, Sink> : McpResponder<RSP> {
-    fun newSession(connectRequest: Request, sink: Sink): SessionId
+    fun new(connectRequest: Request, sink: Sink): SessionId
     fun start(executor: SimpleScheduler = SimpleSchedulerService(1))
 }

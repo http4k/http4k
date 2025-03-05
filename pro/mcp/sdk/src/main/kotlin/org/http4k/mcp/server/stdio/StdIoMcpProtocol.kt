@@ -28,7 +28,7 @@ class StdIoMcpSession(
 
     override fun receive(sId: SessionId, request: Request) = protocol.receive(sId, request, this)
 
-    override fun newSession(connectRequest: Request, sink: Unit) = SessionId.of(UUID(0, 0).toString())
+    override fun new(connectRequest: Request, sink: Unit) = SessionId.of(UUID(0, 0).toString())
 
     override fun error() = Unit
 
