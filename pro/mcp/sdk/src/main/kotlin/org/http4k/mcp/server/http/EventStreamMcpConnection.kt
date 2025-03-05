@@ -34,34 +34,27 @@ class EventStreamMcpConnection(
 
     override fun ok() = Response(ACCEPTED)
 
+    override fun error() = Response(GONE)
+
     override fun send(message: McpNodeType, sessionId: SessionId, status: CompletionStatus) =
         when (val sink = sessions[sessionId]) {
             null -> Response(GONE)
             else -> {
                 sink.send(SseMessage.Event("message", compact(message)))
                 if (status == Finished) sink.close()
-                Response(ACCEPTED)
+                ok()
             }
         }
 
-    override fun receive(sId: SessionId, request: Request) = when {
-        sessionProvider.verify(sId, request) -> {
-            protocol.handleInitialize(
-                McpInitialize.Request(
-                    VersionedMcpEntity(McpEntity.of("server"), Version.of("1")),
-                    ClientCapabilities()
-                ),
-                sId,
-                this
-            )
+    override fun receive(sId: SessionId, request: Request) = run {
+        protocol.handleInitialize(
+            McpInitialize.Request(VersionedMcpEntity(McpEntity.of("server"), Version.of("1")), ClientCapabilities()),
+            sId,
+            this
+        )
 
-            protocol.receive(sId, request, this)
-        }
-
-        else -> error()
+        protocol.receive(sId, request, this)
     }
-
-    override fun error() = Response(GONE)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
         sessions[sessionId]?.also { it.onClose(fn) }
