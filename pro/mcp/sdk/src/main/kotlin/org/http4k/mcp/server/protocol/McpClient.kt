@@ -8,7 +8,7 @@ import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 
-class ClientSession {
+class McpClient {
     private val calls = ConcurrentHashMap<RequestId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 
     fun addCallback(id: RequestId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {
