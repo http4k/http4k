@@ -6,7 +6,7 @@ import org.http4k.routing.sse.bind
 /**
  * Standard MCP server setup for Pure SSE-based MCP Servers
  */
-fun StandardHttpMcp(transport: EventStreamMcpTransport) = poly(
-    "/sse" bind EventStreamCommandEndpoint(transport),
+fun StandardHttpMcp(session: EventStreamMcpSession) = poly(
+    "/sse" bind EventStreamCommandEndpoint(session),
     // TODO insert handler here for messages
 )

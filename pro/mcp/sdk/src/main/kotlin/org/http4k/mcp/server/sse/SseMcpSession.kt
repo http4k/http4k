@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.http
+package org.http4k.mcp.server.sse
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import org.http4k.core.Request
@@ -6,15 +6,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
 import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.model.CompletionStatus.Finished
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.protocol.VersionedMcpEntity
-import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.McpTransport
+import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
@@ -24,12 +18,11 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class EventStreamMcpTransport(
+class SseMcpSession(
     private val protocol: McpProtocol<Response>,
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : McpTransport<Response, Sse> {
-
+) : McpSession<Response, Sse> {
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
     override fun ok() = Response(ACCEPTED)
@@ -39,25 +32,12 @@ class EventStreamMcpTransport(
             null -> Response(GONE)
             else -> {
                 sink.send(SseMessage.Event("message", compact(message)))
-                if (status == Finished) sink.close()
                 Response(ACCEPTED)
             }
         }
 
     override fun receive(sId: SessionId, request: Request) = when {
-        sessionProvider.verify(sId, request) -> {
-            protocol.handleInitialize(
-                McpInitialize.Request(
-                    VersionedMcpEntity(McpEntity.of("server"), Version.of("1")),
-                    ClientCapabilities()
-                ),
-                sId,
-                this
-            )
-
-            protocol.receive(sId, request, this)
-        }
-
+        sessionProvider.verify(sId, request) -> protocol.receive(sId, request, this)
         else -> error()
     }
 
@@ -66,6 +46,7 @@ class EventStreamMcpTransport(
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
         sessions[sessionId]?.also { it.onClose(fn) }
     }
+
 
     override fun newSession(connectRequest: Request, sink: Sse): SessionId {
         val sessionId = sessionProvider.assign(connectRequest)
@@ -77,6 +58,7 @@ class EventStreamMcpTransport(
         executor.scheduleWithFixedDelay({
             sessions.toList().forEach { (sessionId, sink) ->
                 try {
+                    sink.send(SseMessage.Event("ping", ""))
                 } catch (e: Exception) {
                     sessions.remove(sessionId)
                     sink.close()

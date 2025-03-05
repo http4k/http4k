@@ -9,7 +9,7 @@ import org.http4k.routing.sse.bind
 /**
  * Standard MCP server setup for SSE-based MCP Servers
  */
-fun StandardSseMcp(transport: SseMcpTransport) = poly(
-    "/sse" bind SseMcpSessionConnectionEndpoint(transport),
-    CatchLensFailure().then("/message" bind SseMcpSessionCommandEndpoint(transport))
+fun StandardSseMcp(session: SseMcpSession) = poly(
+    "/sse" bind SseMcpSessionConnectionEndpoint(session),
+    CatchLensFailure().then("/message" bind SseMcpSessionCommandEndpoint(session))
 )

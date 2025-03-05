@@ -1,10 +1,7 @@
 package org.http4k.mcp.server.ws
 
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.mcp.server.protocol.McpTransport
 import org.http4k.sse.SseMessage
-import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
 
@@ -12,10 +9,10 @@ import org.http4k.websocket.WsResponse
  * This Websocket handler can be bound to whatever path is required by the server with
  * ws("/path" bind <WsCommandHandler>
  */
-fun WsCommandHandler(transport: McpTransport<Response, Websocket>) = { req: Request ->
+fun WsCommandHandler(session: WsMcpSession) = { req: Request ->
     WsResponse {
-        val newSessionId = transport.newSession(req, it)
-        it.onMessage { transport.receive(newSessionId, req.body(it.bodyString())) }
+        val newSessionId = session.newSession(req, it)
+        it.onMessage { session.receive(newSessionId, req.body(it.bodyString())) }
         it.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
     }
 }

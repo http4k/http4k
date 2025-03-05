@@ -6,8 +6,8 @@ import org.http4k.routing.sse
  * This SSE handler can be bound to whatever path is required by the server with
  * routes("/path" bind <EventStreamCommandEndpoint>
  */
-fun EventStreamCommandEndpoint(transport: EventStreamMcpTransport) = sse {
-    val newSession = transport.newSession(it.connectRequest, it)
+fun EventStreamCommandEndpoint(session: EventStreamMcpSession) = sse {
+    val newSession = session.newSession(it.connectRequest, it)
 
-    transport.receive(newSession, it.connectRequest)
+    session.receive(newSession, it.connectRequest)
 }

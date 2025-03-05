@@ -38,7 +38,7 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.sse.SseMcpTransport
+import org.http4k.mcp.server.sse.SseMcpSession
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -48,7 +48,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Disabled
-class SseMcpClientTest : McpClientContract<Sse, Response, SseMcpTransport> {
+class SseMcpClientTest : McpClientContract<Sse, Response, SseMcpSession> {
 
     override val notifications = true
 
@@ -58,7 +58,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response, SseMcpTransport> {
         tools: Tools,
         resources: Resources,
         completions: Completions,
-    ) = SseMcpTransport(McpProtocol(serverMetaData, tools, resources, prompts, completions))
+    ) = SseMcpSession(McpProtocol(serverMetaData, tools, resources, prompts, completions))
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -67,7 +67,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response, SseMcpTransport> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun toPolyHandler(transport: SseMcpTransport) = StandardSseMcp(transport)
+    override fun toPolyHandler(transport: SseMcpSession) = StandardSseMcp(transport)
 
     @Test
     fun `deals with error`() {

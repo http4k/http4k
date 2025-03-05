@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.GONE
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.McpTransport
+import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.session.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
@@ -19,11 +19,11 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class WsMcpTransport(
+class WsMcpSession(
     private val protocol: McpProtocol<Response>,
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : McpTransport<Response, Websocket> {
+) : McpSession<Response, Websocket> {
     private val sessions = ConcurrentHashMap<SessionId, Websocket>()
 
     override fun ok() = Response(ACCEPTED)
