@@ -10,17 +10,17 @@ import org.http4k.websocket.WsMessage
  * Websocket session connection.
  */
 fun McpSession.Companion.Websocket() = object : McpSession<Websocket> {
-    override fun ping(transport: Websocket) {
-        transport.send(WsMessage(Event("ping", "").toMessage()))
+    override fun ping(sink: Websocket) {
+        sink.send(WsMessage(Event("ping", "").toMessage()))
     }
 
-    override fun event(transport: Websocket, data: String, status: CompletionStatus) {
-        transport.send(WsMessage(Event("message", data).toMessage()))
+    override fun event(sink: Websocket, data: String, status: CompletionStatus) {
+        sink.send(WsMessage(Event("message", data).toMessage()))
     }
 
-    override fun onClose(transport: Websocket, fn: () -> Unit) {
-        transport.onClose { fn() }
+    override fun onClose(sink: Websocket, fn: () -> Unit) {
+        sink.onClose { fn() }
     }
 
-    override fun close(transport: Websocket) = transport.close()
+    override fun close(sink: Websocket) = sink.close()
 }

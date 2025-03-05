@@ -9,17 +9,17 @@ import org.http4k.sse.SseMessage
  * SSE session connection.
  */
 fun McpSession.Companion.SseSession() = object : McpSession<Sse> {
-    override fun ping(transport: Sse) {
-        transport.send(SseMessage.Event("ping", ""))
+    override fun ping(sink: Sse) {
+        sink.send(SseMessage.Event("ping", ""))
     }
 
-    override fun event(transport: Sse, data: String, status: CompletionStatus) {
-        transport.send(SseMessage.Event("message", data))
+    override fun event(sink: Sse, data: String, status: CompletionStatus) {
+        sink.send(SseMessage.Event("message", data))
     }
 
-    override fun onClose(transport: Sse, fn: () -> Unit) {
-        transport.onClose(fn)
+    override fun onClose(sink: Sse, fn: () -> Unit) {
+        sink.onClose(fn)
     }
 
-    override fun close(transport: Sse) = transport.close()
+    override fun close(sink: Sse) = sink.close()
 }

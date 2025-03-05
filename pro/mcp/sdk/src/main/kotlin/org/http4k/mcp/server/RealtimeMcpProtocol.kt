@@ -29,8 +29,8 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class RealtimeMcpProtocol<Transport>(
-    private val mcpSession: McpSession<Transport>,
+class RealtimeMcpProtocol<Sink>(
+    private val mcpSession: McpSession<Sink>,
     metaData: ServerMetaData,
     prompts: Prompts = Prompts(emptyList()),
     tools: Tools = Tools(emptyList()),
@@ -57,7 +57,7 @@ class RealtimeMcpProtocol<Transport>(
      * Constructor useful when only simple MCP protocol behaviours are required
      */
     constructor(
-        mcpSession: McpSession<Transport>,
+        mcpSession: McpSession<Sink>,
         serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>
     ) :
         this(
@@ -69,7 +69,7 @@ class RealtimeMcpProtocol<Transport>(
             Completions(capabilities.filterIsInstance<CompletionCapability>()),
         )
 
-    private val sessions = ConcurrentHashMap<SessionId, Transport>()
+    private val sessions = ConcurrentHashMap<SessionId, Sink>()
 
     override fun ok() = Response(ACCEPTED)
 
@@ -87,7 +87,7 @@ class RealtimeMcpProtocol<Transport>(
         sessions[sessionId]?.also { mcpSession.onClose(it, fn) }
     }
 
-    fun newSession(connectRequest: Request, eventSink: Transport): SessionId {
+    fun newSession(connectRequest: Request, eventSink: Sink): SessionId {
         val sessionId = sessionProvider.assign(connectRequest)
         sessions[sessionId] = eventSink
         return sessionId
