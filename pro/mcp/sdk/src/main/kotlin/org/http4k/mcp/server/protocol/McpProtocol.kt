@@ -72,7 +72,7 @@ open class McpProtocol<RSP : Any>(
 
     private val clients = ConcurrentHashMap<SessionId, McpClient>()
 
-    fun receive(sId: SessionId, request: Request, session: McpConnection<RSP, *>): RSP {
+    fun receive(sId: SessionId, request: Request, connection: McpConnection<RSP, *>): RSP {
         val payload = McpJson.fields(McpJson.parse(request.bodyString())).toMap()
 
         return when {
@@ -81,32 +81,32 @@ open class McpProtocol<RSP : Any>(
 
                 when (McpRpcMethod.of(jsonReq.method)) {
                     McpInitialize.Method ->
-                        session.send(jsonReq.respondTo<McpInitialize.Request> { handleInitialize(it, sId, session) }, sId)
+                        connection.send(jsonReq.respondTo<McpInitialize.Request> { handleInitialize(it, sId, connection) }, sId)
 
                     McpCompletion.Method ->
-                        session.send(
+                        connection.send(
                             jsonReq.respondTo<McpCompletion.Request> { completions.complete(it, request) },
                             sId
                         )
 
-                    McpPing.Method -> session.send(
+                    McpPing.Method -> connection.send(
                         jsonReq.respondTo<McpPing.Request> { ServerMessage.Response.Empty },
                         sId
                     )
 
                     McpPrompt.Get.Method ->
-                        session.send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, request) }, sId)
+                        connection.send(jsonReq.respondTo<McpPrompt.Get.Request> { prompts.get(it, request) }, sId)
 
                     McpPrompt.List.Method ->
-                        session.send(jsonReq.respondTo<McpPrompt.List.Request> { prompts.list(it, request) }, sId)
+                        connection.send(jsonReq.respondTo<McpPrompt.List.Request> { prompts.list(it, request) }, sId)
 
                     McpResource.Template.List.Method ->
-                        session.send(jsonReq.respondTo<McpResource.Template.List.Request> {
+                        connection.send(jsonReq.respondTo<McpResource.Template.List.Request> {
                             resources.listTemplates(it, request)
                         }, sId)
 
                     McpResource.List.Method ->
-                        session.send(jsonReq.respondTo<McpResource.List.Request> {
+                        connection.send(jsonReq.respondTo<McpResource.List.Request> {
                             resources.listResources(
                                 it,
                                 request
@@ -114,55 +114,55 @@ open class McpProtocol<RSP : Any>(
                         }, sId)
 
                     McpResource.Read.Method ->
-                        session.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) }, sId)
+                        connection.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) }, sId)
 
                     McpResource.Subscribe.Method -> {
                         val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
                         resources.subscribe(sId, subscribeRequest) {
-                            session.send(
+                            connection.send(
                                 McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated),
                                 sId
                             )
                         }
-                        session.ok()
+                        connection.ok()
                     }
 
                     McpLogging.SetLevel.Method -> {
                         logger.setLevel(sId, jsonReq.fromJsonRpc<McpLogging.SetLevel.Request>().level)
-                        session.ok()
+                        connection.ok()
                     }
 
                     McpResource.Unsubscribe.Method -> {
                         resources.unsubscribe(sId, jsonReq.fromJsonRpc())
-                        session.ok()
+                        connection.ok()
                     }
 
-                    McpInitialize.Initialized.Method -> session.ok()
+                    McpInitialize.Initialized.Method -> connection.ok()
 
-                    Cancelled.Method -> session.ok()
+                    Cancelled.Method -> connection.ok()
 
-                    McpProgress.Method -> session.ok()
+                    McpProgress.Method -> connection.ok()
 
                     McpRoot.Changed.Method -> {
                         val requestId = RequestId.random(random)
                         clients[sId]?.addCallback(requestId) { roots.update(it.fromJsonRpc()) }
-                        session.send(
+                        connection.send(
                             McpRoot.List.Request().toJsonRpc(McpRoot.List, McpJson.asJsonObject(requestId)),
                             sId
                         )
                     }
 
-                    McpTool.Call.Method -> session.send(
+                    McpTool.Call.Method -> connection.send(
                         jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, request) },
                         sId
                     )
 
-                    McpTool.List.Method -> session.send(
+                    McpTool.List.Method -> connection.send(
                         jsonReq.respondTo<McpTool.List.Request> { tools.list(it, request) },
                         sId
                     )
 
-                    else -> session.send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
+                    else -> connection.send(ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id), sId)
                 }
             }
 
@@ -170,13 +170,13 @@ open class McpProtocol<RSP : Any>(
                 val jsonResult = JsonRpcResult(McpJson, payload)
 
                 when {
-                    jsonResult.isError() -> session.ok()
+                    jsonResult.isError() -> connection.ok()
                     else -> with(McpJson) {
                         val id = jsonResult.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
-                            null -> session.ok()
-                            else -> clients[sId]?.processResult(id, jsonResult)?.let { session.ok() }
-                                ?: session.error()
+                            null -> connection.ok()
+                            else -> clients[sId]?.processResult(id, jsonResult)?.let { connection.ok() }
+                                ?: connection.error()
                         }
                     }
                 }
