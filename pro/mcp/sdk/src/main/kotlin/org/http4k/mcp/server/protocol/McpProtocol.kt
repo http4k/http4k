@@ -60,10 +60,7 @@ open class McpProtocol<RSP : Any>(
     private val logger: Logger = Logger(),
     private val random: Random = Random
 ) {
-    constructor(
-        serverMetaData: ServerMetaData,
-        capabilities: Array<out ServerCapability>
-    ) : this(
+    constructor(serverMetaData: ServerMetaData, capabilities: Array<out ServerCapability>) : this(
         serverMetaData,
         Tools(capabilities.filterIsInstance<ToolCapability>()),
         Resources(capabilities.filterIsInstance<ResourceCapability>()),
