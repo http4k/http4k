@@ -81,7 +81,13 @@ open class McpProtocol<RSP : Any>(
 
                 when (McpRpcMethod.of(jsonReq.method)) {
                     McpInitialize.Method ->
-                        connection.send(jsonReq.respondTo<McpInitialize.Request> { handleInitialize(it, sId, connection) }, sId)
+                        connection.send(jsonReq.respondTo<McpInitialize.Request> {
+                            handleInitialize(
+                                it,
+                                sId,
+                                connection
+                            )
+                        }, sId)
 
                     McpCompletion.Method ->
                         connection.send(
@@ -114,7 +120,10 @@ open class McpProtocol<RSP : Any>(
                         }, sId)
 
                     McpResource.Read.Method ->
-                        connection.send(jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) }, sId)
+                        connection.send(
+                            jsonReq.respondTo<McpResource.Read.Request> { resources.read(it, request) },
+                            sId
+                        )
 
                     McpResource.Subscribe.Method -> {
                         val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
@@ -184,11 +193,8 @@ open class McpProtocol<RSP : Any>(
         }
     }
 
-    fun handleInitialize(
-        request: McpInitialize.Request,
-        sId: SessionId,
-        connection: McpConnection<RSP, *>
-    ): McpInitialize.Response {
+    fun handleInitialize(request: McpInitialize.Request, sId: SessionId, connection: McpConnection<RSP, *>):
+        McpInitialize.Response {
 
         clients[sId] = McpClient()
         logger.subscribe(sId, LogLevel.error) { level, logger, data ->
