@@ -18,10 +18,8 @@ import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.http.EventStreamMcpTransport
-import org.http4k.mcp.server.http.Http
 import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.session.McpSession
 import org.http4k.mcp.server.sse.SseMcpTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpTransport
@@ -57,8 +55,7 @@ fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability)
 fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
     StandardHttpMcp(
         EventStreamMcpTransport(
-            McpProtocol(ServerMetaData(mcpEntity, version), capabilities),
-            McpSession.Http()
+            McpProtocol(ServerMetaData(mcpEntity, version), capabilities)
         ).also { it.start() }
     )
 

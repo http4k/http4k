@@ -9,10 +9,8 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.http.EventStreamMcpTransport
-import org.http4k.mcp.server.http.Http
 import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.session.McpSession
 import org.http4k.sse.Sse
 
 class HttpMcpClientTest : McpClientContract<Sse, Response, EventStreamMcpTransport> {
@@ -26,8 +24,7 @@ class HttpMcpClientTest : McpClientContract<Sse, Response, EventStreamMcpTranspo
         resources: Resources,
         completions: Completions
     ) = EventStreamMcpTransport(
-        McpProtocol(serverMetaData, tools, resources, prompts, completions),
-        McpSession.Http()
+        McpProtocol(serverMetaData, tools, resources, prompts, completions)
     ).also { it.start() }
 
     override fun clientFor(port: Int) = HttpMcpClient(
