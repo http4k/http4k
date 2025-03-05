@@ -129,7 +129,6 @@ abstract class McpProtocol<RSP : Any>(
                         val requestId = RequestId.random(random)
                         clients[sId]?.addCallback(requestId) { roots.update(it.fromJsonRpc()) }
                         send(McpRoot.List.Request().toJsonRpc(McpRoot.List, McpJson.asJsonObject(requestId)), sId)
-                        ok()
                     }
 
                     McpTool.Call.Method -> send(
