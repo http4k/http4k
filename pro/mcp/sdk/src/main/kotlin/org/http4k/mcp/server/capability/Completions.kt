@@ -5,7 +5,7 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpCompletion
 
-class Completions(private val bindings: List<CompletionCapability>) {
+class Completions(private val bindings: Iterable<CompletionCapability>) {
 
     constructor(vararg bindings: CompletionCapability) : this(bindings.toList())
 

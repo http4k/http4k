@@ -1,6 +1,5 @@
 package org.http4k.routing
 
-import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
@@ -12,7 +11,6 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
@@ -23,14 +21,14 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.http.Http
-import org.http4k.mcp.server.http.StandardHttpMcp
-import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
+import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.jsonrpc.JsonRpcTransport
+import org.http4k.mcp.server.sse.SseTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
-import org.http4k.mcp.server.stdio.StdIoMcpProtocol
+import org.http4k.mcp.server.stdio.StdIoMcpTransport
 import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.Websocket
+import org.http4k.mcp.server.ws.WsTransport
 import java.io.Reader
 import java.io.Writer
 
@@ -45,20 +43,22 @@ import java.io.Writer
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), serverMetaData, capabilities).also { it.start() })
+    StandardSseMcp(
+        McpProtocol(SseTransport().also { it.start() }, serverMetaData, *capabilities)
+    )
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWsMcp(RealtimeMcpProtocol(McpSession.Websocket(), serverMetaData, capabilities).also { it.start() })
+    StandardWsMcp(McpProtocol(WsTransport(), serverMetaData, *capabilities))
 
 /**
- * Create an HTTP MCP app from a set of feature bindings.
+ * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
  */
 fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
-    StandardHttpMcp(
-        RealtimeMcpProtocol(McpSession.Http(), ServerMetaData(mcpEntity, version), capabilities)
+    StandardJsonRpcMcp(
+        McpProtocol(JsonRpcTransport(), ServerMetaData(mcpEntity, version), *capabilities)
     )
 
 /**
@@ -70,17 +70,20 @@ fun mcpStdIo(
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
 ) {
-    StdIoMcpProtocol(
+    McpProtocol(
+        StdIoMcpTransport(reader, writer),
+//            .start(SimpleSchedulerService(1))
         serverMetaData,
-        reader,
-        writer,
-        Prompts(capabilities.filterIsInstance<PromptCapability>()),
         Tools(capabilities.filterIsInstance<ToolCapability>()),
         Resources(capabilities.filterIsInstance<ResourceCapability>()),
+        Prompts(capabilities.filterIsInstance<PromptCapability>()),
         Completions(capabilities.filterIsInstance<CompletionCapability>()),
-    ).start(SimpleSchedulerService(1))
+    )
 }
 
+/**
+ * Create Tool capability by binding the Spec to the Handler.
+ */
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)

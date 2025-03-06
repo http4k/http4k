@@ -6,7 +6,6 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.util.DebuggingReader
 import org.http4k.mcp.util.DebuggingWriter
-import org.http4k.routing.compose
 import org.http4k.routing.mcpStdIo
 import server.prompts
 import server.resources

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * Handles protocol traffic for sampling
+ * Handles protocol traffic for sampling. Selects the best model to serve a request.
  */
 class Sampling {
 

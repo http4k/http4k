@@ -9,7 +9,7 @@ import org.http4k.mcp.util.ObservableList
 /**
  * Handles protocol traffic for server provided tools.
  */
-class Tools(list: List<ToolCapability>) : ObservableList<ToolCapability>(list) {
+class Tools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list) {
 
     constructor(vararg list: ToolCapability) : this(list.toList())
 

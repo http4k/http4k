@@ -4,7 +4,7 @@ import org.http4k.mcp.protocol.SessionId
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.properties.Delegates
 
-abstract class ObservableList<T>(initial: List<T>) : Iterable<T> {
+abstract class ObservableList<T>(initial: Iterable<T>) : Iterable<T> {
     private val callbacks = ConcurrentHashMap<SessionId, () -> Any>()
 
     var items by Delegates.observable(initial) { _, _, _ -> callbacks.values.forEach { it() } }

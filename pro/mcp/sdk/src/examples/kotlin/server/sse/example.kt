@@ -5,7 +5,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.routing.compose
 import org.http4k.routing.mcpSse
 import org.http4k.server.Helidon
 import org.http4k.server.asServer

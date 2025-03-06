@@ -3,16 +3,13 @@ package org.http4k.mcp.client
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
-import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingRequest
-import org.http4k.mcp.SamplingResponse
+import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerCapabilities

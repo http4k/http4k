@@ -48,14 +48,14 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.server.RealtimeMcpProtocol
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
-import org.http4k.mcp.server.session.McpSession
-import org.http4k.mcp.server.sse.SseSession
+import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.SessionProvider
+import org.http4k.mcp.server.sse.SseTransport
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
@@ -67,6 +67,7 @@ class TestMcpClientTest {
 
     private val serverName = McpEntity.of("server")
     private val clientName = McpEntity.of("client")
+    private val random = Random(0)
 
     @Test
     fun `can use mcp client to connect and get responses`() {
@@ -111,9 +112,11 @@ class TestMcpClientTest {
             )
         )
         val mcp = StandardSseMcp(
-            RealtimeMcpProtocol(
-                McpSession.SseSession(),
-                metadata, prompts = serverPrompts, random = Random(0)))
+            McpProtocol(
+                SseTransport(SessionProvider.Random(random)), metadata,
+                prompts = serverPrompts, random = random
+            )
+        )
 
         mcp.useClient {
             assertThat(
@@ -161,8 +164,13 @@ class TestMcpClientTest {
 
         val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
-        val mcp =
-            StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, resources = serverResources, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                SseTransport(SessionProvider.Random(random)), metadata,
+                resources = serverResources,
+                random = random
+            )
+        )
 
         mcp.useClient {
             assertThat(
@@ -214,8 +222,13 @@ class TestMcpClientTest {
 
         val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
-        val mcp =
-            StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, resources = serverResources, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                SseTransport(SessionProvider.Random(random)), metadata,
+                resources = serverResources,
+                random = random
+            )
+        )
 
         mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
@@ -240,7 +253,13 @@ class TestMcpClientTest {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = StandardSseMcp(RealtimeMcpProtocol(McpSession.SseSession(), metadata, tools = serverTools, random = Random(0)))
+        val mcp = StandardSseMcp(
+            McpProtocol(
+                SseTransport(SessionProvider.Random(random)), metadata,
+                tools = serverTools,
+                random = random
+            )
+        )
 
         mcp.useClient {
             assertThat(
@@ -294,11 +313,10 @@ class TestMcpClientTest {
         )
 
         val mcp = StandardSseMcp(
-            RealtimeMcpProtocol(
-                McpSession.SseSession(),
-                metadata,
+            McpProtocol(
+                SseTransport(SessionProvider.Random(random)), metadata,
                 completions = serverCompletions,
-                random = Random(0)
+                random = random
             )
         )
 
@@ -318,11 +336,10 @@ class TestMcpClientTest {
         val serverSampling = Sampling()
 
         val mcp = StandardSseMcp(
-            RealtimeMcpProtocol(
-                McpSession.SseSession(),
-                metadata,
+            McpProtocol(
+                SseTransport(SessionProvider.Random(random)), metadata,
                 sampling = serverSampling,
-                random = Random(0)
+                random = random
             )
         )
 

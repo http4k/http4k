@@ -43,10 +43,6 @@ fun main() {
             .complete(CompletionRequest(Reference.Prompt("prompt2"), CompletionArgument("foo", "bar")))
     )
 
-    // TODO test client sampling
-//            ModelIdentifier.of("asd"),
-//            SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-
     println(mcpClient.tools().list().valueOrNull())
     println(mcpClient.tools().call(ToolName.of("weather"), ToolRequest(mapOf("city" to "london"))))
 
