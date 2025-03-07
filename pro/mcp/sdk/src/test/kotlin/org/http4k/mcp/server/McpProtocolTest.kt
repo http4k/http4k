@@ -70,7 +70,7 @@ import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Logger
+import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
@@ -360,7 +360,7 @@ class McpProtocolTest {
 
     @Test
     fun `deal with logger`() {
-        val logger = Logger()
+        val logger = ServerLogger()
         val mcp = StandardSseMcp(
             McpProtocol(
                 metadata,
