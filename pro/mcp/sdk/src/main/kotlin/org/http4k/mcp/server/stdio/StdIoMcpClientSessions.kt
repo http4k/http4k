@@ -4,6 +4,7 @@ import org.http4k.core.Request
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.ClientSessions
+import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import java.io.Reader
 import java.io.Writer
@@ -17,7 +18,7 @@ class StdIoMcpClientSessions(
     override fun ok() {}
 
     override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) = with(writer) {
-        write(org.http4k.mcp.util.McpJson.compact(message) + "\n")
+        write(McpJson.compact(message) + "\n")
         flush()
     }
 
