@@ -40,8 +40,8 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerCapability
+import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
@@ -53,7 +53,7 @@ import kotlin.random.Random
 class McpProtocol<Transport, RSP : Any>(
     internal val metaData: ServerMetaData,
     private val clientSessions: ClientSessions<Transport, RSP>,
-    private val tools: Tools = Tools(),
+    private val tools: Tools = ServerTools(),
     private val resources: Resources = Resources(),
     private val prompts: Prompts = Prompts(),
     private val completions: Completions = Completions(),
@@ -69,7 +69,7 @@ class McpProtocol<Transport, RSP : Any>(
     ) : this(
         serverMetaData,
         clientSessions,
-        Tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
+        ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
         Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),

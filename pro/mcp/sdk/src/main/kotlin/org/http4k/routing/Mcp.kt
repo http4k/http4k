@@ -17,8 +17,9 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.ServerCapability
+import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
@@ -73,7 +74,7 @@ fun mcpStdIo(
         // TODO
 //            .start(SimpleSchedulerService(1))
         StdIoMcpClientSessions(reader, writer),
-        Tools(capabilities.filterIsInstance<ToolCapability>()),
+        ServerTools(capabilities.filterIsInstance<ToolCapability>()),
         Resources(capabilities.filterIsInstance<ResourceCapability>()),
         Prompts(capabilities.filterIsInstance<PromptCapability>()),
         Completions(capabilities.filterIsInstance<CompletionCapability>()),

@@ -36,7 +36,8 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
-import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.capability.ServerTools
+import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
@@ -72,7 +73,7 @@ class SseMcpClientTest : McpClientContract<Response, McpProtocol<Sse, Response>>
     @Test
     fun `deals with error`() {
         val toolArg = Tool.Arg.required("name")
-        val tools = Tools(Tool("reverse", "description", toolArg) bind {
+        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 

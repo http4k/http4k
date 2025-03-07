@@ -52,7 +52,8 @@ import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Sampling
-import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.capability.ServerTools
+import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.server.sse.SseClientSessions
@@ -249,7 +250,7 @@ class TestMcpClientTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val serverTools = Tools(listOf(tool bind {
+        val serverTools = ServerTools(listOf(tool bind {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 

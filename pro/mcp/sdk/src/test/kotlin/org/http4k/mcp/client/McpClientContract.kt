@@ -35,7 +35,8 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
-import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.capability.ServerTools
+import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -58,7 +59,7 @@ interface McpClientContract<R : Any, P : McpProtocol<*, R>> : PortBasedTest {
         )
 
         val toolArg = Tool.Arg.required("name")
-        val tools = Tools(Tool("reverse", "description", toolArg) bind {
+        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 

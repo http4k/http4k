@@ -8,7 +8,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
-import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
