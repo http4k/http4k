@@ -13,12 +13,12 @@ import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.WsClientSessions
+import org.http4k.mcp.server.websocket.StandardWebsocketMcp
+import org.http4k.mcp.server.websocket.WebsocketClientSessions
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WsMcpClientTest : McpClientContract<Unit, McpProtocol<Websocket, Unit>> {
+class WebsocketMcpClientTest : McpClientContract<Unit, McpProtocol<Websocket, Unit>> {
 
     override val notifications = true
 
@@ -28,14 +28,14 @@ class WsMcpClientTest : McpClientContract<Unit, McpProtocol<Websocket, Unit>> {
         tools: Tools,
         resources: Resources,
         completions: Completions
-    ) = McpProtocol(serverMetaData, WsClientSessions(), tools, resources, prompts, completions)
+    ) = McpProtocol(serverMetaData, WebsocketClientSessions(), tools, resources, prompts, completions)
 
-    override fun clientFor(port: Int) = WsMcpClient(
+    override fun clientFor(port: Int) = WebsocketMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
         ClientCapabilities(),
         Request(GET, Uri.of("ws://localhost:${port}/ws")),
         WebsocketClient(Duration.ofSeconds(2), true),
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Websocket, Unit>) = StandardWsMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Websocket, Unit>) = StandardWebsocketMcp(protocol)
 }

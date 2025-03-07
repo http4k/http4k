@@ -4,13 +4,11 @@ import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
-import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.Completions
@@ -21,14 +19,14 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
+import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpClientSessions
-import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.WsClientSessions
+import org.http4k.mcp.server.websocket.StandardWebsocketMcp
+import org.http4k.mcp.server.websocket.WebsocketClientSessions
 import java.io.Reader
 import java.io.Writer
 
@@ -50,15 +48,15 @@ fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
-fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWsMcp(McpProtocol(WsClientSessions(), serverMetaData, *capabilities))
+fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    StandardWebsocketMcp(McpProtocol(WebsocketClientSessions(), serverMetaData, *capabilities))
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
  */
-fun mcpJsonRpc(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
+fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardJsonRpcMcp(
-        McpProtocol(JsonRpcClientSessions(), ServerMetaData(mcpEntity, version), *capabilities)
+        McpProtocol(JsonRpcClientSessions(), serverMetaData, *capabilities)
     )
 
 /**

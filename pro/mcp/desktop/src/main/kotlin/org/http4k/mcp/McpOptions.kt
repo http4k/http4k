@@ -8,14 +8,14 @@ import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
 import org.http4k.mcp.TransportMode.sse
 import org.http4k.mcp.TransportMode.valueOf
+import java.time.Duration
+import java.time.Duration.ZERO
 
 class McpOptions(args: Array<String>) :
     Bunting(
         args, "A proxy to talk to an SSE-based MCP server", "mcp-desktop",
         config = InMemoryConfig().apply { set("foo.bar", "configured value") }
     ) {
-
-    val debug by switch("Write messages to the debug log")
 
     val transport by option("MCP transport. Choose between 'jsonrpc' (non-streaming) and 'sse' (streaming)").map { valueOf(it) }
         .defaultsTo(sse)
@@ -37,8 +37,12 @@ class McpOptions(args: Array<String>) :
         .secret()
 
     val version by option().int().defaultsTo(0)
+
+    val reconnectDelay by option("Reconnect delay (in seconds) in case of disconnection. Defaults to 0").int()
+        .map { Duration.ofSeconds(it.toLong()) }
+        .defaultsTo(ZERO)
 }
 
 enum class TransportMode {
-    jsonrpc, sse
+    jsonrpc, sse, websocket
 }

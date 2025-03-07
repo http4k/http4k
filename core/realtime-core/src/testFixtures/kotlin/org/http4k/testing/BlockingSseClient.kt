@@ -5,6 +5,7 @@ import com.launchdarkly.eventsource.MessageEvent
 import com.launchdarkly.eventsource.background.BackgroundEventHandler
 import com.launchdarkly.eventsource.background.BackgroundEventSource
 import org.http4k.core.Uri
+import org.http4k.sse.SseClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import java.net.URI

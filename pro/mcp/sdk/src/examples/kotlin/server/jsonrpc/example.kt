@@ -1,6 +1,8 @@
-package server.http
+package server.jsonrpc
 
+import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpJsonRpc
 import org.http4k.server.Helidon
@@ -11,17 +13,16 @@ import server.resources
 import server.tools
 
 /**
- * This example demonstrates how to create an MCP server using the HTTP-only protocol.
+ * This example demonstrates how to create an MCP server using the JSONRPC protocol.
  */
 fun main() {
     val mcpServer = mcpJsonRpc(
-        McpEntity.of("http4k mcp via HTTP"), Version.of("0.1.0"),
+        ServerMetaData(McpEntity.of("http4k mcp via jsonrpc"), Version.of("0.1.0")),
         prompts(),
         resources(),
         tools(),
         completions()
     )
 
-    mcpServer.asServer(Helidon(3001)).start()
+    mcpServer.debug().asServer(Helidon(3001)).start()
 }
-

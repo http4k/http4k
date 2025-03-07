@@ -83,7 +83,7 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
         { req ->
             try {
                 next(req).let { response ->
-                    out.println("***** WS RESPONSE ${response.subprotocol} to ${req.method}: ${req.uri} *****")
+                    out.println("***** WS RESPONSE ${response.subprotocol?.let { "$it " } ?: ""}to ${req.method}: ${req.uri} *****")
                     response.withConsumer { ws ->
                         response.consumer(object : Websocket by ws {
                             override fun send(message: WsMessage) {

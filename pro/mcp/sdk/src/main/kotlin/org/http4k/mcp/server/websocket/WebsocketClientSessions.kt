@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.ws
+package org.http4k.mcp.server.websocket
 
 import org.http4k.core.Request
 import org.http4k.mcp.model.CompletionStatus
@@ -13,7 +13,7 @@ import org.http4k.websocket.WsMessage
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class WsClientSessions(
+class WebsocketClientSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
 ) : ClientSessions<Websocket, Unit> {
 

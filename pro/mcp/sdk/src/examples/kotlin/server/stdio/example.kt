@@ -4,8 +4,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.util.DebuggingReader
-import org.http4k.mcp.util.DebuggingWriter
 import org.http4k.routing.mcpStdIo
 import server.prompts
 import server.resources
@@ -22,8 +20,6 @@ fun main() {
         ),
         prompts(),
         resources(),
-        tools(),
-        reader = DebuggingReader(System.`in`.reader()),
-        writer = DebuggingWriter(System.out.writer())
+        tools()
     )
 }

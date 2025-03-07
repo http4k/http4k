@@ -14,6 +14,7 @@ import kotlin.concurrent.thread
  */
 fun pipeJsonRpcTraffic(input: Reader, output: Writer, sseRequest: Request, http: HttpHandler) {
     thread {
+
         input.buffered().lineSequence().forEach { next ->
             val response = http(
                 Request(POST, sseRequest.uri)

@@ -1,6 +1,5 @@
 package server.sse
 
-import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
@@ -28,5 +27,5 @@ fun main() {
         completions()
     )
 
-    mcpServer.debug(debugStream = true).asServer(Helidon(3001)).start()
+    mcpServer.asServer(Helidon(4001)).start()
 }

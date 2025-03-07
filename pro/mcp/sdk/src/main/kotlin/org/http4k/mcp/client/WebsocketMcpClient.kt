@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 /**
  * WS connection MCP client.
  */
-class WsMcpClient(
+class WebsocketMcpClient(
     name: McpEntity,
     version: Version,
     capabilities: ClientCapabilities,

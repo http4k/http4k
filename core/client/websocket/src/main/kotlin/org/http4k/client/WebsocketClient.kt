@@ -27,7 +27,6 @@ object WebsocketClient {
         autoReconnection: Boolean = false,
         draft: Draft = Draft_6455(),
     ) = object: WebsocketFactory {
-
         override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
             val socket = AtomicReference<PushPullAdaptingWebSocket>()
             val client = nonBlockingClient(uri, headers, timeout, onConnect, draft, socket)
