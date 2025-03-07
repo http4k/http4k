@@ -3,7 +3,6 @@ package org.http4k.mcp.internal
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
-import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -29,7 +28,7 @@ class PipeHttpTrafficTest : PortBasedTest {
             Event("message", "data2")
         )
 
-        pipeHttpTraffic(
+        pipeJsonRpcTraffic(
             inputMessages.joinToString("\n").reader(),
             output,
             Request(POST, "http://host/sse"),

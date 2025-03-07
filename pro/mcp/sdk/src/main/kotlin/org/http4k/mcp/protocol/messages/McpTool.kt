@@ -8,6 +8,7 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
+import org.http4k.mcp.util.McpJson
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable

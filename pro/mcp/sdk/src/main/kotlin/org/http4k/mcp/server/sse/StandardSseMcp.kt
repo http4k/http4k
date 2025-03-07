@@ -4,6 +4,8 @@ package org.http4k.mcp.server.sse
 
 import org.http4k.core.Response
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
@@ -16,5 +18,5 @@ import org.http4k.sse.Sse
  */
 fun StandardSseMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
     "/sse" bind SseConnectionEndpoint(mcpProtocol),
-    CatchLensFailure().then("/message" bind SseCommandEndpoint(mcpProtocol))
+    CatchAll().then(CatchLensFailure()).then("/message" bind SseCommandEndpoint(mcpProtocol))
 )

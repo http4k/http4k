@@ -6,7 +6,7 @@ import dev.forkhandles.bunting.int
 import org.http4k.core.Credentials
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
-import org.http4k.mcp.TransportMode.SSE
+import org.http4k.mcp.TransportMode.sse
 import org.http4k.mcp.TransportMode.valueOf
 
 class McpOptions(args: Array<String>) :
@@ -17,8 +17,8 @@ class McpOptions(args: Array<String>) :
 
     val debug by switch("Write messages to the debug log")
 
-    val transport by option("MCP transport. Choose between HTTP (non-streaming) and SSE (streaming)").map { valueOf(it) }
-        .defaultsTo(SSE)
+    val transport by option("MCP transport. Choose between 'jsonrpc' (non-streaming) and 'sse' (streaming)").map { valueOf(it) }
+        .defaultsTo(sse)
 
     val url by option("Base URL of the MCP server to connect to: eg. http://localhost:3001/sse")
         .map(Uri::of).required()
@@ -40,5 +40,5 @@ class McpOptions(args: Array<String>) :
 }
 
 enum class TransportMode {
-    HTTP, SSE
+    jsonrpc, sse
 }

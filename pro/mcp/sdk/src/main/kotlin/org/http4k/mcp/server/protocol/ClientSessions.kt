@@ -6,10 +6,10 @@ import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.util.McpNodeType
 
-interface Transport<Sink, RSP> {
+interface ClientSessions<Transport, RSP> {
     fun ok(): RSP
     fun error(): RSP
-    fun send(message: McpNodeType, sessionId: SessionId, status: CompletionStatus = Finished): RSP
+    fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus = Finished): RSP
     fun onClose(sessionId: SessionId, fn: () -> Unit)
-    fun newSession(connectRequest: Request, eventSink: Sink): SessionId
+    fun new(connectRequest: Request, transport: Transport): SessionId
 }

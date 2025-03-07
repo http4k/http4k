@@ -2,8 +2,6 @@ package org.http4k.mcp.server.capability
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.client.McpError.Timeout
@@ -13,7 +11,6 @@ import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
 import java.time.Duration

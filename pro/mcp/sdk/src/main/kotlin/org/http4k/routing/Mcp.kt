@@ -23,12 +23,12 @@ import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.jsonrpc.JsonRpcTransport
-import org.http4k.mcp.server.sse.SseTransport
+import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
+import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
-import org.http4k.mcp.server.stdio.StdIoMcpTransport
+import org.http4k.mcp.server.stdio.StdIoMcpClientSessions
 import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.WsTransport
+import org.http4k.mcp.server.ws.WsClientSessions
 import java.io.Reader
 import java.io.Writer
 
@@ -44,21 +44,21 @@ import java.io.Writer
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardSseMcp(
-        McpProtocol(SseTransport().also { it.start() }, serverMetaData, *capabilities)
+        McpProtocol(SseClientSessions().also { it.start() }, serverMetaData, *capabilities)
     )
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWs(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWsMcp(McpProtocol(WsTransport(), serverMetaData, *capabilities))
+    StandardWsMcp(McpProtocol(WsClientSessions(), serverMetaData, *capabilities))
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
  */
-fun mcpHttp(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
+fun mcpJsonRpc(mcpEntity: McpEntity, version: Version, vararg capabilities: ServerCapability) =
     StandardJsonRpcMcp(
-        McpProtocol(JsonRpcTransport(), ServerMetaData(mcpEntity, version), *capabilities)
+        McpProtocol(JsonRpcClientSessions(), ServerMetaData(mcpEntity, version), *capabilities)
     )
 
 /**
@@ -71,9 +71,10 @@ fun mcpStdIo(
     writer: Writer = System.out.writer(),
 ) {
     McpProtocol(
-        StdIoMcpTransport(reader, writer),
-//            .start(SimpleSchedulerService(1))
         serverMetaData,
+        // TODO
+//            .start(SimpleSchedulerService(1))
+        StdIoMcpClientSessions(reader, writer),
         Tools(capabilities.filterIsInstance<ToolCapability>()),
         Resources(capabilities.filterIsInstance<ResourceCapability>()),
         Prompts(capabilities.filterIsInstance<PromptCapability>()),

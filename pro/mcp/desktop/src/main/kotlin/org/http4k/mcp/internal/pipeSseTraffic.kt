@@ -30,32 +30,34 @@ fun pipeSseTraffic(
     val incomingMessages = input.buffered().lineSequence()
 
     val httpWithHost = SetHostFrom(sseRequest.uri).then(http)
-    Http4kSseClient(sseRequest.accept(TEXT_EVENT_STREAM), http, reconnectionMode).received().forEach { msg ->
-        when (msg) {
-            is Event -> when (msg.event) {
-                "endpoint" -> {
-                    thread {
-                        incomingMessages
-                            .forEach {
-                                require(
-                                    httpWithHost(
-                                        Request(POST, msg.data)
-                                            .contentType(APPLICATION_JSON)
-                                            .body(it)
-                                    ).status.successful
-                                )
-                            }
+    thread {
+        Http4kSseClient(sseRequest.accept(TEXT_EVENT_STREAM), http, reconnectionMode).received().forEach { msg ->
+            when (msg) {
+                is Event -> when (msg.event) {
+                    "endpoint" -> {
+                        thread {
+                            incomingMessages
+                                .forEach {
+                                    require(
+                                        httpWithHost(
+                                            Request(POST, msg.data)
+                                                .contentType(APPLICATION_JSON)
+                                                .body(it)
+                                        ).status.successful
+                                    )
+                                }
+                        }
                     }
+
+                    "ping" -> {}
+
+                    else -> output.write("${msg.data}\n")
                 }
 
-                "ping" -> {}
-
-                else -> output.write("${msg.data}\n")
+                is Data -> output.write("${msg.data}\n")
+                else -> {}
             }
-
-            is Data -> output.write("${msg.data}\n")
-            else -> {}
+            output.flush()
         }
-        output.flush()
     }
 }

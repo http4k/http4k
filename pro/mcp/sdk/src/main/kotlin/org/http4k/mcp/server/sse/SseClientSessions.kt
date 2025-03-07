@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.Transport
+import org.http4k.mcp.server.protocol.ClientSessions
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -18,10 +18,10 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class SseTransport(
+class SseClientSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : Transport<Sse, Response> {
+) : ClientSessions<Sse, Response> {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
@@ -29,7 +29,7 @@ class SseTransport(
 
     fun close(transport: Sse) = transport.close()
 
-    override fun send(message: McpNodeType, sessionId: SessionId, status: CompletionStatus) =
+    override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         when (val sink = sessions[sessionId]) {
             null -> Response(GONE)
             else -> {
@@ -46,9 +46,9 @@ class SseTransport(
         }
     }
 
-    override fun newSession(connectRequest: Request, eventSink: Sse): SessionId {
+    override fun new(connectRequest: Request, transport: Sse): SessionId {
         val sessionId = sessionProvider.assign(connectRequest)
-        sessions[sessionId] = eventSink
+        sessions[sessionId] = transport
         return sessionId
     }
 

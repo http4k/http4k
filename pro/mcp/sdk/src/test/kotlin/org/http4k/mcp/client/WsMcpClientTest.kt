@@ -14,7 +14,7 @@ import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.ws.StandardWsMcp
-import org.http4k.mcp.server.ws.WsTransport
+import org.http4k.mcp.server.ws.WsClientSessions
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
@@ -28,7 +28,7 @@ class WsMcpClientTest : McpClientContract<Unit, McpProtocol<Websocket, Unit>> {
         tools: Tools,
         resources: Resources,
         completions: Completions
-    ) = McpProtocol(WsTransport(), serverMetaData, tools, resources, prompts, completions)
+    ) = McpProtocol(serverMetaData, WsClientSessions(), tools, resources, prompts, completions)
 
     override fun clientFor(port: Int) = WsMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),

@@ -7,14 +7,16 @@ fun DebuggingReader(reader: Reader, writer: Writer = System.err.writer()) = obje
     private var read = StringBuilder()
 
     override fun read(cbuf: CharArray, off: Int, len: Int) = reader.read(cbuf, off, len)
-        .also {
-            read.append(cbuf)
-            if (cbuf.contains('\n')) {
-                with(writer) {
-                    write(read.toString())
-                    flush()
+        .also { count ->
+            if (count > 0) {
+                read.appendRange(cbuf, off, off + count)
+                if (read.contains('\n')) {
+                    with(writer) {
+                        write(read.toString())
+                        flush()
+                    }
+                    read = StringBuilder()
                 }
-                read = StringBuilder()
             }
         }
 

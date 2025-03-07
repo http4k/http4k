@@ -1,8 +1,8 @@
 package org.http4k.mcp.client
 
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
@@ -13,6 +13,7 @@ import org.http4k.core.Uri
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.lens.accept
 import org.http4k.mcp.CompletionRequest
@@ -52,7 +53,7 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
 
         override fun list(overrideDefaultTimeout: Duration?) =
             http.send<McpTool.List.Response>(McpTool.List, McpTool.List.Request())
-                .flatMap { it.first().map { it.tools } }
+                .map { it.tools }
 
         override fun call(
             name: ToolName,
@@ -62,7 +63,6 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         )
-            .flatMap { it.first() }
             .map {
                 when (it.isError) {
                     true -> Error(ErrorMessage(-1, it.content.joinToString()))
@@ -71,20 +71,19 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
             }
     }
 
-    // TODO simplify this to remove the sequence
     override fun prompts() = object : McpClient.Prompts {
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
             http.send<McpPrompt.List.Response>(McpPrompt.List, McpPrompt.List.Request())
-                .flatMap { it.first().map { it.prompts } }
+                .map { it.prompts }
 
         override fun get(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
         ) = http.send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
-            .flatMap { it.first().map { PromptResponse(it.messages, it.description) } }
+            .map { PromptResponse(it.messages, it.description) }
     }
 
     override fun sampling() = object : McpClient.Sampling {
@@ -97,13 +96,13 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
 
         override fun list(overrideDefaultTimeout: Duration?) =
             http.send<McpResource.List.Response>(McpResource.List, McpResource.List.Request())
-                .flatMap { it.first().map { it.resources } }
+                .map { it.resources }
 
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
         ) = http.send<McpResource.Read.Response>(McpResource.Read, McpResource.Read.Request(request.uri))
-            .flatMap { it.first().map { ResourceResponse(it.contents) } }
+            .map { ResourceResponse(it.contents) }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) = throw UnsupportedOperationException()
 
@@ -113,29 +112,27 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
     override fun completions() = object : McpClient.Completions {
         override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
             http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(request.ref, request.argument))
-                .flatMap { it.first().map { CompletionResponse(it.completion) } }
+                .map { CompletionResponse(it.completion) }
     }
 
     override fun close() {}
 
-    private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage)
-        : McpResult<Sequence<McpResult<T>>> {
+    private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
         val response = this(message.toHttpRequest(baseUri, rpc).accept(TEXT_EVENT_STREAM))
+
         return when {
-            response.status.successful -> resultFrom {
-                listOf(Event("message", response.bodyString()).asAOrFailure<T>()!!).asSequence()
-            }.mapFailure { McpError.Protocol(ParseError) }
+            response.status.successful -> Event("message", response.bodyString()).asAOrFailure<T>()
 
             else -> Failure(Http(response))
         }
     }
 }
 
-private inline fun <reified T : ServerMessage> Event.asAOrFailure() = with(McpJson) {
+private inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, McpError.Protocol> = with(McpJson) {
     val data = parse(data) as MoshiObject
 
     when {
-        data["method"] != null -> null
+        data["method"] != null -> Failure(McpError.Protocol(InvalidRequest))
         else -> {
             resultFrom {
                 convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())

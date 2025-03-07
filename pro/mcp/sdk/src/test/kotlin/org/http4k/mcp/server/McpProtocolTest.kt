@@ -78,7 +78,7 @@ import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.SessionProvider
-import org.http4k.mcp.server.sse.SseTransport
+import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -102,8 +102,8 @@ class McpProtocolTest {
     fun `performs init loop on startup`() {
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(Random(0))),
-                metadata
+                metadata,
+                SseClientSessions(SessionProvider.Random(Random(0)))
             )
         )
 
@@ -122,8 +122,8 @@ class McpProtocolTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(Random(0))),
                 metadata,
+                SseClientSessions(SessionProvider.Random(Random(0))),
                 roots = roots,
                 random = random
             )
@@ -151,7 +151,7 @@ class McpProtocolTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(Random(0))), metadata,
+                metadata, SseClientSessions(SessionProvider.Random(Random(0))),
                 prompts = Prompts(
                     listOf(
                         prompt bind {
@@ -206,7 +206,7 @@ class McpProtocolTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(Random(0))), metadata,
+                metadata, SseClientSessions(SessionProvider.Random(Random(0))),
                 resources = resources,
                 random = random
             )
@@ -261,7 +261,7 @@ class McpProtocolTest {
         val resources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(random)), metadata,
+                metadata, SseClientSessions(SessionProvider.Random(random)),
                 resources = resources,
                 random = random
             )
@@ -311,7 +311,7 @@ class McpProtocolTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(random)), metadata, tools = tools, random = random
+                metadata, SseClientSessions(SessionProvider.Random(random)), tools = tools, random = random
             )
         )
 
@@ -363,8 +363,8 @@ class McpProtocolTest {
         val logger = Logger()
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(random)),
                 metadata,
+                SseClientSessions(SessionProvider.Random(random)),
                 logger = logger,
                 random = random
             )
@@ -397,7 +397,7 @@ class McpProtocolTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(random)), metadata,
+                metadata, SseClientSessions(SessionProvider.Random(random)),
                 completions = completions,
                 random = random
             )
@@ -421,7 +421,7 @@ class McpProtocolTest {
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                SseTransport(SessionProvider.Random(Random(0))), metadata,
+                metadata, SseClientSessions(SessionProvider.Random(Random(0))),
                 sampling = sampling,
             )
         )
