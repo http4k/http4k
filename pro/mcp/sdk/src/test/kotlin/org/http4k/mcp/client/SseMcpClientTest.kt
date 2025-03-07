@@ -40,22 +40,20 @@ import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled
 class SseMcpClientTest : McpClientContract<Sse, Response> {
 
     override val notifications = true
 
     override fun clientFor(port: Int) = SseMcpClient(
-        McpEntity.of("foobar"), Version.of("1.0.0"),
+        clientName, Version.of("1.0.0"),
         ClientCapabilities(),
         Request(GET, Uri.of("http://localhost:${port}/sse")),
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun clientSessions() = SseClientSessions()
+    override fun clientSessions() = SseClientSessions().apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) = StandardSseMcp(protocol)
 

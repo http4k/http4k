@@ -12,18 +12,21 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role.assistant
@@ -35,6 +38,7 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
+import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.ClientSessions
 import org.http4k.mcp.server.protocol.McpProtocol
@@ -47,6 +51,8 @@ import java.util.concurrent.CountDownLatch
 
 interface McpClientContract<T, R : Any> : PortBasedTest {
 
+    val clientName get() = McpEntity.of("foobar")
+
     val notifications: Boolean
 
     fun clientSessions(): ClientSessions<T, R>
@@ -54,20 +60,18 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
     @Test
     fun `can interact with server`() {
         val model = ModelIdentifier.of("my model")
-        // TODO client sampling if supported
-        val samplingResponses = listOf(
-            SamplingResponse(model, assistant, Content.Text("hello"), null),
-            SamplingResponse(model, assistant, Content.Text("world"), StopReason.of("foobar"))
-        )
 
         val toolArg = Tool.Arg.required("name")
         val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
+        val sampling = ServerSampling()
+
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(), tools,
+            clientSessions(),
+            tools,
             ServerResources(
                 Resource.Static(
                     Uri.of("https://http4k.org"),
@@ -81,7 +85,8 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             }),
             ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
-            })
+            }),
+            sampling
         )
 
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
@@ -136,15 +141,29 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
 
-        // TODO test client sampling
-//        assertThat(
-//            mcpClient.sampling().sample(
-//                ModelIdentifier.of("asd"),
-//                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
-//            ).map { it.valueOrNull()!! }.toList(), equalTo(samplingResponses)
-//        )
-
         if (notifications) {
+            val samplingResponses = listOf(
+                SamplingResponse(model, assistant, Content.Text("hello"), null),
+                SamplingResponse(model, assistant, Content.Text("world"), StopReason.of("foobar"))
+            )
+
+            mcpClient.sampling().onSampled {
+                samplingResponses
+                    .map {
+                        println("sending $it")
+                        it
+                    }
+                    .asSequence()
+            }
+
+            val responses = sampling.sampleClient(
+                clientName,
+                SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
+                RequestId.random()
+            )
+
+            assertThat(responses.toList(), equalTo(samplingResponses))
+
             tools.items = emptyList()
 
             latch.await()

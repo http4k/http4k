@@ -42,6 +42,7 @@ import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -158,7 +159,7 @@ class McpProtocol<Transport, RSP : Any>(
                         clients[sId]?.trackRequest(requestId) { roots.update(it.fromJsonRpc()) }
                         clientSessions.send(
                             sId,
-                            McpRoot.List.Request().toJsonRpc(McpRoot.List, McpJson.asJsonObject(requestId))
+                            McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(requestId))
                         )
                         clientSessions.ok()
                     }
@@ -223,7 +224,7 @@ class McpProtocol<Transport, RSP : Any>(
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
             clients[sId]?.trackRequest(id) { sampling.receive(id, it.fromJsonRpc()) }
-            clientSessions.send(sId, req.toJsonRpc(McpSampling, McpJson.asJsonObject(id)))
+            clientSessions.send(sId, req.toJsonRpc(McpSampling, asJsonObject(id)))
         }
 
         clientSessions.onClose(sId) {
