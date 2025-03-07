@@ -35,10 +35,11 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
-import org.http4k.mcp.server.capability.Resources
+import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
@@ -83,7 +84,7 @@ class SseMcpClientTest : McpClientContract<Response, McpProtocol<Sse, Response>>
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             }),
             tools,
-            Resources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
+            ServerResources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             }),
             Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {

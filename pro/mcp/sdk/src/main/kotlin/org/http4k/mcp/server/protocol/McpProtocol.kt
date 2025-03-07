@@ -36,10 +36,10 @@ import org.http4k.mcp.server.capability.Logger
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
-import org.http4k.mcp.server.capability.Resources
 import org.http4k.mcp.server.capability.Roots
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerCapability
+import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.util.McpJson
@@ -54,7 +54,7 @@ class McpProtocol<Transport, RSP : Any>(
     internal val metaData: ServerMetaData,
     private val clientSessions: ClientSessions<Transport, RSP>,
     private val tools: Tools = ServerTools(),
-    private val resources: Resources = Resources(),
+    private val resources: Resources = ServerResources(),
     private val prompts: Prompts = Prompts(),
     private val completions: Completions = Completions(),
     private val sampling: Sampling = Sampling(),
@@ -70,7 +70,7 @@ class McpProtocol<Transport, RSP : Any>(
         serverMetaData,
         clientSessions,
         ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        Resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
+        ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
         Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
     )

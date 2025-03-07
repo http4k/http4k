@@ -50,10 +50,9 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Prompts
-import org.http4k.mcp.server.capability.Resources
+import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.server.sse.SseClientSessions
@@ -163,7 +162,7 @@ class TestMcpClientTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp = StandardSseMcp(
             McpProtocol(
@@ -221,7 +220,7 @@ class TestMcpClientTest {
             Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
-        val serverResources = Resources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp = StandardSseMcp(
             McpProtocol(
