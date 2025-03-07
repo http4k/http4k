@@ -83,10 +83,7 @@ abstract class ToolInput(private val input: MoshiNode) {
 
     override fun toString() = unwrap().toString()
 
-    private fun <IN, OUT : Any?> property(
-        mapInFn: (OUT) -> IN,
-        description: String
-    ) = DataProperty<ToolInput, IN>(
+    private fun <IN, OUT : Any?> property(mapInFn: (OUT) -> IN, description: String) = DataProperty<ToolInput, IN>(
         { name -> existsFn(unwrap(), name) },
         { name -> getFn(unwrap(), name)?.let { value -> value as OUT }?.let(mapInFn) },
         { _, _ -> error("unsupported") },
