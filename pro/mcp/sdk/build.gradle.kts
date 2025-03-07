@@ -15,12 +15,15 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
+    api("dev.zacsweers.moshix:moshi-metadata-reflect:_")
+
     api("se.ansman.kotshi:api:_")
 
     api(project(":http4k-api-jsonrpc"))
     api(project(":http4k-connect-core"))
     api("dev.forkhandles:values4k")
     api("dev.forkhandles:result4k")
+    api("dev.forkhandles:data4k")
     api("dev.forkhandles:time4k")
 
     ksp("se.ansman.kotshi:compiler:_")
