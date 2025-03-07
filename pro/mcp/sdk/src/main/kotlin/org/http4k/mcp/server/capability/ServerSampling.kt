@@ -13,23 +13,21 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.server.protocol.Sampling
 import java.time.Duration
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-/**
- * Handles protocol traffic for sampling. Selects the best model to serve a request.
- */
-class Sampling {
+class ServerSampling : Sampling {
 
     private val subscriptions =
         ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
 
     private val responseQueues = ConcurrentHashMap<RequestId, BlockingQueue<SamplingResponse>>()
 
-    fun receive(id: RequestId, response: McpSampling.Response): CompletionStatus {
+    override fun receive(id: RequestId, response: McpSampling.Response): CompletionStatus {
         val samplingResponse = SamplingResponse(response.model, response.role, response.content, response.stopReason)
 
         responseQueues[id]?.put(samplingResponse)
@@ -43,11 +41,11 @@ class Sampling {
         }
     }
 
-    fun sampleClient(
+    override fun sampleClient(
         entity: McpEntity,
         request: SamplingRequest,
         id: RequestId,
-        fetchNextTimeout: Duration? = null
+        fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
         val queue = ArrayBlockingQueue<SamplingResponse>(1000)
         responseQueues[id] = queue
@@ -95,11 +93,11 @@ class Sampling {
         }
     }
 
-    fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, RequestId) -> Unit) {
+    override fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, RequestId) -> Unit) {
         subscriptions[sessionId] = entity to fn
     }
 
-    fun remove(sessionId: SessionId) {
+    override fun remove(sessionId: SessionId) {
         subscriptions.remove(sessionId)
     }
 }

@@ -31,14 +31,14 @@ import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.protocol.messages.fromJsonRpc
 import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.server.capability.CompletionCapability
-import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.PromptCapability
-import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ResourceCapability
-import org.http4k.mcp.server.capability.ServerRoots
-import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerCapability
+import org.http4k.mcp.server.capability.ServerCompletions
+import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
+import org.http4k.mcp.server.capability.ServerRoots
+import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.util.McpJson
@@ -56,7 +56,7 @@ class McpProtocol<Transport, RSP : Any>(
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = ServerPrompts(),
     private val completions: Completions = ServerCompletions(),
-    private val sampling: Sampling = Sampling(),
+    private val sampling: Sampling = ServerSampling(),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
     private val random: Random = Random

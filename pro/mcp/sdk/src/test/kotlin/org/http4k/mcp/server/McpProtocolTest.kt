@@ -74,7 +74,7 @@ import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
-import org.http4k.mcp.server.capability.Sampling
+import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.SessionProvider
@@ -417,7 +417,7 @@ class McpProtocolTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = Sampling()
+        val sampling = ServerSampling()
 
         val mcp = StandardSseMcp(
             McpProtocol(
