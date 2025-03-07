@@ -10,12 +10,18 @@ import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpPrompt
 
-class PromptCapability(private val prompt: Prompt, val handler: PromptHandler) : ServerCapability {
-    fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.args.map {
+interface PromptCapability : ServerCapability {
+    fun toPrompt(): McpPrompt
+
+    fun get(mcp: McpPrompt.Get.Request, http: Request): McpPrompt.Get.Response
+}
+
+fun PromptCapability(prompt: Prompt, handler: PromptHandler) = object : PromptCapability {
+    override fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.args.map {
         McpPrompt.Argument(it.meta.name, it.meta.description, it.meta.required)
     })
 
-    fun get(mcp: McpPrompt.Get.Request, http: Request) = try {
+    override fun get(mcp: McpPrompt.Get.Request, http: Request) = try {
         handler(PromptRequest(mcp.arguments, http))
             .let { McpPrompt.Get.Response(it.messages, it.description) }
     } catch (e: LensFailure) {

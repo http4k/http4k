@@ -80,9 +80,6 @@ fun mcpStdIo(
     )
 }
 
-/**
- * Create Tool capability by binding the Spec to the Handler.
- */
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)

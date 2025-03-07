@@ -3,7 +3,6 @@ package org.http4k.mcp.server.capability
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
-import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
@@ -27,11 +26,16 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 
-class ToolCapability(private val tool: Tool, private val handler: ToolHandler) : ServerCapability {
+interface ToolCapability : ServerCapability {
+    fun toTool(): McpTool
 
-    fun toTool() = McpTool(tool.name, tool.description, tool.toSchema())
+    fun call(mcp: McpTool.Call.Request, http: Request): McpTool.Call.Response
+}
 
-    fun call(mcp: McpTool.Call.Request, http: Request) =
+fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
+    override fun toTool() = McpTool(tool.name, tool.description, tool.toSchema())
+
+    override fun call(mcp: McpTool.Call.Request, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
@@ -54,20 +58,20 @@ class ToolCapability(private val tool: Tool, private val handler: ToolHandler) :
                     it.meta
                 )
             }
-}
 
-private fun Tool.toSchema() = mapOf(
-    "type" to "object",
-    "required" to args.filter { it.meta.required }.map { it.meta.name },
-    "properties" to mapOf(
-        *args.map {
-            it.meta.name to mapOf(
-                "type" to it.meta.paramMeta.description,
-                "description" to it.meta.description,
-            )
-        }.toTypedArray()
+    private fun Tool.toSchema() = mapOf(
+        "type" to "object",
+        "required" to args.filter { it.meta.required }.map { it.meta.name },
+        "properties" to mapOf(
+            *args.map {
+                it.meta.name to mapOf(
+                    "type" to it.meta.paramMeta.description,
+                    "description" to it.meta.description,
+                )
+            }.toTypedArray()
+        )
     )
-)
+}
 
 private fun Map<String, MoshiNode>.coerceIntoStrings() =
     mapNotNull { it.value.asString()?.let { value -> it.key to value } }.toMap()
