@@ -42,22 +42,20 @@ import java.io.Writer
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardSseMcp(
-        McpProtocol(SseClientSessions().also { it.start() }, serverMetaData, *capabilities)
+        McpProtocol(serverMetaData, SseClientSessions().also { it.start() }, *capabilities)
     )
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWebsocketMcp(McpProtocol(WebsocketClientSessions(), serverMetaData, *capabilities))
+    StandardWebsocketMcp(McpProtocol(serverMetaData, WebsocketClientSessions(), *capabilities))
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
  */
 fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardJsonRpcMcp(
-        McpProtocol(JsonRpcClientSessions(), serverMetaData, *capabilities)
-    )
+    StandardJsonRpcMcp(McpProtocol(serverMetaData, JsonRpcClientSessions(), *capabilities))
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

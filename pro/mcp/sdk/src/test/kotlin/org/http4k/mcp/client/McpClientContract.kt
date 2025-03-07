@@ -36,11 +36,8 @@ import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.protocol.Completions
-import org.http4k.mcp.server.protocol.Tools
+import org.http4k.mcp.server.protocol.ClientSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Prompts
-import org.http4k.mcp.server.protocol.Resources
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -48,9 +45,11 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-interface McpClientContract<R : Any, P : McpProtocol<*, R>> : PortBasedTest {
+interface McpClientContract<T, R : Any> : PortBasedTest {
 
     val notifications: Boolean
+
+    fun clientSessions(): ClientSessions<T, R>
 
     @Test
     fun `can interact with server`() {
@@ -66,14 +65,19 @@ interface McpClientContract<R : Any, P : McpProtocol<*, R>> : PortBasedTest {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
-        val protocol = protocol(
+        val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(), tools,
+            ServerResources(
+                Resource.Static(
+                    Uri.of("https://http4k.org"),
+                    ResourceName.of("HTTP4K"),
+                    "description"
+                ) bind {
+                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                }),
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
-            }),
-            tools,
-            ServerResources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
-                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             }),
             ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
@@ -152,15 +156,7 @@ interface McpClientContract<R : Any, P : McpProtocol<*, R>> : PortBasedTest {
         server.stop()
     }
 
-    fun protocol(
-        serverMetaData: ServerMetaData,
-        prompts: Prompts,
-        tools: Tools,
-        resources: Resources,
-        completions: Completions
-    ): P
-
-    fun toPolyHandler(protocol: P): PolyHandler
+    fun toPolyHandler(protocol: McpProtocol<T, R>): PolyHandler
 
     fun clientFor(port: Int): McpClient
 }

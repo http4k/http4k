@@ -33,15 +33,7 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.capability.ServerCompletions
-import org.http4k.mcp.server.capability.ServerPrompts
-import org.http4k.mcp.server.capability.ServerResources
-import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.protocol.Completions
-import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Prompts
-import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
@@ -52,17 +44,9 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Disabled
-class SseMcpClientTest : McpClientContract<Response, McpProtocol<Sse, Response>> {
+class SseMcpClientTest : McpClientContract<Sse, Response> {
 
     override val notifications = true
-
-    override fun protocol(
-        serverMetaData: ServerMetaData,
-        prompts: Prompts,
-        tools: Tools,
-        resources: Resources,
-        completions: Completions
-    ) = McpProtocol(serverMetaData, SseClientSessions(), tools, resources, prompts, completions)
 
     override fun clientFor(port: Int) = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
@@ -71,27 +55,30 @@ class SseMcpClientTest : McpClientContract<Response, McpProtocol<Sse, Response>>
         JavaHttpClient(responseBodyMode = Stream)
     )
 
+    override fun clientSessions() = SseClientSessions()
+
     override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) = StandardSseMcp(protocol)
 
     @Test
     fun `deals with error`() {
         val toolArg = Tool.Arg.required("name")
-        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
+        val capability = Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
-        })
+        }
 
-        val protocol = protocol(
+        val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
+            clientSessions(),
+            Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
-            }),
-            tools,
-            ServerResources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
+            },
+            capability,
+            Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-            }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+            },
+            Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
-            })
+            }
         )
 
         val server = blowUpWhenBoom().then(toPolyHandler(protocol))

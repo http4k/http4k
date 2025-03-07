@@ -62,8 +62,8 @@ class McpProtocol<Transport, RSP : Any>(
     private val random: Random = Random
 ) {
     constructor(
-        clientSessions: ClientSessions<Transport, RSP>,
         serverMetaData: ServerMetaData,
+        clientSessions: ClientSessions<Transport, RSP>,
         vararg capabilities: ServerCapability
     ) : this(
         serverMetaData,

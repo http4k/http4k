@@ -8,6 +8,7 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.protocol.ClientSessions
 import org.http4k.mcp.server.protocol.Completions
 import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
@@ -18,17 +19,19 @@ import org.http4k.mcp.server.websocket.WebsocketClientSessions
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WebsocketMcpClientTest : McpClientContract<Unit, McpProtocol<Websocket, Unit>> {
+class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
 
     override val notifications = true
 
-    override fun protocol(
+    fun protocol(
         serverMetaData: ServerMetaData,
         prompts: Prompts,
         tools: Tools,
         resources: Resources,
         completions: Completions
-    ) = McpProtocol(serverMetaData, WebsocketClientSessions(), tools, resources, prompts, completions)
+    ) = McpProtocol(serverMetaData, clientSessions(), tools, resources, prompts, completions)
+
+    override fun clientSessions() = WebsocketClientSessions()
 
     override fun clientFor(port: Int) = WebsocketMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
