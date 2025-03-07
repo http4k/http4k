@@ -73,7 +73,7 @@ import org.http4k.mcp.server.capability.Completions
 import org.http4k.mcp.server.capability.Logger
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ServerResources
-import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
@@ -118,7 +118,7 @@ class McpProtocolTest {
 
     @Test
     fun `update roots`() {
-        val roots = Roots()
+        val roots = ServerRoots()
 
         val mcp = StandardSseMcp(
             McpProtocol(

@@ -36,7 +36,7 @@ import org.http4k.mcp.server.capability.Logger
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
-import org.http4k.mcp.server.capability.Roots
+import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ServerResources
@@ -59,7 +59,7 @@ class McpProtocol<Transport, RSP : Any>(
     private val completions: Completions = Completions(),
     private val sampling: Sampling = Sampling(),
     private val logger: Logger = Logger(),
-    private val roots: Roots = Roots(),
+    private val roots: Roots = ServerRoots(),
     private val random: Random = Random
 ) {
     constructor(
