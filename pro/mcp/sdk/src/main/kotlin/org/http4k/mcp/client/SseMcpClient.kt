@@ -16,6 +16,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.format.renderRequest
+import org.http4k.format.renderResult
 import org.http4k.lens.contentType
 import org.http4k.mcp.client.McpError.Http
 import org.http4k.mcp.client.McpError.Timeout
@@ -71,7 +72,7 @@ class SseMcpClient(
         }
     }
 
-    override fun performRequest(
+    override fun sendMessage(
         rpc: McpRpc,
         request: ClientMessage,
         timeout: Duration,
@@ -86,12 +87,10 @@ class SseMcpClient(
 
         val response = http(request.toHttpRequest(Uri.of(endpoint.get()), rpc, requestId))
         return when {
-            response.status.successful -> {
-                resultFrom {
-                    latch.await(timeout.toMillis(), MILLISECONDS)
-                    Success(requestId)
-                }.valueOrNull() ?: Timeout.failWith(requestId)
-            }
+            response.status.successful -> resultFrom {
+                latch.await(timeout.toMillis(), MILLISECONDS)
+                Success(requestId)
+            }.valueOrNull() ?: Timeout.failWith(requestId)
 
             else -> Http(response).failWith(requestId)
         }
@@ -107,10 +106,12 @@ internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, requestId: 
     Request(POST, endpoint)
         .contentType(APPLICATION_JSON)
         .body(with(McpJson) {
+            val params = asJsonObject(this@toHttpRequest)
+            val id = requestId?.let { asJsonObject(it) } ?: nullNode()
             compact(
-                renderRequest(
-                    rpc.Method.value,
-                    asJsonObject(this@toHttpRequest),
-                    requestId?.let { asJsonObject(it) } ?: nullNode())
+                when (this@toHttpRequest) {
+                    is ClientMessage.Response -> renderResult(params, id)
+                    else -> renderRequest(rpc.Method.value, params, id)
+                }
             )
         })

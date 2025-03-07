@@ -180,7 +180,6 @@ class McpProtocol<Transport, RSP : Any>(
 
             else -> {
                 val jsonResult = JsonRpcResult(McpJson, payload)
-
                 when {
                     jsonResult.isError() -> clientSessions.ok()
                     else -> with(McpJson) {

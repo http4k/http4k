@@ -10,6 +10,7 @@ import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.renderRequest
+import org.http4k.format.renderResult
 import org.http4k.mcp.client.McpError.Internal
 import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
@@ -61,13 +62,13 @@ class WebsocketMcpClient(
         Success(Unit)
     }
 
-    override fun performRequest(
+    override fun sendMessage(
         rpc: McpRpc,
-        request: ClientMessage,
+        message: ClientMessage,
         timeout: Duration,
         isComplete: (McpNodeType) -> Boolean
     ): Result<RequestId, McpError> {
-        val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
+        val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
 
         val requestId = RequestId.random()
 
@@ -76,10 +77,18 @@ class WebsocketMcpClient(
             messageQueues[requestId] = ArrayBlockingQueue(100)
 
             with(McpJson) {
+                val params = asJsonObject(message)
+                val id = requestId?.let { asJsonObject(it) } ?: nullNode()
+
                 wsClient
                     .send(
                         WsMessage(
-                            compact(renderRequest(rpc.Method.value, asJsonObject(request), asJsonObject(requestId)))
+                            compact(
+                                when (message) {
+                                    is ClientMessage.Response -> renderResult(params, id)
+                                    else -> renderRequest(rpc.Method.value, params, id)
+                                }
+                            )
                         )
                     )
             }

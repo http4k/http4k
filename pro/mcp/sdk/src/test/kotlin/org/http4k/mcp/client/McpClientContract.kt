@@ -148,12 +148,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             )
 
             mcpClient.sampling().onSampled {
-                samplingResponses
-                    .map {
-                        println("sending $it")
-                        it
-                    }
-                    .asSequence()
+                samplingResponses.asSequence()
             }
 
             val responses = sampling.sampleClient(

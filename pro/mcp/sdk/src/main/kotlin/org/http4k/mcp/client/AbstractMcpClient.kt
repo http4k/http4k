@@ -93,7 +93,7 @@ abstract class AbstractMcpClient(
         return resultFrom { startLatch.await(defaultTimeout.toMillis(), MILLISECONDS) }
             .mapFailure { McpError.Timeout }
             .flatMap {
-                performRequest(
+                sendMessage(
                     McpInitialize,
                     McpInitialize.Request(clientInfo, capabilities, protocolVersion),
                     defaultTimeout
@@ -122,31 +122,31 @@ abstract class AbstractMcpClient(
     }
 
     override fun tools(): McpClient.Tools =
-        ClientTools(::findQueue, ::tidyUp, ::performRequest, defaultTimeout) { rpc, callback ->
+        ClientTools(::findQueue, ::tidyUp, ::sendMessage, defaultTimeout) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): McpClient.Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::performRequest) { rpc, callback ->
+        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(defaultTimeout, ::performRequest) { rpc, callback ->
+        ClientSampling(defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun resources(): McpClient.Resources =
-        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::performRequest) { rpc, callback ->
+        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): McpClient.Completions =
-        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::performRequest)
+        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage)
 
     protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit>
 
-    protected abstract fun performRequest(
+    protected abstract fun sendMessage(
         rpc: McpRpc, request: ClientMessage, timeout: Duration, isComplete: (McpNodeType) -> Boolean = { true }
     ): McpResult<RequestId>
 
