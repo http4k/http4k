@@ -116,7 +116,7 @@ class WsCoreExtensionsTest {
         socket.testWsClient(req)
 
         val actual = String(os.toByteArray())
-        assertThat(actual, containsSubstring("***** WS RESPONSE null to POST:  *****"))
+        assertThat(actual, containsSubstring("***** WS RESPONSE to POST:  *****"))
         assertThat(actual, containsSubstring("***** WS SEND POST:  -> Text: hello"))
         assertThat(actual, containsSubstring("***** WS CLOSED with 1000 on POST:  *****"))
     }
