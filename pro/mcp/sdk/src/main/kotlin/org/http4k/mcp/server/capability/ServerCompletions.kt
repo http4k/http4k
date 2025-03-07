@@ -4,12 +4,13 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpCompletion
+import org.http4k.mcp.server.protocol.Completions
 
-class Completions(private val bindings: Iterable<CompletionCapability>) {
+class ServerCompletions(private val bindings: Iterable<CompletionCapability>) : Completions {
 
     constructor(vararg bindings: CompletionCapability) : this(bindings.toList())
 
-    fun complete(mcp: McpCompletion.Request, http: Request) =
+    override fun complete(mcp: McpCompletion.Request, http: Request) =
         bindings.find { it.toReference() == mcp.ref }
             ?.complete(mcp, http)
             ?: throw McpException(InvalidParams)

@@ -11,7 +11,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
-import org.http4k.mcp.server.capability.Completions
+import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
@@ -76,7 +76,7 @@ fun mcpStdIo(
         ServerTools(capabilities.filterIsInstance<ToolCapability>()),
         ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
         Prompts(capabilities.filterIsInstance<PromptCapability>()),
-        Completions(capabilities.filterIsInstance<CompletionCapability>()),
+        ServerCompletions(capabilities.filterIsInstance<CompletionCapability>()),
     )
 }
 

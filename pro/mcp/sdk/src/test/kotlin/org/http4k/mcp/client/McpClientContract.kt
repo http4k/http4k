@@ -32,10 +32,11 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.capability.Completions
+import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
+import org.http4k.mcp.server.protocol.Completions
 import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Resources
@@ -73,7 +74,7 @@ interface McpClientContract<R : Any, P : McpProtocol<*, R>> : PortBasedTest {
             ServerResources(Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             }),
-            Completions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(Completion(listOf("1", "2")))
             })
         )

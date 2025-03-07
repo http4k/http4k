@@ -48,7 +48,7 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.server.capability.Completions
+import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.Sampling
@@ -308,7 +308,7 @@ class TestMcpClientTest {
     @Test
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
-        val serverCompletions = Completions(
+        val serverCompletions = ServerCompletions(
             listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
         )
 

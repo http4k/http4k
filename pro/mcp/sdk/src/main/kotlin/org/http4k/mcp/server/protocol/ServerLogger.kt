@@ -2,8 +2,6 @@ package org.http4k.mcp.server.protocol
 
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.capability.LogFunction
-import org.http4k.mcp.server.capability.Logger
 import java.util.concurrent.ConcurrentHashMap
 
 class ServerLogger : Logger {

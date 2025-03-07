@@ -31,8 +31,7 @@ import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.protocol.messages.fromJsonRpc
 import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.server.capability.CompletionCapability
-import org.http4k.mcp.server.capability.Completions
-import org.http4k.mcp.server.capability.Logger
+import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.capability.ResourceCapability
@@ -56,7 +55,7 @@ class McpProtocol<Transport, RSP : Any>(
     private val tools: Tools = ServerTools(),
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = Prompts(),
-    private val completions: Completions = Completions(),
+    private val completions: Completions = ServerCompletions(),
     private val sampling: Sampling = Sampling(),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
@@ -72,7 +71,7 @@ class McpProtocol<Transport, RSP : Any>(
         ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        Completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
     )
 
     private val clients = ConcurrentHashMap<SessionId, ClientRequestTracking>()
