@@ -57,7 +57,7 @@ class McpProtocol<Transport, RSP : Any>(
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = ServerPrompts(),
     private val completions: Completions = ServerCompletions(),
-    private val sampling: Sampling = ServerSampling(),
+    private val sampling: Sampling = ServerSampling(Random),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
     private val random: Random = Random

@@ -15,12 +15,7 @@ import java.time.Duration
  */
 interface Sampling {
     fun receive(id: RequestId, response: McpSampling.Response): CompletionStatus
-    fun sampleClient(
-        entity: McpEntity,
-        request: SamplingRequest,
-        id: RequestId,
-        fetchNextTimeout: Duration? = null
-    ): Sequence<McpResult<SamplingResponse>>
+    fun sampleClient(entity: McpEntity, request: SamplingRequest, fetchNextTimeout: Duration? = null): Sequence<McpResult<SamplingResponse>>
 
     fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, RequestId) -> Unit)
     fun remove(sessionId: SessionId)

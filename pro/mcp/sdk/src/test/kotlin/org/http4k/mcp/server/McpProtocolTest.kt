@@ -434,7 +434,7 @@ class McpProtocolTest {
                 serverName, SamplingRequest(
                     listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")
-                ), RequestId.of(1)
+                )
             )
 
             assertNextMessage(

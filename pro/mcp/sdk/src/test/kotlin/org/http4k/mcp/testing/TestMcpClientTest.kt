@@ -32,7 +32,6 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
@@ -329,6 +328,7 @@ class TestMcpClientTest {
     }
 
     @Test
+    // TODO: this test is not working
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
@@ -353,7 +353,7 @@ class TestMcpClientTest {
             }
 
             val received = serverSampling
-                .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), RequestId.of(1))
+                .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)))
 
             sampling().expectSamplingRequest()
 

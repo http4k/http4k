@@ -26,7 +26,6 @@ import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role.assistant
@@ -48,6 +47,7 @@ import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
+import kotlin.random.Random
 
 interface McpClientContract<T, R : Any> : PortBasedTest {
 
@@ -66,7 +66,9 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
-        val sampling = ServerSampling()
+        val random = Random(0)
+
+        val sampling = ServerSampling(random)
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
@@ -153,8 +155,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
             val responses = sampling.sampleClient(
                 clientName,
-                SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
-                RequestId.of(10000)
+                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
             )
 
             assertThat(responses.toList(), equalTo(samplingResponses))
