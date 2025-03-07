@@ -13,7 +13,7 @@ import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.PromptCapability
-import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerCapability
@@ -75,7 +75,7 @@ fun mcpStdIo(
         StdIoMcpClientSessions(reader, writer),
         ServerTools(capabilities.filterIsInstance<ToolCapability>()),
         ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
-        Prompts(capabilities.filterIsInstance<PromptCapability>()),
+        ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),
         ServerCompletions(capabilities.filterIsInstance<CompletionCapability>()),
     )
 }

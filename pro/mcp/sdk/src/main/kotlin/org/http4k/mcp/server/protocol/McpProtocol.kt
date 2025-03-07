@@ -33,7 +33,7 @@ import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.PromptCapability
-import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.Sampling
@@ -54,7 +54,7 @@ class McpProtocol<Transport, RSP : Any>(
     private val clientSessions: ClientSessions<Transport, RSP>,
     private val tools: Tools = ServerTools(),
     private val resources: Resources = ServerResources(),
-    private val prompts: Prompts = Prompts(),
+    private val prompts: Prompts = ServerPrompts(),
     private val completions: Completions = ServerCompletions(),
     private val sampling: Sampling = Sampling(),
     private val logger: Logger = ServerLogger(),
@@ -70,7 +70,7 @@ class McpProtocol<Transport, RSP : Any>(
         clientSessions,
         ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        Prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
+        ServerPrompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
         ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
     )
 

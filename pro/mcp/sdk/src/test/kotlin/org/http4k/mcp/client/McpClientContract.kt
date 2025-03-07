@@ -33,12 +33,13 @@ import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
-import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.Completions
 import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -67,7 +68,7 @@ interface McpClientContract<R : Any, P : McpProtocol<*, R>> : PortBasedTest {
 
         val protocol = protocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            Prompts(Prompt(PromptName.of("prompt"), "description1") bind {
+            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             }),
             tools,

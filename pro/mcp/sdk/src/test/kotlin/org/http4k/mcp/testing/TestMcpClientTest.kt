@@ -49,7 +49,7 @@ import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.capability.ServerCompletions
-import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.Sampling
 import org.http4k.mcp.server.capability.ServerTools
@@ -99,7 +99,7 @@ class TestMcpClientTest {
         val intArg = Prompt.Arg.int().required("name", "description")
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
-        val serverPrompts = Prompts(
+        val serverPrompts = ServerPrompts(
             listOf(
                 prompt bind {
                     PromptResponse(

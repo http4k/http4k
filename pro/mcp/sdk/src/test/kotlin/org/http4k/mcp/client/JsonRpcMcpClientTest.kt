@@ -5,11 +5,11 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.filter.debug
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
 import org.http4k.mcp.server.protocol.Completions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Tools
 

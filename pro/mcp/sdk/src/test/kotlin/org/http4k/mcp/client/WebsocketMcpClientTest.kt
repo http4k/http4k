@@ -8,10 +8,10 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.capability.Prompts
 import org.http4k.mcp.server.protocol.Completions
 import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.websocket.StandardWebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketClientSessions

@@ -71,7 +71,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.protocol.ServerLogger
-import org.http4k.mcp.server.capability.Prompts
+import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.Sampling
@@ -152,7 +152,7 @@ class McpProtocolTest {
         val mcp = StandardSseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(Random(0))),
-                prompts = Prompts(
+                prompts = ServerPrompts(
                     listOf(
                         prompt bind {
                             PromptResponse(
