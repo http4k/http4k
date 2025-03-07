@@ -185,7 +185,7 @@ class McpProtocol<Transport, RSP : Any>(
                     else -> with(McpJson) {
                         val id = jsonResult.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
-                            null -> clientSessions.ok()
+                            null -> clientSessions.error()
                             else -> clients[sId]?.processResult(id, jsonResult)?.let { clientSessions.ok() }
                                 ?: clientSessions.error()
                         }

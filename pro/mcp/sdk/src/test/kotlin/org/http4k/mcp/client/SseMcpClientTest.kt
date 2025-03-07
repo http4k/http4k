@@ -81,9 +81,6 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
         val server = blowUpWhenBoom().then(toPolyHandler(protocol))
             .asServer(Helidon(0)).start()
 
-        // TODO - why not start this?
-//        protocol.start()
-
         val mcpClient = clientFor(server.port())
 
         mcpClient.start()

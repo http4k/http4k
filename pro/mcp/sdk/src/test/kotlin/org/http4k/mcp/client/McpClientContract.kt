@@ -154,7 +154,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             val responses = sampling.sampleClient(
                 clientName,
                 SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
-                RequestId.random()
+                RequestId.of(10000)
             )
 
             assertThat(responses.toList(), equalTo(samplingResponses))

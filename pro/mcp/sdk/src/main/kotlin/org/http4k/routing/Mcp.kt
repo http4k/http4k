@@ -1,5 +1,9 @@
 package org.http4k.routing
 
+import dev.forkhandles.time.executors.SimpleScheduler
+import dev.forkhandles.time.executors.SimpleSchedulerService
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.ResourceHandler
@@ -9,6 +13,7 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.capability.CapabilityPack
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.PromptCapability
@@ -27,8 +32,10 @@ import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpClientSessions
 import org.http4k.mcp.server.websocket.StandardWebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketClientSessions
+import org.http4k.mcp.util.readLines
 import java.io.Reader
 import java.io.Writer
+import java.util.UUID
 
 /**
  * Create an SSE MCP app from a set of feature bindings.
@@ -65,16 +72,23 @@ fun mcpStdIo(
     vararg capabilities: ServerCapability,
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
+    executor: SimpleScheduler = SimpleSchedulerService(1)
 ) = McpProtocol(
     serverMetaData,
-    // TODO
-//            .start(SimpleSchedulerService(1))
-    StdIoMcpClientSessions(reader, writer),
+    StdIoMcpClientSessions(writer),
     ServerTools(capabilities.filterIsInstance<ToolCapability>()),
     ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
     ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),
     ServerCompletions(capabilities.filterIsInstance<CompletionCapability>()),
-)
+).apply {
+    executor.readLines(reader) {
+        try {
+            receive(SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
+        } catch (e: Exception) {
+            e.printStackTrace(System.err)
+        }
+    }
+}
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
