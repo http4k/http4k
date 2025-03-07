@@ -62,9 +62,6 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
     @Test
     fun `deals with error`() {
         val toolArg = Tool.Arg.required("name")
-        val capability = Tool("reverse", "description", toolArg) bind {
-            ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
-        }
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
@@ -72,7 +69,9 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
             Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             },
-            capability,
+            Tool("reverse", "description", toolArg) bind {
+                ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
+            },
             Resource.Static(Uri.of("https://http4k.org"), ResourceName.of("HTTP4K"), "description") bind {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             },

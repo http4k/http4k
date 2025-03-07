@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import java.io.StringWriter
 
 @Disabled
-class PipeHttpTrafficTest : PortBasedTest {
+class PipeJsonRpcTrafficTest : PortBasedTest {
 
     @Test
     fun `pipes input and output to correct place`() {
