@@ -249,7 +249,6 @@ class McpProtocol<Transport, RSP : Any>(
         }
 
         fun processResult(id: RequestId, result: JsonRpcResult<MoshiNode>) {
-            println("Processing result for $id")
             val done = calls[id]?.invoke(result) ?: Finished
             if (done == Finished) calls.remove(id)
         }

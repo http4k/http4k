@@ -447,18 +447,18 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpSampling.Response(model, null, Role.assistant, content),
-                RequestId.of(4719526993124889)
+                RequestId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
-                RequestId.of(1)
+                RequestId.of(7425097216252813)
             )
 
             // this is ignored!
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("another stop reason"), Role.assistant, content),
-                RequestId.of(1)
+                RequestId.of(7425097216252813)
             )
 
             assertThat(
