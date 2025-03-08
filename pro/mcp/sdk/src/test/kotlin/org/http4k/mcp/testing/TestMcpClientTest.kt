@@ -59,6 +59,7 @@ import org.http4k.mcp.server.sse.StandardSseMcp
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
@@ -353,7 +354,7 @@ class TestMcpClientTest {
             }
 
             val received = serverSampling
-                .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)))
+                .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), Duration.ofSeconds(1))
 
             sampling().expectSamplingRequest()
 
