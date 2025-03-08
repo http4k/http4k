@@ -25,7 +25,9 @@ internal class ClientTools(
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Tools {
     override fun onChange(fn: () -> Unit) {
-        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification::class) { fn() })
+        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification::class) { _, _ ->
+            fn()
+        })
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(

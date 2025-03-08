@@ -22,7 +22,9 @@ internal class ClientPrompts(
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Prompts {
     override fun onChange(fn: () -> Unit) {
-        register(McpPrompt.List, McpCallback(McpPrompt.List.Changed.Notification::class) { fn() })
+        register(McpPrompt.List, McpCallback(McpPrompt.List.Changed.Notification::class) { _, _ ->
+            fn()
+        })
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(

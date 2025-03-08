@@ -11,16 +11,14 @@ import java.time.Duration
 import kotlin.random.Random
 
 internal class ClientSampling(
-    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val tidyUp: (RequestId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
-    private val random: Random,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Sampling {
 
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
-        register(McpSampling, McpCallback(McpSampling.Request::class) {
+        register(McpSampling, McpCallback(McpSampling.Request::class) { it, requestId ->
             val responses = fn(
                 SamplingRequest(
                     it.messages, it.maxTokens, it.systemPrompt, it.includeContext,
@@ -32,8 +30,9 @@ internal class ClientSampling(
                     sender(
                         McpSampling, McpSampling.Response(model, stopReason, role, content),
                         overrideDefaultTimeout ?: defaultTimeout,
-                        RequestId.random(random)
+                        requestId!!
                     )
+                    if(stopReason != null) tidyUp(requestId)
                 }
 
             }

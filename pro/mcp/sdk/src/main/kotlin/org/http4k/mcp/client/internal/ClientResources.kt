@@ -25,11 +25,13 @@ internal class ClientResources(
     private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
 
     override fun onChange(fn: () -> Unit) {
-        register(McpResource.List, McpCallback(McpResource.List.Changed.Notification::class) { fn() })
+        register(McpResource.List, McpCallback(McpResource.List.Changed.Notification::class) { _, _ ->
+            fn()
+        })
     }
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
-        register(McpResource.Updated, McpCallback(McpResource.Updated.Notification::class) {
+        register(McpResource.Updated, McpCallback(McpResource.Updated.Notification::class) { _, _ ->
             subscriptions[uri]?.forEach { it() }
         })
         subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
@@ -49,7 +51,12 @@ internal class ClientResources(
         .map { it.resources }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
-        sender(McpResource.Read, McpResource.Read.Request(request.uri), overrideDefaultTimeout ?: defaultTimeout, RequestId.random(random))
+        sender(
+            McpResource.Read,
+            McpResource.Read.Request(request.uri),
+            overrideDefaultTimeout ?: defaultTimeout,
+            RequestId.random(random)
+        )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpResource.Read.Response>() }
             .map { ResourceResponse(it.contents) }

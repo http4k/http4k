@@ -30,6 +30,7 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
+import sun.rmi.transport.DGCAckHandler.received
 import java.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
@@ -71,7 +72,8 @@ abstract class AbstractMcpClient(
                             when {
                                 data["method"] != null -> {
                                     val message = JsonRpcRequest(this, data.attributes)
-                                    callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message) }
+                                    val id = message.id?.let { asA<RequestId>(compact(it)) }
+                                    callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
                                 }
 
                                 else -> {
@@ -135,7 +137,7 @@ abstract class AbstractMcpClient(
         }
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random) { rpc, callback ->
+        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
