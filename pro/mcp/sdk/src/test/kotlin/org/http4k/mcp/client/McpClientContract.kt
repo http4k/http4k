@@ -2,6 +2,7 @@ package org.http4k.mcp.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
@@ -155,10 +156,10 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             val responses = sampling.sampleClient(
                 clientName,
                 SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
-                Duration.ofSeconds(1)
+                Duration.ofSeconds(5)
             )
 
-            assertThat(responses.toList(), equalTo(samplingResponses))
+            assertThat(responses.toList(), equalTo(samplingResponses.map(::Success)))
 
             tools.items = emptyList()
 

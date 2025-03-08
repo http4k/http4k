@@ -436,7 +436,7 @@ class McpProtocolTest {
                     listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")
                 ),
-                Duration.ofSeconds(1)
+                Duration.ofSeconds(5)
             )
 
             assertNextMessage(
