@@ -50,7 +50,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         val queue = ArrayBlockingQueue<SamplingResponse>(1000)
         val id = RequestId.random(random)
 
-        // responseQueues[id] = queue
+        responseQueues[id] = queue
 
         with(request) {
             subscriptions.values.filter { it.first == entity }
