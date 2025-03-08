@@ -94,8 +94,6 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
 
-//        protocol.start()
-
         val mcpClient = clientFor(server.port())
 
         val latch = CountDownLatch(1)

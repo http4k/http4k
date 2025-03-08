@@ -10,6 +10,7 @@ internal fun interface McpRpcSender {
     operator fun invoke(
         rpc: McpRpc,
         message: ClientMessage,
-        timeout: Duration
+        timeout: Duration,
+        requestId: RequestId
     ): McpResult<RequestId>
 }

@@ -14,11 +14,13 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
+import kotlin.random.Random
 
 internal class ClientTools(
     private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val tidyUp: (RequestId) -> Unit,
     private val sender: McpRpcSender,
+    private val random: Random,
     private val defaultTimeout: Duration,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Tools {
@@ -28,7 +30,8 @@ internal class ClientTools(
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpTool.List, McpTool.List.Request(),
-        overrideDefaultTimeout ?: defaultTimeout
+        overrideDefaultTimeout ?: defaultTimeout,
+        RequestId.random(random)
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTool.List.Response>() }
@@ -38,7 +41,8 @@ internal class ClientTools(
         sender(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) }),
-            overrideDefaultTimeout ?: defaultTimeout
+            overrideDefaultTimeout ?: defaultTimeout,
+            RequestId.random(random)
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }

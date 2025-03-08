@@ -3,13 +3,19 @@ package org.http4k.mcp.client.internal
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
+import kotlin.random.Random
 
 internal class ClientSampling(
+    private val queueFor: (RequestId) -> Iterable<McpNodeType>,
+    private val tidyUp: (RequestId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
+    private val random: Random,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Sampling {
 
@@ -25,7 +31,8 @@ internal class ClientSampling(
                 with(it) {
                     sender(
                         McpSampling, McpSampling.Response(model, stopReason, role, content),
-                        overrideDefaultTimeout ?: defaultTimeout
+                        overrideDefaultTimeout ?: defaultTimeout,
+                        RequestId.random(random)
                     )
                 }
 

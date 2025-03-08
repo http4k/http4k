@@ -38,6 +38,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.random.Random
 
 /**
  * SSE connection MCP client.
@@ -49,8 +50,9 @@ class SseMcpClient(
     sseRequest: Request,
     http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     protocolVersion: ProtocolVersion = LATEST_VERSION,
-    defaultTimeout: Duration = Duration.ofSeconds(1)
-) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout) {
+    defaultTimeout: Duration = Duration.ofSeconds(1),
+    random: Random = Random
+) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout, random) {
 
     private val http = SetHostFrom(sseRequest.uri).then(http)
 
@@ -74,18 +76,17 @@ class SseMcpClient(
 
     override fun sendMessage(
         rpc: McpRpc,
-        request: ClientMessage,
+        message: ClientMessage,
         timeout: Duration,
+        requestId: RequestId,
         isComplete: (McpNodeType) -> Boolean
     ): McpResult<RequestId> {
-        val requestId = RequestId.random()
-
-        val latch = CountDownLatch(if (request is ClientMessage.Notification) 0 else 1)
+        val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
 
         requests[requestId] = latch
         messageQueues[requestId] = ArrayBlockingQueue(1000)
 
-        val response = http(request.toHttpRequest(Uri.of(endpoint.get()), rpc, requestId))
+        val response = http(message.toHttpRequest(Uri.of(endpoint.get()), rpc, requestId))
         return when {
             response.status.successful -> resultFrom {
                 latch.await(timeout.toMillis(), MILLISECONDS)

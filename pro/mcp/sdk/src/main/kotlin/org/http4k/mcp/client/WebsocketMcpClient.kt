@@ -33,6 +33,7 @@ import java.time.Duration
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.random.Random
 
 /**
  * WS connection MCP client.
@@ -44,8 +45,9 @@ class WebsocketMcpClient(
     private val wsRequest: Request,
     private val websocketFactory: WebsocketFactory,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
-    defaultTimeout: Duration = Duration.ofSeconds(1)
-) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout) {
+    defaultTimeout: Duration = Duration.ofSeconds(1),
+    random: Random = Random
+) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout, random) {
     private val wsClient by lazy {
         websocketFactory.blocking(
             wsRequest.uri,
@@ -66,27 +68,25 @@ class WebsocketMcpClient(
         rpc: McpRpc,
         message: ClientMessage,
         timeout: Duration,
+        requestId: RequestId,
         isComplete: (McpNodeType) -> Boolean
     ): Result<RequestId, McpError> {
         val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
-
-        val requestId = RequestId.random()
 
         return resultFrom {
             requests[requestId] = latch
             messageQueues[requestId] = ArrayBlockingQueue(100)
 
             with(McpJson) {
-                val params = asJsonObject(message)
-                val id = requestId?.let { asJsonObject(it) } ?: nullNode()
+                val payload = asJsonObject(message)
 
                 wsClient
                     .send(
                         WsMessage(
                             compact(
                                 when (message) {
-                                    is ClientMessage.Response -> renderResult(params, id)
-                                    else -> renderRequest(rpc.Method.value, params, id)
+                                    is ClientMessage.Response -> renderResult(payload, asJsonObject(requestId))
+                                    else -> renderRequest(rpc.Method.value, payload, asJsonObject(requestId))
                                 }
                             )
                         )

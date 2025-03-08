@@ -37,12 +37,14 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
+import kotlin.random.Random
 
 abstract class AbstractMcpClient(
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
-    private val defaultTimeout: Duration
+    private val defaultTimeout: Duration,
+    private val random: Random
 ) : McpClient {
     private val running = AtomicBoolean(false)
     protected val requests = ConcurrentHashMap<RequestId, CountDownLatch>()
@@ -96,7 +98,8 @@ abstract class AbstractMcpClient(
                 sendMessage(
                     McpInitialize,
                     McpInitialize.Request(clientInfo, capabilities, protocolVersion),
-                    defaultTimeout
+                    defaultTimeout,
+                    RequestId.random(random)
                 )
                     .flatMap { reqId ->
                         val next = findQueue(reqId)
@@ -122,32 +125,36 @@ abstract class AbstractMcpClient(
     }
 
     override fun tools(): McpClient.Tools =
-        ClientTools(::findQueue, ::tidyUp, ::sendMessage, defaultTimeout) { rpc, callback ->
+        ClientTools(::findQueue, ::tidyUp, ::sendMessage, random, defaultTimeout) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): McpClient.Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
+        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(defaultTimeout, ::sendMessage) { rpc, callback ->
+        ClientSampling(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun resources(): McpClient.Resources =
-        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
+        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): McpClient.Completions =
-        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage)
+        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random)
 
     protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit>
 
     protected abstract fun sendMessage(
-        rpc: McpRpc, request: ClientMessage, timeout: Duration, isComplete: (McpNodeType) -> Boolean = { true }
+        rpc: McpRpc,
+        message: ClientMessage,
+        timeout: Duration,
+        requestId: RequestId,
+        isComplete: (McpNodeType) -> Boolean = { true }
     ): McpResult<RequestId>
 
     override fun close() {

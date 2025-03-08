@@ -9,17 +9,20 @@ import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
+import kotlin.random.Random
 
 internal class ClientCompletions(
     private val queueFor: (RequestId) -> Iterable<McpNodeType>,
     private val tidyUp: (RequestId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
+    private val random: Random
 ) : McpClient.Completions {
     override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpCompletion, McpCompletion.Request(request.ref, request.argument),
-            overrideDefaultTimeout ?: defaultTimeout
+            overrideDefaultTimeout ?: defaultTimeout,
+            RequestId.random(random)
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
