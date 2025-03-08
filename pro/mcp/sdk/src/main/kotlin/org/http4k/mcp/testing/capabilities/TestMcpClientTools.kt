@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.map
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
@@ -34,7 +35,7 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {
         sender(McpTool.List, McpTool.List.Request())
-        return client.nextEvent<McpTool.List.Response, List<McpTool>> { tools }
+        return client.nextEvent<McpTool.List.Response, List<McpTool>> { tools }.map { it.second }
     }
 
     override fun call(
@@ -57,6 +58,6 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
 
                 else -> ToolResponse.Ok(content)
             }
-        })
+        }).map { it.second }
     }
 }

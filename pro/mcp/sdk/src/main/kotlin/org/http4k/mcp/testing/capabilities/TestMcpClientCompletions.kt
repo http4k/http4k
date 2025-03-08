@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.map
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.client.McpClient
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class TestMcpClientCompletions(private val sender: TestMcpSender, private val client: AtomicReference<TestSseClient>) :
     McpClient.Completions {
-        
+
     override fun complete(
         request: CompletionRequest,
         overrideDefaultTimeout: Duration?
@@ -21,6 +22,6 @@ class TestMcpClientCompletions(private val sender: TestMcpSender, private val cl
         sender(McpCompletion, McpCompletion.Request(request.ref, request.argument))
         return client.nextEvent<McpCompletion.Response, CompletionResponse>(
             { CompletionResponse(completion) }
-        )
+        ).map { it.second }
     }
 }

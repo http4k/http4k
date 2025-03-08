@@ -61,6 +61,7 @@ import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 import kotlin.random.Random
 
 class TestMcpClientTest {
@@ -353,19 +354,26 @@ class TestMcpClientTest {
                 )
             }
 
-            val received = serverSampling
-                .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), Duration.ofSeconds(1))
+            val latch = CountDownLatch(0)
+            thread {
+                val received = serverSampling
+                    .sampleClient(clientName, SamplingRequest(listOf(), MaxTokens.of(1)), Duration.ofSeconds(5))
+
+                assertThat(
+                    received.toList(), equalTo(
+                        listOf(
+                            Success(SamplingResponse(model, Role.assistant, content, null)),
+                            Success(SamplingResponse(model, Role.assistant, content, StopReason.of("bored")))
+                        )
+                    )
+                )
+
+                latch.countDown()
+            }
 
             sampling().expectSamplingRequest()
 
-            assertThat(
-                received.toList(), equalTo(
-                    listOf(
-                        Success(SamplingResponse(model, Role.assistant, content, null)),
-                        Success(SamplingResponse(model, Role.assistant, content, StopReason.of("bored")))
-                    )
-                )
-            )
+            latch.await()
         }
     }
 

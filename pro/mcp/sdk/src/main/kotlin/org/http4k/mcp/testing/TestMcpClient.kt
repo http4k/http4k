@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing
 
+import dev.forkhandles.result4k.map
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -61,7 +62,7 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
         )
         sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
 
-        return client.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }
+        return client.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }.map { it.second }
     }
 
     override fun tools(): TestMcpClientTools = tools

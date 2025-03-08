@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.map
 import org.http4k.core.Uri
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
@@ -43,12 +44,12 @@ class TestMcpClientResources(private val sender: TestMcpSender, private val clie
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpResource>> {
         sender(McpResource.List, McpResource.List.Request())
-        return client.nextEvent<McpResource.List.Response, List<McpResource>> { resources }
+        return client.nextEvent<McpResource.List.Response, List<McpResource>> { resources }.map { it.second }
     }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?): McpResult<ResourceResponse> {
         sender(McpResource.Read, McpResource.Read.Request(request.uri))
-        return client.nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
+        return client.nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }.map { it.second }
     }
 
 

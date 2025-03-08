@@ -1,5 +1,6 @@
 package org.http4k.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.map
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
@@ -31,7 +32,7 @@ class TestMcpClientPrompts(private val sender: TestMcpSender, private val client
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpPrompt>> {
         sender(McpPrompt.List, McpPrompt.List.Request())
-        return client.nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }
+        return client.nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }.map { it.second }
     }
 
     override fun get(
@@ -42,6 +43,6 @@ class TestMcpClientPrompts(private val sender: TestMcpSender, private val client
         sender(McpPrompt.Get, McpPrompt.Get.Request(name, request))
         return client.nextEvent<McpPrompt.Get.Response, PromptResponse>({
             PromptResponse(messages, description)
-        })
+        }).map { it.second }
     }
 }
