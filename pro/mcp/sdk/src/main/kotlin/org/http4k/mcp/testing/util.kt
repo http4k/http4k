@@ -24,17 +24,16 @@ inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T
             McpError.Protocol(McpJson.convert<McpNodeType, ErrorMessage>(fields["error"]!!))
         )
 
-        else -> {
-            Success(
-                fields["id"]?.let { McpJson.convert<MoshiNode, RequestId>(it) }
-                    to
-                    fn(
-                        McpJson.convert<McpNodeType, T>(
-                            fields["result"] ?: fields["params"] ?: error("No result or params in $fields")
-                        )
+        else -> Success(
+            fields["id"]?.let { McpJson.convert<MoshiNode, RequestId>(it) }
+                to
+                fn(
+                    McpJson.convert<McpNodeType, T>(
+                        fields["result"] ?: fields["params"]
+                        ?: error("No result or params in $fields")
                     )
-            )
-        }
+                )
+        )
     }
 }
 

@@ -222,7 +222,8 @@ class McpProtocol<Transport, RSP : Any>(
         }
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
-            clients[sId]?.trackRequest(id) { sampling.receive(id, it.fromJsonRpc()) }
+            clients[sId]?.trackRequest(id) {
+                sampling.receive(id, it.fromJsonRpc()) }
             clientSessions.send(sId, req.toJsonRpc(McpSampling, asJsonObject(id)))
         }
 
@@ -240,7 +241,6 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun newSession(req: Request, sink: Transport) = clientSessions.new(req, sink)
 
-
     private class ClientRequestTracking {
         private val calls = ConcurrentHashMap<RequestId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 
@@ -249,6 +249,7 @@ class McpProtocol<Transport, RSP : Any>(
         }
 
         fun processResult(id: RequestId, result: JsonRpcResult<MoshiNode>) {
+            println("Processing result for $id")
             val done = calls[id]?.invoke(result) ?: Finished
             if (done == Finished) calls.remove(id)
         }
