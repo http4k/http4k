@@ -46,6 +46,7 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
@@ -155,7 +156,8 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
             val responses = sampling.sampleClient(
                 clientName,
-                SamplingRequest(listOfNotNull(), MaxTokens.of(123))
+                SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
+                Duration.ofSeconds(1)
             )
 
             assertThat(responses.toList(), equalTo(samplingResponses))

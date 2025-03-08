@@ -88,6 +88,7 @@ import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.Duration
 import kotlin.random.Random
 
 class McpProtocolTest {
@@ -417,7 +418,7 @@ class McpProtocolTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelIdentifier.of("name")
-        val sampling = ServerSampling()
+        val sampling = ServerSampling(Random(0))
 
         val mcp = StandardSseMcp(
             McpProtocol(
@@ -434,18 +435,19 @@ class McpProtocolTest {
                 serverName, SamplingRequest(
                     listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")
-                )
+                ),
+                Duration.ofSeconds(1)
             )
 
             assertNextMessage(
                 McpSampling,
                 McpSampling.Request(listOf(), MaxTokens.of(1)),
-                RequestId.of(1)
+                RequestId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
                 McpSampling.Response(model, null, Role.assistant, content),
-                RequestId.of(1)
+                RequestId.of(4719526993124889)
             )
 
             mcp.sendToMcp(
