@@ -45,7 +45,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
     override fun sampleClient(
         entity: McpEntity,
         request: SamplingRequest,
-        fetchNextTimeout: Duration?
+        fetchNextTimeout: Duration
     ): Sequence<McpResult<SamplingResponse>> {
         val queue = ArrayBlockingQueue<SamplingResponse>(1000)
         val id = RequestId.random(random)
@@ -71,12 +71,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
 
         return sequence {
             while (true) {
-                val nextMessage: SamplingResponse? = when (fetchNextTimeout) {
-                    null -> queue.take()
-                    else -> queue.poll(fetchNextTimeout.toMillis(), MILLISECONDS)
-                }
-
-                when (nextMessage) {
+                when (val nextMessage = queue.poll(fetchNextTimeout.toMillis(), MILLISECONDS)) {
                     null -> {
                         yield(Failure(Timeout))
                         break
