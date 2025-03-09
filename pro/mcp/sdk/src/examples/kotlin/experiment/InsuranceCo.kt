@@ -28,14 +28,7 @@ fun raiseClaim(): ToolCapability {
     }
 }
 
-fun getInvoiceForPurchase() = Resource.Templated(
-    Uri.of("purchases://invoices/{what}"), ResourceName.of("Invoice"), "Invoice document for a purchase",
-    MimeType.of(APPLICATION_PDF)
-) bind { req: ResourceRequest ->
-    ResourceResponse(Resource.Content.Blob(Base64Blob.encode("PDF"), req.uri, MimeType.of(APPLICATION_PDF)))
-}
-
 val insuranceCo = mcpWebsocket(
     ServerMetaData("AcmeHealthInsurance", "1.0.0"),
     raiseClaim()
-).debug().asServer(Helidon(9500)).start()
+).asServer(Helidon(9500)).start()
