@@ -19,6 +19,8 @@ data class ToolRequest(private val args: Map<String, Any> = emptyMap(), val conn
 sealed interface ToolResponse {
     val meta: Meta
 
-    data class Ok(val content: List<Content>, override val meta: Meta = default) : ToolResponse
+    data class Ok(val content: List<Content>, override val meta: Meta = default) : ToolResponse {
+        constructor(vararg content: Content, meta: Meta = default) : this(content.toList(), meta)
+    }
     data class Error(val error: ErrorMessage, override val meta: Meta = default) : ToolResponse
 }
