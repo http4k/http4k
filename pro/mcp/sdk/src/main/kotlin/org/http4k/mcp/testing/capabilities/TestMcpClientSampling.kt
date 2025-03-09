@@ -26,20 +26,15 @@ class TestMcpClientSampling(private val sender: TestMcpSender, private val clien
                             temperature, stopSequences,
                             modelPreferences, metadata
                         )
-                    }.valueOrNull()!!
-                    thread {
-                        onSampling.forEach {
-                            it(next.second).forEach {
-                                sender(
-                                    with(it) { McpSampling.Response(model, stopReason, role, content) },
-                                    next.first!!
-                                )
-                            }
-                            println("DONE")
+                    }.valueOrNull() ?: error("no message received")
+                    onSampling.forEach {
+                        it(next.second).forEach {
+                            sender(
+                                with(it) { McpSampling.Response(model, stopReason, role, content) },
+                                next.first!!
+                            )
                         }
-
                     }
-
                 }
             }
         }
