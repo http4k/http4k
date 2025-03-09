@@ -71,7 +71,8 @@ class ServerSampling(private val random: Random = Random) : Sampling {
 
         return sequence {
             while (true) {
-                when (val nextMessage = responseQueues[id]?.poll(fetchNextTimeout?.toMillis() ?: Long.MAX_VALUE, MILLISECONDS)) {
+                val responses = responseQueues[id] ?: break
+                when (val nextMessage = responses.poll(fetchNextTimeout?.toMillis() ?: Long.MAX_VALUE, MILLISECONDS)) {
                     null -> {
                         yield(Failure(Timeout))
                         break
