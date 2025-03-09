@@ -19,6 +19,7 @@ sealed class Resource : CapabilitySpec  {
         override val description: String? = null,
         override val mimeType: MimeType? = null
     ) : Resource() {
+        constructor(uri: String, name: String, description: String? = null, mimeType: MimeType? = null) : this(Uri.of(uri), ResourceName.of(name), description, mimeType)
         override fun matches(uri: Uri) = this.uri == uri
     }
 
@@ -29,6 +30,7 @@ sealed class Resource : CapabilitySpec  {
         override val mimeType: MimeType? = null,
         internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.authority == it.authority }
     ) : Resource() {
+        constructor(uriTemplate: String, name: String, description: String? = null, mimeType: MimeType? = null) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType)
         override fun matches(uri: Uri) = matchFn(uri)
     }
 

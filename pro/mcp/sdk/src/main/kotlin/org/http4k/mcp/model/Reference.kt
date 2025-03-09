@@ -13,11 +13,15 @@ import se.ansman.kotshi.PolymorphicLabel
 sealed class Reference : CapabilitySpec {
     @JsonSerializable
     @PolymorphicLabel("ref/resource")
-    data class Resource(val uri: Uri) : Reference()
+    data class Resource(val uri: Uri) : Reference() {
+        constructor(uri: String) : this(Uri.of(uri))
+    }
 
     @JsonSerializable
     @PolymorphicLabel("ref/prompt")
-    data class Prompt(val name: String) : Reference()
+    data class Prompt(val name: String) : Reference() {
+        constructor(name: PromptName) : this(name.value)
+    }
 
     companion object {
         fun of(uri: Uri) = Resource(uri)

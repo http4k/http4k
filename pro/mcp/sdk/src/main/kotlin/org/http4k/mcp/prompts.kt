@@ -14,4 +14,6 @@ data class PromptRequest(
     val connectRequest: Request? = null
 ) : Map<String, String> by args, McpLensTarget
 
-data class PromptResponse(val messages: List<Message>, val description: String? = null)
+data class PromptResponse(val messages: List<Message>, val description: String? = null) {
+    constructor(vararg messages: Message, description: String? = null) : this(messages.toList(), description)
+}
