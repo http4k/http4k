@@ -23,15 +23,12 @@ import kotlin.random.Random
 
 class ServerSampling(private val random: Random = Random) : Sampling {
 
-    private val subscriptions =
-        ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
+    private val subscriptions = ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
 
     private val responseQueues = ConcurrentHashMap<RequestId, BlockingQueue<SamplingResponse>>()
 
     override fun receive(id: RequestId, response: McpSampling.Response): CompletionStatus {
-        val samplingResponse = SamplingResponse(response.model, response.role, response.content, response.stopReason)
-
-        responseQueues[id]!!.put(samplingResponse)
+        responseQueues[id]?.put(SamplingResponse(response.model, response.role, response.content, response.stopReason))
 
         return when {
             response.stopReason == null -> InProgress
@@ -71,15 +68,13 @@ class ServerSampling(private val random: Random = Random) : Sampling {
 
         return sequence {
             while (true) {
-                val responses = responseQueues[id] ?: break
-                when (val nextMessage = responses.poll(fetchNextTimeout?.toMillis() ?: Long.MAX_VALUE, MILLISECONDS)) {
+                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: Long.MAX_VALUE, MILLISECONDS)) {
                     null -> {
                         yield(Failure(Timeout))
                         break
                     }
 
                     else -> {
-                        println(nextMessage)
                         yield(Success(nextMessage))
 
                         if (nextMessage.stopReason != null) {

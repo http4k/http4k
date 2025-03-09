@@ -52,7 +52,6 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
             when (isError) {
                 true -> {
                     val input = (content.first() as Content.Text).text
-                    System.err.println(input)
                     ToolResponse.Error(McpJson.asA<ErrorMessage>(input))
                 }
 
