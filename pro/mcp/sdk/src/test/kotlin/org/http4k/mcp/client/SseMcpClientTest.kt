@@ -74,7 +74,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             },
             Reference.Resource(Uri.of("https://http4k.org")) bind {
-                CompletionResponse(Completion(listOf("1", "2")))
+                CompletionResponse(listOf("1", "2"))
             }
         )
 

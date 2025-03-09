@@ -112,7 +112,7 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
     override fun completions() = object : McpClient.Completions {
         override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
             http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(request.ref, request.argument))
-                .map { CompletionResponse(it.completion) }
+                .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
     }
 
     override fun close() {}

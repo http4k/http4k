@@ -21,7 +21,7 @@ class TestMcpClientCompletions(private val sender: TestMcpSender, private val cl
     ): McpResult<CompletionResponse> {
         sender(McpCompletion, McpCompletion.Request(request.ref, request.argument))
         return client.nextEvent<McpCompletion.Response, CompletionResponse>(
-            { CompletionResponse(completion) }
+            { CompletionResponse(completion.values, completion.total, completion.hasMore) }
         ).map { it.second }
     }
 }

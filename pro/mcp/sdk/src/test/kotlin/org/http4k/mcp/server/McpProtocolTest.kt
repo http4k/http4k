@@ -393,7 +393,7 @@ class McpProtocolTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
+            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = StandardSseMcp(

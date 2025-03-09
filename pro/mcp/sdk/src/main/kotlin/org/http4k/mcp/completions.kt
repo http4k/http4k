@@ -16,4 +16,4 @@ data class CompletionRequest(
     val connectRequest: Request? = null
 )
 
-data class CompletionResponse(val completion: Completion)
+data class CompletionResponse(val values: List<String>, val total: Int? = null, val hasMore: Boolean? = null)

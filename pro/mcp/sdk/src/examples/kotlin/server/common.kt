@@ -55,7 +55,7 @@ fun resources() = compose(
 
 fun completions() = compose(
     Reference.Prompt("prompt2") bind {
-        CompletionResponse(Completion(listOf("1", "2")))
+        CompletionResponse(listOf("1", "2"))
     }
 )
 

@@ -309,7 +309,7 @@ class TestMcpClientTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val serverCompletions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(Completion(listOf("values"), 1, true)) })
+            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = StandardSseMcp(
@@ -323,7 +323,7 @@ class TestMcpClientTest {
         mcp.useClient {
             assertThat(
                 completions().complete(CompletionRequest(ref, CompletionArgument("arg", "value"))),
-                equalTo(Success(CompletionResponse(Completion(listOf("values"), 1, true))))
+                equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
             )
         }
     }

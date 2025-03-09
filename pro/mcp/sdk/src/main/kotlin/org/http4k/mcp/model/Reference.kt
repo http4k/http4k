@@ -18,4 +18,9 @@ sealed class Reference : CapabilitySpec {
     @JsonSerializable
     @PolymorphicLabel("ref/prompt")
     data class Prompt(val name: String) : Reference()
+
+    companion object {
+        fun of(uri: Uri) = Resource(uri)
+        fun of(name: PromptName) = Prompt(name.value)
+    }
 }

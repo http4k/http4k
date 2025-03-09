@@ -20,4 +20,11 @@ data class ServerMetaData internal constructor(
         vararg capabilities: ProtocolCapability,
         protocolVersion: ProtocolVersion = LATEST_VERSION
     ) : this(VersionedMcpEntity(entity, version), protocolVersion, ServerCapabilities(*capabilities))
+
+    constructor(
+        entity: String,
+        version: String,
+        vararg capabilities: ProtocolCapability,
+        protocolVersion: ProtocolVersion = LATEST_VERSION
+    ) : this(VersionedMcpEntity(entity, version), protocolVersion, ServerCapabilities(*capabilities))
 }

@@ -88,7 +88,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
                 PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
             }),
             ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
-                CompletionResponse(Completion(listOf("1", "2")))
+                CompletionResponse(listOf("1", "2"))
             }),
             sampling
         )
@@ -133,7 +133,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
                         CompletionArgument("foo", "bar")
                     )
                 ).valueOrNull()!!,
-            equalTo(CompletionResponse(Completion(listOf("1", "2"))))
+            equalTo(CompletionResponse(listOf("1", "2")))
         )
 
         assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(1))

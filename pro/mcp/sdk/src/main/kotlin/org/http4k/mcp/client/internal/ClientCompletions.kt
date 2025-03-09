@@ -26,5 +26,5 @@ internal class ClientCompletions(
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
-            .map { CompletionResponse(it.completion) }
+            .map { CompletionResponse(it.completion.values, it.completion.total, it.completion.hasMore) }
 }
