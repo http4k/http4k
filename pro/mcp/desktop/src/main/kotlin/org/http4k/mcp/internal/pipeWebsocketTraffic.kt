@@ -1,5 +1,6 @@
 package org.http4k.mcp.internal
 
+import org.http4k.client.ReconnectionMode
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -11,34 +12,50 @@ import org.http4k.sse.SseMessage
 import org.http4k.websocket.WsMessage
 import java.io.Reader
 import java.io.Writer
-import kotlin.concurrent.thread
+import java.util.concurrent.CountDownLatch
 
-fun pipeWebsocketTraffic(input: Reader, output: Writer, uri: Uri, security: McpClientSecurity) {
-
+fun pipeWebsocketTraffic(
+    input: Reader,
+    output: Writer,
+    uri: Uri,
+    security: McpClientSecurity,
+    reconnectionMode: ReconnectionMode
+) {
     val response = security.filter.then { Response(OK).headers(it.headers) }(Request(GET, ""))
 
-    val client = WebsocketClient.nonBlocking(uri, response.headers)
+    do {
+        runCatching {
+            val client = WebsocketClient.nonBlocking(uri, response.headers)
 
-    thread {
-        input.buffered().lineSequence().forEach {
-            client.send(WsMessage(it))
-        }
-    }
+            val pingLatch = CountDownLatch(1)
 
-    client.onMessage {
-        when (val sseMessage = SseMessage.parse(it.bodyString())) {
-            is SseMessage.Event -> {
-                when (sseMessage.event) {
-                    "message" -> {
-                        output.write("${sseMessage.data}\n")
-                        output.flush()
+            client.onMessage {
+                pingLatch.countDown()
+
+                when (val sseMessage = SseMessage.parse(it.bodyString())) {
+                    is SseMessage.Event -> {
+                        when (sseMessage.event) {
+                            "message" -> {
+                                output.write("${sseMessage.data}\n")
+                                output.flush()
+                            }
+
+                            "else" -> {}
+                        }
                     }
 
-                    "else" -> {}
+                    else -> {}
                 }
             }
 
-            else -> {}
+            pingLatch.await()
+
+            input.buffered().lineSequence().forEach {
+                client.send(WsMessage(it))
+            }
+
+        }.onFailure {
+            it.printStackTrace(System.err)
         }
-    }
+    } while (reconnectionMode.doReconnect())
 }

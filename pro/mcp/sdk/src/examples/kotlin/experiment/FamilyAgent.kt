@@ -1,7 +1,6 @@
 package experiment
 
-import org.http4k.connect.model.Base64Blob
-import org.http4k.lens.value
+import org.http4k.lens.string
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ToolResponse
@@ -42,7 +41,7 @@ fun insuranceClaim(): PromptCapability {
                     user, Text(
                         """To raise a claim for ${claimant(req)} expensing ${item(req)}.
                 - Check their purchases using the resource: purchases://${claimant(req)}.
-                - Download the invoice for the purchase using the resource: purchases://invoices/${item(req)}.
+                - Download the invoice for the purchase using the resource.
                 - Save the invoice to disk.
                 - Raise a claim against AcmeHealthInsurance for the item and the cost, attaching the invoice.
                 """.trimIndent()
@@ -55,17 +54,17 @@ fun insuranceClaim(): PromptCapability {
 
 fun saveToMyDisk(): ToolCapability {
     val fileName = Tool.Arg.required("filename")
-    val content = Tool.Arg.value(Base64Blob).required("content")
+    val content = Tool.Arg.string().required("content")
     return Tool(
         "saveFile", "Save a file to my disk", fileName,
         content
     ) bind { req ->
-        File(fileName(req)).writeBytes(content(req).decodedBytes())
+        File(fileName(req)).writeText(content(req))
         ToolResponse.Ok(Text("File saved ${fileName(req)}"))
     }
 }
 
-val family = mcpSse(
+val familyAgent = mcpSse(
     ServerMetaData("my family agent", "1.0.0"),
     getClaimants(),
     insuranceClaim(),

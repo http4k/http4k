@@ -1,16 +1,19 @@
 package experiment
 
-import org.http4k.connect.model.Base64Blob
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.Uri
-import org.http4k.filter.debug
-import org.http4k.mcp.ResourceRequest
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.lens.int
 import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
 import org.http4k.routing.mcpJsonRpc
 import org.http4k.server.Helidon
@@ -25,24 +28,31 @@ fun getPurchases() = Resource.Static(
         listOf(
             Resource.Content.Text(
                 when (req.uri.authority) {
-                    "david" -> """[{"name": "contact lenses", "cost": "£50"}]"""
+                    "david" -> """[{"name": "contact lenses","invoice-id":1, "cost": "£50"}]"""
                     else -> """[]]"""
                 },
-                req.uri,
+                Uri.of("purchases://invoices/contacts"),
                 MimeType.of(APPLICATION_JSON)
             )
         )
     )
 }
 
-fun getInvoiceForPurchase() = Resource.Templated(
-    Uri.of("purchases://invoices/{what}"), ResourceName.of("Invoice"), "Invoice document for a purchase",
-    MimeType.of(APPLICATION_PDF)
-) bind { req: ResourceRequest ->
-    ResourceResponse(Resource.Content.Blob(Base64Blob.encode("PDF"), req.uri, MimeType.of(APPLICATION_PDF)))
+fun getInvoiceForPurchase(): ToolCapability {
+    val invoiceId = Tool.Arg.int().required("invoice-id", "invoice id")
+    return Tool(
+        "getInvoiceForPurchase",
+        "Get invoice for a purchase",
+        invoiceId
+    ) bind { req: ToolRequest ->
+        when (invoiceId(req)) {
+            1 -> ToolResponse.Ok(Content.Text("A receipt for some contact lenses"))
+            else -> ToolResponse.Error(InvalidRequest)
+        }
+    }
 }
 
-val ecommerce = mcpJsonRpc(
+val congoDotCom = mcpJsonRpc(
     ServerMetaData("CongoDotCom", "1.0.0"),
     getPurchases(),
     getInvoiceForPurchase()

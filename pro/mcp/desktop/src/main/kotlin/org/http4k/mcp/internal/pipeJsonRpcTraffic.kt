@@ -14,14 +14,16 @@ import kotlin.concurrent.thread
  */
 fun pipeJsonRpcTraffic(input: Reader, output: Writer, sseRequest: Request, http: HttpHandler) {
     thread {
-
         input.buffered().lineSequence().forEach { next ->
-            val response = http(
-                Request(POST, sseRequest.uri)
-                    .contentType(APPLICATION_JSON)
-                    .body(next)
-            )
-            output.apply { write("${response.bodyString()}\n") }.flush()
+            runCatching {
+                val response = http(
+                    Request(POST, sseRequest.uri)
+                        .contentType(APPLICATION_JSON)
+                        .body(next)
+                )
+                output.apply { write("${response.bodyString()}\n") }.flush()
+            }
+                .onFailure { it.printStackTrace(System.err) }
         }
     }
 }

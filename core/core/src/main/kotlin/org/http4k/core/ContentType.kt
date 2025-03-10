@@ -43,5 +43,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         val TEXT_HTML = Text("text/html")
         val TEXT_XML = Text("text/xml")
         val TEXT_YAML = Text("text/yaml")
+        val IMAGE_PNG = Text("image/png")
+        val IMAGE_JPG = Text("image/jpeg")
     }
 }

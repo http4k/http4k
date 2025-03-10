@@ -15,10 +15,12 @@ import dev.failsafe.FailsafeException
 import dev.failsafe.Fallback
 import dev.failsafe.RateLimiter
 import dev.failsafe.Timeout
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
@@ -32,9 +34,9 @@ class FailsafeFilterTest {
 
     @Test
     fun `response is returned when failsafe policies pass`() {
-        val withFailsafe = FailsafeFilter(Failsafe.none()).then { Response(Status.OK).body("All OK") }
+        val withFailsafe = FailsafeFilter(Failsafe.none()).then { Response(OK).body("All OK") }
 
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(Status.OK) and hasBody("All OK"))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(OK) and hasBody("All OK"))
     }
 
     @Test
@@ -48,8 +50,8 @@ class FailsafeFilterTest {
         val withFailsafe = FailsafeFilter(executor).then { Response(Status.INTERNAL_SERVER_ERROR) }
 
         // Second request should fail because the circuit breaker is open
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(Status.INTERNAL_SERVER_ERROR))
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(503, "Circuit is open"))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(Status.INTERNAL_SERVER_ERROR))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(503, "Circuit is open"))
     }
 
     @Test
@@ -60,15 +62,15 @@ class FailsafeFilterTest {
         val withFailsafe = FailsafeFilter(executor).then {
             latch.countDown()
             Thread.sleep(1000)
-            Response(Status.OK)
+            Response(OK)
         }
 
         thread {
-            withFailsafe(Request(Method.GET, ""))
+            withFailsafe(Request(GET, ""))
         }
         latch.await()
 
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(429, "Bulkhead limit exceeded"))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(429, "Bulkhead limit exceeded"))
     }
 
     @Test
@@ -76,11 +78,11 @@ class FailsafeFilterTest {
         val executor = Failsafe.with(Timeout.of<Response>(Duration.ofMillis(10)))
 
         val withFailsafe = FailsafeFilter(executor).then {
-            Thread.sleep(50)
-            Response(Status.OK)
+            Thread.sleep(1000)
+            Response(OK)
         }
 
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(Status.CLIENT_TIMEOUT))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(CLIENT_TIMEOUT))
     }
 
     @Test
@@ -89,23 +91,23 @@ class FailsafeFilterTest {
             RateLimiter.smoothBuilder<Response>(1, Duration.ofMillis(100)).build()
         )
 
-        val withFailsafe = FailsafeFilter(executor).then { Response(Status.OK) }
+        val withFailsafe = FailsafeFilter(executor).then { Response(OK) }
 
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(Status.OK))
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(429, "Rate limit exceeded"))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(OK))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(429, "Rate limit exceeded"))
     }
 
     @Test
     fun `uses result of fallback policy on error`() {
         val executor = Failsafe.with(
-            Fallback.of(Response(Status.OK).body("Fallback")),
+            Fallback.of(Response(OK).body("Fallback")),
             RateLimiter.smoothBuilder<Response>(1, Duration.ofMillis(100)).build()
         )
 
-        val withFailsafe = FailsafeFilter(executor).then { Response(Status.OK).body("All OK") }
+        val withFailsafe = FailsafeFilter(executor).then { Response(OK).body("All OK") }
 
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(Status.OK) and hasBody("All OK"))
-        assertThat(withFailsafe(Request(Method.GET, "")), hasStatus(Status.OK) and hasBody("Fallback"))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(OK) and hasBody("All OK"))
+        assertThat(withFailsafe(Request(GET, "")), hasStatus(OK) and hasBody("Fallback"))
     }
 
     @Test
@@ -113,14 +115,15 @@ class FailsafeFilterTest {
         val withFailsafe = FailsafeFilter(Failsafe.none()).then { throw IOException("Boom") }
 
         assertThat(
-            { withFailsafe(Request(Method.GET, "")) },
+            { withFailsafe(Request(GET, "")) },
             throws(has(FailsafeException::cause, present(isA(has(IOException::message, equalTo("Boom"))))))
         )
     }
 
     companion object {
         private fun hasStatus(code: Int, description: String): Matcher<Response> =
-            has(Response::status,
+            has(
+                Response::status,
                 has(Status::code, equalTo(code)) and has(Status::description, equalTo(description))
             )
     }

@@ -2,8 +2,8 @@ package org.http4k.mcp
 
 import dev.forkhandles.bunting.use
 import org.http4k.client.JavaHttpClient
-import org.http4k.client.SseReconnectionMode.Delayed
-import org.http4k.client.SseReconnectionMode.Immediate
+import org.http4k.client.ReconnectionMode.Delayed
+import org.http4k.client.ReconnectionMode.Immediate
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.mcp.TransportMode.jsonrpc
@@ -43,7 +43,8 @@ object McpDesktop {
                     System.`in`.reader(),
                     System.out.writer(),
                     url,
-                    security
+                    security,
+                    if (reconnectDelay.isZero) Immediate else Delayed(reconnectDelay),
                 )
             }
         }

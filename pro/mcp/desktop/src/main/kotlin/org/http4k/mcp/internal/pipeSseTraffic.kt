@@ -1,7 +1,7 @@
 package org.http4k.mcp.internal
 
 import org.http4k.client.Http4kSseClient
-import org.http4k.client.SseReconnectionMode
+import org.http4k.client.ReconnectionMode
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -25,7 +25,7 @@ fun pipeSseTraffic(
     output: Writer,
     sseRequest: Request,
     http: HttpHandler,
-    reconnectionMode: SseReconnectionMode
+    reconnectionMode: ReconnectionMode
 ) {
     val incomingMessages = input.buffered().lineSequence()
 

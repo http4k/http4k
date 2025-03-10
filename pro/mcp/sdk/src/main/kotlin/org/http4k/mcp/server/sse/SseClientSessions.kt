@@ -27,8 +27,6 @@ class SseClientSessions(
 
     override fun ok() = Response(ACCEPTED)
 
-    fun close(transport: Sse) = transport.close()
-
     override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         when (val sink = sessions[sessionId]) {
             null -> Response(GONE)

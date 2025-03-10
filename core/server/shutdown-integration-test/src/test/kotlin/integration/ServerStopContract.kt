@@ -202,7 +202,7 @@ abstract class ServerStopContract(
             }
         }
         countDownInflightRequestsStarted.await(1, SECONDS)
-        Thread.sleep(100)
+        Thread.sleep(200)
 
         assertThat(responses.size, equalTo(0))
         stop()

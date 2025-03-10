@@ -49,14 +49,14 @@ import java.util.UUID
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardSseMcp(
-        McpProtocol(serverMetaData, SseClientSessions().also { it.start() }, *capabilities)
+        McpProtocol(serverMetaData, SseClientSessions().apply { start() }, *capabilities)
     )
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWebsocketMcp(McpProtocol(serverMetaData, WebsocketClientSessions(), *capabilities))
+    StandardWebsocketMcp(McpProtocol(serverMetaData, WebsocketClientSessions().apply { start() }, *capabilities))
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.

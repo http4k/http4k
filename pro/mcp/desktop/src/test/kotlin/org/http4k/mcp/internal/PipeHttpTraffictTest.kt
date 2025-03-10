@@ -2,6 +2,7 @@ package org.http4k.mcp.internal
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -10,11 +11,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.contentType
 import org.http4k.sse.SseMessage.Event
 import org.http4k.util.PortBasedTest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.StringWriter
 
-@Disabled
 class PipeJsonRpcTrafficTest : PortBasedTest {
 
     @Test
@@ -23,10 +22,9 @@ class PipeJsonRpcTrafficTest : PortBasedTest {
         val output = StringWriter()
         val sentToHttp = mutableListOf<String>()
 
-        val expectedList = listOf(
-            Event("message", "data1"),
-            Event("message", "data2")
-        )
+        val expectedList = listOf("data1", "data2")
+
+        val responses = expectedList.iterator()
 
         pipeJsonRpcTraffic(
             inputMessages.joinToString("\n").reader(),
@@ -35,16 +33,18 @@ class PipeJsonRpcTrafficTest : PortBasedTest {
             { req: Request ->
                 sentToHttp += req.bodyString()
                 Response(OK)
-                    .contentType(TEXT_EVENT_STREAM)
-                    .body(expectedList.joinToString("\n") { it.toMessage() })
+                    .contentType(APPLICATION_JSON)
+                    .body(req.bodyString() + responses.next())
             }
         )
 
-        assertThat(sentToHttp, equalTo(inputMessages))
+        Thread.sleep(500)
+
+        assertThat(sentToHttp.toList(), equalTo(inputMessages))
 
         assertThat(
             output.toString().trimEnd().split("\n"),
-            equalTo(listOf("hellodata1", "hellodata2", "worlddata1", "worlddata2"))
+            equalTo(listOf("hellodata1", "worlddata2"))
         )
     }
 }

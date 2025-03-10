@@ -2,7 +2,7 @@ package org.http4k.mcp.internal
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.SseReconnectionMode.Disconnect
+import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.io.StringWriter
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
@@ -25,7 +26,7 @@ class PipeSseTrafficTest : PortBasedTest {
     fun `pipes input and output to correct place`() {
         val inputMessages = listOf("hello", "world")
         val output = StringWriter()
-        val sentToSse = mutableListOf<String>()
+        val sentToSse = ArrayBlockingQueue<String>(3)
         val latch = CountDownLatch(2)
 
         val expectedList = listOf(
@@ -73,9 +74,8 @@ class PipeSseTrafficTest : PortBasedTest {
             )
         }
 
-        latch.await()
-
-        assertThat(sentToSse, equalTo(inputMessages))
+        assertThat(sentToSse.take(), equalTo(inputMessages[0]))
+        assertThat(sentToSse.take(), equalTo(inputMessages[1]))
 
         assertThat(
             output.toString().trimEnd().split("\n"),

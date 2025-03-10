@@ -3,24 +3,24 @@ package org.http4k.client
 import java.time.Duration
 
 /**
- * Determines how the SSE client should behave when the connection is lost.
+ * Determines how a client should behave when the realtime connection is lost.
  */
-interface SseReconnectionMode {
+interface ReconnectionMode {
 
     fun doReconnect(): Boolean
 
     // If the connection is lost, the client will not attempt to reconnect.
-    data object Disconnect : SseReconnectionMode {
+    data object Disconnect : ReconnectionMode {
         override fun doReconnect() = false
     }
 
     // If the connection is lost, the client will attempt to reconnect immediately.
-    data object Immediate : SseReconnectionMode {
+    data object Immediate : ReconnectionMode {
         override fun doReconnect() = true
     }
 
     // If the connection is lost, the client will attempt to reconnect after the specified delay.
-    data class Delayed(val delay: Duration) : SseReconnectionMode {
+    data class Delayed(val delay: Duration) : ReconnectionMode {
         override fun doReconnect(): Boolean {
             Thread.sleep(delay)
             return true

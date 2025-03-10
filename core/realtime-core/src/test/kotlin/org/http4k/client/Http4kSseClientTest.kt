@@ -17,6 +17,7 @@ import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
@@ -32,8 +33,7 @@ class Http4kSseClientTest : PortBasedTest {
         }.asServer(Helidon(0)).start()
 
         try {
-            val messages = mutableListOf<SseMessage>()
-            val latch = CountDownLatch(1)
+            val messages = ArrayBlockingQueue<SseMessage>(100)
 
             thread {
                 Http4kSseClient(
@@ -43,22 +43,12 @@ class Http4kSseClientTest : PortBasedTest {
                     .received()
                     .forEach { msg ->
                         messages.add(msg)
-                        latch.countDown()
                     }
             }
 
-            Thread.sleep(100)
-            latch.await()
+            assertThat(messages.take(), equalTo(Event("event", "data1")))
+            assertThat(messages.take(), equalTo(Data("data2")))
 
-            assertThat(
-                messages,
-                equalTo(
-                    listOf(
-                        Event("event", "data1"),
-                        Data("data2")
-                    )
-                )
-            )
         } finally {
             server.stop()
         }

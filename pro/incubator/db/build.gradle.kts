@@ -9,15 +9,16 @@ plugins {
 }
 
 dependencies {
+    api(platform("dev.forkhandles:forkhandles-bom:_"))
     compileOnly(platform("org.junit:junit-bom:_"))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
     api(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
 
     testImplementation(project(":http4k-testing-strikt"))
-    api("dev.forkhandles:result4k:_")
-    api("dev.forkhandles:values4k:_")
-    api("dev.forkhandles:time4k:_")
+    api("dev.forkhandles:result4k")
+    api("dev.forkhandles:values4k")
+    api("dev.forkhandles:time4k")
 
     testImplementation("org.hsqldb:hsqldb:_")
 

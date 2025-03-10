@@ -29,7 +29,7 @@ class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
         completions: Completions
     ) = McpProtocol(serverMetaData, clientSessions(), tools, resources, prompts, completions)
 
-    override fun clientSessions() = WebsocketClientSessions()
+    override fun clientSessions() = WebsocketClientSessions().apply { start() }
 
     override fun clientFor(port: Int) = WebsocketMcpClient(
         clientName, Version.of("1.0.0"),

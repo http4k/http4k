@@ -1,7 +1,7 @@
 package experiment
 
 fun main() {
-    family
-    ecommerce
-    insuranceCo
+    familyAgent
+    congoDotCom
+    acmeHealthInsurance
 }

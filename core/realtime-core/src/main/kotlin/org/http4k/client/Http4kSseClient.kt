@@ -1,6 +1,6 @@
 package org.http4k.client
 
-import org.http4k.client.SseReconnectionMode.Disconnect
+import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -24,7 +24,7 @@ import kotlin.concurrent.thread
 class Http4kSseClient(
     private val sseRequest: Request,
     private val http: HttpHandler,
-    private var reconnectionMode: SseReconnectionMode = Disconnect,
+    private var reconnectionMode: ReconnectionMode = Disconnect,
     private val reportError: (Exception) -> Unit = {}
 ) : SseClient {
 
