@@ -1,6 +1,7 @@
 package experiment
 
 import org.http4k.lens.string
+import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ToolResponse
@@ -22,34 +23,8 @@ import org.http4k.server.asServer
 import java.io.File
 
 
-fun getClaimants(): CompletionCapability = Reference.Prompt("HealthInsuranceClaim") bind { req ->
+fun getFamilyMembers(): CompletionCapability = Reference.Prompt("Family Members") bind { req: CompletionRequest ->
     CompletionResponse(listOf("Alice", "Bob", "Charlie", "David"))
-}
-
-fun insuranceClaim(): PromptCapability {
-    val claimant = Prompt.Arg.required("claimant")
-    val item = Prompt.Arg.required("item")
-    return Prompt(
-        PromptName.of("HealthInsuranceClaim"),
-        "Raising a health insurance claim",
-        claimant,
-        item
-    ) bind { req ->
-        PromptResponse(
-            listOf(
-                Message(
-                    user, Text(
-                        """To raise a claim for ${claimant(req)} expensing ${item(req)}.
-                - Check their purchases using the resource: purchases://${claimant(req)}.
-                - Download the invoice for the purchase using the resource.
-                - Save the invoice to disk.
-                - Raise a claim against AcmeHealthInsurance for the item and the cost, attaching the invoice.
-                """.trimIndent()
-                    )
-                )
-            )
-        )
-    }
 }
 
 fun saveToMyDisk(): ToolCapability {
@@ -66,7 +41,6 @@ fun saveToMyDisk(): ToolCapability {
 
 val familyAgent = mcpSse(
     ServerMetaData("my family agent", "1.0.0"),
-    getClaimants(),
-    insuranceClaim(),
+    getFamilyMembers(),
     saveToMyDisk()
 ).asServer(Helidon(7500)).start()
