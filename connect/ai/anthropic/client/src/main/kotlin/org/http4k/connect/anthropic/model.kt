@@ -37,6 +37,10 @@ class ToolName private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ToolName>(::ToolName)
 }
 
+class ToolUseId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<ToolUseId>(::ToolUseId)
+}
+
 
 @JsonSerializable
 data class ToolChoice(

@@ -3,6 +3,7 @@ package org.http4k.connect.anthropic.action
 import org.http4k.connect.anthropic.MediaType
 import org.http4k.connect.anthropic.SourceType
 import org.http4k.connect.anthropic.ToolName
+import org.http4k.connect.anthropic.ToolUseId
 import org.http4k.connect.anthropic.UserId
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.Role
@@ -27,6 +28,10 @@ sealed class Content {
     @JsonSerializable
     @PolymorphicLabel("image")
     data class Image(val source: Source) : Content()
+
+    @JsonSerializable
+    @PolymorphicLabel("tool_use")
+    data class ToolUse(val name: ToolName, val id: ToolUseId, val input: Any) : Content()
 }
 
 @JsonSerializable

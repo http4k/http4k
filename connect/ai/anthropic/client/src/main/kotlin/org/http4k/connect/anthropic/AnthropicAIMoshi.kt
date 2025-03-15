@@ -26,6 +26,7 @@ object AnthropicAIMoshi : ConfigurableMoshi(
         .value(ModelType)
         .value(Prompt)
         .value(Role)
+        .value(ToolUseId)
         .value(Timestamp)
         .value(UserId)
         .value(Prompt)
