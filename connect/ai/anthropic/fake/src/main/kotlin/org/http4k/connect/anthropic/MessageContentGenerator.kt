@@ -43,6 +43,8 @@ val MessageContentGenerator.Companion.Echo
             when (c) {
                 is Image -> Text("some image content")
                 is Text -> Text(c.text)
+                is ToolResult -> Text("tool result " + c.content.toString())
+                is ToolUse -> Text("tool use " + c.name + " " + c.input.toString())
             }
         }
     }
