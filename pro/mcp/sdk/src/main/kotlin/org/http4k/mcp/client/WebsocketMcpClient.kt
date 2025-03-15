@@ -41,9 +41,9 @@ import kotlin.random.Random
 class WebsocketMcpClient(
     name: McpEntity,
     version: Version,
-    capabilities: ClientCapabilities,
     private val wsRequest: Request,
     private val websocketFactory: WebsocketFactory,
+    capabilities: ClientCapabilities = ClientCapabilities(),
     protocolVersion: ProtocolVersion = LATEST_VERSION,
     defaultTimeout: Duration = Duration.ofSeconds(1),
     random: Random = Random

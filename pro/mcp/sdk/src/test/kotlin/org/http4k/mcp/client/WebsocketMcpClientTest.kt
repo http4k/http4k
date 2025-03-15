@@ -33,9 +33,9 @@ class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
 
     override fun clientFor(port: Int) = WebsocketMcpClient(
         clientName, Version.of("1.0.0"),
-        ClientCapabilities(),
         Request(GET, Uri.of("ws://localhost:${port}/ws")),
         WebsocketClient(Duration.ofSeconds(2), true),
+        ClientCapabilities(),
     )
 
     override fun toPolyHandler(protocol: McpProtocol<Websocket, Unit>) = StandardWebsocketMcp(protocol)

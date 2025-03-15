@@ -18,7 +18,6 @@ import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
@@ -48,9 +47,9 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
 
     override fun clientFor(port: Int) = SseMcpClient(
         clientName, Version.of("1.0.0"),
-        ClientCapabilities(),
         Request(GET, Uri.of("http://localhost:${port}/sse")),
-        JavaHttpClient(responseBodyMode = Stream)
+        JavaHttpClient(responseBodyMode = Stream),
+        ClientCapabilities()
     )
 
     override fun clientSessions() = SseClientSessions().apply { start() }

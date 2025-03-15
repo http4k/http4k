@@ -46,9 +46,9 @@ import kotlin.random.Random
 class SseMcpClient(
     name: McpEntity,
     version: Version,
-    capabilities: ClientCapabilities,
     sseRequest: Request,
     http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
+    capabilities: ClientCapabilities = ClientCapabilities(),
     protocolVersion: ProtocolVersion = LATEST_VERSION,
     defaultTimeout: Duration = Duration.ofSeconds(1),
     random: Random = Random

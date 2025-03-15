@@ -9,13 +9,10 @@ import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.ResourceRequest
-import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.client.SseMcpClient
 import org.http4k.mcp.model.CompletionArgument
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.ToolName
@@ -25,9 +22,9 @@ import org.http4k.mcp.protocol.Version
 fun main() {
     val mcpClient = SseMcpClient(
         McpEntity.of("foobar"), Version.of("1.0.0"),
-        ClientCapabilities(),
         Request(GET, "http://localhost:3001/sse"),
-        JavaHttpClient(responseBodyMode = Stream)
+        JavaHttpClient(responseBodyMode = Stream),
+        ClientCapabilities()
     )
 
     println(mcpClient.start())
