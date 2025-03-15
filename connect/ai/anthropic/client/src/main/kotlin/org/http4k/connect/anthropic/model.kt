@@ -5,6 +5,7 @@ import dev.forkhandles.values.LocalDateValueFactory
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.Value
+import org.http4k.connect.model.ModelName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -83,3 +84,7 @@ class ApiVersion private constructor(value: LocalDate) : LocalDateValue(value), 
         val _2023_06_01 = ApiVersion.parse("2023-06-01")
     }
 }
+
+val ModelName.Companion.CLAUDE_3_7_SONNET get() = ModelName.of("claude-3-7-sonnet-20250219")
+
+val ModelName.Companion.CLAUDE_3_5_SONNET get() = ModelName.of("claude-3-5-sonnet-20240620")
