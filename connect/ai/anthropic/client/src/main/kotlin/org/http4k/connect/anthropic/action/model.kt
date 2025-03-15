@@ -32,6 +32,10 @@ sealed class Content {
     @JsonSerializable
     @PolymorphicLabel("tool_use")
     data class ToolUse(val name: ToolName, val id: ToolUseId, val input: Any) : Content()
+
+    @JsonSerializable
+    @PolymorphicLabel("tool_result")
+    data class ToolResult(val name: ToolName, val tool_use_id: ToolUseId, val content: Any) : Content()
 }
 
 @JsonSerializable
@@ -49,7 +53,21 @@ data class Message(val role: Role, val content: List<Content>) {
 }
 
 @JsonSerializable
-data class Tool(val name: ToolName, val description: String, val input_schema: Schema)
+data class Tool(
+    val name: ToolName,
+    val description: String,
+    val input_schema: Schema,
+    val type: ToolType? = null,
+    val cache_control: CacheControl? = null
+)
+
+enum class ToolType {
+    ephemeral
+}
+
+enum class CacheControl {
+    ephemeral
+}
 
 @JsonSerializable
 data class Schema(val type: String, val properties: Map<String, Any>, val required: List<String>)

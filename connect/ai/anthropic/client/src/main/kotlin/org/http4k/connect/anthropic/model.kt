@@ -44,7 +44,7 @@ class ToolUseId private constructor(value: String) : StringValue(value) {
 
 @JsonSerializable
 data class ToolChoice(
-    val type: ToolType
+    val type: ToolChoiceType
 )
 
 enum class SourceType {
@@ -55,7 +55,7 @@ enum class Type {
     text, image
 }
 
-enum class ToolType {
+enum class ToolChoiceType {
     auto,
     any,
     specific_tool
