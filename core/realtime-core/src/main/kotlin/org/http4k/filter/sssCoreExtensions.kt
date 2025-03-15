@@ -74,31 +74,35 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
     SseFilter { next ->
         { req ->
             try {
-                next(req).let { response ->
-                    out.println(
-                        (
-                            listOf(
-                                "***** SSE RESPONSE ${response.status.code} to ${req.method}: ${req.uri} *****"
-                            ) +
-                                response.headers.map { "${it.first}: ${it.second}" }
-                            )
-                            .joinToString("\n")
-                    )
+                val response = next(req)
+                when {
+                    response.handled -> response.run {
+                        out.println(
+                            (
+                                listOf(
+                                    "***** SSE RESPONSE ${status.code} to ${req.method}: ${req.uri} *****"
+                                ) +
+                                    headers.map { "${it.first}: ${it.second}" }
+                                )
+                                .joinToString("\n")
+                        )
 
-                    response.withConsumer { sse ->
-                        response.consumer(object : Sse by sse {
-                            override fun send(message: SseMessage) = apply {
-                                sse.send(message)
-                                out.println("""***** SSE SEND ${req.method}: ${req.uri} -> ${message::class.simpleName}""")
-                                out.println(message.toMessage())
-                            }
+                        withConsumer { sse ->
+                            consumer(object : Sse by sse {
+                                override fun send(message: SseMessage) = apply {
+                                    sse.send(message)
+                                    out.println("""***** SSE SEND ${req.method}: ${req.uri} -> ${message::class.simpleName}""")
+                                    out.println(message.toMessage())
+                                }
 
-                            override fun close() {
-                                sse.close()
-                                out.println("***** SSE CLOSED on ${req.method}: ${req.uri} *****")
-                            }
-                        })
+                                override fun close() {
+                                    sse.close()
+                                    out.println("***** SSE CLOSED on ${req.method}: ${req.uri} *****")
+                                }
+                            })
+                        }
                     }
+                    else -> response
                 }
             } catch (e: Exception) {
                 out.println("***** SSE RESPONSE FAILED to ${req.method}: ${req.uri} *****")
