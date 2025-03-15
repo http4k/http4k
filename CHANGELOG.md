@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.1.1.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-connect-ai-anthropic-*** : [Fix] Correct name of input_schema field in Tool.
 
 ### v6.1.0.1
 - **http4k-core** : Return null value rather than throw exception if `Request.path(name)` cannot find a path parameter in a valid (routed) request.

@@ -44,7 +44,7 @@ data class Message(val role: Role, val content: List<Content>) {
 }
 
 @JsonSerializable
-data class Tool(val name: ToolName, val description: String, val inputSchema: Schema)
+data class Tool(val name: ToolName, val description: String, val input_schema: Schema)
 
 @JsonSerializable
 data class Schema(val type: String, val properties: Map<String, Any>, val required: List<String>)
