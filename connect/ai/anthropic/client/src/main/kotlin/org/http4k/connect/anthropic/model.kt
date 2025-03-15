@@ -6,6 +6,8 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.Value
 import se.ansman.kotshi.JsonSerializable
+import se.ansman.kotshi.Polymorphic
+import se.ansman.kotshi.PolymorphicLabel
 import java.time.LocalDate
 
 class AnthropicIApiKey private constructor(value: String) : StringValue(value) {
@@ -41,24 +43,28 @@ class ToolUseId private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ToolUseId>(::ToolUseId)
 }
 
-
 @JsonSerializable
-data class ToolChoice(
-    val type: ToolChoiceType
-)
+@Polymorphic("type")
+sealed class ToolChoice {
+    @JsonSerializable
+    @PolymorphicLabel("auto")
+    data class Auto(val disable_parallel_tool_use: Boolean = false) : ToolChoice()
+
+    @JsonSerializable
+    @PolymorphicLabel("any")
+    data class Any(val disable_parallel_tool_use: Boolean = false) : ToolChoice()
+
+    @JsonSerializable
+    @PolymorphicLabel("tool")
+    data class Tool(val name: ToolName, val disable_parallel_tool_use: Boolean = false) : ToolChoice()
+
+    @JsonSerializable
+    @PolymorphicLabel("none")
+    data object None : ToolChoice()
+}
 
 enum class SourceType {
     base64
-}
-
-enum class Type {
-    text, image
-}
-
-enum class ToolChoiceType {
-    auto,
-    any,
-    specific_tool
 }
 
 class ResponseId private constructor(value: String) : StringValue(value) {
