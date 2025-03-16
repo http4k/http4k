@@ -1,6 +1,7 @@
 package org.http4k.mcp.model
 
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MimeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel

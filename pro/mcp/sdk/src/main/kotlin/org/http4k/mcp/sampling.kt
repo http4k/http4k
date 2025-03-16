@@ -1,15 +1,15 @@
 package org.http4k.mcp
 
+import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.MaxTokens
 import org.http4k.core.Request
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.Message
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.ModelPreferences
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
-import org.http4k.mcp.model.StopReason
-import org.http4k.mcp.model.Temperature
+import org.http4k.connect.model.StopReason
+import org.http4k.connect.model.Temperature
 
 /**
  *  Processes a sampling request from an MCP client/server
@@ -29,7 +29,7 @@ data class SamplingRequest(
 )
 
 data class SamplingResponse(
-    val model: ModelIdentifier,
+    val model: ModelName,
     val role: Role,
     val content: Content,
     val stopReason: StopReason? = null

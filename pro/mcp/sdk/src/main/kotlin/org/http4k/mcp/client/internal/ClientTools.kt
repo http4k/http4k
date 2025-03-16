@@ -2,13 +2,13 @@ package org.http4k.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
+import org.http4k.connect.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.RequestId
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson

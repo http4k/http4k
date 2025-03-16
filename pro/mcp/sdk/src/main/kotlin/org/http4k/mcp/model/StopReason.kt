@@ -1,8 +1,8 @@
 package org.http4k.mcp.model
 
-import dev.forkhandles.values.NonBlankStringValueFactory
-import dev.forkhandles.values.StringValue
+import org.http4k.connect.model.StopReason
 
-class StopReason private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<StopReason>(::StopReason)
-}
+val StopReason.Companion.end_turn get() = of("end_turn")
+val StopReason.Companion.max_tokens get() = of("max_tokens")
+val StopReason.Companion.stop_sequence get() = of("stop_sequence")
+val StopReason.Companion.tool_use get() = of("tool_use")

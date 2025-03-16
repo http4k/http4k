@@ -13,8 +13,10 @@ import org.http4k.connect.lmstudio.TokenId
 import org.http4k.connect.lmstudio.User
 import org.http4k.connect.lmstudio.action.Detail.auto
 import org.http4k.connect.model.FinishReason
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.util.toCompletionSequence
 import org.http4k.core.Method.POST
@@ -31,8 +33,8 @@ import se.ansman.kotshi.JsonSerializable
 data class ChatCompletion(
     val model: ModelName,
     val messages: List<Message>,
-    val max_tokens: Int? = null,
-    val temperature: Double = 1.0,
+    val max_tokens: MaxTokens? = null,
+    val temperature: Temperature = Temperature.ONE,
     val top_p: Double = 1.0,
     val n: Int = 1,
     val stop: List<String>? = null,
@@ -46,14 +48,14 @@ data class ChatCompletion(
     val tool_choice: Any? = null,
     val parallel_tool_calls: Boolean? = null,
 ) : LmStudioAction<Sequence<CompletionResponse>> {
-    constructor(model: ModelName, message: Message, max_tokens: Int = 16, stream: Boolean = true)
+    constructor(model: ModelName, message: Message, max_tokens: MaxTokens, stream: Boolean = true)
         : this(model, listOf(message), max_tokens, stream)
 
-    constructor(model: ModelName, messages: List<Message>, max_tokens: Int = 16, stream: Boolean = true) : this(
+    constructor(model: ModelName, messages: List<Message>, max_tokens: MaxTokens, stream: Boolean = true) : this(
         model,
         messages,
         max_tokens = max_tokens,
-        temperature = 1.0,
+        temperature = Temperature.ONE,
         top_p = 1.0,
         n = 1,
         stop = null,

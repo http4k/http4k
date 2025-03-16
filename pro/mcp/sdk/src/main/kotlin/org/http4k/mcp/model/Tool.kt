@@ -1,5 +1,6 @@
 package org.http4k.mcp.model
 
+import org.http4k.connect.model.ToolName
 import org.http4k.lens.BiDiLens
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.LensGet

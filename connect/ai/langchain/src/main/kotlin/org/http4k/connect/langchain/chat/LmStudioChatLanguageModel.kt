@@ -36,16 +36,18 @@ import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.FinishReason.content_filter
 import org.http4k.connect.model.FinishReason.length
 import org.http4k.connect.model.FinishReason.tool_calls
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.Temperature
 import org.http4k.connect.orThrow
 import org.http4k.core.Uri
 
 data class LmStudioChatModelOptions(
     val model: ModelName,
     val stream: Boolean? = null,
-    val maxTokens: Int? = null,
-    val temperature: Double = 1.0,
+    val maxTokens: MaxTokens? = null,
+    val temperature: Temperature = Temperature.ONE,
     val top_p: Double = 1.0,
     val n: Int = 1,
     val stop: List<String>? = null,

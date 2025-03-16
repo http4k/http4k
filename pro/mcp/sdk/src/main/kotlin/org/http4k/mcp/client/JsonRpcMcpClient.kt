@@ -7,6 +7,7 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.client.JavaHttpClient
+import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
@@ -28,7 +29,6 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpError.Http
 import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpCompletion

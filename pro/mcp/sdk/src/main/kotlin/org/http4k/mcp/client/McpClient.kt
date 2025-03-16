@@ -1,5 +1,6 @@
 package org.http4k.mcp.client
 
+import org.http4k.connect.model.ToolName
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
@@ -11,7 +12,6 @@ import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource

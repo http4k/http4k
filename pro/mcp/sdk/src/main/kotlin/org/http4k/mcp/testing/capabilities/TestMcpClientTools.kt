@@ -1,13 +1,13 @@
 package org.http4k.mcp.testing.capabilities
 
 import dev.forkhandles.result4k.map
+import org.http4k.connect.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent

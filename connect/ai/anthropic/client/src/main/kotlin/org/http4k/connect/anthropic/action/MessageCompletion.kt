@@ -7,11 +7,13 @@ import org.http4k.connect.anthropic.AnthropicAIAction
 import org.http4k.connect.anthropic.AnthropicAIMoshi
 import org.http4k.connect.anthropic.Prompt
 import org.http4k.connect.anthropic.ResponseId
-import org.http4k.connect.anthropic.StopReason
 import org.http4k.connect.anthropic.ToolChoice
 import org.http4k.connect.asRemoteFailure
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.StopReason
+import org.http4k.connect.model.Temperature
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -24,11 +26,11 @@ import se.ansman.kotshi.JsonSerializable
 data class MessageCompletion internal constructor(
     override val model: ModelName,
     override val messages: List<Message>,
-    override val max_tokens: Int,
+    override val max_tokens: MaxTokens,
     override val metadata: Metadata? = null,
     override val stop_sequences: List<String> = emptyList(),
     override val system: Prompt? = null,
-    override val temperature: Double? = 0.0,
+    override val temperature: Temperature? = Temperature.ZERO,
     override val tool_choice: ToolChoice? = null,
     override val tools: List<Tool> = emptyList(),
     override val top_k: Int? = 0,
@@ -38,11 +40,11 @@ data class MessageCompletion internal constructor(
     constructor(
         model: ModelName,
         prompt: Prompt,
-        max_tokens: Int,
+        max_tokens: MaxTokens,
         metadata: Metadata? = null,
         stop_sequences: List<String> = emptyList(),
         system: Prompt? = null,
-        temperature: Double? = 0.0,
+        temperature: Temperature? = Temperature.ZERO,
         tool_choice: ToolChoice? = null,
         tools: List<Tool> = emptyList(),
         top_k: Int? = 0,
@@ -56,11 +58,11 @@ data class MessageCompletion internal constructor(
     constructor(
         model: ModelName,
         messages: List<Message>,
-        max_tokens: Int,
+        max_tokens: MaxTokens,
         metadata: Metadata? = null,
         stop_sequences: List<String> = emptyList(),
         system: Prompt? = null,
-        temperature: Double? = 0.0,
+        temperature: Temperature? = Temperature.ZERO,
         tool_choice: ToolChoice? = null,
         tools: List<Tool> = emptyList(),
         top_k: Int? = 0,

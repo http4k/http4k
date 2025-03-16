@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.failureOrNull
 import org.http4k.client.JavaHttpClient
+import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
@@ -28,7 +29,6 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role.assistant
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version

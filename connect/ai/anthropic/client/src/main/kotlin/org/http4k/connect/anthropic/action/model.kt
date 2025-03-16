@@ -1,12 +1,12 @@
 package org.http4k.connect.anthropic.action
 
-import org.http4k.connect.anthropic.MediaType
 import org.http4k.connect.anthropic.SourceType
-import org.http4k.connect.anthropic.ToolName
 import org.http4k.connect.anthropic.ToolUseId
 import org.http4k.connect.anthropic.UserId
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.ToolName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -14,7 +14,7 @@ import se.ansman.kotshi.PolymorphicLabel
 @JsonSerializable
 data class Source(
     val data: Base64Blob,
-    val media_type: MediaType,
+    val media_type: MimeType,
     val type: SourceType = SourceType.base64
 )
 

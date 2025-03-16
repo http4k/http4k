@@ -10,7 +10,9 @@ import org.http4k.connect.anthropic.action.Message
 import org.http4k.connect.anthropic.action.MessageGenerationEvent
 import org.http4k.connect.anthropic.action.Source
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.MimeType
 import org.http4k.connect.successValue
 import org.http4k.testing.ApprovalTest
 import org.junit.jupiter.api.Test
@@ -32,14 +34,14 @@ interface AnthropicAIContract {
                         Content.Image(
                             Source(
                                 Base64Blob.encode(resourceLoader.stream("dog.png")),
-                                MediaType.IMAGE_PNG
+                                MimeType.IMAGE_PNG
                             )
                         ),
                         Content.Text("What is in the image?"),
                     )
                 )
             ),
-            100,
+            MaxTokens.of(100),
         ).successValue()
 
         assertThat(responses.usage.input_tokens!!, greaterThan(0))
@@ -52,7 +54,7 @@ interface AnthropicAIContract {
             listOf(
                 Message.User(listOf(Content.Text("You are Leonardo Da Vinci")))
             ),
-            100,
+            MaxTokens.of(100),
         ).successValue().toList()
 
         assertThat(responses.first(), isA<MessageGenerationEvent.StartMessage>())

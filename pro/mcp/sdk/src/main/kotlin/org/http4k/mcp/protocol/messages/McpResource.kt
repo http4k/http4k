@@ -1,9 +1,9 @@
 package org.http4k.mcp.protocol.messages
 
+import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.protocol.McpRpcMethod

@@ -1,6 +1,7 @@
 import dev.forkhandles.result4k.onFailure
 import org.http4k.chaos.start
 import org.http4k.client.JavaHttpClient
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.GPT3_5
@@ -29,7 +30,7 @@ fun main() {
 
     // get a chat completion
     openai
-        .chatCompletion(ModelName.GPT3_5, listOf(Message.User("good afternoon")), 1000, true)
+        .chatCompletion(ModelName.GPT3_5, listOf(Message.User("good afternoon")), MaxTokens.of(1000), true)
         .onFailure { error(it) }
         .toList()
         .first()

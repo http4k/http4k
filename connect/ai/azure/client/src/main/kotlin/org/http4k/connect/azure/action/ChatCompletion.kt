@@ -11,6 +11,7 @@ import org.http4k.connect.azure.action.Detail.auto
 import org.http4k.connect.model.FinishReason
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -28,7 +29,7 @@ data class ChatCompletion(
     val model: ModelName,
     val messages: List<Message>,
     val max_tokens: Int? = null,
-    val temperature: Double = 1.0,
+    val temperature: Temperature = Temperature.ONE,
     val top_p: Double = 1.0,
     val seed: Int = 1,
     val stop: List<String>? = null,

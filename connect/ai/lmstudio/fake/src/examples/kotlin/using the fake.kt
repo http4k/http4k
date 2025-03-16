@@ -8,6 +8,7 @@ import org.http4k.connect.lmstudio.LmStudio
 import org.http4k.connect.model.Role.Companion.User
 import org.http4k.connect.lmstudio.action.Message
 import org.http4k.connect.lmstudio.chatCompletion
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -25,7 +26,7 @@ fun main() {
 
     // get a chat completion
     openai
-        .chatCompletion(ModelName.CHAT_MODEL, listOf(Message.User("good afternoon")), 1000, true)
+        .chatCompletion(ModelName.CHAT_MODEL, listOf(Message.User("good afternoon")), MaxTokens.of(100), true)
         .onFailure { error(it) }
         .toList()
         .first()

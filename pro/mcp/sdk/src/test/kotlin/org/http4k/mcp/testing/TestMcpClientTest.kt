@@ -5,6 +5,10 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MaxTokens
+import org.http4k.connect.model.MimeType
+import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
@@ -21,23 +25,18 @@ import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpError
-import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
-import org.http4k.mcp.model.MimeType
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
-import org.http4k.mcp.model.StopReason
+import org.http4k.connect.model.StopReason
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ProtocolCapability.Experimental
 import org.http4k.mcp.protocol.ProtocolCapability.PromptsChanged
 import org.http4k.mcp.protocol.ServerCapabilities
@@ -332,7 +331,7 @@ class TestMcpClientTest {
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val model = ModelIdentifier.of("name")
+        val model = ModelName.of("name")
         val serverSampling = ServerSampling()
 
         val mcp = StandardSseMcp(

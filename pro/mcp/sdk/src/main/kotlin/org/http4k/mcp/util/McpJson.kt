@@ -3,6 +3,13 @@ package org.http4k.mcp.util
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MaxTokens
+import org.http4k.connect.model.MimeType
+import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.StopReason
+import org.http4k.connect.model.Temperature
+import org.http4k.connect.model.ToolName
+import org.http4k.connect.withAiMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -15,17 +22,11 @@ import org.http4k.format.value
 import org.http4k.format.withStandardMappings
 import org.http4k.mcp.model.CostPriority
 import org.http4k.mcp.model.IntelligencePriority
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.MimeType
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.SpeedPriority
-import org.http4k.mcp.model.StopReason
-import org.http4k.mcp.model.Temperature
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
@@ -44,23 +45,18 @@ object McpJson : ConfigurableMoshi(
         .addLast(MoshiNodeAdapter)
         .asConfigurable()
         .withStandardMappings()
+        .withAiMappings()
         .value(Base64Blob)
         .value(CostPriority)
         .value(IntelligencePriority)
-        .value(MaxTokens)
         .value(McpEntity)
         .value(McpRpcMethod)
         .value(RequestId)
-        .value(MimeType)
-        .value(ModelIdentifier)
         .value(ProtocolVersion)
         .value(PromptName)
         .value(ResourceName)
         .value(SessionId)
         .value(SpeedPriority)
-        .value(StopReason)
-        .value(Temperature)
-        .value(ToolName)
         .value(Version)
         .done()
 )

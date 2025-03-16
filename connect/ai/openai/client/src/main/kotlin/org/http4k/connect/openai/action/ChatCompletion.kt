@@ -6,8 +6,10 @@ import dev.forkhandles.result4k.Result
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.model.FinishReason
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.openai.CompletionId
 import org.http4k.connect.openai.ObjectType
@@ -34,8 +36,8 @@ import se.ansman.kotshi.PolymorphicLabel
 data class ChatCompletion(
     val model: ModelName,
     val messages: List<Message>,
-    val max_tokens: Int? = null,
-    val temperature: Double = 1.0,
+    val max_tokens: MaxTokens? = null,
+    val temperature: Temperature = Temperature.ONE,
     val top_p: Double = 1.0,
     val n: Int = 1,
     val stop: List<String>? = null,
@@ -52,11 +54,11 @@ data class ChatCompletion(
     val seed: Int? = null,
     val stream_options: StreamOptions? = null
 ) : OpenAIAction<Sequence<CompletionResponse>> {
-    constructor(model: ModelName, messages: List<Message>, max_tokens: Int = 16, stream: Boolean = true) : this(
+    constructor(model: ModelName, messages: List<Message>, max_tokens: MaxTokens, stream: Boolean = true) : this(
         model,
         messages,
         max_tokens = max_tokens,
-        temperature = 1.0,
+        temperature = Temperature.ONE,
         top_p = 1.0,
         n = 1,
         stop = null,
@@ -67,11 +69,11 @@ data class ChatCompletion(
         stream = stream
     )
 
-    constructor(model: ModelName, message: Message, max_tokens: Int = 16, stream: Boolean = true) : this(
+    constructor(model: ModelName, message: Message, max_tokens: MaxTokens, stream: Boolean = true) : this(
         model,
         listOf(message),
         max_tokens = max_tokens,
-        temperature = 1.0,
+        temperature = Temperature.ONE,
         top_p = 1.0,
         n = 1,
         stop = null,

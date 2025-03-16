@@ -46,7 +46,7 @@ class ChatCompletionGeneratorTest {
         assertThat(
             ChatCompletionGenerator.Echo(input),
             equalTo(
-                listOf(Choice(0, ChoiceDetail(System, "foobar "), null, stop))
+                listOf(Choice(0, ChoiceDetail(System, "foobar"), null, stop))
             )
         )
     }

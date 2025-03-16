@@ -8,10 +8,8 @@ import com.natpryce.hamkrest.present
 import org.http4k.connect.lmstudio.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.lmstudio.ObjectType.Companion.ChatCompletionChunk
 import org.http4k.connect.lmstudio.action.Message
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.Role.Companion
-import org.http4k.connect.model.Role.Companion.System
 import org.http4k.connect.successValue
 import org.http4k.testing.ApprovalTest
 import org.junit.jupiter.api.Test
@@ -39,7 +37,7 @@ interface LmStudioContract {
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
             ),
-            1000,
+            MaxTokens.of(1000),
             stream = false
         ).successValue().toList()
         assertThat(responses.size, equalTo(1))
@@ -55,7 +53,7 @@ interface LmStudioContract {
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
             ),
-            1000,
+            MaxTokens.of(1000),
             stream = true
         ).successValue().toList()
         assertThat(responses.size, greaterThan(0))

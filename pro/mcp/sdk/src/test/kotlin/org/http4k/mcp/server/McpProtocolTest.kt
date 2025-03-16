@@ -4,6 +4,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MaxTokens
+import org.http4k.connect.model.MimeType
+import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -31,11 +35,8 @@ import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.LogLevel
-import org.http4k.mcp.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
-import org.http4k.mcp.model.MimeType
-import org.http4k.mcp.model.ModelIdentifier
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -44,9 +45,8 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
-import org.http4k.mcp.model.StopReason
+import org.http4k.connect.model.StopReason
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolCapability
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
@@ -70,13 +70,13 @@ import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.ServerCompletions
-import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.server.sse.SseClientSessions
 import org.http4k.mcp.server.sse.StandardSseMcp
@@ -417,7 +417,7 @@ class McpProtocolTest {
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val model = ModelIdentifier.of("name")
+        val model = ModelName.of("name")
         val sampling = ServerSampling(Random(0))
 
         val mcp = StandardSseMcp(

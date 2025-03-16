@@ -1,5 +1,6 @@
 package org.http4k.connect.langchain.chat
 
+import org.http4k.connect.model.Temperature
 import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
@@ -9,7 +10,7 @@ class OpenAiChatLanguageModelTest : ChatLanguageModelContract {
     override val model by lazy {
         OpenAiChatLanguageModel(
             OpenAI.Http(OpenAIToken.of("hello"), FakeOpenAI()),
-            OpenAiChatModelOptions(temperature = 0.0)
+            OpenAiChatModelOptions(temperature = Temperature.ZERO)
         )
     }
 }

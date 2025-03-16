@@ -1,3 +1,4 @@
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.openai.GPT3_5
 import org.http4k.connect.openai.Http
@@ -20,7 +21,7 @@ fun main() {
             listOf(
                 Message.User("Explain pythagoras's theorem to a 5 year old child")
             ),
-            1000,
+            MaxTokens.of(1000),
             false
         )
     )

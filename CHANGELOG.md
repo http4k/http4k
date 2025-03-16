@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.1.1.0 (uncut)
+### v6.2.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-connect-*** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
 - **http4k-connect-ai-anthropic-*** : [Fix] Correct name of input_schema field in Tool.
 
 ### v6.1.0.1

@@ -6,6 +6,7 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
 import org.http4k.connect.model.Timestamp
+import org.http4k.connect.withAiMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -21,15 +22,14 @@ object AzureAIMoshi : ConfigurableMoshi(
         .add(MapAdapter)
         .asConfigurable()
         .withStandardMappings()
+        .withAiMappings()
         .value(Base64Blob)
         .value(CompletionId)
-        .value(ModelName)
         .value(ModelProvider)
         .value(ModelType)
         .value(ObjectType)
         .value(ObjectId)
         .value(Prompt)
-        .value(Role)
         .value(Timestamp)
         .value(TokenId)
         .value(User)

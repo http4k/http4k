@@ -1,18 +1,21 @@
 package org.http4k.mcp.protocol.messages
 
+import org.http4k.connect.model.ToolName
 import org.http4k.format.MoshiNode
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
-import org.http4k.mcp.util.McpJson
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class McpTool(val name: ToolName, val description: String, val inputSchema: Map<String, Any> = emptyMap()) {
+data class McpTool(
+    val name: ToolName,
+    val description: String,
+    val inputSchema: Map<String, Any> = emptyMap()
+) {
     object List : McpRpc {
         override val Method = of("tools/list")
 

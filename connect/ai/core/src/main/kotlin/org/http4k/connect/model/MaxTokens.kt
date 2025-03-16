@@ -1,4 +1,4 @@
-package org.http4k.mcp.model
+package org.http4k.connect.model
 
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory

@@ -1,5 +1,6 @@
 package experiment
 
+import org.http4k.connect.model.MimeType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
@@ -8,7 +9,6 @@ import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.MimeType
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Tool

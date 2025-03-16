@@ -1,6 +1,7 @@
 package org.http4k.mcp.model
 
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
@@ -19,7 +20,8 @@ sealed class Resource : CapabilitySpec  {
         override val description: String? = null,
         override val mimeType: MimeType? = null
     ) : Resource() {
-        constructor(uri: String, name: String, description: String? = null, mimeType: MimeType? = null) : this(Uri.of(uri), ResourceName.of(name), description, mimeType)
+        constructor(uri: String, name: String, description: String? = null,
+                    mimeType: MimeType? = null) : this(Uri.of(uri), ResourceName.of(name), description, mimeType)
         override fun matches(uri: Uri) = this.uri == uri
     }
 
@@ -30,7 +32,8 @@ sealed class Resource : CapabilitySpec  {
         override val mimeType: MimeType? = null,
         internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.authority == it.authority }
     ) : Resource() {
-        constructor(uriTemplate: String, name: String, description: String? = null, mimeType: MimeType? = null) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType)
+        constructor(uriTemplate: String, name: String, description: String? = null,
+                    mimeType: MimeType? = null) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType)
         override fun matches(uri: Uri) = matchFn(uri)
     }
 

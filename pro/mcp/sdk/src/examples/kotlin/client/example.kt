@@ -2,6 +2,7 @@ package client
 
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.client.JavaHttpClient
+import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -15,7 +16,6 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.ToolName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.Version
 

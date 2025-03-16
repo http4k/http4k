@@ -10,6 +10,7 @@ import org.http4k.connect.azure.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.azure.ObjectType.Companion.ChatCompletionChunk
 import org.http4k.connect.azure.action.Completion
 import org.http4k.connect.azure.action.Message
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.System
 import org.http4k.connect.model.Role.Companion.User
@@ -51,7 +52,7 @@ interface AzureAIContract {
         val responses = azureAi(Completion(
             Prompt.of("foobar"),
             stream = false,
-            max_tokens = 1000,
+            max_tokens = MaxTokens.of(1000),
         )).successValue().toList()
         assertThat(responses.size, equalTo(1))
         assertThat(responses.first().usage, present())
@@ -79,7 +80,7 @@ interface AzureAIContract {
         val responses = azureAi(
             Completion(
                 Prompt.of("what is the best type of cat?"),
-                1000,
+                MaxTokens.of(1000),
                 stream = true
             )
         ).successValue().toList()

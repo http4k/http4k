@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.startsWith
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.System
 import org.http4k.connect.model.Role.Companion.User
@@ -42,7 +43,7 @@ interface OpenAIContract {
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
             ),
-            1000,
+            MaxTokens.of(1000),
             stream = false
         ).successValue().toList()
         assertThat(responses.size, equalTo(1))
@@ -58,7 +59,7 @@ interface OpenAIContract {
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
             ),
-            1000,
+            MaxTokens.of(1000),
             stream = true
         ).successValue().toList()
         assertThat(responses.size, greaterThan(0))
