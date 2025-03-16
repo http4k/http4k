@@ -35,7 +35,12 @@ internal class ClientSampling(
             val timeout = overrideDefaultTimeout ?: defaultTimeout
 
             responses.forEach {
-                sender(McpSampling, McpSampling.Response(it.model, it.stopReason, it.role, it.content), timeout, requestId)
+                sender(
+                    McpSampling,
+                    McpSampling.Response(it.model, it.stopReason, it.role, it.content),
+                    timeout,
+                    requestId
+                )
 
                 if (it.stopReason != null) tidyUp(requestId)
             }

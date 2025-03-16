@@ -8,7 +8,6 @@ import org.http4k.connect.azure.Region
 import org.http4k.connect.azure.action.Message
 import org.http4k.connect.azure.chatCompletion
 import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.User
 import org.http4k.lens.value
 
 fun main() {

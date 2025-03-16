@@ -18,7 +18,8 @@ class Prompt private constructor(
     constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>) :
         this(name, description, args.toList())
 
-    object Arg : BiDiLensSpec<PromptRequest, String>("promptRequest", StringParam,
+    object Arg : BiDiLensSpec<PromptRequest, String>(
+        "promptRequest", StringParam,
         LensGet { name, target -> listOfNotNull(target[name]) },
         LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m + (name to v)) } }
     )

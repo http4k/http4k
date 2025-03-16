@@ -13,7 +13,6 @@ import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.output.Response
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
 import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.Role.Companion.System
 import org.http4k.connect.model.Role.Companion.User

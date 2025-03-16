@@ -12,8 +12,6 @@ import org.http4k.connect.azure.action.Completion
 import org.http4k.connect.azure.action.Message
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.System
-import org.http4k.connect.model.Role.Companion.User
 import org.http4k.connect.successValue
 import org.http4k.testing.ApprovalTest
 import org.junit.jupiter.api.Test

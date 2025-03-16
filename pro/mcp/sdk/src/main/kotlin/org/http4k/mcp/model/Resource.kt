@@ -7,7 +7,7 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 
-sealed class Resource : CapabilitySpec  {
+sealed class Resource : CapabilitySpec {
     abstract fun matches(uri: Uri): Boolean
 
     abstract val name: ResourceName
@@ -20,8 +20,11 @@ sealed class Resource : CapabilitySpec  {
         override val description: String? = null,
         override val mimeType: MimeType? = null
     ) : Resource() {
-        constructor(uri: String, name: String, description: String? = null,
-                    mimeType: MimeType? = null) : this(Uri.of(uri), ResourceName.of(name), description, mimeType)
+        constructor(
+            uri: String, name: String, description: String? = null,
+            mimeType: MimeType? = null
+        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType)
+
         override fun matches(uri: Uri) = this.uri == uri
     }
 
@@ -32,8 +35,11 @@ sealed class Resource : CapabilitySpec  {
         override val mimeType: MimeType? = null,
         internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.authority == it.authority }
     ) : Resource() {
-        constructor(uriTemplate: String, name: String, description: String? = null,
-                    mimeType: MimeType? = null) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType)
+        constructor(
+            uriTemplate: String, name: String, description: String? = null,
+            mimeType: MimeType? = null
+        ) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType)
+
         override fun matches(uri: Uri) = matchFn(uri)
     }
 

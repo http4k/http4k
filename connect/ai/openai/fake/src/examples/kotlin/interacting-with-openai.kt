@@ -4,7 +4,6 @@ import org.http4k.connect.openai.GPT3_5
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.OpenAIToken
-import org.http4k.connect.model.Role.Companion.User
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.chatCompletion
 

@@ -4,10 +4,8 @@ import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.azure.AzureAIMoshi.autoBody
 import org.http4k.connect.azure.Prompt
 import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.Role
 import org.http4k.connect.model.Temperature
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.with
 import se.ansman.kotshi.JsonSerializable

@@ -32,9 +32,9 @@ import org.http4k.connect.lmstudio.action.ResponseFormat
 import org.http4k.connect.lmstudio.action.Tool
 import org.http4k.connect.lmstudio.action.ToolCall
 import org.http4k.connect.lmstudio.chatCompletion
-import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.FinishReason.content_filter
 import org.http4k.connect.model.FinishReason.length
+import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.FinishReason.tool_calls
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName

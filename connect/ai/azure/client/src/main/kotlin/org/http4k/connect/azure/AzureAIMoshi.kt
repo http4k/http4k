@@ -3,8 +3,6 @@ package org.http4k.connect.azure
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.withAiMappings
 import org.http4k.format.ConfigurableMoshi

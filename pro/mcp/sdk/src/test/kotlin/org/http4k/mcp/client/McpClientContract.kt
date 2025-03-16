@@ -4,7 +4,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.Role.Companion.Assistant
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
@@ -21,7 +24,6 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
-import org.http4k.connect.model.MaxTokens
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Prompt
@@ -29,8 +31,6 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.Role.assistant
-import org.http4k.connect.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
@@ -84,7 +84,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
-                PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
+                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
             ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(listOf("1", "2"))
@@ -144,8 +144,8 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
         if (notifications) {
             val samplingResponses = listOf(
-                SamplingResponse(model, assistant, Content.Text("hello"), null),
-                SamplingResponse(model, assistant, Content.Text("world"), StopReason.of("foobar"))
+                SamplingResponse(model, Assistant, Content.Text("hello"), null),
+                SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
             )
 
             mcpClient.sampling().onSampled {

@@ -1,7 +1,9 @@
 package org.http4k.connect.anthropic
 
-import org.http4k.connect.anthropic.action.Content
-import org.http4k.connect.anthropic.action.Content.*
+import org.http4k.connect.anthropic.action.Content.Image
+import org.http4k.connect.anthropic.action.Content.Text
+import org.http4k.connect.anthropic.action.Content.ToolResult
+import org.http4k.connect.anthropic.action.Content.ToolUse
 import org.http4k.connect.anthropic.action.Message
 import java.util.Random
 

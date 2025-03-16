@@ -23,7 +23,8 @@ import kotlin.random.Random
 
 class ServerSampling(private val random: Random = Random) : Sampling {
 
-    private val subscriptions = ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
+    private val subscriptions =
+        ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, RequestId) -> Unit>>()
 
     private val responseQueues = ConcurrentHashMap<RequestId, BlockingQueue<SamplingResponse>>()
 

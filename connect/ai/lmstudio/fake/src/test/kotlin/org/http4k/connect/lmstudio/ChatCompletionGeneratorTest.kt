@@ -6,10 +6,8 @@ import org.http4k.connect.lmstudio.action.ChatCompletion
 import org.http4k.connect.lmstudio.action.Choice
 import org.http4k.connect.lmstudio.action.ChoiceDetail
 import org.http4k.connect.lmstudio.action.Message
-import org.http4k.connect.model.FinishReason
-import org.http4k.connect.model.FinishReason.*
+import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.User
 import org.http4k.connect.model.Role.Companion.System
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver

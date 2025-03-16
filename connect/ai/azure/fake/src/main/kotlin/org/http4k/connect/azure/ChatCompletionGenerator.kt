@@ -1,10 +1,8 @@
 package org.http4k.connect.azure
 
-import de.svenjacobs.loremipsum.LoremIpsum
-import org.http4k.connect.azure.action.ModelCompletion
-import org.http4k.connect.azure.action.ChatCompletion
 import org.http4k.connect.azure.action.Choice
 import org.http4k.connect.azure.action.ChoiceDetail
+import org.http4k.connect.azure.action.ModelCompletion
 import org.http4k.connect.model.FinishReason
 import org.http4k.connect.model.Role
 import org.http4k.connect.model.Role.Companion.User

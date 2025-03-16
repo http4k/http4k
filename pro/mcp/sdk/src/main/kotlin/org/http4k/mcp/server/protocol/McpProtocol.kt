@@ -223,7 +223,8 @@ class McpProtocol<Transport, RSP : Any>(
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
             clients[sId]?.trackRequest(id) {
-                sampling.receive(id, it.fromJsonRpc()) }
+                sampling.receive(id, it.fromJsonRpc())
+            }
             clientSessions.send(sId, req.toJsonRpc(McpSampling, asJsonObject(id)))
         }
 

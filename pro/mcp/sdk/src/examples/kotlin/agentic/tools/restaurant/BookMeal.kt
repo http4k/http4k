@@ -15,8 +15,11 @@ fun BookMeal(name: String): ToolCapability {
     val peopleArg = Tool.Arg.int().required("people", "how many people are in the party")
     val timeArg = Tool.Arg.localTime().required("time", "time for the booking. in the format 10:15")
     return Tool(
-        "${name.filter { it.isLetterOrDigit() }}_Book_meal", "Books a slot for a given date, time, and number of people at $name",
-        dateArg, peopleArg, timeArg,
+        "${name.filter { it.isLetterOrDigit() }}_Book_meal",
+        "Books a slot for a given date, time, and number of people at $name",
+        dateArg,
+        peopleArg,
+        timeArg,
     ) bind {
         val date = dateArg(it)
         val people = peopleArg(it)

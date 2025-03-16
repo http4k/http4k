@@ -4,7 +4,6 @@ Intro Image
 Get an instant summary of this page
 Along with context, alternative points of view, and links to learn more
 
-
 Get summary
 You have early access to a new product. Give us feedback on how to make it better: extension@shortform.com
 
@@ -152,7 +151,7 @@ For servers that do not implement OAuth 2.0 Authorization Server Metadata, clien
 2.3.2]({{< ref "specification/draft/basic/authorization#232-authorization-base-url" >}})):
 
 | Endpoint               | Default Path | Description                          |
-| ---------------------- | ------------ | ------------------------------------ |
+|------------------------|--------------|--------------------------------------|
 | Authorization Endpoint | /authorize   | Used for authorization requests      |
 | Token Endpoint         | /token       | Used for token exchange & refresh    |
 | Registration Endpoint  | /register    | Used for dynamic client registration |
@@ -297,7 +296,7 @@ The following security requirements **MUST** be implemented:
 Servers **MUST** return appropriate HTTP status codes for authorization errors:
 
 | Status Code | Description  | Usage                                      |
-| ----------- | ------------ | ------------------------------------------ |
+|-------------|--------------|--------------------------------------------|
 | 401         | Unauthorized | Authorization required or token invalid    |
 | 403         | Forbidden    | Invalid scopes or insufficient permissions |
 | 400         | Bad Request  | Malformed authorization request            |

@@ -8,6 +8,8 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.Role.Companion.Assistant
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
@@ -34,8 +36,6 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.Role
-import org.http4k.connect.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ProtocolCapability.Experimental
 import org.http4k.mcp.protocol.ProtocolCapability.PromptsChanged
@@ -103,7 +103,7 @@ class TestMcpClientTest {
                 prompt bind {
                     PromptResponse(
                         listOf(
-                            Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
+                            Message(Assistant, Content.Text(intArg(it).toString().reversed()))
                         ),
                         "description",
                     )
@@ -137,7 +137,7 @@ class TestMcpClientTest {
                 equalTo(
                     Success(
                         PromptResponse(
-                            listOf(Message(Role.assistant, Content.Text("321"))),
+                            listOf(Message(Assistant, Content.Text("321"))),
                             "description"
                         )
                     )
@@ -345,9 +345,9 @@ class TestMcpClientTest {
         mcp.useClient {
             sampling().onSampled {
                 sequenceOf(
-                    SamplingResponse(model, Role.assistant, content, null),
-                    SamplingResponse(model, Role.assistant, content, StopReason.of("bored")),
-                    SamplingResponse(model, Role.assistant, content, StopReason.of("this should not be processed"))
+                    SamplingResponse(model, Assistant, content, null),
+                    SamplingResponse(model, Assistant, content, StopReason.of("bored")),
+                    SamplingResponse(model, Assistant, content, StopReason.of("this should not be processed"))
                 )
             }
 
@@ -360,8 +360,8 @@ class TestMcpClientTest {
             assertThat(
                 received.toList(), equalTo(
                     listOf(
-                        Success(SamplingResponse(model, Role.assistant, content, null)),
-                        Success(SamplingResponse(model, Role.assistant, content, StopReason.of("bored")))
+                        Success(SamplingResponse(model, Assistant, content, null)),
+                        Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
                     )
                 )
             )

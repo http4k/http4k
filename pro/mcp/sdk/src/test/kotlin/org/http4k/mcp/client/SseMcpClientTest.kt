@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.failureOrNull
 import org.http4k.client.JavaHttpClient
+import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Filter
@@ -27,7 +28,6 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.Role.assistant
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
@@ -64,7 +64,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
             Prompt(PromptName.of("prompt"), "description1") bind {
-                PromptResponse(listOf(Message(assistant, Content.Text(it.toString()))), "description")
+                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             },
             Tool("reverse", "description", toolArg) bind {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))

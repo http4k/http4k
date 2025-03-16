@@ -2,14 +2,14 @@ package org.http4k.mcp.protocol.messages
 
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.Role
+import org.http4k.connect.model.StopReason
+import org.http4k.connect.model.Temperature
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.ModelPreferences
-import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.SamplingIncludeContext
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
 import org.http4k.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
 

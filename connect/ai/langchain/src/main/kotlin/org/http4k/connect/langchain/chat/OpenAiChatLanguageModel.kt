@@ -15,12 +15,11 @@ import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.output.FinishReason
 import dev.langchain4j.model.output.Response
+import dev.langchain4j.model.output.TokenUsage
+import org.http4k.connect.model.FinishReason.content_filter
+import org.http4k.connect.model.FinishReason.length
 import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.FinishReason.tool_calls
-import org.http4k.connect.model.FinishReason.length
-import org.http4k.connect.model.FinishReason.content_filter
-
-import dev.langchain4j.model.output.TokenUsage
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role

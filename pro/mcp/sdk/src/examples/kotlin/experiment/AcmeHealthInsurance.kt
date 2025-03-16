@@ -1,12 +1,12 @@
 package experiment
 
+import org.http4k.connect.model.Role.Companion.User
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.Role.user
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.PromptCapability
@@ -37,7 +37,7 @@ fun insuranceClaim(): PromptCapability {
         PromptResponse(
             listOf(
                 Message(
-                    user, Text(
+                    User, Text(
                         """To raise a claim for ${claimant(req)} expensing ${item(req)}.
                 - Obtain an invoice for the item.
                 - Save the invoice to disk for future reference.

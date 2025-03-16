@@ -1,13 +1,8 @@
 package org.http4k.connect.openai
 
-import dev.forkhandles.values.LongValue
-import dev.forkhandles.values.LongValueFactory
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
-import dev.forkhandles.values.minValue
 import org.http4k.connect.model.ModelName
-import java.time.Instant
-import java.time.Instant.ofEpochSecond
 
 class OpenAIToken private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<OpenAIToken>(::OpenAIToken)

@@ -2,10 +2,6 @@ package org.http4k.connect.azure
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
-import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.filter.debug
 
 class Region private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Region>(::Region)

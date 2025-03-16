@@ -7,6 +7,8 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.Role.Companion.Assistant
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
@@ -43,9 +45,7 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.Role
 import org.http4k.mcp.model.Root
-import org.http4k.connect.model.StopReason
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolCapability
@@ -158,7 +158,7 @@ class McpProtocolTest {
                         prompt bind {
                             PromptResponse(
                                 listOf(
-                                    Message(Role.assistant, Content.Text(intArg(it).toString().reversed()))
+                                    Message(Assistant, Content.Text(intArg(it).toString().reversed()))
                                 ),
                                 "description",
                             )
@@ -187,7 +187,7 @@ class McpProtocolTest {
 
             assertNextMessage(
                 McpPrompt.Get.Response(
-                    listOf(Message(Role.assistant, Content.Text("321"))),
+                    listOf(Message(Assistant, Content.Text("321"))),
                     "description"
                 )
             )
@@ -446,26 +446,26 @@ class McpProtocolTest {
             )
 
             mcp.sendToMcp(
-                McpSampling.Response(model, null, Role.assistant, content),
+                McpSampling.Response(model, null, Assistant, content),
                 RequestId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
-                McpSampling.Response(model, StopReason.of("bored"), Role.assistant, content),
+                McpSampling.Response(model, StopReason.of("bored"), Assistant, content),
                 RequestId.of(7425097216252813)
             )
 
             // this is ignored!
             mcp.sendToMcp(
-                McpSampling.Response(model, StopReason.of("another stop reason"), Role.assistant, content),
+                McpSampling.Response(model, StopReason.of("another stop reason"), Assistant, content),
                 RequestId.of(7425097216252813)
             )
 
             assertThat(
                 received.toList(), equalTo(
                     listOf(
-                        Success(SamplingResponse(model, Role.assistant, content, null)),
-                        Success(SamplingResponse(model, Role.assistant, content, StopReason.of("bored")))
+                        Success(SamplingResponse(model, Assistant, content, null)),
+                        Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
                     )
                 )
             )

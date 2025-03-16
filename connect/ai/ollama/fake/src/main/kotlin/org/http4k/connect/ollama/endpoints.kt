@@ -2,7 +2,6 @@ package org.http4k.connect.ollama
 
 
 import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
 import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.Role.Companion.User
 import org.http4k.connect.ollama.OllamaMoshi.asFormatString

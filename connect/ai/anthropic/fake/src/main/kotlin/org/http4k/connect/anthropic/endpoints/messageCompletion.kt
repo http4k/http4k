@@ -5,7 +5,6 @@ import org.http4k.connect.anthropic.AnthropicAIMoshi.autoBody
 import org.http4k.connect.anthropic.LoremIpsum
 import org.http4k.connect.anthropic.MessageContentGenerator
 import org.http4k.connect.anthropic.ResponseId
-import org.http4k.connect.model.StopReason
 import org.http4k.connect.anthropic.action.MessageCompletion
 import org.http4k.connect.anthropic.action.MessageCompletionResponse
 import org.http4k.connect.anthropic.action.MessageCompletionStream
@@ -14,6 +13,7 @@ import org.http4k.connect.anthropic.action.Usage
 import org.http4k.connect.anthropic.end_turn
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.StopReason
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method
 import org.http4k.core.Response

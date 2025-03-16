@@ -22,7 +22,8 @@ class Tool private constructor(
         arguments.toList()
     )
 
-    object Arg : BiDiLensSpec<ToolRequest, String>("toolRequest", StringParam,
+    object Arg : BiDiLensSpec<ToolRequest, String>(
+        "toolRequest", StringParam,
         LensGet { name, target ->
             when (val value = target[name]) {
                 null -> emptyList()

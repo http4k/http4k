@@ -3,7 +3,6 @@ package org.http4k.connect.openai
 import org.http4k.connect.model.FinishReason
 import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.Role
-import org.http4k.connect.model.Timestamp
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.ChoiceDetail
