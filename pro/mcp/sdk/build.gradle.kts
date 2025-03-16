@@ -18,7 +18,8 @@ dependencies {
     api("se.ansman.kotshi:api:_")
 
     api(project(":http4k-api-jsonrpc"))
-    api(project(":http4k-connect-core"))
+    api(project(":http4k-connect-ai-core"))
+
     api("dev.forkhandles:values4k")
     api("dev.forkhandles:result4k")
     api("dev.forkhandles:time4k")
