@@ -56,7 +56,7 @@ data class Message(val role: Role, val content: List<Content>) {
 data class Tool(
     val name: ToolName,
     val description: String,
-    val input_schema: Schema,
+    val input_schema: Map<String, Any>,
     val type: ToolType? = null,
     val cache_control: CacheControl? = null
 )
@@ -68,9 +68,6 @@ enum class ToolType {
 enum class CacheControl {
     ephemeral
 }
-
-@JsonSerializable
-data class Schema(val type: String, val properties: Map<String, Any>, val required: List<String>)
 
 @JsonSerializable
 data class Metadata(val user_id: UserId?)
