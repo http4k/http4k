@@ -16,13 +16,10 @@ import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.output.FinishReason
 import dev.langchain4j.model.output.Response
 import dev.langchain4j.model.output.TokenUsage
-import org.http4k.connect.model.FinishReason.content_filter
-import org.http4k.connect.model.FinishReason.length
-import org.http4k.connect.model.FinishReason.stop
-import org.http4k.connect.model.FinishReason.tool_calls
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.Temperature
 import org.http4k.connect.openai.GPT3_5
 import org.http4k.connect.openai.OpenAI
@@ -41,6 +38,10 @@ import org.http4k.connect.openai.action.ResponseFormat
 import org.http4k.connect.openai.action.Tool
 import org.http4k.connect.openai.action.ToolCall
 import org.http4k.connect.openai.chatCompletion
+import org.http4k.connect.openai.content_filter
+import org.http4k.connect.openai.length
+import org.http4k.connect.openai.stop
+import org.http4k.connect.openai.tool_calls
 import org.http4k.connect.orThrow
 import org.http4k.core.Uri
 
@@ -103,10 +104,10 @@ fun OpenAiChatLanguageModel(
                         AiMessage(it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""),
                         it.usage?.let { TokenUsage(it.prompt_tokens, it.completion_tokens, it.total_tokens) },
                         when (it.choices?.last()?.finish_reason) {
-                            stop -> FinishReason.STOP
-                            length -> FinishReason.LENGTH
-                            content_filter -> FinishReason.CONTENT_FILTER
-                            tool_calls -> FinishReason.TOOL_EXECUTION
+                            StopReason.stop -> FinishReason.STOP
+                            StopReason.length -> FinishReason.LENGTH
+                            StopReason.content_filter -> FinishReason.CONTENT_FILTER
+                            StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
                             else -> FinishReason.OTHER
                         }
                     )

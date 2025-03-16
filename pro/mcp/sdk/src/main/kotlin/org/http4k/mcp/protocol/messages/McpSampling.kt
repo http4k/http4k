@@ -4,6 +4,7 @@ import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
 import org.http4k.connect.model.StopReason
+import org.http4k.connect.model.SystemMessage
 import org.http4k.connect.model.Temperature
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
@@ -20,7 +21,7 @@ object McpSampling : McpRpc {
     data class Request(
         val messages: List<Message>,
         val maxTokens: MaxTokens,
-        val systemPrompt: String? = null,
+        val systemPrompt: SystemMessage? = null,
         val includeContext: SamplingIncludeContext? = null,
         val temperature: Temperature? = null,
         val stopSequences: List<String>? = null,

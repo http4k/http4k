@@ -2,9 +2,9 @@ package org.http4k.connect.openai
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.System
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.ChoiceDetail
@@ -34,7 +34,7 @@ class ChatCompletionGeneratorTest {
         assertThat(
             ChatCompletionGenerator.ReverseInput(input),
             equalTo(
-                listOf(Choice(0, ChoiceDetail(System, "raboof"), null, stop))
+                listOf(Choice(0, ChoiceDetail(System, "raboof"), null, StopReason.stop))
             )
         )
     }
@@ -44,7 +44,7 @@ class ChatCompletionGeneratorTest {
         assertThat(
             ChatCompletionGenerator.Echo(input),
             equalTo(
-                listOf(Choice(0, ChoiceDetail(System, "foobar"), null, stop))
+                listOf(Choice(0, ChoiceDetail(System, "foobar"), null, StopReason.stop))
             )
         )
     }

@@ -6,9 +6,9 @@ import org.http4k.connect.lmstudio.action.ChatCompletion
 import org.http4k.connect.lmstudio.action.Choice
 import org.http4k.connect.lmstudio.action.ChoiceDetail
 import org.http4k.connect.lmstudio.action.Message
-import org.http4k.connect.model.FinishReason.stop
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.System
+import org.http4k.connect.model.StopReason
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -34,7 +34,7 @@ class ChatCompletionGeneratorTest {
         assertThat(
             ChatCompletionGenerator.ReverseInput(input),
             equalTo(
-                listOf(Choice(0, ChoiceDetail(System, "raboof"), null, stop))
+                listOf(Choice(0, ChoiceDetail(System, "raboof"), null, StopReason.stop))
             )
         )
     }
@@ -44,7 +44,7 @@ class ChatCompletionGeneratorTest {
         assertThat(
             ChatCompletionGenerator.Echo(input),
             equalTo(
-                listOf(Choice(0, ChoiceDetail(System, "foobar"), null, stop))
+                listOf(Choice(0, ChoiceDetail(System, "foobar"), null, StopReason.stop))
             )
         )
     }

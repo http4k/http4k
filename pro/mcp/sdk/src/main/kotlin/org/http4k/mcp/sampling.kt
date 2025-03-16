@@ -4,6 +4,7 @@ import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
 import org.http4k.connect.model.StopReason
+import org.http4k.connect.model.SystemMessage
 import org.http4k.connect.model.Temperature
 import org.http4k.core.Request
 import org.http4k.mcp.model.Content
@@ -19,7 +20,7 @@ typealias SamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
 data class SamplingRequest(
     val messages: List<Message>,
     val maxTokens: MaxTokens,
-    val systemPrompt: String? = null,
+    val systemPrompt: SystemMessage? = null,
     val includeContext: SamplingIncludeContext? = null,
     val temperature: Temperature? = null,
     val stopSequences: List<String>? = null,

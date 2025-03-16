@@ -5,10 +5,10 @@ package org.http4k.connect.openai.action
 import dev.forkhandles.result4k.Result
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
-import org.http4k.connect.model.FinishReason
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.openai.CompletionId
@@ -175,7 +175,7 @@ data class Choice(
     @JsonProperty(name = "message")
     internal val msg: ChoiceDetail?,
     internal val delta: ChoiceDetail?,
-    val finish_reason: FinishReason?
+    val finish_reason: StopReason?
 ) {
     val message get() = msg ?: delta
 }

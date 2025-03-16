@@ -3,6 +3,7 @@ package org.http4k.connect.lmstudio
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.StopReason
 
 class Org private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Org>(::Org) {
@@ -48,3 +49,7 @@ class CompletionId private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<CompletionId>(::CompletionId)
 }
 
+val StopReason.Companion.stop get() = StopReason.of("stop")
+val StopReason.Companion.length get() = StopReason.of("length")
+val StopReason.Companion.content_filter get() = StopReason.of("content_filter")
+val StopReason.Companion.tool_calls get() = StopReason.of("tool_calls")
