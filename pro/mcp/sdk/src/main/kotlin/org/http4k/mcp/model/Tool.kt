@@ -7,6 +7,7 @@ import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.protocol.messages.McpTool
 
 /**
  * Description of a Tool capability.
@@ -34,4 +35,19 @@ class Tool private constructor(
         LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m + (name to v)) } }
     )
 }
+
+fun Tool.asMcp() = McpTool(name, description, toSchema())
+
+fun Tool.toSchema() = mapOf(
+    "type" to "object",
+    "required" to args.filter { it.meta.required }.map { it.meta.name },
+    "properties" to mapOf(
+        *args.map {
+            it.meta.name to mapOf(
+                "type" to it.meta.paramMeta.description,
+                "description" to it.meta.description,
+            )
+        }.toTypedArray()
+    )
+)
 

@@ -23,6 +23,7 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.asMcp
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 
@@ -33,7 +34,7 @@ interface ToolCapability : ServerCapability {
 }
 
 fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
-    override fun toTool() = McpTool(tool.name, tool.description, tool.toSchema())
+    override fun toTool() = tool.asMcp()
 
     override fun call(mcp: McpTool.Call.Request, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), http) }
@@ -58,19 +59,6 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                     it.meta
                 )
             }
-
-    private fun Tool.toSchema() = mapOf(
-        "type" to "object",
-        "required" to args.filter { it.meta.required }.map { it.meta.name },
-        "properties" to mapOf(
-            *args.map {
-                it.meta.name to mapOf(
-                    "type" to it.meta.paramMeta.description,
-                    "description" to it.meta.description,
-                )
-            }.toTypedArray()
-        )
-    )
 }
 
 private fun Map<String, MoshiNode>.coerceIntoStrings() =
