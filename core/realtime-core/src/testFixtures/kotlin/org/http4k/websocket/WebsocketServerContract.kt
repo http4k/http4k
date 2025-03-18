@@ -101,7 +101,14 @@ abstract class WebsocketServerContract(
                         ws.send(WsMessage(content))
                     }
                 }
-            })
+            },
+            "/headers" bind { req ->
+                WsResponse { ws ->
+                    val headers = req.headers.joinToString(",") { (key, value) -> "$key=$value" }
+                    ws.send(WsMessage(headers))
+                }
+            }
+        )
 
         server = when {
             httpSupported -> poly(http, ws).asServer(serverConfig(0)).start()
@@ -299,5 +306,18 @@ abstract class WebsocketServerContract(
         client.send(anotherMessage)
 
         assertThat(client.received().take(2).toList(), equalTo(listOf(longMessage, anotherMessage)))
+    }
+
+    @Test
+    open fun `can receive headers from upgrade request`() {
+        val client = WebsocketClient.blocking(
+            Uri.of("ws://localhost:$port/headers"),
+            listOf("Foo" to "bar")
+        )
+
+        assertThat(
+            client.received().take(1).first().bodyString(),
+            containsSubstring("Foo=bar")
+        )
     }
 }
