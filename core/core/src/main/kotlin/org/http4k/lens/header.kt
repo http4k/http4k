@@ -5,6 +5,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
+import org.http4k.core.Method
 import org.http4k.core.Parameters
 import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
@@ -24,15 +25,17 @@ import java.util.Locale.getDefault
 typealias HeaderLens<T> = Lens<HttpMessage, T>
 
 
-object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
+object Header : BiDiLensSpec<HttpMessage, String>(
+    "header", StringParam,
     LensGet { name, target -> target.headerValues(name).map { it ?: "" } },
     LensSet { name, values, target -> values.fold(target.removeHeader(name)) { m, next -> m.header(name, next) } }
 ) {
     val CONTENT_TYPE = map(
         {
             parseValueAndDirectives(it).let {
-                ContentType(it.first, it.second
-                    .filter { it.first.lowercase(getDefault()) in setOf("boundary", "charset", "media-type") }
+                ContentType(
+                    it.first, it.second
+                        .filter { it.first.lowercase(getDefault()) in setOf("boundary", "charset", "media-type") }
                 )
             }
         },
@@ -48,7 +51,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
             .map { rawContentType ->
                 parseValueAndDirectives(rawContentType)
-                    .let { it.toAcceptContentType() to it.second.findQValue()}
+                    .let { it.toAcceptContentType() to it.second.findQValue() }
             }
             .map { QualifiedContent(it.first, it.second) }
             .let(::Accept)
@@ -110,7 +113,7 @@ fun Request.accept(): Accept? = ACCEPT(this)
 
 fun Request.accept(accept: Accept) = with(ACCEPT of accept)
 
-fun Request.accept(contentType: ContentType) = with(ACCEPT of Accept(listOf(QualifiedContent(contentType))))
+fun Request.accept(vararg contentTypes: ContentType) = with(ACCEPT of Accept(contentTypes.map(::QualifiedContent)))
 
 fun Request.basicAuthentication() = AUTHORIZATION_BASIC(this)
 
@@ -124,3 +127,9 @@ fun Request.bearerToken(): String? = header("Authorization")
     ?.substringAfter("earer ")
 
 fun Response.html(body: String) = contentType(TEXT_HTML).body(body)
+
+fun main() {
+    println(
+        Request(Method.GET, "").accept(ContentType.APPLICATION_JSON).accept(ContentType.TEXT_EVENT_STREAM)
+    )
+}
