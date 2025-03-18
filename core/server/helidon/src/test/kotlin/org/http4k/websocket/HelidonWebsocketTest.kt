@@ -13,6 +13,7 @@ class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) },
 
     /**
      * Helidon fails to provide the headers
+     * https://github.com/helidon-io/helidon/issues/9918
      */
     @Disabled
     override fun `can receive headers from upgrade request`() {
