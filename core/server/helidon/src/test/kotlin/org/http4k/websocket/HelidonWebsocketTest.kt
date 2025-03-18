@@ -10,4 +10,12 @@ class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) },
     override fun `should propagate close on server stop`() {
         super.`should propagate close on server stop`()
     }
+
+    /**
+     * Helidon fails to provide the headers
+     */
+    @Disabled
+    override fun `can receive headers from upgrade request`() {
+        super.`can receive headers from upgrade request`()
+    }
 }
