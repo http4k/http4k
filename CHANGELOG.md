@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.2.0.0 (uncut)
 - **http4k-*** : Upgrade some dependency versions.
+- **http4k-realtime-core** : Add Router binding for all Websockets and SSE handlers
 - **http4k-connect-*** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
 - **http4k-connect-openai-*** : [Breaking] Rename `FinishReason` to `StopReason`
 - **http4k-connect-ai-anthropic-*** : [Breaking] Replaced `Schema` with a simple `Map<String, Any>`, as we are unifying the types across all AI modules. A new Schema type will be introduced in a future release. Replace existing Schema usage with a Map<String, Any> for now.
