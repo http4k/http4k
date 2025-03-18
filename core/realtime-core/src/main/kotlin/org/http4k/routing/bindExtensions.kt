@@ -14,6 +14,8 @@ infix fun String.bindHttp(method: Method): PathMethod = PathMethod(this, method)
 infix fun String.bindSse(action: SseHandler): RoutingSseHandler = this bind action
 infix fun String.bindSse(action: RoutingSseHandler): RoutingSseHandler = this bind action
 infix fun String.bindSse(method: Method): PathMethod = PathMethod(this, method)
+infix fun Router.bindSse(handler: RoutingSseHandler): RoutingSseHandler = this bind handler
 
 infix fun String.bindWs(action: WsHandler): RoutingWsHandler = this bind action
 infix fun String.bindWs(action: RoutingWsHandler): RoutingWsHandler = this bind action
+infix fun Router.bindWs(handler: RoutingWsHandler): RoutingWsHandler = this bind handler

@@ -1,12 +1,21 @@
 package org.http4k.routing
 
+import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
+import org.http4k.routing.RoutingResult.Matched
+import org.http4k.routing.RoutingResult.NotMatched
+import org.http4k.sse.NoOp
+import org.http4k.sse.SseFilter
+import org.http4k.sse.SseHandler
+import org.http4k.sse.SseResponse
+import org.http4k.sse.then
 import org.http4k.websocket.NoOp
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsResponse
+import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
 import org.http4k.websocket.WsStatus.Companion.REFUSE
 import org.http4k.websocket.then
 
@@ -71,4 +80,26 @@ class TemplatedWsRoute(
 infix fun PathMethod.to(handler: WsHandler) = when (handler) {
     is RoutingWsHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
     else -> RoutingWsHandler(listOf(TemplatedWsRoute(UriTemplate.from(path), handler, method.asRouter())))
+}
+
+data class SimpleWsRouteMatcher(
+    private val router: Router,
+    private val handler: WsHandler,
+    private val filter: WsFilter = WsFilter.NoOp
+) : RouteMatcher<WsResponse, WsFilter> {
+
+    override fun match(request: Request) = when (val result = router(request)) {
+        is Matched -> RoutingMatch(0, result.description, filter.then(handler))
+        is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request -> WsResponse { it.close(
+            NEVER_CONNECTED)} })
+    }
+
+    override fun withBasePath(prefix: String): RouteMatcher<WsResponse, WsFilter> =
+        TemplatedWsRoute(UriTemplate.from(prefix), handler, router, filter)
+
+    override fun withRouter(other: Router): RouteMatcher<WsResponse, WsFilter> = copy(router = router.and(other))
+
+    override fun withFilter(new: WsFilter): RouteMatcher<WsResponse, WsFilter> = copy(filter = new.then(filter))
+
+    override fun toString(): String = router.toString()
 }

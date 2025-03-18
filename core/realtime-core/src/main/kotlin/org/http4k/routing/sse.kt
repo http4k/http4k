@@ -1,8 +1,11 @@
 package org.http4k.routing
 
 import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.UriTemplate
 import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
+import org.http4k.routing.RoutingResult.Matched
+import org.http4k.routing.RoutingResult.NotMatched
 import org.http4k.sse.NoOp
 import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
@@ -67,12 +70,43 @@ class TemplatedSseRoute(
     router = router,
     filter = filter,
     responseFor = { SseResponse(it, emptyList(), false, Sse::close) },
-    addUriTemplateFilter = { next -> { SseResponseWithContext(next(RequestWithContext(it, uriTemplate)), uriTemplate) } }
+    addUriTemplateFilter = { next ->
+        {
+            SseResponseWithContext(
+                next(RequestWithContext(it, uriTemplate)),
+                uriTemplate
+            )
+        }
+    }
 ) {
     override fun withBasePath(prefix: String) = TemplatedSseRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 
     override fun withFilter(new: SseFilter) = TemplatedSseRoute(uriTemplate, handler, router, new.then(filter))
 
     override fun withRouter(other: Router) = TemplatedSseRoute(uriTemplate, handler, router.and(other), filter)
+}
 
+data class SimpleSseRouteMatcher(
+    private val router: Router,
+    private val handler: SseHandler,
+    private val filter: SseFilter = SseFilter.NoOp
+) : RouteMatcher<SseResponse, SseFilter> {
+
+    override fun match(request: Request) = when (val result = router(request)) {
+        is Matched -> RoutingMatch(0, result.description, filter.then(handler))
+        is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request ->
+            SseResponse(result.status) {
+                it.close()
+            }
+        })
+    }
+
+    override fun withBasePath(prefix: String): RouteMatcher<SseResponse, SseFilter> =
+        TemplatedSseRoute(UriTemplate.from(prefix), handler, router, filter)
+
+    override fun withRouter(other: Router): RouteMatcher<SseResponse, SseFilter> = copy(router = router.and(other))
+
+    override fun withFilter(new: SseFilter): RouteMatcher<SseResponse, SseFilter> = copy(filter = new.then(filter))
+
+    override fun toString(): String = router.toString()
 }
