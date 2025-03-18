@@ -11,4 +11,6 @@ plugins {
 dependencies {
     api(project(":http4k-format-moshi"))
     api("io.lettuce:lettuce-core:_")
+
+    testFixturesApi("io.mockk:mockk:_")
 }
