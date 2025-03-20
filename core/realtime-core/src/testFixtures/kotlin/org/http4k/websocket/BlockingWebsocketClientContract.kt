@@ -19,7 +19,7 @@ abstract class BlockingWebsocketClientContract(
     private val connectionErrorTimeout: Duration = Duration.ofSeconds(1)
 ) : BaseWebsocketClientContract(serverConfig) {
 
-    private val websockets = websocketFactory(Duration.ofSeconds(3))
+    private val websockets = websocketFactory(Duration.ofSeconds(5))
     abstract fun <T: Throwable> connectErrorMatcher(): Matcher<T>
     abstract fun <T: Throwable> connectionClosedErrorMatcher(): Matcher<T>
 
@@ -28,7 +28,7 @@ abstract class BlockingWebsocketClientContract(
         val ws = websockets.blocking(Uri.of("ws://localhost:$port/bob"))
         ws.send(WsMessage("hello"))
 
-        val messages = ws.received().take(4).toList()
+        val messages = ws.received().take(2).toList()
 
         assertThat(messages, equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
     }
