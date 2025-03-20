@@ -73,12 +73,15 @@ class WsFilterTest {
     fun `can Tap request`() {
         WsFilter
             .Tap { messages += it.uri.toString() }
-            .then { WsResponse {} }
+            .then {
+                messages += "connected"
+                WsResponse {}
+            }
             .invoke(Request(GET, Uri.of("/path")))
 
         assertThat(
             messages,
-            equalTo(listOf("/path"))
+            equalTo(listOf("/path", "connected"))
         )
     }
 }
