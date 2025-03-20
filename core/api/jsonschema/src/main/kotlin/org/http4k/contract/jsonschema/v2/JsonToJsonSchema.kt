@@ -26,7 +26,6 @@ class JsonToJsonSchema<NODE>(
             JsonType.Number -> numberSchema()
             JsonType.Boolean -> JsonSchema(BooleanParam.schema(json.boolean(json.bool(node))), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-            else -> throw IllegalSchemaException("unknown type")
         }
 
     private fun JsonSchema<NODE>.numberSchema() = json {
