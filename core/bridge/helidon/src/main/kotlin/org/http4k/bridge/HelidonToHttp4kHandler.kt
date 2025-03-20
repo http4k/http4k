@@ -1,5 +1,6 @@
 package org.http4k.bridge
 
+import io.helidon.http.Headers
 import io.helidon.http.Status.create
 import io.helidon.http.sse.SseEvent.builder
 import io.helidon.webserver.http.Handler
@@ -108,10 +109,7 @@ private fun ServerRequest.toHttp4k(): Request? =
                 .body(content().inputStream(), headers().contentLength().let {
                     if (it.isPresent) it.asLong else null
                 })
-                .headers(
-                    headers()
-                        .flatMap { value -> value.allValues().map { value.headerName().defaultCase() to it } }
-                )
+                .headers(headers())
                 .source(RequestSource(remotePeer().host(), remotePeer().port()))
         }
 
@@ -122,3 +120,6 @@ private fun ServerResponse.from(response: Response) = apply {
     }
     outputStream().use { response.body.stream.copyTo(it) }
 }
+
+internal fun Request.headers(headers: Headers) =
+    headers(headers.flatMap { value -> value.allValues().map { value.headerName().defaultCase() to it } })

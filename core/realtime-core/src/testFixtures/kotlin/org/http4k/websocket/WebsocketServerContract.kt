@@ -43,7 +43,7 @@ abstract class WebsocketServerContract(
 ) : PortBasedTest {
     private lateinit var server: Http4kServer
 
-    private val port by lazy { server.port() }
+    protected val port by lazy { server.port() }
 
     private val lens = WsMessage.string().map(String::toInt).toLens()
 

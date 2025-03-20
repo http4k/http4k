@@ -1,9 +1,14 @@
 package org.http4k.websocket
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
+import org.http4k.client.WebsocketClient
+import org.http4k.core.Uri
 import org.http4k.server.Helidon
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) }, JavaHttpClient()) {
     @Disabled
@@ -11,11 +16,19 @@ class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) },
         super.`should propagate close on server stop`()
     }
 
-    /**
-     * Helidon fails to provide the headers
+    /*
+     * This ensures that Helidon's websocket listeners are unique per connection.
+     * If not true, the helidon listener will throw an error
      */
-    @Disabled
-    override fun `can receive headers from upgrade request`() {
-        super.`can receive headers from upgrade request`()
+    @Test
+    fun `can create multiple simultaneous connections`() {
+        val client1 = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
+        val client2 = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=bar"))
+
+        client1.send(WsMessage("hello"))
+        client2.send(WsMessage("hello"))
+
+        assertThat(client1.received().take(1).toList(), equalTo(listOf(WsMessage("foo"))))
+        assertThat(client2.received().take(1).toList(), equalTo(listOf(WsMessage("bar"))))
     }
 }

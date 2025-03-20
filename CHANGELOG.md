@@ -11,6 +11,7 @@ changes with their rationale when appropriate:
 - **http4k-connect-ai-anthropic-*** : [Breaking] Replaced `Schema` with a simple `Map<String, Any>`, as we are unifying the types across all AI modules. A new Schema type will be introduced in a future release. Replace existing Schema usage with a Map<String, Any> for now.
 - **http4k-connect-ai-anthropic-*** : [Fix] Correct name of input_schema field in Tool.
 - **http4k-client-helidon** : Add Helidon Websocket client. H/T @oharaandrew314
+- **http4k-server-helidon** : [Fix] Support headers for websocket upgrade request. H/T @oharaandrew314
 
 ### v6.1.0.1
 - **http4k-core** : Return null value rather than throw exception if `Request.path(name)` cannot find a path parameter in a valid (routed) request.
