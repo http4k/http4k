@@ -1,12 +1,12 @@
 package org.http4k
 
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.java
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.kotlin
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.sourceSets
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.test
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testFixturesApi
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testFixturesImplementation
-import gradle.kotlin.dsl.accessors._2c21a9b74f632bc62548adf44b0b8067.testImplementation
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.java
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.kotlin
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.sourceSets
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.test
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testFixturesApi
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testFixturesImplementation
+import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testImplementation
 import org.gradle.api.JavaVersion.VERSION_21
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
