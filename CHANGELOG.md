@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.2.0.0 (uncut)
+### v6.2.0.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-realtime-core** : Add Router binding for all Websockets and SSE handlers
 - **http4k-connect-*** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
