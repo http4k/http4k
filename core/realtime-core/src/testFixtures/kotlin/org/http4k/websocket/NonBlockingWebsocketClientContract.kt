@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.hasSize
 import org.http4k.base64Encode
-import org.http4k.core.Headers
 import org.http4k.core.MemoryBody
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 abstract class NonBlockingWebsocketClientContract(
     serverConfig: PolyServerConfig,
-    private val websocketFactory: (Uri, Headers, (Throwable) -> Unit, WsConsumer) -> Websocket
+    private val websockets: WebsocketFactory
 ) : BaseWebsocketClientContract(serverConfig) {
 
     @Test
@@ -28,17 +27,18 @@ abstract class NonBlockingWebsocketClientContract(
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 
-        val ws = websocket(Uri.of("ws://localhost:$port/bob"))
-        var sent = false
-        ws.onMessage {
-            if (!sent) {
-                sent = true
-                ws.send(WsMessage("hello"))
+        websockets.nonBlocking(Uri.of("ws://localhost:$port/bob")) { ws ->
+            var sent = false
+            ws.onMessage {
+                if (!sent) {
+                    sent = true
+                    ws.send(WsMessage("hello"))
+                }
+                queue.add { it }
             }
-            queue.add { it }
-        }
-        ws.onClose {
-            queue.add { null }
+            ws.onClose {
+                queue.add { null }
+            }
         }
 
         assertThat(received.take(4).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
@@ -52,7 +52,7 @@ abstract class NonBlockingWebsocketClientContract(
 
         val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
 
-        websocket(Uri.of("ws://localhost:$port/bin")) { ws ->
+        websockets.nonBlocking(Uri.of("ws://localhost:$port/bin")) { ws ->
             ws.onMessage { message ->
                 queue.add { message }
             }
@@ -78,7 +78,7 @@ abstract class NonBlockingWebsocketClientContract(
 
         val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
 
-        websocket(Uri.of("ws://localhost:$port/bin")) { ws ->
+        websockets.nonBlocking(Uri.of("ws://localhost:$port/bin")) { ws ->
             ws.onMessage { message ->
                 queue.add { message }
             }
@@ -100,7 +100,7 @@ abstract class NonBlockingWebsocketClientContract(
     fun `onConnect is called when connected`() {
         val connected = CountDownLatch(1)
 
-        websocket(Uri.of("ws://localhost:$port/bob")) {
+        websockets.nonBlocking(Uri.of("ws://localhost:$port/bob")) {
             connected.countDown()
         }
 
@@ -111,7 +111,7 @@ abstract class NonBlockingWebsocketClientContract(
     fun `onError is called on connection error`() {
         val error = CountDownLatch(1)
 
-        websocket(Uri.of("ws://does-not-exist:12345"), onError = { error.countDown() })
+        websockets.nonBlocking(Uri.of("ws://does-not-exist:12345"), onError = { error.countDown() })
 
         assertThat(error, isTrue)
     }
@@ -121,7 +121,7 @@ abstract class NonBlockingWebsocketClientContract(
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 
-        val ws = websocket(Uri.of("ws://localhost:$port/headers"), headers = listOf("testOne" to "1", "testTwo" to "2")) {
+        val ws = websockets.nonBlocking(Uri.of("ws://localhost:$port/headers"), headers = listOf("testOne" to "1", "testTwo" to "2")) {
             it.send(WsMessage(""))
         }
         ws.onMessage {
@@ -133,10 +133,6 @@ abstract class NonBlockingWebsocketClientContract(
 
         assertThat(received.take(4).toList(), equalTo(listOf(WsMessage("testOne=1"), WsMessage("testTwo=2"))))
     }
-
-    private fun websocket(uri: Uri, headers: Headers = emptyList(), onError: (Throwable) -> Unit = {},
-                          onConnect: WsConsumer = {}): Websocket =
-        websocketFactory(uri, headers, onError, onConnect)
 
     private val isTrue: Matcher<CountDownLatch> = has("counted down", { it.await(5, TimeUnit.SECONDS) }, equalTo(true))
 }
