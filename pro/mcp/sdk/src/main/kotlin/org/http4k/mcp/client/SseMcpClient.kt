@@ -58,7 +58,7 @@ class SseMcpClient(
 
     private val endpoint = AtomicReference<String>()
 
-    private val sseClient = Http4kSseClient(sseRequest.with(MCP_PROTOCOL_VERSION of version), http)
+    private val sseClient = Http4kSseClient(sseRequest.with(MCP_PROTOCOL_VERSION of protocolVersion), http)
 
     override fun received() = sseClient.received()
 

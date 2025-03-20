@@ -9,4 +9,4 @@ class Version private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Version>(::Version)
 }
 
-val MCP_PROTOCOL_VERSION = Header.value(Version).optional("MCP-Protocol-Version")
+val MCP_PROTOCOL_VERSION = Header.value(ProtocolVersion).optional("MCP-Protocol-Version")
