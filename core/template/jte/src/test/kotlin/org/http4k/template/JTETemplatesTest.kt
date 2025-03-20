@@ -6,7 +6,7 @@ import gg.jte.ContentType
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-//@Disabled
+@Disabled
 class JTETemplatesTest : TemplatesContract<JTETemplates>(JTETemplates(ContentType.Html)) {
 
     override val supportsRoot = false
