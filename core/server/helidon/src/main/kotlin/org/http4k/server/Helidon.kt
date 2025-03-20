@@ -10,6 +10,7 @@ import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
+import java.util.function.Supplier
 
 class Helidon(val port: Int = 8000, override val stopMode: StopMode) : PolyServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)
@@ -22,7 +23,7 @@ class Helidon(val port: Int = 8000, override val stopMode: StopMode) : PolyServe
         object : Http4kServer {
             private val server = WebServer.builder()
                 .addRouting(HttpRouting.builder().any(HelidonToHttp4kHandler(http, sse)))
-                .apply { ws?.let { addRouting(WsRouting.builder().endpoint("*", HelidonToHttp4kWebSocketListener(it))) } }
+                .apply { ws?.let { addRouting(WsRouting.builder().endpoint("*") { HelidonToHttp4kWebSocketListener(it) }) } }
                 .port(port)
                 .build()
 
