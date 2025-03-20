@@ -1,6 +1,5 @@
 package org.http4k.client
 
-import io.helidon.http.HeaderNames
 import io.helidon.http.Method
 import io.helidon.webclient.api.HttpClientResponse
 import io.helidon.webclient.api.WebClient
@@ -64,7 +63,7 @@ object HelidonClient {
                     queryParam(name, *values.map { it?.replace(' ', '+') }.toTypedArray())
                 }
                 request.headers.groupBy { it.first }.entries.fold(this) { acc, (key, parameters) ->
-                    acc.header(HeaderNames.create(key.lowercase(), key), parameters.map { it.second })
+                    acc.header(key.toHelidonHeaderName(), parameters.map { it.second })
                 }
             }
 }

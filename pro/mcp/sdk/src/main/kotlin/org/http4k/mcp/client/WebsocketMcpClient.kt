@@ -51,7 +51,7 @@ class WebsocketMcpClient(
     private val wsClient by lazy {
         websocketFactory.blocking(
             wsRequest.uri,
-            wsRequest.with(MCP_PROTOCOL_VERSION of version).headers
+            wsRequest.with(MCP_PROTOCOL_VERSION of protocolVersion).headers
         )
     }
 
