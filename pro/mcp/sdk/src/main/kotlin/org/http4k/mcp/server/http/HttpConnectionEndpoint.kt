@@ -12,9 +12,13 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.ClientCapabilities.Companion
+import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
+import org.http4k.mcp.protocol.ClientCapabilities.Companion.Roots
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Sampling
 import org.http4k.mcp.server.protocol.Session.Invalid
 import org.http4k.mcp.server.protocol.Session.Valid
 import org.http4k.sse.Sse
@@ -35,7 +39,7 @@ fun HttpConnectionEndpoint(protocol: McpProtocol<Sse, Response>) = { req: Reques
                         protocol.handleInitialize(
                             McpInitialize.Request(
                                 VersionedMcpEntity(McpEntity.of(session.sessionId.value), protocol.metaData.entity.version),
-                                ClientCapabilities()
+                                All
                             ),
                             session.sessionId
                         )

@@ -22,6 +22,8 @@ data class ClientCapabilities internal constructor(
     )
 
     companion object {
+        val All = ClientCapabilities(Roots(true), Unit, Unit)
+
         @JsonSerializable
         data class Roots(val listChanged: Boolean? = false)
     }

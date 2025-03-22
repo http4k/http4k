@@ -16,6 +16,7 @@ import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.MCP_PROTOCOL_VERSION
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
@@ -43,7 +44,7 @@ class WebsocketMcpClient(
     version: Version,
     private val wsRequest: Request,
     private val websocketFactory: WebsocketFactory,
-    capabilities: ClientCapabilities = ClientCapabilities(),
+    capabilities: ClientCapabilities = All,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
     defaultTimeout: Duration = Duration.ofSeconds(1),
     random: Random = Random

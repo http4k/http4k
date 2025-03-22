@@ -5,8 +5,6 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.mapFailure
-import dev.forkhandles.result4k.resultFrom
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode
@@ -20,11 +18,8 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
-import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
@@ -46,6 +41,7 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
@@ -61,7 +57,6 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asA
 import org.http4k.mcp.util.McpJson.compact
@@ -78,7 +73,7 @@ class HttpStreamMcpClient(
     private val version: Version,
     private val baseUri: Uri,
     private val http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
-    private val capabilities: ClientCapabilities = ClientCapabilities(),
+    private val capabilities: ClientCapabilities = All,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
     private val notificationSseReconnectionMode: ReconnectionMode = Immediate
 ) : McpClient {

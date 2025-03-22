@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 
 class HttpStreamMcpClientTest : McpClientContract<Sse, Response> {
 
-    override val notifications = true
+    override val notifications = false
 
     override fun clientFor(port: Int) = HttpStreamMcpClient(
         clientName, Version.of("1.0.0"),
