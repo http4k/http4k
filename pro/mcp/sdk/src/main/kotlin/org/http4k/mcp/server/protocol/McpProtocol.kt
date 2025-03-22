@@ -36,6 +36,7 @@ import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
+import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
@@ -60,6 +61,7 @@ class McpProtocol<Transport, RSP : Any>(
     private val sampling: Sampling = ServerSampling(Random),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
+    private val progress: RequestProgress = ServerRequestProgress(),
     private val random: Random = Random
 ) {
     constructor(
@@ -208,6 +210,9 @@ class McpProtocol<Transport, RSP : Any>(
         prompts.onChange(sId) {
             clientSessions.send(sId, McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed))
         }
+        progress.onProgress(sId) {
+            clientSessions.send(sId, it.toJsonRpc(McpProgress))
+        }
         resources.onChange(sId) {
             clientSessions.send(
                 sId,
@@ -231,6 +236,7 @@ class McpProtocol<Transport, RSP : Any>(
         clientSessions.onClose(sId) {
             clients.remove(sId)
             prompts.remove(sId)
+            progress.remove(sId)
             resources.remove(sId)
             tools.remove(sId)
             sampling.remove(sId)

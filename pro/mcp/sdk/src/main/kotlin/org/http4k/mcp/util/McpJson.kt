@@ -17,6 +17,7 @@ import org.http4k.format.withStandardMappings
 import org.http4k.mcp.model.CostPriority
 import org.http4k.mcp.model.IntelligencePriority
 import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.RequestId
 import org.http4k.mcp.model.ResourceName

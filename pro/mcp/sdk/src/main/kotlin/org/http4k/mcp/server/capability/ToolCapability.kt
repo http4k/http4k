@@ -37,7 +37,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     override fun toTool() = tool.asMcp()
 
     override fun call(mcp: McpTool.Call.Request, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), http) }
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta.progress, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {

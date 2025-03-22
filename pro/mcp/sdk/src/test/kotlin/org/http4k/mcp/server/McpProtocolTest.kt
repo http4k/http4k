@@ -39,6 +39,8 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -60,6 +62,7 @@ import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpLogging
 import org.http4k.mcp.protocol.messages.McpNotification
 import org.http4k.mcp.protocol.messages.McpPing
+import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpRequest
 import org.http4k.mcp.protocol.messages.McpResource
@@ -71,6 +74,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
+import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
@@ -306,13 +310,27 @@ class McpProtocolTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
+        val progress = ServerRequestProgress()
+
         val tools = ServerTools(listOf(tool bind {
-            ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
+            val stringArg1 = stringArg(it)
+            val intArg1 = intArg(it)
+
+            it.progressToken?.let {
+                progress.report(Progress(1, 5.0, it))
+                progress.report(Progress(2, 5.0, it))
+            }
+
+            ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
         }))
 
         val mcp = StandardSseMcp(
             McpProtocol(
-                metadata, SseClientSessions(SessionProvider.Random(random)), tools = tools, random = random
+                metadata,
+                SseClientSessions(SessionProvider.Random(random)),
+                tools = tools,
+                progress = progress,
+                random = random
             )
         )
 
@@ -339,16 +357,29 @@ class McpProtocolTest {
                 )
             )
 
+            val progress1 = "123"
+
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)))
+                McpTool.Call.Request(
+                    tool.name,
+                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(progress1)
+                )
             )
 
+            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progress1))
+            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progress1))
             assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
+
+            val progress2 = "123"
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(tool.name, mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")))
+                McpTool.Call.Request(
+                    tool.name,
+                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
+                    Meta(progress2)
+                )
             )
 
             assertNextMessage(InvalidParams)
