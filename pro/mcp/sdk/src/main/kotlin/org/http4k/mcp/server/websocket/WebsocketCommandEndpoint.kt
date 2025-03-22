@@ -4,7 +4,9 @@ import org.http4k.core.Request
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session.Valid
 import org.http4k.mcp.server.protocol.Session.Invalid
+import org.http4k.sse.SseMessage
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus.Companion.REFUSE
 
@@ -18,6 +20,7 @@ fun WebsocketCommandEndpoint(protocol: McpProtocol<Websocket, Unit>) = { req: Re
             with(protocol) {
                 assign(session, ws)
                 ws.onMessage { receive(ws, session.sessionId, req.body(it.bodyString())) }
+                ws.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
             }
         }
 
