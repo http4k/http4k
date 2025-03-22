@@ -24,6 +24,6 @@ interface ClientSessions<Transport, RSP> {
     fun assign(session: Session, transport: Transport)
     fun transportFor(session: Existing): Transport
 
-    fun end(session: Session): RSP
+    fun end(sessionId: SessionId): RSP
 }
 

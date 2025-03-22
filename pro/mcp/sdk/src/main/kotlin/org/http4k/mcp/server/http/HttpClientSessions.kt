@@ -68,10 +68,7 @@ class HttpClientSessions(
         return sessions[session.sessionId] ?: error("Session not found")
     }
 
-    override fun end(session: Session) = when (session) {
-        Invalid -> error()
-        is Valid -> ok().also { sessions.remove(session.sessionId)?.close() }
-    }
+    override fun end(sessionId: SessionId) = ok().also { sessions.remove(sessionId)?.close() }
 
     override fun assign(session: Session, transport: Sse) {
         when (session) {

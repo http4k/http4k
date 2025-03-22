@@ -58,10 +58,7 @@ class SseClientSessions(
         }
     }
 
-    override fun end(session: Session) = when (session) {
-        Invalid -> error()
-        is Valid -> ok().also { sessions.remove(session.sessionId)?.close() }
-    }
+    override fun end(sessionId: SessionId) = ok().also { sessions.remove(sessionId)?.close() }
 
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
     override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("No session")

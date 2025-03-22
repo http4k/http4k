@@ -40,5 +40,5 @@ class JsonRpcClientSessions(private val sessionProvider: SessionProvider = Sessi
     override fun assign(session: Session, transport: Unit) {
     }
 
-    override fun end(session: Session) = ok()
+    override fun end(sessionId: SessionId) = ok()
 }

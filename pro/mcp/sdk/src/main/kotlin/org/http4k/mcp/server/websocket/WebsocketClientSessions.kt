@@ -59,10 +59,7 @@ class WebsocketClientSessions(
         }
     }
 
-    override fun end(session: Session) = when (session) {
-        Invalid -> error()
-        is Valid -> ok().also { sessions.remove(session.sessionId)?.close() }
-    }
+    override fun end(sessionId: SessionId) = ok().also { sessions.remove(sessionId)?.close() }
 
     private fun pruneDeadConnections() =
         sessions.toList().forEach { (sessionId, sink) ->

@@ -33,7 +33,7 @@ class StdIoMcpClientSessions(private val writer: Writer) : ClientSessions<Unit, 
         error("not implemented")
     }
 
-    override fun end(session: Session) {}
+    override fun end(sessionId: SessionId) {}
 
     override fun assign(session: Session, transport: Unit) {}
 }
