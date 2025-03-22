@@ -94,9 +94,7 @@ abstract class AbstractMcpClient(
             }
         }
 
-        return resultFrom {
-            if (!startLatch.await(defaultTimeout.toMillis(), MILLISECONDS)) error("Timeout waiting for endpoint")
-        }
+        return resultFrom { startLatch.await(defaultTimeout.toMillis(), MILLISECONDS) }
             .mapFailure { Timeout }
             .flatMap {
                 sendMessage(
