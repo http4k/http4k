@@ -6,6 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.GONE
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.ClientSessions
@@ -29,14 +30,14 @@ class SseClientSessions(
 
     override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         when (val sink = sessions[sessionId]) {
-            null -> Response(GONE)
+            null -> error()
             else -> {
                 sink.send(SseMessage.Event("message", McpJson.compact(message)))
-                Response(ACCEPTED)
+                ok()
             }
         }
 
-    override fun error() = Response(GONE)
+    override fun error() = Response(NOT_FOUND)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
         sessions[sessionId]?.also {

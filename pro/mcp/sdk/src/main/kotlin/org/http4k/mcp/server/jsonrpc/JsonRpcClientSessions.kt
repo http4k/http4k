@@ -4,7 +4,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.GONE
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
@@ -23,7 +23,7 @@ class JsonRpcClientSessions(private val sessionProvider: SessionProvider = Sessi
     override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
 
-    override fun error() = Response(GONE)
+    override fun error() = Response(NOT_FOUND)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
     }
