@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.client.JavaHttpClient
+import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Response
@@ -28,13 +29,14 @@ import org.junit.jupiter.api.Test
 
 class HttpStreamMcpClientTest : McpClientContract<Sse, Response> {
 
-    override val notifications = false
+    override val notifications = true
 
     override fun clientFor(port: Int) = HttpStreamMcpClient(
         clientName, Version.of("1.0.0"),
         Uri.of("http://localhost:${port}/mcp"),
         JavaHttpClient(responseBodyMode = Stream),
-        ClientCapabilities()
+        ClientCapabilities(),
+        notificationSseReconnectionMode = Disconnect,
     )
 
     override fun clientSessions() = HttpClientSessions().apply { start() }

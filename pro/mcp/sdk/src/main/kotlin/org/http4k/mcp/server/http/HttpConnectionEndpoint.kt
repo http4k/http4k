@@ -10,6 +10,10 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MCP_SESSION_ID
+import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.protocol.ClientCapabilities
+import org.http4k.mcp.protocol.VersionedMcpEntity
+import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session.Invalid
 import org.http4k.mcp.server.protocol.Session.Valid
@@ -26,7 +30,17 @@ fun HttpConnectionEndpoint(protocol: McpProtocol<Sse, Response>) = { req: Reques
         ) {
             with(protocol) {
                 when (req.method) {
-                    GET -> assign(session, it)
+                    GET -> {
+                        assign(session, it)
+                        protocol.handleInitialize(
+                            McpInitialize.Request(
+                                VersionedMcpEntity(McpEntity.of(session.sessionId.value), protocol.metaData.entity.version),
+                                ClientCapabilities()
+                            ),
+                            session.sessionId
+                        )
+                    }
+
                     POST -> receive(it, session.sessionId, req)
                     else -> it.close()
                 }

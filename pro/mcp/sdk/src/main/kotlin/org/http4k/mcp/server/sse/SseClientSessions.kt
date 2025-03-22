@@ -41,7 +41,7 @@ class SseClientSessions(
         return Response(ACCEPTED)
     }
 
-    override fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
+    override fun request(sessionId: SessionId, message: McpNodeType) =
         when (val sink = sessions[sessionId]) {
             null -> error()
             else -> {

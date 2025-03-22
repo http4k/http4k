@@ -14,7 +14,7 @@ import java.util.UUID
 class StdIoMcpClientSessions(private val writer: Writer) : ClientSessions<Unit, Unit> {
     override fun ok() {}
 
-    override fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) = with(writer) {
+    override fun request(sessionId: SessionId, message: McpNodeType) = with(writer) {
         write(McpJson.compact(message) + "\n")
         flush()
     }

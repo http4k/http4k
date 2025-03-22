@@ -34,7 +34,7 @@ class WebsocketClientSessions(
         transport.send(WsMessage(Event("message", compact(message)).toMessage()))
     }
 
-    override fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
+    override fun request(sessionId: SessionId, message: McpNodeType) =
         when (val sink = sessions[sessionId]) {
             null -> Unit
             else -> sink.send(WsMessage(Event("message", compact(message)).toMessage()))

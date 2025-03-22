@@ -17,7 +17,7 @@ interface ClientSessions<Transport, RSP> {
         status: CompletionStatus = Finished
     ): RSP
 
-    fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus = Finished): RSP
+    fun request(sessionId: SessionId, message: McpNodeType): RSP
     fun onClose(sessionId: SessionId, fn: () -> Unit)
 
     fun validate(connectRequest: Request): Session

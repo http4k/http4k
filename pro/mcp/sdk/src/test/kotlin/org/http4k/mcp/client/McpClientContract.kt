@@ -48,6 +48,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.random.Random
 
 interface McpClientContract<T, R : Any> : PortBasedTest {
@@ -162,7 +163,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
             tools.items = emptyList()
 
-            latch.await()
+            require(latch.await(2, SECONDS))
 
             assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(0))
         }

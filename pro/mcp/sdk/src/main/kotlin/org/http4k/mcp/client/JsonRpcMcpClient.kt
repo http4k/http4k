@@ -127,16 +127,3 @@ class JsonRpcMcpClient(private val baseUri: Uri, private val http: HttpHandler =
         }
     }
 }
-
-private inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, McpError.Protocol> = with(McpJson) {
-    val data = parse(data) as MoshiObject
-
-    when {
-        data["method"] != null -> Failure(McpError.Protocol(InvalidRequest))
-        else -> {
-            resultFrom {
-                convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())
-            }.mapFailure { McpError.Protocol(ParseError) }
-        }
-    }
-}

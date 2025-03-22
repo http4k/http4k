@@ -2,9 +2,9 @@ package org.http4k.mcp.server.protocol
 
 import org.http4k.core.Request
 import org.http4k.format.MoshiNode
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.model.CompletionStatus
@@ -78,7 +78,7 @@ class McpProtocol<Transport, RSP : Any>(
         ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
     )
 
-    private val clients = ConcurrentHashMap<SessionId, ClientRequestTracking>()
+    private val clientRequests = ConcurrentHashMap<SessionId, ClientRequestTracking>()
 
     fun receive(
         transport: Transport,
@@ -174,7 +174,7 @@ class McpProtocol<Transport, RSP : Any>(
 
                     McpRoot.Changed.Method -> {
                         val requestId = RequestId.random(random)
-                        clients[sId]?.trackRequest(requestId) { roots.update(it.fromJsonRpc()) }
+                        clientRequests[sId]?.trackRequest(requestId) { roots.update(it.fromJsonRpc()) }
                         clientSessions.respond(
                             transport,
                             sId,
@@ -195,7 +195,7 @@ class McpProtocol<Transport, RSP : Any>(
                         jsonReq.respondTo<McpTool.List.Request> { tools.list(it, httpReq) }
                     )
 
-                    else -> clientSessions.respond(transport, sId, ErrorMessage.MethodNotFound.toJsonRpc(jsonReq.id))
+                    else -> clientSessions.respond(transport, sId, MethodNotFound.toJsonRpc(jsonReq.id))
                 }
             }
 
@@ -207,7 +207,7 @@ class McpProtocol<Transport, RSP : Any>(
                         val id = jsonResult.id?.let { RequestId.parse(compact(it)) }
                         when (id) {
                             null -> clientSessions.error()
-                            else -> clients[sId]?.processResult(id, jsonResult)?.let { clientSessions.ok() }
+                            else -> clientRequests[sId]?.processResult(id, jsonResult)?.let { clientSessions.ok() }
                                 ?: clientSessions.error()
                         }
                     }
@@ -217,7 +217,7 @@ class McpProtocol<Transport, RSP : Any>(
     }
 
     fun handleInitialize(request: McpInitialize.Request, sId: SessionId): McpInitialize.Response {
-        clients[sId] = ClientRequestTracking()
+        if (!clientRequests.contains(sId)) clientRequests[sId] = ClientRequestTracking()
 
         logger.subscribe(sId, LogLevel.error) { level, logger, data ->
             clientSessions.request(
@@ -245,14 +245,14 @@ class McpProtocol<Transport, RSP : Any>(
         }
 
         sampling.onSampleClient(sId, request.clientInfo.name) { req, id ->
-            clients[sId]?.trackRequest(id) {
+            clientRequests[sId]?.trackRequest(id) {
                 sampling.receive(id, it.fromJsonRpc())
             }
             clientSessions.request(sId, req.toJsonRpc(McpSampling, asJsonObject(id)))
         }
 
         clientSessions.onClose(sId) {
-            clients.remove(sId)
+            clientRequests.remove(sId)
             prompts.remove(sId)
             progress.remove(sId)
             resources.remove(sId)
@@ -268,7 +268,7 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun end(session: Session) = clientSessions.end(session)
 
-    fun assign(session: Session, sink: Transport) = clientSessions.assign(session, sink)
+    fun assign(session: Session, transport: Transport) = clientSessions.assign(session, transport)
 
     fun transportFor(session: Existing) = clientSessions.transportFor(session)
 
