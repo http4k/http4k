@@ -2,11 +2,11 @@ package org.http4k.mcp.server.http
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.GONE
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
@@ -37,7 +37,7 @@ class HttpClientSessions(
 
     override fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         when (val sink = sessions[sessionId]) {
-            null -> Response(GONE)
+            null -> error()
             else -> {
                 sink.send(SseMessage.Event("message", McpJson.compact(message)))
                 Response(ACCEPTED)
@@ -52,10 +52,10 @@ class HttpClientSessions(
     ): Response {
         val data = McpJson.compact(message)
         transport.send(SseMessage.Event("message", data))
-        return Response(OK).contentType(ContentType.APPLICATION_JSON).body(data)
+        return Response(OK).contentType(APPLICATION_JSON).body(data)
     }
 
-    override fun error() = Response(GONE)
+    override fun error() = Response(BAD_REQUEST)
 
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
         sessions[sessionId]?.also { it.onClose(fn) }

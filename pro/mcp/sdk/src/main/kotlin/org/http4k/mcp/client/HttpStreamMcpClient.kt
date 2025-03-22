@@ -56,7 +56,7 @@ import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * HTTP Streaming connection MCP client.
+ * HTTP Streaming connection MCP client
  */
 class HttpStreamMcpClient(
     private val name: McpEntity,
