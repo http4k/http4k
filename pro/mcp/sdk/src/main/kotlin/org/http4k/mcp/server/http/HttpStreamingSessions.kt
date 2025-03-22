@@ -79,9 +79,7 @@ class HttpStreamingSessions(
     override fun validate(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(session: Valid.Existing): Sse {
-        return sessions[session.sessionId] ?: error("Session not found")
-    }
+    override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("Session not found")
 
     override fun end(sessionId: SessionId) = ok().also {
         sessions.remove(sessionId)?.close()
