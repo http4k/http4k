@@ -10,6 +10,7 @@ import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.ClientSessions
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -20,7 +21,10 @@ class JsonRpcClientSessions(private val sessionProvider: SessionProvider = Sessi
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
+    override fun respond(transport: Unit, sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
+        Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
+
+    override fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
 
     override fun error() = Response(NOT_FOUND)
@@ -28,5 +32,13 @@ class JsonRpcClientSessions(private val sessionProvider: SessionProvider = Sessi
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
     }
 
-    override fun new(connectRequest: Request, transport: Unit) = sessionProvider.assign(connectRequest)
+    override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, null)
+    override fun transportFor(session: Session.Valid.Existing) {
+        error("not implemented")
+    }
+
+    override fun assign(session: Session, transport: Unit) {
+    }
+
+    override fun end(session: Session) = ok()
 }

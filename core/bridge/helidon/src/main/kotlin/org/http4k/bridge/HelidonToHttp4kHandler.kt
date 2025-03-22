@@ -70,7 +70,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
                             .let { if (message.id == null) it else it.id(message.id?.value) }
                     }.build()
                 )
-            } catch (e: IllegalStateException) {
+            } catch (e: Exception) {
                 triggerClose()
                 latch.countDown()
             }

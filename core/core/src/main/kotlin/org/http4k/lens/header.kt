@@ -127,9 +127,3 @@ fun Request.bearerToken(): String? = header("Authorization")
     ?.substringAfter("earer ")
 
 fun Response.html(body: String) = contentType(TEXT_HTML).body(body)
-
-fun main() {
-    println(
-        Request(Method.GET, "").accept(ContentType.APPLICATION_JSON).accept(ContentType.TEXT_EVENT_STREAM)
-    )
-}

@@ -5,11 +5,13 @@ import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.GONE
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.ClientSessions
+import org.http4k.mcp.server.protocol.Session
+import org.http4k.mcp.server.protocol.Session.Invalid
+import org.http4k.mcp.server.protocol.Session.Valid
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -28,7 +30,18 @@ class SseClientSessions(
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun send(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
+    override fun respond(
+        transport: Sse,
+        sessionId: SessionId,
+        message: McpNodeType,
+        status: CompletionStatus
+    ): Response {
+        val data = McpJson.compact(message)
+        transport.send(SseMessage.Event("message", data))
+        return Response(ACCEPTED)
+    }
+
+    override fun request(sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
         when (val sink = sessions[sessionId]) {
             null -> error()
             else -> {
@@ -45,10 +58,19 @@ class SseClientSessions(
         }
     }
 
-    override fun new(connectRequest: Request, transport: Sse): SessionId {
-        val sessionId = sessionProvider.assign(connectRequest)
-        sessions[sessionId] = transport
-        return sessionId
+    override fun end(session: Session) = when (session) {
+        Invalid -> error()
+        is Valid -> ok().also { sessions.remove(session.sessionId)?.close() }
+    }
+
+    override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
+    override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("No session")
+
+    override fun assign(session: Session, transport: Sse) {
+        when (session) {
+            is Valid -> sessions[session.sessionId] = transport
+            is Invalid -> {}
+        }
     }
 
     private fun pruneDeadConnections() =

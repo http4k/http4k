@@ -9,6 +9,7 @@ import dev.forkhandles.result4k.resultFrom
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
+import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.client.internal.ClientCompletions
 import org.http4k.mcp.client.internal.ClientPrompts
 import org.http4k.mcp.client.internal.ClientResources
@@ -94,7 +95,7 @@ abstract class AbstractMcpClient(
         }
 
         return resultFrom { startLatch.await(defaultTimeout.toMillis(), MILLISECONDS) }
-            .mapFailure { McpError.Timeout }
+            .mapFailure { Timeout }
             .flatMap {
                 sendMessage(
                     McpInitialize,
@@ -108,7 +109,7 @@ abstract class AbstractMcpClient(
                             ?.asOrFailure<McpInitialize.Response>()
 
                         when (next) {
-                            null -> Failure(McpError.Timeout)
+                            null -> Failure(Timeout)
                             else -> next
                                 .flatMap { input ->
                                     notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)

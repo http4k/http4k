@@ -2,6 +2,8 @@ package org.http4k.mcp.server.protocol
 
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.server.protocol.Session.Valid.New
+import org.http4k.mcp.server.protocol.Session.Valid.Existing
 import java.util.UUID
 import kotlin.random.Random
 
@@ -10,8 +12,7 @@ import kotlin.random.Random
  * which can be used to track the connection.
  */
 interface SessionProvider {
-    fun assign(connectRequest: Request): SessionId
-    fun check(connectRequest: Request): Boolean
+    fun validate(connectRequest: Request, sessionId: SessionId?): Session
 
     companion object {
         /**
@@ -19,10 +20,11 @@ interface SessionProvider {
          */
         fun Random(random: Random) =
             object : SessionProvider {
-                override fun assign(connectRequest: Request) =
-                    SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())
-
-                override fun check(connectRequest: Request) = true
+                override fun validate(connectRequest: Request, sessionId: SessionId?) =
+                    when (sessionId) {
+                        null -> New(SessionId.of(UUID(random.nextLong(), random.nextLong()).toString()))
+                        else -> Existing(sessionId)
+                    }
             }
     }
 }

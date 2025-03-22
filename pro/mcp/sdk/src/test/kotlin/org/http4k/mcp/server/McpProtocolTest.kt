@@ -18,6 +18,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.format.MoshiInteger
 import org.http4k.format.MoshiString
 import org.http4k.format.renderError
@@ -519,7 +520,7 @@ class McpProtocolTest {
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
+            McpInitialize.Response(metadata.entity, metadata.capabilities, sessionId, metadata.protocolVersion)
         )
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)

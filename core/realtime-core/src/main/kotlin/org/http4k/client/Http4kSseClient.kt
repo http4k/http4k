@@ -8,9 +8,9 @@ import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.accept
+import org.http4k.sse.SseClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
-import org.http4k.sse.SseClient
 import java.io.InputStream
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean

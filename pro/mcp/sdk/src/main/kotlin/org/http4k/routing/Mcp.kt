@@ -24,6 +24,8 @@ import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.http.HttpClientSessions
+import org.http4k.mcp.server.http.StandardHttpMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
@@ -64,6 +66,11 @@ fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapa
 fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     StandardJsonRpcMcp(McpProtocol(serverMetaData, JsonRpcClientSessions(), *capabilities))
 
+fun mcpHttp(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    StandardHttpMcp(
+        McpProtocol(serverMetaData, HttpClientSessions().apply { start() }, *capabilities)
+    )
+
 /**
  * Create a StdIO MCP app from a set of feature bindings.
  */
@@ -83,7 +90,7 @@ fun mcpStdIo(
 ).apply {
     executor.readLines(reader) {
         try {
-            receive(SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
+            receive(Unit, SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
         } catch (e: Exception) {
             e.printStackTrace(System.err)
         }
