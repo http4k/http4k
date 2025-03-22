@@ -1,14 +1,8 @@
 package org.http4k
 
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.java
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.kotlin
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.sourceSets
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.test
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testFixturesApi
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testFixturesImplementation
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testImplementation
 import org.gradle.api.JavaVersion.VERSION_21
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -25,7 +19,7 @@ repositories {
 
 version = rootProject.version
 
-kotlin {
+the<KotlinJvmProjectExtension>().apply {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
@@ -48,10 +42,12 @@ val testJar by tasks.registering(Jar::class, fun Jar.() {
     from(project.the<SourceSetContainer>()["test"].output)
 })
 
-sourceSets {
-    test {
-        kotlin.srcDir("$projectDir/src/examples/kotlin")
-        kotlin.srcDir("$projectDir/src/tools/kotlin")
+the<SourceSetContainer>().apply {
+    named<SourceSet>("test") {
+        extensions.getByName<SourceDirectorySet>("kotlin").apply {
+            srcDir("$projectDir/src/examples/kotlin")
+            srcDir("$projectDir/src/tools/kotlin")
+        }
     }
 }
 
@@ -69,7 +65,7 @@ tasks {
         }
     }
 
-    java {
+    the<JavaPluginExtension>().apply {
         sourceCompatibility = VERSION_21
         targetCompatibility = VERSION_21
     }
