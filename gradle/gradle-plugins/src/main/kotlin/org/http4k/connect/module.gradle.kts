@@ -1,20 +1,5 @@
 package org.http4k.connect
 
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.api
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.kotlin
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.main
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.sourceSets
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.test
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testFixtures
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testFixturesApi
-import gradle.kotlin.dsl.accessors._2e55a1929723e8daca5ee9cab0b58c90.testImplementation
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.`java-test-fixtures`
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.project
-import org.gradle.kotlin.dsl.repositories
-
 plugins {
     id("org.http4k.internal.module")
     `java-test-fixtures`
@@ -57,17 +42,22 @@ tasks {
     }
 }
 
-sourceSets {
-    main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
+the<SourceSetContainer>().apply {
+    named<SourceSet>("main") {
+        extensions.getByName<SourceDirectorySet>("kotlin").apply {
+            srcDir("build/generated/ksp/main/kotlin")
+        }
+    }
+    named<SourceSet>("test") {
+        extensions.getByName<SourceDirectorySet>("kotlin").apply {
+            srcDir("src/examples/kotlin")
+        }
     }
 
-    test {
-        kotlin.srcDir("src/examples/kotlin")
-    }
-
-    testFixtures {
-        kotlin.srcDir("build/generated/ksp/testFixtures/kotlin")
-        kotlin.srcDir("build/generated-testFixtures-avro-java")
+    named<SourceSet>("testFixtures") {
+        extensions.getByName<SourceDirectorySet>("kotlin").apply {
+            srcDir("build/generated/ksp/testFixtures/kotlin")
+            srcDir("build/generated-testFixtures-avro-java")
+        }
     }
 }
