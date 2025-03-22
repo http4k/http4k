@@ -1,5 +1,6 @@
 package org.http4k.mcp.protocol.messages
 
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
@@ -25,7 +26,7 @@ object McpInitialize : McpRpc {
         val serverInfo: VersionedMcpEntity,
         val capabilities: ServerCapabilities = ServerCapabilities(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
-        override val _meta: Map<String, Any> = default,
+        override val _meta: Meta = default,
     ) : HasMeta, ServerMessage.Response
 
     data object Initialized : McpRpc {

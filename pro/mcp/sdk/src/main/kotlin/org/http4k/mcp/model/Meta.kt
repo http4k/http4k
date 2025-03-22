@@ -1,3 +1,6 @@
 package org.http4k.mcp.model
 
-typealias Meta = Map<String, Any>
+import se.ansman.kotshi.JsonSerializable
+
+@JsonSerializable
+data class Meta(val progress: ProgressToken? = null)
