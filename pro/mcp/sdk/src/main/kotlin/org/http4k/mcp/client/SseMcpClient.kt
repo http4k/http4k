@@ -90,7 +90,7 @@ class SseMcpClient(
         val response = http(message.toHttpRequest(Uri.of(endpoint.get()), rpc, requestId))
         return when {
             response.status.successful -> resultFrom {
-                latch.await(timeout.toMillis(), MILLISECONDS)
+                if(!latch.await(timeout.toMillis(), MILLISECONDS)) error("Timeout waiting for init")
                 Success(requestId)
             }.valueOrNull() ?: Timeout.failWith(requestId)
 

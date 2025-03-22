@@ -96,7 +96,10 @@ class WebsocketMcpClient(
         }
             .flatMapFailure { Failure(Internal(it)) }
             .flatMap { reqId ->
-                resultFrom { latch.await(timeout.toMillis(), MILLISECONDS) }
+                resultFrom {
+                    if (!latch.await(timeout.toMillis(), MILLISECONDS)) error("Timeout waiting for init")
+                }
+
                     .flatMapFailure { Timeout.failWith(requestId) }
                     .map { reqId }
             }
