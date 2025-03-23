@@ -26,7 +26,7 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class HttpClientSessions(
+class HttpStreamingClientSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : ClientSessions<Sse, Response> {

@@ -54,7 +54,7 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.SessionProvider
 import org.http4k.mcp.server.sse.SseClientSessions
-import org.http4k.mcp.server.sse.StandardSseMcp
+import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.junit.jupiter.api.Test
@@ -110,7 +110,7 @@ class TestMcpClientTest {
                 }
             )
         )
-        val mcp = StandardSseMcp(
+        val mcp = SseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
@@ -163,7 +163,7 @@ class TestMcpClientTest {
 
         val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
-        val mcp = StandardSseMcp(
+        val mcp = SseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(random)),
                 resources = serverResources,
@@ -221,7 +221,7 @@ class TestMcpClientTest {
 
         val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
-        val mcp = StandardSseMcp(
+        val mcp = SseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(random)),
                 resources = serverResources,
@@ -252,7 +252,7 @@ class TestMcpClientTest {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
-        val mcp = StandardSseMcp(
+        val mcp = SseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(random)),
                 tools = serverTools,
@@ -311,7 +311,7 @@ class TestMcpClientTest {
             listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
 
-        val mcp = StandardSseMcp(
+        val mcp = SseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(random)),
                 completions = serverCompletions,
@@ -334,7 +334,7 @@ class TestMcpClientTest {
         val model = ModelName.of("name")
         val serverSampling = ServerSampling()
 
-        val mcp = StandardSseMcp(
+        val mcp = SseMcp(
             McpProtocol(
                 metadata, SseClientSessions(SessionProvider.Random(random)),
                 sampling = serverSampling,

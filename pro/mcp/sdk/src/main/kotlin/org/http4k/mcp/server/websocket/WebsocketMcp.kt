@@ -8,8 +8,8 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.then
 
 /**
- * Standard MCP server setup for WS-based MCP Servers
+ * Non-standard (but compliant) MCP server setup for WS-based MCP Servers
  */
-fun StandardWebsocketMcp(mcpProtocol: McpProtocol<Websocket, Unit>) = poly(
+fun WebsocketMcp(mcpProtocol: McpProtocol<Websocket, Unit>) = poly(
     ServerFilters.CatchAllWs().then(WebsocketConnection(mcpProtocol)),
 )

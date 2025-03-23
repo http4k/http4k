@@ -12,10 +12,10 @@ import org.http4k.mcp.server.protocol.Session.Valid
 import org.http4k.routing.bind
 
 /**
- * This SSE handler can be bound to whatever path is required by the server with
- * routes("/path" bind <HttpCommandHandler>
+ * Routes inbound POST requests to the MCP server to the MCP protocol for processing and immediate response
+ * via JSON RPC result messages.
  */
-fun JsonRpcCommandEndpoint(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bind { req: Request ->
+fun JsonRpcConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bind { req: Request ->
     when (val session = protocol.validate(req)) {
         is Valid -> {
             with(protocol) {

@@ -12,7 +12,7 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Tools
-import org.http4k.mcp.server.websocket.StandardWebsocketMcp
+import org.http4k.mcp.server.websocket.WebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketClientSessions
 import org.http4k.websocket.Websocket
 import java.time.Duration
@@ -38,5 +38,5 @@ class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
         ClientCapabilities(),
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Websocket, Unit>) = StandardWebsocketMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Websocket, Unit>) = WebsocketMcp(protocol)
 }

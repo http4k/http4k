@@ -18,8 +18,8 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.http.HttpClientSessions
-import org.http4k.mcp.server.http.StandardHttpMcp
+import org.http4k.mcp.server.http.HttpStreamingClientSessions
+import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -39,10 +39,10 @@ class HttpStreamMcpClientTest : McpClientContract<Sse, Response> {
         notificationSseReconnectionMode = Disconnect,
     )
 
-    override fun clientSessions() = HttpClientSessions().apply { start() }
+    override fun clientSessions() = HttpStreamingClientSessions().apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) =
-        StandardHttpMcp(protocol)
+        HttpStreamingMcp(protocol)
 
     @Test
     fun `deals with error`() {

@@ -4,7 +4,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
-import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
+import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 
 class JsonRpcMcpClientTest : McpClientContract<Unit, Response> {
@@ -18,5 +18,5 @@ class JsonRpcMcpClientTest : McpClientContract<Unit, Response> {
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Unit, Response>) = StandardJsonRpcMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Unit, Response>) = JsonRpcMcp(protocol)
 }

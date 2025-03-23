@@ -12,9 +12,11 @@ import org.http4k.sse.Sse
 import org.http4k.sse.then
 
 /**
- * Standard MCP server setup for Streaming HTTP-based MCP Servers
+ * Draft MCP server setup for Streaming HTTP-based MCP Servers
+ *
+ * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOBOL AND IS SUBJECT TO CHANGE
  */
-fun StandardHttpMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
+fun HttpStreamingMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
     ServerFilters.CatchAllSse().then(HttpStreamingConnection(mcpProtocol)),
     CatchAll().then(CatchLensFailure()).then(HttpNonStreamingConnection(mcpProtocol))
 )

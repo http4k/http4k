@@ -7,6 +7,10 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Session.Valid.Existing
 import org.http4k.mcp.util.McpNodeType
 
+/**
+ * A ClientSessions is responsible for managing the lifecycle of client sessions, including the assignment of
+ * transport to session, and the sending of messages to the client.
+ */
 interface ClientSessions<Transport, RSP> {
     fun ok(): RSP
     fun error(): RSP

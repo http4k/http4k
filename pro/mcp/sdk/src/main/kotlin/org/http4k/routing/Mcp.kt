@@ -24,15 +24,15 @@ import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.http.HttpClientSessions
-import org.http4k.mcp.server.http.StandardHttpMcp
+import org.http4k.mcp.server.http.HttpStreamingClientSessions
+import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
-import org.http4k.mcp.server.jsonrpc.StandardJsonRpcMcp
+import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sse.SseClientSessions
-import org.http4k.mcp.server.sse.StandardSseMcp
+import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.stdio.StdIoMcpClientSessions
-import org.http4k.mcp.server.websocket.StandardWebsocketMcp
+import org.http4k.mcp.server.websocket.WebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketClientSessions
 import org.http4k.mcp.util.readLines
 import java.io.Reader
@@ -50,7 +50,7 @@ import java.util.UUID
  *      /messages <-- receive commands from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardSseMcp(
+    SseMcp(
         McpProtocol(serverMetaData, SseClientSessions().apply { start() }, *capabilities)
     )
 
@@ -58,17 +58,17 @@ fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability
  * Create an HTTP MCP app from a set of feature bindings.
  */
 fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardWebsocketMcp(McpProtocol(serverMetaData, WebsocketClientSessions().apply { start() }, *capabilities))
+    WebsocketMcp(McpProtocol(serverMetaData, WebsocketClientSessions().apply { start() }, *capabilities))
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
  */
 fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardJsonRpcMcp(McpProtocol(serverMetaData, JsonRpcClientSessions(), *capabilities))
+    JsonRpcMcp(McpProtocol(serverMetaData, JsonRpcClientSessions(), *capabilities))
 
 fun mcpHttp(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    StandardHttpMcp(
-        McpProtocol(serverMetaData, HttpClientSessions().apply { start() }, *capabilities)
+    HttpStreamingMcp(
+        McpProtocol(serverMetaData, HttpStreamingClientSessions().apply { start() }, *capabilities)
     )
 
 /**

@@ -23,6 +23,9 @@ import org.http4k.routing.sse
 import org.http4k.sse.Sse
 import org.http4k.sse.SseResponse
 
+/**
+ *  * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOBOL AND IS SUBJECT TO CHANGE
+ */
 fun HttpStreamingConnection(protocol: McpProtocol<Sse, Response>) =
     "/mcp" bindSse sse(TEXT_EVENT_STREAM.accepted() bindSse { req: Request ->
         when (val session = protocol.validate(req)) {

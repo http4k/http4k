@@ -15,8 +15,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 
 /**
- * This SSE connection handler can be bound to whatever path is required by the server with
- * routes("/path" bind <SseConnectionHandle>
+ * Persistent SSE which routes outbound MCP messages for the allocated session to the client
  */
 fun SseOutboundConnection(protocol: McpProtocol<Sse, Response>) =
     "/sse" bind { req: Request ->

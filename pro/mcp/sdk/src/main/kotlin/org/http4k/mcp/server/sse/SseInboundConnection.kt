@@ -9,8 +9,7 @@ import org.http4k.routing.bind
 import org.http4k.sse.Sse
 
 /**
- * This HTTP handler can be bound to whatever path is required by the server with
- * routes("/path" bind <SseCommandEndpoint>
+ * Routes inbound POST requests to the MCP server to the MCP protocol for processing.
  */
 fun SseInboundConnection(protocol: McpProtocol<Sse, Response>) =
     "/message" bind POST to { req ->
