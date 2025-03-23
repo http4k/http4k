@@ -22,7 +22,7 @@ import server.tools
  * This example demonstrates how to create an MCP server using the draft HTTP Streaming protocol.
  */
 fun main() {
-    val mcpServer = mcpHttpStreaming(
+    val mcpServer = mcpHttpStreaming( // replace with mcpHttpNonStreaming for simple RPC interactions
         ServerMetaData(
             McpEntity.of("http4k mcp via SSE"), Version.of("0.1.0"),
             *ProtocolCapability.entries.toTypedArray()
