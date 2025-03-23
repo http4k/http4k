@@ -7,8 +7,8 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
@@ -21,7 +21,7 @@ fun SseOutboundMcpConnection(protocol: McpProtocol<Sse, Response>) =
     "/sse" bind { req: Request ->
         when (val session = protocol.validate(req)) {
             is Valid -> SseResponse(OK) {
-                protocol.assign(session, it)
+                protocol.assign(session, it, req)
                 it.send(
                     SseMessage.Event(
                         "endpoint",

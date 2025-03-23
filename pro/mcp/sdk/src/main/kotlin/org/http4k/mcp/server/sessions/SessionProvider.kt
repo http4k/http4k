@@ -1,9 +1,9 @@
-package org.http4k.mcp.server.protocol
+package org.http4k.mcp.server.sessions
 
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.Session.Valid.New
-import org.http4k.mcp.server.protocol.Session.Valid.Existing
+import org.http4k.mcp.server.sessions.Session.Valid.New
+import org.http4k.mcp.server.sessions.Session.Valid.Existing
 import java.util.UUID
 import kotlin.random.Random
 

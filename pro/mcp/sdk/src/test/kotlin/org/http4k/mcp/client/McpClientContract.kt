@@ -39,7 +39,7 @@ import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.protocol.ClientSessions
+import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -57,7 +57,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
     val notifications: Boolean
 
-    fun clientSessions(): ClientSessions<T, R>
+    fun clientSessions(): Sessions<T, R>
 
     @Test
     fun `can interact with server`() {

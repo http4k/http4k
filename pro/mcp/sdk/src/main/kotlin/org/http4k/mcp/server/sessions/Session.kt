@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.protocol
+package org.http4k.mcp.server.sessions
 
 import org.http4k.mcp.protocol.SessionId
 

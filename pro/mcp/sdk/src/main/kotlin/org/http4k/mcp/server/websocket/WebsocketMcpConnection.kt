@@ -2,8 +2,8 @@ package org.http4k.mcp.server.websocket
 
 import org.http4k.core.Request
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.routing.bindWs
 import org.http4k.sse.SseMessage
 import org.http4k.websocket.Websocket
@@ -19,7 +19,7 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket, Unit>) = "/ws" bindW
     when (val session = protocol.validate(req)) {
         is Valid -> WsResponse { ws ->
             with(protocol) {
-                assign(session, ws)
+                assign(session, ws, req)
                 ws.onMessage { receive(ws, session.sessionId, req.body(it.bodyString())) }
                 ws.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
             }

@@ -7,11 +7,11 @@ import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.ClientSessions
-import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
-import org.http4k.mcp.server.protocol.SessionProvider
+import org.http4k.mcp.server.protocol.Sessions
+import org.http4k.mcp.server.sessions.Session
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
+import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
@@ -21,10 +21,10 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class WebsocketClientSessions(
+class WebsocketSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : ClientSessions<Websocket, Unit> {
+) : Sessions<Websocket, Unit> {
 
     private val sessions = ConcurrentHashMap<SessionId, Websocket>()
 
@@ -52,7 +52,7 @@ class WebsocketClientSessions(
     override fun transportFor(session: Valid.Existing) =
         sessions[session.sessionId] ?: error("Session not found")
 
-    override fun assign(session: Session, transport: Websocket) {
+    override fun assign(session: Session, transport: Websocket, connectRequest: Request) {
         when (session) {
             is Valid -> sessions[session.sessionId] = transport
             is Invalid -> {}

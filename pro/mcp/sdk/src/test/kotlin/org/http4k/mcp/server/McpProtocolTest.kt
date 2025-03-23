@@ -81,8 +81,8 @@ import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
-import org.http4k.mcp.server.protocol.SessionProvider
-import org.http4k.mcp.server.sse.SseClientSessions
+import org.http4k.mcp.server.sessions.SessionProvider
+import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -109,7 +109,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 metadata,
-                SseClientSessions(SessionProvider.Random(Random(0)))
+                SseSessions(SessionProvider.Random(Random(0)))
             )
         )
 
@@ -129,7 +129,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 metadata,
-                SseClientSessions(SessionProvider.Random(Random(0))),
+                SseSessions(SessionProvider.Random(Random(0))),
                 roots = roots,
                 random = random
             )
@@ -157,7 +157,7 @@ class McpProtocolTest {
 
         val mcp = SseMcp(
             McpProtocol(
-                metadata, SseClientSessions(SessionProvider.Random(Random(0))),
+                metadata, SseSessions(SessionProvider.Random(Random(0))),
                 prompts = ServerPrompts(
                     listOf(
                         prompt bind {
@@ -212,7 +212,7 @@ class McpProtocolTest {
 
         val mcp = SseMcp(
             McpProtocol(
-                metadata, SseClientSessions(SessionProvider.Random(Random(0))),
+                metadata, SseSessions(SessionProvider.Random(Random(0))),
                 resources = resources,
                 random = random
             )
@@ -267,7 +267,7 @@ class McpProtocolTest {
         val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
         val mcp = SseMcp(
             McpProtocol(
-                metadata, SseClientSessions(SessionProvider.Random(random)),
+                metadata, SseSessions(SessionProvider.Random(random)),
                 resources = resources,
                 random = random
             )
@@ -328,7 +328,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 metadata,
-                SseClientSessions(SessionProvider.Random(random)),
+                SseSessions(SessionProvider.Random(random)),
                 tools = tools,
                 progress = progress,
                 random = random
@@ -397,7 +397,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 metadata,
-                SseClientSessions(SessionProvider.Random(random)),
+                SseSessions(SessionProvider.Random(random)),
                 logger = logger,
                 random = random
             )
@@ -405,13 +405,13 @@ class McpProtocolTest {
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
-            logger.log(sessionId, LogLevel.info, "message", emptyMap())
+            logger.log(firstDeterministicSessionId, LogLevel.info, "message", emptyMap())
 
             assertNoResponse()
 
             mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
 
-            logger.log(sessionId, LogLevel.info, "message", emptyMap())
+            logger.log(firstDeterministicSessionId, LogLevel.info, "message", emptyMap())
 
             assertNextMessage(
                 McpLogging.LoggingMessage,
@@ -430,7 +430,7 @@ class McpProtocolTest {
 
         val mcp = SseMcp(
             McpProtocol(
-                metadata, SseClientSessions(SessionProvider.Random(random)),
+                metadata, SseSessions(SessionProvider.Random(random)),
                 completions = completions,
                 random = random
             )
@@ -454,7 +454,7 @@ class McpProtocolTest {
 
         val mcp = SseMcp(
             McpProtocol(
-                metadata, SseClientSessions(SessionProvider.Random(Random(0))),
+                metadata, SseSessions(SessionProvider.Random(Random(0))),
                 sampling = sampling,
             )
         )
@@ -509,7 +509,7 @@ class McpProtocolTest {
 
         assertThat(
             received().first(),
-            equalTo(SseMessage.Event("endpoint", "/message?sessionId=$sessionId"))
+            equalTo(SseMessage.Event("endpoint", "/message?sessionId=$firstDeterministicSessionId"))
         )
 
         mcp.sendToMcp(
@@ -520,7 +520,7 @@ class McpProtocolTest {
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, sessionId, metadata.protocolVersion)
+            McpInitialize.Response(metadata.entity, metadata.capabilities, firstDeterministicSessionId, metadata.protocolVersion)
         )
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
@@ -581,9 +581,9 @@ private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notifi
 private fun PolyHandler.sendToMcp(body: String) {
     assertThat(
         http!!(
-            Request(POST, "/message?sessionId=$sessionId").body(body)
+            Request(POST, "/message?sessionId=$firstDeterministicSessionId").body(body)
         ), hasStatus(ACCEPTED)
     )
 }
 
-val sessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
+val firstDeterministicSessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")

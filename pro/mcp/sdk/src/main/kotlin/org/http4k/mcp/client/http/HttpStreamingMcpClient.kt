@@ -5,6 +5,7 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode
@@ -87,20 +88,6 @@ class HttpStreamingMcpClient(
     private val sessionId = AtomicReference<SessionId>()
 
     override fun start(): Result<ServerCapabilities, McpError> {
-        thread(isDaemon = true) {
-            Http4kSseClient(Request(GET, baseUri), http, notificationSseReconnectionMode, ::println)
-                .received()
-                .filterIsInstance<Event>()
-                .filter { it.event == "message" }
-                .map { McpJson.parse(it.data) as MoshiObject }
-                .filter { it["method"] != null }
-                .forEach {
-                    val message = JsonRpcRequest(McpJson, it.attributes)
-                    val id = message.id?.let { asA<MessageId>(compact(it)) }
-                    callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
-                }
-        }
-
         return http.send(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(name, version),
@@ -111,6 +98,27 @@ class HttpStreamingMcpClient(
             .flatMap { it.first().asAOrFailure<McpInitialize.Response>() }
             .map { it.also { sessionId.set(it.sessionId) } }
             .map(McpInitialize.Response::capabilities)
+            .also {
+                thread(isDaemon = true) {
+                    Http4kSseClient(
+                        Request(GET, baseUri)
+                            .with(Header.MCP_SESSION_ID of sessionId.get()),
+                        http, notificationSseReconnectionMode, ::println
+                    )
+                        .received()
+                        .filterIsInstance<Event>()
+                        .filter { it.event == "message" }
+                        .map { resultFrom { McpJson.parse(it.data) as MoshiObject } }
+                        .filterIsInstance<Success<MoshiObject>>()
+                        .map { it.value }
+                        .filter { it["method"] != null }
+                        .forEach {
+                            val message = JsonRpcRequest(McpJson, it.attributes)
+                            val id = message.id?.let { asA<MessageId>(compact(it)) }
+                            callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
+                        }
+                }
+            }
     }
 
     override fun tools() = object : McpClient.Tools {
@@ -188,8 +196,6 @@ class HttpStreamingMcpClient(
                             McpSampling.Response(it.model, it.stopReason, it.role, it.content),
                             requestId
                         )
-                            .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response>() }
-                            .map { PromptResponse(it.messages, it.description) }
 //                        if (it.stopReason != null) tidyUp(requestId)
                     }
                 })

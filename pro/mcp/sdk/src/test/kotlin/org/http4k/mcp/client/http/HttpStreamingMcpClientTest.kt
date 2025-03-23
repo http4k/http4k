@@ -1,32 +1,69 @@
 package org.http4k.mcp.client.http
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
+import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode.Disconnect
+import org.http4k.client.chunkedSseSequence
+import org.http4k.connect.model.ModelName
+import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.LAST_EVENT_ID
+import org.http4k.lens.MCP_SESSION_ID
+import org.http4k.lens.accept
 import org.http4k.lens.with
+import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.PromptResponse
+import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClientContract
+import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
+import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Prompt
+import org.http4k.mcp.model.PromptName
+import org.http4k.mcp.model.Reference
+import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.http.HttpStreamingClientSessions
+import org.http4k.mcp.server.capability.ServerCompletions
+import org.http4k.mcp.server.capability.ServerPrompts
+import org.http4k.mcp.server.capability.ServerResources
+import org.http4k.mcp.server.capability.ServerSampling
+import org.http4k.mcp.server.capability.ServerTools
+import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
+import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.sessions.SessionEventStore
+import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
+import org.http4k.sse.SseEventId
+import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.random.Random
 
 class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
@@ -40,7 +77,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
         notificationSseReconnectionMode = Disconnect,
     )
 
-    override fun clientSessions() = HttpStreamingClientSessions().apply { start() }
+    override fun clientSessions() = HttpStreamingSessions().apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) =
         HttpStreamingMcp(protocol)
@@ -69,5 +106,105 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
         mcpClient.stop()
         server.stop()
+    }
+
+    @Test
+    fun `resume a stream`() {
+        val model = ModelName.of("my model")
+
+        val toolArg = Tool.Arg.required("name")
+        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
+            ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
+        })
+
+        val random = Random(0)
+
+        val sampling = ServerSampling(random)
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            HttpStreamingSessions(
+                sessionProvider = SessionProvider.Random(Random(0)),
+                eventStore = InMemorySessionEventStore()
+            ).apply { start() },
+            tools,
+            ServerResources(
+                Resource.Static(
+                    Uri.of("https://http4k.org"),
+                    ResourceName.of("HTTP4K"),
+                    "description"
+                ) bind {
+                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                }),
+            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
+                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
+            }),
+            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+                CompletionResponse(listOf("1", "2"))
+            }),
+            sampling
+        )
+
+        val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
+
+        val mcpClient = clientFor(server.port())
+
+        val latch = CountDownLatch(1)
+
+        mcpClient.start()
+
+        mcpClient.tools().list().orThrow { TODO() }
+
+        mcpClient.tools().onChange {
+            latch.countDown()
+        }
+
+        tools.items = emptyList()
+
+        require(latch.await(1, SECONDS))
+
+        mcpClient.resources().list().orThrow { TODO() }
+        mcpClient.prompts().list().orThrow { TODO() }
+
+        val messages = JavaHttpClient(responseBodyMode = Stream)(
+            Request(GET, Uri.of("http://localhost:${server.port()}/mcp"))
+                .accept(TEXT_EVENT_STREAM)
+                .with(Header.MCP_SESSION_ID of firstDeterministicSessionId)
+                .with(Header.LAST_EVENT_ID of SseEventId("3")),
+        ).body.stream.chunkedSseSequence()
+            .take(2)
+            .filterIsInstance<SseMessage.Event>()
+            .map { it.data }
+            .toList()
+
+        assertThat(messages.size, equalTo(2))
+
+//        val samplingResponses = listOf(
+//            SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
+//        )
+//
+//        mcpClient.sampling().onSampled {
+//            samplingResponses.asSequence()
+//        }
+
+        mcpClient.stop()
+        server.stop()
+    }
+}
+
+private class InMemorySessionEventStore : SessionEventStore {
+    private val events = mutableMapOf<SessionId, ArrayDeque<SseMessage.Event>>()
+
+    override fun read(sessionId: SessionId, lastEventId: SseEventId?) =
+        when (lastEventId) {
+            null -> events[sessionId]?.asSequence() ?: emptySequence()
+
+            else -> events[sessionId]
+                ?.drop(lastEventId.value.toInt())
+                ?.asSequence() ?: emptySequence()
+        }
+
+    override fun write(sessionId: SessionId, message: SseMessage.Event) {
+        events.getOrPut(sessionId) { ArrayDeque() }.add(message)
     }
 }

@@ -14,7 +14,7 @@ import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Tools
 import org.http4k.mcp.server.websocket.WebsocketMcp
-import org.http4k.mcp.server.websocket.WebsocketClientSessions
+import org.http4k.mcp.server.websocket.WebsocketSessions
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
@@ -30,7 +30,7 @@ class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
         completions: Completions
     ) = McpProtocol(serverMetaData, clientSessions(), tools, resources, prompts, completions)
 
-    override fun clientSessions() = WebsocketClientSessions().apply { start() }
+    override fun clientSessions() = WebsocketSessions().apply { start() }
 
     override fun clientFor(port: Int) = WebsocketMcpClient(
         clientName, Version.of("1.0.0"),

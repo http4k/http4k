@@ -8,13 +8,12 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.ClientSessions
-import org.http4k.mcp.server.protocol.ServerSessionEventTracking
-import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
-import org.http4k.mcp.server.protocol.SessionEventTracking
-import org.http4k.mcp.server.protocol.SessionProvider
+import org.http4k.mcp.server.protocol.Sessions
+import org.http4k.mcp.server.sessions.Session
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
+import org.http4k.mcp.server.sessions.SessionEventTracking
+import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
@@ -23,11 +22,11 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class SseClientSessions(
+class SseSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
-    private val sessionEventTracking: SessionEventTracking = ServerSessionEventTracking(),
+    private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : ClientSessions<Sse, Response> {
+) : Sessions<Sse, Response> {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
@@ -68,7 +67,7 @@ class SseClientSessions(
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
     override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("No session")
 
-    override fun assign(session: Session, transport: Sse) {
+    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
         when (session) {
             is Valid -> sessions[session.sessionId] = transport
             is Invalid -> {}

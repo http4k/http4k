@@ -25,16 +25,16 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.http.HttpNonStreamingMcp
-import org.http4k.mcp.server.http.HttpStreamingClientSessions
+import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
+import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.sse.SseClientSessions
+import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.sse.SseMcp
-import org.http4k.mcp.server.stdio.StdIoMcpClientSessions
+import org.http4k.mcp.server.stdio.StdIoMcpSessions
 import org.http4k.mcp.server.websocket.WebsocketMcp
-import org.http4k.mcp.server.websocket.WebsocketClientSessions
+import org.http4k.mcp.server.websocket.WebsocketSessions
 import org.http4k.mcp.util.readLines
 import java.io.Reader
 import java.io.Writer
@@ -48,39 +48,53 @@ import java.util.UUID
  *
  *  The standard paths used are:
  *      /sse <-- setup the SSE connection to an MCP client
- *      /messages <-- receive commands from connected MCP clients
+ *      /messages (POST) <-- receive messages from connected MCP clients
  */
 fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     SseMcp(
-        McpProtocol(serverMetaData, SseClientSessions().apply { start() }, *capabilities)
+        McpProtocol(serverMetaData, SseSessions().apply { start() }, *capabilities)
     )
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
+ *
+ *  The standard paths used are:
+ *      /ws <-- setup the WS connection to an MCP client
  */
 fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    WebsocketMcp(McpProtocol(serverMetaData, WebsocketClientSessions().apply { start() }, *capabilities))
+    WebsocketMcp(McpProtocol(serverMetaData, WebsocketSessions().apply { start() }, *capabilities))
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
+ *
+ *  The standard paths used are:
+ *      /jsonrpc (POST) <-- receive messages from connected MCP clients
  */
 fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    JsonRpcMcp(McpProtocol(serverMetaData, JsonRpcClientSessions(), *capabilities))
+    JsonRpcMcp(McpProtocol(serverMetaData, JsonRpcSessions(), *capabilities))
 
 /**
  * Create an HTTP (+ SSE) MCP app from a set of feature bindings.
+ *
+ *  The standard paths used are:
+ *      /mcp (accept EventStream) <-- setup streaming connection to an MCP client
+ *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
+ *      /mcp (DELETE) <-- delete a session
  */
 fun mcpHttpStreaming(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     HttpStreamingMcp(
-        McpProtocol(serverMetaData, HttpStreamingClientSessions().apply { start() }, *capabilities)
+        McpProtocol(serverMetaData, HttpStreamingSessions().apply { start() }, *capabilities)
     )
 
 /**
  * Create an HTTP (non-streaming) MCP app from a set of feature bindings.
+ *
+ *  The standard paths used are:
+ *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
  */
 fun mcpHttpNonStreaming(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     HttpNonStreamingMcp(
-        McpProtocol(serverMetaData, HttpStreamingClientSessions().apply { start() }, *capabilities)
+        McpProtocol(serverMetaData, HttpStreamingSessions().apply { start() }, *capabilities)
     )
 
 /**
@@ -94,7 +108,7 @@ fun mcpStdIo(
     executor: SimpleScheduler = SimpleSchedulerService(1)
 ) = McpProtocol(
     serverMetaData,
-    StdIoMcpClientSessions(writer),
+    StdIoMcpSessions(writer),
     ServerTools(capabilities.filterIsInstance<ToolCapability>()),
     ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
     ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),

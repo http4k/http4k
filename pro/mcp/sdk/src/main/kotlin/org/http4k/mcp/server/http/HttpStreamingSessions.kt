@@ -9,32 +9,33 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header
+import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.ClientSessions
-import org.http4k.mcp.server.protocol.ServerSessionEventTracking
-import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
-import org.http4k.mcp.server.protocol.SessionEventTracking
-import org.http4k.mcp.server.protocol.SessionProvider
+import org.http4k.mcp.server.protocol.Sessions
+import org.http4k.mcp.server.sessions.Session
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
+import org.http4k.mcp.server.sessions.SessionEventStore
+import org.http4k.mcp.server.sessions.SessionEventStore.Companion.NoCache
+import org.http4k.mcp.server.sessions.SessionEventTracking
+import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
-import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
-class HttpStreamingClientSessions(
+class HttpStreamingSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
-    private val sessionEventTracking: SessionEventTracking = ServerSessionEventTracking(),
-    private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : ClientSessions<Sse, Response> {
+    private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
+    private val eventStore: SessionEventStore = NoCache,
+    private val keepAliveDelay: Duration = Duration.ofSeconds(2)
+) : Sessions<Sse, Response> {
 
     private val sessions = ConcurrentHashMap<SessionId, Sse>()
 
@@ -44,7 +45,10 @@ class HttpStreamingClientSessions(
         when (val sse = sessions[sessionId]) {
             null -> error()
             else -> {
-                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)))
+                SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)).also {
+                    sse.send(it)
+                    eventStore.write(sessionId, it)
+                }
                 Response(ACCEPTED)
             }
         }
@@ -55,9 +59,15 @@ class HttpStreamingClientSessions(
         message: McpNodeType,
         status: CompletionStatus
     ): Response {
-        val data = compact(message)
-        transport.send(SseMessage.Event("message", data, sessionEventTracking.next(sessionId)))
-        return Response(OK).contentType(APPLICATION_JSON).body(data)
+        SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)).also {
+            try {
+                eventStore.write(sessionId, it)
+                transport.send(it)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return Response(OK).contentType(APPLICATION_JSON).body(compact(message))
     }
 
     override fun error() = Response(BAD_REQUEST)
@@ -78,9 +88,14 @@ class HttpStreamingClientSessions(
         sessionEventTracking.remove(sessionId)
     }
 
-    override fun assign(session: Session, transport: Sse) {
+    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
         when (session) {
-            is Valid -> sessions[session.sessionId] = transport
+            is Valid -> {
+                sessions[session.sessionId] = transport
+                eventStore.read(session.sessionId, Header.LAST_EVENT_ID(connectRequest))
+                    .forEach(transport::send)
+            }
+
             is Invalid -> {}
         }
     }

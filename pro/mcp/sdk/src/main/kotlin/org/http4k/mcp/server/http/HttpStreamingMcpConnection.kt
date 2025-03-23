@@ -16,8 +16,8 @@ import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
@@ -38,12 +38,12 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
                 with(protocol) {
                     when (req.method) {
                         GET -> {
-                            assign(session, sse)
-                            protocol.handleInitialize(
+                            assign(session, sse, req)
+                            handleInitialize(
                                 McpInitialize.Request(
                                     VersionedMcpEntity(
                                         McpEntity.of(session.sessionId.value),
-                                        protocol.metaData.entity.version
+                                        metaData.entity.version
                                     ),
                                     All
                                 ),

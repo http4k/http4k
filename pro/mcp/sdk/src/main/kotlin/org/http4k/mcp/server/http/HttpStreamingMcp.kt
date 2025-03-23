@@ -20,3 +20,4 @@ fun HttpStreamingMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
     ServerFilters.CatchAllSse().then(HttpStreamingMcpConnection(mcpProtocol)),
     CatchAll().then(CatchLensFailure()).then(HttpNonStreamingMcpConnection(mcpProtocol))
 )
+

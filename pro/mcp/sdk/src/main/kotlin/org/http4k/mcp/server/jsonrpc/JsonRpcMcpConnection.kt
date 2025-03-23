@@ -7,8 +7,8 @@ import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Session.Invalid
-import org.http4k.mcp.server.protocol.Session.Valid
+import org.http4k.mcp.server.sessions.Session.Invalid
+import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.routing.bind
 
 /**
