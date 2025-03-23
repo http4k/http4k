@@ -2,7 +2,6 @@ package org.http4k.mcp.server.protocol
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpResource
 
 /**
@@ -17,11 +16,11 @@ interface Resources {
 
     fun read(req: McpResource.Read.Request, http: Request): McpResource.Read.Response
 
-    fun subscribe(sessionId: SessionId, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit)
+    fun subscribe(session: Session, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit)
 
-    fun unsubscribe(sessionId: SessionId, req: McpResource.Unsubscribe.Request)
+    fun unsubscribe(session: Session, req: McpResource.Unsubscribe.Request)
 
-    fun onChange(sessionId: SessionId, handler: () -> Any)
+    fun onChange(session: Session, handler: () -> Any)
 
-    fun remove(sessionId: SessionId)
+    fun remove(session: Session)
 }

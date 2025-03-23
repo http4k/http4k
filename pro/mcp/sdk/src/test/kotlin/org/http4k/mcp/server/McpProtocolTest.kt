@@ -81,6 +81,7 @@ import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.sse.SseMcp
@@ -405,13 +406,13 @@ class McpProtocolTest {
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
-            logger.log(firstDeterministicSessionId, LogLevel.info, "message", emptyMap())
+            logger.log(Session(firstDeterministicSessionId), LogLevel.info, "message", emptyMap())
 
             assertNoResponse()
 
             mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
 
-            logger.log(firstDeterministicSessionId, LogLevel.info, "message", emptyMap())
+            logger.log(Session(firstDeterministicSessionId), LogLevel.info, "message", emptyMap())
 
             assertNextMessage(
                 McpLogging.LoggingMessage,

@@ -6,7 +6,6 @@ import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
 import java.time.Duration
 
@@ -21,6 +20,6 @@ interface Sampling {
         fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>>
 
-    fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, McpMessageId) -> Unit)
-    fun remove(sessionId: SessionId)
+    fun onSampleClient(session: Session, entity: McpEntity, fn: (McpSampling.Request, McpMessageId) -> Unit)
+    fun remove(session: Session)
 }

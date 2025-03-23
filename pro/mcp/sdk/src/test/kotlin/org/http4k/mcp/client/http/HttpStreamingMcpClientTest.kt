@@ -52,8 +52,10 @@ import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
+import org.http4k.mcp.server.sse.sessionId
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -193,18 +195,18 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 }
 
 private class InMemorySessionEventStore : SessionEventStore {
-    private val events = mutableMapOf<SessionId, ArrayDeque<SseMessage.Event>>()
+    private val events = mutableMapOf<Session, ArrayDeque<SseMessage.Event>>()
 
-    override fun read(sessionId: SessionId, lastEventId: SseEventId?) =
+    override fun read(session: Session, lastEventId: SseEventId?) =
         when (lastEventId) {
-            null -> events[sessionId]?.asSequence() ?: emptySequence()
+            null -> events[session]?.asSequence() ?: emptySequence()
 
-            else -> events[sessionId]
+            else -> events[session]
                 ?.drop(lastEventId.value.toInt())
                 ?.asSequence() ?: emptySequence()
         }
 
-    override fun write(sessionId: SessionId, message: SseMessage.Event) {
-        events.getOrPut(sessionId) { ArrayDeque() }.add(message)
+    override fun write(session: Session, message: SseMessage.Event) {
+        events.getOrPut(session) { ArrayDeque() }.add(message)
     }
 }

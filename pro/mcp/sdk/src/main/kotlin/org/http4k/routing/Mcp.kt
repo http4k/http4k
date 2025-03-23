@@ -30,6 +30,7 @@ import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.stdio.StdIoMcpSessions
@@ -116,7 +117,7 @@ fun mcpStdIo(
 ).apply {
     executor.readLines(reader) {
         try {
-            receive(Unit, SessionId.of(UUID(0, 0).toString()), Request(POST, "").body(it))
+            receive(Unit, Session(SessionId.of(UUID(0, 0).toString())), Request(POST, "").body(it))
         } catch (e: Exception) {
             e.printStackTrace(System.err)
         }

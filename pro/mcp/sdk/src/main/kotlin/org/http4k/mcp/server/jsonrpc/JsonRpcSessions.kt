@@ -8,7 +8,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionProvider
@@ -21,15 +20,15 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun respond(transport: Unit, sessionId: SessionId, message: McpNodeType, status: CompletionStatus) =
+    override fun respond(transport: Unit, session: Session, message: McpNodeType, status: CompletionStatus) =
         Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
 
-    override fun request(sessionId: SessionId, message: McpNodeType) =
+    override fun request(session: Session, message: McpNodeType) =
         Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
 
     override fun error() = Response(NOT_FOUND)
 
-    override fun onClose(sessionId: SessionId, fn: () -> Unit) {
+    override fun onClose(session: Session, fn: () -> Unit) {
     }
 
     override fun retrieveSession(connectRequest: Request) = sessionProvider.validate(connectRequest, null)
@@ -41,5 +40,5 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
     override fun assign(session: Session, transport: Unit, connectRequest: Request) {
     }
 
-    override fun end(sessionId: SessionId) = ok()
+    override fun end(session: Session) = ok()
 }

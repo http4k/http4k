@@ -6,7 +6,6 @@ import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionProvider
@@ -24,44 +23,44 @@ class WebsocketSessions(
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : Sessions<Websocket, Unit> {
 
-    private val sessions = ConcurrentHashMap<SessionId, Websocket>()
+    private val sessions = ConcurrentHashMap<Session, Websocket>()
 
     override fun ok() = Unit
 
-    override fun respond(transport: Websocket, sessionId: SessionId, message: McpNodeType, status: CompletionStatus) {
+    override fun respond(transport: Websocket, session: Session, message: McpNodeType, status: CompletionStatus) {
         transport.send(WsMessage(Event("message", compact(message)).toMessage()))
     }
 
-    override fun request(sessionId: SessionId, message: McpNodeType) =
-        when (val ws = sessions[sessionId]) {
+    override fun request(session: Session, message: McpNodeType) =
+        when (val ws = sessions[session]) {
             null -> Unit
             else -> ws.send(WsMessage(Event("message", compact(message)).toMessage()))
         }
 
     override fun error() = Unit
 
-    override fun onClose(sessionId: SessionId, fn: () -> Unit) {
-        sessions[sessionId]?.also { it.onClose { fn() } }
+    override fun onClose(session: Session, fn: () -> Unit) {
+        sessions[session]?.also { it.onClose { fn() } }
     }
 
     override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
     override fun transportFor(session: Session) =
-        sessions[session.id] ?: error("Session not found")
+        sessions[session] ?: error("Session not found")
 
     override fun assign(session: Session, transport: Websocket, connectRequest: Request) {
-        sessions[session.id] = transport
+        sessions[session] = transport
     }
 
-    override fun end(sessionId: SessionId) = ok().also { sessions.remove(sessionId)?.close() }
+    override fun end(session: Session) = ok().also { sessions.remove(session)?.close() }
 
     private fun pruneDeadConnections() =
-        sessions.toList().forEach { (sessionId, sink) ->
+        sessions.toList().forEach { (session, sink) ->
             try {
                 sink.send(WsMessage(Event("ping", "").toMessage()))
             } catch (e: Exception) {
-                sessions.remove(sessionId)
+                sessions.remove(session)
                 sink.close()
             }
         }

@@ -6,9 +6,9 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.routing.bind
 
 /**
@@ -21,10 +21,10 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bin
             with(protocol) {
                 handleInitialize(
                     McpInitialize.Request(VersionedMcpEntity(metaData.entity.name, metaData.entity.version), All),
-                    session.id
+                    session
                 )
 
-                receive(Unit, session.id, req)
+                receive(Unit, session, req)
             }
         }
 

@@ -15,9 +15,9 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
@@ -47,11 +47,11 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
                                     ),
                                     All
                                 ),
-                                session.id
+                                session
                             )
                         }
 
-                        POST -> receive(sse, session.id, req).also { sse.close() }
+                        POST -> receive(sse, session, req).also { sse.close() }
                         else -> sse.close()
                     }
                 }

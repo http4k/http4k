@@ -11,9 +11,9 @@ import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.server.protocol.Sampling
+import org.http4k.mcp.server.protocol.Session
 import java.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
@@ -24,7 +24,7 @@ import kotlin.random.Random
 class ServerSampling(private val random: Random = Random) : Sampling {
 
     private val subscriptions =
-        ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, McpMessageId) -> Unit>>()
+        ConcurrentHashMap<Session, Pair<McpEntity, (McpSampling.Request, McpMessageId) -> Unit>>()
 
     private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
 
@@ -88,11 +88,11 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         }
     }
 
-    override fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, McpMessageId) -> Unit) {
-        subscriptions[sessionId] = entity to fn
+    override fun onSampleClient(session: Session, entity: McpEntity, fn: (McpSampling.Request, McpMessageId) -> Unit) {
+        subscriptions[session] = entity to fn
     }
 
-    override fun remove(sessionId: SessionId) {
-        subscriptions.remove(sessionId)
+    override fun remove(session: Session) {
+        subscriptions.remove(session)
     }
 }

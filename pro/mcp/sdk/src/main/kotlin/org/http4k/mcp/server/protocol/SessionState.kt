@@ -8,4 +8,5 @@ import org.http4k.mcp.protocol.SessionId
 sealed interface SessionState
 
 data class Session(val id: SessionId) : SessionState
+
 data object InvalidSession : SessionState

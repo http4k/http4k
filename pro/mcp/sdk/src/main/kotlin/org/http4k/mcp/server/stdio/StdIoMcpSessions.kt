@@ -13,17 +13,17 @@ import java.util.UUID
 class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit, Unit> {
     override fun ok() {}
 
-    override fun request(sessionId: SessionId, message: McpNodeType) = with(writer) {
+    override fun request(session: Session, message: McpNodeType) = with(writer) {
         write(McpJson.compact(message) + "\n")
         flush()
     }
 
     override fun error() = Unit
 
-    override fun respond(transport: Unit, sessionId: SessionId, message: McpNodeType, status: CompletionStatus) {
+    override fun respond(transport: Unit, session: Session, message: McpNodeType, status: CompletionStatus) {
     }
 
-    override fun onClose(sessionId: SessionId, fn: () -> Unit) = fn()
+    override fun onClose(session: Session, fn: () -> Unit) = fn()
 
     override fun retrieveSession(connectRequest: Request) =
         Session(SessionId.of(UUID.randomUUID().toString()))
@@ -32,7 +32,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit, Unit> {
         error("not implemented")
     }
 
-    override fun end(sessionId: SessionId) {}
+    override fun end(session: Session) {}
 
     override fun assign(session: Session, transport: Unit, connectRequest: Request) {}
 }

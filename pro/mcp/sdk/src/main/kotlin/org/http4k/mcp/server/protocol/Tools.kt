@@ -1,7 +1,6 @@
 package org.http4k.mcp.server.protocol
 
 import org.http4k.core.Request
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpTool
 
 /**
@@ -12,8 +11,8 @@ interface Tools {
 
     fun call(req: McpTool.Call.Request, http: Request): McpTool.Call.Response
 
-    fun onChange(sessionId: SessionId, handler: () -> Any)
+    fun onChange(session: Session, handler: () -> Any)
 
-    fun remove(sessionId: SessionId)
+    fun remove(session: Session)
 }
 

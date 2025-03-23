@@ -1,6 +1,6 @@
 package org.http4k.mcp.server.sessions
 
-import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.sse.SseEventId
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -9,21 +9,21 @@ import java.util.concurrent.atomic.AtomicInteger
  * Tracks the next event ID for a given session.
  */
 interface SessionEventTracking {
-    fun next(sessionId: SessionId): SseEventId
-    fun remove(sessionId: SessionId)
+    fun next(session: Session): SseEventId
+    fun remove(session: Session)
 
     companion object {
         /**
          * Stores the next event ID in memory.
          */
         fun InMemory() = object : SessionEventTracking {
-            private val sessionLastIds = ConcurrentHashMap<SessionId, AtomicInteger>()
+            private val sessionLastIds = ConcurrentHashMap<Session, AtomicInteger>()
 
-            override fun next(sessionId: SessionId) =
-                SseEventId(sessionLastIds.getOrPut(sessionId) { AtomicInteger(0) }.incrementAndGet().toString())
+            override fun next(session: Session) =
+                SseEventId(sessionLastIds.getOrPut(session) { AtomicInteger(0) }.incrementAndGet().toString())
 
-            override fun remove(sessionId: SessionId) {
-                sessionLastIds.remove(sessionId)
+            override fun remove(session: Session) {
+                sessionLastIds.remove(session)
             }
         }
     }

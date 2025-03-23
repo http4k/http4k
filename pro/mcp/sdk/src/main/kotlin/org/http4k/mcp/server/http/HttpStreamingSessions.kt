@@ -13,7 +13,6 @@ import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -35,17 +34,17 @@ class HttpStreamingSessions(
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : Sessions<Sse, Response> {
 
-    private val sessions = ConcurrentHashMap<SessionId, Sse>()
+    private val sessions = ConcurrentHashMap<Session, Sse>()
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun request(sessionId: SessionId, message: McpNodeType) =
-        when (val sse = sessions[sessionId]) {
+    override fun request(session: Session, message: McpNodeType) =
+        when (val sse = sessions[session]) {
             null -> error()
             else -> {
-                SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)).also {
+                SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
                     sse.send(it)
-                    eventStore.write(sessionId, it)
+                    eventStore.write(session, it)
                 }
                 Response(ACCEPTED)
             }
@@ -53,12 +52,12 @@ class HttpStreamingSessions(
 
     override fun respond(
         transport: Sse,
-        sessionId: SessionId,
+        session: Session,
         message: McpNodeType,
         status: CompletionStatus
     ): Response {
-        SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)).also {
-            eventStore.write(sessionId, it)
+        SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
+            eventStore.write(session, it)
             transport.send(it)
         }
         return Response(OK).contentType(APPLICATION_JSON).body(compact(message))
@@ -66,23 +65,23 @@ class HttpStreamingSessions(
 
     override fun error() = Response(BAD_REQUEST)
 
-    override fun onClose(sessionId: SessionId, fn: () -> Unit) {
-        sessions[sessionId]?.also { it.onClose(fn) }
+    override fun onClose(session: Session, fn: () -> Unit) {
+        sessions[session]?.also { it.onClose(fn) }
     }
 
     override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(session: Session) = sessions[session.id] ?: error("Session not found")
+    override fun transportFor(session: Session) = sessions[session] ?: error("Session not found")
 
-    override fun end(sessionId: SessionId) = ok().also {
-        sessions.remove(sessionId)?.close()
-        sessionEventTracking.remove(sessionId)
+    override fun end(session: Session) = ok().also {
+        sessions.remove(session)?.close()
+        sessionEventTracking.remove(session)
     }
 
     override fun assign(session: Session, transport: Sse, connectRequest: Request) {
-        sessions[session.id] = transport
-        eventStore.read(session.id, Header.LAST_EVENT_ID(connectRequest))
+        sessions[session] = transport
+        eventStore.read(session, Header.LAST_EVENT_ID(connectRequest))
             .forEach(transport::send)
     }
 
@@ -90,11 +89,11 @@ class HttpStreamingSessions(
         executor.scheduleWithFixedDelay(::pruneDeadConnections, keepAliveDelay, keepAliveDelay)
 
     private fun pruneDeadConnections() =
-        sessions.toList().forEach { (sessionId, sse) ->
+        sessions.toList().forEach { (session, sse) ->
             try {
                 sse.send(SseMessage.Event("ping", ""))
             } catch (e: Exception) {
-                sessions.remove(sessionId)
+                sessions.remove(session)
                 sse.close()
             }
         }

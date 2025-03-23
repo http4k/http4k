@@ -6,9 +6,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
