@@ -1,4 +1,4 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.http
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.isA
@@ -13,6 +13,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.with
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -27,11 +28,11 @@ import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.junit.jupiter.api.Test
 
-class HttpStreamMcpClientTest : McpClientContract<Sse, Response> {
+class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
     override val notifications = false
 
-    override fun clientFor(port: Int) = HttpStreamMcpClient(
+    override fun clientFor(port: Int) = HttpStreamingMcpClient(
         clientName, Version.of("1.0.0"),
         Uri.of("http://localhost:${port}/mcp"),
         JavaHttpClient(responseBodyMode = Stream),

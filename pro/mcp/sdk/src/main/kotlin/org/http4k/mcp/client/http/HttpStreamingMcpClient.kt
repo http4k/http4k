@@ -1,4 +1,4 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.http
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
@@ -35,11 +35,16 @@ import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
+import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpError.Http
+import org.http4k.mcp.client.McpResult
+import org.http4k.mcp.client.asAOrFailure
 import org.http4k.mcp.client.internal.McpCallback
+import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.McpRpcMethod
@@ -68,7 +73,7 @@ import kotlin.concurrent.thread
 /**
  * HTTP Streaming connection MCP client
  */
-class HttpStreamMcpClient(
+class HttpStreamingMcpClient(
     private val name: McpEntity,
     private val version: Version,
     private val baseUri: Uri,

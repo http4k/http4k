@@ -1,21 +1,14 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.jsonrpc
 
 import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.mapFailure
-import dev.forkhandles.result4k.resultFrom
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
-import org.http4k.format.MoshiNode
-import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
-import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.lens.accept
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
@@ -27,7 +20,11 @@ import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
+import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpError.Http
+import org.http4k.mcp.client.McpResult
+import org.http4k.mcp.client.asAOrFailure
+import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.ClientMessage

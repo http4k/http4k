@@ -11,7 +11,7 @@ import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.client.SseMcpClient
+import org.http4k.mcp.client.sse.SseMcpClient
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.PromptName

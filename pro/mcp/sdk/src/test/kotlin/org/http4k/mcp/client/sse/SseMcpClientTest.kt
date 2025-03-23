@@ -1,4 +1,4 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
@@ -16,6 +16,7 @@ import org.http4k.core.then
 import org.http4k.lens.with
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Tool

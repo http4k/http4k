@@ -1,4 +1,4 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.websocket
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
@@ -11,6 +11,8 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
+import org.http4k.mcp.client.AbstractMcpClient
+import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpError.Internal
 import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
@@ -31,7 +33,6 @@ import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsMessage
 import java.time.Duration
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS

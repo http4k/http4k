@@ -1,8 +1,9 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.jsonrpc
 
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
 import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol

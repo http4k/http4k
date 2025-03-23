@@ -1,9 +1,10 @@
-package org.http4k.mcp.client
+package org.http4k.mcp.client.websocket
 
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
