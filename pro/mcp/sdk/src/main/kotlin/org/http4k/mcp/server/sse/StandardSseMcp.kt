@@ -9,9 +9,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.routing.bind
 import org.http4k.routing.poly
-import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.then
 
@@ -19,6 +17,6 @@ import org.http4k.sse.then
  * Standard MCP server setup for SSE-based MCP Servers
  */
 fun StandardSseMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
-    ServerFilters.CatchAllSse().then("/sse" bind SseConnectionEndpoint(mcpProtocol)),
-    CatchAll().then(CatchLensFailure()).then("/message" bind SseCommandEndpoint(mcpProtocol))
+    ServerFilters.CatchAllSse().then(SseOutboundConnection(mcpProtocol)),
+    CatchAll().then(CatchLensFailure()).then(SseInboundConnection(mcpProtocol))
 )

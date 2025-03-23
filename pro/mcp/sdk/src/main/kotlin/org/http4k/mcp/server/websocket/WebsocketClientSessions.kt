@@ -35,9 +35,9 @@ class WebsocketClientSessions(
     }
 
     override fun request(sessionId: SessionId, message: McpNodeType) =
-        when (val sink = sessions[sessionId]) {
+        when (val ws = sessions[sessionId]) {
             null -> Unit
-            else -> sink.send(WsMessage(Event("message", compact(message)).toMessage()))
+            else -> ws.send(WsMessage(Event("message", compact(message)).toMessage()))
         }
 
     override fun error() = Unit
