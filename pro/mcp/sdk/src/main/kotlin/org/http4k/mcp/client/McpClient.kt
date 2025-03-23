@@ -65,7 +65,6 @@ interface McpClient : AutoCloseable {
          * Note that the timeout defined here is applied between each message received by the model
          */
         fun onSampled(overrideDefaultTimeout: Duration? = null, fn: SamplingHandler)
-
     }
 
     /**
