@@ -39,7 +39,7 @@ import org.http4k.mcp.client.McpError.Http
 import org.http4k.mcp.client.internal.McpCallback
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.model.MessageId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.McpRpcMethod
@@ -91,7 +91,7 @@ class HttpStreamMcpClient(
                 .filter { it["method"] != null }
                 .forEach {
                     val message = JsonRpcRequest(McpJson, it.attributes)
-                    val id = message.id?.let { asA<RequestId>(compact(it)) }
+                    val id = message.id?.let { asA<MessageId>(compact(it)) }
                     callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
                 }
         }
@@ -238,10 +238,10 @@ class HttpStreamMcpClient(
     private fun HttpHandler.send(
         rpc: McpRpc,
         message: ClientMessage,
-        requestId: RequestId? = null
+        messageId: MessageId? = null
     ): McpResult<Sequence<Event>> {
         val response = this(
-            message.toHttpRequest(baseUri, rpc, requestId)
+            message.toHttpRequest(baseUri, rpc, messageId)
                 .accept(TEXT_EVENT_STREAM)
                 .with(Header.MCP_SESSION_ID of sessionId.get())
         )

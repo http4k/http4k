@@ -21,7 +21,7 @@ import org.http4k.lens.contentType
 import org.http4k.mcp.client.McpError.Http
 import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.model.MessageId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.MCP_PROTOCOL_VERSION
@@ -79,23 +79,23 @@ class SseMcpClient(
         rpc: McpRpc,
         message: ClientMessage,
         timeout: Duration,
-        requestId: RequestId,
+        messageId: MessageId,
         isComplete: (McpNodeType) -> Boolean
-    ): McpResult<RequestId> {
+    ): McpResult<MessageId> {
         val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
 
-        requests[requestId] = latch
+        requests[messageId] = latch
 
-        if (messageQueues[requestId] == null) messageQueues[requestId] = ArrayBlockingQueue(1000)
+        if (messageQueues[messageId] == null) messageQueues[messageId] = ArrayBlockingQueue(1000)
 
-        val response = http(message.toHttpRequest(Uri.of(endpoint.get()), rpc, requestId))
+        val response = http(message.toHttpRequest(Uri.of(endpoint.get()), rpc, messageId))
         return when {
             response.status.successful -> resultFrom {
                 if(!latch.await(timeout.toMillis(), MILLISECONDS)) error("Timeout waiting for init")
-                Success(requestId)
-            }.valueOrNull() ?: Timeout.failWith(requestId)
+                Success(messageId)
+            }.valueOrNull() ?: Timeout.failWith(messageId)
 
-            else -> Http(response).failWith(requestId)
+            else -> Http(response).failWith(messageId)
         }
     }
 
@@ -105,12 +105,12 @@ class SseMcpClient(
     }
 }
 
-internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, requestId: RequestId? = null) =
+internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, messageId: MessageId? = null) =
     Request(POST, endpoint)
         .contentType(APPLICATION_JSON)
         .body(with(McpJson) {
             val params = asJsonObject(this@toHttpRequest)
-            val id = requestId?.let { asJsonObject(it) } ?: nullNode()
+            val id = messageId?.let { asJsonObject(it) } ?: nullNode()
             compact(
                 when (this@toHttpRequest) {
                     is ClientMessage.Response -> renderResult(params, id)

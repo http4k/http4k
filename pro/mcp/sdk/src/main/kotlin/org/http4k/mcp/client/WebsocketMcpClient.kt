@@ -14,7 +14,7 @@ import org.http4k.format.renderResult
 import org.http4k.mcp.client.McpError.Internal
 import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.model.MessageId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.MCP_PROTOCOL_VERSION
@@ -69,14 +69,14 @@ class WebsocketMcpClient(
         rpc: McpRpc,
         message: ClientMessage,
         timeout: Duration,
-        requestId: RequestId,
+        messageId: MessageId,
         isComplete: (McpNodeType) -> Boolean
-    ): Result<RequestId, McpError> {
+    ): Result<MessageId, McpError> {
         val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
 
         return resultFrom {
-            requests[requestId] = latch
-            messageQueues[requestId] = ArrayBlockingQueue(100)
+            requests[messageId] = latch
+            messageQueues[messageId] = ArrayBlockingQueue(100)
 
             with(McpJson) {
                 val payload = asJsonObject(message)
@@ -86,20 +86,20 @@ class WebsocketMcpClient(
                         WsMessage(
                             compact(
                                 when (message) {
-                                    is ClientMessage.Response -> renderResult(payload, asJsonObject(requestId))
-                                    else -> renderRequest(rpc.Method.value, payload, asJsonObject(requestId))
+                                    is ClientMessage.Response -> renderResult(payload, asJsonObject(messageId))
+                                    else -> renderRequest(rpc.Method.value, payload, asJsonObject(messageId))
                                 }
                             )
                         )
                     )
             }
-            requestId
+            messageId
         }
             .flatMapFailure { Failure(Internal(it)) }
             .flatMap { reqId ->
                 resultFrom {
                     if (!latch.await(timeout.toMillis(), MILLISECONDS)) error("Timeout waiting for init")
-                }.flatMapFailure { Timeout.failWith(requestId) }
+                }.flatMapFailure { Timeout.failWith(messageId) }
                     .map { reqId }
             }
     }

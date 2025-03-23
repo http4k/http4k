@@ -3,13 +3,13 @@ package org.http4k.mcp.client.internal
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.model.MessageId
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpSampling
 import java.time.Duration
 
 internal class ClientSampling(
-    private val tidyUp: (RequestId) -> Unit,
+    private val tidyUp: (MessageId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
     private val register: (McpRpc, McpCallback<*>) -> Any

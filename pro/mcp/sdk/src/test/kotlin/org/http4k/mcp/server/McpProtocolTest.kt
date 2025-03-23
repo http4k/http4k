@@ -18,7 +18,6 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.format.MoshiInteger
 import org.http4k.format.MoshiString
 import org.http4k.format.renderError
@@ -45,7 +44,7 @@ import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.RequestId
+import org.http4k.mcp.model.MessageId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Root
@@ -140,11 +139,11 @@ class McpProtocolTest {
 
             mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification)
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), RequestId.of(7425097216252813))
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(7425097216252813))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), RequestId.of(7425097216252813))
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(7425097216252813))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -474,23 +473,23 @@ class McpProtocolTest {
             assertNextMessage(
                 McpSampling,
                 McpSampling.Request(listOf(), MaxTokens.of(1)),
-                RequestId.of(7425097216252813)
+                MessageId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
                 McpSampling.Response(model, null, Assistant, content),
-                RequestId.of(7425097216252813)
+                MessageId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("bored"), Assistant, content),
-                RequestId.of(7425097216252813)
+                MessageId.of(7425097216252813)
             )
 
             // this is ignored!
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("another stop reason"), Assistant, content),
-                RequestId.of(7425097216252813)
+                MessageId.of(7425097216252813)
             )
 
             assertThat(

@@ -7,9 +7,9 @@ import dev.forkhandles.values.maxValue
 import dev.forkhandles.values.minValue
 import kotlin.random.Random
 
-class RequestId private constructor(value: Long) : LongValue(value) {
-    companion object : LongValueFactory<RequestId>(::RequestId, 1L.minValue.and(MAX_MCP_REQUEST_ID.maxValue)) {
-        fun random(random: Random = Random) = of(random.nextLong(1, MAX_MCP_REQUEST_ID))
+class MessageId private constructor(value: Long) : LongValue(value) {
+    companion object : LongValueFactory<MessageId>(::MessageId, 1L.minValue.and(MAX_MCP_MESSAGE_ID.maxValue)) {
+        fun random(random: Random = Random) = of(random.nextLong(1, MAX_MCP_MESSAGE_ID))
     }
 }
 
@@ -18,4 +18,4 @@ class RequestId private constructor(value: Long) : LongValue(value) {
  * Moshi deserializes it as a double. MCP servers seem to need a precise integer value for the
  * request ID, so we need to limit the range of the message ID to this value.
  */
-private const val MAX_MCP_REQUEST_ID = 9_007_199_254_740_991L
+private const val MAX_MCP_MESSAGE_ID = 9_007_199_254_740_991L
