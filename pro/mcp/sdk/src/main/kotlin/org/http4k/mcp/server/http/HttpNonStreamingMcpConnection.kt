@@ -17,7 +17,7 @@ import org.http4k.sse.SseMessage
  * Routes inbound POST requests to the MCP server to the MCP protocol for processing (returning responses via JSON RPC),
  * and deletes old sessions at the request of the client.
  */
-fun HttpNonStreamingConnection(protocol: McpProtocol<Sse, Response>) =
+fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
     "/mcp" bind routes(
         POST to { req ->
             when (val session = protocol.validate(req)) {

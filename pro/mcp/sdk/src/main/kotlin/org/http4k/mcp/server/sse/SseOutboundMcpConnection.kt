@@ -17,7 +17,7 @@ import org.http4k.sse.SseResponse
 /**
  * Persistent SSE which routes outbound MCP messages for the allocated session to the client
  */
-fun SseOutboundConnection(protocol: McpProtocol<Sse, Response>) =
+fun SseOutboundMcpConnection(protocol: McpProtocol<Sse, Response>) =
     "/sse" bind { req: Request ->
         when (val session = protocol.validate(req)) {
             is Valid -> SseResponse(OK) {

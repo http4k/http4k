@@ -17,6 +17,6 @@ import org.http4k.sse.then
  * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOBOL AND IS SUBJECT TO CHANGE
  */
 fun HttpStreamingMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
-    ServerFilters.CatchAllSse().then(HttpStreamingConnection(mcpProtocol)),
-    CatchAll().then(CatchLensFailure()).then(HttpNonStreamingConnection(mcpProtocol))
+    ServerFilters.CatchAllSse().then(HttpStreamingMcpConnection(mcpProtocol)),
+    CatchAll().then(CatchLensFailure()).then(HttpNonStreamingMcpConnection(mcpProtocol))
 )

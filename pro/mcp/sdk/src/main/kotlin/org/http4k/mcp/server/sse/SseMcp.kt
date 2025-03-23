@@ -17,6 +17,6 @@ import org.http4k.sse.then
  * Standard MCP server setup for SSE-based MCP Servers
  */
 fun SseMcp(mcpProtocol: McpProtocol<Sse, Response>) = poly(
-    ServerFilters.CatchAllSse().then(SseOutboundConnection(mcpProtocol)),
-    CatchAll().then(CatchLensFailure()).then(SseInboundConnection(mcpProtocol))
+    ServerFilters.CatchAllSse().then(SseOutboundMcpConnection(mcpProtocol)),
+    CatchAll().then(CatchLensFailure()).then(SseInboundMcpConnection(mcpProtocol))
 )

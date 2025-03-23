@@ -11,5 +11,5 @@ import org.http4k.routing.poly
  * Non-standard (but compliant) MCP server setup for JSONRPC-based (non streaming) MCP Servers
  */
 fun JsonRpcMcp(protocol: McpProtocol<Unit, Response>) = poly(
-    CatchAll().then(CatchLensFailure()).then(JsonRpcConnection(protocol))
+    CatchAll().then(CatchLensFailure()).then(JsonRpcMcpConnection(protocol))
 )
