@@ -18,8 +18,8 @@ import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session.Invalid
 import org.http4k.mcp.server.protocol.Session.Valid
-import org.http4k.routing.bindSse
 import org.http4k.routing.sse
+import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseResponse
 
@@ -27,7 +27,7 @@ import org.http4k.sse.SseResponse
  *  * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOBOL AND IS SUBJECT TO CHANGE
  */
 fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
-    "/mcp" bindSse sse(TEXT_EVENT_STREAM.accepted() bindSse { req: Request ->
+    "/mcp" bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
         when (val session = protocol.validate(req)) {
             is Valid -> SseResponse(
                 OK, listOf(

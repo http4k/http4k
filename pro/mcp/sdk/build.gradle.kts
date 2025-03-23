@@ -26,6 +26,7 @@ dependencies {
 
     ksp("se.ansman.kotshi:compiler:_")
 
+    testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))
 
     testImplementation("org.jsoup:jsoup:_")

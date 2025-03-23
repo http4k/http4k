@@ -4,9 +4,10 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.mcp.client.McpClientContract
+import org.http4k.mcp.server.http.HttpNonStreamingMcpConnection
 import org.http4k.mcp.server.http.HttpStreamingClientSessions
-import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.routing.poly
 import org.http4k.sse.Sse
 
 class HttpNonStreamingMcpClientTest : McpClientContract<Sse, Response> {
@@ -20,5 +21,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse, Response> {
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) = HttpStreamingMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) = poly(
+        HttpNonStreamingMcpConnection(protocol)
+    )
 }

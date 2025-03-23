@@ -20,10 +20,11 @@ import org.http4k.sse.SseMessage
 fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
     "/mcp" bind routes(
         POST to { req ->
-            when (val session = protocol.validate(req)) {
-                is Valid -> protocol.receive(FakeSse(req), session.sessionId, req)
-
-                is Invalid -> Response(BAD_REQUEST)
+            with(protocol) {
+                when (val session = validate(req)) {
+                    is Valid -> receive(FakeSse(req), session.sessionId, req)
+                    is Invalid -> Response(BAD_REQUEST)
+                }
             }
         },
         DELETE to { req -> protocol.end(protocol.validate(req)) }

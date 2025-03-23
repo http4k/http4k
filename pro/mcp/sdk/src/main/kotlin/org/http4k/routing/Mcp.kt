@@ -24,6 +24,7 @@ import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingClientSessions
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcClientSessions
@@ -66,8 +67,19 @@ fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapa
 fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     JsonRpcMcp(McpProtocol(serverMetaData, JsonRpcClientSessions(), *capabilities))
 
-fun mcpHttp(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+/**
+ * Create an HTTP (+ SSE) MCP app from a set of feature bindings.
+ */
+fun mcpHttpStreaming(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
     HttpStreamingMcp(
+        McpProtocol(serverMetaData, HttpStreamingClientSessions().apply { start() }, *capabilities)
+    )
+
+/**
+ * Create an HTTP (non-streaming) MCP app from a set of feature bindings.
+ */
+fun mcpHttpNonStreaming(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
+    HttpNonStreamingMcp(
         McpProtocol(serverMetaData, HttpStreamingClientSessions().apply { start() }, *capabilities)
     )
 
