@@ -31,11 +31,11 @@ fun HttpConnectionEndpoint(protocol: McpProtocol<Sse, Response>) = { req: Reques
                 CONTENT_TYPE.meta.name to TEXT_EVENT_STREAM.withNoDirectives().value,
                 Header.MCP_SESSION_ID.meta.name to session.sessionId.value,
             )
-        ) {
+        ) { sse ->
             with(protocol) {
                 when (req.method) {
                     GET -> {
-                        assign(session, it)
+                        assign(session, sse)
                         protocol.handleInitialize(
                             McpInitialize.Request(
                                 VersionedMcpEntity(McpEntity.of(session.sessionId.value), protocol.metaData.entity.version),
@@ -45,8 +45,8 @@ fun HttpConnectionEndpoint(protocol: McpProtocol<Sse, Response>) = { req: Reques
                         )
                     }
 
-                    POST -> receive(it, session.sessionId, req)
-                    else -> it.close()
+                    POST -> receive(sse, session.sessionId, req).also { sse.close() }
+                    else -> sse.close()
                 }
             }
         }
