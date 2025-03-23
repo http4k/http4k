@@ -87,6 +87,7 @@ import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
+import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
@@ -524,35 +525,38 @@ class McpProtocolTest {
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
     }
-}
 
-private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
-    assertNextMessage(with(McpJson) { renderError(error, number(1)) })
-}
 
-private fun TestSseClient.assertNextMessage(input: McpResponse) {
-    assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
-}
+    private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
+        assertNextMessage(with(McpJson) { renderError(error, number(1)) })
+    }
 
-private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpNotification) {
-    assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(notification), nullNode()) })
-}
+    private fun TestSseClient.assertNextMessage(input: McpResponse) {
+        assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
+    }
 
-private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpRequest, id: Any) {
-    assertNextMessage(with(McpJson) {
-        renderRequest(
-            hasMethod.Method.value,
-            asJsonObject(input),
-            asJsonObject(id)
+    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpNotification) {
+        assertNextMessage(with(McpJson) { renderRequest(hasMethod.Method.value, asJsonObject(notification), nullNode()) })
+    }
+
+    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpRequest, id: Any) {
+        assertNextMessage(with(McpJson) {
+            renderRequest(
+                hasMethod.Method.value,
+                asJsonObject(input),
+                asJsonObject(id)
+            )
+        })
+    }
+
+    private var inboundCounter = 1
+    private fun TestSseClient.assertNextMessage(node: McpNodeType) {
+        assertThat(
+            received().first(),
+            equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }, SseEventId(inboundCounter++.toString())))
         )
-    })
-}
+    }
 
-private fun TestSseClient.assertNextMessage(node: McpNodeType) {
-    assertThat(
-        received().first(),
-        equalTo(SseMessage.Event("message", with(McpJson) { compact(node) }))
-    )
 }
 
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) {
@@ -567,9 +571,10 @@ private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
     })
 }
 
+private var outboundMessageCounter = 0
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) {
     sendToMcp(with(McpJson) {
-        compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
+        compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(outboundMessageCounter++)))
     })
 }
 

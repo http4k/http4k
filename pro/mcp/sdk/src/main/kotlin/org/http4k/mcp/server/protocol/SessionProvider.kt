@@ -9,7 +9,8 @@ import kotlin.random.Random
 
 /**
  * Provides a session identifier for a given connection request. This can be used to allocate a particular session
- * which can be used to track the connection.
+ * which can be used to track the connection. Handles both new and existing sessions, as well as validating
+ * if a particular request is authorised to connect to that session.
  */
 interface SessionProvider {
     fun validate(connectRequest: Request, sessionId: SessionId?): Session

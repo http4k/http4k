@@ -9,11 +9,13 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.ClientSessions
+import org.http4k.mcp.server.protocol.ServerSessionEventTracking
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Session.Invalid
 import org.http4k.mcp.server.protocol.Session.Valid
+import org.http4k.mcp.server.protocol.SessionEventTracking
 import org.http4k.mcp.server.protocol.SessionProvider
-import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.compact
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
@@ -23,6 +25,7 @@ import kotlin.random.Random
 
 class SseClientSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
+    private val sessionEventTracking: SessionEventTracking = ServerSessionEventTracking(),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : ClientSessions<Sse, Response> {
 
@@ -36,16 +39,15 @@ class SseClientSessions(
         message: McpNodeType,
         status: CompletionStatus
     ): Response {
-        val data = McpJson.compact(message)
-        transport.send(SseMessage.Event("message", data))
+        transport.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)))
         return Response(ACCEPTED)
     }
 
     override fun request(sessionId: SessionId, message: McpNodeType) =
-        when (val sink = sessions[sessionId]) {
+        when (val sse = sessions[sessionId]) {
             null -> error()
             else -> {
-                sink.send(SseMessage.Event("message", McpJson.compact(message)))
+                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)))
                 ok()
             }
         }
@@ -58,7 +60,10 @@ class SseClientSessions(
         }
     }
 
-    override fun end(sessionId: SessionId) = ok().also { sessions.remove(sessionId)?.close() }
+    override fun end(sessionId: SessionId) = ok().also {
+        sessions.remove(sessionId)?.close()
+        sessionEventTracking.remove(sessionId)
+    }
 
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
     override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("No session")
@@ -70,16 +75,17 @@ class SseClientSessions(
         }
     }
 
-    private fun pruneDeadConnections() =
-        sessions.toList().forEach { (sessionId, sink) ->
-            try {
-                sink.send(SseMessage.Event("ping", ""))
-            } catch (e: Exception) {
-                sessions.remove(sessionId)
-                sink.close()
-            }
-        }
-
     fun start(executor: SimpleScheduler = SimpleSchedulerService(1)) =
         executor.scheduleWithFixedDelay(::pruneDeadConnections, keepAliveDelay, keepAliveDelay)
+
+    private fun pruneDeadConnections() =
+        sessions.toList().forEach { (sessionId, sse) ->
+            try {
+                sse.send(SseMessage.Event("ping", ""))
+            } catch (e: Exception) {
+                sessions.remove(sessionId)
+                sse.close()
+            }
+        }
 }
+

@@ -63,7 +63,7 @@ class Http4kSseClient(
         while (running.get()) {
             val value = messageQueue.take()
             yield(value)
-            if (value is SseMessage.Event) lastEventId.set(value.id)
+            if (value is SseMessage.Event && value.id != null) lastEventId.set(value.id)
         }
     }
 
