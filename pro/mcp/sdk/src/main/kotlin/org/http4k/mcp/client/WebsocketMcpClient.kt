@@ -33,11 +33,15 @@ import org.http4k.websocket.WsMessage
 import java.time.Duration
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.random.Random
 
 /**
  * WS connection MCP client.
+ *
+ * Note that the internal representation uses an unbounded blocking queue, so clients are required to consume messages
+ * using received().
  */
 class WebsocketMcpClient(
     name: McpEntity,
@@ -76,7 +80,7 @@ class WebsocketMcpClient(
 
         return resultFrom {
             requests[messageId] = latch
-            messageQueues[messageId] = ArrayBlockingQueue(100)
+            messageQueues[messageId] = LinkedBlockingQueue()
 
             with(McpJson) {
                 val payload = asJsonObject(message)

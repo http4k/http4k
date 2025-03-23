@@ -19,6 +19,8 @@ import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsMessage.Mode.Binary
+import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsStatus
 import java.net.URI
 import java.nio.ByteBuffer
@@ -28,6 +30,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 object JettyWebsocketClient {
 
@@ -115,13 +118,11 @@ private class JettyNonBlockingWebsocket(
     }
 
     override fun send(message: WsMessage) = with(listener) {
-        if (!isOpen) {
-            throw WebSocketException("Connection to ${req.uri} is closed.")
-        }
+        if (!isOpen) throw WebSocketException("Connection to ${req.uri} is closed.")
         try {
             when (message.mode) {
-                WsMessage.Mode.Binary -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
-                WsMessage.Mode.Text -> Completable.with { session.sendText(message.body.toString(), it) }.get()
+                Binary -> Completable.with { session.sendBinary(message.body.payload, it) }.get()
+                Text -> Completable.with { session.sendText(message.body.toString(), it) }.get()
             }
         } catch (error: Throwable) {
             triggerError(error)
@@ -130,9 +131,7 @@ private class JettyNonBlockingWebsocket(
     }
 
     override fun close(status: WsStatus) = with(listener) {
-        if (isOpen) {
-            Completable.with { session.close(status.code, status.description, it) }.get()
-        }
+        if (isOpen) Completable.with { session.close(status.code, status.description, it) }.get()
     }
 
     inner class Listener : Session.Listener.AbstractAutoDemanding() {
@@ -171,5 +170,5 @@ private class JettyNonBlockingWebsocket(
 
 private fun clientUpgradeRequest(headers: Headers, timeout: Duration) = ClientUpgradeRequest().apply {
     setHeaders(headers.toParametersMap())
-    setTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+    setTimeout(timeout.toMillis(), MILLISECONDS)
 }

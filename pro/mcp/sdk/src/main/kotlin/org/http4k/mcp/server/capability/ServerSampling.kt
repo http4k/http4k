@@ -15,9 +15,9 @@ import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.server.protocol.Sampling
 import java.time.Duration
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.random.Random
 
@@ -45,7 +45,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         request: SamplingRequest,
         fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
-        val queue = ArrayBlockingQueue<SamplingResponse>(1000)
+        val queue = LinkedBlockingDeque<SamplingResponse>()
         val id = MessageId.random(random)
 
         responseQueues[id] = queue

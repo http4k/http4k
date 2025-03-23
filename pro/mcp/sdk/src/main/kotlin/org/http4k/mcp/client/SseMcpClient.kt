@@ -35,8 +35,8 @@ import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
@@ -86,7 +86,7 @@ class SseMcpClient(
 
         requests[messageId] = latch
 
-        if (messageQueues[messageId] == null) messageQueues[messageId] = ArrayBlockingQueue(1000)
+        if (messageQueues[messageId] == null) messageQueues[messageId] = LinkedBlockingQueue()
 
         val response = http(message.toHttpRequest(Uri.of(endpoint.get()), rpc, messageId))
         return when {

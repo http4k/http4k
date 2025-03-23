@@ -17,8 +17,8 @@ import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
@@ -33,7 +33,7 @@ class Http4kSseClientTest : PortBasedTest {
         }.asServer(Helidon(0)).start()
 
         try {
-            val messages = ArrayBlockingQueue<SseMessage>(100)
+            val messages = LinkedBlockingQueue<SseMessage>()
 
             thread {
                 Http4kSseClient(

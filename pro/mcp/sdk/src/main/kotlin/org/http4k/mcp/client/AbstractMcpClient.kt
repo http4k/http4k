@@ -79,7 +79,7 @@ abstract class AbstractMcpClient(
                                 else -> {
                                     val message = JsonRpcResult(this, data.attributes)
                                     val id = asA<MessageId>(compact(message.id ?: nullNode()))
-                                    messageQueues[id]?.add(data) ?: error("no queue for $id: $data")
+                                    messageQueues[id]?.offer(data) ?: error("no queue for $id: $data")
                                     val latch = requests[id] ?: error("no request found for $id: $data")
                                     if (message.isError()) requests.remove(id)
                                     latch.countDown()
