@@ -3,8 +3,8 @@ package org.http4k.mcp.server.stdio
 import org.http4k.core.Request
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.server.protocol.AuthedSession
 import org.http4k.mcp.server.protocol.Sessions
-import org.http4k.mcp.server.sessions.Session
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import java.io.Writer
@@ -26,13 +26,13 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit, Unit> {
     override fun onClose(sessionId: SessionId, fn: () -> Unit) = fn()
 
     override fun validate(connectRequest: Request) =
-        Session.Valid(SessionId.of(UUID.randomUUID().toString()))
+        AuthedSession(SessionId.of(UUID.randomUUID().toString()))
 
-    override fun transportFor(session: Session.Valid) {
+    override fun transportFor(session: AuthedSession) {
         error("not implemented")
     }
 
     override fun end(sessionId: SessionId) {}
 
-    override fun assign(session: Session.Valid, transport: Unit, connectRequest: Request) {}
+    override fun assign(session: AuthedSession, transport: Unit, connectRequest: Request) {}
 }

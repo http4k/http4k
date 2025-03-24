@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Sessions
-import org.http4k.mcp.server.sessions.Session.Valid
+import org.http4k.mcp.server.protocol.AuthedSession
 import org.http4k.mcp.server.sessions.SessionEventTracking
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
@@ -63,10 +63,10 @@ class SseSessions(
     }
 
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
-    override fun transportFor(session: Valid) = sessions[session.sessionId] ?: error("No session")
+    override fun transportFor(session: AuthedSession) = sessions[session.id] ?: error("No session")
 
-    override fun assign(session: Valid, transport: Sse, connectRequest: Request) {
-        sessions[session.sessionId] = transport
+    override fun assign(session: AuthedSession, transport: Sse, connectRequest: Request) {
+        sessions[session.id] = transport
     }
 
     fun start(executor: SimpleScheduler = SimpleSchedulerService(1)) =

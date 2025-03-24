@@ -2,14 +2,13 @@ package org.http4k.mcp.server.jsonrpc
 
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.sessions.Session.Invalid
-import org.http4k.mcp.server.sessions.Session.Valid
+import org.http4k.mcp.server.protocol.InvalidSession
+import org.http4k.mcp.server.protocol.AuthedSession
 import org.http4k.routing.bind
 
 /**
@@ -18,17 +17,17 @@ import org.http4k.routing.bind
  */
 fun JsonRpcMcpConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bind { req: Request ->
     when (val session = protocol.validate(req)) {
-        is Valid -> {
+        is AuthedSession -> {
             with(protocol) {
                 handleInitialize(
                     McpInitialize.Request(VersionedMcpEntity(metaData.entity.name, metaData.entity.version), All),
-                    session.sessionId
+                    session.id
                 )
 
-                receive(Unit, session.sessionId, req)
+                receive(Unit, session.id, req)
             }
         }
 
-        is Invalid -> Response(NOT_FOUND)
+        is InvalidSession -> Response(NOT_FOUND)
     }
 }
