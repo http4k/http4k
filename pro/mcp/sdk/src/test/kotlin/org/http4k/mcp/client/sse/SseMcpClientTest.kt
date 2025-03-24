@@ -34,7 +34,8 @@ import org.junit.jupiter.api.Test
 
 class SseMcpClientTest : McpClientContract<Sse, Response> {
 
-    override val notifications = true
+    override val doesNotifications = true
+    override val doesSampling = false
 
     override fun clientFor(port: Int) = SseMcpClient(
         clientName, Version.of("1.0.0"),

@@ -12,7 +12,8 @@ import org.http4k.sse.Sse
 
 class HttpNonStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
-    override val notifications = false
+    override val doesNotifications = false
+    override val doesSampling = false
 
     override fun clientSessions() = HttpStreamingSessions()
 

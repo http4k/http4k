@@ -20,7 +20,8 @@ import java.time.Duration
 
 class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
 
-    override val notifications = true
+    override val doesNotifications = true
+    override val doesSampling = false
 
     fun protocol(
         serverMetaData: ServerMetaData,

@@ -7,6 +7,7 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.McpEntity
@@ -28,9 +29,9 @@ import org.http4k.testing.testSseClient
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Create an in-memory MCP test client
+ * Create an in-memory MCP test client // SSE only
  */
-fun PolyHandler.testMcpClient(connectRequest: Request = Request(GET, "/sse")) = TestMcpClient(this, connectRequest)
+fun PolyHandler.testMcpSseClient(connectRequest: Request = Request(GET, "/sse")) = TestMcpClient(this, connectRequest)
 
 class TestMcpClient(private val poly: PolyHandler, private val connectRequest: Request) : McpClient {
 
@@ -44,7 +45,7 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
     private val completions = TestMcpClientCompletions(sender, client)
 
     override fun start(): McpResult<ServerCapabilities> {
-        val mcpResponse = poly.sse!!.testSseClient(connectRequest)
+        val mcpResponse = poly.debug().testSseClient(connectRequest)
 
         client.set(mcpResponse)
 

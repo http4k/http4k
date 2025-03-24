@@ -189,7 +189,16 @@ class McpProtocol<Transport, RSP : Any>(
                             session,
                             jsonReq.respondTo<McpTool.Call.Request> {
                                 val method = it._meta.progress?.let(::RequestBased)
-                                if (method != null) sessions.assign(method, transport, httpReq)
+                                if (method != null) {
+                                    sessions.assign(method, transport, httpReq)
+                                    sampling.onSampleClient(method) { req, id ->
+                                        clientRequests[session]?.trackRequest(id) {
+                                            sampling.receive(id, it.fromJsonRpc())
+                                        }
+                                        sessions.request(session, req.toJsonRpc(McpSampling, asJsonObject(id)))
+                                    }
+
+                                }
                                 tools.call(it, httpReq)
                                     .also { if (method != null) sessions.end(method) }
                             }
@@ -251,19 +260,11 @@ class McpProtocol<Transport, RSP : Any>(
             )
         }
 
-        sampling.onSampleClient(session, request.clientInfo.name) { req, id ->
-            clientRequests[session]?.trackRequest(id) {
-                sampling.receive(id, it.fromJsonRpc())
-            }
-            sessions.request(session, req.toJsonRpc(McpSampling, asJsonObject(id)))
-        }
-
         sessions.onClose(session) {
             prompts.remove(session)
             progress.remove(session)
             resources.remove(session)
             tools.remove(session)
-            sampling.remove(session)
             logger.unsubscribe(session)
         }
 

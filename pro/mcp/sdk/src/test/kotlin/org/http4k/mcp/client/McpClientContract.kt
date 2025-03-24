@@ -39,8 +39,8 @@ import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -55,7 +55,8 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
     val clientName get() = McpEntity.of("foobar")
 
-    val notifications: Boolean
+    val doesNotifications: Boolean
+    val doesSampling: Boolean
 
     fun clientSessions(): Sessions<T, R>
 
@@ -64,13 +65,17 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
         val model = ModelName.of("my model")
 
         val toolArg = Tool.Arg.required("name")
-        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
-            ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
-        })
 
         val random = Random(0)
 
         val sampling = ServerSampling(random)
+
+
+        val tools = ServerTools(
+            Tool("reverse", "description", toolArg) bind {
+                ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
+            }
+        )
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
@@ -99,7 +104,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
         val latch = CountDownLatch(1)
 
-        if (notifications) {
+        if (doesNotifications) {
             mcpClient.tools().onChange {
                 latch.countDown()
             }
@@ -143,7 +148,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
 
-        if (notifications) {
+        if (doesSampling) {
             val samplingResponses = listOf(
                 SamplingResponse(model, Assistant, Content.Text("hello"), null),
                 SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
@@ -154,7 +159,6 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             }
 
             val responses = sampling.sampleClient(
-                clientName,
                 SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
                 Duration.ofSeconds(5)
             )

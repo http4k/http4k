@@ -9,11 +9,12 @@ import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
-import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.server.protocol.ClientRequestMethod
+import org.http4k.mcp.server.protocol.ClientRequestMethod.RequestBased
 import org.http4k.mcp.server.protocol.Sampling
-import org.http4k.mcp.server.protocol.Session
 import java.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
@@ -24,7 +25,7 @@ import kotlin.random.Random
 class ServerSampling(private val random: Random = Random) : Sampling {
 
     private val subscriptions =
-        ConcurrentHashMap<Session, Pair<McpEntity, (McpSampling.Request, McpMessageId) -> Unit>>()
+        ConcurrentHashMap<ClientRequestMethod, (McpSampling.Request, McpMessageId) -> Unit>()
 
     private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
 
@@ -41,7 +42,6 @@ class ServerSampling(private val random: Random = Random) : Sampling {
     }
 
     override fun sampleClient(
-        entity: McpEntity,
         request: SamplingRequest,
         fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
@@ -51,8 +51,10 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         responseQueues[id] = queue
 
         with(request) {
-            subscriptions.values.filter { it.first == entity }
-                .random().second.invoke(
+            subscriptions.filter { (method) -> request.progressToken?.let(::RequestBased) == method }
+                .takeIf { it.isNotEmpty() }
+                ?.values
+                ?.random()?.invoke(
                     McpSampling.Request(
                         messages,
                         maxTokens,
@@ -61,7 +63,8 @@ class ServerSampling(private val random: Random = Random) : Sampling {
                         temperature,
                         stopSequences,
                         modelPreferences,
-                        metadata
+                        metadata,
+                        _meta = Meta(progressToken)
                     ),
                     id
                 )
@@ -88,11 +91,14 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         }
     }
 
-    override fun onSampleClient(session: Session, entity: McpEntity, fn: (McpSampling.Request, McpMessageId) -> Unit) {
-        subscriptions[session] = entity to fn
+    override fun onSampleClient(
+        method: ClientRequestMethod,
+        fn: (McpSampling.Request, McpMessageId) -> Unit
+    ) {
+        subscriptions[method] = fn
     }
 
-    override fun remove(session: Session) {
-        subscriptions.remove(session)
+    override fun remove(method: ClientRequestMethod) {
+        subscriptions.remove(method)
     }
 }

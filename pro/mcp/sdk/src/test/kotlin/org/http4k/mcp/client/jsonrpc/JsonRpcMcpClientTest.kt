@@ -10,7 +10,8 @@ import org.http4k.mcp.server.protocol.McpProtocol
 
 class JsonRpcMcpClientTest : McpClientContract<Unit, Response> {
 
-    override val notifications = false
+    override val doesNotifications = false
+    override val doesSampling = false
 
     override fun clientSessions() = JsonRpcSessions()
 
