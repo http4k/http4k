@@ -41,6 +41,7 @@ import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpNodeType
@@ -263,13 +264,13 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 
-    fun end(session: Session) {
-        clientRequests.remove(session)
-        sessions.end(session)
+    fun end(method: ClientRequestMethod) {
+        if (method is Stream) clientRequests.remove(method.session)
+        sessions.end(method)
     }
 
-    fun assign(session: Session, transport: Transport, connectRequest: Request) =
-        sessions.assign(session, transport, connectRequest)
+    fun assign(method: ClientRequestMethod, transport: Transport, connectRequest: Request) =
+        sessions.assign(method, transport, connectRequest)
 
     fun transportFor(session: Session) = sessions.transportFor(session)
 

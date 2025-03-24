@@ -23,9 +23,9 @@ interface Sessions<Transport, RSP> {
     fun onClose(session: Session, fn: () -> Unit)
 
     fun retrieveSession(connectRequest: Request): SessionState
-    fun assign(session: Session, transport: Transport, connectRequest: Request)
+    fun assign(method: ClientRequestMethod, transport: Transport, connectRequest: Request)
     fun transportFor(session: Session): Transport
 
-    fun end(session: Session): RSP
+    fun end(method: ClientRequestMethod): RSP
 }
 

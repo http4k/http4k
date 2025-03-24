@@ -6,6 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
@@ -21,7 +22,7 @@ fun SseOutboundMcpConnection(protocol: McpProtocol<Sse, Response>) =
     "/sse" bind { req: Request ->
         when (val session = protocol.retrieveSession(req)) {
             is Session -> SseResponse(OK) {
-                protocol.assign(session, it, req)
+                protocol.assign(Stream(session), it, req)
                 it.send(
                     SseMessage.Event(
                         "endpoint",

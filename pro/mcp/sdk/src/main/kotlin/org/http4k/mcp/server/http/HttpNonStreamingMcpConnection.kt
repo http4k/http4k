@@ -7,6 +7,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.StreamBody
+import org.http4k.mcp.server.protocol.ClientRequestMethod
+import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
@@ -32,7 +35,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse, Response>, messageS
         DELETE to { req ->
             when(val session = protocol.retrieveSession(req)) {
                 is Session -> {
-                    protocol.end(session)
+                    protocol.end(Stream(session))
                     Response(ACCEPTED)
                 }
                 InvalidSession -> Response(NOT_FOUND)

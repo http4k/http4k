@@ -3,6 +3,7 @@ package org.http4k.mcp.server.stdio
 import org.http4k.core.Request
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
+import org.http4k.mcp.server.protocol.ClientRequestMethod
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.util.McpJson
@@ -32,7 +33,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit, Unit> {
         error("not implemented")
     }
 
-    override fun end(session: Session) {}
+    override fun end(method: ClientRequestMethod) {}
 
-    override fun assign(session: Session, transport: Unit, connectRequest: Request) {}
+    override fun assign(method: ClientRequestMethod, transport: Unit, connectRequest: Request) {}
 }

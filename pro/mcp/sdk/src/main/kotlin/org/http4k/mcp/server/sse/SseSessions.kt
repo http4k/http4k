@@ -7,6 +7,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
+import org.http4k.mcp.server.protocol.ClientRequestMethod
+import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventTracking
@@ -56,17 +58,22 @@ class SseSessions(
         }
     }
 
-    override fun end(session: Session) = ok().also {
-        sessions.remove(session)?.close()
-        sessionEventTracking.remove(session)
+    override fun end(method: ClientRequestMethod) = ok().also {
+        if (method is Stream) {
+            sessions.remove(method.session)?.close()
+            sessionEventTracking.remove(method.session)
+        }
     }
 
-    override fun retrieveSession(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
+    override fun retrieveSession(connectRequest: Request) =
+        sessionProvider.validate(connectRequest, sessionId(connectRequest))
 
     override fun transportFor(session: Session) = sessions[session] ?: error("No session")
 
-    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
-        sessions[session] = transport
+    override fun assign(method: ClientRequestMethod, transport: Sse, connectRequest: Request) {
+        if (method is Stream) {
+            sessions[method.session] = transport
+        }
     }
 
     fun start(executor: SimpleScheduler = SimpleSchedulerService(1)) =

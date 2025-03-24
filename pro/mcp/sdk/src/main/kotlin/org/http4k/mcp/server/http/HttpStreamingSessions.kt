@@ -13,6 +13,10 @@ import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
+import org.http4k.mcp.model.ProgressToken
+import org.http4k.mcp.server.protocol.ClientRequestMethod
+import org.http4k.mcp.server.protocol.ClientRequestMethod.RequestBased
+import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -35,6 +39,7 @@ class HttpStreamingSessions(
 ) : Sessions<Sse, Response> {
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
+    private val progressTokens = ConcurrentHashMap<ProgressToken, Sse>()
 
     override fun ok() = Response(ACCEPTED)
 
@@ -74,15 +79,25 @@ class HttpStreamingSessions(
 
     override fun transportFor(session: Session) = sessions[session] ?: error("Session not found")
 
-    override fun end(session: Session) = ok().also {
-        sessions.remove(session)?.close()
-        sessionEventTracking.remove(session)
+    override fun end(method: ClientRequestMethod) = ok().also {
+        when (method) {
+            is RequestBased -> TODO()
+            is Stream -> {
+                sessions.remove(method.session)?.close()
+                sessionEventTracking.remove(method.session)
+            }
+        }
     }
 
-    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
-        sessions[session] = transport
-        eventStore.read(session, Header.LAST_EVENT_ID(connectRequest))
-            .forEach(transport::send)
+    override fun assign(method: ClientRequestMethod, transport: Sse, connectRequest: Request) {
+        when (method) {
+            is RequestBased -> TODO()
+            is Stream -> {
+                sessions[method.session] = transport
+                eventStore.read(method.session, Header.LAST_EVENT_ID(connectRequest))
+                    .forEach(transport::send)
+            }
+        }
     }
 
     fun start(executor: SimpleScheduler = SimpleSchedulerService(1)) =
