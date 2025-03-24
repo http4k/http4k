@@ -15,7 +15,7 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.sse
@@ -28,8 +28,8 @@ import org.http4k.sse.SseResponse
  */
 fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
     "/mcp" bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
-        when (val session = protocol.validate(req)) {
-            is AuthedSession -> SseResponse(
+        when (val session = protocol.retrieveSession(req)) {
+            is Session -> SseResponse(
                 OK, listOf(
                     CONTENT_TYPE.meta.name to TEXT_EVENT_STREAM.withNoDirectives().value,
                     Header.MCP_SESSION_ID.meta.name to session.id.value,

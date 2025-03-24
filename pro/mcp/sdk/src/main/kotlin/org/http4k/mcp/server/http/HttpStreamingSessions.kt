@@ -14,7 +14,7 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionEventStore.Companion.NoCache
@@ -70,17 +70,17 @@ class HttpStreamingSessions(
         sessions[sessionId]?.also { it.onClose(fn) }
     }
 
-    override fun validate(connectRequest: Request) =
+    override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(session: AuthedSession) = sessions[session.id] ?: error("Session not found")
+    override fun transportFor(session: Session) = sessions[session.id] ?: error("Session not found")
 
     override fun end(sessionId: SessionId) = ok().also {
         sessions.remove(sessionId)?.close()
         sessionEventTracking.remove(sessionId)
     }
 
-    override fun assign(session: AuthedSession, transport: Sse, connectRequest: Request) {
+    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
         sessions[session.id] = transport
         eventStore.read(session.id, Header.LAST_EVENT_ID(connectRequest))
             .forEach(transport::send)

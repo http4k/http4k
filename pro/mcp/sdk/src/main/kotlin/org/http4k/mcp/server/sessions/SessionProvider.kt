@@ -2,7 +2,7 @@ package org.http4k.mcp.server.sessions
 
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.SessionState
 import java.util.UUID
 import kotlin.random.Random
@@ -22,7 +22,7 @@ interface SessionProvider {
         fun Random(random: Random) =
             object : SessionProvider {
                 override fun validate(connectRequest: Request, sessionId: SessionId?) =
-                    AuthedSession(
+                    Session(
                         when (sessionId) {
                             null -> SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())
                             else -> sessionId

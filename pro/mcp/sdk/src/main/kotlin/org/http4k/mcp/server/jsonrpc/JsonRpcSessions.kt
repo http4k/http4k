@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson
@@ -32,13 +32,13 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
     override fun onClose(sessionId: SessionId, fn: () -> Unit) {
     }
 
-    override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, null)
+    override fun retrieveSession(connectRequest: Request) = sessionProvider.validate(connectRequest, null)
 
-    override fun transportFor(session: AuthedSession) {
+    override fun transportFor(session: Session) {
         error("not implemented")
     }
 
-    override fun assign(session: AuthedSession, transport: Unit, connectRequest: Request) {
+    override fun assign(session: Session, transport: Unit, connectRequest: Request) {
     }
 
     override fun end(sessionId: SessionId) = ok()

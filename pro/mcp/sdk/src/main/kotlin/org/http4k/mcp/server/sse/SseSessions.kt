@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventTracking
 import org.http4k.mcp.server.sessions.SessionProvider
@@ -62,10 +62,10 @@ class SseSessions(
         sessionEventTracking.remove(sessionId)
     }
 
-    override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
-    override fun transportFor(session: AuthedSession) = sessions[session.id] ?: error("No session")
+    override fun retrieveSession(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
+    override fun transportFor(session: Session) = sessions[session.id] ?: error("No session")
 
-    override fun assign(session: AuthedSession, transport: Sse, connectRequest: Request) {
+    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
         sessions[session.id] = transport
     }
 

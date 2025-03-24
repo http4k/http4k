@@ -23,9 +23,9 @@ interface Sessions<Transport, RSP> {
     fun request(sessionId: SessionId, message: McpNodeType): RSP
     fun onClose(sessionId: SessionId, fn: () -> Unit)
 
-    fun validate(connectRequest: Request): SessionState
-    fun assign(session: AuthedSession, transport: Transport, connectRequest: Request)
-    fun transportFor(session: AuthedSession): Transport
+    fun retrieveSession(connectRequest: Request): SessionState
+    fun assign(session: Session, transport: Transport, connectRequest: Request)
+    fun transportFor(session: Session): Transport
 
     fun end(sessionId: SessionId): RSP
 }

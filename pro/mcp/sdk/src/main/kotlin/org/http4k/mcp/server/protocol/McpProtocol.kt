@@ -262,17 +262,17 @@ class McpProtocol<Transport, RSP : Any>(
         return McpInitialize.Response(metaData.entity, metaData.capabilities, sId, metaData.protocolVersion)
     }
 
-    fun validate(req: Request) = sessions.validate(req)
+    fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 
-    fun end(session: AuthedSession) {
+    fun end(session: Session) {
         clientRequests.remove(session.id)
         sessions.end(session.id)
     }
 
-    fun assign(session: AuthedSession, transport: Transport, connectRequest: Request) =
+    fun assign(session: Session, transport: Transport, connectRequest: Request) =
         sessions.assign(session, transport, connectRequest)
 
-    fun transportFor(session: AuthedSession) = sessions.transportFor(session)
+    fun transportFor(session: Session) = sessions.transportFor(session)
 
     private class ClientRequestTracking {
         private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()

@@ -6,7 +6,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
@@ -16,8 +16,8 @@ import org.http4k.routing.bind
  * via JSON RPC result messages.
  */
 fun JsonRpcMcpConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bind { req: Request ->
-    when (val session = protocol.validate(req)) {
-        is AuthedSession -> {
+    when (val session = protocol.retrieveSession(req)) {
+        is Session -> {
             with(protocol) {
                 handleInitialize(
                     McpInitialize.Request(VersionedMcpEntity(metaData.entity.name, metaData.entity.version), All),
