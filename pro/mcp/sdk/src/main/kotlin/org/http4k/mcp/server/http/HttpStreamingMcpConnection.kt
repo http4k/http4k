@@ -6,6 +6,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.accepted
 import org.http4k.lens.Header
@@ -57,6 +58,6 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse, Response>) =
                 }
             }
 
-            is Invalid -> SseResponse(BAD_REQUEST) { it.close() }
+            is Invalid -> SseResponse(NOT_FOUND) { it.close() }
         }
     })

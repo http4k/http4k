@@ -4,7 +4,9 @@ import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.Session.Invalid
 import org.http4k.mcp.server.sessions.Session.Valid
@@ -27,7 +29,15 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse, Response>, messageS
                 }
             }
         },
-        DELETE to { req -> protocol.end(protocol.validate(req)) }
+        DELETE to { req ->
+            when(val session = protocol.validate(req)) {
+                is Valid -> {
+                    protocol.end(session)
+                    Response(ACCEPTED)
+                }
+                Invalid -> Response(NOT_FOUND)
+            }
+        }
     )
 
 private class FakeSse(override val connectRequest: Request) : Sse {

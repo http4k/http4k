@@ -3,6 +3,7 @@ package org.http4k.mcp.server.jsonrpc
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
@@ -28,6 +29,6 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bin
             }
         }
 
-        is Invalid -> Response(BAD_REQUEST)
+        is Invalid -> Response(NOT_FOUND)
     }
 }

@@ -43,7 +43,6 @@ import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.sessions.Session
-import org.http4k.mcp.server.sessions.Session.Invalid
 import org.http4k.mcp.server.sessions.Session.Valid.Existing
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
@@ -267,17 +266,13 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun validate(req: Request) = sessions.validate(req)
 
-    fun end(session: Session) =
-        when (session) {
-            is Session.Valid -> {
-                clientRequests.remove(session.sessionId)
-                sessions.end(session.sessionId)
-            }
+    fun end(session: Session.Valid) {
+        clientRequests.remove(session.sessionId)
+        sessions.end(session.sessionId)
+    }
 
-            Invalid -> sessions.error()
-        }
-
-    fun assign(session: Session.Valid, transport: Transport, connectRequest: Request) = sessions.assign(session, transport, connectRequest)
+    fun assign(session: Session.Valid, transport: Transport, connectRequest: Request) =
+        sessions.assign(session, transport, connectRequest)
 
     fun transportFor(session: Existing) = sessions.transportFor(session)
 
