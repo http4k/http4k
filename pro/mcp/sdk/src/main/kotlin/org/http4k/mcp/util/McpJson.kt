@@ -18,7 +18,7 @@ import org.http4k.mcp.model.CostPriority
 import org.http4k.mcp.model.IntelligencePriority
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.protocol.McpRpcMethod
@@ -45,7 +45,7 @@ object McpJson : ConfigurableMoshi(
         .value(IntelligencePriority)
         .value(McpEntity)
         .value(McpRpcMethod)
-        .value(MessageId)
+        .value(McpMessageId)
         .value(ProtocolVersion)
         .value(PromptName)
         .value(ResourceName)

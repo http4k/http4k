@@ -10,7 +10,7 @@ import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.server.protocol.Sampling
@@ -24,11 +24,11 @@ import kotlin.random.Random
 class ServerSampling(private val random: Random = Random) : Sampling {
 
     private val subscriptions =
-        ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, MessageId) -> Unit>>()
+        ConcurrentHashMap<SessionId, Pair<McpEntity, (McpSampling.Request, McpMessageId) -> Unit>>()
 
-    private val responseQueues = ConcurrentHashMap<MessageId, BlockingQueue<SamplingResponse>>()
+    private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
 
-    override fun receive(id: MessageId, response: McpSampling.Response): CompletionStatus {
+    override fun receive(id: McpMessageId, response: McpSampling.Response): CompletionStatus {
         responseQueues[id]?.put(SamplingResponse(response.model, response.role, response.content, response.stopReason))
 
         return when {
@@ -46,7 +46,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
         val queue = LinkedBlockingDeque<SamplingResponse>()
-        val id = MessageId.random(random)
+        val id = McpMessageId.random(random)
 
         responseQueues[id] = queue
 
@@ -88,7 +88,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         }
     }
 
-    override fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, MessageId) -> Unit) {
+    override fun onSampleClient(sessionId: SessionId, entity: McpEntity, fn: (McpSampling.Request, McpMessageId) -> Unit) {
         subscriptions[sessionId] = entity to fn
     }
 

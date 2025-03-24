@@ -6,7 +6,7 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpNodeType
@@ -14,8 +14,8 @@ import java.time.Duration
 import kotlin.random.Random
 
 internal class ClientPrompts(
-    private val queueFor: (MessageId) -> Iterable<McpNodeType>,
-    private val tidyUp: (MessageId) -> Unit,
+    private val queueFor: (McpMessageId) -> Iterable<McpNodeType>,
+    private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
     private val random: Random,
@@ -29,7 +29,7 @@ internal class ClientPrompts(
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpPrompt.List,
-        McpPrompt.List.Request(), overrideDefaultTimeout ?: defaultTimeout, MessageId.random(random)
+        McpPrompt.List.Request(), overrideDefaultTimeout ?: defaultTimeout, McpMessageId.random(random)
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpPrompt.List.Response>() }
@@ -40,7 +40,7 @@ internal class ClientPrompts(
             McpPrompt.Get,
             McpPrompt.Get.Request(name, request),
             overrideDefaultTimeout ?: defaultTimeout,
-            MessageId.random(random)
+            McpMessageId.random(random)
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }

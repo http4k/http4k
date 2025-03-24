@@ -19,7 +19,7 @@ import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.MCP_PROTOCOL_VERSION
@@ -76,9 +76,9 @@ class SseMcpClient(
         rpc: McpRpc,
         message: ClientMessage,
         timeout: Duration,
-        messageId: MessageId,
+        messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean
-    ): McpResult<MessageId> {
+    ): McpResult<McpMessageId> {
         val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
 
         requests[messageId] = latch

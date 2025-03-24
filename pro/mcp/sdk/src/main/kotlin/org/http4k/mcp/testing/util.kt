@@ -7,7 +7,7 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.client.McpResult
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
@@ -15,7 +15,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
 import java.util.concurrent.atomic.AtomicReference
 
-inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T.() -> OUT): McpResult<Pair<MessageId?, OUT>> {
+inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
 
     val fields = McpJson.fields(McpJson.parse((get().received().first() as SseMessage.Event).data)).toMap()
 
@@ -25,7 +25,7 @@ inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T
         )
 
         else -> Success(
-            fields["id"]?.let { McpJson.convert<MoshiNode, MessageId>(it) }
+            fields["id"]?.let { McpJson.convert<MoshiNode, McpMessageId>(it) }
                 to
                 fn(
                     McpJson.convert<McpNodeType, T>(

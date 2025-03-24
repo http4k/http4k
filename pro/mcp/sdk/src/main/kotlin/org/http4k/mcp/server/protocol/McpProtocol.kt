@@ -10,7 +10,7 @@ import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.LogLevel
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ServerMetaData
@@ -175,7 +175,7 @@ class McpProtocol<Transport, RSP : Any>(
                     McpProgress.Method -> sessions.ok()
 
                     McpRoot.Changed.Method -> {
-                        val messageId = MessageId.random(random)
+                        val messageId = McpMessageId.random(random)
                         clientRequests[sId]?.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
                         sessions.respond(
                             transport,
@@ -206,7 +206,7 @@ class McpProtocol<Transport, RSP : Any>(
                 when {
                     jsonResult.isError() -> sessions.ok()
                     else -> with(McpJson) {
-                        val id = jsonResult.id?.let { MessageId.parse(compact(it)) }
+                        val id = jsonResult.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
                             null -> sessions.error()
                             else -> clientRequests[sId]?.processResult(id, jsonResult)?.let { sessions.ok() }
@@ -282,13 +282,13 @@ class McpProtocol<Transport, RSP : Any>(
     fun transportFor(session: Existing) = sessions.transportFor(session)
 
     private class ClientRequestTracking {
-        private val calls = ConcurrentHashMap<MessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
+        private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 
-        fun trackRequest(id: MessageId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {
+        fun trackRequest(id: McpMessageId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {
             calls[id] = callback
         }
 
-        fun processResult(id: MessageId, result: JsonRpcResult<MoshiNode>) {
+        fun processResult(id: McpMessageId, result: JsonRpcResult<MoshiNode>) {
             val done = calls[id]?.invoke(result) ?: Finished
             if (done == Finished) calls.remove(id)
         }

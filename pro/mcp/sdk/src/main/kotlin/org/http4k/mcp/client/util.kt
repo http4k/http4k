@@ -15,7 +15,7 @@ import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.lens.contentType
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.ServerMessage
@@ -35,7 +35,7 @@ internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, 
     }
 }
 
-internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, messageId: MessageId? = null) =
+internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, messageId: McpMessageId? = null) =
     Request(POST, endpoint)
         .contentType(APPLICATION_JSON)
         .body(with(McpJson) {

@@ -1,7 +1,7 @@
 package org.http4k.mcp.client.internal
 
 import org.http4k.mcp.client.McpResult
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
 import java.time.Duration
@@ -11,6 +11,6 @@ internal fun interface McpRpcSender {
         rpc: McpRpc,
         message: ClientMessage,
         timeout: Duration,
-        messageId: MessageId
-    ): McpResult<MessageId>
+        messageId: McpMessageId
+    ): McpResult<McpMessageId>
 }

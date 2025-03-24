@@ -5,15 +5,15 @@ import dev.forkhandles.result4k.map
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
 import kotlin.random.Random
 
 internal class ClientCompletions(
-    private val queueFor: (MessageId) -> Iterable<McpNodeType>,
-    private val tidyUp: (MessageId) -> Unit,
+    private val queueFor: (McpMessageId) -> Iterable<McpNodeType>,
+    private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
     private val random: Random
@@ -22,7 +22,7 @@ internal class ClientCompletions(
         sender(
             McpCompletion, McpCompletion.Request(request.ref, request.argument),
             overrideDefaultTimeout ?: defaultTimeout,
-            MessageId.random(random)
+            McpMessageId.random(random)
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpCompletion.Response>() }

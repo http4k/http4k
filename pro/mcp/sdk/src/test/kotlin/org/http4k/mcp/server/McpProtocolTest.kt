@@ -44,7 +44,7 @@ import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Root
@@ -140,11 +140,11 @@ class McpProtocolTest {
 
             mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification)
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), MessageId.of(7425097216252813))
+            assertNextMessage(McpRoot.List, McpRoot.List.Request(), McpMessageId.of(7425097216252813))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), MessageId.of(7425097216252813))
+            mcp.sendToMcp(McpRoot.List.Response(newRoots), McpMessageId.of(7425097216252813))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -474,23 +474,23 @@ class McpProtocolTest {
             assertNextMessage(
                 McpSampling,
                 McpSampling.Request(listOf(), MaxTokens.of(1)),
-                MessageId.of(7425097216252813)
+                McpMessageId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
                 McpSampling.Response(model, null, Assistant, content),
-                MessageId.of(7425097216252813)
+                McpMessageId.of(7425097216252813)
             )
 
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("bored"), Assistant, content),
-                MessageId.of(7425097216252813)
+                McpMessageId.of(7425097216252813)
             )
 
             // this is ignored!
             mcp.sendToMcp(
                 McpSampling.Response(model, StopReason.of("another stop reason"), Assistant, content),
-                MessageId.of(7425097216252813)
+                McpMessageId.of(7425097216252813)
             )
 
             assertThat(

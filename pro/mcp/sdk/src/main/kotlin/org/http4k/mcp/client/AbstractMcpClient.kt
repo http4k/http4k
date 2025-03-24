@@ -17,7 +17,7 @@ import org.http4k.mcp.client.internal.ClientSampling
 import org.http4k.mcp.client.internal.ClientTools
 import org.http4k.mcp.client.internal.McpCallback
 import org.http4k.mcp.client.internal.asOrFailure
-import org.http4k.mcp.model.MessageId
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
@@ -48,9 +48,9 @@ abstract class AbstractMcpClient(
     private val random: Random
 ) : McpClient {
     private val running = AtomicBoolean(false)
-    protected val requests = ConcurrentHashMap<MessageId, CountDownLatch>()
+    protected val requests = ConcurrentHashMap<McpMessageId, CountDownLatch>()
     private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
-    protected val messageQueues = ConcurrentHashMap<MessageId, BlockingQueue<McpNodeType>>()
+    protected val messageQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<McpNodeType>>()
 
     override fun start(): McpResult<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
@@ -72,13 +72,13 @@ abstract class AbstractMcpClient(
                             when {
                                 data["method"] != null -> {
                                     val message = JsonRpcRequest(this, data.attributes)
-                                    val id = message.id?.let { asA<MessageId>(compact(it)) }
+                                    val id = message.id?.let { asA<McpMessageId>(compact(it)) }
                                     callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
                                 }
 
                                 else -> {
                                     val message = JsonRpcResult(this, data.attributes)
-                                    val id = asA<MessageId>(compact(message.id ?: nullNode()))
+                                    val id = asA<McpMessageId>(compact(message.id ?: nullNode()))
                                     messageQueues[id]?.offer(data) ?: error("no queue for $id: $data")
                                     val latch = requests[id] ?: error("no request found for $id: $data")
                                     if (message.isError()) requests.remove(id)
@@ -103,7 +103,7 @@ abstract class AbstractMcpClient(
                     McpInitialize,
                     McpInitialize.Request(clientInfo, capabilities, protocolVersion),
                     defaultTimeout,
-                    MessageId.random(random)
+                    McpMessageId.random(random)
                 )
                     .flatMap { reqId ->
                         val next = findQueue(reqId)
@@ -157,20 +157,20 @@ abstract class AbstractMcpClient(
         rpc: McpRpc,
         message: ClientMessage,
         timeout: Duration,
-        messageId: MessageId,
+        messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean = { true }
-    ): McpResult<MessageId>
+    ): McpResult<McpMessageId>
 
     override fun close() {
         running.set(false)
     }
 
-    private fun tidyUp(messageId: MessageId) {
+    private fun tidyUp(messageId: McpMessageId) {
         requests.remove(messageId)
         messageQueues.remove(messageId)
     }
 
-    protected fun McpError.failWith(messageId: MessageId): Result4k<Nothing, McpError> {
+    protected fun McpError.failWith(messageId: McpMessageId): Result4k<Nothing, McpError> {
         tidyUp(messageId)
         return Failure(this)
     }
@@ -178,5 +178,5 @@ abstract class AbstractMcpClient(
     protected abstract fun endpoint(it: Event)
     protected abstract fun received(): Sequence<SseMessage>
 
-    private fun findQueue(id: MessageId) = messageQueues[id] ?: error("no queue for $id")
+    private fun findQueue(id: McpMessageId) = messageQueues[id] ?: error("no queue for $id")
 }
