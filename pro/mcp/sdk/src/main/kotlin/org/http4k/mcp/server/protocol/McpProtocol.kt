@@ -41,6 +41,7 @@ import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.protocol.ClientRequestMethod.RequestBased
 import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
@@ -182,11 +183,18 @@ class McpProtocol<Transport, RSP : Any>(
                         sessions.ok()
                     }
 
-                    McpTool.Call.Method -> sessions.respond(
-                        transport,
-                        session,
-                        jsonReq.respondTo<McpTool.Call.Request> { tools.call(it, httpReq) }
-                    )
+                    McpTool.Call.Method -> {
+                        sessions.respond(
+                            transport,
+                            session,
+                            jsonReq.respondTo<McpTool.Call.Request> {
+                                val method = it._meta.progress?.let(::RequestBased)
+                                if (method != null) sessions.assign(method, transport, httpReq)
+                                tools.call(it, httpReq)
+                                    .also { if (method != null) sessions.end(method) }
+                            }
+                        )
+                    }
 
                     McpTool.List.Method -> sessions.respond(
                         transport,
