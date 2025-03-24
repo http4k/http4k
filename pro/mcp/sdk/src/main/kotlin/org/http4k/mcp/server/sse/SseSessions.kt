@@ -41,11 +41,11 @@ class SseSessions(
         return Response(ACCEPTED)
     }
 
-    override fun request(session: Session, message: McpNodeType) =
-        when (val sse = sessions[session]) {
+    override fun request(method: ClientRequestMethod, message: McpNodeType) =
+        when (val sse = sessions[method.session]) {
             null -> error()
             else -> {
-                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(session)))
+                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(method.session)))
                 ok()
             }
         }

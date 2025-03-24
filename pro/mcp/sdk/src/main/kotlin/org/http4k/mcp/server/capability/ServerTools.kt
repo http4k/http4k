@@ -1,7 +1,7 @@
 package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.protocol.Tools
@@ -16,5 +16,5 @@ class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapabilit
     override fun call(req: McpTool.Call.Request, http: Request): McpTool.Call.Response = items
         .find { it.toTool().name == req.name }
         ?.call(req, http)
-        ?: throw McpException(ErrorMessage.InvalidParams)
+        ?: throw McpException(InvalidParams)
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 class ServerSampling(private val random: Random = Random) : Sampling {
@@ -51,7 +52,12 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         responseQueues[id] = queue
 
         with(request) {
-            subscriptions.filter { (method) -> request.progressToken?.let(::RequestBased) == method }
+            subscriptions.filter { (method) ->
+                when (method) {
+                    is RequestBased -> method.progressToken == request.progressToken
+                    else -> false
+                }
+            }
                 .takeIf { it.isNotEmpty() }
                 ?.values
                 ?.random()?.invoke(
@@ -72,7 +78,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
 
         return sequence {
             while (true) {
-                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: Long.MAX_VALUE, MILLISECONDS)) {
+                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
                     null -> {
                         yield(Failure(Timeout))
                         break

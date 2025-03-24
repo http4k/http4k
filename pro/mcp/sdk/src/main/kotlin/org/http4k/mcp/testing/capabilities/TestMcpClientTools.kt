@@ -8,6 +8,7 @@ import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
@@ -46,7 +47,8 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
         sender(
             McpTool.Call, McpTool.Call.Request(
                 name,
-                request.mapValues { McpJson.asJsonObject(it.value) })
+                request.mapValues { McpJson.asJsonObject(it.value) }, Meta(request.progressToken)
+            )
         )
         return client.nextEvent<McpTool.Call.Response, ToolResponse>({
             when (isError) {

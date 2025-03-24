@@ -34,6 +34,7 @@ import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
@@ -45,6 +46,7 @@ import org.http4k.mcp.client.internal.McpCallback
 import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
@@ -102,7 +104,7 @@ class HttpStreamingMcpClient(
                     Http4kSseClient(
                         Request(GET, baseUri)
                             .with(Header.MCP_SESSION_ID of sessionId.get()),
-                        http, notificationSseReconnectionMode, ::println
+                        http, notificationSseReconnectionMode, System.err::println
                     )
                         .received()
                         .filterIsInstance<Event>()
@@ -136,17 +138,36 @@ class HttpStreamingMcpClient(
             name: ToolName,
             request: ToolRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send(
-            McpTool.Call,
-            McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
-        )
-            .flatMap { it.first().asAOrFailure<McpTool.Call.Response>() }
-            .map {
-                when (it.isError) {
-                    true -> Error(ErrorMessage(-1, it.content.joinToString()))
-                    else -> Ok(it.content)
+        ): Result<ToolResponse, McpError> {
+            val incoming = http.send(
+                McpTool.Call,
+                McpTool.Call.Request(
+                    name,
+                    request.mapValues { McpJson.asJsonObject(it.value) },
+                    Meta(request.progressToken)
+                )
+            )
+            return incoming
+                .flatMap {
+                    it.mapNotNull {
+                        when ((McpJson.parse(it.data) as MoshiObject)["method"]) {
+                            null -> it
+                            else -> {
+                                val message = JsonRpcRequest(McpJson, (McpJson.parse(it.data) as MoshiObject).attributes)
+                                val id = message.id?.let { asA<McpMessageId>(compact(it)) }
+                                callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
+                                null
+                            }
+                        }
+                    }.first().asAOrFailure<McpTool.Call.Response>()
                 }
-            }
+                .map {
+                    when (it.isError) {
+                        true -> Error(ErrorMessage(-1, it.content.joinToString()))
+                        else -> Ok(it.content)
+                    }
+                }
+        }
     }
 
     override fun prompts() = object : McpClient.Prompts {

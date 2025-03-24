@@ -33,8 +33,8 @@ class WebsocketSessions(
         transport.send(WsMessage(Event("message", compact(message)).toMessage()))
     }
 
-    override fun request(session: Session, message: McpNodeType) =
-        when (val ws = sessions[session]) {
+    override fun request(method: ClientRequestMethod, message: McpNodeType) =
+        when (val ws = sessions[method.session]) {
             null -> Unit
             else -> ws.send(WsMessage(Event("message", compact(message)).toMessage()))
         }

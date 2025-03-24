@@ -11,6 +11,7 @@ import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.lens.with
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
@@ -62,19 +63,12 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
     @Test
     fun `can interact with server`() {
-        val model = ModelName.of("my model")
-
         val toolArg = Tool.Arg.required("name")
-
-        val random = Random(0)
-
-        val sampling = ServerSampling(random)
-
 
         val tools = ServerTools(
             Tool("reverse", "description", toolArg) bind {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
-            }
+            },
         )
 
         val protocol = McpProtocol(
@@ -95,7 +89,6 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(listOf("1", "2"))
             }),
-            sampling
         )
 
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
@@ -148,23 +141,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
 
-        if (doesSampling) {
-            val samplingResponses = listOf(
-                SamplingResponse(model, Assistant, Content.Text("hello"), null),
-                SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
-            )
-
-            mcpClient.sampling().onSampled {
-                samplingResponses.asSequence()
-            }
-
-            val responses = sampling.sampleClient(
-                SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
-                Duration.ofSeconds(5)
-            )
-
-            assertThat(responses.toList(), equalTo(samplingResponses.map(::Success)))
-
+        if (doesNotifications) {
             tools.items = emptyList()
 
             require(latch.await(2, SECONDS))

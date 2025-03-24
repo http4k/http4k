@@ -4,13 +4,16 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.client.chunkedSseSequence
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.Assistant
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
@@ -27,6 +30,8 @@ import org.http4k.lens.with
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.SamplingRequest
+import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClientContract
@@ -41,7 +46,6 @@ import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
@@ -62,6 +66,7 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.random.Random
@@ -192,6 +197,59 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
         mcpClient.stop()
         server.stop()
     }
+
+    @Test
+    fun `can do sampling`() {
+        val model = ModelName.of("my model")
+
+        val random = Random(0)
+
+        val sampling = ServerSampling(random)
+
+        val samplingResponses = listOf(
+            SamplingResponse(model, Assistant, Content.Text("hello"), null),
+            SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
+        )
+
+        val tools = ServerTools(
+            Tool("sample", "description") bind {
+                try {
+                    val received = sampling.sampleClient(
+                        SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
+                        Duration.ofSeconds(5)
+                    ).toList()
+                    assertThat(received, equalTo(samplingResponses.map { Success(it) }))
+                    ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
+                } catch (e: Exception) {
+                    throw e
+                }
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools,
+            sampling = sampling,
+        )
+
+        val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
+
+        mcpClient.start()
+
+        mcpClient.sampling().onSampled {
+            samplingResponses.asSequence()
+        }
+
+        assertThat(
+            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample")),
+            equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
+        )
+
+        mcpClient.stop()
+        toPolyHandler(protocol).asServer(Helidon(0)).start().stop()
+    }
+
 }
 
 private class InMemorySessionEventStore : SessionEventStore {

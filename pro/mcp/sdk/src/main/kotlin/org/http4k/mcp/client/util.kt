@@ -12,9 +12,11 @@ import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.lens.contentType
+import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -30,7 +32,8 @@ internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, 
         else -> {
             resultFrom {
                 convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())
-            }.mapFailure { McpError.Protocol(ParseError) }
+            }.mapFailure {
+                McpError.Protocol(ErrorMessage(-1, it.toString())) }
         }
     }
 }

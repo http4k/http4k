@@ -188,14 +188,14 @@ class McpProtocol<Transport, RSP : Any>(
                             transport,
                             session,
                             jsonReq.respondTo<McpTool.Call.Request> {
-                                val method = it._meta.progress?.let(::RequestBased)
+                                val method = it._meta.progress?.let { RequestBased(it, session) }
                                 if (method != null) {
                                     sessions.assign(method, transport, httpReq)
                                     sampling.onSampleClient(method) { req, id ->
                                         clientRequests[session]?.trackRequest(id) {
                                             sampling.receive(id, it.fromJsonRpc())
                                         }
-                                        sessions.request(session, req.toJsonRpc(McpSampling, asJsonObject(id)))
+                                        sessions.request(method, req.toJsonRpc(McpSampling, asJsonObject(id)))
                                     }
 
                                 }
@@ -237,25 +237,25 @@ class McpProtocol<Transport, RSP : Any>(
 
         logger.subscribe(session, LogLevel.error) { level, logger, data ->
             sessions.request(
-                session,
+                Stream(session),
                 McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage)
             )
         }
         prompts.onChange(session) {
-            sessions.request(session, McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed))
+            sessions.request(Stream(session), McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed))
         }
         progress.onProgress(session) {
-            sessions.request(session, it.toJsonRpc(McpProgress))
+            sessions.request(Stream(session), it.toJsonRpc(McpProgress))
         }
         resources.onChange(session) {
             sessions.request(
-                session,
+                Stream(session),
                 McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
             )
         }
         tools.onChange(session) {
             sessions.request(
-                session,
+                Stream(session),
                 McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
             )
         }

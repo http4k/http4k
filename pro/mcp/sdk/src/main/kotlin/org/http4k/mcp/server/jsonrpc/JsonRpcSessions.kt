@@ -24,7 +24,7 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
     override fun respond(transport: Unit, session: Session, message: McpNodeType, status: CompletionStatus) =
         Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
 
-    override fun request(session: Session, message: McpNodeType) =
+    override fun request(method: ClientRequestMethod, message: McpNodeType) =
         Response(OK).contentType(APPLICATION_JSON).body(McpJson.compact(message))
 
     override fun error() = Response(NOT_FOUND)

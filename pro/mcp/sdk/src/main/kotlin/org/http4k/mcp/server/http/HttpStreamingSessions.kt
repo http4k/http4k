@@ -39,21 +39,27 @@ class HttpStreamingSessions(
 ) : Sessions<Sse, Response> {
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
-    private val progressTokens = ConcurrentHashMap<ProgressToken, Sse>()
+    private val requests = ConcurrentHashMap<ProgressToken, Sse>()
 
     override fun ok() = Response(ACCEPTED)
 
-    override fun request(session: Session, message: McpNodeType) =
-        when (val sse = sessions[session]) {
+    override fun request(method: ClientRequestMethod, message: McpNodeType): Response {
+        val sse = when (method) {
+            is RequestBased -> requests[method.progressToken]
+            is Stream -> sessions[method.session]
+        }
+
+        return when (sse) {
             null -> error()
             else -> {
-                SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
+                SseMessage.Event("message", compact(message), sessionEventTracking.next(method.session)).also {
                     sse.send(it)
-                    eventStore.write(session, it)
+                    eventStore.write(method.session, it)
                 }
                 Response(ACCEPTED)
             }
         }
+    }
 
     override fun respond(
         transport: Sse,
@@ -81,7 +87,7 @@ class HttpStreamingSessions(
 
     override fun end(method: ClientRequestMethod) = ok().also {
         when (method) {
-            is RequestBased -> TODO()
+            is RequestBased -> requests.remove(method.progressToken)
             is Stream -> {
                 sessions.remove(method.session)?.close()
                 sessionEventTracking.remove(method.session)
@@ -91,11 +97,10 @@ class HttpStreamingSessions(
 
     override fun assign(method: ClientRequestMethod, transport: Sse, connectRequest: Request) {
         when (method) {
-            is RequestBased -> TODO()
+            is RequestBased -> requests[method.progressToken] = transport
             is Stream -> {
                 sessions[method.session] = transport
-                eventStore.read(method.session, Header.LAST_EVENT_ID(connectRequest))
-                    .forEach(transport::send)
+                eventStore.read(method.session, Header.LAST_EVENT_ID(connectRequest)).forEach(transport::send)
             }
         }
     }
