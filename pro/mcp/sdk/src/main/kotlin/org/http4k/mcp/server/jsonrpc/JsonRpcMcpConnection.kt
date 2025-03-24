@@ -6,9 +6,9 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.InvalidSession
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
 
 /**

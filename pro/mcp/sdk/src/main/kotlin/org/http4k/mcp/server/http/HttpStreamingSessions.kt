@@ -14,8 +14,8 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionEventStore.Companion.NoCache
 import org.http4k.mcp.server.sessions.SessionEventTracking

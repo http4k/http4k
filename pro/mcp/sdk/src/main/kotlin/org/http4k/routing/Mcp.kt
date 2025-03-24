@@ -25,13 +25,13 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.http.HttpNonStreamingMcp
-import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
+import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
+import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.sse.SseMcp
+import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.stdio.StdIoMcpSessions
 import org.http4k.mcp.server.websocket.WebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketSessions

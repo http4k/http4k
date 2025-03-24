@@ -5,8 +5,8 @@ import dev.forkhandles.result4k.map
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpNodeType

@@ -11,7 +11,6 @@ import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.AuthedSession
 import org.http4k.mcp.server.protocol.Sessions
-import org.http4k.mcp.server.protocol.SessionState
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType

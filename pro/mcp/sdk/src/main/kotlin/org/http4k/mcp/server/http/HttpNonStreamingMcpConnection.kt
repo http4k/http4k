@@ -7,9 +7,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.AuthedSession
+import org.http4k.mcp.server.protocol.InvalidSession
+import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.sse.Sse
