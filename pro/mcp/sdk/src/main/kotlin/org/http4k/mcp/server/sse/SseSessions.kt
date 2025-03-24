@@ -9,7 +9,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Sessions
-import org.http4k.mcp.server.sessions.Session
 import org.http4k.mcp.server.sessions.Session.Invalid
 import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.mcp.server.sessions.SessionEventTracking
@@ -67,7 +66,7 @@ class SseSessions(
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
     override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("No session")
 
-    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
+    override fun assign(session: Valid, transport: Sse, connectRequest: Request) {
         when (session) {
             is Valid -> sessions[session.sessionId] = transport
             is Invalid -> {}

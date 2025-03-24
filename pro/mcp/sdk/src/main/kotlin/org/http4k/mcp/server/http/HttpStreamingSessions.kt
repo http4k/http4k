@@ -15,8 +15,6 @@ import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Sessions
-import org.http4k.mcp.server.sessions.Session
-import org.http4k.mcp.server.sessions.Session.Invalid
 import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionEventStore.Companion.NoCache
@@ -86,16 +84,10 @@ class HttpStreamingSessions(
         sessionEventTracking.remove(sessionId)
     }
 
-    override fun assign(session: Session, transport: Sse, connectRequest: Request) {
-        when (session) {
-            is Valid -> {
-                sessions[session.sessionId] = transport
-                eventStore.read(session.sessionId, Header.LAST_EVENT_ID(connectRequest))
-                    .forEach(transport::send)
-            }
-
-            is Invalid -> {}
-        }
+    override fun assign(session: Valid, transport: Sse, connectRequest: Request) {
+        sessions[session.sessionId] = transport
+        eventStore.read(session.sessionId, Header.LAST_EVENT_ID(connectRequest))
+            .forEach(transport::send)
     }
 
     fun start(executor: SimpleScheduler = SimpleSchedulerService(1)) =

@@ -277,7 +277,7 @@ class McpProtocol<Transport, RSP : Any>(
             Invalid -> sessions.error()
         }
 
-    fun assign(session: Session, transport: Transport, connectRequest: Request) = sessions.assign(session, transport, connectRequest)
+    fun assign(session: Session.Valid, transport: Transport, connectRequest: Request) = sessions.assign(session, transport, connectRequest)
 
     fun transportFor(session: Existing) = sessions.transportFor(session)
 

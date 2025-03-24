@@ -8,7 +8,6 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.protocol.Sessions
-import org.http4k.mcp.server.sessions.Session
 import org.http4k.mcp.server.sessions.Session.Invalid
 import org.http4k.mcp.server.sessions.Session.Valid
 import org.http4k.mcp.server.sessions.SessionProvider
@@ -52,7 +51,7 @@ class WebsocketSessions(
     override fun transportFor(session: Valid.Existing) =
         sessions[session.sessionId] ?: error("Session not found")
 
-    override fun assign(session: Session, transport: Websocket, connectRequest: Request) {
+    override fun assign(session: Valid, transport: Websocket, connectRequest: Request) {
         when (session) {
             is Valid -> sessions[session.sessionId] = transport
             is Invalid -> {}

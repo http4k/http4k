@@ -35,5 +35,5 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit, Unit> {
 
     override fun end(sessionId: SessionId) {}
 
-    override fun assign(session: Session, transport: Unit, connectRequest: Request) {}
+    override fun assign(session: Session.Valid, transport: Unit, connectRequest: Request) {}
 }

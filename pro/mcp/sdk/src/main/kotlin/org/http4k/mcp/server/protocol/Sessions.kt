@@ -26,7 +26,7 @@ interface Sessions<Transport, RSP> {
     fun onClose(sessionId: SessionId, fn: () -> Unit)
 
     fun validate(connectRequest: Request): Session
-    fun assign(session: Session, transport: Transport, connectRequest: Request)
+    fun assign(session: Session.Valid, transport: Transport, connectRequest: Request)
     fun transportFor(session: Existing): Transport
 
     fun end(sessionId: SessionId): RSP

@@ -37,7 +37,7 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
         error("not implemented")
     }
 
-    override fun assign(session: Session, transport: Unit, connectRequest: Request) {
+    override fun assign(session: Session.Valid, transport: Unit, connectRequest: Request) {
     }
 
     override fun end(sessionId: SessionId) = ok()
