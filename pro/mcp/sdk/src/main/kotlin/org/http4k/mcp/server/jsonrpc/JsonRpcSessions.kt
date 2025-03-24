@@ -33,7 +33,8 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
     }
 
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, null)
-    override fun transportFor(session: Session.Valid.Existing) {
+
+    override fun transportFor(session: Session.Valid) {
         error("not implemented")
     }
 

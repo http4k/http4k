@@ -63,7 +63,7 @@ class SseSessions(
     }
 
     override fun validate(connectRequest: Request) = sessionProvider.validate(connectRequest, sessionId(connectRequest))
-    override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("No session")
+    override fun transportFor(session: Valid) = sessions[session.sessionId] ?: error("No session")
 
     override fun assign(session: Valid, transport: Sse, connectRequest: Request) {
         sessions[session.sessionId] = transport

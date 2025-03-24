@@ -6,14 +6,6 @@ import org.http4k.mcp.protocol.SessionId
  * Represents a session for a connection.
  */
 sealed interface Session {
-
-    sealed interface Valid : Session {
-        val sessionId: SessionId
-
-        data class Existing(override val sessionId: SessionId) : Valid
-
-        data class New(override val sessionId: SessionId) : Valid
-    }
-
+    data class Valid(val sessionId: SessionId) : Session
     data object Invalid : Session
 }

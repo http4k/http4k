@@ -43,7 +43,6 @@ import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.sessions.Session
-import org.http4k.mcp.server.sessions.Session.Valid.Existing
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpNodeType
@@ -274,7 +273,7 @@ class McpProtocol<Transport, RSP : Any>(
     fun assign(session: Session.Valid, transport: Transport, connectRequest: Request) =
         sessions.assign(session, transport, connectRequest)
 
-    fun transportFor(session: Existing) = sessions.transportFor(session)
+    fun transportFor(session: Session.Valid) = sessions.transportFor(session)
 
     private class ClientRequestTracking {
         private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()

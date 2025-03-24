@@ -2,8 +2,6 @@ package org.http4k.mcp.server.sessions
 
 import org.http4k.core.Request
 import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.sessions.Session.Valid.New
-import org.http4k.mcp.server.sessions.Session.Valid.Existing
 import java.util.UUID
 import kotlin.random.Random
 
@@ -22,10 +20,12 @@ interface SessionProvider {
         fun Random(random: Random) =
             object : SessionProvider {
                 override fun validate(connectRequest: Request, sessionId: SessionId?) =
-                    when (sessionId) {
-                        null -> New(SessionId.of(UUID(random.nextLong(), random.nextLong()).toString()))
-                        else -> Existing(sessionId)
-                    }
+                    Session.Valid(
+                        when (sessionId) {
+                            null -> SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())
+                            else -> sessionId
+                        }
+                    )
             }
     }
 }

@@ -5,7 +5,6 @@ import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.server.sessions.Session
-import org.http4k.mcp.server.sessions.Session.Valid.Existing
 import org.http4k.mcp.util.McpNodeType
 
 /**
@@ -27,7 +26,7 @@ interface Sessions<Transport, RSP> {
 
     fun validate(connectRequest: Request): Session
     fun assign(session: Session.Valid, transport: Transport, connectRequest: Request)
-    fun transportFor(session: Existing): Transport
+    fun transportFor(session: Session.Valid): Transport
 
     fun end(sessionId: SessionId): RSP
 }

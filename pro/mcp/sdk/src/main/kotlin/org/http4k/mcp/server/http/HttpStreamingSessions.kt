@@ -58,12 +58,8 @@ class HttpStreamingSessions(
         status: CompletionStatus
     ): Response {
         SseMessage.Event("message", compact(message), sessionEventTracking.next(sessionId)).also {
-            try {
-                eventStore.write(sessionId, it)
-                transport.send(it)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            eventStore.write(sessionId, it)
+            transport.send(it)
         }
         return Response(OK).contentType(APPLICATION_JSON).body(compact(message))
     }
@@ -77,7 +73,7 @@ class HttpStreamingSessions(
     override fun validate(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(session: Valid.Existing) = sessions[session.sessionId] ?: error("Session not found")
+    override fun transportFor(session: Valid) = sessions[session.sessionId] ?: error("Session not found")
 
     override fun end(sessionId: SessionId) = ok().also {
         sessions.remove(sessionId)?.close()

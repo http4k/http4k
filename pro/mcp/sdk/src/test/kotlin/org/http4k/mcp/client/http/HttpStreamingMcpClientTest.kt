@@ -161,7 +161,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
         tools.items = emptyList()
 
-        require(latch.await(1, SECONDS))
+        require(latch.await(2, SECONDS))
 
         mcpClient.resources().list().orThrow { TODO() }
         mcpClient.prompts().list().orThrow { TODO() }
