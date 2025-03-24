@@ -27,7 +27,6 @@ object McpInitialize : McpRpc {
     data class Response(
         val serverInfo: VersionedMcpEntity,
         val capabilities: ServerCapabilities = ServerCapabilities(),
-        val sessionId: SessionId?,
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
         override val _meta: Meta = default,
     ) : HasMeta, ServerMessage.Response

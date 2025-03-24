@@ -96,7 +96,6 @@ class HttpStreamingMcpClient(
             )
         )
             .flatMap { it.first().asAOrFailure<McpInitialize.Response>() }
-            .map { it.also { sessionId.set(it.sessionId) } }
             .map(McpInitialize.Response::capabilities)
             .also {
                 thread(isDaemon = true) {

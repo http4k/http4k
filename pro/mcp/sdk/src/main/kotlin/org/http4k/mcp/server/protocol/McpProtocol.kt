@@ -258,7 +258,7 @@ class McpProtocol<Transport, RSP : Any>(
             logger.unsubscribe(session)
         }
 
-        return McpInitialize.Response(metaData.entity, metaData.capabilities, session.id, metaData.protocolVersion)
+        return McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
     }
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)

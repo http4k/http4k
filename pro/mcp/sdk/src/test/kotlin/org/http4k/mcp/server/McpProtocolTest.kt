@@ -521,7 +521,7 @@ class McpProtocolTest {
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, firstDeterministicSessionId, metadata.protocolVersion)
+            McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
         )
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)

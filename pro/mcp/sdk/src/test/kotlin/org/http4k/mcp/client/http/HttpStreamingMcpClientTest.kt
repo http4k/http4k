@@ -55,7 +55,6 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
-import org.http4k.mcp.server.sse.sessionId
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
