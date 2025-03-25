@@ -197,7 +197,7 @@ class McpProtocol<Transport, RSP : Any>(
                                 }
                                 contextAndTarget?.let { (method, target) ->
                                     sessions.assign(method, transport, httpReq)
-                                    progress.onProgress(method) {
+                                    progress.onProgress(target) {
                                         sessions.request(
                                             method,
                                             McpProgress.Notification(it.progress, it.total, it.progressToken)
@@ -216,8 +216,8 @@ class McpProtocol<Transport, RSP : Any>(
                                     .also {
                                         if (contextAndTarget != null) {
                                             sampling.remove(contextAndTarget.second)
+                                            progress.remove(contextAndTarget.second)
                                             sessions.end(contextAndTarget.first)
-                                            progress.remove(contextAndTarget.first)
                                         }
                                     }
                             }
@@ -275,12 +275,14 @@ class McpProtocol<Transport, RSP : Any>(
                 McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
             )
         }
-
         sampling.onSampleClient(Entity(entity)) { req, id ->
             clientRequests[session]?.trackRequest(id) {
                 sampling.receive(id, it.fromJsonRpc())
             }
             sessions.request(Stream(session), req.toJsonRpc(McpSampling, asJsonObject(id)))
+        }
+        progress.onProgress(Entity(entity)) {
+            sessions.request(Stream(session), it.toJsonRpc(McpProgress))
         }
 
         sessions.onClose(session) {
@@ -288,6 +290,8 @@ class McpProtocol<Transport, RSP : Any>(
             resources.remove(session)
             tools.remove(session)
             logger.unsubscribe(session)
+            sampling.remove(Entity(entity))
+            progress.remove(Entity(entity))
         }
 
         return McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)

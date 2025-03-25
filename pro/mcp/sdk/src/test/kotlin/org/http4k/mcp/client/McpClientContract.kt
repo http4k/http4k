@@ -26,6 +26,7 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -36,6 +37,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
+import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
@@ -50,6 +52,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
 interface McpClientContract<T, R : Any> : PortBasedTest {
@@ -77,6 +80,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
         val random = Random(0)
 
         val sampling = ServerSampling(random)
+        val progress = ServerRequestProgress()
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
@@ -97,6 +101,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
                 CompletionResponse(listOf("1", "2"))
             }),
             sampling = sampling,
+            progress = progress,
         )
 
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
@@ -150,10 +155,23 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
         )
 
         if (supportsOutOfBandStreaming) {
+
+            mcpClient.tools()
+
             val samplingResponses = listOf(
                 SamplingResponse(model, Assistant, Content.Text("hello"), null),
                 SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
             )
+
+            val reportedProgress = Progress(1, 2.0, "123")
+
+            val receivedProgress = AtomicReference<Progress>()
+
+            mcpClient.tools().onProgress(fn = receivedProgress::set)
+
+            progress.report(Entity(clientName), reportedProgress)
+
+            assertThat(receivedProgress, equalTo(reportedProgress))
 
             mcpClient.sampling().onSampled {
                 samplingResponses.asSequence()

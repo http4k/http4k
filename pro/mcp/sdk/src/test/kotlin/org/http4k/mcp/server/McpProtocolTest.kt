@@ -80,7 +80,7 @@ import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.protocol.ClientRequestTarget
+import org.http4k.mcp.server.protocol.ClientRequestTarget.*
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
@@ -322,8 +322,8 @@ class McpProtocolTest {
             val intArg1 = intArg(it)
 
             it.progressToken?.let {
-                progress.report(Progress(1, 5.0, it))
-                progress.report(Progress(2, 5.0, it))
+                progress.report(Request(it), Progress(1, 5.0, it))
+                progress.report(Request(it), Progress(2, 5.0, it))
             }
 
             ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
@@ -362,18 +362,18 @@ class McpProtocolTest {
                 )
             )
 
-            val progress1 = "123"
+            val progressToken = "123"
 
             mcp.sendToMcp(
                 McpTool.Call,
                 McpTool.Call.Request(
                     tool.name,
-                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(progress1)
+                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(progressToken)
                 )
             )
 
-            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progress1))
-            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progress1))
+            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progressToken))
+            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progressToken))
             assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
 
             val progress2 = "123"
@@ -469,7 +469,7 @@ class McpProtocolTest {
             assertInitializeLoop(mcp)
 
             val received = sampling.sampleClient(
-                ClientRequestTarget.Entity(metadata.entity.name),
+                Entity(metadata.entity.name),
                 SamplingRequest(
                     listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")
