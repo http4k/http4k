@@ -71,6 +71,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
 class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
@@ -270,17 +271,22 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
                 eventStore = eventStore
             ).apply { start() },
             tools = tools,
-            progress = progress,
+            progress = progress
         )
 
         val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
 
         mcpClient.start()
 
+        val prog = AtomicReference<Progress>()
+        mcpClient.tools().onProgress(fn = prog::set)
+
         assertThat(
             mcpClient.tools().call(ToolName.of("progress"), ToolRequest(progressToken = "progress")),
             equalTo(Success(ToolResponse.Ok(Content.Text(""))))
         )
+
+        assertThat(prog.get(), equalTo(Progress(1, 2.0, "progress")))
 
         mcpClient.stop()
 

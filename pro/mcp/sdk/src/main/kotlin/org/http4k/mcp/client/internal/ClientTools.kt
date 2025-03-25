@@ -10,6 +10,8 @@ import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.Progress
+import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
@@ -31,6 +33,12 @@ internal class ClientTools(
         })
     }
 
+    override fun onProgress(overrideDefaultTimeout: Duration?, fn: (Progress) -> Unit) {
+        register(McpProgress, McpCallback(McpProgress.Notification::class) { n, _ ->
+            fn(Progress(n.progress, n.total, n.progressToken))
+        })
+    }
+
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpTool.List, McpTool.List.Request(),
         overrideDefaultTimeout ?: defaultTimeout,
@@ -43,7 +51,11 @@ internal class ClientTools(
     override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpTool.Call,
-            McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) }, Meta(request.progressToken)),
+            McpTool.Call.Request(
+                name,
+                request.mapValues { McpJson.asJsonObject(it.value) },
+                Meta(request.progressToken)
+            ),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)
         )

@@ -19,7 +19,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 import java.time.Duration
 
 /**
- * Client for the MCP protocol. Provides access to the various resources and tools on this MCP Server
+ * Client for the MCP protocol. Provides access to the various resources and tools on ths MCP Server
  */
 interface McpClient : AutoCloseable {
     fun start(): McpResult<ServerCapabilities>
@@ -36,6 +36,7 @@ interface McpClient : AutoCloseable {
      */
     interface Tools {
         fun onChange(fn: () -> Unit)
+        fun onProgress(overrideDefaultTimeout: Duration? = null, fn: (org.http4k.mcp.model.Progress) -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
         fun call(
             name: ToolName,
@@ -58,7 +59,7 @@ interface McpClient : AutoCloseable {
     }
 
     /**
-     * Perform Model Sampling by a model provided by this MCP server
+     * Perform Model Sampling on a model provided by this MCP client. Works during a tool call.
      */
     interface Sampling {
         /**
@@ -79,7 +80,7 @@ interface McpClient : AutoCloseable {
     }
 
     /**
-     * Generate Prompt Completions provided by this MCP Server
+     * Generate Prompt Completions provided by ths MCP Server
      */
     interface Completions {
         fun complete(

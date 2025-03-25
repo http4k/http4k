@@ -9,6 +9,8 @@ import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.Progress
+import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
@@ -22,9 +24,14 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
     McpClient.Tools {
 
     private val notifications = mutableListOf<() -> Unit>()
+    private val progress = mutableListOf<(Progress) -> Unit>()
 
     override fun onChange(fn: () -> Unit) {
         notifications += fn
+    }
+
+    override fun onProgress(overrideDefaultTimeout: Duration?, fn: (Progress) -> Unit) {
+        progress += fn
     }
 
     /**
@@ -33,6 +40,12 @@ class TestMcpClientTools(private val sender: TestMcpSender, private val client: 
     fun expectNotification() =
         client.nextNotification<McpTool.List.Changed.Notification>(McpTool.List.Changed)
             .also { notifications.forEach { it() } }
+
+    /**
+     * Force a list changed notification to be received and process it
+     */
+    fun expectProgress() = client.nextNotification<McpProgress.Notification>(McpProgress)
+        .also { n -> progress.forEach { it(Progress(n.progress, n.total, n.progressToken)) } }
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {
         sender(McpTool.List, McpTool.List.Request())

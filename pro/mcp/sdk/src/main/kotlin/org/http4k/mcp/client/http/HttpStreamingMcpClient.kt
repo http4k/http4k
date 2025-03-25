@@ -47,6 +47,7 @@ import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
@@ -60,6 +61,7 @@ import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpInitialize
+import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -126,6 +128,14 @@ class HttpStreamingMcpClient(
         override fun onChange(fn: () -> Unit) {
             callbacks.getOrPut(McpTool.List.Changed.Method) { mutableListOf() }.add(
                 McpCallback(McpPrompt.List.Changed.Notification::class) { _, _ -> fn() }
+            )
+        }
+
+        override fun onProgress(overrideDefaultTimeout: Duration?, fn: (Progress) -> Unit) {
+            callbacks.getOrPut(McpProgress.Method) { mutableListOf() }.add(
+                McpCallback(McpProgress.Notification::class) { n, _ -> fn(
+                    Progress(n.progress, n.total, n.progressToken)
+                ) }
             )
         }
 
