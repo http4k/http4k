@@ -57,7 +57,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
     val clientName get() = McpEntity.of("foobar")
 
     val doesNotifications: Boolean
-    val doesSampling: Boolean
+    val supportsOutOfBandStreaming: Boolean
 
     fun clientSessions(): Sessions<T, R>
 
@@ -149,7 +149,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
             equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
 
-        if (doesSampling) {
+        if (supportsOutOfBandStreaming) {
             val samplingResponses = listOf(
                 SamplingResponse(model, Assistant, Content.Text("hello"), null),
                 SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))

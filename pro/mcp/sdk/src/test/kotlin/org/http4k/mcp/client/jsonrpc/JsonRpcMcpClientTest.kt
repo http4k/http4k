@@ -11,7 +11,7 @@ import org.http4k.mcp.server.protocol.McpProtocol
 class JsonRpcMcpClientTest : McpClientContract<Unit, Response> {
 
     override val doesNotifications = false
-    override val doesSampling = false
+    override val supportsOutOfBandStreaming = false
 
     override fun clientSessions() = JsonRpcSessions()
 
