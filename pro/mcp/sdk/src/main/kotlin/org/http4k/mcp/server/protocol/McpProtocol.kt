@@ -98,7 +98,10 @@ class McpProtocol<Transport, RSP : Any>(
                         sessions.respond(
                             transport,
                             session,
-                            jsonReq.respondTo<McpInitialize.Request> { handleInitialize(it, session) })
+                            jsonReq.respondTo<McpInitialize.Request> {
+                                assign(Stream(session), transport, httpReq)
+                                handleInitialize(it, session)
+                            })
 
                     McpCompletion.Method ->
                         sessions.respond(
