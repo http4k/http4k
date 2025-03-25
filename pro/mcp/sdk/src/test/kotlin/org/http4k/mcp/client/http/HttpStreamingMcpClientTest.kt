@@ -38,6 +38,7 @@ import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -49,6 +50,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
+import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
@@ -117,8 +119,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
     @Test
     fun `resume a stream`() {
-        val model = ModelName.of("my model")
-
         val toolArg = Tool.Arg.required("name")
         val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
@@ -186,14 +186,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
         assertThat(messages.size, equalTo(2))
 
-//        val samplingResponses = listOf(
-//            SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
-//        )
-//
-//        mcpClient.sampling().onSampled {
-//            samplingResponses.asSequence()
-//        }
-
         mcpClient.stop()
         server.stop()
     }
@@ -226,9 +218,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
             }
         )
 
+        val eventStore = InMemorySessionEventStore()
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
+            HttpStreamingSessions(
+                sessionProvider = SessionProvider.Random(Random(0)),
+                eventStore = eventStore
+            ).apply { start() },
             tools = tools,
             sampling = sampling,
         )
@@ -247,9 +243,50 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
         )
 
         mcpClient.stop()
-        toPolyHandler(protocol).asServer(Helidon(0)).start().stop()
+
+        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(3))
     }
 
+    @Test
+    fun `can do progress`() {
+        val progress = ServerRequestProgress()
+
+        val tools = ServerTools(
+            Tool("progress", "description") bind {
+                try {
+                    progress.report(Progress(1, 2.0, it.progressToken!!))
+                    ToolResponse.Ok(listOf(Content.Text("")))
+                } catch (e: Exception) {
+                    throw e
+                }
+            }
+        )
+
+        val eventStore = InMemorySessionEventStore()
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            HttpStreamingSessions(
+                sessionProvider = SessionProvider.Random(Random(0)),
+                eventStore = eventStore
+            ).apply { start() },
+            tools = tools,
+            progress = progress,
+        )
+
+        val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
+
+        mcpClient.start()
+
+        assertThat(
+            mcpClient.tools().call(ToolName.of("progress"), ToolRequest(progressToken = "progress")),
+            equalTo(Success(ToolResponse.Ok(Content.Text(""))))
+        )
+
+        mcpClient.stop()
+
+        val read = eventStore.read(Session(firstDeterministicSessionId), null)
+        assertThat(read.toList().size, equalTo(3))
+    }
 }
 
 private class InMemorySessionEventStore : SessionEventStore {

@@ -7,7 +7,7 @@ import org.http4k.mcp.protocol.messages.McpProgress
  * Handles protocol traffic for client progress notifications.
  */
 interface RequestProgress {
-    fun onProgress(session: Session, handler: (McpProgress.Notification) -> Unit)
-    fun remove(session: Session)
+    fun onProgress(method: ClientRequestMethod, handler: (McpProgress.Notification) -> Unit)
+    fun remove(method: ClientRequestMethod)
     fun report(req: Progress)
 }

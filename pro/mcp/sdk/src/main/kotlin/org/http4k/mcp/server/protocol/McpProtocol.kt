@@ -191,6 +191,13 @@ class McpProtocol<Transport, RSP : Any>(
                                 val method = it._meta.progress?.let { RequestBased(it, session) }
                                 if (method != null) {
                                     sessions.assign(method, transport, httpReq)
+                                    progress.onProgress(method) {
+                                        sessions.request(
+                                            method,
+                                            McpProgress.Notification(it.progress, it.total, it.progressToken)
+                                                .toJsonRpc(McpProgress)
+                                        )
+                                    }
                                     sampling.onSampleClient(method) { req, id ->
                                         clientRequests[session]?.trackRequest(id) {
                                             sampling.receive(id, it.fromJsonRpc())
@@ -200,7 +207,13 @@ class McpProtocol<Transport, RSP : Any>(
 
                                 }
                                 tools.call(it, httpReq)
-                                    .also { if (method != null) sessions.end(method) }
+                                    .also {
+                                        if (method != null) {
+                                            sampling.remove(method)
+                                            sessions.end(method)
+                                            progress.remove(method)
+                                        }
+                                    }
                             }
                         )
                     }
@@ -244,9 +257,6 @@ class McpProtocol<Transport, RSP : Any>(
         prompts.onChange(session) {
             sessions.request(Stream(session), McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed))
         }
-        progress.onProgress(session) {
-            sessions.request(Stream(session), it.toJsonRpc(McpProgress))
-        }
         resources.onChange(session) {
             sessions.request(
                 Stream(session),
@@ -262,7 +272,6 @@ class McpProtocol<Transport, RSP : Any>(
 
         sessions.onClose(session) {
             prompts.remove(session)
-            progress.remove(session)
             resources.remove(session)
             tools.remove(session)
             logger.unsubscribe(session)
