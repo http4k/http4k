@@ -23,7 +23,6 @@ import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 class ServerSampling(private val random: Random = Random) : Sampling {
-
     private val subscriptions =
         ConcurrentHashMap<ClientRequestTarget, (McpSampling.Request, McpMessageId) -> Unit>()
 
@@ -91,6 +90,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
     }
 
     override fun remove(target: ClientRequestTarget) {
-        subscriptions[target]
+        // TODO ref count this
+        subscriptions.remove(target)
     }
 }

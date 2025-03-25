@@ -41,8 +41,8 @@ import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
 import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
@@ -252,9 +252,7 @@ class McpProtocol<Transport, RSP : Any>(
     }
 
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
-        if (!clientRequests.contains(session)) clientRequests[session] = ClientTracking()
-
-        val target = Entity(request.clientInfo.name)
+        val entity = (clientRequests[session] ?: ClientTracking(request).also { clientRequests[session] = it }).entity
 
         logger.subscribe(session, LogLevel.error) { level, logger, data ->
             sessions.request(
@@ -278,7 +276,7 @@ class McpProtocol<Transport, RSP : Any>(
             )
         }
 
-        sampling.onSampleClient(target) { req, id ->
+        sampling.onSampleClient(Entity(entity)) { req, id ->
             clientRequests[session]?.trackRequest(id) {
                 sampling.receive(id, it.fromJsonRpc())
             }
@@ -290,7 +288,6 @@ class McpProtocol<Transport, RSP : Any>(
             resources.remove(session)
             tools.remove(session)
             logger.unsubscribe(session)
-            sampling.remove(target)
         }
 
         return McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
@@ -308,7 +305,8 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun transportFor(session: Session) = sessions.transportFor(session)
 
-    private class ClientTracking {
+    private class ClientTracking(private val initialize: McpInitialize.Request) {
+        val entity = initialize.clientInfo.name
         private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 
         fun trackRequest(id: McpMessageId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {

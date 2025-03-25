@@ -58,7 +58,6 @@ import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.ClientRequestTarget
-import org.http4k.mcp.server.protocol.ClientRequestTarget.Request
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -171,7 +170,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
         tools.items = emptyList()
 
-        require(latch.await(2, SECONDS))
+        require(latch.await(2, SECONDS)) // TODO RACE CONDITION
 
         mcpClient.resources().list().orThrow { TODO() }
         mcpClient.prompts().list().orThrow { TODO() }
