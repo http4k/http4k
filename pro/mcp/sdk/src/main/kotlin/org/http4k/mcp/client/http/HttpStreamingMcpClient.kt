@@ -124,18 +124,23 @@ class HttpStreamingMcpClient(
             }
     }
 
+
+    override fun progress() = object : McpClient.RequestProgress {
+        override fun onProgress(fn: (Progress) -> Unit) {
+            callbacks.getOrPut(McpProgress.Method) { mutableListOf() }.add(
+                McpCallback(McpProgress.Notification::class) { n, _ ->
+                    fn(
+                        Progress(n.progress, n.total, n.progressToken)
+                    )
+                }
+            )
+        }
+    }
+
     override fun tools() = object : McpClient.Tools {
         override fun onChange(fn: () -> Unit) {
             callbacks.getOrPut(McpTool.List.Changed.Method) { mutableListOf() }.add(
                 McpCallback(McpPrompt.List.Changed.Notification::class) { _, _ -> fn() }
-            )
-        }
-
-        override fun onProgress(overrideDefaultTimeout: Duration?, fn: (Progress) -> Unit) {
-            callbacks.getOrPut(McpProgress.Method) { mutableListOf() }.add(
-                McpCallback(McpProgress.Notification::class) { n, _ -> fn(
-                    Progress(n.progress, n.total, n.progressToken)
-                ) }
             )
         }
 
@@ -163,7 +168,8 @@ class HttpStreamingMcpClient(
                         when ((McpJson.parse(it.data) as MoshiObject)["method"]) {
                             null -> it
                             else -> {
-                                val message = JsonRpcRequest(McpJson, (McpJson.parse(it.data) as MoshiObject).attributes)
+                                val message =
+                                    JsonRpcRequest(McpJson, (McpJson.parse(it.data) as MoshiObject).attributes)
                                 val id = message.id?.let { asA<McpMessageId>(compact(it)) }
                                 callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
                                 null

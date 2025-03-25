@@ -19,6 +19,7 @@ import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.testing.capabilities.TestMcpClientCompletions
 import org.http4k.mcp.testing.capabilities.TestMcpClientPrompts
+import org.http4k.mcp.testing.capabilities.TestMcpClientRequestProgress
 import org.http4k.mcp.testing.capabilities.TestMcpClientResources
 import org.http4k.mcp.testing.capabilities.TestMcpClientSampling
 import org.http4k.mcp.testing.capabilities.TestMcpClientTools
@@ -39,6 +40,7 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
     private val client = AtomicReference<TestSseClient>()
     private val tools = TestMcpClientTools(sender, client)
     private val prompts = TestMcpClientPrompts(sender, client)
+    private val progress = TestMcpClientRequestProgress(client)
     private val sampling = TestMcpClientSampling(sender, client)
     private val resources = TestMcpClientResources(sender, client)
     private val completions = TestMcpClientCompletions(sender, client)
@@ -68,6 +70,7 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
     override fun tools(): TestMcpClientTools = tools
 
     override fun prompts(): TestMcpClientPrompts = prompts
+    override fun progress(): TestMcpClientRequestProgress = progress
 
     override fun sampling(): TestMcpClientSampling = sampling
 

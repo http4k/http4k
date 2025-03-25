@@ -167,7 +167,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
             val receivedProgress = AtomicReference<Progress>()
 
-            mcpClient.tools().onProgress(fn = receivedProgress::set)
+            mcpClient.progress().onProgress(fn = receivedProgress::set)
 
             progress.report(Entity(clientName), reportedProgress)
 

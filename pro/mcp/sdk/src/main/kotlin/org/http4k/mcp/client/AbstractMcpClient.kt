@@ -12,6 +12,7 @@ import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.client.McpError.Timeout
 import org.http4k.mcp.client.internal.ClientCompletions
 import org.http4k.mcp.client.internal.ClientPrompts
+import org.http4k.mcp.client.internal.ClientRequestProgress
 import org.http4k.mcp.client.internal.ClientResources
 import org.http4k.mcp.client.internal.ClientSampling
 import org.http4k.mcp.client.internal.ClientTools
@@ -140,6 +141,11 @@ abstract class AbstractMcpClient(
 
     override fun sampling(): McpClient.Sampling =
         ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+        }
+
+    override fun progress(): McpClient.RequestProgress =
+        ClientRequestProgress { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 

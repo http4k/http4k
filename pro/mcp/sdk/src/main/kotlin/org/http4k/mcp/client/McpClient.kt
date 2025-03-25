@@ -27,6 +27,7 @@ interface McpClient : AutoCloseable {
 
     fun tools(): Tools
     fun prompts(): Prompts
+    fun progress(): RequestProgress
     fun sampling(): Sampling
     fun resources(): Resources
     fun completions(): Completions
@@ -36,7 +37,6 @@ interface McpClient : AutoCloseable {
      */
     interface Tools {
         fun onChange(fn: () -> Unit)
-        fun onProgress(overrideDefaultTimeout: Duration? = null, fn: (org.http4k.mcp.model.Progress) -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
         fun call(
             name: ToolName,
@@ -56,6 +56,13 @@ interface McpClient : AutoCloseable {
             request: PromptRequest,
             overrideDefaultTimeout: Duration? = null
         ): McpResult<PromptResponse>
+    }
+
+    /**
+     * Receive progress reports from a Server
+     */
+    interface RequestProgress {
+        fun onProgress(fn: (org.http4k.mcp.model.Progress) -> Unit)
     }
 
     /**

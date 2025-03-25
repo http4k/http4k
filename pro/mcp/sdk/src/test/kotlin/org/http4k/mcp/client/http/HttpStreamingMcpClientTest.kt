@@ -277,7 +277,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
         mcpClient.start()
 
         val prog = AtomicReference<Progress>()
-        mcpClient.tools().onProgress(fn = prog::set)
+        mcpClient.progress().onProgress(fn = prog::set)
 
         assertThat(
             mcpClient.tools().call(ToolName.of("progress"), ToolRequest(progressToken = "progress")),

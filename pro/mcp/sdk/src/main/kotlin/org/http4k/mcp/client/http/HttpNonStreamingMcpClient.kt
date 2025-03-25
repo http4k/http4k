@@ -48,10 +48,13 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
 
     override fun start() = Success(ServerCapabilities())
 
+    override fun progress() = object : McpClient.RequestProgress {
+        override fun onProgress(fn: (Progress) -> Unit) =
+            throw UnsupportedOperationException()
+    }
+
     override fun tools() = object : McpClient.Tools {
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
-        override fun onProgress(overrideDefaultTimeout: Duration?, fn: (Progress) -> Unit) =
-            throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
             http.send<McpTool.List.Response>(McpTool.List, McpTool.List.Request())

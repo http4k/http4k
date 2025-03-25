@@ -10,8 +10,6 @@ import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.Progress
-import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
@@ -30,12 +28,6 @@ internal class ClientTools(
     override fun onChange(fn: () -> Unit) {
         register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification::class) { _, _ ->
             fn()
-        })
-    }
-
-    override fun onProgress(overrideDefaultTimeout: Duration?, fn: (Progress) -> Unit) {
-        register(McpProgress, McpCallback(McpProgress.Notification::class) { n, _ ->
-            fn(Progress(n.progress, n.total, n.progressToken))
         })
     }
 
