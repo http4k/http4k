@@ -23,7 +23,7 @@ import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 class ServerSampling(private val random: Random = Random) :
-    ClientTracking<(McpSampling.Request, McpMessageId) -> Unit>(), Sampling {
+    ClientTracking<ClientRequestTarget, (McpSampling.Request, McpMessageId) -> Unit>(), Sampling {
 
     private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
 

@@ -8,6 +8,6 @@ import org.http4k.mcp.protocol.messages.McpProgress
  */
 interface RequestProgress {
     fun onProgress(context: ClientRequestContext, handler: (McpProgress.Notification) -> Unit)
-    fun remove(context: ClientRequestContext)
+    fun remove(target: ClientRequestContext)
     fun report(req: Progress)
 }
