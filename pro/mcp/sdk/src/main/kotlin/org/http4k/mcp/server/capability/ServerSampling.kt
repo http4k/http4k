@@ -19,14 +19,11 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit.MILLISECONDS
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
-class ServerSampling(private val random: Random = Random) : Sampling {
-    private val subscriptions =
-        ConcurrentHashMap<ClientRequestTarget, (McpSampling.Request, McpMessageId) -> Unit>()
-    private val counts = ConcurrentHashMap<ClientRequestTarget, AtomicInteger>()
+class ServerSampling(private val random: Random = Random) :
+    ClientTracking<(McpSampling.Request, McpMessageId) -> Unit>(), Sampling {
 
     private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
 
@@ -43,8 +40,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
     }
 
     override fun onSampleClient(target: ClientRequestTarget, fn: (McpSampling.Request, McpMessageId) -> Unit) {
-        subscriptions[target] = fn
-        counts.getOrPut(target) { AtomicInteger() }.incrementAndGet()
+        add(target, fn)
     }
 
     override fun sampleClient(
@@ -89,13 +85,6 @@ class ServerSampling(private val random: Random = Random) : Sampling {
                     }
                 }
             }
-        }
-    }
-
-    override fun remove(target: ClientRequestTarget) {
-        if (counts.getOrPut(target) { AtomicInteger(0) }.decrementAndGet() <- 0) {
-            subscriptions.remove(target)
-            counts.remove(target)
         }
     }
 }
