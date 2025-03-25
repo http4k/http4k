@@ -6,8 +6,8 @@ import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.server.protocol.ClientRequestMethod
-import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext
+import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionProvider
@@ -33,8 +33,8 @@ class WebsocketSessions(
         transport.send(WsMessage(Event("message", compact(message)).toMessage()))
     }
 
-    override fun request(method: ClientRequestMethod, message: McpNodeType) =
-        when (val ws = sessions[method.session]) {
+    override fun request(context: ClientRequestContext, message: McpNodeType) =
+        when (val ws = sessions[context.session]) {
             null -> Unit
             else -> ws.send(WsMessage(Event("message", compact(message)).toMessage()))
         }
@@ -51,12 +51,12 @@ class WebsocketSessions(
     override fun transportFor(session: Session) =
         sessions[session] ?: error("Session not found")
 
-    override fun assign(method: ClientRequestMethod, transport: Websocket, connectRequest: Request) {
-        if (method is Stream) sessions[method.session] = transport
+    override fun assign(context: ClientRequestContext, transport: Websocket, connectRequest: Request) {
+        if (context is Stream) sessions[context.session] = transport
     }
 
-    override fun end(method: ClientRequestMethod) = ok().also {
-        if (method is Stream) sessions.remove(method.session)?.close()
+    override fun end(context: ClientRequestContext) = ok().also {
+        if (context is Stream) sessions.remove(context.session)?.close()
     }
 
     private fun pruneDeadConnections() =

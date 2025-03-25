@@ -7,8 +7,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.server.protocol.ClientRequestMethod
-import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext
+import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventTracking
@@ -41,11 +41,11 @@ class SseSessions(
         return Response(ACCEPTED)
     }
 
-    override fun request(method: ClientRequestMethod, message: McpNodeType) =
-        when (val sse = sessions[method.session]) {
+    override fun request(context: ClientRequestContext, message: McpNodeType) =
+        when (val sse = sessions[context.session]) {
             null -> error()
             else -> {
-                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(method.session)))
+                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(context.session)))
                 ok()
             }
         }
@@ -58,10 +58,10 @@ class SseSessions(
         }
     }
 
-    override fun end(method: ClientRequestMethod) = ok().also {
-        if (method is Stream) {
-            sessions.remove(method.session)?.close()
-            sessionEventTracking.remove(method.session)
+    override fun end(context: ClientRequestContext) = ok().also {
+        if (context is Stream) {
+            sessions.remove(context.session)?.close()
+            sessionEventTracking.remove(context.session)
         }
     }
 
@@ -70,9 +70,9 @@ class SseSessions(
 
     override fun transportFor(session: Session) = sessions[session] ?: error("No session")
 
-    override fun assign(method: ClientRequestMethod, transport: Sse, connectRequest: Request) {
-        if (method is Stream) {
-            sessions[method.session] = transport
+    override fun assign(context: ClientRequestContext, transport: Sse, connectRequest: Request) {
+        if (context is Stream) {
+            sessions[context.session] = transport
         }
     }
 

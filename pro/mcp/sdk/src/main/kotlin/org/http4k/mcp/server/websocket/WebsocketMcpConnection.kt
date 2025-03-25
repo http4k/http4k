@@ -1,7 +1,7 @@
 package org.http4k.mcp.server.websocket
 
 import org.http4k.core.Request
-import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session

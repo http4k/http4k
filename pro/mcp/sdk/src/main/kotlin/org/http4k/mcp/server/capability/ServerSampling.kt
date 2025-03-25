@@ -12,8 +12,7 @@ import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpSampling
-import org.http4k.mcp.server.protocol.ClientRequestMethod
-import org.http4k.mcp.server.protocol.ClientRequestMethod.RequestBased
+import org.http4k.mcp.server.protocol.ClientRequestTarget
 import org.http4k.mcp.server.protocol.Sampling
 import java.time.Duration
 import java.util.concurrent.BlockingQueue
@@ -26,7 +25,7 @@ import kotlin.random.Random
 class ServerSampling(private val random: Random = Random) : Sampling {
 
     private val subscriptions =
-        ConcurrentHashMap<ClientRequestMethod, (McpSampling.Request, McpMessageId) -> Unit>()
+        ConcurrentHashMap<ClientRequestTarget, (McpSampling.Request, McpMessageId) -> Unit>()
 
     private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
 
@@ -42,40 +41,34 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         }
     }
 
+    override fun onSampleClient(target: ClientRequestTarget, fn: (McpSampling.Request, McpMessageId) -> Unit) {
+        subscriptions[target] = fn
+    }
+
     override fun sampleClient(
+        target: ClientRequestTarget,
         request: SamplingRequest,
         fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>> {
         val queue = LinkedBlockingDeque<SamplingResponse>()
         val id = McpMessageId.random(random)
-
         responseQueues[id] = queue
-
         with(request) {
-            subscriptions.filter { (method) ->
-                when (method) {
-                    is RequestBased -> method.progressToken == request.progressToken
-                    else -> false
-                }
-            }
-                .takeIf { it.isNotEmpty() }
-                ?.values
-                ?.random()?.invoke(
-                    McpSampling.Request(
-                        messages,
-                        maxTokens,
-                        systemPrompt,
-                        includeContext,
-                        temperature,
-                        stopSequences,
-                        modelPreferences,
-                        metadata,
-                        _meta = Meta(progressToken)
-                    ),
-                    id
-                )
+            subscriptions[target]?.invoke(
+                McpSampling.Request(
+                    messages,
+                    maxTokens,
+                    systemPrompt,
+                    includeContext,
+                    temperature,
+                    stopSequences,
+                    modelPreferences,
+                    metadata,
+                    _meta = Meta(progressToken)
+                ),
+                id
+            )
         }
-
         return sequence {
             while (true) {
                 when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
@@ -97,14 +90,7 @@ class ServerSampling(private val random: Random = Random) : Sampling {
         }
     }
 
-    override fun onSampleClient(
-        method: ClientRequestMethod,
-        fn: (McpSampling.Request, McpMessageId) -> Unit
-    ) {
-        subscriptions[method] = fn
-    }
-
-    override fun remove(method: ClientRequestMethod) {
-        subscriptions.remove(method)
+    override fun remove(target: ClientRequestTarget) {
+        subscriptions[target]
     }
 }

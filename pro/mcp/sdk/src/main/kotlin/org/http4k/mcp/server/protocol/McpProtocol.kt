@@ -41,8 +41,9 @@ import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.protocol.ClientRequestMethod.RequestBased
-import org.http4k.mcp.server.protocol.ClientRequestMethod.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
+import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpNodeType
@@ -78,7 +79,7 @@ class McpProtocol<Transport, RSP : Any>(
         ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
     )
 
-    private val clientRequests = ConcurrentHashMap<Session, ClientRequestTracking>()
+    private val clientRequests = ConcurrentHashMap<Session, ClientTracking>()
 
     fun receive(
         transport: Transport,
@@ -191,8 +192,10 @@ class McpProtocol<Transport, RSP : Any>(
                             transport,
                             session,
                             jsonReq.respondTo<McpTool.Call.Request> {
-                                val method = it._meta.progress?.let { RequestBased(it, session) }
-                                if (method != null) {
+                                val contextAndTarget = it._meta.progress?.let {
+                                    ToolCall(it, session) to ClientRequestTarget.Request(it)
+                                }
+                                contextAndTarget?.let { (method, target) ->
                                     sessions.assign(method, transport, httpReq)
                                     progress.onProgress(method) {
                                         sessions.request(
@@ -201,7 +204,7 @@ class McpProtocol<Transport, RSP : Any>(
                                                 .toJsonRpc(McpProgress)
                                         )
                                     }
-                                    sampling.onSampleClient(method) { req, id ->
+                                    sampling.onSampleClient(target) { req, id ->
                                         clientRequests[session]?.trackRequest(id) {
                                             sampling.receive(id, it.fromJsonRpc())
                                         }
@@ -211,10 +214,10 @@ class McpProtocol<Transport, RSP : Any>(
                                 }
                                 tools.call(it, httpReq)
                                     .also {
-                                        if (method != null) {
-                                            sampling.remove(method)
-                                            sessions.end(method)
-                                            progress.remove(method)
+                                        if (contextAndTarget != null) {
+                                            sampling.remove(contextAndTarget.second)
+                                            sessions.end(contextAndTarget.first)
+                                            progress.remove(contextAndTarget.first)
                                         }
                                     }
                             }
@@ -249,7 +252,9 @@ class McpProtocol<Transport, RSP : Any>(
     }
 
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
-        if (!clientRequests.contains(session)) clientRequests[session] = ClientRequestTracking()
+        if (!clientRequests.contains(session)) clientRequests[session] = ClientTracking()
+
+        val target = Entity(request.clientInfo.name)
 
         logger.subscribe(session, LogLevel.error) { level, logger, data ->
             sessions.request(
@@ -273,11 +278,19 @@ class McpProtocol<Transport, RSP : Any>(
             )
         }
 
+        sampling.onSampleClient(target) { req, id ->
+            clientRequests[session]?.trackRequest(id) {
+                sampling.receive(id, it.fromJsonRpc())
+            }
+            sessions.request(Stream(session), req.toJsonRpc(McpSampling, asJsonObject(id)))
+        }
+
         sessions.onClose(session) {
             prompts.remove(session)
             resources.remove(session)
             tools.remove(session)
             logger.unsubscribe(session)
+            sampling.remove(target)
         }
 
         return McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
@@ -285,17 +298,17 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 
-    fun end(method: ClientRequestMethod) {
+    fun end(method: ClientRequestContext) {
         if (method is Stream) clientRequests.remove(method.session)
         sessions.end(method)
     }
 
-    fun assign(method: ClientRequestMethod, transport: Transport, connectRequest: Request) =
+    fun assign(method: ClientRequestContext, transport: Transport, connectRequest: Request) =
         sessions.assign(method, transport, connectRequest)
 
     fun transportFor(session: Session) = sessions.transportFor(session)
 
-    private class ClientRequestTracking {
+    private class ClientTracking {
         private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 
         fun trackRequest(id: McpMessageId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {

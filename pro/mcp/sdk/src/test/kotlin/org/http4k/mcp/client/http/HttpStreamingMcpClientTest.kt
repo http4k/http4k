@@ -57,6 +57,8 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
+import org.http4k.mcp.server.protocol.ClientRequestTarget
+import org.http4k.mcp.server.protocol.ClientRequestTarget.Request
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -206,16 +208,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
         val tools = ServerTools(
             Tool("sample", "description") bind {
-                try {
-                    val received = sampling.sampleClient(
-                        SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
-                        Duration.ofSeconds(5)
-                    ).toList()
-                    assertThat(received, equalTo(samplingResponses.map { Success(it) }))
-                    ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
-                } catch (e: Exception) {
-                    throw e
-                }
+                val received = sampling.sampleClient(
+                    ClientRequestTarget.Request(it.progressToken!!),
+                    SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
+                    Duration.ofSeconds(5)
+                ).toList()
+                assertThat(received, equalTo(samplingResponses.map { Success(it) }))
+                ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
             }
         )
 

@@ -53,6 +53,7 @@ import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
+import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.server.sse.SseMcp
@@ -344,6 +345,7 @@ class TestMcpClientTest {
                 tools = ServerTools(
                     Tool("sample", "description") bind {
                         val received = serverSampling.sampleClient(
+                            Entity(metadata.entity.name),
                             SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
                             Duration.ofSeconds(5)
                         ).toList()
@@ -376,7 +378,10 @@ class TestMcpClientTest {
             sampling().start()
 
             val received = serverSampling
-                .sampleClient(SamplingRequest(listOf(), MaxTokens.of(1)), Duration.ofSeconds(5))
+                .sampleClient(
+                    Entity(metadata.entity.name),
+                    SamplingRequest(listOf(), MaxTokens.of(1)), Duration.ofSeconds(5)
+                )
 
             assertThat(
                 received.toList(), equalTo(

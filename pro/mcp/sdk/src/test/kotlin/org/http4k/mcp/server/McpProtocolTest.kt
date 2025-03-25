@@ -80,6 +80,7 @@ import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
+import org.http4k.mcp.server.protocol.ClientRequestTarget
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
@@ -468,6 +469,7 @@ class McpProtocolTest {
             assertInitializeLoop(mcp)
 
             val received = sampling.sampleClient(
+                ClientRequestTarget.Entity(metadata.entity.name),
                 SamplingRequest(
                     listOf(), MaxTokens.of(1),
                     connectRequest = Request(GET, "")

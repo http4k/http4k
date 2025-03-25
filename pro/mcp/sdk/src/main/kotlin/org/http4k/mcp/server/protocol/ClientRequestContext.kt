@@ -1,0 +1,12 @@
+package org.http4k.mcp.server.protocol
+
+import org.http4k.mcp.model.ProgressToken
+
+/**
+ * How a client is identified for sending a request to.
+ */
+sealed interface ClientRequestContext {
+    val session: Session
+    data class Stream(override val session: Session) : ClientRequestContext
+    data class ToolCall(val progressToken: ProgressToken, override val session: Session) : ClientRequestContext
+}

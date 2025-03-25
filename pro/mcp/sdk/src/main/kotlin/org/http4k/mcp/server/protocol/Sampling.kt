@@ -14,10 +14,12 @@ import java.time.Duration
 interface Sampling {
     fun receive(id: McpMessageId, response: McpSampling.Response): CompletionStatus
     fun sampleClient(
+        target: ClientRequestTarget,
         request: SamplingRequest,
         fetchNextTimeout: Duration?
     ): Sequence<McpResult<SamplingResponse>>
 
-    fun onSampleClient(method: ClientRequestMethod, fn: (McpSampling.Request, McpMessageId) -> Unit)
-    fun remove(method: ClientRequestMethod)
+    fun onSampleClient(target: ClientRequestTarget, fn: (McpSampling.Request, McpMessageId) -> Unit)
+
+    fun remove(target: ClientRequestTarget)
 }
