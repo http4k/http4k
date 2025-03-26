@@ -3,7 +3,9 @@ package org.http4k.mcp.server.protocol
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.get
 import org.http4k.core.Request
+import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
@@ -51,6 +53,7 @@ import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpJson.nullNode
+import org.http4k.mcp.util.McpJson.parse
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -86,17 +89,20 @@ class McpProtocol<Transport>(
 
     private val clientRequests = ConcurrentHashMap<Session, ClientTracking>()
 
-    fun receive(
-        transport: Transport,
-        session: Session,
-        httpReq: Request
-    ): Result4k<McpNodeType, McpNodeType> {
-        val rawPayload = runCatching {
-            McpJson.parse(httpReq.bodyString())
-        }.getOrElse { return error() }
-
+    fun receive(transport: Transport, session: Session, httpReq: Request): Result4k<McpNodeType, McpNodeType> {
+        val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return error() }
         return when (rawPayload) {
-//            is MoshiArray -> ""
+            is MoshiArray -> {
+                Success(
+                    MoshiArray(
+                        rawPayload.elements
+                            .filterIsInstance<MoshiObject>()
+                            .map { processMessage(it, transport, session, httpReq) }
+                            .map { it.get() }
+                    )
+                )
+            }
+
             is MoshiObject -> processMessage(rawPayload, transport, session, httpReq)
             else -> error()
         }

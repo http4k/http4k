@@ -579,27 +579,27 @@ class McpProtocolTest {
 
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) {
     sendToMcp(with(McpJson) {
-        compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(1)))
+        renderRequest(hasMethod.Method.value, asJsonObject(input), number(1))
     })
 }
 
 private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
     sendToMcp(with(McpJson) {
-        compact(renderResult(asJsonObject(hasMethod), asJsonObject(id)))
+        renderResult(asJsonObject(hasMethod), asJsonObject(id))
     })
 }
 
 private var outboundMessageCounter = 0
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) {
     sendToMcp(with(McpJson) {
-        compact(renderRequest(hasMethod.Method.value, asJsonObject(input), number(outboundMessageCounter++)))
+        renderRequest(hasMethod.Method.value, asJsonObject(input), number(outboundMessageCounter++))
     })
 }
 
-private fun PolyHandler.sendToMcp(body: String) {
+private fun PolyHandler.sendToMcp(body: McpNodeType) {
     assertThat(
         http!!(
-            Request(POST, "/message?sessionId=$firstDeterministicSessionId").body(body)
+            Request(POST, "/message?sessionId=$firstDeterministicSessionId").body(McpJson.compact(body))
         ), hasStatus(ACCEPTED)
     )
 }
