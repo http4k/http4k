@@ -450,6 +450,42 @@ class McpProtocolTest {
     }
 
     @Test
+    fun `can handle multiple messages`() {
+        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val completions = ServerCompletions(
+            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+        )
+
+        val mcp = SseMcp(
+            McpProtocol(
+                metadata, SseSessions(SessionProvider.Random(random)),
+                completions = completions,
+                random = random
+            )
+        )
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            with(McpJson) {
+                mcp.sendToMcp(
+                    array(
+                        listOf(
+                            renderRequest(McpPrompt.List, McpPrompt.List.Request()),
+                            renderRequest(McpResource.List, McpResource.List.Request()),
+                            renderRequest(McpTool.List, McpTool.List.Request()),
+                        )
+                    )
+                )
+            }
+
+            assertNextMessage(McpPrompt.List.Response(listOf()))
+            assertNextMessage(McpResource.List.Response(listOf()))
+            assertNextMessage(McpTool.List.Response(listOf()))
+        }
+    }
+
+    @Test
     @Disabled
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -562,6 +598,7 @@ class McpProtocolTest {
     }
 
     private var inboundCounter = 1
+
     private fun TestSseClient.assertNextMessage(node: McpNodeType) {
         assertThat(
             received().first(),
@@ -577,31 +614,28 @@ class McpProtocolTest {
 
 }
 
-private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) {
-    sendToMcp(with(McpJson) {
-        renderRequest(hasMethod.Method.value, asJsonObject(input), number(1))
-    })
-}
+private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) =
+    sendToMcp(with(McpJson) { renderRequest(hasMethod, input) })
 
-private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) {
+private fun McpJson.renderRequest(hasMethod: McpRpc, input: ClientMessage.Request) =
+    renderRequest(hasMethod.Method.value, asJsonObject(input), number(1))
+
+private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) =
     sendToMcp(with(McpJson) {
         renderResult(asJsonObject(hasMethod), asJsonObject(id))
     })
-}
 
 private var outboundMessageCounter = 0
-private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) {
+private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) =
     sendToMcp(with(McpJson) {
         renderRequest(hasMethod.Method.value, asJsonObject(input), number(outboundMessageCounter++))
     })
-}
 
-private fun PolyHandler.sendToMcp(body: McpNodeType) {
+private fun PolyHandler.sendToMcp(body: McpNodeType) =
     assertThat(
         http!!(
             Request(POST, "/message?sessionId=$firstDeterministicSessionId").body(McpJson.compact(body))
         ), hasStatus(ACCEPTED)
     )
-}
 
 val firstDeterministicSessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")

@@ -5,7 +5,6 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID

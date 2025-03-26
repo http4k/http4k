@@ -91,6 +91,7 @@ class McpProtocol<Transport>(
 
     fun receive(transport: Transport, session: Session, httpReq: Request): Result4k<McpNodeType, McpNodeType> {
         val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return error() }
+
         return when (rawPayload) {
             is MoshiArray -> {
                 Success(
