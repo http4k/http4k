@@ -129,9 +129,7 @@ class HttpStreamingMcpClient(
         override fun onProgress(fn: (Progress) -> Unit) {
             callbacks.getOrPut(McpProgress.Method) { mutableListOf() }.add(
                 McpCallback(McpProgress.Notification::class) { n, _ ->
-                    fn(
-                        Progress(n.progress, n.total, n.progressToken)
-                    )
+                    fn(Progress(n.progress, n.total, n.progressToken))
                 }
             )
         }

@@ -171,7 +171,9 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
 
             progress.report(Entity(clientName), reportedProgress)
 
-            assertThat(receivedProgress, equalTo(reportedProgress))
+            Thread.sleep(1000)
+
+            assertThat(receivedProgress.get(), equalTo(reportedProgress))
 
             mcpClient.sampling().onSampled {
                 samplingResponses.asSequence()
