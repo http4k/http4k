@@ -16,7 +16,7 @@ import org.http4k.routing.bind
  * Routes inbound POST requests to the MCP server to the MCP protocol for processing and immediate response
  * via JSON RPC result messages.
  */
-fun JsonRpcMcpConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bind { req: Request ->
+fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: Request ->
     when (val session = protocol.retrieveSession(req)) {
         is Session -> {
             with(protocol) {

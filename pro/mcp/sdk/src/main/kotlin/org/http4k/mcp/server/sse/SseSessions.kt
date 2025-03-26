@@ -24,7 +24,7 @@ class SseSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : Sessions<Sse, Response> {
+) : Sessions<Sse> {
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
 

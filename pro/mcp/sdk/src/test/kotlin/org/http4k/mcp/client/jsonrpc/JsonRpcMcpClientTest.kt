@@ -20,5 +20,5 @@ class JsonRpcMcpClientTest : McpClientContract<Unit, Response> {
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Unit, Response>) = JsonRpcMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Unit>) = JsonRpcMcp(protocol)
 }

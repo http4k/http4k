@@ -1,6 +1,5 @@
 package org.http4k.mcp.server.http
 
-import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
@@ -12,5 +11,5 @@ import org.http4k.sse.Sse
  *
  * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOCOL AND IS SUBJECT TO CHANGE
  */
-fun HttpNonStreamingMcp(mcpProtocol: McpProtocol<Sse, Response>) =
+fun HttpNonStreamingMcp(mcpProtocol: McpProtocol<Sse>) =
     CatchAll().then(CatchLensFailure()).then(HttpNonStreamingMcpConnection(mcpProtocol))

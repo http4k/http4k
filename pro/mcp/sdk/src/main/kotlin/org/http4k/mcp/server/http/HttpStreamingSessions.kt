@@ -33,7 +33,7 @@ class HttpStreamingSessions(
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val eventStore: SessionEventStore = NoCache,
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
-) : Sessions<Sse, Response> {
+) : Sessions<Sse> {
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
     private val requests = ConcurrentHashMap<ProgressToken, Sse>()

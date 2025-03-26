@@ -12,7 +12,7 @@ import org.http4k.mcp.util.McpNodeType
 import kotlin.random.Random
 
 class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProvider.Random(Random)) :
-    Sessions<Unit, Response> {
+    Sessions<Unit> {
 
     override fun respond(transport: Unit, session: Session, message: McpNodeType, status: CompletionStatus) =
         Success(message)

@@ -90,7 +90,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
 
     override fun clientSessions() = HttpStreamingSessions().apply { start() }
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) =
+    override fun toPolyHandler(protocol: McpProtocol<Sse>) =
         HttpStreamingMcp(protocol)
 
     @Test

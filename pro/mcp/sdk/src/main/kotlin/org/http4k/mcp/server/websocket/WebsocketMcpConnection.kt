@@ -16,7 +16,7 @@ import org.http4k.websocket.WsStatus.Companion.REFUSE
  * This Websocket handler can be bound to whatever path is required by the server with
  * ws("/path" bind <WsCommandHandler>
  */
-fun WebsocketMcpConnection(protocol: McpProtocol<Websocket, Unit>) = "/ws" bindWs { req: Request ->
+fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { req: Request ->
     when (val session = protocol.retrieveSession(req)) {
         is Session -> WsResponse { ws ->
             with(protocol) {

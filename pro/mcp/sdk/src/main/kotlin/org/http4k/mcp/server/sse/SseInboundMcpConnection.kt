@@ -13,7 +13,7 @@ import org.http4k.sse.Sse
 /**
  * Routes inbound POST requests to the MCP server to the MCP protocol for processing.
  */
-fun SseInboundMcpConnection(protocol: McpProtocol<Sse, Response>) =
+fun SseInboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/message" bind POST to { req ->
         when (val session = protocol.retrieveSession(req)) {
             is Session -> protocol.receive(protocol.transportFor(session), session, req).asHttp()

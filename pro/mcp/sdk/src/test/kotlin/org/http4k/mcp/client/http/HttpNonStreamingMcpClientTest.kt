@@ -22,7 +22,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse, Response> {
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) = poly(
+    override fun toPolyHandler(protocol: McpProtocol<Sse>) = poly(
         HttpNonStreamingMcpConnection(protocol)
     )
 }

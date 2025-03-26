@@ -25,7 +25,7 @@ import kotlin.random.Random
 class WebsocketSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : Sessions<Websocket, Unit> {
+) : Sessions<Websocket> {
 
     private val sessions = ConcurrentHashMap<Session, Websocket>()
 

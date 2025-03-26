@@ -62,7 +62,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
     val doesNotifications: Boolean
     val supportsOutOfBandStreaming: Boolean
 
-    fun clientSessions(): Sessions<T, R>
+    fun clientSessions(): Sessions<T>
 
     @Test
     fun `can interact with server`() {
@@ -200,7 +200,7 @@ interface McpClientContract<T, R : Any> : PortBasedTest {
         server.stop()
     }
 
-    fun toPolyHandler(protocol: McpProtocol<T, R>): PolyHandler
+    fun toPolyHandler(protocol: McpProtocol<T>): PolyHandler
 
     fun clientFor(port: Int): McpClient
 }

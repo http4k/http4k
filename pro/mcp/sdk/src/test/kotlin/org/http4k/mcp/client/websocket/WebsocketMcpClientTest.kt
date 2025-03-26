@@ -40,5 +40,5 @@ class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
         ClientCapabilities(),
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Websocket, Unit>) = WebsocketMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Websocket>) = WebsocketMcp(protocol)
 }

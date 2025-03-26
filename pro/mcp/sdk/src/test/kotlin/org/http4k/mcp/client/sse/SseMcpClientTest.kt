@@ -46,7 +46,7 @@ class SseMcpClientTest : McpClientContract<Sse, Response> {
 
     override fun clientSessions() = SseSessions().apply { start() }
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse, Response>) = SseMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Sse>) = SseMcp(protocol)
 
     @Test
     fun `deals with error`() {

@@ -12,7 +12,7 @@ import org.http4k.mcp.util.McpNodeType
 import java.io.Writer
 import java.util.UUID
 
-class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit, Unit> {
+class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
 
     override fun request(context: ClientRequestContext, message: McpNodeType) = with(writer) {
         write(McpJson.compact(message) + "\n")

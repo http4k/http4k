@@ -58,9 +58,9 @@ import kotlin.random.Random
 /**
  * Models the MCP protocol in terms of message handling and session management.
  */
-class McpProtocol<Transport, RSP : Any>(
+class McpProtocol<Transport>(
     internal val metaData: ServerMetaData,
-    private val sessions: Sessions<Transport, RSP>,
+    private val sessions: Sessions<Transport>,
     private val tools: Tools = ServerTools(),
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = ServerPrompts(),
@@ -73,7 +73,7 @@ class McpProtocol<Transport, RSP : Any>(
 ) {
     constructor(
         serverMetaData: ServerMetaData,
-        sessions: Sessions<Transport, RSP>,
+        sessions: Sessions<Transport>,
         vararg capabilities: ServerCapability
     ) : this(
         serverMetaData,
