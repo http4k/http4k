@@ -75,7 +75,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
-class HttpStreamingMcpClientTest : McpClientContract<Sse, Response> {
+class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = false
     override val supportsOutOfBandStreaming = true

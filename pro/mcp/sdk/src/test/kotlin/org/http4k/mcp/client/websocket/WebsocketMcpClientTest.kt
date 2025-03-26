@@ -18,7 +18,7 @@ import org.http4k.mcp.server.websocket.WebsocketSessions
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WebsocketMcpClientTest : McpClientContract<Websocket, Unit> {
+class WebsocketMcpClientTest : McpClientContract<Websocket> {
 
     override val doesNotifications = true
     override val supportsOutOfBandStreaming = false

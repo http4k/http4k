@@ -8,7 +8,7 @@ import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.protocol.McpProtocol
 
-class JsonRpcMcpClientTest : McpClientContract<Unit, Response> {
+class JsonRpcMcpClientTest : McpClientContract<Unit> {
 
     override val doesNotifications = false
     override val supportsOutOfBandStreaming = false

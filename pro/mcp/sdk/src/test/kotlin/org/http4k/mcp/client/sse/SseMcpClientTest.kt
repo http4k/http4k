@@ -32,7 +32,7 @@ import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.junit.jupiter.api.Test
 
-class SseMcpClientTest : McpClientContract<Sse, Response> {
+class SseMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = true
     override val supportsOutOfBandStreaming = true

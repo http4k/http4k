@@ -10,7 +10,7 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.routing.poly
 import org.http4k.sse.Sse
 
-class HttpNonStreamingMcpClientTest : McpClientContract<Sse, Response> {
+class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = false
     override val supportsOutOfBandStreaming = false

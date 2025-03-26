@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
-interface McpClientContract<T, R : Any> : PortBasedTest {
+interface McpClientContract<T> : PortBasedTest {
 
     val clientName get() = McpEntity.of("foobar")
 
