@@ -1,7 +1,11 @@
 package org.http4k.mcp.server.protocol
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result4k
+import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
 import org.http4k.format.MoshiNode
+import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
@@ -46,6 +50,7 @@ import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
 import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
+import org.http4k.mcp.util.McpJson.nullNode
 import org.http4k.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -85,11 +90,28 @@ class McpProtocol<Transport, RSP : Any>(
         transport: Transport,
         session: Session,
         httpReq: Request
-    ): RSP {
-        val payload = runCatching {
-            McpJson.fields(McpJson.parse(httpReq.bodyString())).toMap()
-        }.getOrElse { return sessions.error() }
+    ): Result4k<McpNodeType, McpNodeType> {
+        val rawPayload = runCatching {
+            McpJson.parse(httpReq.bodyString())
+        }.getOrElse { return error() }
 
+        return when (rawPayload) {
+//            is MoshiArray -> ""
+            is MoshiObject -> processMessage(rawPayload, transport, session, httpReq)
+            else -> error()
+        }
+    }
+
+    private fun ok() = Success(nullNode())
+    private fun error() = Failure(nullNode())
+
+    private fun processMessage(
+        rawPayload: MoshiObject,
+        transport: Transport,
+        session: Session,
+        httpReq: Request
+    ): Result4k<McpNodeType, McpNodeType> {
+        val payload = McpJson.fields(rawPayload).toMap()
         return when {
             payload["method"] != null -> {
                 val jsonReq = JsonRpcRequest(McpJson, payload)
@@ -157,24 +179,24 @@ class McpProtocol<Transport, RSP : Any>(
                                 McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated)
                             )
                         }
-                        sessions.ok()
+                        ok()
                     }
 
                     McpLogging.SetLevel.Method -> {
                         logger.setLevel(session, jsonReq.fromJsonRpc<McpLogging.SetLevel.Request>().level)
-                        sessions.ok()
+                        ok()
                     }
 
                     McpResource.Unsubscribe.Method -> {
                         resources.unsubscribe(session, jsonReq.fromJsonRpc())
-                        sessions.ok()
+                        ok()
                     }
 
-                    McpInitialize.Initialized.Method -> sessions.ok()
+                    McpInitialize.Initialized.Method -> ok()
 
-                    Cancelled.Method -> sessions.ok()
+                    Cancelled.Method -> ok()
 
-                    McpProgress.Method -> sessions.ok()
+                    McpProgress.Method -> ok()
 
                     McpRoot.Changed.Method -> {
                         val messageId = McpMessageId.random(random)
@@ -184,7 +206,7 @@ class McpProtocol<Transport, RSP : Any>(
                             session,
                             McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
                         )
-                        sessions.ok()
+                        ok()
                     }
 
                     McpTool.Call.Method -> {
@@ -218,6 +240,7 @@ class McpProtocol<Transport, RSP : Any>(
                                             sampling.remove(contextAndTarget.second)
                                             progress.remove(contextAndTarget.second)
                                             sessions.end(contextAndTarget.first)
+                                            ok()
                                         }
                                     }
                             }
@@ -237,13 +260,13 @@ class McpProtocol<Transport, RSP : Any>(
             else -> {
                 val jsonResult = JsonRpcResult(McpJson, payload)
                 when {
-                    jsonResult.isError() -> sessions.ok()
+                    jsonResult.isError() -> ok()
                     else -> with(McpJson) {
                         val id = jsonResult.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
-                            null -> sessions.error()
-                            else -> clientRequests[session]?.processResult(id, jsonResult)?.let { sessions.ok() }
-                                ?: sessions.error()
+                            null -> error()
+                            else -> clientRequests[session]?.processResult(id, jsonResult)?.let { ok() }
+                                ?: error()
                         }
                     }
                 }
@@ -309,7 +332,7 @@ class McpProtocol<Transport, RSP : Any>(
 
     fun transportFor(session: Session) = sessions.transportFor(session)
 
-    private class ClientTracking(private val initialize: McpInitialize.Request) {
+    private class ClientTracking(initialize: McpInitialize.Request) {
         val entity = initialize.clientInfo.name
         private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 

@@ -1,5 +1,7 @@
 package org.http4k.mcp.server.websocket
 
+import dev.forkhandles.result4k.Result4k
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Request
@@ -27,10 +29,14 @@ class WebsocketSessions(
 
     private val sessions = ConcurrentHashMap<Session, Websocket>()
 
-    override fun ok() = Unit
-
-    override fun respond(transport: Websocket, session: Session, message: McpNodeType, status: CompletionStatus) {
+    override fun respond(
+        transport: Websocket,
+        session: Session,
+        message: McpNodeType,
+        status: CompletionStatus
+    ): Result4k<McpNodeType, McpNodeType> {
         transport.send(WsMessage(Event("message", compact(message)).toMessage()))
+        return Success(message)
     }
 
     override fun request(context: ClientRequestContext, message: McpNodeType) =
@@ -38,8 +44,6 @@ class WebsocketSessions(
             null -> Unit
             else -> ws.send(WsMessage(Event("message", compact(message)).toMessage()))
         }
-
-    override fun error() = Unit
 
     override fun onClose(session: Session, fn: () -> Unit) {
         sessions[session]?.also { it.onClose { fn() } }
@@ -55,7 +59,7 @@ class WebsocketSessions(
         if (context is Stream) sessions[context.session] = transport
     }
 
-    override fun end(context: ClientRequestContext) = ok().also {
+    override fun end(context: ClientRequestContext) {
         if (context is Stream) sessions.remove(context.session)?.close()
     }
 

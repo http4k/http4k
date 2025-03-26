@@ -1,22 +1,19 @@
 package org.http4k.mcp.server.http
 
+import dev.forkhandles.result4k.Result4k
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.lens.contentType
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.server.protocol.ClientRequestContext
-import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -41,22 +38,19 @@ class HttpStreamingSessions(
     private val sessions = ConcurrentHashMap<Session, Sse>()
     private val requests = ConcurrentHashMap<ProgressToken, Sse>()
 
-    override fun ok() = Response(ACCEPTED)
-
-    override fun request(context: ClientRequestContext, message: McpNodeType): Response {
+    override fun request(context: ClientRequestContext, message: McpNodeType) {
         val sse = when (context) {
             is ToolCall -> requests[context.progressToken]
             is Stream -> sessions[context.session]
         }
 
-        return when (sse) {
-            null -> error()
+        when (sse) {
+            null -> {}
             else -> {
                 SseMessage.Event("message", compact(message), sessionEventTracking.next(context.session)).also {
                     sse.send(it)
                     eventStore.write(context.session, it)
                 }
-                Response(ACCEPTED)
             }
         }
     }
@@ -66,15 +60,13 @@ class HttpStreamingSessions(
         session: Session,
         message: McpNodeType,
         status: CompletionStatus
-    ): Response {
+    ): Result4k<McpNodeType, McpNodeType> {
         SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
             eventStore.write(session, it)
             transport.send(it)
         }
-        return Response(OK).contentType(APPLICATION_JSON).body(compact(message))
+        return Success(message)
     }
-
-    override fun error() = Response(BAD_REQUEST)
 
     override fun onClose(session: Session, fn: () -> Unit) {
         sessions[session]?.also { it.onClose(fn) }
@@ -85,7 +77,7 @@ class HttpStreamingSessions(
 
     override fun transportFor(session: Session) = sessions[session] ?: error("Session not found")
 
-    override fun end(context: ClientRequestContext) = ok().also {
+    override fun end(context: ClientRequestContext) {
         when (context) {
             is ToolCall -> requests.remove(context.progressToken)
             is Stream -> {

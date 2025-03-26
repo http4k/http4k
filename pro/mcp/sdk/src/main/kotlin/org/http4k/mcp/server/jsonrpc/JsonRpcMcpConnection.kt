@@ -9,6 +9,7 @@ import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
+import org.http4k.mcp.util.asHttp
 import org.http4k.routing.bind
 
 /**
@@ -23,8 +24,7 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit, Response>) = "/jsonrpc" bin
                     McpInitialize.Request(VersionedMcpEntity(metaData.entity.name, metaData.entity.version), All),
                     session
                 )
-
-                receive(Unit, session, req)
+                receive(Unit, session, req).asHttp()
             }
         }
 

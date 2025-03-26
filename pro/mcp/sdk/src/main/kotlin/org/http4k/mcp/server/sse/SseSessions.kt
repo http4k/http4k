@@ -1,11 +1,10 @@
 package org.http4k.mcp.server.sse
 
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.server.protocol.ClientRequestContext
 import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
@@ -29,28 +28,22 @@ class SseSessions(
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
 
-    override fun ok() = Response(ACCEPTED)
-
     override fun respond(
         transport: Sse,
         session: Session,
         message: McpNodeType,
         status: CompletionStatus
-    ): Response {
+    ): Success<McpNodeType> {
         transport.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(session)))
-        return Response(ACCEPTED)
+        return Success(message)
     }
 
-    override fun request(context: ClientRequestContext, message: McpNodeType) =
+    override fun request(context: ClientRequestContext, message: McpNodeType) {
         when (val sse = sessions[context.session]) {
-            null -> error()
-            else -> {
-                sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(context.session)))
-                ok()
-            }
+            null -> {}
+            else -> sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(context.session)))
         }
-
-    override fun error() = Response(NOT_FOUND)
+    }
 
     override fun onClose(session: Session, fn: () -> Unit) {
         sessions[session]?.also {
@@ -58,7 +51,7 @@ class SseSessions(
         }
     }
 
-    override fun end(context: ClientRequestContext) = ok().also {
+    override fun end(context: ClientRequestContext) {
         if (context is Stream) {
             sessions.remove(context.session)?.close()
             sessionEventTracking.remove(context.session)
