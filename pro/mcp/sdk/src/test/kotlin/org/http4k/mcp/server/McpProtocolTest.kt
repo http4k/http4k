@@ -450,7 +450,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `can handle multiple messages`() {
+    fun `can handle batched messages`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
@@ -617,15 +617,15 @@ class McpProtocolTest {
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) =
     sendToMcp(with(McpJson) { renderRequest(hasMethod, input) })
 
-private fun McpJson.renderRequest(hasMethod: McpRpc, input: ClientMessage.Request) =
-    renderRequest(hasMethod.Method.value, asJsonObject(input), number(1))
+fun McpJson.renderRequest(hasMethod: McpRpc, input: ClientMessage.Request, id: Int = 1) =
+    renderRequest(hasMethod.Method.value, asJsonObject(input), number(id))
 
 private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) =
     sendToMcp(with(McpJson) {
         renderResult(asJsonObject(hasMethod), asJsonObject(id))
     })
 
-private var outboundMessageCounter = 0
+var outboundMessageCounter = 0
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) =
     sendToMcp(with(McpJson) {
         renderRequest(hasMethod.Method.value, asJsonObject(input), number(outboundMessageCounter++))
