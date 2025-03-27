@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.3.0.0
+### v6.3.1.0
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-mcp-sdk*** : [NEW PRO MODULE] A fully-featured SDK for the [MCP](https://modelcontextprotocol.io) platform. See the [MCP microsite](https://mcp.http4k.org) for more details.
 
