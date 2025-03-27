@@ -2,6 +2,7 @@ name: Broadcast Release
 on:
   schedule:
     - cron: '0 * * * *' # every hour
+  workflow_dispatch:
 jobs:
   check-new-version:
     if: github.repository == 'http4k/http4k'
