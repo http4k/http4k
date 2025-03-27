@@ -10,7 +10,7 @@ import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpPrompt
 
-interface PromptCapability : ServerCapability {
+interface PromptCapability : ServerCapability, PromptHandler {
     fun toPrompt(): McpPrompt
 
     fun get(mcp: McpPrompt.Get.Request, http: Request): McpPrompt.Get.Response
@@ -29,4 +29,6 @@ fun PromptCapability(prompt: Prompt, handler: PromptHandler) = object : PromptCa
     } catch (e: Exception) {
         throw McpException(InternalError, e)
     }
+
+    override fun invoke(p1: PromptRequest) = handler(p1)
 }

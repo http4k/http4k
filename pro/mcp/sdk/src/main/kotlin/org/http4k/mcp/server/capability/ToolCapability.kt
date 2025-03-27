@@ -27,7 +27,7 @@ import org.http4k.mcp.model.asMcp
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 
-interface ToolCapability : ServerCapability {
+interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
 
     fun call(mcp: McpTool.Call.Request, http: Request): McpTool.Call.Response
@@ -60,6 +60,8 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                     it.meta
                 )
             }
+
+    override fun invoke(p1: ToolRequest) = handler(p1)
 }
 
 private fun Map<String, MoshiNode>.coerceIntoStrings() =

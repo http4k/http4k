@@ -5,13 +5,13 @@ import org.http4k.core.PolyHandler
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
-import org.http4k.routing.mcpSse
+import org.http4k.routing.mcpHttpStreaming
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
 fun franck(): PolyHandler =
-    mcpSse(
+    mcpHttpStreaming(
         ServerMetaData(McpEntity.of("Franck"), Version.of("0.0.1")),
         PersonToolPack("Franck", ::franck)
     )

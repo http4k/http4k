@@ -7,7 +7,7 @@ import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.messages.McpResource
 
-interface ResourceCapability : ServerCapability {
+interface ResourceCapability : ServerCapability, ResourceHandler {
     fun toResource(): McpResource
     fun matches(uri: Uri): Boolean
     fun read(mcp: McpResource.Read.Request, http: Request): McpResource.Read.Response
@@ -29,4 +29,6 @@ fun ResourceCapability(resource: Resource, handler: ResourceHandler) = object : 
     override fun read(mcp: McpResource.Read.Request, http: Request) = handler(ResourceRequest(mcp.uri, http)).let {
         McpResource.Read.Response(it.list, it.meta)
     }
+
+    override fun invoke(p1: ResourceRequest) = handler(p1)
 }

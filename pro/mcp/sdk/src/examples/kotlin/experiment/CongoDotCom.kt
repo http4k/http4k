@@ -15,7 +15,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
-import org.http4k.routing.mcpJsonRpc
+import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 
@@ -52,7 +52,7 @@ fun getInvoiceForPurchase(): ToolCapability {
     }
 }
 
-val congoDotCom = mcpJsonRpc(
+val congoDotCom = mcpHttpStreaming(
     ServerMetaData("CongoDotCom", "1.0.0"),
     getPurchases(),
     getInvoiceForPurchase()
