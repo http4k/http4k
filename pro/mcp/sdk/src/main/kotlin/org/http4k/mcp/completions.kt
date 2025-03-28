@@ -8,6 +8,7 @@ import org.http4k.mcp.model.Reference
  * A CompletionHandler is a function which creates a Completion from a set of inputs
  */
 typealias CompletionHandler = (CompletionRequest) -> CompletionResponse
+typealias CompletionWithClientHandler = (CompletionRequest, Client) -> CompletionResponse
 
 data class CompletionRequest(
     val ref: Reference,

@@ -10,6 +10,7 @@ import org.http4k.mcp.protocol.messages.HasMeta
  * A resource handler is responsible for loading the content of a Resource
  */
 typealias ResourceHandler = (ResourceRequest) -> ResourceResponse
+typealias ResourceWithClientHandler = (ResourceRequest, Client) -> ResourceResponse
 
 data class ResourceRequest(
     val uri: Uri,

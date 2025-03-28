@@ -7,7 +7,7 @@ import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Request
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.server.protocol.ClientRequestContext
-import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventTracking
@@ -50,7 +50,7 @@ class SseSessions(
     }
 
     override fun end(context: ClientRequestContext) {
-        if (context is Stream) {
+        if (context is Subscription) {
             sessions.remove(context.session)?.close()
             sessionEventTracking.remove(context.session)
         }
@@ -62,7 +62,7 @@ class SseSessions(
     override fun transportFor(session: Session) = sessions[session] ?: error("No session")
 
     override fun assign(context: ClientRequestContext, transport: Sse, connectRequest: Request) {
-        if (context is Stream) {
+        if (context is Subscription) {
             sessions[context.session] = transport
         }
     }

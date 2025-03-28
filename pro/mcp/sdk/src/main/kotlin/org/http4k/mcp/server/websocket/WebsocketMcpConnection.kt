@@ -1,7 +1,7 @@
 package org.http4k.mcp.server.websocket
 
 import org.http4k.core.Request
-import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
@@ -20,7 +20,7 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
     when (val session = protocol.retrieveSession(req)) {
         is Session -> WsResponse { ws ->
             with(protocol) {
-                assign(Stream(session), ws, req)
+                assign(Subscription(session), ws, req)
                 ws.onMessage { receive(ws, session, req.body(it.bodyString())) }
                 ws.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
             }

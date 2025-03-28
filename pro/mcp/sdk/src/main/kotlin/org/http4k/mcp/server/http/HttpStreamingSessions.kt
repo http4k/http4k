@@ -11,8 +11,8 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.server.protocol.ClientRequestContext
-import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
-import org.http4k.mcp.server.protocol.ClientRequestContext.ToolCall
+import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
+import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -39,8 +39,8 @@ class HttpStreamingSessions(
 
     override fun request(context: ClientRequestContext, message: McpNodeType) {
         val sse = when (context) {
-            is ToolCall -> requests[context.progressToken]
-            is Stream -> sessions[context.session]
+            is ClientCall -> requests[context.progressToken]
+            is Subscription -> sessions[context.session]
         }
 
         when (sse) {
@@ -78,8 +78,8 @@ class HttpStreamingSessions(
 
     override fun end(context: ClientRequestContext) {
         when (context) {
-            is ToolCall -> requests.remove(context.progressToken)
-            is Stream -> {
+            is ClientCall -> requests.remove(context.progressToken)
+            is Subscription -> {
                 sessions.remove(context.session)?.close()
                 sessionEventTracking.remove(context.session)
             }
@@ -88,8 +88,8 @@ class HttpStreamingSessions(
 
     override fun assign(context: ClientRequestContext, transport: Sse, connectRequest: Request) {
         when (context) {
-            is ToolCall -> requests[context.progressToken] = transport
-            is Stream -> {
+            is ClientCall -> requests[context.progressToken] = transport
+            is Subscription -> {
                 sessions[context.session] = transport
                 eventStore.read(context.session, Header.LAST_EVENT_ID(connectRequest)).forEach(transport::send)
             }

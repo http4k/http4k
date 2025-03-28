@@ -17,35 +17,42 @@ import org.http4k.format.MoshiString
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
+import org.http4k.mcp.Client
+import org.http4k.mcp.Client.Companion.NoOp
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
+import org.http4k.mcp.ToolWithClientHandler
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.asMcp
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 
-interface ToolCapability : ServerCapability, ToolHandler {
+interface ToolCapability : ServerCapability, ToolWithClientHandler {
     fun toTool(): McpTool
 
-    fun call(mcp: McpTool.Call.Request, http: Request): McpTool.Call.Response
+    operator fun invoke(request: ToolRequest): ToolResponse = this(request, NoOp)
+
+    fun call(mcp: McpTool.Call.Request, http: Request, client: Client): McpTool.Call.Response
 }
 
-fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
+fun ToolCapability(tool: Tool, handler: ToolHandler) = ToolCapability(tool, { request, _ -> handler(request) })
+
+fun ToolCapability(tool: Tool, handler: ToolWithClientHandler) = object : ToolCapability {
     override fun toTool() = tool.asMcp()
 
-    override fun call(mcp: McpTool.Call.Request, http: Request) =
+    override fun call(mcp: McpTool.Call.Request, http: Request, client: Client) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta.progress, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
-                    handler(it)
+                    handler(it, client)
                 } catch (e: LensFailure) {
                     throw McpException(InvalidParams)
                 } catch (e: Exception) {
-                    e.printStackTrace()
                     Error(InternalError)
                 }
             }
@@ -61,7 +68,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                 )
             }
 
-    override fun invoke(p1: ToolRequest) = handler(p1)
+    override fun invoke(p1: ToolRequest, client: Client) = handler(p1, client)
 }
 
 private fun Map<String, MoshiNode>.coerceIntoStrings() =

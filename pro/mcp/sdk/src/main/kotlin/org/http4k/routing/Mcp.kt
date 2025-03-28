@@ -6,8 +6,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.PromptHandler
+import org.http4k.mcp.PromptWithClientHandler
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ToolHandler
+import org.http4k.mcp.ToolWithClientHandler
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
@@ -125,6 +127,7 @@ fun mcpStdIo(
 }
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
+infix fun Tool.bind(handler: ToolWithClientHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this, handler)

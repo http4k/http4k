@@ -9,7 +9,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.server.protocol.ClientRequestContext
-import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionProvider
@@ -56,11 +56,11 @@ class WebsocketSessions(
         sessions[session] ?: error("Session not found")
 
     override fun assign(context: ClientRequestContext, transport: Websocket, connectRequest: Request) {
-        if (context is Stream) sessions[context.session] = transport
+        if (context is Subscription) sessions[context.session] = transport
     }
 
     override fun end(context: ClientRequestContext) {
-        if (context is Stream) sessions.remove(context.session)?.close()
+        if (context is Subscription) sessions.remove(context.session)?.close()
     }
 
     private fun pruneDeadConnections() =

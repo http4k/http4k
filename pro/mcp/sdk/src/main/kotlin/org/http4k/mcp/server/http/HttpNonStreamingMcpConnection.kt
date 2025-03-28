@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.mcp.server.protocol.ClientRequestContext.Stream
+import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.InvalidSession
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
@@ -20,12 +20,12 @@ import org.http4k.sse.SseMessage
  * Routes inbound POST requests to the MCP server to the MCP protocol for processing (returning responses via JSON RPC),
  * and deletes old sessions at the request of the client.
  */
-fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, messageStore: (Sse) -> Sse = { it }) =
+fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>) =
     "/mcp" bind routes(
         POST to { req ->
             with(protocol) {
                 when (val session = retrieveSession(req)) {
-                    is Session -> receive(messageStore(FakeSse(req)), session, req).asHttp()
+                    is Session -> receive(FakeSse(req), session, req).asHttp()
                     is InvalidSession -> Response(NOT_FOUND)
                 }
             }
@@ -33,7 +33,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, messageStore: (Sse
         DELETE to { req ->
             when (val session = protocol.retrieveSession(req)) {
                 is Session -> {
-                    protocol.end(Stream(session))
+                    protocol.end(Subscription(session))
                     Response(ACCEPTED)
                 }
 

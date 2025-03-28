@@ -7,6 +7,6 @@ import org.http4k.mcp.model.ProgressToken
  */
 sealed interface ClientRequestContext {
     val session: Session
-    data class Stream(override val session: Session) : ClientRequestContext
-    data class ToolCall(val progressToken: ProgressToken, override val session: Session) : ClientRequestContext
+    data class Subscription(override val session: Session) : ClientRequestContext
+    data class ClientCall(val progressToken: ProgressToken, override val session: Session) : ClientRequestContext
 }
