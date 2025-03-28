@@ -251,7 +251,7 @@ class TestMcpClientTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val serverTools = ServerTools(listOf(tool bind {
+        val serverTools = ServerTools(listOf(tool bind { it ->
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
@@ -343,7 +343,7 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 sampling = serverSampling,
                 tools = ServerTools(
-                    Tool("sample", "description") bind {
+                    Tool("sample", "description") bind { it ->
                         val received = serverSampling.sampleClient(
                             Entity(metadata.entity.name),
                             SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),

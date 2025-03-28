@@ -55,7 +55,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
-            Tool("reverse", "description", toolArg) bind {
+            Tool("reverse", "description", toolArg) bind { it, _ ->
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             }
         )

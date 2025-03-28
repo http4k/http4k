@@ -19,7 +19,6 @@ import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.Header
@@ -57,7 +56,6 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
-import org.http4k.mcp.server.protocol.ClientRequestTarget.*
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
@@ -100,7 +98,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
-            Tool("reverse", "description", toolArg) bind { error("bad things") }
+            Tool("reverse", "description", toolArg) bind { it, _ -> error("bad things") }
         )
 
         val server = toPolyHandler(protocol)
@@ -122,7 +120,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     @Test
     fun `resume a stream`() {
         val toolArg = Tool.Arg.required("name")
-        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
+        val tools = ServerTools(Tool("reverse", "description", toolArg) bind { it, _ ->
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
@@ -206,9 +204,8 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         )
 
         val tools = ServerTools(
-            Tool("sample", "description") bind {
-                val received = sampling.sampleClient(
-                    Request(it.progressToken!!),
+            Tool("sample", "description") bind { it, client ->
+                val received = client.sample(
                     SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
                     Duration.ofSeconds(5)
                 ).toList()
@@ -251,9 +248,9 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         val progress = ServerRequestProgress()
 
         val tools = ServerTools(
-            Tool("progress", "description") bind {
+            Tool("progress", "description") bind { it, client ->
                 try {
-                    progress.report(Request(it.progressToken!!), Progress(1, 2.0, it.progressToken!!))
+                    client.report(Progress(1, 2.0, it.progressToken!!))
                     ToolResponse.Ok(listOf(Content.Text("")))
                 } catch (e: Exception) {
                     throw e
