@@ -94,7 +94,7 @@ class McpProtocol<Transport>(
         ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
     )
 
-    private val clientRequests = ConcurrentHashMap<Session, ClientTracking>()
+    private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
     fun receive(transport: Transport, session: Session, httpReq: Request): Result4k<McpNodeType, McpNodeType> {
         val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return error() }
@@ -202,9 +202,9 @@ class McpProtocol<Transport>(
                     McpProgress.Method -> ok()
 
                     McpRoot.Changed.Method -> {
-                        if (clientRequests[session]?.supportsRoots == true) {
+                        if (clientTracking[session]?.supportsRoots == true) {
                             val messageId = McpMessageId.random(random)
-                            clientRequests[session]?.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
+                            clientTracking[session]?.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
 
                             sessions.respond(
                                 transport,
@@ -237,7 +237,7 @@ class McpProtocol<Transport>(
                         val id = jsonResult.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
                             null -> error()
-                            else -> clientRequests[session]?.processResult(id, jsonResult)?.let { ok() }
+                            else -> clientTracking[session]?.processResult(id, jsonResult)?.let { ok() }
                                 ?: error()
                         }
                     }
@@ -275,9 +275,9 @@ class McpProtocol<Transport>(
             val queue = LinkedBlockingDeque<SamplingResponse>()
             val id = McpMessageId.random(random)
 
-            if (clientRequests[session]?.supportsSampling != true) return emptySequence()
+            if (clientTracking[session]?.supportsSampling != true) return emptySequence()
 
-            clientRequests[session]?.trackRequest(id) {
+            clientTracking[session]?.trackRequest(id) {
                 with(it.fromJsonRpc<McpSampling.Response>()) {
                     queue.put(SamplingResponse(model, role, content, stopReason))
                     when {
@@ -328,7 +328,7 @@ class McpProtocol<Transport>(
     }
 
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
-        clientRequests[session] = ClientTracking(request)
+        clientTracking[session] = ClientTracking(request)
 
         logger.subscribe(session, LogLevel.error) { level, logger, data ->
             sessions.request(
@@ -373,7 +373,7 @@ class McpProtocol<Transport>(
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 
     fun end(method: ClientRequestContext) {
-        if (method is Subscription) clientRequests.remove(method.session)
+        if (method is Subscription) clientTracking.remove(method.session)
         sessions.end(method)
     }
 
