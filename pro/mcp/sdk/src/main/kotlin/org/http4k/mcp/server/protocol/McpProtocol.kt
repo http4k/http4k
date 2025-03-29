@@ -177,12 +177,10 @@ class McpProtocol<Transport>(
                         })
 
                     McpResource.List.Method ->
-                        sessions.respond(transport, session, jsonReq.respondTo<McpResource.List.Request> {
-                            resources.listResources(
-                                it,
-                                httpReq
-                            )
-                        })
+                        sessions.respond(
+                            transport, session,
+                            jsonReq.respondTo<McpResource.List.Request> { resources.listResources(it, httpReq) }
+                        )
 
                     McpResource.Read.Method ->
                         sessions.respond(
@@ -234,20 +232,11 @@ class McpProtocol<Transport>(
                             transport,
                             session,
                             jsonReq.respondTo<McpTool.Call.Request> {
-                                val contextAndTarget = it._meta.progress?.let {
-                                    ClientCall(it, session) to ClientRequestTarget.Request(it)
-                                }
-                                contextAndTarget?.let { (context, _) ->
-                                    sessions.assign(context, transport, httpReq)
-                                }
+                                val context = it._meta.progress?.let { ClientCall(it, session) }
+                                context?.let { sessions.assign(it, transport, httpReq) }
                                 tools.call(it, httpReq, Client(session))
                                     .also {
-                                        if (contextAndTarget != null) {
-                                            sampling.remove(contextAndTarget.second)
-                                            progress.remove(contextAndTarget.second)
-                                            sessions.end(contextAndTarget.first)
-                                            ok()
-                                        }
+                                        if (context != null) sessions.end(context)
                                     }
                             }
                         )

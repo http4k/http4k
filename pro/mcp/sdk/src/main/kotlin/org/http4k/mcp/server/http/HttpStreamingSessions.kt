@@ -11,8 +11,8 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.server.protocol.ClientRequestContext
-import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
+import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
