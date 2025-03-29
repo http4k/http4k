@@ -240,14 +240,6 @@ class McpProtocol<Transport>(
                                 contextAndTarget?.let { (context, _) ->
                                     sessions.assign(context, transport, httpReq)
                                 }
-//                                    progress.onProgress(target) {
-//                                        sessions.request(
-//                                            method,
-//                                            McpProgress.Notification(it.progress, it.total, it.progressToken)
-//                                                .toJsonRpc(McpProgress)
-//                                        )
-//                                    }
-//                                }
                                 tools.call(it, httpReq, Client(session))
                                     .also {
                                         if (contextAndTarget != null) {
