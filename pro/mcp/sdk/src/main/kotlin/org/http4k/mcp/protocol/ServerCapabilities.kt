@@ -14,16 +14,16 @@ data class ServerCapabilities internal constructor(
     val tools: ToolCapabilities = ToolCapabilities(),
     val prompts: PromptCapabilities = PromptCapabilities(),
     val resources: ResourceCapabilities = ResourceCapabilities(),
-    val experimental: Unit? = null,
     val completions: Unit? = null,
+    val experimental: Unit? = null,
     val logging: Unit? = null
 ) {
     constructor(vararg capabilities: ProtocolCapability) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
         PromptCapabilities(capabilities.contains(PromptsChanged)),
         ResourceCapabilities(capabilities.contains(ResourcesChanged)),
-        if (capabilities.contains(Experimental)) Unit else null,
         if (capabilities.contains(Completions)) Unit else null,
+        if (capabilities.contains(Experimental)) Unit else null,
         if (capabilities.contains(Logging)) Unit else null,
     )
 
