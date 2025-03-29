@@ -98,7 +98,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
-            Tool("reverse", "description", toolArg) bind { _, _ -> error("bad things") }
+            Tool("reverse", "description", toolArg) bind { _ -> error("bad things") }
         )
 
         val server = toPolyHandler(protocol)
@@ -120,7 +120,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     @Test
     fun `resume a stream`() {
         val toolArg = Tool.Arg.required("name")
-        val tools = ServerTools(Tool("reverse", "description", toolArg) bind { it, _ ->
+        val tools = ServerTools(Tool("reverse", "description", toolArg) bind { it ->
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
@@ -140,13 +140,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                     Uri.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
                     "description"
-                ) bind {
+                ) bind { it ->
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
+            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind { it ->
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind { it ->
                 CompletionResponse(listOf("1", "2"))
             }),
             sampling

@@ -23,7 +23,7 @@ fun RestaurantAvailability(name: String): ToolCapability {
         val people = peopleArg(req)
 
         val slots = when {
-            date == LocalDate.of(2025, 3, 22) -> listOf(
+            date == LocalDate.of(2025, 5, 10) -> listOf(
                 Content.Text("18:00 - Available for $people people"),
                 Content.Text("19:00 - Available for $people people"),
                 Content.Text("20:00 - Available for $people people")

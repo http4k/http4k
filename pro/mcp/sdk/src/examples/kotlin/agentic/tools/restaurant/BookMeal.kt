@@ -25,7 +25,7 @@ fun BookMeal(name: String): ToolCapability {
         val people = peopleArg(req)
         val time = timeArg(req)
         val confirmation =
-            if (people == 3 && (date == LocalDate.of(2025, 3, 21) || date == LocalDate.of(2025, 3, 22))) {
+            if (people == 3 && (date == LocalDate.of(2025, 5, 10))) {
                 Content.Text("Booking confirmed for $people people on $date at $time")
             } else {
                 Content.Text("Booking failed: No availability for $people people on $date at $time")

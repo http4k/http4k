@@ -91,38 +91,36 @@ class HttpStreamingMcpClient(
 
     private val sessionId = AtomicReference<SessionId>()
 
-    override fun start(): Result<ServerCapabilities, McpError> {
-        return http.send(
-            McpInitialize, McpInitialize.Request(
-                VersionedMcpEntity(name, version),
-                capabilities,
-                protocolVersion
-            )
+    override fun start(): Result<ServerCapabilities, McpError> = http.send(
+        McpInitialize, McpInitialize.Request(
+            VersionedMcpEntity(name, version),
+            capabilities,
+            protocolVersion
         )
-            .flatMap { it.first().asAOrFailure<McpInitialize.Response>() }
-            .map(McpInitialize.Response::capabilities)
-            .also {
-                thread(isDaemon = true) {
-                    Http4kSseClient(
-                        Request(GET, baseUri)
-                            .with(Header.MCP_SESSION_ID of sessionId.get()),
-                        http, notificationSseReconnectionMode, System.err::println
-                    )
-                        .received()
-                        .filterIsInstance<Event>()
-                        .filter { it.event == "message" }
-                        .map { resultFrom { McpJson.parse(it.data) as MoshiObject } }
-                        .filterIsInstance<Success<MoshiObject>>()
-                        .map { it.value }
-                        .filter { it["method"] != null }
-                        .forEach {
-                            val message = JsonRpcRequest(McpJson, it.attributes)
-                            val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                            callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
-                        }
-                }
+    )
+        .flatMap { it.first().asAOrFailure<McpInitialize.Response>() }
+        .map(McpInitialize.Response::capabilities)
+        .also {
+            thread(isDaemon = true) {
+                Http4kSseClient(
+                    Request(GET, baseUri)
+                        .with(Header.MCP_SESSION_ID of sessionId.get()),
+                    http, notificationSseReconnectionMode, System.err::println
+                )
+                    .received()
+                    .filterIsInstance<Event>()
+                    .filter { it.event == "message" }
+                    .map { resultFrom { McpJson.parse(it.data) as MoshiObject } }
+                    .filterIsInstance<Success<MoshiObject>>()
+                    .map { it.value }
+                    .filter { it["method"] != null }
+                    .forEach {
+                        val message = JsonRpcRequest(McpJson, it.attributes)
+                        val id = message.id?.let { asA<McpMessageId>(compact(it)) }
+                        callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
+                    }
             }
-    }
+        }
 
 
     override fun progress() = object : McpClient.RequestProgress {
