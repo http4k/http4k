@@ -160,7 +160,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         mcpClient.start()
 
-        mcpClient.tools().list().orThrow { TODO() }
+        mcpClient.tools().list().orThrow { error("bad things") }
 
         mcpClient.tools().onChange {
             latch.countDown()
@@ -170,8 +170,8 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         require(latch.await(2, SECONDS)) // TODO RACE CONDITION
 
-        mcpClient.resources().list().orThrow { TODO() }
-        mcpClient.prompts().list().orThrow { TODO() }
+        mcpClient.resources().list().orThrow { error("bad things") }
+        mcpClient.prompts().list().orThrow { error("bad things") }
 
         val messages = JavaHttpClient(responseBodyMode = Stream)(
             Request(GET, Uri.of("http://localhost:${server.port()}/mcp"))
