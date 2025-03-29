@@ -13,10 +13,10 @@ fun Diary(name: String, appointments: (YearMonth) -> Map<LocalDate, List<String>
     val arg = Tool.Arg.yearMonth().required("yearMonth", "year month in format yyyy-mm")
     return Tool(
         "diary_for_${name}",
-        "details $name's diary appointments. Responds with a list of appointments for the given month",
+        "details $name's diary appointments. Responds with a list of appointments for the given month. Any dates that are not listed have full availability.",
         arg,
-    ) bind {
-        val content = appointments(arg(it))
+    ) bind { yearMonth ->
+        val content = appointments(arg(yearMonth))
             .flatMap { (date, slots) ->
                 slots.map {
                     Content.Text("$date: $it")
