@@ -73,10 +73,8 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
-import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
-import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.protocol.ClientRequestTarget.*
@@ -314,8 +312,6 @@ class McpProtocolTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val progress = ServerRequestProgress()
-
         val tools = ServerTools(listOf(tool bind { it, client ->
             val stringArg1 = stringArg(it)
             val intArg1 = intArg(it)
@@ -333,7 +329,6 @@ class McpProtocolTest {
                 metadata,
                 SseSessions(SessionProvider.Random(random)),
                 tools = tools,
-                progress = progress,
                 random = random
             )
         )
@@ -495,7 +490,6 @@ class McpProtocolTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(Random(0))),
-                sampling = sampling,
             )
         )
 

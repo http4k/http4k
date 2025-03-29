@@ -48,7 +48,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
-import org.http4k.mcp.server.capability.ServerSampling
+import org.http4k.mcp.server.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
@@ -337,7 +337,6 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
-                sampling = serverSampling,
                 tools = ServerTools(
                     Tool("sample", "description") bind { it ->
                         val received = serverSampling.sampleClient(

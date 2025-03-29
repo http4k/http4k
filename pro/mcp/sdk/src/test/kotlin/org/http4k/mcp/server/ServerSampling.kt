@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.capability
+package org.http4k.mcp.server
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
@@ -12,8 +12,8 @@ import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.server.capability.ClientTracking
 import org.http4k.mcp.server.protocol.ClientRequestTarget
-import org.http4k.mcp.server.protocol.Sampling
 import java.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap

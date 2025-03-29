@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.protocol
+package org.http4k.mcp.server
 
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
@@ -6,6 +6,7 @@ import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.server.protocol.ClientRequestTarget
 import java.time.Duration
 
 /**

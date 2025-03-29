@@ -49,15 +49,12 @@ import org.http4k.mcp.server.capability.ResourceCapability
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
-import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
-import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpJson.nullNode
@@ -81,10 +78,8 @@ class McpProtocol<Transport>(
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = ServerPrompts(),
     private val completions: Completions = ServerCompletions(),
-    private val sampling: Sampling = ServerSampling(Random),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
-    private val progress: RequestProgress = ServerRequestProgress(),
     private val random: Random = Random
 ) {
     constructor(
@@ -287,7 +282,7 @@ class McpProtocol<Transport>(
             if (clientRequests[session]?.supportsSampling != true) return emptySequence()
 
             clientRequests[session]?.trackRequest(id) {
-                val response: McpSampling.Response = it.fromJsonRpc()
+                val response  = it.fromJsonRpc<McpSampling.Response>()
                 responseQueues[id]?.put(
                     SamplingResponse(
                         response.model,
@@ -349,7 +344,7 @@ class McpProtocol<Transport>(
     }
 
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
-        val entity = (clientRequests[session] ?: ClientTracking(request).also { clientRequests[session] = it }).entity
+        clientRequests[session] = ClientTracking(request)
 
         logger.subscribe(session, LogLevel.error) { level, logger, data ->
             sessions.request(
@@ -375,28 +370,12 @@ class McpProtocol<Transport>(
                 McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
             )
         }
-        sampling.onSampleClient(Entity(entity)) { req, id ->
-            when {
-                clientRequests[session]?.supportsSampling != true -> error("Client does not support sampling")
-
-                else -> {
-                    clientRequests[session]?.trackRequest(id) { sampling.receive(id, it.fromJsonRpc()) }
-                    sessions.request(Subscription(session), req.toJsonRpc(McpSampling, asJsonObject(id)))
-                }
-            }
-        }
-
-        progress.onProgress(Entity(entity)) {
-            sessions.request(Subscription(session), it.toJsonRpc(McpProgress))
-        }
 
         sessions.onClose(session) {
             prompts.remove(session)
             resources.remove(session)
             tools.remove(session)
             logger.unsubscribe(session)
-            sampling.remove(Entity(entity))
-            progress.remove(Entity(entity))
         }
 
         return McpInitialize.Response(
@@ -420,7 +399,6 @@ class McpProtocol<Transport>(
     fun transportFor(session: Session) = sessions.transportFor(session)
 
     private class ClientTracking(initialize: McpInitialize.Request) {
-        val entity = initialize.clientInfo.name
         val supportsSampling = initialize.capabilities.sampling != null
         val supportsRoots = initialize.capabilities.roots?.listChanged == true
 

@@ -49,9 +49,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
-import org.http4k.mcp.server.capability.ServerRequestProgress
 import org.http4k.mcp.server.capability.ServerResources
-import org.http4k.mcp.server.capability.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
@@ -124,10 +122,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
-        val random = Random(0)
-
-        val sampling = ServerSampling(random)
-
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             HttpStreamingSessions(
@@ -148,8 +142,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             }),
             ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind { it ->
                 CompletionResponse(listOf("1", "2"))
-            }),
-            sampling
+            })
         )
 
         val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
@@ -196,10 +189,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     fun `can do sampling`() {
         val model = ModelName.of("my model")
 
-        val random = Random(0)
-
-        val sampling = ServerSampling(random)
-
         val samplingResponses = listOf(
             SamplingResponse(model, Assistant, Content.Text("hello"), null),
             SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
@@ -224,7 +213,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                 eventStore = eventStore
             ).apply { start() },
             tools = tools,
-            sampling = sampling,
         )
 
         val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
@@ -245,8 +233,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     @Test
     fun `can do progress`() {
-        val progress = ServerRequestProgress()
-
         val tools = ServerTools(
             Tool("progress", "description") bind { it, client ->
                 try {
@@ -265,8 +251,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                 sessionProvider = SessionProvider.Random(Random(0)),
                 eventStore = eventStore
             ).apply { start() },
-            tools = tools,
-            progress = progress
+            tools = tools
         )
 
         val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
