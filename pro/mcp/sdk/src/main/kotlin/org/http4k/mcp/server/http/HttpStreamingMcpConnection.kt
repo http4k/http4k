@@ -21,6 +21,7 @@ import org.http4k.mcp.server.protocol.Session
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseResponse
 
 /**
@@ -49,6 +50,7 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>) =
                                 ),
                                 session
                             )
+                            sse.send(Event("ping", ""))
                         }
 
                         POST -> receive(sse, session, req).also { sse.close() }
