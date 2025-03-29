@@ -278,18 +278,12 @@ class McpProtocol<Transport>(
             if (clientRequests[session]?.supportsSampling != true) return emptySequence()
 
             clientRequests[session]?.trackRequest(id) {
-                val response = it.fromJsonRpc<McpSampling.Response>()
-                queue.put(
-                    SamplingResponse(
-                        response.model,
-                        response.role,
-                        response.content,
-                        response.stopReason
-                    )
-                )
-                when {
-                    response.stopReason == null -> InProgress
-                    else -> Finished
+                with(it.fromJsonRpc<McpSampling.Response>()) {
+                    queue.put(SamplingResponse(model, role, content, stopReason))
+                    when {
+                        stopReason == null -> InProgress
+                        else -> Finished
+                    }
                 }
             }
 
