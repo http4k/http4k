@@ -18,9 +18,9 @@ fun RestaurantAvailability(name: String): ToolCapability {
         "for restaurant $name, provides a list of available slots for a given number of people on a specified date",
         dateArg,
         peopleArg
-    ) bind {
-        val date = dateArg(it)
-        val people = peopleArg(it)
+    ) bind { req ->
+        val date = dateArg(req)
+        val people = peopleArg(req)
 
         val slots = when {
             date == LocalDate.of(2025, 3, 22) -> listOf(

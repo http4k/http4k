@@ -20,10 +20,10 @@ fun BookMeal(name: String): ToolCapability {
         dateArg,
         peopleArg,
         timeArg,
-    ) bind {
-        val date = dateArg(it)
-        val people = peopleArg(it)
-        val time = timeArg(it)
+    ) bind { req ->
+        val date = dateArg(req)
+        val people = peopleArg(req)
+        val time = timeArg(req)
         val confirmation =
             if (people == 3 && (date == LocalDate.of(2025, 3, 21) || date == LocalDate.of(2025, 3, 22))) {
                 Content.Text("Booking confirmed for $people people on $date at $time")
