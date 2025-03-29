@@ -91,13 +91,13 @@ interface McpClientContract<T> : PortBasedTest {
                     Uri.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
                     "description"
-                ) bind {
+                ) bind { _ ->
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
+            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind { it ->
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind { _ ->
                 CompletionResponse(listOf("1", "2"))
             }),
             sampling = sampling,
