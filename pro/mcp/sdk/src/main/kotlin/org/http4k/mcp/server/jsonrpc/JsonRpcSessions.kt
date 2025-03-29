@@ -2,8 +2,6 @@ package org.http4k.mcp.server.jsonrpc
 
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.server.protocol.ClientRequestContext
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
@@ -14,7 +12,7 @@ import kotlin.random.Random
 class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProvider.Random(Random)) :
     Sessions<Unit> {
 
-    override fun respond(transport: Unit, session: Session, message: McpNodeType, status: CompletionStatus) =
+    override fun respond(transport: Unit, session: Session, message: McpNodeType) =
         Success(message)
 
     override fun request(context: ClientRequestContext, message: McpNodeType) = error("Unsupported")

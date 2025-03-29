@@ -2,8 +2,6 @@ package org.http4k.mcp.server.protocol
 
 import dev.forkhandles.result4k.Result4k
 import org.http4k.core.Request
-import org.http4k.mcp.model.CompletionStatus
-import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.util.McpNodeType
 
 /**
@@ -11,12 +9,7 @@ import org.http4k.mcp.util.McpNodeType
  * transport to session, and the sending of messages to the client.
  */
 interface Sessions<Transport> {
-    fun respond(
-        transport: Transport,
-        session: Session,
-        message: McpNodeType,
-        status: CompletionStatus = Finished
-    ): Result4k<McpNodeType, McpNodeType>
+    fun respond(transport: Transport, session: Session, message: McpNodeType): Result4k<McpNodeType, McpNodeType>
 
     fun request(context: ClientRequestContext, message: McpNodeType)
     fun onClose(session: Session, fn: () -> Unit)

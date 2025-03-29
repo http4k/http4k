@@ -7,7 +7,6 @@ import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.server.protocol.ClientRequestContext
 import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.Session
@@ -32,8 +31,7 @@ class WebsocketSessions(
     override fun respond(
         transport: Websocket,
         session: Session,
-        message: McpNodeType,
-        status: CompletionStatus
+        message: McpNodeType
     ): Result4k<McpNodeType, McpNodeType> {
         transport.send(WsMessage(Event("message", compact(message)).toMessage()))
         return Success(message)

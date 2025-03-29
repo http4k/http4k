@@ -8,7 +8,6 @@ import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.server.protocol.ClientRequestContext
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
@@ -57,8 +56,7 @@ class HttpStreamingSessions(
     override fun respond(
         transport: Sse,
         session: Session,
-        message: McpNodeType,
-        status: CompletionStatus
+        message: McpNodeType
     ): Result4k<McpNodeType, McpNodeType> {
         SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
             eventStore.write(session, it)
