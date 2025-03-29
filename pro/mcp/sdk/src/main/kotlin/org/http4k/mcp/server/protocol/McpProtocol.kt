@@ -257,7 +257,7 @@ class McpProtocol<Transport>(
         .mapCatching {
             val context = it._meta.progress?.let { ClientCall(it, session) }
             context?.let { sessions.assign(it, this, httpReq) }
-            fn(it, Client(session)).also { if (context != null) sessions.end(context) }
+            fn(it, Client(session, sessions, clientTracking::get)).also { if (context != null) sessions.end(context) }
         }
         .map { it.toJsonRpc(jsonReq.id) }
         .recover {
@@ -268,7 +268,11 @@ class McpProtocol<Transport>(
         }
         .getOrElse { InvalidRequest.toJsonRpc(jsonReq.id) })
 
-    private fun Client(session: Session) = object : Client {
+    private fun <Transport> Client(
+        session: Session,
+        sessions: Sessions<Transport>,
+        clientTrackingLookup: (Session) -> ClientTracking?
+    ) = object : Client {
 
         override fun sample(
             request: SamplingRequest,
@@ -278,7 +282,7 @@ class McpProtocol<Transport>(
 
             val queue = LinkedBlockingDeque<SamplingResponse>()
 
-            val tracking = clientTracking[session] ?: return emptySequence()
+            val tracking = clientTrackingLookup(session) ?: return emptySequence()
             when {
                 !tracking.supportsSampling -> return emptySequence()
                 else -> {
