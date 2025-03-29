@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test
 class SseMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = true
-    override val supportsOutOfBandStreaming = true
 
     override fun clientFor(port: Int) = SseMcpClient(
         clientName, Version.of("1.0.0"),

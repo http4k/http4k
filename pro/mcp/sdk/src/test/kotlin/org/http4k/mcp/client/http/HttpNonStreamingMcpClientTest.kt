@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test
 class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = false
-    override val supportsOutOfBandStreaming = false
 
     override fun clientSessions() = HttpStreamingSessions()
 

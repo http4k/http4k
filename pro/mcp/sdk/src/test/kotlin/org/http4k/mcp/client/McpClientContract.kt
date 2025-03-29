@@ -49,7 +49,6 @@ interface McpClientContract<T> : PortBasedTest {
     val clientName get() = McpEntity.of("foobar")
 
     val doesNotifications: Boolean
-    val supportsOutOfBandStreaming: Boolean
 
     fun clientSessions(): Sessions<T>
 
@@ -137,40 +136,6 @@ interface McpClientContract<T> : PortBasedTest {
             mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).valueOrNull()!!,
             equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
         )
-
-        if (supportsOutOfBandStreaming) {
-
-//            mcpClient.tools()
-//
-//            val samplingResponses = listOf(
-//                SamplingResponse(model, Assistant, Content.Text("hello"), null),
-//                SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
-//            )
-
-//            val reportedProgress = Progress(1, 2.0, "123")
-//
-//            val receivedProgress = AtomicReference<Progress>()
-//
-//            mcpClient.progress().onProgress(fn = receivedProgress::set)
-
-//            progress.report(Entity(clientName), reportedProgress)
-//
-//            Thread.sleep(1000)
-//
-//            assertThat(receivedProgress.get(), equalTo(reportedProgress))
-//
-//            mcpClient.sampling().onSampled {
-//                samplingResponses.asSequence()
-//            }
-//
-//            val responses = sampling.sampleClient(
-//                Entity(clientName),
-//                SamplingRequest(listOfNotNull(), MaxTokens.of(123)),
-//                Duration.ofSeconds(5)
-//            )
-//
-//            assertThat(responses.toList(), equalTo(samplingResponses.map(::Success)))
-        }
 
         if (doesNotifications) {
             tools.items = emptyList()

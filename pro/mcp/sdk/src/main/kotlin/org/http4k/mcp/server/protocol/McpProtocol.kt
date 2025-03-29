@@ -24,7 +24,6 @@ import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
-import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ServerMetaData
@@ -255,10 +254,15 @@ class McpProtocol<Transport>(
         fn: (IN, Client) -> ServerMessage.Response
     ) = sessions.respond(this, session, jsonReq.runCatching { jsonReq.fromJsonRpc<IN>() }
         .mapCatching {
-            val context = it._meta.progress?.let { ClientCall(it, session) }
-            context?.let { sessions.assign(it, this, httpReq) }
-            fn(it, Client(session, sessions, random, clientTracking::get))
-                .also { if (context != null) sessions.end(context) }
+            when (val progress = it._meta.progress) {
+                null -> fn(it, Client(Subscription(session), sessions, random) { clientTracking[session] })
+                else -> {
+                    val context = ClientCall(progress, session)
+                    sessions.assign(context, this, httpReq)
+                    fn(it, Client(context, sessions, random, { clientTracking[session] }))
+                        .also { sessions.end(context) }
+                }
+            }
         }
         .map { it.toJsonRpc(jsonReq.id) }
         .recover {
@@ -273,38 +277,37 @@ class McpProtocol<Transport>(
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
         clientTracking[session] = ClientTracking(request)
 
+        val context = Subscription(session)
         logger.subscribe(session, LogLevel.error) { level, logger, data ->
             sessions.request(
-                Subscription(session),
+                context,
                 McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage)
             )
         }
         prompts.onChange(session) {
             sessions.request(
-                Subscription(session),
+                context,
                 McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
             )
         }
         resources.onChange(session) {
             sessions.request(
-                Subscription(session),
+                context,
                 McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
             )
         }
         tools.onChange(session) {
             sessions.request(
-                Subscription(session),
+                context,
                 McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
             )
         }
-
-        sessions.onClose(Subscription(session)) {
+        sessions.onClose(context) {
             prompts.remove(session)
             resources.remove(session)
             tools.remove(session)
             logger.unsubscribe(session)
         }
-
         return McpInitialize.Response(
             metaData.entity, metaData.capabilities, when {
                 metaData.protocolVersions.contains(request.protocolVersion) -> request.protocolVersion
@@ -343,70 +346,73 @@ private class ClientTracking(initialize: McpInitialize.Request) {
 }
 
 private fun <Transport> Client(
-    session: Session, sessions: Sessions<Transport>, random: Random,
-    clientTracking: (Session) -> ClientTracking?
-) = object : Client {
+    context: ClientRequestContext,
+    sessions: Sessions<Transport>,
+    random: Random,
+    clientTracking: () -> ClientTracking?
+): Client =
+    object : Client {
+        override fun sample(
+            request: SamplingRequest,
+            fetchNextTimeout: Duration?
+        ): Sequence<McpResult<SamplingResponse>> {
+            val id = McpMessageId.random(random)
 
-    override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
-        val id = McpMessageId.random(random)
+            val queue = LinkedBlockingDeque<SamplingResponse>()
 
-        val queue = LinkedBlockingDeque<SamplingResponse>()
+            val tracking = clientTracking() ?: return emptySequence()
+            when {
+                !tracking.supportsSampling -> return emptySequence()
+                else -> {
+                    tracking.trackRequest(id) {
+                        with(it.fromJsonRpc<McpSampling.Response>()) {
+                            queue.put(SamplingResponse(model, role, content, stopReason))
+                            when {
+                                stopReason == null -> InProgress
+                                else -> Finished
+                            }
+                        }
+                    }
+                }
+            }
 
-        val tracking = clientTracking(session) ?: return emptySequence()
-        when {
-            !tracking.supportsSampling -> return emptySequence()
-            else -> {
-                tracking.trackRequest(id) {
-                    with(it.fromJsonRpc<McpSampling.Response>()) {
-                        queue.put(SamplingResponse(model, role, content, stopReason))
-                        when {
-                            stopReason == null -> InProgress
-                            else -> Finished
+            with(request) {
+                sessions.request(
+                    context, McpSampling.Request(
+                        messages,
+                        maxTokens,
+                        systemPrompt,
+                        includeContext,
+                        temperature,
+                        stopSequences,
+                        modelPreferences,
+                        metadata,
+                        _meta = Meta(progressToken)
+                    ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
+                )
+            }
+            return sequence {
+                while (true) {
+                    when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                        null -> {
+                            yield(Failure(Timeout))
+                            break
+                        }
+
+                        else -> {
+                            yield(Success(nextMessage))
+
+                            if (nextMessage.stopReason != null) break
                         }
                     }
                 }
             }
         }
 
-        with(request) {
+        override fun report(req: Progress) = with(req) {
             sessions.request(
-                progressToken.context(session), McpSampling.Request(
-                    messages,
-                    maxTokens,
-                    systemPrompt,
-                    includeContext,
-                    temperature,
-                    stopSequences,
-                    modelPreferences,
-                    metadata,
-                    _meta = Meta(progressToken)
-                ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
+                context, McpProgress.Notification(progress, total, progressToken)
+                    .toJsonRpc(McpProgress)
             )
         }
-        return sequence {
-            while (true) {
-                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
-                    null -> {
-                        yield(Failure(Timeout))
-                        break
-                    }
-
-                    else -> {
-                        yield(Success(nextMessage))
-
-                        if (nextMessage.stopReason != null) break
-                    }
-                }
-            }
-        }
     }
-
-    override fun report(req: Progress) {
-        val mcpReq = with(req) { McpProgress.Notification(progress, total, progressToken) }
-            .toJsonRpc(McpProgress)
-        sessions.request(req.progressToken.context(session), mcpReq)
-    }
-
-    private fun ProgressToken?.context(session: Session) = this?.let { ClientCall(it, session) } ?: Subscription(session)
-
-}
