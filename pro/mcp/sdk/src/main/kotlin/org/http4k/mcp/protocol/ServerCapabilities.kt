@@ -15,16 +15,16 @@ data class ServerCapabilities internal constructor(
     val prompts: PromptCapabilities = PromptCapabilities(),
     val resources: ResourceCapabilities = ResourceCapabilities(),
     val completions: Unit? = null,
-    val experimental: Unit? = null,
-    val logging: Unit? = null
+    val logging: Unit? = null,
+    val experimental: Unit? = null
 ) {
-    constructor(vararg capabilities: ProtocolCapability) : this(
+    constructor(vararg capabilities: ProtocolCapability = ProtocolCapability.entries.toTypedArray()) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
         PromptCapabilities(capabilities.contains(PromptsChanged)),
         ResourceCapabilities(capabilities.contains(ResourcesChanged)),
         if (capabilities.contains(Completions)) Unit else null,
-        if (capabilities.contains(Experimental)) Unit else null,
         if (capabilities.contains(Logging)) Unit else null,
+        if (capabilities.contains(Experimental)) Unit else null,
     )
 
     @JsonSerializable
