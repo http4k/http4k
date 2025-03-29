@@ -8,7 +8,6 @@ import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.server.protocol.ClientRequestContext
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
@@ -33,13 +32,12 @@ class HttpStreamingSessions(
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : Sessions<Sse> {
 
-    private val sessions = ConcurrentHashMap<Session, Sse>()
-    private val requests = ConcurrentHashMap<ProgressToken, Sse>()
+    private val clientConnections = ConcurrentHashMap<ClientRequestContext, Sse>()
 
     override fun request(context: ClientRequestContext, message: McpNodeType) {
         val sse = when (context) {
-            is ClientCall -> requests[context.progressToken]
-            is Subscription -> sessions[context.session]
+            is ClientCall -> clientConnections[context]
+            is Subscription -> clientConnections[context]
         }
 
         when (sse) {
@@ -66,31 +64,28 @@ class HttpStreamingSessions(
     }
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) {
-        sessions[context.session]?.also { it.onClose(fn) }
+        clientConnections[context]?.also { it.onClose(fn) }
     }
 
     override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(context: ClientRequestContext) = sessions[context.session] ?: error("Session not found")
+    override fun transportFor(context: ClientRequestContext) = clientConnections[context] ?: error("Session not found")
 
     override fun end(context: ClientRequestContext) {
         when (context) {
-            is ClientCall -> requests.remove(context.progressToken)
+            is ClientCall -> clientConnections.remove(context)
             is Subscription -> {
-                sessions.remove(context.session)?.close()
+                clientConnections.remove(context)?.close()
                 sessionEventTracking.remove(context.session)
             }
         }
     }
 
     override fun assign(context: ClientRequestContext, transport: Sse, connectRequest: Request) {
-        when (context) {
-            is ClientCall -> requests[context.progressToken] = transport
-            is Subscription -> {
-                sessions[context.session] = transport
-                eventStore.read(context.session, Header.LAST_EVENT_ID(connectRequest)).forEach(transport::send)
-            }
+        clientConnections[context] = transport
+        if (context is Subscription) {
+            eventStore.read(context.session, Header.LAST_EVENT_ID(connectRequest)).forEach(transport::send)
         }
     }
 
@@ -98,11 +93,13 @@ class HttpStreamingSessions(
         executor.scheduleWithFixedDelay(::pruneDeadConnections, keepAliveDelay, keepAliveDelay)
 
     private fun pruneDeadConnections() =
-        sessions.toList().forEach { (session, sse) ->
+        clientConnections
+            .filterKeys { it is Subscription }
+            .toList().forEach { (session, sse) ->
             try {
                 sse.send(SseMessage.Event("ping", ""))
             } catch (e: Exception) {
-                sessions.remove(session)
+                clientConnections.remove(session)
                 sse.close()
             }
         }
