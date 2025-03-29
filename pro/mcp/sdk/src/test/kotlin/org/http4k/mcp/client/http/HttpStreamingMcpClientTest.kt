@@ -166,9 +166,11 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             latch.countDown()
         }
 
+        Thread.sleep(1000) // TODO RACE CONDITION
+
         tools.items = emptyList()
 
-        require(latch.await(2, SECONDS)) // TODO RACE CONDITION
+        require(latch.await(2, SECONDS))
 
         mcpClient.resources().list().orThrow { error("bad things") }
         mcpClient.prompts().list().orThrow { error("bad things") }
