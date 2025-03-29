@@ -257,10 +257,8 @@ class McpProtocol<Transport>(
         .mapCatching {
             val context = it._meta.progress?.let { ClientCall(it, session) }
             context?.let { sessions.assign(it, this, httpReq) }
-            fn(
-                it,
-                org.http4k.mcp.server.protocol.Client(session, sessions, random, clientTracking::get)
-            ).also { if (context != null) sessions.end(context) }
+            fn(it, Client(session, sessions, random, clientTracking::get))
+                .also { if (context != null) sessions.end(context) }
         }
         .map { it.toJsonRpc(jsonReq.id) }
         .recover {
@@ -347,20 +345,16 @@ private class ClientTracking(initialize: McpInitialize.Request) {
 private fun ProgressToken?.context(session: Session) = this?.let { ClientCall(it, session) } ?: Subscription(session)
 
 private fun <Transport> Client(
-    session: Session,
-    sessions: Sessions<Transport>,
-    random: Random,
-    clientTrackingLookup: (Session) -> ClientTracking?
+    session: Session, sessions: Sessions<Transport>, random: Random,
+    clientTracking: (Session) -> ClientTracking?
 ) = object : Client {
-    override fun sample(
-        request: SamplingRequest,
-        fetchNextTimeout: Duration?
-    ): Sequence<McpResult<SamplingResponse>> {
+
+    override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
         val id = McpMessageId.random(random)
 
         val queue = LinkedBlockingDeque<SamplingResponse>()
 
-        val tracking = clientTrackingLookup(session) ?: return emptySequence()
+        val tracking = clientTracking(session) ?: return emptySequence()
         when {
             !tracking.supportsSampling -> return emptySequence()
             else -> {
