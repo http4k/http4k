@@ -230,7 +230,6 @@ class HttpStreamingMcpClient(
                             McpSampling.Response(it.model, it.stopReason, it.role, it.content),
                             requestId
                         )
-//                        if (it.stopReason != null) tidyUp(requestId)
                     }
                 })
         }

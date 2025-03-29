@@ -226,7 +226,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         )
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample")),
+            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample2")),
             equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
         )
 

@@ -3,6 +3,7 @@ package org.http4k.mcp.server.protocol
 import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.model.CompletionStatus
+import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.util.McpNodeType
@@ -19,7 +20,9 @@ class ClientTracking(initialize: McpInitialize.Request) {
     }
 
     fun processResult(id: McpMessageId, result: JsonRpcResult<MoshiNode>) {
-        val done = calls[id]?.invoke(result) ?: CompletionStatus.Finished
-        if (done == CompletionStatus.Finished) calls.remove(id)
+        synchronized(id) {
+            val done = calls[id]?.invoke(result) ?: Finished
+            if (done == Finished) calls.remove(id)
+        }
     }
 }
