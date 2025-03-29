@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.5.0.0 (uncut)
 - **http4k-mcp-sdk*** [Breaking]: Protocol negotiation and turning on Server and Client capabilities by default.
+- **http4k-mcp-sdk*** Add in-band sampling and progress to most client requests
 
 ### v6.4.1.0
 - **http4k-mcp-sdk*** [DevEx]: Capabilities now implement their Handler type, allowing you to call through directly to the handler,
