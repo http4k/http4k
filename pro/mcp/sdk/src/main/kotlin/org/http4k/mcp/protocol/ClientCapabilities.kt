@@ -11,9 +11,9 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 @ConsistentCopyVisibility
 data class ClientCapabilities internal constructor(
-    val roots: Roots? = null,
-    val sampling: Unit? = null,
-    val experimental: Unit? = null,
+    val roots: Roots?,
+    val sampling: Unit?,
+    val experimental: Unit?,
 ) {
     constructor(vararg capabilities: ClientProtocolCapability = ClientProtocolCapability.entries.toTypedArray()) : this(
         Roots(capabilities.contains(RootChanged)),

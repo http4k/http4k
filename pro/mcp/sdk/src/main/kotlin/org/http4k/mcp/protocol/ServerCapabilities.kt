@@ -11,12 +11,12 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 @ConsistentCopyVisibility
 data class ServerCapabilities internal constructor(
-    val tools: ToolCapabilities = ToolCapabilities(),
-    val prompts: PromptCapabilities = PromptCapabilities(),
-    val resources: ResourceCapabilities = ResourceCapabilities(),
-    val completions: Unit? = null,
-    val logging: Unit? = null,
-    val experimental: Unit? = null
+    val tools: ToolCapabilities,
+    val prompts: PromptCapabilities,
+    val resources: ResourceCapabilities,
+    val completions: Unit?,
+    val logging: Unit?,
+    val experimental: Unit?
 ) {
     constructor(vararg capabilities: ServerProtocolCapability = ServerProtocolCapability.entries.toTypedArray()) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),

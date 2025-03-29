@@ -217,13 +217,15 @@ class McpProtocol<Transport>(
                     McpProgress.Method -> ok()
 
                     McpRoot.Changed.Method -> {
-                        val messageId = McpMessageId.random(random)
-                        clientRequests[session]?.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
-                        sessions.respond(
-                            transport,
-                            session,
-                            McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
-                        )
+                        if (clientRequests[session]?.supportsRoots == true) {
+                            val messageId = McpMessageId.random(random)
+                            clientRequests[session]?.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
+                            sessions.respond(
+                                transport,
+                                session,
+                                McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
+                            )
+                        }
                         ok()
                     }
 
@@ -280,6 +282,8 @@ class McpProtocol<Transport>(
             val queue = LinkedBlockingDeque<SamplingResponse>()
             val id = McpMessageId.random(random)
             responseQueues[id] = queue
+
+            if (clientRequests[session]?.supportsSampling != true) return emptySequence()
 
             clientRequests[session]?.trackRequest(id) {
                 val response: McpSampling.Response = it.fromJsonRpc()
@@ -371,11 +375,16 @@ class McpProtocol<Transport>(
             )
         }
         sampling.onSampleClient(Entity(entity)) { req, id ->
-            clientRequests[session]?.trackRequest(id) {
-                sampling.receive(id, it.fromJsonRpc())
+            when {
+                clientRequests[session]?.supportsSampling != true -> error("Client does not support sampling")
+
+                else -> {
+                    clientRequests[session]?.trackRequest(id) { sampling.receive(id, it.fromJsonRpc()) }
+                    sessions.request(Subscription(session), req.toJsonRpc(McpSampling, asJsonObject(id)))
+                }
             }
-            sessions.request(Subscription(session), req.toJsonRpc(McpSampling, asJsonObject(id)))
         }
+
         progress.onProgress(Entity(entity)) {
             sessions.request(Subscription(session), it.toJsonRpc(McpProgress))
         }
@@ -411,6 +420,9 @@ class McpProtocol<Transport>(
 
     private class ClientTracking(initialize: McpInitialize.Request) {
         val entity = initialize.clientInfo.name
+        val supportsSampling = initialize.capabilities.sampling != null
+        val supportsRoots = initialize.capabilities.roots?.listChanged == true
+
         private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 
         fun trackRequest(id: McpMessageId, callback: (JsonRpcResult<McpNodeType>) -> CompletionStatus) {
