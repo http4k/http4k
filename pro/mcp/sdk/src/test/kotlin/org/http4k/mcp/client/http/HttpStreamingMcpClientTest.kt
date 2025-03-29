@@ -226,9 +226,14 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
         )
 
+        assertThat(
+            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample")),
+            equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
+        )
+
         mcpClient.stop()
 
-        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(3))
+        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(5))
     }
 
     @Test

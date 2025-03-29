@@ -61,7 +61,6 @@ import org.http4k.mcp.util.McpJson.nullNode
 import org.http4k.mcp.util.McpJson.parse
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -269,21 +268,18 @@ class McpProtocol<Transport>(
 
     private fun Client(session: Session) = object : Client {
 
-        private val responseQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<SamplingResponse>>()
-
         override fun sample(
             request: SamplingRequest,
             fetchNextTimeout: Duration?
         ): Sequence<McpResult<SamplingResponse>> {
             val queue = LinkedBlockingDeque<SamplingResponse>()
             val id = McpMessageId.random(random)
-            responseQueues[id] = queue
 
             if (clientRequests[session]?.supportsSampling != true) return emptySequence()
 
             clientRequests[session]?.trackRequest(id) {
-                val response  = it.fromJsonRpc<McpSampling.Response>()
-                responseQueues[id]?.put(
+                val response = it.fromJsonRpc<McpSampling.Response>()
+                queue.put(
                     SamplingResponse(
                         response.model,
                         response.role,
@@ -293,10 +289,7 @@ class McpProtocol<Transport>(
                 )
                 when {
                     response.stopReason == null -> InProgress
-                    else -> {
-                        responseQueues.remove(id)
-                        Finished
-                    }
+                    else -> Finished
                 }
             }
 
@@ -326,10 +319,7 @@ class McpProtocol<Transport>(
                         else -> {
                             yield(Success(nextMessage))
 
-                            if (nextMessage.stopReason != null) {
-                                responseQueues.remove(id)
-                                break
-                            }
+                            if (nextMessage.stopReason != null) break
                         }
                     }
                 }
