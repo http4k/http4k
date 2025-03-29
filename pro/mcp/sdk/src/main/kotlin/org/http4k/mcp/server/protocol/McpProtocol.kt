@@ -184,7 +184,7 @@ class McpProtocol<Transport>(
                             transport,
                             session,
                             jsonReq.respondTo<McpResource.Template.List.Request>(session, transport, httpReq) {
-                                resources.listTemplates(it, httpReq)
+                                resources.listTemplates(it, Client(session), httpReq)
                             })
 
                     McpResource.List.Method ->
@@ -194,7 +194,7 @@ class McpProtocol<Transport>(
                                 session,
                                 transport,
                                 httpReq
-                            ) { resources.listResources(it, httpReq) }
+                            ) { resources.listResources(it, Client(session), httpReq) }
                         )
 
                     McpResource.Read.Method ->

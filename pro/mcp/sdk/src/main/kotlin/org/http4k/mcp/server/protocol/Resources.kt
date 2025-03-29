@@ -10,9 +10,9 @@ import org.http4k.mcp.protocol.messages.McpResource
 interface Resources {
     fun triggerUpdated(uri: Uri)
 
-    fun listResources(req: McpResource.List.Request, http: Request): McpResource.List.Response
+    fun listResources(req: McpResource.List.Request, client: Client, http: Request): McpResource.List.Response
 
-    fun listTemplates(req: McpResource.Template.List.Request, http: Request): McpResource.Template.List.Response
+    fun listTemplates(req: McpResource.Template.List.Request, client: Client, http: Request): McpResource.Template.List.Response
 
     fun read(req: McpResource.Read.Request, client: Client, http: Request): McpResource.Read.Response
 
