@@ -295,7 +295,7 @@ class McpProtocol<Transport>(
 
             with(request) {
                 sessions.request(
-                    request.progressToken.context(session), McpSampling.Request(
+                    progressToken.context(session), McpSampling.Request(
                         messages,
                         maxTokens,
                         systemPrompt,
