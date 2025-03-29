@@ -11,7 +11,7 @@ import org.http4k.mcp.util.ObservableList
 class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
     constructor(vararg list: ToolCapability) : this(list.toList())
 
-    override fun list(req: McpTool.List.Request, http: Request): McpTool.List.Response =
+    override fun list(req: McpTool.List.Request, client: Client, http: Request): McpTool.List.Response =
         McpTool.List.Response(items.map(ToolCapability::toTool))
 
     override fun call(req: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response = items
