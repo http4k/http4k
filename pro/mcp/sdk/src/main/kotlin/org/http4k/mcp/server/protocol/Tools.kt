@@ -9,7 +9,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 interface Tools {
     fun list(req: McpTool.List.Request, http: Request): McpTool.List.Response
 
-    fun call(req: McpTool.Call.Request, http: Request, client: Client): McpTool.Call.Response
+    fun call(req: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response
 
     fun onChange(session: Session, handler: () -> Any)
 

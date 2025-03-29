@@ -5,9 +5,11 @@ import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.mcp.CompletionHandler
+import org.http4k.mcp.CompletionWithClientHandler
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptWithClientHandler
 import org.http4k.mcp.ResourceHandler
+import org.http4k.mcp.ResourceWithClientHandler
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolWithClientHandler
 import org.http4k.mcp.model.Prompt
@@ -129,7 +131,10 @@ fun mcpStdIo(
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Tool.bind(handler: ToolWithClientHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
+infix fun Prompt.bind(handler: PromptWithClientHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)
+infix fun Resource.bind(handler: ResourceWithClientHandler) = ResourceCapability(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this, handler)
+infix fun Reference.bind(handler: CompletionWithClientHandler) = CompletionCapability(this, handler)
 
 fun compose(vararg bindings: ServerCapability) = CapabilityPack(bindings = bindings)

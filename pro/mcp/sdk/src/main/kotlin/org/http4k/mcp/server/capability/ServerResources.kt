@@ -5,6 +5,7 @@ import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpResource
+import org.http4k.mcp.server.protocol.Client
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.util.ObservableList
@@ -34,9 +35,9 @@ class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<Resou
             items.map { it.toResource() }.filter { it.uriTemplate != null }
         )
 
-    override fun read(req: McpResource.Read.Request, http: Request) = items
+    override fun read(req: McpResource.Read.Request, client: Client, http: Request) = items
         .find { it.matches(req.uri) }
-        ?.read(req, http)
+        ?.read(req, client, http)
         ?: throw McpException(InvalidParams)
 
     override fun subscribe(session: Session, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit) {

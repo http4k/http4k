@@ -14,7 +14,7 @@ interface Resources {
 
     fun listTemplates(req: McpResource.Template.List.Request, http: Request): McpResource.Template.List.Response
 
-    fun read(req: McpResource.Read.Request, http: Request): McpResource.Read.Response
+    fun read(req: McpResource.Read.Request, client: Client, http: Request): McpResource.Read.Response
 
     fun subscribe(session: Session, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit)
 
