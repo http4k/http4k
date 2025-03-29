@@ -211,19 +211,21 @@ class HttpStreamingMcpClient(
                 McpCallback(McpSampling.Request::class) { request, requestId ->
                     if (requestId == null) return@McpCallback
 
-                    val responses = fn(
-                        SamplingRequest(
-                            request.messages,
-                            request.maxTokens,
-                            request.systemPrompt,
-                            request.includeContext,
-                            request.temperature,
-                            request.stopSequences,
-                            request.modelPreferences,
-                            request.metadata
-                        )
-                    )
-
+                    val responses =
+                        with(request) {
+                            fn(
+                                SamplingRequest(
+                                    messages,
+                                    maxTokens,
+                                    systemPrompt,
+                                    includeContext,
+                                    temperature,
+                                    stopSequences,
+                                    modelPreferences,
+                                    metadata
+                                )
+                            )
+                        }
                     responses.forEach {
                         http.send(
                             McpSampling,

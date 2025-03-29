@@ -98,7 +98,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
-            Tool("reverse", "description", toolArg) bind { it, _ -> error("bad things") }
+            Tool("reverse", "description", toolArg) bind { _, _ -> error("bad things") }
         )
 
         val server = toPolyHandler(protocol)
@@ -229,9 +229,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         mcpClient.start()
 
-        mcpClient.sampling().onSampled {
-            samplingResponses.asSequence()
-        }
+        mcpClient.sampling().onSampled { samplingResponses.asSequence() }
 
         assertThat(
             mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample")),

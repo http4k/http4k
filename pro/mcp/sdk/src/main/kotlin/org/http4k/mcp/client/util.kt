@@ -15,6 +15,7 @@ import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.lens.contentType
+import org.http4k.mcp.client.McpError.Protocol
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -22,15 +23,15 @@ import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.util.McpJson
 import org.http4k.sse.SseMessage.Event
 
-internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, McpError.Protocol> = with(McpJson) {
+internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, Protocol> = with(McpJson) {
     val data = parse(data) as MoshiObject
 
     when {
-        data["method"] != null -> Failure(McpError.Protocol(InvalidRequest))
+        data["method"] != null -> Failure(Protocol(InvalidRequest))
         else -> {
             resultFrom {
                 convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())
-            }.mapFailure { McpError.Protocol(ErrorMessage(-1, it.toString())) }
+            }.mapFailure { Protocol(ErrorMessage(-1, it.toString())) }
         }
     }
 }

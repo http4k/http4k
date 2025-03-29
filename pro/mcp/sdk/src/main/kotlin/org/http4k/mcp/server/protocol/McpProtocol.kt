@@ -238,23 +238,17 @@ class McpProtocol<Transport>(
                                 val contextAndTarget = it._meta.progress?.let {
                                     ClientCall(it, session) to ClientRequestTarget.Request(it)
                                 }
-                                contextAndTarget?.let { (method, target) ->
-                                    sessions.assign(method, transport, httpReq)
-                                    progress.onProgress(target) {
-                                        sessions.request(
-                                            method,
-                                            McpProgress.Notification(it.progress, it.total, it.progressToken)
-                                                .toJsonRpc(McpProgress)
-                                        )
-                                    }
-                                    sampling.onSampleClient(target) { req, id ->
-                                        clientRequests[session]?.trackRequest(id) {
-                                            sampling.receive(id, it.fromJsonRpc())
-                                        }
-                                        sessions.request(method, req.toJsonRpc(McpSampling, asJsonObject(id)))
-                                    }
-
+                                contextAndTarget?.let { (context, _) ->
+                                    sessions.assign(context, transport, httpReq)
                                 }
+//                                    progress.onProgress(target) {
+//                                        sessions.request(
+//                                            method,
+//                                            McpProgress.Notification(it.progress, it.total, it.progressToken)
+//                                                .toJsonRpc(McpProgress)
+//                                        )
+//                                    }
+//                                }
                                 tools.call(it, httpReq, Client(session))
                                     .also {
                                         if (contextAndTarget != null) {
@@ -306,6 +300,8 @@ class McpProtocol<Transport>(
             val queue = LinkedBlockingDeque<SamplingResponse>()
             val id = McpMessageId.random(random)
             responseQueues[id] = queue
+            clientRequests[session]?.trackRequest(id) { receive(id, it.fromJsonRpc()) }
+
             with(request) {
                 sessions.request(
                     request.progressToken.context(session), McpSampling.Request(
