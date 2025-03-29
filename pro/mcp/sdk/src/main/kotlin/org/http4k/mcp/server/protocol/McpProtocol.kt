@@ -88,11 +88,11 @@ class McpProtocol<Transport>(
     private val random: Random = Random
 ) {
     constructor(
-        serverMetaData: ServerMetaData,
+        metaData: ServerMetaData,
         sessions: Sessions<Transport>,
         vararg capabilities: ServerCapability
     ) : this(
-        serverMetaData,
+        metaData,
         sessions,
         ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),

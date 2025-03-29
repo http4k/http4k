@@ -2,7 +2,7 @@ package org.http4k.mcp.protocol
 
 import org.http4k.mcp.protocol.ProtocolCapability.Experimental
 import org.http4k.mcp.protocol.ProtocolCapability.RootChanged
-import org.http4k.mcp.protocol.ProtocolCapability.Sampling
+import org.http4k.mcp.protocol.ProtocolCapability.Completions
 import se.ansman.kotshi.JsonSerializable
 
 /**
@@ -17,7 +17,7 @@ data class ClientCapabilities internal constructor(
 ) {
     constructor(vararg capabilities: ProtocolCapability) : this(
         Roots(capabilities.contains(RootChanged)),
-        if (capabilities.contains(Sampling)) Unit else null,
+        if (capabilities.contains(Completions)) Unit else null,
         if (capabilities.contains(Experimental)) Unit else null,
     )
 
