@@ -75,7 +75,7 @@ import kotlin.random.Random
 
 class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
-    override val doesNotifications = false
+    override val doesNotifications = true
     override val supportsOutOfBandStreaming = true
 
     override fun clientFor(port: Int) = HttpStreamingMcpClient(
