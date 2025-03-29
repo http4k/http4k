@@ -408,8 +408,6 @@ class McpProtocol<Transport>(
             progress.remove(Entity(entity))
         }
 
-        println(request.protocolVersion)
-        println(metaData.protocolVersions)
         return McpInitialize.Response(
             metaData.entity, metaData.capabilities, when {
                 metaData.protocolVersions.contains(request.protocolVersion) -> request.protocolVersion
