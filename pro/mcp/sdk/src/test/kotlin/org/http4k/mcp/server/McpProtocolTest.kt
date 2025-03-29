@@ -163,7 +163,7 @@ class McpProtocolTest {
                 metadata, SseSessions(SessionProvider.Random(Random(0))),
                 prompts = ServerPrompts(
                     listOf(
-                        prompt bind {
+                        prompt bind { it ->
                             PromptResponse(
                                 listOf(
                                     Message(Assistant, Content.Text(intArg(it).toString().reversed()))
@@ -211,7 +211,7 @@ class McpProtocolTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val resources = ServerResources(listOf(resource bind { _ -> ResourceResponse(listOf(content)) }))
 
         val mcp = SseMcp(
             McpProtocol(
@@ -267,7 +267,7 @@ class McpProtocolTest {
             Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
-        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val resources = ServerResources(listOf(resource bind { _ -> ResourceResponse(listOf(content)) }))
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
@@ -428,7 +428,7 @@ class McpProtocolTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { _ -> CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(
@@ -452,7 +452,7 @@ class McpProtocolTest {
     fun `can handle batched messages`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { _ -> CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(
