@@ -202,15 +202,17 @@ class McpProtocol<Transport>(
                     McpProgress.Method -> ok()
 
                     McpRoot.Changed.Method -> {
-                        if (clientTracking[session]?.supportsRoots == true) {
-                            val messageId = McpMessageId.random(random)
-                            clientTracking[session]?.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
+                        clientTracking[session]?.let {
+                            if (it.supportsRoots) {
+                                val messageId = McpMessageId.random(random)
+                                it.trackRequest(messageId) { roots.update(it.fromJsonRpc()) }
 
-                            sessions.respond(
-                                transport,
-                                session,
-                                McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
-                            )
+                                sessions.respond(
+                                    transport,
+                                    session,
+                                    McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
+                                )
+                            }
                         }
                         ok()
                     }
@@ -272,17 +274,22 @@ class McpProtocol<Transport>(
             request: SamplingRequest,
             fetchNextTimeout: Duration?
         ): Sequence<McpResult<SamplingResponse>> {
-            val queue = LinkedBlockingDeque<SamplingResponse>()
             val id = McpMessageId.random(random)
 
-            if (clientTracking[session]?.supportsSampling != true) return emptySequence()
+            val queue = LinkedBlockingDeque<SamplingResponse>()
 
-            clientTracking[session]?.trackRequest(id) {
-                with(it.fromJsonRpc<McpSampling.Response>()) {
-                    queue.put(SamplingResponse(model, role, content, stopReason))
-                    when {
-                        stopReason == null -> InProgress
-                        else -> Finished
+            val tracking = clientTracking[session] ?: return emptySequence()
+            when {
+                !tracking.supportsSampling -> return emptySequence()
+                else -> {
+                    tracking.trackRequest(id) {
+                        with(it.fromJsonRpc<McpSampling.Response>()) {
+                            queue.put(SamplingResponse(model, role, content, stopReason))
+                            when {
+                                stopReason == null -> InProgress
+                                else -> Finished
+                            }
+                        }
                     }
                 }
             }
