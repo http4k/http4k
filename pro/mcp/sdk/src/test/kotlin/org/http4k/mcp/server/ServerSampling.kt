@@ -12,13 +12,13 @@ import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpSampling
-import org.http4k.mcp.server.capability.ClientTracking
 import org.http4k.mcp.server.protocol.ClientRequestTarget
 import java.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
@@ -85,6 +85,27 @@ class ServerSampling(private val random: Random = Random) :
                     }
                 }
             }
+        }
+    }
+}
+
+
+/**
+ * Trace counters for client sessions
+ */
+abstract class ClientTracking<KEY, T> {
+    protected val subscriptions = ConcurrentHashMap<KEY, T>()
+    private val counts = ConcurrentHashMap<KEY, AtomicInteger>()
+
+    protected fun add(target: KEY, item: T) {
+        subscriptions[target] = item
+        counts.getOrPut(target) { AtomicInteger() }.incrementAndGet()
+    }
+
+    fun remove(target: KEY) {
+        if (counts.getOrPut(target) { AtomicInteger(0) }.decrementAndGet() < -0) {
+            subscriptions.remove(target)
+            counts.remove(target)
         }
     }
 }
