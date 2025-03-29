@@ -140,7 +140,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                     Uri.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
                     "description"
-                ) bind { it ->
+                ) bind { _ ->
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind { it ->
