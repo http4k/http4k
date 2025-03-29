@@ -7,7 +7,7 @@ import org.http4k.core.Request
 import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ProtocolCapability
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpHttpStreaming
@@ -25,7 +25,7 @@ fun main() {
     val mcpServer = mcpHttpStreaming( // replace with mcpHttpNonStreaming for simple RPC interactions
         ServerMetaData(
             McpEntity.of("http4k mcp via SSE"), Version.of("0.1.0"),
-            *ProtocolCapability.entries.toTypedArray()
+            *ServerProtocolCapability.entries.toTypedArray()
         ),
         prompts(),
         resources(),

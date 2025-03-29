@@ -50,7 +50,7 @@ import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.ProtocolCapability
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
@@ -558,7 +558,7 @@ class McpProtocolTest {
         mcp.sendToMcp(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(clientName, Version.of("1")),
-                ClientCapabilities(*ProtocolCapability.entries.toTypedArray()), `2024-10-07`
+                ClientCapabilities(), `2024-10-07`
             )
         )
 

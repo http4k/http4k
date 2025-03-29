@@ -1,5 +1,6 @@
 package org.http4k.mcp.protocol
 
-enum class ProtocolCapability {
+enum class ServerProtocolCapability {
     ToolsChanged, PromptsChanged, ResourcesChanged, RootChanged, Completions, Logging, Experimental
 }
+

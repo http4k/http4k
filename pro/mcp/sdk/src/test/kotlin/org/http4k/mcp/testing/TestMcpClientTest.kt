@@ -37,8 +37,8 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.protocol.ProtocolCapability.Experimental
-import org.http4k.mcp.protocol.ProtocolCapability.PromptsChanged
+import org.http4k.mcp.protocol.ServerProtocolCapability.Experimental
+import org.http4k.mcp.protocol.ServerProtocolCapability.PromptsChanged
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.ServerCapabilities.PromptCapabilities
 import org.http4k.mcp.protocol.ServerMetaData

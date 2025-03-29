@@ -2,7 +2,7 @@ package server.websocket
 
 import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ProtocolCapability
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpWebsocket
@@ -20,7 +20,7 @@ fun main() {
     val mcpServer = mcpWebsocket(
         ServerMetaData(
             McpEntity.of("http4k mcp via WS"), Version.of("0.1.0"),
-            *ProtocolCapability.entries.toTypedArray()
+            *ServerProtocolCapability.entries.toTypedArray()
         ),
         prompts(),
         resources(),

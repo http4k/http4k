@@ -1,11 +1,11 @@
 package org.http4k.mcp.protocol
 
-import org.http4k.mcp.protocol.ProtocolCapability.Experimental
-import org.http4k.mcp.protocol.ProtocolCapability.Logging
-import org.http4k.mcp.protocol.ProtocolCapability.PromptsChanged
-import org.http4k.mcp.protocol.ProtocolCapability.ResourcesChanged
-import org.http4k.mcp.protocol.ProtocolCapability.Completions
-import org.http4k.mcp.protocol.ProtocolCapability.ToolsChanged
+import org.http4k.mcp.protocol.ServerProtocolCapability.Experimental
+import org.http4k.mcp.protocol.ServerProtocolCapability.Logging
+import org.http4k.mcp.protocol.ServerProtocolCapability.PromptsChanged
+import org.http4k.mcp.protocol.ServerProtocolCapability.ResourcesChanged
+import org.http4k.mcp.protocol.ServerProtocolCapability.Completions
+import org.http4k.mcp.protocol.ServerProtocolCapability.ToolsChanged
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -18,7 +18,7 @@ data class ServerCapabilities internal constructor(
     val logging: Unit? = null,
     val experimental: Unit? = null
 ) {
-    constructor(vararg capabilities: ProtocolCapability = ProtocolCapability.entries.toTypedArray()) : this(
+    constructor(vararg capabilities: ServerProtocolCapability = ServerProtocolCapability.entries.toTypedArray()) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
         PromptCapabilities(capabilities.contains(PromptsChanged)),
         ResourceCapabilities(capabilities.contains(ResourcesChanged)),

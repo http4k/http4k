@@ -1,7 +1,7 @@
 package server.sse
 
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ProtocolCapability
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpSse
@@ -19,7 +19,7 @@ fun main() {
     val mcpServer = mcpSse(
         ServerMetaData(
             McpEntity.of("http4k mcp via SSE"), Version.of("0.1.0"),
-            *ProtocolCapability.entries.toTypedArray()
+            *ServerProtocolCapability.entries.toTypedArray()
         ),
         prompts(),
         resources(),

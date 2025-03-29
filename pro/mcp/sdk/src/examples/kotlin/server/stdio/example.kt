@@ -1,7 +1,7 @@
 package server.stdio
 
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ProtocolCapability
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpStdIo
@@ -16,7 +16,7 @@ fun main() {
     mcpStdIo(
         ServerMetaData(
             McpEntity.of("stdio mcp via STDIO"), Version.of("0.1.0"),
-            *ProtocolCapability.entries.toTypedArray()
+            *ServerProtocolCapability.entries.toTypedArray()
         ),
         prompts(),
         resources(),
