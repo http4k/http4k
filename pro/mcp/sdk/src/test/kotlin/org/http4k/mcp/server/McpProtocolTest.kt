@@ -50,8 +50,7 @@ import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.ServerProtocolCapability
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
@@ -425,7 +424,6 @@ class McpProtocolTest {
         }
     }
 
-
     @Test
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
@@ -558,17 +556,16 @@ class McpProtocolTest {
         mcp.sendToMcp(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(clientName, Version.of("1")),
-                ClientCapabilities(), `2024-10-07`
+                ClientCapabilities(), `2024-11-05`
             )
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, metadata.protocolVersion)
+            McpInitialize.Response(metadata.entity, metadata.capabilities, `2024-11-05`)
         )
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
     }
-
 
     private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
         assertNextMessage(with(McpJson) { renderError(error, number(1)) })

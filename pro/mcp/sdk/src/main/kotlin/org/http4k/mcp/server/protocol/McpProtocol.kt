@@ -408,7 +408,14 @@ class McpProtocol<Transport>(
             progress.remove(Entity(entity))
         }
 
-        return McpInitialize.Response(metaData.entity, metaData.capabilities, metaData.protocolVersion)
+        println(request.protocolVersion)
+        println(metaData.protocolVersions)
+        return McpInitialize.Response(
+            metaData.entity, metaData.capabilities, when {
+                metaData.protocolVersions.contains(request.protocolVersion) -> request.protocolVersion
+                else -> metaData.protocolVersions.max()
+            }
+        )
     }
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)

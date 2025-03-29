@@ -1,7 +1,8 @@
 package org.http4k.mcp.protocol
 
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2025-03-26`
 import se.ansman.kotshi.JsonSerializable
 
 /**
@@ -11,20 +12,20 @@ import se.ansman.kotshi.JsonSerializable
 @ConsistentCopyVisibility
 data class ServerMetaData internal constructor(
     val entity: VersionedMcpEntity,
-    val protocolVersion: ProtocolVersion = LATEST_VERSION,
+    val protocolVersions: Set<ProtocolVersion> = setOf(`2025-03-26`, `2024-11-05`),
     val capabilities: ServerCapabilities = ServerCapabilities(),
 ) {
     constructor(
         entity: McpEntity,
         version: Version,
         vararg capabilities: ServerProtocolCapability,
-        protocolVersion: ProtocolVersion = LATEST_VERSION
-    ) : this(VersionedMcpEntity(entity, version), protocolVersion, ServerCapabilities(*capabilities))
+        protocolVersions: Set<ProtocolVersion> = setOf(`2025-03-26`, `2024-11-05`),
+    ) : this(VersionedMcpEntity(entity, version), protocolVersions, ServerCapabilities(*capabilities))
 
     constructor(
         entity: String,
         version: String,
         vararg capabilities: ServerProtocolCapability,
-        protocolVersion: ProtocolVersion = LATEST_VERSION
-    ) : this(VersionedMcpEntity(entity, version), protocolVersion, ServerCapabilities(*capabilities))
+        protocolVersions: Set<ProtocolVersion> = setOf(`2025-03-26`, `2024-11-05`),
+    ) : this(VersionedMcpEntity(entity, version), protocolVersions, ServerCapabilities(*capabilities))
 }

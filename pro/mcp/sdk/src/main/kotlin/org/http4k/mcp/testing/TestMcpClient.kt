@@ -11,7 +11,7 @@ import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-10-07`
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
@@ -58,7 +58,7 @@ class TestMcpClient(private val poly: PolyHandler, private val connectRequest: R
         sender(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(McpEntity.of("client"), Version.of("1")),
-                ClientCapabilities(), `2024-10-07`
+                ClientCapabilities(), `2024-11-05`
             )
         )
         sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
