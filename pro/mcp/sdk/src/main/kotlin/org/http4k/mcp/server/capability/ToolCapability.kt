@@ -17,8 +17,8 @@ import org.http4k.format.MoshiString
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
-import org.http4k.mcp.Client
-import org.http4k.mcp.Client.Companion.NoOp
+import org.http4k.mcp.server.protocol.Client
+import org.http4k.mcp.server.protocol.Client.Companion.NoOp
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse

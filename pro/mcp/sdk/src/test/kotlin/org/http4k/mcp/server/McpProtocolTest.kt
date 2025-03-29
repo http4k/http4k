@@ -317,13 +317,13 @@ class McpProtocolTest {
 
         val progress = ServerRequestProgress()
 
-        val tools = ServerTools(listOf(tool bind {
+        val tools = ServerTools(listOf(tool bind { it, client ->
             val stringArg1 = stringArg(it)
             val intArg1 = intArg(it)
 
             it.progressToken?.let {
-                progress.report(Request(it), Progress(1, 5.0, it))
-                progress.report(Request(it), Progress(2, 5.0, it))
+                client.report(Progress(1, 5.0, it))
+                client.report(Progress(2, 5.0, it))
             }
 
             ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))

@@ -3,6 +3,7 @@ package org.http4k.mcp
 import org.http4k.core.Request
 import org.http4k.lens.McpLensTarget
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.server.protocol.Client
 
 /**
  * A PromptHandler is a function which creates a Prompt from a set of inputs

@@ -5,6 +5,7 @@ import org.http4k.core.Uri
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.protocol.messages.HasMeta
+import org.http4k.mcp.server.protocol.Client
 
 /**
  * A resource handler is responsible for loading the content of a Resource

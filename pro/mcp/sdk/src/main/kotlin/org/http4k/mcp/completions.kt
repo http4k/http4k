@@ -3,6 +3,7 @@ package org.http4k.mcp
 import org.http4k.core.Request
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Reference
+import org.http4k.mcp.server.protocol.Client
 
 /**
  * A CompletionHandler is a function which creates a Completion from a set of inputs

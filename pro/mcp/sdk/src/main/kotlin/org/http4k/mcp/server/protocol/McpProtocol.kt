@@ -13,7 +13,6 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.mcp.Client
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.client.McpError.Timeout
@@ -300,7 +299,25 @@ class McpProtocol<Transport>(
             val queue = LinkedBlockingDeque<SamplingResponse>()
             val id = McpMessageId.random(random)
             responseQueues[id] = queue
-            clientRequests[session]?.trackRequest(id) { receive(id, it.fromJsonRpc()) }
+
+            clientRequests[session]?.trackRequest(id) {
+                val response: McpSampling.Response = it.fromJsonRpc()
+                responseQueues[id]?.put(
+                    SamplingResponse(
+                        response.model,
+                        response.role,
+                        response.content,
+                        response.stopReason
+                    )
+                )
+                when {
+                    response.stopReason == null -> InProgress
+                    else -> {
+                        responseQueues.remove(id)
+                        Finished
+                    }
+                }
+            }
 
             with(request) {
                 sessions.request(
@@ -334,25 +351,6 @@ class McpProtocol<Transport>(
                             }
                         }
                     }
-                }
-            }
-        }
-
-        override fun receive(id: McpMessageId, response: McpSampling.Response): CompletionStatus {
-            responseQueues[id]?.put(
-                SamplingResponse(
-                    response.model,
-                    response.role,
-                    response.content,
-                    response.stopReason
-                )
-            )
-
-            return when {
-                response.stopReason == null -> InProgress
-                else -> {
-                    responseQueues.remove(id)
-                    Finished
                 }
             }
         }
