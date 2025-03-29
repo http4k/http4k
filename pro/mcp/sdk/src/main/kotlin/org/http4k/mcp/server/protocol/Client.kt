@@ -42,56 +42,57 @@ fun <Transport> Client(
 ): Client = object : Client {
     override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
         val id = McpMessageId.random(random)
-
         val queue = LinkedBlockingDeque<SamplingResponse>()
-
         val tracking = clientTracking() ?: return emptySequence()
-        when {
-            tracking.supportsSampling -> tracking.trackRequest(id) {
-                with(it.fromJsonRpc<McpSampling.Response>()) {
-                    queue.put(SamplingResponse(model, role, content, stopReason))
-                    when {
-                        stopReason == null -> InProgress
-                        else -> Finished
+
+        return when {
+            tracking.supportsSampling -> {
+                tracking.trackRequest(id) {
+                    with(it.fromJsonRpc<McpSampling.Response>()) {
+                        queue.put(SamplingResponse(model, role, content, stopReason))
+                        when {
+                            stopReason == null -> InProgress
+                            else -> Finished
+                        }
+                    }
+                }
+
+                with(request) {
+                    sessions.request(
+                        context, McpSampling.Request(
+                            messages,
+                            maxTokens,
+                            systemPrompt,
+                            includeContext,
+                            temperature,
+                            stopSequences,
+                            modelPreferences,
+                            metadata,
+                            _meta = Meta(progressToken)
+                        ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
+                    )
+                }
+                sequence {
+                    while (true) {
+                        when (val nextMessage = queue.poll(
+                            fetchNextTimeout?.toMillis() ?: MAX_VALUE,
+                            MILLISECONDS
+                        )) {
+                            null -> {
+                                yield(Failure(McpError.Timeout))
+                                break
+                            }
+
+                            else -> {
+                                yield(Success(nextMessage))
+                                if (nextMessage.stopReason != null) break
+                            }
+                        }
                     }
                 }
             }
 
-            else -> return emptySequence()
-        }
-
-        with(request) {
-            sessions.request(
-                context, McpSampling.Request(
-                    messages,
-                    maxTokens,
-                    systemPrompt,
-                    includeContext,
-                    temperature,
-                    stopSequences,
-                    modelPreferences,
-                    metadata,
-                    _meta = Meta(progressToken)
-                ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
-            )
-        }
-        return sequence {
-            while (true) {
-                when (val nextMessage = queue.poll(
-                    fetchNextTimeout?.toMillis() ?: MAX_VALUE,
-                    MILLISECONDS
-                )) {
-                    null -> {
-                        yield(Failure(McpError.Timeout))
-                        break
-                    }
-
-                    else -> {
-                        yield(Success(nextMessage))
-                        if (nextMessage.stopReason != null) break
-                    }
-                }
-            }
+            else -> emptySequence()
         }
     }
 
