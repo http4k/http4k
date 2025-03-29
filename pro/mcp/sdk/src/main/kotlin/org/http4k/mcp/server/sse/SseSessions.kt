@@ -57,7 +57,7 @@ class SseSessions(
     override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, sessionId(connectRequest))
 
-    override fun transportFor(session: Session) = sessions[session] ?: error("No session")
+    override fun transportFor(context: ClientRequestContext) = sessions[context.session] ?: error("No session")
 
     override fun assign(context: ClientRequestContext, transport: Sse, connectRequest: Request) {
         if (context is Subscription) {

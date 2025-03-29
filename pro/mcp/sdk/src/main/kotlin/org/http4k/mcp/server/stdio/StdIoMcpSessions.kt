@@ -26,7 +26,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
     override fun retrieveSession(connectRequest: Request) =
         Session(SessionId.of(UUID.randomUUID().toString()))
 
-    override fun transportFor(session: Session) {
+    override fun transportFor(context: ClientRequestContext) {
         error("not implemented")
     }
 

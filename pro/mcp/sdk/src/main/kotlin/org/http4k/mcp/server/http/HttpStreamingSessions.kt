@@ -72,7 +72,7 @@ class HttpStreamingSessions(
     override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(session: Session) = sessions[session] ?: error("Session not found")
+    override fun transportFor(context: ClientRequestContext) = sessions[context.session] ?: error("Session not found")
 
     override fun end(context: ClientRequestContext) {
         when (context) {

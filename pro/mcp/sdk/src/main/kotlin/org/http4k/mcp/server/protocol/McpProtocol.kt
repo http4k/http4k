@@ -320,10 +320,10 @@ class McpProtocol<Transport>(
         sessions.end(method)
     }
 
-    fun assign(method: ClientRequestContext, transport: Transport, connectRequest: Request) =
-        sessions.assign(method, transport, connectRequest)
+    fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request) =
+        sessions.assign(context, transport, connectRequest)
 
-    fun transportFor(session: Session) = sessions.transportFor(session)
+    fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
 }
 
 private class ClientTracking(initialize: McpInitialize.Request) {

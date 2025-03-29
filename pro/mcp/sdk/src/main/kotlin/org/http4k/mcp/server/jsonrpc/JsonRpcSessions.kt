@@ -22,7 +22,7 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
 
     override fun retrieveSession(connectRequest: Request) = sessionProvider.validate(connectRequest, null)
 
-    override fun transportFor(session: Session) {
+    override fun transportFor(context: ClientRequestContext) {
         error("Unsupported")
     }
 

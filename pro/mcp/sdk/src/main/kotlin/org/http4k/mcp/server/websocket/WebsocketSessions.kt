@@ -50,8 +50,8 @@ class WebsocketSessions(
     override fun retrieveSession(connectRequest: Request) =
         sessionProvider.validate(connectRequest, Header.MCP_SESSION_ID(connectRequest))
 
-    override fun transportFor(session: Session) =
-        sessions[session] ?: error("Session not found")
+    override fun transportFor(context: ClientRequestContext) =
+        sessions[context.session] ?: error("Session not found")
 
     override fun assign(context: ClientRequestContext, transport: Websocket, connectRequest: Request) {
         if (context is Subscription) sessions[context.session] = transport

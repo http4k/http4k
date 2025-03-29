@@ -10,7 +10,7 @@ import org.http4k.mcp.util.McpNodeType
  */
 interface Sessions<Transport> {
     fun respond(transport: Transport, session: Session, message: McpNodeType): Result4k<McpNodeType, McpNodeType>
-    fun transportFor(session: Session): Transport
+    fun transportFor(context: ClientRequestContext): Transport
     fun onClose(session: Session, fn: () -> Unit)
 
     fun request(context: ClientRequestContext, message: McpNodeType)
