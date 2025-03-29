@@ -273,7 +273,6 @@ class McpProtocol<Transport>(
         }
         .getOrElse { InvalidRequest.toJsonRpc(jsonReq.id) })
 
-
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
         clientTracking[session] = ClientTracking(request)
 
