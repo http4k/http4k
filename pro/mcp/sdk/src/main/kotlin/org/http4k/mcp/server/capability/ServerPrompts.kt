@@ -19,7 +19,7 @@ class ServerPrompts(bindings: Iterable<PromptCapability>) : ObservableList<Promp
         ?.get(req, client, http)
         ?: throw McpException(InvalidParams)
 
-    override fun list(mcp: McpPrompt.List.Request, http: Request) =
+    override fun list(mcp: McpPrompt.List.Request, client: Client, http: Request) =
         McpPrompt.List.Response(items.map(PromptCapability::toPrompt))
 }
 

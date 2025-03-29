@@ -176,7 +176,7 @@ class McpProtocol<Transport>(
                             transport,
                             session,
                             jsonReq.respondTo<McpPrompt.List.Request>(session, transport, httpReq) {
-                                prompts.list(it, httpReq)
+                                prompts.list(it, Client(session), httpReq)
                             })
 
                     McpResource.Template.List.Method ->
