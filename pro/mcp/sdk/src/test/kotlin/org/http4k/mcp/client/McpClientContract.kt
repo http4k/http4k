@@ -72,7 +72,7 @@ interface McpClientContract<T> : PortBasedTest {
         val toolArg = Tool.Arg.required("name")
 
         val tools = ServerTools(
-            Tool("reverse", "description", toolArg) bind {
+            Tool("reverse", "description", toolArg) bind { it, _ ->
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             },
         )
