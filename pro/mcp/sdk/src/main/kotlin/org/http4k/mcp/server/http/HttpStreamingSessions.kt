@@ -65,8 +65,8 @@ class HttpStreamingSessions(
         return Success(message)
     }
 
-    override fun onClose(session: Session, fn: () -> Unit) {
-        sessions[session]?.also { it.onClose(fn) }
+    override fun onClose(context: ClientRequestContext, fn: () -> Unit) {
+        sessions[context.session]?.also { it.onClose(fn) }
     }
 
     override fun retrieveSession(connectRequest: Request) =

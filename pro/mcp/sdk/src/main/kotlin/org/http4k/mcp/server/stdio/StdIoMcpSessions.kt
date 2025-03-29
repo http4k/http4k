@@ -21,7 +21,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
     override fun respond(transport: Unit, session: Session, message: McpNodeType) =
         Success(message)
 
-    override fun onClose(session: Session, fn: () -> Unit) = fn()
+    override fun onClose(context: ClientRequestContext, fn: () -> Unit) = fn()
 
     override fun retrieveSession(connectRequest: Request) =
         Session(SessionId.of(UUID.randomUUID().toString()))

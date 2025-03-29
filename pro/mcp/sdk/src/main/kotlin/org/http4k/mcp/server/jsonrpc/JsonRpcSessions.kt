@@ -17,7 +17,7 @@ class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProv
 
     override fun request(context: ClientRequestContext, message: McpNodeType) = error("Unsupported")
 
-    override fun onClose(session: Session, fn: () -> Unit) {
+    override fun onClose(context: ClientRequestContext, fn: () -> Unit) {
     }
 
     override fun retrieveSession(connectRequest: Request) = sessionProvider.validate(connectRequest, null)

@@ -298,7 +298,7 @@ class McpProtocol<Transport>(
             )
         }
 
-        sessions.onClose(session) {
+        sessions.onClose(Subscription(session)) {
             prompts.remove(session)
             resources.remove(session)
             tools.remove(session)
