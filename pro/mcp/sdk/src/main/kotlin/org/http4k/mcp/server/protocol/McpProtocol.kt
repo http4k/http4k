@@ -342,8 +342,6 @@ private class ClientTracking(initialize: McpInitialize.Request) {
     }
 }
 
-private fun ProgressToken?.context(session: Session) = this?.let { ClientCall(it, session) } ?: Subscription(session)
-
 private fun <Transport> Client(
     session: Session, sessions: Sessions<Transport>, random: Random,
     clientTracking: (Session) -> ClientTracking?
@@ -408,4 +406,7 @@ private fun <Transport> Client(
             .toJsonRpc(McpProgress)
         sessions.request(req.progressToken.context(session), mcpReq)
     }
+
+    private fun ProgressToken?.context(session: Session) = this?.let { ClientCall(it, session) } ?: Subscription(session)
+
 }
