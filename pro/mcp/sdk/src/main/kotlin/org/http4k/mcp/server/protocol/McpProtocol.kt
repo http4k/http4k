@@ -435,28 +435,6 @@ class McpProtocol<Transport>(
             if (done == Finished) calls.remove(id)
         }
     }
-
-    private inline fun <reified IN : ClientMessage.Request> JsonRpcRequest<McpNodeType>.respondTo(
-        session: Session,
-        transport: Transport,
-        httpReq: Request,
-        fn: (IN, Client) -> ServerMessage.Response
-    ) =
-        runCatching { fromJsonRpc<IN>() }
-            .mapCatching {
-                val context = it._meta.progress?.let { ClientCall(it, session) }
-                context?.let { sessions.assign(it, transport, httpReq) }
-                fn(it, Client(session)).also { if (context != null) sessions.end(context) }
-            }
-            .map { it.toJsonRpc(id) }
-            .recover {
-                when (it) {
-                    is McpException -> it.error.toJsonRpc(id)
-                    else -> InternalError.toJsonRpc(id)
-                }
-            }
-            .getOrElse { InvalidRequest.toJsonRpc(id) }
-
 }
 
 private fun ProgressToken?.context(session: Session) = this?.let { ClientCall(it, session) } ?: Subscription(session)
