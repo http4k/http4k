@@ -5,8 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
+import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.Assistant
+import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
@@ -19,6 +22,8 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
+import org.http4k.mcp.SamplingRequest
+import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpError
@@ -352,68 +357,52 @@ class TestMcpClientTest {
         }
     }
 
-//    @Test
-//    @Disabled // TODO replace
-//    fun `deal with client sampling in http streaming`() {
-//        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-//
-//        val model = ModelName.of("name")
-//        val serverSampling = ServerSampling()
-//
-//        val mcp = HttpStreamingMcp(
-//            McpProtocol(
-//                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
-//                tools = ServerTools(
-//                    Tool("sample", "description") bind {
-//                        val received = serverSampling.sampleClient(
-//                            Entity(metadata.entity.name),
-//                            SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
-//                            Duration.ofSeconds(5)
-//                        ).toList()
-//
-//                        assertThat(
-//                            received, equalTo(
-//                                listOf(
-//                                    Success(SamplingResponse(model, Assistant, content, null)),
-//                                    Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
-//                                )
-//                            )
-//                        )
-//
-//                        ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
-//                    }
-//                ),
-//                random = random
-//            ),
-//        )
-//
-//        mcp.useClient {
-//            sampling().onSampled {
-//                sequenceOf(
-//                    SamplingResponse(model, Assistant, content, null),
-//                    SamplingResponse(model, Assistant, content, StopReason.of("bored")),
-//                    SamplingResponse(model, Assistant, content, StopReason.of("this should not be processed"))
-//                )
-//            }
-//
-//            sampling().start()
-//
-//            val received = serverSampling
-//                .sampleClient(
-//                    Entity(metadata.entity.name),
-//                    SamplingRequest(listOf(), MaxTokens.of(1)), Duration.ofSeconds(5)
-//                )
-//
-//            assertThat(
-//                received.toList(), equalTo(
-//                    listOf(
-//                        Success(SamplingResponse(model, Assistant, content, null)),
-//                        Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
-//                    )
-//                )
-//            )
-//        }
-//    }
+    @Test
+    fun `deal with client sampling in http streaming`() {
+        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+
+        val model = ModelName.of("name")
+
+        val mcp = HttpStreamingMcp(
+            McpProtocol(
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                tools = ServerTools(
+                    Tool("sample", "description") bindWithClient { it, client ->
+                        val received = client.sample(
+                            SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
+                        ).toList()
+
+                        assertThat(
+                            received, equalTo(
+                                listOf(
+                                    Success(SamplingResponse(model, Assistant, content, null)),
+                                    Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
+                                )
+                            )
+                        )
+
+                        ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
+                    }
+                ),
+                random = random
+            ),
+        )
+
+        mcp.useClient {
+            sampling().onSampled {
+                sequenceOf(
+                    SamplingResponse(model, Assistant, content, null),
+                    SamplingResponse(model, Assistant, content, StopReason.of("bored")),
+                    SamplingResponse(model, Assistant, content, StopReason.of("this should not be processed"))
+                )
+            }
+
+            assertThat(
+                tools().call(ToolName.of("sample"), ToolRequest()),
+                equalTo(Success(ToolResponse.Ok(listOf(Content.Text("2")))))
+            )
+        }
+    }
 
     private fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
         testMcpClient().use {
