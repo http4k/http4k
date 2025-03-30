@@ -11,7 +11,6 @@ import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionRequest
@@ -321,9 +320,10 @@ class TestMcpClientTest {
     fun `deal with progress`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
 
+        val progress = Progress(1, 1.0, "hello")
         val serverCompletions = ServerCompletions(
-            listOf(ref bindWithClient { it, client ->
-                client.report(Progress(1, 1.0, "hello"))
+            listOf(ref bindWithClient { _, client ->
+                client.report(progress)
 
                 CompletionResponse(listOf("values"), 1, true)
             })
@@ -338,11 +338,17 @@ class TestMcpClientTest {
         )
 
         mcp.useClient {
-            progress().onProgress { println("progress: $it") }
+            val latch = CountDownLatch(1)
+            progress().onProgress {
+                assertThat(it, equalTo(progress))
+                latch.countDown()
+            }
 
             completions().complete(CompletionRequest(ref, CompletionArgument("arg", "value")))
 
             progress().expectProgress()
+
+            latch.await()
         }
     }
 
@@ -410,7 +416,7 @@ class TestMcpClientTest {
 //    }
 
     private fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
-        debug().testMcpClient().use {
+        testMcpClient().use {
             it.start()
             it.fn()
         }

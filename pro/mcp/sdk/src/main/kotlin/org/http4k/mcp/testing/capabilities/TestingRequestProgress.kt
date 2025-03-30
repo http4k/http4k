@@ -15,7 +15,7 @@ class TestingRequestProgress(private val sender: TestMcpSender) : McpClient.Requ
     }
 
     /**
-     * Force a list changed notification to be received and process it
+     * Force a progress notification to be received and process it
      */
     fun expectProgress() = sender.stream().nextNotification<McpProgress.Notification>(McpProgress)
         .also { n -> progress.forEach { it(Progress(n.progress, n.total, n.progressToken)) } }

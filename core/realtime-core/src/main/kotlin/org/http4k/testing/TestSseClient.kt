@@ -21,6 +21,7 @@ class TestSseClient internal constructor(sseResponse: SseResponse, request: Requ
     private val queue = ArrayDeque<() -> SseMessage?>()
 
     override fun received() = generateSequence {
+        if (queue.isEmpty()) return@generateSequence null
         queue.remove()()
     }
 

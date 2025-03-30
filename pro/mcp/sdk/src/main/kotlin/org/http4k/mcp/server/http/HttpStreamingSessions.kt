@@ -28,7 +28,7 @@ import kotlin.random.Random
 class HttpStreamingSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
-    private val eventStore: SessionEventStore = InMemory(1),
+    private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : Sessions<Sse> {
 

@@ -37,12 +37,7 @@ inline fun <reified T : Any, OUT> Sequence<SseMessage.Event>.nextEvent(fn: T.() 
 }
 
 inline fun <reified T : Any> Sequence<SseMessage.Event>.nextNotification(mcpRpc: McpRpc): T {
-    System.err.println("HELLO")
-    System.err.println(this.map { it.data }.joinToString("\n"))
-    System.err.println("HELLO1")
     val request = this
-        .toList()
-        .also { println(it) }
         .map { McpJson.fields(McpJson.parse(it.data)).toMap() }
         .filter { it.containsKey("method") }
         .filter { McpJson.text(it["method"]!!) == mcpRpc.Method.value }
