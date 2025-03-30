@@ -37,6 +37,28 @@ inline fun <reified T : Any, OUT> AtomicReference<TestSseClient>.nextEvent(fn: T
     }
 }
 
+inline fun <reified T : Any, OUT> TestSseClient.nextEvent(fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
+
+    val fields = McpJson.fields(McpJson.parse((received().first() as SseMessage.Event).data)).toMap()
+
+    return when {
+        fields["error"] != null -> Failure(
+            McpError.Protocol(McpJson.convert<McpNodeType, ErrorMessage>(fields["error"]!!))
+        )
+
+        else -> Success(
+            fields["id"]?.let { McpJson.convert<MoshiNode, McpMessageId>(it) }
+                to
+                fn(
+                    McpJson.convert<McpNodeType, T>(
+                        fields["result"] ?: fields["params"]
+                        ?: error("No result or params in $fields")
+                    )
+                )
+        )
+    }
+}
+
 inline fun <reified T : Any> AtomicReference<TestSseClient>.nextNotification(mcpRpc: McpRpc): T {
     val jsonRpcRequest = JsonRpcRequest(
         McpJson,
