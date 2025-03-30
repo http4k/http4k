@@ -126,7 +126,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             HttpStreamingSessions(
                 sessionProvider = SessionProvider.Random(Random(0)),
-                eventStore = InMemorySessionEventStore()
             ).apply { start() },
             tools,
             ServerResources(
@@ -205,7 +204,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             }
         )
 
-        val eventStore = InMemorySessionEventStore()
+        val eventStore = SessionEventStore.InMemory(10)
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             HttpStreamingSessions(
@@ -249,7 +248,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             }
         )
 
-        val eventStore = InMemorySessionEventStore()
+        val eventStore = SessionEventStore.InMemory(10)
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             HttpStreamingSessions(
@@ -277,22 +276,5 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val read = eventStore.read(Session(firstDeterministicSessionId), null)
         assertThat(read.toList().size, equalTo(3))
-    }
-}
-
-private class InMemorySessionEventStore : SessionEventStore {
-    private val events = mutableMapOf<Session, ArrayDeque<SseMessage.Event>>()
-
-    override fun read(session: Session, lastEventId: SseEventId?) =
-        when (lastEventId) {
-            null -> events[session]?.asSequence() ?: emptySequence()
-
-            else -> events[session]
-                ?.drop(lastEventId.value.toInt())
-                ?.asSequence() ?: emptySequence()
-        }
-
-    override fun write(session: Session, message: SseMessage.Event) {
-        events.getOrPut(session) { ArrayDeque() }.add(message)
     }
 }

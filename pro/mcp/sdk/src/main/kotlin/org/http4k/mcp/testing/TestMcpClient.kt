@@ -13,32 +13,37 @@ import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
+import org.http4k.mcp.testing.capabilities.TestingCompletions
+import org.http4k.mcp.testing.capabilities.TestingPrompts
+import org.http4k.mcp.testing.capabilities.TestingResources
+import org.http4k.mcp.testing.capabilities.TestingTools
 
 /**
- * Create an in-memory MCP test client - HTTP Streaming only
+ * Create an in-memory MCP test client - HTTP Streaming only. For Non-HTTP Streaming, use HttpNonStreamingMcpClient
  */
 fun PolyHandler.testMcpClient(connectRequest: Request = Request(POST, "/mcp")) = TestMcpClient(this, connectRequest)
 
-class TestMcpClient(private val poly: PolyHandler, private val connectRequest: Request) : McpClient {
+class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
 
-    private val send = TestMcpSender(poly, connectRequest)
-    private val tools = TestingTools(send)
-    private val prompts = TestingPrompts(send)
-//    private val progress = TestMcpClientRequestProgress(client)
+    private val sender = TestMcpSender(poly, connectRequest)
+    private val tools = TestingTools(sender)
+    private val prompts = TestingPrompts(sender)
+
+    //    private val progress = TestMcpClientRequestProgress(client)
 //    private val sampling = TestMcpClientSampling(send, client)
-    private val resources = TestingResources(send)
-    private val completions = TestingCompletions(send)
+    private val resources = TestingResources(sender)
+    private val completions = TestingCompletions(sender)
 
 
     override fun start(): McpResult<ServerCapabilities> {
-        val initResponse = send(
+        val initResponse = sender(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(McpEntity.of("client"), Version.of("1")),
                 ClientCapabilities(), `2024-11-05`
             )
         )
 
-        send(McpInitialize.Initialized, McpInitialize.Initialized.Notification).received().toList()
+        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).toList()
         return initResponse.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }.map { it.second }
     }
 

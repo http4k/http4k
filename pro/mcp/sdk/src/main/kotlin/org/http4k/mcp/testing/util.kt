@@ -3,6 +3,7 @@ package org.http4k.mcp.testing
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.format.MoshiNode
 import org.http4k.format.renderRequest
@@ -18,49 +19,33 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
-import org.http4k.testing.TestSseClient
-import java.util.concurrent.atomic.AtomicReference
 
 
 fun Request.withMcp(mcpRpc: McpRpc, input: ClientMessage.Request, id: Int) =
     with(McpJson) {
-        accept(TEXT_EVENT_STREAM)
-            .body(
-                compact(
-                    renderRequest(
-                        mcpRpc.Method.value,
-                        asJsonObject(input),
-                        number(id)
-                    )
-                )
-            )
+        method(POST)
+            .accept(TEXT_EVENT_STREAM)
+            .body(compact(renderRequest(mcpRpc.Method.value, asJsonObject(input), number(id))))
     }
 
 fun Request.withMcp(input: ClientMessage.Response, messageId: McpMessageId) =
     with(McpJson) {
-        accept(TEXT_EVENT_STREAM)
+        method(POST)
+            .accept(TEXT_EVENT_STREAM)
             .body(compact(renderResult(asJsonObject(input), number(messageId.value))))
     }
 
-// TODO remove IDs
 fun Request.withMcp(mcpRpc: McpRpc, input: ClientMessage.Notification, id: Int) =
     with(McpJson) {
-        accept(TEXT_EVENT_STREAM)
-            .body(
-                compact(
-                    renderRequest(
-                        mcpRpc.Method.value,
-                        asJsonObject(input),
-                        number(id)
-                    )
-                )
-            )
+        method(POST)
+            .accept(TEXT_EVENT_STREAM)
+            .body(compact(renderRequest(mcpRpc.Method.value, asJsonObject(input), number(id))))
     }
 
 
-inline fun <reified T : Any, OUT> TestSseClient.nextEvent(fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
+inline fun <reified T : Any, OUT> Sequence<SseMessage.Event>.nextEvent(fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
 
-    val fields = McpJson.fields(McpJson.parse((received().first() as SseMessage.Event).data)).toMap()
+    val fields = McpJson.fields(McpJson.parse(first().data)).toMap()
 
     return when {
         fields["error"] != null -> Failure(
@@ -80,10 +65,10 @@ inline fun <reified T : Any, OUT> TestSseClient.nextEvent(fn: T.() -> OUT): McpR
     }
 }
 
-inline fun <reified T : Any> AtomicReference<TestSseClient>.nextNotification(mcpRpc: McpRpc): T {
+inline fun <reified T : Any> Sequence<SseMessage.Event>.nextNotification(mcpRpc: McpRpc): T {
     val jsonRpcRequest = JsonRpcRequest(
         McpJson,
-        McpJson.fields(McpJson.parse((get().received().first() as SseMessage.Event).data)).toMap()
+        McpJson.fields(McpJson.parse(first().data)).toMap()
     )
 
     require(mcpRpc.Method.value == jsonRpcRequest.method) {

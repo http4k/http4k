@@ -4,6 +4,7 @@ import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.accepted
@@ -59,6 +60,6 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>) =
                 }
             }
 
-            is InvalidSession -> SseResponse(NOT_FOUND) { it.close() }
+            is InvalidSession -> SseResponse(BAD_REQUEST) { it.close() }
         }
     })

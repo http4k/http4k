@@ -14,7 +14,7 @@ import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.mcp.server.sessions.SessionEventStore
-import org.http4k.mcp.server.sessions.SessionEventStore.Companion.NoCache
+import org.http4k.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.mcp.server.sessions.SessionEventTracking
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.util.McpJson.compact
@@ -28,7 +28,7 @@ import kotlin.random.Random
 class HttpStreamingSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
-    private val eventStore: SessionEventStore = NoCache,
+    private val eventStore: SessionEventStore = InMemory(1),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
 ) : Sessions<Sse> {
 
@@ -96,11 +96,11 @@ class HttpStreamingSessions(
         clientConnections
             .filterKeys { it is Subscription }
             .toList().forEach { (session, sse) ->
-            try {
-                sse.send(SseMessage.Event("ping", ""))
-            } catch (e: Exception) {
-                clientConnections.remove(session)
-                sse.close()
+                try {
+                    sse.send(SseMessage.Event("ping", ""))
+                } catch (e: Exception) {
+                    clientConnections.remove(session)
+                    sse.close()
+                }
             }
-        }
 }

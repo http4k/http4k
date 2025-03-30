@@ -5,15 +5,13 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionRequest
@@ -22,8 +20,6 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingRequest
-import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpError
@@ -48,19 +44,14 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
-import org.http4k.mcp.server.ServerSampling
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
-import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.SessionProvider
-import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
@@ -110,7 +101,7 @@ class TestMcpClientTest {
         )
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, SseSessions(SessionProvider.Random(random)),
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
             )
         )
@@ -149,10 +140,9 @@ class TestMcpClientTest {
 
             serverPrompts.items = emptyList()
 
-//            prompts().expectNotification()
+            prompts().expectNotification()
         }
     }
-
 
     @Test
     fun `deal with static resources`() {
@@ -163,7 +153,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, SseSessions(SessionProvider.Random(random)),
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 resources = serverResources,
                 random = random
             )
@@ -197,17 +187,17 @@ class TestMcpClientTest {
 
             serverResources.triggerUpdated(resource.uri)
 
-//            resources().expectSubscriptionNotification(resource.uri)
+            resources().expectSubscriptionNotification(resource.uri)
 
-//            assertThat(calls, equalTo(1))
-//
-//            resources().unsubscribe(resource.uri)
-//            serverResources.triggerUpdated(resource.uri)
-//            assertThat(calls, equalTo(1))
-//
-//            serverResources.items = emptyList()
+            assertThat(calls, equalTo(1))
 
-//            resources().expectNotification()
+            resources().unsubscribe(resource.uri)
+            serverResources.triggerUpdated(resource.uri)
+            assertThat(calls, equalTo(1))
+
+            serverResources.items = emptyList()
+
+            resources().expectNotification()
         }
     }
 
@@ -221,7 +211,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, SseSessions(SessionProvider.Random(random)),
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 resources = serverResources,
                 random = random
             )
@@ -252,7 +242,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, SseSessions(SessionProvider.Random(random)),
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 tools = serverTools,
                 random = random
             )
@@ -296,9 +286,9 @@ class TestMcpClientTest {
 
             serverTools.items = emptyList()
 
-//            tools().expectNotification()
+            tools().expectNotification()
 
-//            latch.await()
+            latch.await()
         }
     }
 
@@ -311,7 +301,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, SseSessions(SessionProvider.Random(random)),
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 completions = serverCompletions,
                 random = random
             )
