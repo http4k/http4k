@@ -129,12 +129,16 @@ fun mcpStdIo(
 }
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
-infix fun Tool.bind(handler: ToolWithClientHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
-infix fun Prompt.bind(handler: PromptWithClientHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)
-infix fun Resource.bind(handler: ResourceWithClientHandler) = ResourceCapability(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this, handler)
-infix fun Reference.bind(handler: CompletionWithClientHandler) = CompletionCapability(this, handler)
+
+/**
+ * Bind a capability with a client for intra request communication.
+ */
+infix fun Tool.bindWithClient(handler: ToolWithClientHandler) = ToolCapability(this, handler)
+infix fun Prompt.bindWithClient(handler: PromptWithClientHandler) = PromptCapability(this, handler)
+infix fun Resource.bindWithClient(handler: ResourceWithClientHandler) = ResourceCapability(this, handler)
+infix fun Reference.bindWithClient(handler: CompletionWithClientHandler) = CompletionCapability(this, handler)
 
 fun compose(vararg bindings: ServerCapability) = CapabilityPack(bindings = bindings)

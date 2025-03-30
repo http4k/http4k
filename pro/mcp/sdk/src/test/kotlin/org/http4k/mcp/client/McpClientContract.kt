@@ -36,6 +36,7 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.routing.bind
+import org.http4k.routing.bindWithClient
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
@@ -60,7 +61,7 @@ interface McpClientContract<T> : PortBasedTest {
         val toolArg = Tool.Arg.required("name")
 
         val tools = ServerTools(
-            Tool("reverse", "description", toolArg) bind { it, _ ->
+            Tool("reverse", "description", toolArg) bind {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             },
         )
@@ -76,13 +77,13 @@ interface McpClientContract<T> : PortBasedTest {
                     Uri.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
                     "description"
-                ) bind { _ ->
+                ) bind {
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind { it ->
+            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind { _ ->
+            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(listOf("1", "2"))
             }),
         )

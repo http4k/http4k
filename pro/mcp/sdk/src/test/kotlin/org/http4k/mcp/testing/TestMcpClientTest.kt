@@ -99,7 +99,7 @@ class TestMcpClientTest {
 
         val serverPrompts = ServerPrompts(
             listOf(
-                prompt bind { it ->
+                prompt bind {
                     PromptResponse(
                         listOf(
                             Message(Assistant, Content.Text(intArg(it).toString().reversed()))
@@ -160,7 +160,7 @@ class TestMcpClientTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val serverResources = ServerResources(listOf(resource bind { it -> ResourceResponse(listOf(content)) }))
+        val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp = SseMcp(
             McpProtocol(
@@ -218,7 +218,7 @@ class TestMcpClientTest {
             Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
-        val serverResources = ServerResources(listOf(resource bind { it -> ResourceResponse(listOf(content)) }))
+        val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp = SseMcp(
             McpProtocol(
@@ -247,7 +247,7 @@ class TestMcpClientTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val serverTools = ServerTools(listOf(tool bind { it ->
+        val serverTools = ServerTools(listOf(tool bind {
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
@@ -307,7 +307,7 @@ class TestMcpClientTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val serverCompletions = ServerCompletions(
-            listOf(ref bind { it -> CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(
@@ -338,7 +338,7 @@ class TestMcpClientTest {
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 tools = ServerTools(
-                    Tool("sample", "description") bind { it ->
+                    Tool("sample", "description") bind {
                         val received = serverSampling.sampleClient(
                             Entity(metadata.entity.name),
                             SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),

@@ -59,6 +59,7 @@ import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
+import org.http4k.routing.bindWithClient
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
@@ -95,7 +96,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
-            Tool("reverse", "description", toolArg) bind { _ -> error("bad things") }
+            Tool("reverse", "description", toolArg) bind { error("bad things") }
         )
 
         val server = toPolyHandler(protocol)
@@ -117,7 +118,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     @Test
     fun `resume a stream`() {
         val toolArg = Tool.Arg.required("name")
-        val tools = ServerTools(Tool("reverse", "description", toolArg) bind { it ->
+        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
@@ -133,13 +134,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                     Uri.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
                     "description"
-                ) bind { _ ->
+                ) bind {
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind { it ->
+            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind { it ->
+            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(listOf("1", "2"))
             })
         )
@@ -194,7 +195,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         )
 
         val tools = ServerTools(
-            Tool("sample", "description") bind { it, client ->
+            Tool("sample", "description") bindWithClient { it, client ->
                 val received = client.sample(
                     SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
                     Duration.ofSeconds(5)
@@ -238,7 +239,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     @Test
     fun `can do progress`() {
         val tools = ServerTools(
-            Tool("progress", "description") bind { it, client ->
+            Tool("progress", "description") bindWithClient { it, client ->
                 try {
                     client.report(Progress(1, 2.0, it.progressToken!!))
                     ToolResponse.Ok(listOf(Content.Text("")))

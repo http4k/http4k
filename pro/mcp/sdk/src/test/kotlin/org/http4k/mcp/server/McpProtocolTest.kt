@@ -87,6 +87,7 @@ import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
+import org.http4k.routing.bindWithClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
@@ -161,7 +162,7 @@ class McpProtocolTest {
                 metadata, SseSessions(SessionProvider.Random(Random(0))),
                 prompts = ServerPrompts(
                     listOf(
-                        prompt bind { it ->
+                        prompt bind {
                             PromptResponse(
                                 listOf(
                                     Message(Assistant, Content.Text(intArg(it).toString().reversed()))
@@ -209,7 +210,7 @@ class McpProtocolTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val resources = ServerResources(listOf(resource bind { _ -> ResourceResponse(listOf(content)) }))
+        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
         val mcp = SseMcp(
             McpProtocol(
@@ -265,7 +266,7 @@ class McpProtocolTest {
             Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
-        val resources = ServerResources(listOf(resource bind { _ -> ResourceResponse(listOf(content)) }))
+        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
@@ -312,7 +313,7 @@ class McpProtocolTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = ServerTools(listOf(tool bind { it, client ->
+        val tools = ServerTools(listOf(tool bindWithClient { it, client ->
             val stringArg1 = stringArg(it)
             val intArg1 = intArg(it)
 
@@ -423,7 +424,7 @@ class McpProtocolTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { _ -> CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(
@@ -447,7 +448,7 @@ class McpProtocolTest {
     fun `can handle batched messages`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { _ -> CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(
