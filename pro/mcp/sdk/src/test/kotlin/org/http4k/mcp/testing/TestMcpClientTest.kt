@@ -408,7 +408,7 @@ class TestMcpClientTest {
     }
 
     private fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
-        debug().
+//        debug().
         testMcpClient().use {
             it.start()
             it.fn()
