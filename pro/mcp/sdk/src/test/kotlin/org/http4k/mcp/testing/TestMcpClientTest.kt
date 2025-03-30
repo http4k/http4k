@@ -27,6 +27,7 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -50,6 +51,7 @@ import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
+import org.http4k.routing.bindWithClient
 import org.http4k.routing.mcpHttpStreaming
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
@@ -315,6 +317,35 @@ class TestMcpClientTest {
         }
     }
 
+    @Test
+    fun `deal with progress`() {
+        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+
+        val serverCompletions = ServerCompletions(
+            listOf(ref bindWithClient { it, client ->
+                client.report(Progress(1, 1.0, "hello"))
+
+                CompletionResponse(listOf("values"), 1, true)
+            })
+        )
+
+        val mcp = HttpStreamingMcp(
+            McpProtocol(
+                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                completions = serverCompletions,
+                random = random
+            )
+        )
+
+        mcp.useClient {
+            progress().onProgress { println("progress: $it") }
+
+            completions().complete(CompletionRequest(ref, CompletionArgument("arg", "value")))
+
+            progress().expectProgress()
+        }
+    }
+
 //    @Test
 //    @Disabled // TODO replace
 //    fun `deal with client sampling in http streaming`() {
@@ -379,7 +410,7 @@ class TestMcpClientTest {
 //    }
 
     private fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
-        testMcpClient().use {
+        debug().testMcpClient().use {
             it.start()
             it.fn()
         }

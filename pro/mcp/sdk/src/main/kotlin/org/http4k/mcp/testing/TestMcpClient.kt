@@ -15,6 +15,7 @@ import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.testing.capabilities.TestingCompletions
 import org.http4k.mcp.testing.capabilities.TestingPrompts
+import org.http4k.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.mcp.testing.capabilities.TestingResources
 import org.http4k.mcp.testing.capabilities.TestingTools
 
@@ -28,12 +29,11 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
     private val sender = TestMcpSender(poly, connectRequest)
     private val tools = TestingTools(sender)
     private val prompts = TestingPrompts(sender)
+    private val progress = TestingRequestProgress(sender)
 
-    //    private val progress = TestMcpClientRequestProgress(client)
-//    private val sampling = TestMcpClientSampling(send, client)
+    //    private val sampling = TestMcpClientSampling(send, client)
     private val resources = TestingResources(sender)
     private val completions = TestingCompletions(sender)
-
 
     override fun start(): McpResult<ServerCapabilities> {
         val initResponse = sender(
@@ -51,7 +51,7 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
 
     override fun prompts() = prompts
 
-    override fun progress() = TODO()
+    override fun progress() = progress
 
     override fun sampling() = TODO()
 
