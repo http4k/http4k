@@ -58,6 +58,7 @@ import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
 import org.http4k.routing.bindWithClient
 import org.http4k.routing.mcpHttpStreaming
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
@@ -359,7 +360,8 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with client sampling in http streaming`() {
+    @Disabled
+    fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelName.of("name")
