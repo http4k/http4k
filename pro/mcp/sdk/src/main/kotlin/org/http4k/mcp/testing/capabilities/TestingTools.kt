@@ -1,11 +1,13 @@
 package org.http4k.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
 import org.http4k.connect.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpTool
@@ -38,19 +40,23 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
         name: ToolName,
         request: ToolRequest,
         overrideDefaultTimeout: Duration?
-    ) = sender(
-        McpTool.Call, McpTool.Call.Request(
-            name,
-            request.mapValues { McpJson.asJsonObject(it.value) }, Meta(request.progressToken)
+    ): Result<ToolResponse, McpError> {
+        val received = sender(
+            McpTool.Call, McpTool.Call.Request(
+                name,
+                request.mapValues { McpJson.asJsonObject(it.value) }, Meta(request.progressToken)
+            )
         )
-    ).nextEvent<McpTool.Call.Response, ToolResponse>({
-        when (isError) {
-            true -> {
-                val input = (content.first() as Content.Text).text
-                ToolResponse.Error(McpJson.asA<ErrorMessage>(input))
-            }
 
-            else -> ToolResponse.Ok(content)
-        }
-    }).map { it.second }
+        return received.nextEvent<McpTool.Call.Response, ToolResponse> {
+            when (isError) {
+                true -> {
+                    val input = (content.first() as Content.Text).text
+                    ToolResponse.Error(McpJson.asA<ErrorMessage>(input))
+                }
+
+                else -> ToolResponse.Ok(content)
+            }
+        }.map { it.second }
+    }
 }
