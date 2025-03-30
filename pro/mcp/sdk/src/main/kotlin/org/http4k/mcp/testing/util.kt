@@ -21,27 +21,6 @@ import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
 
 
-fun Request.withMcp(mcpRpc: McpRpc, input: ClientMessage.Request, id: Int) =
-    with(McpJson) {
-        method(POST)
-            .accept(TEXT_EVENT_STREAM)
-            .body(compact(renderRequest(mcpRpc.Method.value, asJsonObject(input), number(id))))
-    }
-
-fun Request.withMcp(input: ClientMessage.Response, messageId: McpMessageId) =
-    with(McpJson) {
-        method(POST)
-            .accept(TEXT_EVENT_STREAM)
-            .body(compact(renderResult(asJsonObject(input), number(messageId.value))))
-    }
-
-fun Request.withMcp(mcpRpc: McpRpc, input: ClientMessage.Notification, id: Int) =
-    with(McpJson) {
-        method(POST)
-            .accept(TEXT_EVENT_STREAM)
-            .body(compact(renderRequest(mcpRpc.Method.value, asJsonObject(input), number(id))))
-    }
-
 
 inline fun <reified T : Any, OUT> Sequence<SseMessage.Event>.nextEvent(fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
 
