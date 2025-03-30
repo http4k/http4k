@@ -48,6 +48,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
             )
         )
 
+        println(received.toList())
         return received.nextEvent<McpTool.Call.Response, ToolResponse> {
             when (isError) {
                 true -> {
