@@ -1,10 +1,12 @@
 package org.http4k.routing
 
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Uri
+import org.http4k.core.accepted
 import org.http4k.core.queries
 
 fun RoutingHttpHandler.and(router: Router) = withRouter(router)
@@ -39,7 +41,8 @@ fun query(name: String) =
 /**
  * Ensure all queries are present and match what is in the Uri
  */
-fun queriesFrom(uri: Uri) = { req: Request -> uri.queries().all { (name, value) -> req.queries(name).contains(value) } }.asRouter()
+fun queriesFrom(uri: Uri) =
+    { req: Request -> uri.queries().all { (name, value) -> req.queries(name).contains(value) } }.asRouter()
 
 /**
  * Apply routing predicate to a header
@@ -69,9 +72,19 @@ fun body(fn: (Body) -> Boolean) = { it: Request -> fn(it.body) }.asRouter("Body 
 @JvmName("bodyMatches")
 fun body(fn: (String) -> Boolean) = { req: Request -> fn(req.bodyString()) }.asRouter("Body matching $fn")
 
-interface Matcher: (String) -> Boolean{
-    companion object{
-        fun equalTo(value: String) = object :Matcher{
+/**
+ * Bind a path and another router together
+ */
+infix fun String.and(router: Router) = { req: Request -> req.uri.path == this }.asRouter().and(router)
+
+/**
+ * Ensure the request is accepting a specific content type
+ */
+infix fun String.accepting(contentType: ContentType) = "/users".and(contentType.accepted())
+
+interface Matcher : (String) -> Boolean {
+    companion object {
+        fun equalTo(value: String) = object : Matcher {
             override fun invoke(p1: String) = p1 == value
             override fun toString(): String = value
         }
