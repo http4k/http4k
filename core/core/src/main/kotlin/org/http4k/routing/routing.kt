@@ -75,12 +75,12 @@ fun body(fn: (String) -> Boolean) = { req: Request -> fn(req.bodyString()) }.asR
 /**
  * Bind a path and another router together
  */
-infix fun String.and(router: Router) = { req: Request -> req.uri.path == this }.asRouter().and(router)
+infix fun String.and(router: Router) = { req: Request -> req.uri.path.trim('/') == trim('/') }.asRouter().and(router)
 
 /**
  * Ensure the request is accepting a specific content type
  */
-infix fun String.accepting(contentType: ContentType) = "/users".and(contentType.accepted())
+infix fun String.accepting(contentType: ContentType) = and(contentType.accepted())
 
 interface Matcher : (String) -> Boolean {
     companion object {

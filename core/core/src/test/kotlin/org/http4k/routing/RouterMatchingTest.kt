@@ -4,13 +4,17 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import org.http4k.core.Body
+import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 import org.http4k.lens.Query
+import org.http4k.lens.accept
 import org.http4k.lens.int
 import org.http4k.lens.matches
 import org.http4k.routing.RoutingResult.Matched
@@ -25,6 +29,22 @@ class RouterMatchingTest {
         assertThat(router(Request(GET, "").query("foo", "6")), isA<Matched>())
         assertThat(router(Request(GET, "").query("foo", "5")), isA<NotMatched>())
         assertThat(router(Request(GET, "").query("foo", "bar")), isA<NotMatched>())
+    }
+
+    @Test
+    fun `path router`() {
+        val router = "/bob" and GET.asRouter()
+        assertThat(router(Request(GET, "bob")), isA<Matched>())
+        assertThat(router(Request(GET, "/bob")), isA<Matched>())
+        assertThat(router(Request(POST, "/bob")), isA<NotMatched>())
+    }
+
+    @Test
+    fun `accepting content type with a path`() {
+        val router = "bob".accepting(APPLICATION_JSON)
+        assertThat(router(Request(GET, "bob")), isA<NotMatched>())
+        assertThat(router(Request(GET, "/bob").accept(TEXT_EVENT_STREAM)), isA<NotMatched>())
+        assertThat(router(Request(GET, "bob").accept(APPLICATION_JSON)), isA<Matched>())
     }
 
     @Test
@@ -94,7 +114,7 @@ class RouterMatchingTest {
 
     @Test
     fun `generic router`() {
-        val router = Router("foo", Status.NOT_FOUND, { r: Request -> r.method == GET })
+        val router = Router("foo", NOT_FOUND, { r: Request -> r.method == GET })
         assertThat(router(Request(GET, "")), isA<Matched>())
         assertThat(router(Request(POST, "")), isA<NotMatched>())
         assertThat(router.description, equalTo(RouterDescription("foo")))
@@ -104,7 +124,10 @@ class RouterMatchingTest {
     fun `method router`() {
         val router = GET.asRouter()
         assertThat(router(Request(GET, "")), isA<Matched>())
-        assertThat(router(Request(POST, "")), equalTo(NotMatched(METHOD_NOT_ALLOWED, RouterDescription("method == GET"))))
+        assertThat(
+            router(Request(POST, "")),
+            equalTo(NotMatched(METHOD_NOT_ALLOWED, RouterDescription("method == GET")))
+        )
     }
 
     @Test
