@@ -49,6 +49,7 @@ import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.PromptName
+import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.mcp.protocol.McpRpcMethod
@@ -271,8 +272,8 @@ class HttpStreamingMcpClient(
     }
 
     override fun completions() = object : McpClient.Completions {
-        override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
-            http.send(McpCompletion, McpCompletion.Request(request.ref, request.argument))
+        override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
+            http.send(McpCompletion, McpCompletion.Request(ref, request.argument))
                 .flatMap { it.first().asAOrFailure<McpCompletion.Response>() }
                 .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
     }

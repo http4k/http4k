@@ -12,6 +12,7 @@ import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.PromptName
+import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
@@ -91,6 +92,7 @@ interface McpClient : AutoCloseable {
      */
     interface Completions {
         fun complete(
+            ref: Reference,
             request: CompletionRequest,
             overrideDefaultTimeout: Duration? = null
         ): McpResult<CompletionResponse>

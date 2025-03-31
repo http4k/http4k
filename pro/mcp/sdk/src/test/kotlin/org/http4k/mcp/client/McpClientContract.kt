@@ -123,10 +123,8 @@ interface McpClientContract<T> : PortBasedTest {
         assertThat(
             mcpClient.completions()
                 .complete(
-                    CompletionRequest(
-                        Reference.Resource(Uri.of("https://http4k.org")),
-                        CompletionArgument("foo", "bar")
-                    )
+                    Reference.Resource(Uri.of("https://http4k.org")),
+                    CompletionRequest(CompletionArgument("foo", "bar"))
                 ).valueOrNull()!!,
             equalTo(CompletionResponse(listOf("1", "2")))
         )

@@ -35,7 +35,7 @@ fun main() {
 
     println(
         mcpClient.completions()
-            .complete(CompletionRequest(Reference.Prompt("prompt2"), CompletionArgument("foo", "bar")))
+            .complete(Reference.Prompt("prompt2"), CompletionRequest(CompletionArgument("foo", "bar")))
     )
 
     println(mcpClient.tools().list().valueOrNull())

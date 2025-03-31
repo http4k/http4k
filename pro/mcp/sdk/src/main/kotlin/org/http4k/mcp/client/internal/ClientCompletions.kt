@@ -6,6 +6,7 @@ import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
@@ -18,9 +19,9 @@ internal class ClientCompletions(
     private val sender: McpRpcSender,
     private val random: Random
 ) : McpClient.Completions {
-    override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
+    override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
         sender(
-            McpCompletion, McpCompletion.Request(request.ref, request.argument),
+            McpCompletion, McpCompletion.Request(ref, request.argument),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)
         )

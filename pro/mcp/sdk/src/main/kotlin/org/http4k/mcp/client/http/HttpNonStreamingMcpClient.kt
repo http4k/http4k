@@ -28,6 +28,7 @@ import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.PromptName
+import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpCompletion
@@ -119,8 +120,8 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
     }
 
     override fun completions() = object : McpClient.Completions {
-        override fun complete(request: CompletionRequest, overrideDefaultTimeout: Duration?) =
-            http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(request.ref, request.argument))
+        override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
+            http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(ref, request.argument))
                 .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
     }
 

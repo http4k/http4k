@@ -317,7 +317,7 @@ class TestMcpClientTest {
 
         mcp.useClient {
             assertThat(
-                completions().complete(CompletionRequest(ref, CompletionArgument("arg", "value"))),
+                completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value"))),
                 equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
             )
         }
@@ -351,7 +351,7 @@ class TestMcpClientTest {
                 latch.countDown()
             }
 
-            completions().complete(CompletionRequest(ref, CompletionArgument("arg", "value")))
+            completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value")))
 
             progress().expectProgress()
 
