@@ -22,7 +22,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.3.0
+        uses: gradle/actions/setup-gradle@v4
       - name: create-branch
         uses: peterjgrainger/action-create-branch@v3.0.0
         with:

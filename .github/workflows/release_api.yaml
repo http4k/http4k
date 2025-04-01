@@ -13,7 +13,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.3.0
+        uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew -i dokkaHtmlMultiModule -PreleaseVersion="${{ github.event.client_payload.version }}" -Porg.gradle.parallel=false
       - uses: actions/checkout@v4.2.2
         with:
