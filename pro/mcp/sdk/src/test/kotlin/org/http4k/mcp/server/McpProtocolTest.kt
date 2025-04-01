@@ -423,7 +423,13 @@ class McpProtocolTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind {
+                it.meta.progress?.let { p ->
+                    it.client.progress(1, 5.0)
+                    it.client.progress(2, 5.0)
+                }
+
+                CompletionResponse(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(
@@ -437,7 +443,12 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value")))
+            val progressToken = "progress"
+
+            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value"), Meta(progressToken)))
+
+            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progressToken))
+            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progressToken))
 
             assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
         }
