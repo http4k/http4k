@@ -13,6 +13,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -27,8 +28,10 @@ data class ResponsesToId(val events: Sequence<SseMessage.Event>, val id: McpMess
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
-    private val outbound: (SseMessage.Event) -> Unit = {
-        println(it)
+    private val outbound = mutableMapOf<McpRpc, MutableList<(SseMessage.Event) -> Unit>>()
+
+    fun on(mcpRpc: McpRpc, fn: (SseMessage.Event) -> Unit) {
+        outbound.getOrPut(mcpRpc) { mutableListOf() }.add(fn)
     }
 
     private fun filterOut(responsesToId: ResponsesToId, mpcRpc: McpRpc) = responsesToId.events
@@ -36,7 +39,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
             when {
                 it.isFor(mpcRpc) || it.isResult() || it.isError() -> true
                 else -> {
-                    this.outbound(it)
+                    outbound[mpcRpc]?.forEach { sub -> sub(it) }
                     false
                 }
             }
