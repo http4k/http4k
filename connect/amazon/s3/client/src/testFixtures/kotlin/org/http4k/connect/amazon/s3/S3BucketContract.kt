@@ -132,6 +132,27 @@ interface S3BucketContract : AwsContract {
         }
     }
 
+
+    @Test
+    fun `bucket key with unusual characters`() {
+        waitForBucketCreation()
+
+        val newKey = BucketKey.of("key#with#multiple#hash + spaces")
+
+        try {
+
+            assertThat(s3Bucket[newKey].successValue(), absent())
+            assertThat(s3Bucket.putObject(newKey, "hello".byteInputStream()).successValue(), equalTo(Unit))
+            assertThat(String(s3Bucket[newKey].successValue()!!.readBytes()), equalTo("hello"))
+            assertThat(s3Bucket.listObjectsV2().successValue().items.map { it.Key }, equalTo(listOf(newKey)))
+
+
+        } finally {
+            s3Bucket.deleteObject(newKey)
+            s3Bucket.deleteBucket()
+        }
+    }
+
     @Test
     fun `pre signed request`() {
         val preSigner = S3BucketPreSigner(

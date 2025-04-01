@@ -5,7 +5,7 @@ import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
-import org.http4k.aws.encodePlusCharInPath
+import org.http4k.aws.encodeUriToMatchSignature
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -66,7 +66,7 @@ fun ClientFilters.AwsAuth(
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
 
-            next(signedRequest.encodePlusCharInPath().body(Body(it.body.payload)))
+            next(signedRequest.encodeUriToMatchSignature().body(Body(it.body.payload)))
         }
     }
 
