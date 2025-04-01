@@ -13,11 +13,11 @@ import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
-import org.http4k.mcp.testing.capabilities.TestingSampling
 import org.http4k.mcp.testing.capabilities.TestingCompletions
 import org.http4k.mcp.testing.capabilities.TestingPrompts
 import org.http4k.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.mcp.testing.capabilities.TestingResources
+import org.http4k.mcp.testing.capabilities.TestingSampling
 import org.http4k.mcp.testing.capabilities.TestingTools
 
 /**
@@ -43,7 +43,7 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
             )
         )
 
-        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).toList()
+        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).events.toList()
         return initResponse.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }.map { it.second }
     }
 

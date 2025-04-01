@@ -9,7 +9,6 @@ import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent

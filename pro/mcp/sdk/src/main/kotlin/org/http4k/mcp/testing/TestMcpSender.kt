@@ -22,6 +22,9 @@ import org.http4k.testing.testSseClient
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
+
+data class ResponsesToId(val events: Sequence<SseMessage.Event>, val id: McpMessageId)
+
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
     private var id = AtomicInteger(0)
@@ -31,13 +34,21 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     fun stream() = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Request) =
-        mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet()))
+        ResponsesToId(
+            mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
+            McpMessageId.of(id.get().toLong())
+        )
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Notification) =
-        mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet()))
+        ResponsesToId(
+            mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
+            McpMessageId.of(id.get().toLong())
+        )
 
     operator fun invoke(input: ClientMessage.Response, id: McpMessageId) =
-        mcpHandler.callWith(connectRequest.withMcp(input, id))
+        ResponsesToId(
+            mcpHandler.callWith(connectRequest.withMcp(input, id)), id
+        )
 
     private fun PolyHandler.callWith(request: Request): Sequence<SseMessage.Event> {
         val client = when (sessionId.get()) {

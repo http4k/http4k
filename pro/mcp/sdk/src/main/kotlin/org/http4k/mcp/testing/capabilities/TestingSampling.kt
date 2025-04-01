@@ -4,7 +4,9 @@ import dev.forkhandles.result4k.map
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.client.McpClient
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.messages.McpSampling
+import org.http4k.mcp.testing.ResponsesToId
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import java.time.Duration
@@ -22,7 +24,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
         thread(isDaemon = true) {
             while (true) {
                 runCatching {
-                    sender.stream().nextEvent<McpSampling.Request, SamplingRequest> {
+                    ResponsesToId(sender.stream(), McpMessageId.random()).nextEvent<McpSampling.Request, SamplingRequest> {
                         SamplingRequest(
                             messages, maxTokens,
                             systemPrompt, includeContext,
