@@ -28,10 +28,10 @@ data class ResponsesToId(val events: Sequence<SseMessage.Event>, val id: McpMess
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
-    private val outbound = mutableMapOf<McpRpc, MutableList<(SseMessage.Event) -> Unit>>()
+    private val outbound = mutableMapOf<McpRpcMethod, MutableList<(SseMessage.Event) -> Unit>>()
 
     fun on(mcpRpc: McpRpc, fn: (SseMessage.Event) -> Unit) {
-        outbound.getOrPut(mcpRpc) { mutableListOf() }.add(fn)
+        outbound.getOrPut(mcpRpc.Method) { mutableListOf() }.add(fn)
     }
 
     private fun filterOut(responsesToId: ResponsesToId, mpcRpc: McpRpc) = responsesToId.events
@@ -39,7 +39,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
             when {
                 it.isFor(mpcRpc) || it.isResult() || it.isError() -> true
                 else -> {
-                    outbound[mpcRpc]?.forEach { sub -> sub(it) }
+                    outbound[it.mcpMethod()]?.forEach { sub -> sub(it) }
                     false
                 }
             }
@@ -48,8 +48,10 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     private fun SseMessage.Event.isResult() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("result")
     private fun SseMessage.Event.isError() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("error")
 
-    private fun SseMessage.Event.isFor(rpc: McpRpc) =
-        McpJson.fields(McpJson.parse(data)).toMap()["method"]?.toString() == rpc.Method.value
+    private fun SseMessage.Event.isFor(rpc: McpRpc) = mcpMethod() == rpc.Method
+
+    private fun SseMessage.Event.mcpMethod() =
+        McpJson.fields(McpJson.parse(data)).toMap()["method"]?.let { McpRpcMethod.of(McpJson.text(it)) }
 
     private var id = AtomicInteger(0)
 

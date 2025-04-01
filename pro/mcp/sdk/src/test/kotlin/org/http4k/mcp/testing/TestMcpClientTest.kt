@@ -366,8 +366,6 @@ class TestMcpClientTest {
                 equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
             )
 
-            progress().expectProgress()
-
             latch.await()
         }
     }
