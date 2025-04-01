@@ -4,7 +4,6 @@ import org.http4k.connect.amazon.s3.BucketKeyContent
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
@@ -62,5 +61,3 @@ private fun deleteObjectTagging(
 
     return Response(OK)
 }
-
-private fun keyFor(req: Request) = req.path("bucketKey")!!

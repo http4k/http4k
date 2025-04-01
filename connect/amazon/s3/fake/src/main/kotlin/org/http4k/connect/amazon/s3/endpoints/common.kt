@@ -14,6 +14,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.with
 import org.http4k.lens.LastModified
 import org.http4k.routing.Router
+import org.http4k.routing.path
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.viewModel
 import java.time.Clock
@@ -65,3 +66,6 @@ val otherwise = Router("Catch-all") { _: Request -> true }
 internal fun lastModified(headers: Headers, clock: Clock) = headers
     .firstOrNull { it.first == X_HTTP4K_LAST_MODIFIED }?.second?.let { LastModified.parse(it) }?.value?.toInstant()
     ?: Instant.now(clock)
+
+internal fun keyFor(request: Request) =
+    request.uri(request.uri.path(request.uri.path.replace("+", " "))).path("bucketKey")!!
