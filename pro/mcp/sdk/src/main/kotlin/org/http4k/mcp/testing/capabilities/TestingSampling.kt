@@ -19,12 +19,23 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
         onSampling.add(fn)
     }
+//
+//    init {
+//        sender.on(McpSampling) { event ->
+//            listOf(event).asSequence().nextEvent<McpSampling.Request, SamplingRequest>() {}
+//                .also { n -> progress.forEach { it(Progress(n.progress, n.total, n.progressToken)) } }
+//        }
+//    }
+//
 
     init {
         thread(isDaemon = true) {
             while (true) {
                 runCatching {
-                    ResponsesToId(sender.stream(), McpMessageId.random()).events.nextEvent<McpSampling.Request, SamplingRequest> {
+                    ResponsesToId(
+                        sender.stream(),
+                        McpMessageId.random()
+                    ).events.nextEvent<McpSampling.Request, SamplingRequest> {
                         SamplingRequest(
                             messages, maxTokens,
                             systemPrompt, includeContext,

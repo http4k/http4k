@@ -371,7 +371,6 @@ class TestMcpClientTest {
     }
 
     @Test
-    @Disabled
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
