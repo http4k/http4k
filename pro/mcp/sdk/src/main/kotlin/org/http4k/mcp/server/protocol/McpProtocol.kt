@@ -125,7 +125,6 @@ class McpProtocol<Transport>(
 
                     McpCompletion.Method ->
                         transport.respondTo<McpCompletion.Request>(session, jsonReq, httpReq) { it, c ->
-                            println(c)
                             completions.complete(it, c, httpReq)
                         }
 

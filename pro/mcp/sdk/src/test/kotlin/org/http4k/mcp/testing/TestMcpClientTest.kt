@@ -243,6 +243,11 @@ class TestMcpClientTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val serverTools = ServerTools(listOf(tool bind {
+            it.meta.progress?.let { p ->
+                it.client.progress(1, 5.0)
+                it.client.progress(2, 5.0)
+            }
+
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
@@ -276,25 +281,32 @@ class TestMcpClientTest {
                 )
             )
 
+            var progress = 0
+            progress().onProgress {
+                progress++
+            }
+
             assertThat(
-                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123))),
+                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123), meta = Meta("foobar"))),
                 equalTo(Success(ToolResponse.Ok(listOf(content, Content.Text("foo123")))))
             )
+
+            assertThat(progress, equalTo(2))
 
             assertThat(
                 tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to "notAnInt"))),
                 equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
 
-            val latch = CountDownLatch(1)
+            val toolsLatch = CountDownLatch(1)
 
-            tools().onChange(latch::countDown)
+            tools().onChange(toolsLatch::countDown)
 
             serverTools.items = emptyList()
 
             tools().expectNotification()
 
-            latch.await()
+            toolsLatch.await()
         }
     }
 
@@ -345,13 +357,14 @@ class TestMcpClientTest {
         mcp.useClient {
             val latch = CountDownLatch(1)
             progress().onProgress {
-                println("FOOOO!!")
                 assertThat(it, equalTo(progress))
-                println("BAAARR!!")
                 latch.countDown()
             }
 
-            completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value"), meta = Meta("hello")))
+            assertThat(
+                completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value"), meta = Meta("hello"))),
+                equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
+            )
 
             progress().expectProgress()
 
