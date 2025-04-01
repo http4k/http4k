@@ -9,6 +9,7 @@ import org.http4k.connect.model.Temperature
 import org.http4k.core.Request
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.ModelPreferences
 import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.model.SamplingIncludeContext
@@ -27,7 +28,6 @@ data class SamplingRequest(
     val stopSequences: List<String>? = null,
     val modelPreferences: ModelPreferences? = null,
     val metadata: Map<String, Any> = emptyMap(),
-    val progressToken: ProgressToken? = null,
     val connectRequest: Request? = null
 )
 

@@ -53,7 +53,7 @@ internal class ClientResources(
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpResource.Read,
-            McpResource.Read.Request(request.uri),
+            McpResource.Read.Request(request.uri, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)
         )

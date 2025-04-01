@@ -87,7 +87,6 @@ import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
@@ -313,13 +312,13 @@ class McpProtocolTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = ServerTools(listOf(tool bindWithClient { it, client ->
+        val tools = ServerTools(listOf(tool bind {
             val stringArg1 = stringArg(it)
             val intArg1 = intArg(it)
 
-            it.progressToken?.let {
-                client.report(Progress(1, 5.0, it))
-                client.report(Progress(2, 5.0, it))
+            it.meta.progress?.let { p ->
+                it.client.progress(1, 5.0)
+                it.client.progress(2, 5.0)
             }
 
             ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))

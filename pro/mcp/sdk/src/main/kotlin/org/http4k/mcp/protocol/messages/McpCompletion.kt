@@ -5,7 +5,6 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.McpRpcMethod
-import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 object McpCompletion : McpRpc {
@@ -15,13 +14,13 @@ object McpCompletion : McpRpc {
     data class Request(
         val ref: Reference,
         val argument: CompletionArgument,
-        override val _meta: Meta = default
+        override val _meta: Meta = Meta.default
     ) : ClientMessage.Request, HasMeta
 
     @JsonSerializable
     data class Response(
         val completion: Completion,
-        override val _meta: Meta = default
+        override val _meta: Meta = Meta.default
     ) : ServerMessage.Response,
         HasMeta
 }

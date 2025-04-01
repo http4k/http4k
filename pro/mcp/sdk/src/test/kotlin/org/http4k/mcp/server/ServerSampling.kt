@@ -61,8 +61,7 @@ class ServerSampling(private val random: Random = Random) :
                     temperature,
                     stopSequences,
                     modelPreferences,
-                    metadata,
-                    _meta = Meta(progressToken)
+                    metadata
                 ),
                 id
             )

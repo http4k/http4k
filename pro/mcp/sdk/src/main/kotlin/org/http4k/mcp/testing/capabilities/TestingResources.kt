@@ -46,7 +46,7 @@ class TestingResources(private val sender: TestMcpSender) : McpClient.Resources 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpResource.Read,
-            McpResource.Read.Request(request.uri)
+            McpResource.Read.Request(request.uri, request.meta)
         ).nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
             .map { it.second }
 

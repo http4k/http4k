@@ -8,7 +8,6 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -26,13 +25,13 @@ data class McpResource(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
         data class Response(
             val contents: kotlin.collections.List<Resource.Content>,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ServerMessage.Response, HasMeta
     }
 
@@ -42,14 +41,14 @@ data class McpResource(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : PaginatedRequest, HasMeta
 
         @JsonSerializable
         data class Response(
             val resources: kotlin.collections.List<McpResource>,
             override val nextCursor: Cursor? = null,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
         data object Changed : McpRpc {
@@ -64,7 +63,7 @@ data class McpResource(
         override val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
         @JsonSerializable
-        data class Notification(val uri: Uri, override val _meta: Meta = default) : ServerMessage.Notification, HasMeta
+        data class Notification(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification, HasMeta
     }
 
     object Subscribe : McpRpc {
@@ -73,7 +72,7 @@ data class McpResource(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -83,7 +82,7 @@ data class McpResource(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -94,14 +93,14 @@ data class McpResource(
             @JsonSerializable
             data class Request(
                 override val cursor: Cursor? = null,
-                override val _meta: Meta = default
+                override val _meta: Meta = Meta.default
             ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
 
             @JsonSerializable
             data class Response(
                 val resourceTemplates: kotlin.collections.List<McpResource>,
                 override val nextCursor: Cursor? = null,
-                override val _meta: Meta = default
+                override val _meta: Meta = Meta.default
             ) : ServerMessage.Response, PaginatedResponse, HasMeta
         }
     }

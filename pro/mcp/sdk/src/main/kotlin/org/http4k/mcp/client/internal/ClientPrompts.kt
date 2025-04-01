@@ -38,7 +38,7 @@ internal class ClientPrompts(
     override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpPrompt.Get,
-            McpPrompt.Get.Request(name, request),
+            McpPrompt.Get.Request(name, request, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)
         )

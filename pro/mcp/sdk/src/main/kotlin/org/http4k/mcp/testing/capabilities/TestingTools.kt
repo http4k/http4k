@@ -44,7 +44,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
         val received = sender(
             McpTool.Call, McpTool.Call.Request(
                 name,
-                request.mapValues { McpJson.asJsonObject(it.value) }, Meta(request.progressToken)
+                request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
             )
         )
 

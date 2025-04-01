@@ -46,7 +46,7 @@ internal class ClientTools(
             McpTool.Call.Request(
                 name,
                 request.mapValues { McpJson.asJsonObject(it.value) },
-                Meta(request.progressToken)
+                request.meta
             ),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)

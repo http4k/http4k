@@ -30,6 +30,7 @@ import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
@@ -54,7 +55,6 @@ import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.routing.mcpHttpStreaming
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -110,7 +110,7 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -163,7 +163,7 @@ class TestMcpClientTest {
                 resources = serverResources,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -221,7 +221,7 @@ class TestMcpClientTest {
                 resources = serverResources,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
@@ -252,7 +252,7 @@ class TestMcpClientTest {
                 tools = serverTools,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -311,7 +311,7 @@ class TestMcpClientTest {
                 completions = serverCompletions,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -327,8 +327,8 @@ class TestMcpClientTest {
 
         val progress = Progress(1, 1.0, "hello")
         val serverCompletions = ServerCompletions(
-            listOf(ref bindWithClient { _, client ->
-                client.report(progress)
+            listOf(ref bind {
+                it.client.progress(progress.progress, progress.total)
 
                 CompletionResponse(listOf("values"), 1, true)
             })
@@ -340,16 +340,18 @@ class TestMcpClientTest {
                 completions = serverCompletions,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             val latch = CountDownLatch(1)
             progress().onProgress {
+                println("FOOOO!!")
                 assertThat(it, equalTo(progress))
+                println("BAAARR!!")
                 latch.countDown()
             }
 
-            completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value")))
+            completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value"), meta = Meta("hello")))
 
             progress().expectProgress()
 
@@ -368,9 +370,9 @@ class TestMcpClientTest {
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 tools = ServerTools(
-                    Tool("sample", "description") bindWithClient { it, client ->
-                        val received = client.sample(
-                            SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
+                    Tool("sample", "description") bind {
+                        val received = it.client.sample(
+                            SamplingRequest(listOf(), MaxTokens.of(1)),
                         ).toList()
 
                         assertThat(
@@ -387,7 +389,7 @@ class TestMcpClientTest {
                 ),
                 random = random
             ),
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             sampling().onSampled {

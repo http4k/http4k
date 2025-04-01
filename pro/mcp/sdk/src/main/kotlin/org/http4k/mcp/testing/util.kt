@@ -2,7 +2,6 @@ package org.http4k.mcp.testing
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.core.PolyHandler
 import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
@@ -50,8 +49,8 @@ internal inline fun <reified T : Any> Sequence<SseMessage.Event>.nextNotificatio
     return McpJson.convert<McpNodeType, T>(request.params ?: McpJson.nullNode())
 }
 
-fun PolyHandler.useClient(fn: TestMcpClient.() -> Unit) {
-    testMcpClient().use {
+fun TestMcpClient.useClient(fn: TestMcpClient.() -> Unit) {
+    use {
         it.start()
         it.fn()
     }

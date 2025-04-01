@@ -37,6 +37,7 @@ import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
@@ -59,7 +60,6 @@ import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
@@ -194,9 +194,9 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         )
 
         val tools = ServerTools(
-            Tool("sample", "description") bindWithClient { it, client ->
-                val received = client.sample(
-                    SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
+            Tool("sample", "description") bind {
+                val received = it.client.sample(
+                    SamplingRequest(listOf(), MaxTokens.of(1)),
                     Duration.ofSeconds(5)
                 ).toList()
                 assertThat(received, equalTo(samplingResponses.map { Success(it) }))
@@ -221,12 +221,12 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         mcpClient.sampling().onSampled { samplingResponses.asSequence() }
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample")),
+            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
             equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
         )
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(progressToken = "sample2")),
+            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
             equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
         )
 
@@ -238,9 +238,9 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     @Test
     fun `can do progress`() {
         val tools = ServerTools(
-            Tool("progress", "description") bindWithClient { it, client ->
+            Tool("progress", "description") bind {
                 try {
-                    client.report(Progress(1, 2.0, it.progressToken!!))
+                    it.client.progress(1, 2.0)
                     ToolResponse.Ok(listOf(Content.Text("")))
                 } catch (e: Exception) {
                     throw e
@@ -266,7 +266,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         mcpClient.progress().onProgress(fn = prog::set)
 
         assertThat(
-            mcpClient.tools().call(ToolName.of("progress"), ToolRequest(progressToken = "progress")),
+            mcpClient.tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
             equalTo(Success(ToolResponse.Ok(Content.Text(""))))
         )
 

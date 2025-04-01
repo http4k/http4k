@@ -10,7 +10,7 @@ import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.Progress
+import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.fromJsonRpc
@@ -24,22 +24,23 @@ import kotlin.random.Random
 
 interface Client {
     fun sample(request: SamplingRequest, fetchNextTimeout: Duration? = null): Sequence<McpResult<SamplingResponse>>
-    fun report(req: Progress)
+    fun progress(progress: Int, total: Double? = null)
 
     companion object {
         object NoOp : Client {
             override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?) = error("NoOp")
-            override fun report(req: Progress) = error("NoOp")
+            override fun progress(progress: Int, total: Double?) = error("NoOp")
         }
     }
 }
 
-fun <Transport> Client(
-    context: ClientRequestContext,
-    sessions: Sessions<Transport>,
-    random: Random,
-    clientTracking: () -> ClientTracking?
-): Client = object : Client {
+class ProgressClient<Transport>(
+    private val progressToken: ProgressToken,
+    private val context: ClientRequestContext,
+    private val sessions: Sessions<Transport>,
+    private val random: Random,
+    private val clientTracking: () -> ClientTracking?
+) : Client {
     override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
         val id = McpMessageId.random(random)
         val queue = LinkedBlockingDeque<SamplingResponse>()
@@ -96,7 +97,7 @@ fun <Transport> Client(
         }
     }
 
-    override fun report(req: Progress) = with(req) {
+    override fun progress(progress: Int, total: Double?) {
         sessions.request(
             context, McpProgress.Notification(progress, total, progressToken)
                 .toJsonRpc(McpProgress)

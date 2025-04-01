@@ -25,7 +25,6 @@ import org.http4k.mcp.client.McpError.Http
 import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.client.asAOrFailure
 import org.http4k.mcp.client.toHttpRequest
-import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -67,11 +66,7 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
             overrideDefaultTimeout: Duration?
         ) = http.send<McpTool.Call.Response>(
             McpTool.Call,
-            McpTool.Call.Request(
-                name,
-                request.mapValues { McpJson.asJsonObject(it.value) },
-                Meta(request.progressToken)
-            )
+            McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         )
             .map {
                 when (it.isError) {

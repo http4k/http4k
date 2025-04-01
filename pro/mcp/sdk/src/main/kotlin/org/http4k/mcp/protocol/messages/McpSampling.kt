@@ -27,7 +27,7 @@ object McpSampling : McpRpc {
         val stopSequences: List<String>? = null,
         val modelPreferences: ModelPreferences? = null,
         val metadata: Map<String, Any> = emptyMap(),
-        override val _meta: Meta = HasMeta.default
+        override val _meta: Meta = Meta.default
     ) : ServerMessage.Request, ClientMessage.Request, HasMeta
 
     @JsonSerializable

@@ -40,7 +40,7 @@ class TestingPrompts(private val sender: TestMcpSender) : McpClient.Prompts {
     ): McpResult<PromptResponse> {
         return sender(
             McpPrompt.Get,
-            McpPrompt.Get.Request(name, request)
+            McpPrompt.Get.Request(name, request, request.meta)
         ).nextEvent<McpPrompt.Get.Response, PromptResponse>({
             PromptResponse(messages, description)
         }).map { it.second }

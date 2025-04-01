@@ -15,7 +15,7 @@ class TestingCompletions(private val sender: TestMcpSender) : McpClient.Completi
         ref: Reference,
         request: CompletionRequest,
         overrideDefaultTimeout: Duration?
-    ) = sender(McpCompletion, McpCompletion.Request(ref, request.argument))
+    ) = sender(McpCompletion, McpCompletion.Request(ref, request.argument, request.meta))
         .nextEvent<McpCompletion.Response, CompletionResponse>(
             { CompletionResponse(completion.values, completion.total, completion.hasMore) }
         ).map { it.second }

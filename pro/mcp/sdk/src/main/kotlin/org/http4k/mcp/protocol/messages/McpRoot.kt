@@ -11,10 +11,10 @@ object McpRoot {
         override val Method = McpRpcMethod.of("roots/list")
 
         @JsonSerializable
-        data class Request(override val _meta: Meta = HasMeta.default) : ServerMessage.Request, HasMeta
+        data class Request(override val _meta: Meta = Meta.default) : ServerMessage.Request, HasMeta
 
         @JsonSerializable
-        data class Response(val roots: kotlin.collections.List<Root>, override val _meta: Meta = HasMeta.default) :
+        data class Response(val roots: kotlin.collections.List<Root>, override val _meta: Meta = Meta.default) :
             ClientMessage.Response, HasMeta
     }
 

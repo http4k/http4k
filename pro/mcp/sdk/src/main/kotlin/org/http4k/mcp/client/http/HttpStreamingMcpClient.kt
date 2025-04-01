@@ -46,7 +46,6 @@ import org.http4k.mcp.client.internal.McpCallback
 import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
-import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -156,7 +155,7 @@ class HttpStreamingMcpClient(
                 McpTool.Call.Request(
                     name,
                     request.mapValues { McpJson.asJsonObject(it.value) },
-                    Meta(request.progressToken)
+                    request.meta
                 )
             )
             return incoming
