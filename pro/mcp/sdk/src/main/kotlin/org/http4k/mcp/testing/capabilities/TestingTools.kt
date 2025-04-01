@@ -14,9 +14,12 @@ import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import org.http4k.mcp.testing.nextNotification
 import org.http4k.mcp.util.McpJson
+import org.http4k.sse.SseMessage
 import java.time.Duration
 
-class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
+class TestingTools(
+    private val sender: TestMcpSender
+) : McpClient.Tools {
     private val notifications = mutableListOf<() -> Unit>()
 
     override fun onChange(fn: () -> Unit) {
@@ -32,7 +35,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
 
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpTool.List, McpTool.List.Request()).events.nextEvent<McpTool.List.Response, List<McpTool>> { tools }
+        sender(McpTool.List, McpTool.List.Request()).nextEvent<McpTool.List.Response, List<McpTool>> { tools }
             .map { it.second }
 
     override fun call(
@@ -47,7 +50,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
             )
         )
 
-        return received.events.nextEvent<McpTool.Call.Response, ToolResponse> {
+        return received.nextEvent<McpTool.Call.Response, ToolResponse> {
             when (isError) {
                 true -> {
                     val input = (content.first() as Content.Text).text

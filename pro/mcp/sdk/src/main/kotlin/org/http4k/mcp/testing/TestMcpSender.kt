@@ -27,6 +27,27 @@ data class ResponsesToId(val events: Sequence<SseMessage.Event>, val id: McpMess
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
+    private val outbound: (SseMessage.Event) -> Unit = {
+        println(it)
+    }
+
+    private fun filterOut(responsesToId: ResponsesToId, mpcRpc: McpRpc) = responsesToId.events
+        .filter {
+            when {
+                it.isFor(mpcRpc) || it.isResult() || it.isError() -> true
+                else -> {
+                    this.outbound(it)
+                    false
+                }
+            }
+        }
+
+    private fun SseMessage.Event.isResult() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("result")
+    private fun SseMessage.Event.isError() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("error")
+
+    private fun SseMessage.Event.isFor(rpc: McpRpc) =
+        McpJson.fields(McpJson.parse(data)).toMap()["method"]?.toString() == rpc.Method.value
+
     private var id = AtomicInteger(0)
 
     private var sessionId = AtomicReference<SessionId>()
@@ -34,15 +55,21 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     fun stream() = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Request) =
-        ResponsesToId(
-            mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
-            McpMessageId.of(id.get().toLong())
+        filterOut(
+            ResponsesToId(
+                mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
+                McpMessageId.of(id.get().toLong())
+            ),
+            mcpRpc
         )
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Notification) =
-        ResponsesToId(
-            mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
-            McpMessageId.of(id.get().toLong())
+        filterOut(
+            ResponsesToId(
+                mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
+                McpMessageId.of(id.get().toLong())
+            ),
+            mcpRpc
         )
 
     operator fun invoke(input: ClientMessage.Response, id: McpMessageId) =

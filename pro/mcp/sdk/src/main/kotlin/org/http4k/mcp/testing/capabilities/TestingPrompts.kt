@@ -10,9 +10,12 @@ import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import org.http4k.mcp.testing.nextNotification
+import org.http4k.sse.SseMessage
 import java.time.Duration
 
-class TestingPrompts(private val sender: TestMcpSender) : McpClient.Prompts {
+class TestingPrompts(
+    private val sender: TestMcpSender,
+) : McpClient.Prompts {
     private val notifications = mutableListOf<() -> Unit>()
 
     override fun onChange(fn: () -> Unit) {
@@ -31,7 +34,7 @@ class TestingPrompts(private val sender: TestMcpSender) : McpClient.Prompts {
         sender(
             McpPrompt.List,
             McpPrompt.List.Request()
-        ).events.nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }.map { it.second }
+        ).nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }.map { it.second }
 
     override fun get(
         name: PromptName,
@@ -41,7 +44,7 @@ class TestingPrompts(private val sender: TestMcpSender) : McpClient.Prompts {
         return sender(
             McpPrompt.Get,
             McpPrompt.Get.Request(name, request, request.meta)
-        ).events.nextEvent<McpPrompt.Get.Response, PromptResponse>({
+        ).nextEvent<McpPrompt.Get.Response, PromptResponse>({
             PromptResponse(messages, description)
         }).map { it.second }
     }
