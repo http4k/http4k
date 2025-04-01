@@ -31,7 +31,7 @@ class TestingPrompts(private val sender: TestMcpSender) : McpClient.Prompts {
         sender(
             McpPrompt.List,
             McpPrompt.List.Request()
-        ).nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }.map { it.second }
+        ).events.nextEvent<McpPrompt.List.Response, List<McpPrompt>> { prompts }.map { it.second }
 
     override fun get(
         name: PromptName,
@@ -41,7 +41,7 @@ class TestingPrompts(private val sender: TestMcpSender) : McpClient.Prompts {
         return sender(
             McpPrompt.Get,
             McpPrompt.Get.Request(name, request, request.meta)
-        ).nextEvent<McpPrompt.Get.Response, PromptResponse>({
+        ).events.nextEvent<McpPrompt.Get.Response, PromptResponse>({
             PromptResponse(messages, description)
         }).map { it.second }
     }

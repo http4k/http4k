@@ -24,7 +24,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
         thread(isDaemon = true) {
             while (true) {
                 runCatching {
-                    ResponsesToId(sender.stream(), McpMessageId.random()).nextEvent<McpSampling.Request, SamplingRequest> {
+                    ResponsesToId(sender.stream(), McpMessageId.random()).events.nextEvent<McpSampling.Request, SamplingRequest> {
                         SamplingRequest(
                             messages, maxTokens,
                             systemPrompt, includeContext,

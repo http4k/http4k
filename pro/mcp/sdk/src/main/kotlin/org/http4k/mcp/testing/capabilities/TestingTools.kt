@@ -32,7 +32,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
 
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpTool.List, McpTool.List.Request()).nextEvent<McpTool.List.Response, List<McpTool>> { tools }
+        sender(McpTool.List, McpTool.List.Request()).events.nextEvent<McpTool.List.Response, List<McpTool>> { tools }
             .map { it.second }
 
     override fun call(
@@ -47,7 +47,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
             )
         )
 
-        return received.nextEvent<McpTool.Call.Response, ToolResponse> {
+        return received.events.nextEvent<McpTool.Call.Response, ToolResponse> {
             when (isError) {
                 true -> {
                     val input = (content.first() as Content.Text).text

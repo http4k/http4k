@@ -41,13 +41,13 @@ class TestingResources(private val sender: TestMcpSender) : McpClient.Resources 
         sender(
             McpResource.List,
             McpResource.List.Request()
-        ).nextEvent<McpResource.List.Response, List<McpResource>> { resources }.map { it.second }
+        ).events.nextEvent<McpResource.List.Response, List<McpResource>> { resources }.map { it.second }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpResource.Read,
             McpResource.Read.Request(request.uri, request.meta)
-        ).nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
+        ).events.nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
             .map { it.second }
 
 

@@ -44,7 +44,7 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
         )
 
         sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).events.toList()
-        return initResponse.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }.map { it.second }
+        return initResponse.events.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }.map { it.second }
     }
 
     override fun tools() = tools
