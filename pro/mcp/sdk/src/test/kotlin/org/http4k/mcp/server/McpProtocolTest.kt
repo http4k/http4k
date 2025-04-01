@@ -41,7 +41,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -77,7 +76,7 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.protocol.ClientRequestTarget.*
+import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
