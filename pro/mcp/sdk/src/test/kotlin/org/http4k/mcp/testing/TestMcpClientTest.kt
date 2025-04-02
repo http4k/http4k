@@ -56,8 +56,8 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import kotlin.random.Random
 
@@ -383,6 +383,7 @@ class TestMcpClientTest {
                     Tool("sample", "description") bind {
                         val received = it.client.sample(
                             SamplingRequest(listOf(), MaxTokens.of(1)),
+                            Duration.ofSeconds(3)
                         ).toList()
 
                         assertThat(

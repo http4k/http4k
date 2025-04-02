@@ -255,7 +255,11 @@ class McpProtocol<Transport>(
         .recover {
             when (it) {
                 is McpException -> it.error.toJsonRpc(jsonReq.id)
-                else -> InternalError.toJsonRpc(jsonReq.id)
+                else -> {
+                    // TODO do better here
+                    it.printStackTrace()
+                    InternalError.toJsonRpc(jsonReq.id)
+                }
             }
         }
         .getOrElse { InvalidRequest.toJsonRpc(jsonReq.id) })

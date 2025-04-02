@@ -197,7 +197,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             Tool("sample", "description") bind {
                 val received = it.client.sample(
                     SamplingRequest(listOf(), MaxTokens.of(1)),
-                    Duration.ofSeconds(5)
+                    Duration.ofSeconds(1)
                 ).toList()
                 assertThat(received, equalTo(samplingResponses.map { Success(it) }))
                 ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
