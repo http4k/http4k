@@ -34,6 +34,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         val APPLICATION_PDF = Text("application/pdf")
         val APPLICATION_XML = Text("application/xml")
         val APPLICATION_YAML = Text("application/yaml")
+        val APPLICATION_ZIP = Text("application/zip")
         val MULTIPART_FORM_DATA = Text("multipart/form-data")
         val MULTIPART_MIXED = Text("multipart/mixed")
         val OCTET_STREAM = ContentType("application/octet-stream")
