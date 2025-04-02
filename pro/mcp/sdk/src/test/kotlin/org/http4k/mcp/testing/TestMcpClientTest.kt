@@ -411,7 +411,7 @@ class TestMcpClientTest {
             }
 
             assertThat(
-                tools().call(ToolName.of("sample"), ToolRequest()),
+                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("hello"))),
                 equalTo(Success(ToolResponse.Ok(listOf(Content.Text("2")))))
             )
         }
