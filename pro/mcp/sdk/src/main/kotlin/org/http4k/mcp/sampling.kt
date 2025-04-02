@@ -27,8 +27,7 @@ data class SamplingRequest(
     val temperature: Temperature? = null,
     val stopSequences: List<String>? = null,
     val modelPreferences: ModelPreferences? = null,
-    val metadata: Map<String, Any> = emptyMap(),
-    val connectRequest: Request? = null
+    val metadata: Map<String, Any> = emptyMap()
 )
 
 data class SamplingResponse(

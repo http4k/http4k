@@ -428,7 +428,8 @@ class McpProtocolTest {
                     it.client.progress(2, 5.0)
                 }
 
-                CompletionResponse(listOf("values"), 1, true) })
+                CompletionResponse(listOf("values"), 1, true)
+            })
         )
 
         val mcp = SseMcp(
@@ -444,7 +445,10 @@ class McpProtocolTest {
 
             val progressToken = "progress"
 
-            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value"), Meta(progressToken)))
+            mcp.sendToMcp(
+                McpCompletion,
+                McpCompletion.Request(ref, CompletionArgument("arg", "value"), Meta(progressToken))
+            )
 
             assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progressToken))
             assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progressToken))
@@ -509,10 +513,7 @@ class McpProtocolTest {
 
             val received = sampling.sampleClient(
                 Entity(metadata.entity.name),
-                SamplingRequest(
-                    listOf(), MaxTokens.of(1),
-                    connectRequest = Request(GET, "")
-                ),
+                SamplingRequest(listOf(), MaxTokens.of(1)),
                 Duration.ofSeconds(5)
             )
 
