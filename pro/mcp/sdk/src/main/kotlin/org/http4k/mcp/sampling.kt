@@ -15,7 +15,7 @@ import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.model.SamplingIncludeContext
 
 /**
- *  Processes a sampling request from an MCP client/server
+ *  Processes a sampling request from an MCP server to a client
  */
 typealias SamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
 
