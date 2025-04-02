@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.5.2.0 (uncut)
+- **http4k-*** : Upgrade some dependency versions.
+- **http4k-connect-amazon-s3*** :Added support for s3 bucket keys containing hash (#). H/T @aharin
+- **http4k-mcp-sdk**: Updates to support sampling callbacks in Tool and other requests.
+
 ### v6.5.1.0
 - **http4k-mcp-sdk**: Tidy up completions API.
 
