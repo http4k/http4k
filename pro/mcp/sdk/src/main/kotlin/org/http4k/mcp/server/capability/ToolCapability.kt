@@ -45,8 +45,6 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                 } catch (e: LensFailure) {
                     throw McpException(InvalidParams)
                 } catch (e: Exception) {
-                    //TODO do better here
-                    e.printStackTrace()
                     Error(InternalError)
                 }
             }

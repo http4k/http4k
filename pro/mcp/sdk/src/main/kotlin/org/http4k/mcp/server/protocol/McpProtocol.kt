@@ -65,7 +65,8 @@ class McpProtocol<Transport>(
     private val completions: Completions = ServerCompletions(),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
-    private val random: Random = Random
+    private val random: Random = Random,
+    private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) }
 ) {
     constructor(
         metaData: ServerMetaData,
@@ -256,8 +257,7 @@ class McpProtocol<Transport>(
             when (it) {
                 is McpException -> it.error.toJsonRpc(jsonReq.id)
                 else -> {
-                    // TODO do better here
-                    it.printStackTrace()
+                    onError(it)
                     InternalError.toJsonRpc(jsonReq.id)
                 }
             }
