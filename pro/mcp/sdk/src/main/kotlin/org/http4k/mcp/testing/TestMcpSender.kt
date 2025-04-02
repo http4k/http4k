@@ -13,6 +13,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpRpc
@@ -21,8 +22,37 @@ import org.http4k.sse.SseMessage
 import org.http4k.testing.testSseClient
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
+
+
+data class ResponsesToId(val events: Sequence<SseMessage.Event>, val id: McpMessageId)
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
+
+    private val outbound = mutableMapOf<McpRpcMethod, MutableList<(SseMessage.Event) -> Unit>>()
+
+    fun on(mcpRpc: McpRpc, fn: (SseMessage.Event) -> Unit) {
+        outbound.getOrPut(mcpRpc.Method) { mutableListOf() }.add(fn)
+    }
+
+    private fun filterOut(responsesToId: ResponsesToId, mpcRpc: McpRpc) = responsesToId.events
+        .filter {
+            when {
+                it.isFor(mpcRpc) || it.isResult() || it.isError() -> true
+                else -> {
+                    outbound[it.mcpMethod()]?.forEach { sub -> sub(it) }
+                    false
+                }
+            }
+        }
+
+    private fun SseMessage.Event.isResult() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("result")
+    private fun SseMessage.Event.isError() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("error")
+
+    private fun SseMessage.Event.isFor(rpc: McpRpc) = mcpMethod() == rpc.Method
+
+    private fun SseMessage.Event.mcpMethod() =
+        McpJson.fields(McpJson.parse(data)).toMap()["method"]?.let { McpRpcMethod.of(McpJson.text(it)) }
 
     private var id = AtomicInteger(0)
 
@@ -31,13 +61,31 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     fun stream() = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Request) =
-        mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet()))
+        filterOut(
+                ResponsesToId(
+                    mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
+                    McpMessageId.of(id.get().toLong())
+            ),
+            mcpRpc
+        )
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Notification) =
-        mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet()))
+        filterOut(
+            ResponsesToId(
+                mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
+                McpMessageId.of(id.get().toLong())
+            ),
+            mcpRpc
+        )
 
-    operator fun invoke(input: ClientMessage.Response, id: McpMessageId) =
-        mcpHandler.callWith(connectRequest.withMcp(input, id))
+    operator fun invoke(input: ClientMessage.Response, id: McpMessageId) {
+        val a = ResponsesToId(
+            mcpHandler.callWith(connectRequest.withMcp(input, id)), id
+        )
+        thread {
+            a.events.toList()
+        }
+    }
 
     private fun PolyHandler.callWith(request: Request): Sequence<SseMessage.Event> {
         val client = when (sessionId.get()) {
@@ -53,7 +101,8 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
 
         require(client.response.status == OK)
 
-        return client.received().filterIsInstance<SseMessage.Event>().filter { it.event == "message" }
+        return client.received()
+            .filterIsInstance<SseMessage.Event>().filter { it.event == "message" }
     }
 }
 

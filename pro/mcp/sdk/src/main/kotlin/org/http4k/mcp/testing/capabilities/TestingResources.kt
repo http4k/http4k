@@ -9,9 +9,12 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import org.http4k.mcp.testing.nextNotification
+import org.http4k.sse.SseMessage
 import java.time.Duration
 
-class TestingResources(private val sender: TestMcpSender) : McpClient.Resources {
+class TestingResources(
+    private val sender: TestMcpSender
+) : McpClient.Resources {
     private val changeNotifications = mutableListOf<() -> Unit>()
 
     private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
@@ -46,18 +49,18 @@ class TestingResources(private val sender: TestMcpSender) : McpClient.Resources 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpResource.Read,
-            McpResource.Read.Request(request.uri)
+            McpResource.Read.Request(request.uri, request.meta)
         ).nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
             .map { it.second }
 
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
         sender(McpResource.Subscribe, McpResource.Subscribe.Request(uri))
-            subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
+        subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
     }
 
     override fun unsubscribe(uri: Uri) {
         sender(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(uri))
-            subscriptions -= uri
+        subscriptions -= uri
     }
 }

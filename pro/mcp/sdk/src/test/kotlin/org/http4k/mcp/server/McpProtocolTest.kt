@@ -41,7 +41,6 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -77,7 +76,7 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.protocol.ClientRequestTarget.*
+import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
@@ -87,7 +86,6 @@ import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
@@ -313,13 +311,13 @@ class McpProtocolTest {
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = ServerTools(listOf(tool bindWithClient { it, client ->
+        val tools = ServerTools(listOf(tool bind {
             val stringArg1 = stringArg(it)
             val intArg1 = intArg(it)
 
-            it.progressToken?.let {
-                client.report(Progress(1, 5.0, it))
-                client.report(Progress(2, 5.0, it))
+            it.meta.progress?.let { p ->
+                it.client.progress(1, 5.0)
+                it.client.progress(2, 5.0)
             }
 
             ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
@@ -424,7 +422,14 @@ class McpProtocolTest {
     fun `deal with completions`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind {
+                it.meta.progress?.let { p ->
+                    it.client.progress(1, 5.0)
+                    it.client.progress(2, 5.0)
+                }
+
+                CompletionResponse(listOf("values"), 1, true)
+            })
         )
 
         val mcp = SseMcp(
@@ -438,7 +443,15 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpCompletion, McpCompletion.Request(ref, CompletionArgument("arg", "value")))
+            val progressToken = "progress"
+
+            mcp.sendToMcp(
+                McpCompletion,
+                McpCompletion.Request(ref, CompletionArgument("arg", "value"), Meta(progressToken))
+            )
+
+            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progressToken))
+            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progressToken))
 
             assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
         }
@@ -500,10 +513,7 @@ class McpProtocolTest {
 
             val received = sampling.sampleClient(
                 Entity(metadata.entity.name),
-                SamplingRequest(
-                    listOf(), MaxTokens.of(1),
-                    connectRequest = Request(GET, "")
-                ),
+                SamplingRequest(listOf(), MaxTokens.of(1)),
                 Duration.ofSeconds(5)
             )
 

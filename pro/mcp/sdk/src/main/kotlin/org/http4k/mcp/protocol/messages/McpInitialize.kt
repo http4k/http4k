@@ -9,7 +9,6 @@ import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.VersionedMcpEntity
-import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 object McpInitialize : McpRpc {
@@ -27,7 +26,7 @@ object McpInitialize : McpRpc {
         val serverInfo: VersionedMcpEntity,
         val capabilities: ServerCapabilities = ServerCapabilities(),
         val protocolVersion: ProtocolVersion = LATEST_VERSION,
-        override val _meta: Meta = default,
+        override val _meta: Meta = Meta.default,
     ) : HasMeta, ServerMessage.Response
 
     data object Initialized : McpRpc {

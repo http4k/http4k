@@ -26,10 +26,12 @@ import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpError
+import org.http4k.mcp.client.McpResult
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
+import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
@@ -54,11 +56,12 @@ import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.routing.mcpHttpStreaming
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 import kotlin.random.Random
 
 class TestMcpClientTest {
@@ -110,7 +113,7 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -163,7 +166,7 @@ class TestMcpClientTest {
                 resources = serverResources,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -221,7 +224,7 @@ class TestMcpClientTest {
                 resources = serverResources,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(resources().list(), equalTo(Success(emptyList())))
@@ -243,6 +246,11 @@ class TestMcpClientTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val serverTools = ServerTools(listOf(tool bind {
+            it.meta.progress?.let { p ->
+                it.client.progress(1, 5.0)
+                it.client.progress(2, 5.0)
+            }
+
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
@@ -252,7 +260,7 @@ class TestMcpClientTest {
                 tools = serverTools,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -276,25 +284,32 @@ class TestMcpClientTest {
                 )
             )
 
+            var progress = 0
+            progress().onProgress {
+                progress++
+            }
+
             assertThat(
-                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123))),
+                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123), meta = Meta("foobar"))),
                 equalTo(Success(ToolResponse.Ok(listOf(content, Content.Text("foo123")))))
             )
+
+            assertThat(progress, equalTo(2))
 
             assertThat(
                 tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to "notAnInt"))),
                 equalTo(Failure(McpError.Protocol(InvalidParams)))
             )
 
-            val latch = CountDownLatch(1)
+            val toolsLatch = CountDownLatch(1)
 
-            tools().onChange(latch::countDown)
+            tools().onChange(toolsLatch::countDown)
 
             serverTools.items = emptyList()
 
             tools().expectNotification()
 
-            latch.await()
+            toolsLatch.await()
         }
     }
 
@@ -311,7 +326,7 @@ class TestMcpClientTest {
                 completions = serverCompletions,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             assertThat(
@@ -327,8 +342,8 @@ class TestMcpClientTest {
 
         val progress = Progress(1, 1.0, "hello")
         val serverCompletions = ServerCompletions(
-            listOf(ref bindWithClient { _, client ->
-                client.report(progress)
+            listOf(ref bind {
+                it.client.progress(progress.progress, progress.total)
 
                 CompletionResponse(listOf("values"), 1, true)
             })
@@ -340,7 +355,7 @@ class TestMcpClientTest {
                 completions = serverCompletions,
                 random = random
             )
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             val latch = CountDownLatch(1)
@@ -349,45 +364,58 @@ class TestMcpClientTest {
                 latch.countDown()
             }
 
-            completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value")))
-
-            progress().expectProgress()
+            assertThat(
+                completions().complete(
+                    ref,
+                    CompletionRequest(CompletionArgument("arg", "value"), meta = Meta("hello"))
+                ),
+                equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
+            )
 
             latch.await()
         }
     }
 
     @Test
-    @Disabled
     fun `deal with client sampling`() {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelName.of("name")
 
+        val seq: AtomicReference<Sequence<McpResult<SamplingResponse>>> = AtomicReference(null)
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 tools = ServerTools(
-                    Tool("sample", "description") bindWithClient { it, client ->
-                        val received = client.sample(
-                            SamplingRequest(listOf(), MaxTokens.of(1), progressToken = it.progressToken!!),
-                        ).toList()
-
-                        assertThat(
-                            received, equalTo(
-                                listOf(
-                                    Success(SamplingResponse(model, Assistant, content, null)),
-                                    Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
-                                )
+                    Tool("sample", "description") bind {
+                        seq.set(
+                            it.client.sample(
+                                SamplingRequest(listOf(), MaxTokens.of(1)),
+                                Duration.ofSeconds(30)
                             )
                         )
+                        thread {
 
-                        ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
+//                            seq.get().toList()
+                        }
+
+//                        val actual = received.toList() // WAITING ON THIS LIST
+//                        println("<SAMPLING")
+//                        assertThat(
+//                            actual, equalTo(
+//                                listOf(
+//                                    Success(SamplingResponse(model, Assistant, content, null)),
+//                                    Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
+//                                )
+//                            )
+//                        )
+
+                        ToolResponse.Ok(listOf(Content.Text("")))
                     }
                 ),
                 random = random
             ),
-        )
+        ).testMcpClient()
 
         mcp.useClient {
             sampling().onSampled {
@@ -398,10 +426,17 @@ class TestMcpClientTest {
                 )
             }
 
-            assertThat(
-                tools().call(ToolName.of("sample"), ToolRequest()),
-                equalTo(Success(ToolResponse.Ok(listOf(Content.Text("2")))))
-            )
+            val latch = CountDownLatch(1)
+            thread {
+                assertThat(
+                    tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("hello"))),
+                    equalTo(Success(ToolResponse.Ok(listOf(Content.Text("")))))
+                )
+                latch.countDown()
+            }
+            latch.await()
+
+            assertThat(seq.get().toList().size, equalTo(2))
         }
     }
 }

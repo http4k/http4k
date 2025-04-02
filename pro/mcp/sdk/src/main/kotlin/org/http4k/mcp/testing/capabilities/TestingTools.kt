@@ -9,15 +9,17 @@ import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import org.http4k.mcp.testing.nextNotification
 import org.http4k.mcp.util.McpJson
+import org.http4k.sse.SseMessage
 import java.time.Duration
 
-class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
+class TestingTools(
+    private val sender: TestMcpSender
+) : McpClient.Tools {
     private val notifications = mutableListOf<() -> Unit>()
 
     override fun onChange(fn: () -> Unit) {
@@ -44,7 +46,7 @@ class TestingTools(private val sender: TestMcpSender) : McpClient.Tools {
         val received = sender(
             McpTool.Call, McpTool.Call.Request(
                 name,
-                request.mapValues { McpJson.asJsonObject(it.value) }, Meta(request.progressToken)
+                request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
             )
         )
 

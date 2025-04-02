@@ -13,6 +13,6 @@ object McpProgress : McpRpc {
         val progress: Int,
         val total: Double?,
         val progressToken: ProgressToken,
-        override val _meta: Meta = HasMeta.default
+        override val _meta: Meta = Meta.default
     ) : ServerMessage.Notification, ClientMessage.Notification, HasMeta
 }

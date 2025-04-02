@@ -42,6 +42,7 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.protocol.Client.Companion.NoOp
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.util.McpJson
@@ -241,11 +242,11 @@ class McpProtocol<Transport>(
     ) = sessions.respond(this, session, jsonReq.runCatching { jsonReq.fromJsonRpc<IN>() }
         .mapCatching {
             when (val progress = it._meta.progress) {
-                null -> fn(it, Client(Subscription(session), sessions, random) { clientTracking[session] })
+                null -> fn(it, NoOp)
                 else -> {
                     val context = ClientCall(progress, session)
                     sessions.assign(context, this, httpReq)
-                    fn(it, Client(context, sessions, random, { clientTracking[session] }))
+                    fn(it, ProgressClient(progress, context, sessions, random) { clientTracking[session] })
                         .also { sessions.end(context) }
                 }
             }
@@ -254,7 +255,11 @@ class McpProtocol<Transport>(
         .recover {
             when (it) {
                 is McpException -> it.error.toJsonRpc(jsonReq.id)
-                else -> InternalError.toJsonRpc(jsonReq.id)
+                else -> {
+                    // TODO do better here
+                    it.printStackTrace()
+                    InternalError.toJsonRpc(jsonReq.id)
+                }
             }
         }
         .getOrElse { InvalidRequest.toJsonRpc(jsonReq.id) })

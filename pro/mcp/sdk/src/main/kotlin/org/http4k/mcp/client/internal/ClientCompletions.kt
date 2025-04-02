@@ -21,7 +21,7 @@ internal class ClientCompletions(
 ) : McpClient.Completions {
     override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
         sender(
-            McpCompletion, McpCompletion.Request(ref, request.argument),
+            McpCompletion, McpCompletion.Request(ref, request.argument, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)
         )

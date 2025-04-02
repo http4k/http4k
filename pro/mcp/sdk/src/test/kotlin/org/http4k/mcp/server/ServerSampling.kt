@@ -10,7 +10,6 @@ import org.http4k.mcp.model.CompletionStatus
 import org.http4k.mcp.model.CompletionStatus.Finished
 import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpMessageId
-import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.server.protocol.ClientRequestTarget
 import java.time.Duration
@@ -61,8 +60,7 @@ class ServerSampling(private val random: Random = Random) :
                     temperature,
                     stopSequences,
                     modelPreferences,
-                    metadata,
-                    _meta = Meta(progressToken)
+                    metadata
                 ),
                 id
             )

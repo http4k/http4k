@@ -21,34 +21,32 @@ import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
-import org.http4k.mcp.ToolWithClientHandler
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.asMcp
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.server.protocol.Client
-import org.http4k.mcp.server.protocol.Client.Companion.NoOp
 
-interface ToolCapability : ServerCapability, ToolWithClientHandler, ToolHandler {
+interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
     fun call(mcp: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response
 }
 
-fun ToolCapability(tool: Tool, handler: ToolHandler) = ToolCapability(tool) { request, _ -> handler(request) }
-
-fun ToolCapability(tool: Tool, handler: ToolWithClientHandler) = object : ToolCapability {
+fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     override fun toTool() = tool.asMcp()
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta.progress, http) }
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
-                    handler(it, client)
+                    handler(it)
                 } catch (e: LensFailure) {
                     throw McpException(InvalidParams)
                 } catch (e: Exception) {
+                    //TODO do better here
+                    e.printStackTrace()
                     Error(InternalError)
                 }
             }
@@ -64,8 +62,7 @@ fun ToolCapability(tool: Tool, handler: ToolWithClientHandler) = object : ToolCa
                 )
             }
 
-    override fun invoke(p1: ToolRequest) = handler(p1, NoOp)
-    override fun invoke(p1: ToolRequest, client: Client) = handler(p1, client)
+    override fun invoke(p1: ToolRequest) = handler(p1)
 }
 
 private fun Map<String, MoshiNode>.coerceIntoStrings() =

@@ -27,7 +27,6 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse

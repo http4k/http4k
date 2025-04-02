@@ -36,14 +36,12 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.routing.bind
-import org.http4k.routing.bindWithClient
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
-import kotlin.random.Random
 
 interface McpClientContract<T> : PortBasedTest {
 
@@ -56,8 +54,6 @@ interface McpClientContract<T> : PortBasedTest {
     @Test
     fun `can interact with server`() {
 
-        val model = ModelName.of("my model")
-
         val toolArg = Tool.Arg.required("name")
 
         val tools = ServerTools(
@@ -65,8 +61,6 @@ interface McpClientContract<T> : PortBasedTest {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             },
         )
-
-        val random = Random(0)
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),

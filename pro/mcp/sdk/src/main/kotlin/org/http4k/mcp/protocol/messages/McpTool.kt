@@ -7,7 +7,6 @@ import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.mcp.protocol.messages.HasMeta.Companion.default
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -22,14 +21,14 @@ data class McpTool(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta, PaginatedRequest
 
         @JsonSerializable
         data class Response(
             val tools: kotlin.collections.List<McpTool>,
             override val nextCursor: Cursor? = null,
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
         data object Changed : McpRpc {
@@ -47,14 +46,14 @@ data class McpTool(
         data class Request(
             val name: ToolName,
             val arguments: Map<String, MoshiNode> = emptyMap(),
-            override val _meta: Meta = default
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
         data class Response(
             val content: kotlin.collections.List<Content>,
             val isError: Boolean? = false,
-            override val _meta: Meta = default,
+            override val _meta: Meta = Meta.default,
         ) : ServerMessage.Response, HasMeta
     }
 }
