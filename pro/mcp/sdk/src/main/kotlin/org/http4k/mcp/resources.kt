@@ -12,6 +12,17 @@ import org.http4k.mcp.server.protocol.Client.Companion.NoOp
  */
 typealias ResourceHandler = (ResourceRequest) -> ResourceResponse
 
+fun interface ResourceFilter {
+    operator fun invoke(request: ResourceHandler): ResourceHandler
+    companion object
+}
+
+val ResourceFilter.Companion.NoOp: ResourceFilter get() = ResourceFilter { it }
+
+fun ResourceFilter.then(next: ResourceFilter): ResourceFilter = ResourceFilter { this(next(it)) }
+
+fun ResourceFilter.then(next: ResourceHandler): ResourceHandler = this(next)
+
 data class ResourceRequest(
     val uri: Uri,
     val meta: Meta = Meta.default,

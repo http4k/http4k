@@ -12,6 +12,17 @@ import org.http4k.mcp.server.protocol.Client.Companion.NoOp
  */
 typealias PromptHandler = (PromptRequest) -> PromptResponse
 
+fun interface PromptFilter {
+    operator fun invoke(request: PromptHandler): PromptHandler
+    companion object
+}
+
+val PromptFilter.Companion.NoOp: PromptFilter get() = PromptFilter { it }
+
+fun PromptFilter.then(next: PromptFilter): PromptFilter = PromptFilter { this(next(it)) }
+
+fun PromptFilter.then(next: PromptHandler): PromptHandler = this(next)
+
 data class PromptRequest(
     val args: Map<String, String> = emptyMap(),
     val meta: Meta = Meta.default,

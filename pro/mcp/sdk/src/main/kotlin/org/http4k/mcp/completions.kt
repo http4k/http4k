@@ -11,6 +11,17 @@ import org.http4k.mcp.server.protocol.Client.Companion.NoOp
  */
 typealias CompletionHandler = (CompletionRequest) -> CompletionResponse
 
+fun interface CompletionFilter {
+    operator fun invoke(request: CompletionHandler): CompletionHandler
+    companion object
+}
+
+val CompletionFilter.Companion.NoOp: CompletionFilter get() = CompletionFilter { it }
+
+fun CompletionFilter.then(next: CompletionFilter): CompletionFilter = CompletionFilter { this(next(it)) }
+
+fun CompletionFilter.then(next: CompletionHandler): CompletionHandler = this(next)
+
 data class CompletionRequest(
     val argument: CompletionArgument,
     val meta: Meta = Meta.default,

@@ -19,6 +19,17 @@ import org.http4k.mcp.model.SamplingIncludeContext
  */
 typealias SamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
 
+fun interface SamplingFilter {
+    operator fun invoke(request: SamplingHandler): SamplingHandler
+    companion object
+}
+
+val SamplingFilter.Companion.NoOp: SamplingFilter get() = SamplingFilter { it }
+
+fun SamplingFilter.then(next: SamplingFilter): SamplingFilter = SamplingFilter { this(next(it)) }
+
+fun SamplingFilter.then(next: SamplingHandler): SamplingHandler = this(next)
+
 data class SamplingRequest(
     val messages: List<Message>,
     val maxTokens: MaxTokens,

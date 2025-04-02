@@ -1,5 +1,7 @@
 package org.http4k.mcp
 
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
@@ -12,6 +14,18 @@ import org.http4k.mcp.server.protocol.Client.Companion.NoOp
  * A tool handler invokes a tool with an input and returns a response
  */
 typealias ToolHandler = (ToolRequest) -> ToolResponse
+
+fun interface ToolFilter {
+    operator fun invoke(request: ToolHandler): ToolHandler
+    companion object
+}
+
+val ToolFilter.Companion.NoOp: ToolFilter get() = ToolFilter { it }
+
+fun ToolFilter.then(next: ToolFilter): ToolFilter = ToolFilter { this(next(it)) }
+
+fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
+
 
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
