@@ -1,7 +1,6 @@
 package org.http4k.mcp.testing.capabilities
 
-import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.result4k.valueOrNull
 import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.client.McpClient
@@ -20,24 +19,20 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
 
     init {
         sender.on(McpSampling) { event ->
-            listOf(event).asSequence().nextEvent<McpSampling.Request, SamplingRequest>() {
-                SamplingRequest(
-                    messages, maxTokens,
-                    systemPrompt, includeContext,
-                    temperature, stopSequences,
-                    modelPreferences, metadata
-                )
-            }.map { (id, request) ->
-                onSampling.forEach {
-                    it(request)
-                        .forEach {
-                            sender(
-                                with(it) { McpSampling.Response(model, stopReason, role, content) },
-                                id!!
-                            )
+            val (id, req) =
+                event.nextEvent<SamplingRequest, McpSampling.Request> {
+                    SamplingRequest(
+                        messages, maxTokens,
+                        systemPrompt, includeContext,
+                        temperature, stopSequences,
+                        modelPreferences, metadata
+                    )
+                }.valueOrNull()!!
+            onSampling.forEach { handler ->
+                handler(req).forEach { response ->
+                    sender(with(response) { McpSampling.Response(model, stopReason, role, content) }, id!!)
                 }
             }
-        }.onFailure { error(it) }
+        }
     }
-}
 }

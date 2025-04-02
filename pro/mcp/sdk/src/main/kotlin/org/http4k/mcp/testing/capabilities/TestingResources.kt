@@ -9,7 +9,6 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import org.http4k.mcp.testing.nextNotification
-import org.http4k.sse.SseMessage
 import java.time.Duration
 
 class TestingResources(
@@ -41,16 +40,16 @@ class TestingResources(
             }
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(
-            McpResource.List,
-            McpResource.List.Request()
-        ).nextEvent<McpResource.List.Response, List<McpResource>> { resources }.map { it.second }
+        sender(McpResource.List, McpResource.List.Request()).first()
+            .nextEvent<List<McpResource>, McpResource.List.Response> {
+                 resources
+            }.map { it.second }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
-        sender(
-            McpResource.Read,
-            McpResource.Read.Request(request.uri, request.meta)
-        ).nextEvent<McpResource.Read.Response, ResourceResponse> { ResourceResponse(contents) }
+        sender(McpResource.Read, McpResource.Read.Request(request.uri, request.meta)).first()
+            .nextEvent<ResourceResponse, McpResource.Read.Response>( {
+                ResourceResponse(contents)
+            })
             .map { it.second }
 
 

@@ -22,10 +22,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.testing.testSseClient
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.concurrent.thread
 
-
-data class ResponsesToId(val events: Sequence<SseMessage.Event>, val id: McpMessageId)
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
@@ -35,7 +32,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
         outbound.getOrPut(mcpRpc.Method) { mutableListOf() }.add(fn)
     }
 
-    private fun filterOut(responsesToId: ResponsesToId, mpcRpc: McpRpc) = responsesToId.events
+    private fun filterOut(events: Sequence<SseMessage.Event>, mpcRpc: McpRpc) = events
         .filter {
             when {
                 it.isFor(mpcRpc) || it.isResult() || it.isError() -> true
@@ -62,29 +59,18 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Request) =
         filterOut(
-                ResponsesToId(
-                    mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
-                    McpMessageId.of(id.get().toLong())
-            ),
+            mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
             mcpRpc
         )
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Notification) =
         filterOut(
-            ResponsesToId(
-                mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
-                McpMessageId.of(id.get().toLong())
-            ),
+            mcpHandler.callWith(connectRequest.withMcp(mcpRpc, input, id.incrementAndGet())),
             mcpRpc
         )
 
     operator fun invoke(input: ClientMessage.Response, id: McpMessageId) {
-        val a = ResponsesToId(
-            mcpHandler.callWith(connectRequest.withMcp(input, id)), id
-        )
-        thread {
-            a.events.toList()
-        }
+        mcpHandler.callWith(connectRequest.withMcp(input, id)).toList()
     }
 
     private fun PolyHandler.callWith(request: Request): Sequence<SseMessage.Event> {

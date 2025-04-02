@@ -1,20 +1,17 @@
 package org.http4k.mcp.testing.capabilities
 
-import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
 import org.http4k.connect.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.testing.TestMcpSender
 import org.http4k.mcp.testing.nextEvent
 import org.http4k.mcp.testing.nextNotification
 import org.http4k.mcp.util.McpJson
-import org.http4k.sse.SseMessage
 import java.time.Duration
 
 class TestingTools(
@@ -33,24 +30,22 @@ class TestingTools(
         sender.stream().nextNotification<McpTool.List.Changed.Notification>(McpTool.List.Changed)
             .also { notifications.forEach { it() } }
 
-
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpTool.List, McpTool.List.Request()).nextEvent<McpTool.List.Response, List<McpTool>> { tools }
+        sender(McpTool.List, McpTool.List.Request()).first()
+            .nextEvent<List<McpTool>, McpTool.List.Response>(fun McpTool.List.Response.() = tools)
             .map { it.second }
 
     override fun call(
         name: ToolName,
         request: ToolRequest,
         overrideDefaultTimeout: Duration?
-    ): Result<ToolResponse, McpError> {
-        val received = sender(
-            McpTool.Call, McpTool.Call.Request(
-                name,
-                request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
-            )
+    ) = sender(
+        McpTool.Call, McpTool.Call.Request(
+            name,
+            request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
         )
-
-        return received.nextEvent<McpTool.Call.Response, ToolResponse> {
+    ).last()
+        .nextEvent<ToolResponse, McpTool.Call.Response> {
             when (isError) {
                 true -> {
                     val input = (content.first() as Content.Text).text
@@ -60,5 +55,4 @@ class TestingTools(
                 else -> ToolResponse.Ok(content)
             }
         }.map { it.second }
-    }
 }

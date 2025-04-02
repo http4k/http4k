@@ -14,9 +14,8 @@ import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage
 
 
-internal inline fun <reified T : Any, OUT> Sequence<SseMessage.Event>.nextEvent(fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
-
-    val fields = McpJson.fields(McpJson.parse(first().data)).toMap()
+inline fun <OUT, reified T : Any> SseMessage.Event.nextEvent(noinline fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
+    val fields = McpJson.fields(McpJson.parse(data)).toMap()
 
     return when {
         fields["error"] != null -> Failure(

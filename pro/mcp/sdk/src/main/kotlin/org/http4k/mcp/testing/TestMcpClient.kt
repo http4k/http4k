@@ -44,7 +44,10 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
         )
 
         sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).toList()
-        return initResponse.nextEvent<McpInitialize.Response, ServerCapabilities> { capabilities }
+        return initResponse.first()
+            .nextEvent<ServerCapabilities, McpInitialize.Response>(fun McpInitialize.Response.(): ServerCapabilities {
+                return capabilities
+            })
             .map { it.second }
     }
 
