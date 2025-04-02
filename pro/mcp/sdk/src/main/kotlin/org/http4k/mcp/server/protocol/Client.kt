@@ -50,7 +50,7 @@ class ProgressClient<Transport>(
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
                     with(it.fromJsonRpc<McpSampling.Response>()) {
-                        queue.put(SamplingResponse(model, role, content, stopReason))
+                            queue.put(SamplingResponse(model, role, content, stopReason))
                         when {
                             stopReason == null -> InProgress
                             else -> Finished

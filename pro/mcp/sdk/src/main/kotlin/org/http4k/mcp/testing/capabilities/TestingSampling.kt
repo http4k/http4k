@@ -34,40 +34,10 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                             sender(
                                 with(it) { McpSampling.Response(model, stopReason, role, content) },
                                 id!!
-                            ).events.toList()
-                        }
+                            )
                 }
-            }.onFailure { error(it) }
-        }
+            }
+        }.onFailure { error(it) }
     }
-
-
-//    init {
-//        thread(isDaemon = true) {
-//            while (true) {
-//                runCatching {
-//                    ResponsesToId(
-//                        sender.stream(),
-//                        McpMessageId.random()
-//                    ).events.nextEvent<McpSampling.Request, SamplingRequest> {
-//                        SamplingRequest(
-//                            messages, maxTokens,
-//                            systemPrompt, includeContext,
-//                            temperature, stopSequences,
-//                            modelPreferences, metadata
-//                        )
-//                    }.map { next ->
-//                        onSampling.forEach {
-//                            it(next.second).forEach {
-//                                sender(
-//                                    with(it) { McpSampling.Response(model, stopReason, role, content) },
-//                                    next.first!!
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+}
 }
