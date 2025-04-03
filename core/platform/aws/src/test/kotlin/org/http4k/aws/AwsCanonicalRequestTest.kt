@@ -45,7 +45,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
 
     @Test
     fun `normalises path`() {
-        val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a:b:c/d e/*f/~g"), canonicalPayload)
+        val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a%3Ab%3Ac/d%20e/%2Af/~g"), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
 /a%3Ab%3Ac/d%20e/%2Af/~g
 

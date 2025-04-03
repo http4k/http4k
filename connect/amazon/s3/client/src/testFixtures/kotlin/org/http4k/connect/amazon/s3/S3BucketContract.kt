@@ -134,10 +134,10 @@ interface S3BucketContract : AwsContract {
 
 
     @Test
-    fun `bucket key with unusual characters`() {
+    fun `bucket key with non ascii characters`() {
         waitForBucketCreation()
 
-        val newKey = BucketKey.of("key#with#multiple#hash + spaces")
+        val newKey = BucketKey.of("key:%7C/+ |ü#with#multiple#hash + %2F+spaces/üo*~é_.png")
 
         try {
 

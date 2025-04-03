@@ -68,4 +68,4 @@ internal fun lastModified(headers: Headers, clock: Clock) = headers
     ?: Instant.now(clock)
 
 internal fun keyFor(request: Request) =
-    request.uri(request.uri.path(request.uri.path.replace("+", " "))).path("bucketKey")!!
+    request.path("bucketKey")!!

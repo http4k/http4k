@@ -5,7 +5,7 @@ import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
-import org.http4k.aws.encodeUriToMatchSignature
+import org.http4k.aws.encodeUri
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -47,6 +47,7 @@ fun ClientFilters.AwsAuth(
             val date = AwsRequestDate.of(clock.instant())
 
             val fullRequest = it
+                .encodeUri()
                 .replaceHeader("host", "${it.uri.host}${it.uri.port?.let { port -> ":$port" } ?: ""}")
                 .replaceHeader("x-amz-content-sha256", payload.hash)
                 .replaceHeader("x-amz-date", date.full).let {
@@ -66,7 +67,7 @@ fun ClientFilters.AwsAuth(
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
 
-            next(signedRequest.encodeUriToMatchSignature().body(Body(it.body.payload)))
+            next(signedRequest.body(Body(it.body.payload)))
         }
     }
 
