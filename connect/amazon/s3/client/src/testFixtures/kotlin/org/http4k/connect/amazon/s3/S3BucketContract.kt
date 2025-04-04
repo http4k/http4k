@@ -52,6 +52,8 @@ interface S3BucketContract : AwsContract {
 
     private val s3 get() = S3.Http({ aws.credentials }, http)
 
+    val preSigner get() = S3BucketPreSigner(bucket, aws.region, aws.credentials, clock)
+
     val key get() = BucketKey.of("originalKey")
 
     fun open() {}
@@ -135,6 +137,7 @@ interface S3BucketContract : AwsContract {
 
     @Test
     fun `bucket key with non ascii characters`() {
+        val http = SetXForwardedHost().then(http)
         waitForBucketCreation()
 
         val newKey = BucketKey.of("key:%7C/+ |ü#with#multiple#hash + %2F+spaces/üo*~é_.png")
@@ -146,6 +149,12 @@ interface S3BucketContract : AwsContract {
             assertThat(String(s3Bucket[newKey].successValue()!!.readBytes()), equalTo("hello"))
             assertThat(s3Bucket.listObjectsV2().successValue().items.map { it.Key }, equalTo(listOf(newKey)))
 
+            preSigner.get(newKey, Duration.ofMinutes(1)).also {
+                val response = Request(GET, it.uri)
+                    .headers(it.signedHeaders)
+                    .let(http)
+                assertThat(response, hasStatus(OK) and hasBody("hello"))
+            }
 
         } finally {
             s3Bucket.deleteObject(newKey)
@@ -155,12 +164,6 @@ interface S3BucketContract : AwsContract {
 
     @Test
     fun `pre signed request`() {
-        val preSigner = S3BucketPreSigner(
-            bucketName = bucket,
-            region = aws.region,
-            credentials = aws.credentials,
-            clock = clock
-        )
         val http = SetXForwardedHost().then(http)
 
         waitForBucketCreation()
