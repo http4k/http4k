@@ -41,10 +41,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .joinToString("&")
 
         private fun Uri.normalisedPath() =
-            if (path.isBlank()) "/" else path.split("/")
-                .joinToString("/") { it.urlEncodedForAws() }
-                .let { if (fragment.isBlank()) it else it + "#${fragment}".urlEncodedForAws() }
-                .let { if (it.startsWith("/")) it else "/$it" }
+            path.let { if (it.startsWith("/")) it else "/$it" }
     }
 }
 
@@ -52,4 +49,3 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
 internal fun Request.signedHeaders(): String =
     headers.map { it.first.lowercase(getDefault()) }.toSet().sorted().joinToString(";")
 
-private fun String.urlEncodedForAws() = urlEncoded().replace("+", "%20").replace("*", "%2A").replace("%7E", "~")
