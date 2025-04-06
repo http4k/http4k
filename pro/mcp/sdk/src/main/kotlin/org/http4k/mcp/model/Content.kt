@@ -9,13 +9,6 @@ import se.ansman.kotshi.PolymorphicLabel
 @JsonSerializable
 @Polymorphic("type")
 sealed class Content {
-
-    @JsonSerializable
-    @PolymorphicLabel("text")
-    data class Text(val text: String) : Content() {
-        constructor(value: Any) : this(value.toString())
-    }
-
     @JsonSerializable
     @PolymorphicLabel("audio")
     data class Audio(val data: Base64Blob, val mimeType: MimeType, val annotations: Annotations) : Content()
@@ -27,4 +20,10 @@ sealed class Content {
     @JsonSerializable
     @PolymorphicLabel("resource")
     data class EmbeddedResource(val resource: Resource.Content) : Content()
+
+    @JsonSerializable
+    @PolymorphicLabel("text")
+    data class Text(val text: String) : Content() {
+        constructor(value: Any) : this(value.toString())
+    }
 }
