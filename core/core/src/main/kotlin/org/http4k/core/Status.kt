@@ -8,11 +8,11 @@ class Status internal constructor(override val code: Int, override val descripti
     constructor(code: Int, description: String?) : this(code, description ?: "No description", false)
 
     companion object {
-        private val INFORMATIONAL = 100..199
+        val INFORMATIONAL = 100..199
         @JvmField val CONTINUE = Status(100, "Continue")
         @JvmField val SWITCHING_PROTOCOLS = Status(101, "Switching Protocols")
 
-        private val SUCCESSFUL = 200..299
+        val SUCCESSFUL = 200..299
         @JvmField val OK = Status(200, "OK")
         @JvmField val CREATED = Status(201, "Created")
         @JvmField val ACCEPTED = Status(202, "Accepted")
@@ -21,7 +21,7 @@ class Status internal constructor(override val code: Int, override val descripti
         @JvmField val RESET_CONTENT = Status(205, "Reset Content")
         @JvmField val PARTIAL_CONTENT = Status(206, "Partial Content")
 
-        private val REDIRECTION = 300..399
+        val REDIRECTION = 300..399
         @JvmField val MULTIPLE_CHOICES = Status(300, "Multiple Choices")
         @JvmField val MOVED_PERMANENTLY = Status(301, "Moved Permanently")
         @JvmField val FOUND = Status(302, "Found")
@@ -31,7 +31,7 @@ class Status internal constructor(override val code: Int, override val descripti
         @JvmField val TEMPORARY_REDIRECT = Status(307, "Temporary Redirect")
         @JvmField val PERMANENT_REDIRECT = Status(308, "Permanent Redirect")
 
-        private val CLIENT_ERROR = 400..499
+        val CLIENT_ERROR = 400..499
         @JvmField val BAD_REQUEST = Status(400, "Bad Request")
         @JvmField val UNSATISFIABLE_PARAMETERS = BAD_REQUEST.description("Unsatisfiable Parameters")
         @JvmField val UNAUTHORIZED = Status(401, "Unauthorized")
@@ -63,7 +63,7 @@ class Status internal constructor(override val code: Int, override val descripti
         @JvmField val REQUEST_HEADER_FIELDS_TOO_LARGE = Status(431, "Request Header Fields Too Large")
         @JvmField val UNAVAILABLE_FOR_LEGAL_REASONS = Status(451, "Unavailable For Legal Reasons")
 
-        private val SERVER_ERROR = 500..599
+        val SERVER_ERROR = 500..599
         @JvmField val INTERNAL_SERVER_ERROR = Status(500, "Internal Server Error")
         @JvmField val NOT_IMPLEMENTED = Status(501, "Not Implemented")
         @JvmField val BAD_GATEWAY = Status(502, "Bad Gateway")
