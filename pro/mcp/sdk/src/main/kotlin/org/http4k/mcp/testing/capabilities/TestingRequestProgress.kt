@@ -11,7 +11,7 @@ class TestingRequestProgress(sender: TestMcpSender) : McpClient.RequestProgress 
     init {
         sender.on(McpProgress) { event ->
             listOf(event).asSequence().nextNotification<McpProgress.Notification>(McpProgress)
-                .also { n -> progress.forEach { it(Progress(n.progress, n.total, n.progressToken)) } }
+                .also { n -> progress.forEach { it(Progress(n.progressToken, n.progress, n.total, n.description)) } }
         }
     }
 

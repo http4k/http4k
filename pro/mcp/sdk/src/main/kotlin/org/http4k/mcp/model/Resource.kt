@@ -11,19 +11,25 @@ sealed class Resource : CapabilitySpec {
     abstract fun matches(uri: Uri): Boolean
 
     abstract val name: ResourceName
+    abstract val size: Size?
     abstract val description: String?
     abstract val mimeType: MimeType?
+    abstract val annotations: Annotations?
 
     data class Static(
         val uri: Uri,
         override val name: ResourceName,
         override val description: String? = null,
-        override val mimeType: MimeType? = null
+        override val mimeType: MimeType? = null,
+        override val size: Size? = null,
+        override val annotations: Annotations? = null,
     ) : Resource() {
         constructor(
             uri: String, name: String, description: String? = null,
-            mimeType: MimeType? = null
-        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType)
+            mimeType: MimeType? = null,size: Size? = null,
+
+            annotations: Annotations? = null,
+        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations)
 
         override fun matches(uri: Uri) = this.uri == uri
     }
@@ -33,12 +39,16 @@ sealed class Resource : CapabilitySpec {
         override val name: ResourceName,
         override val description: String? = null,
         override val mimeType: MimeType? = null,
+        override val size: Size? = null,
+        override val annotations: Annotations? = null,
         internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.authority == it.authority }
     ) : Resource() {
         constructor(
             uriTemplate: String, name: String, description: String? = null,
-            mimeType: MimeType? = null
-        ) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType)
+            mimeType: MimeType? = null,
+            annotations: Annotations? = null,
+            size: Size? = null,
+        ) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations)
 
         override fun matches(uri: Uri) = matchFn(uri)
     }

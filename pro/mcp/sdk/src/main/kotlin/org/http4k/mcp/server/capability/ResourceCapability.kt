@@ -21,7 +21,9 @@ fun ResourceCapability(resource: Resource, handler: ResourceHandler) = object : 
             if (this is Resource.Templated) uriTemplate else null,
             name,
             description,
-            mimeType
+            mimeType,
+            size,
+            annotations
         )
     }
 

@@ -2,10 +2,12 @@ package org.http4k.mcp.protocol.messages
 
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
+import org.http4k.mcp.model.Annotations
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.Size
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
@@ -16,7 +18,9 @@ data class McpResource(
     val uriTemplate: Uri?,
     val name: ResourceName,
     val description: String?,
-    val mimeType: MimeType?
+    val mimeType: MimeType?,
+    val size: Size?,
+    val annotations: Annotations?,
 ) {
 
     object Read : McpRpc {

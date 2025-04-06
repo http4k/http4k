@@ -24,12 +24,12 @@ import kotlin.random.Random
 
 interface Client {
     fun sample(request: SamplingRequest, fetchNextTimeout: Duration? = null): Sequence<McpResult<SamplingResponse>>
-    fun progress(progress: Int, total: Double? = null)
+    fun progress(progress: Int, total: Double? = null, description: String? = null)
 
     companion object {
         object NoOp : Client {
             override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?) = error("NoOp")
-            override fun progress(progress: Int, total: Double?) = error("NoOp")
+            override fun progress(progress: Int, total: Double?, description: String?) = error("NoOp")
         }
     }
 }
@@ -50,7 +50,7 @@ class ProgressClient<Transport>(
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
                     with(it.fromJsonRpc<McpSampling.Response>()) {
-                            queue.put(SamplingResponse(model, role, content, stopReason))
+                        queue.put(SamplingResponse(model, role, content, stopReason))
                         when {
                             stopReason == null -> InProgress
                             else -> Finished
@@ -97,9 +97,9 @@ class ProgressClient<Transport>(
         }
     }
 
-    override fun progress(progress: Int, total: Double?) {
+    override fun progress(progress: Int, total: Double?, description: String?) {
         sessions.request(
-            context, McpProgress.Notification(progress, total, progressToken)
+            context, McpProgress.Notification(progressToken, progress, total, description)
                 .toJsonRpc(McpProgress)
         )
     }

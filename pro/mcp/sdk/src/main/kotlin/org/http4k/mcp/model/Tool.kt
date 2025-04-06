@@ -15,12 +15,19 @@ import org.http4k.mcp.protocol.messages.McpTool
 class Tool private constructor(
     val name: ToolName,
     val description: String,
-    val args: List<BiDiLens<ToolRequest, *>>
+    val args: List<BiDiLens<ToolRequest, *>>,
+    val annotations: ToolAnnotations? = null,
 ) : CapabilitySpec {
-    constructor(name: String, description: String, vararg arguments: BiDiLens<ToolRequest, *>) : this(
+    constructor(
+        name: String,
+        description: String,
+        vararg arguments: BiDiLens<ToolRequest, *>,
+        annotations: ToolAnnotations? = null
+    ) : this(
         ToolName.of(name),
         description,
-        arguments.toList()
+        arguments.toList(),
+        annotations
     )
 
     object Arg : BiDiLensSpec<ToolRequest, String>(
@@ -36,7 +43,7 @@ class Tool private constructor(
     )
 }
 
-fun Tool.asMcp() = McpTool(name, description, toSchema())
+fun Tool.asMcp() = McpTool(name, description, toSchema(), annotations)
 
 fun Tool.toSchema() = mapOf(
     "type" to "object",

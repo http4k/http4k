@@ -5,6 +5,7 @@ import org.http4k.format.MoshiNode
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.ToolAnnotations
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
@@ -13,7 +14,8 @@ import se.ansman.kotshi.JsonSerializable
 data class McpTool(
     val name: ToolName,
     val description: String,
-    val inputSchema: Map<String, Any> = emptyMap()
+    val inputSchema: Map<String, Any> = emptyMap(),
+    val annotations: ToolAnnotations? = null,
 ) {
     object List : McpRpc {
         override val Method = of("tools/list")

@@ -10,9 +10,10 @@ object McpProgress : McpRpc {
 
     @JsonSerializable
     data class Notification(
+        val progressToken: ProgressToken,
         val progress: Int,
         val total: Double?,
-        val progressToken: ProgressToken,
+        val description: String?,
         override val _meta: Meta = Meta.default
     ) : ServerMessage.Notification, ClientMessage.Notification, HasMeta
 }

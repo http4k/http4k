@@ -6,6 +6,7 @@ import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
+import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.StopReason
@@ -33,14 +34,17 @@ import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.model.Annotations
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
+import org.http4k.mcp.model.Priority
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -205,7 +209,8 @@ class McpProtocolTest {
 
     @Test
     fun `deal with static resources`() {
-        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
+        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description",
+            IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)))
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
         val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
@@ -231,7 +236,9 @@ class McpProtocolTest {
                             null,
                             ResourceName.of("HTTP4K"),
                             "description",
-                            null
+                            IMAGE_GIF,
+                            Size.of(1),
+                            Annotations(listOf(Assistant), Priority.of(1.0))
                         )
                     )
                 )
@@ -261,7 +268,8 @@ class McpProtocolTest {
     @Test
     fun `deal with templated resources`() {
         val resource =
-            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
+            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description",
+                IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)))
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
         val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
@@ -290,7 +298,9 @@ class McpProtocolTest {
                             resource.uriTemplate,
                             ResourceName.of("HTTP4K"),
                             "description",
-                            null
+                            IMAGE_GIF,
+                            Size.of(1),
+                            Annotations(listOf(Assistant), Priority.of(1.0)),
                         )
                     )
                 )
@@ -316,8 +326,8 @@ class McpProtocolTest {
             val intArg1 = intArg(it)
 
             it.meta.progress?.let { p ->
-                it.client.progress(1, 5.0)
-                it.client.progress(2, 5.0)
+                it.client.progress(1, 5.0, "d1")
+                it.client.progress(2, 5.0, "d2")
             }
 
             ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
@@ -366,8 +376,8 @@ class McpProtocolTest {
             )
 
 
-            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progressToken))
-            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progressToken))
+            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
+            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 2, 5.0, "d2"))
             assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
 
             val progress2 = "123"
@@ -424,8 +434,8 @@ class McpProtocolTest {
         val completions = ServerCompletions(
             listOf(ref bind {
                 it.meta.progress?.let { p ->
-                    it.client.progress(1, 5.0)
-                    it.client.progress(2, 5.0)
+                    it.client.progress(1, 5.0, "d1")
+                    it.client.progress(2, 5.0, "d2")
                 }
 
                 CompletionResponse(listOf("values"), 1, true)
@@ -450,8 +460,8 @@ class McpProtocolTest {
                 McpCompletion.Request(ref, CompletionArgument("arg", "value"), Meta(progressToken))
             )
 
-            assertNextMessage(McpProgress, McpProgress.Notification(1, 5.0, progressToken))
-            assertNextMessage(McpProgress, McpProgress.Notification(2, 5.0, progressToken))
+            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
+            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 2, 5.0, "d2"))
 
             assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
         }

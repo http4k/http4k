@@ -270,7 +270,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             equalTo(Success(ToolResponse.Ok(Content.Text(""))))
         )
 
-        assertThat(prog.get(), equalTo(Progress(1, 2.0, "progress")))
+        assertThat(prog.get(), equalTo(Progress("progress", 1, 2.0)))
 
         mcpClient.stop()
 

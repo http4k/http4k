@@ -175,6 +175,8 @@ class TestMcpClientTest {
                                 null,
                                 ResourceName.of("HTTP4K"),
                                 "description",
+                                null,
+                                null,
                                 null
                             )
                         )
@@ -337,7 +339,7 @@ class TestMcpClientTest {
     fun `deal with progress`() {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
 
-        val progress = Progress(1, 1.0, "hello")
+        val progress = Progress("hello", 1, 1.0)
         val serverCompletions = ServerCompletions(
             listOf(ref bind {
                 it.client.progress(progress.progress, progress.total)
