@@ -70,7 +70,7 @@ fun SseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false
 fun RoutingSseHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintSseRequestAndResponse(out, debugStream).then(this)
 
-fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
+fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out, shouldReport: (SseMessage) -> Boolean = { true }) =
     SseFilter { next ->
         { req ->
             try {
@@ -91,8 +91,10 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                             consumer(object : Sse by sse {
                                 override fun send(message: SseMessage) = apply {
                                     sse.send(message)
-                                    out.println("""***** SSE SEND ${req.method}: ${req.uri} -> ${message::class.simpleName}""")
-                                    out.println(message.toMessage())
+                                    if (shouldReport(message)) {
+                                        out.println("""***** SSE SEND ${req.method}: ${req.uri} -> ${message::class.simpleName}""")
+                                        out.println(message.toMessage())
+                                    }
                                 }
 
                                 override fun close() {
@@ -102,6 +104,7 @@ fun DebuggingFilters.PrintSseResponse(out: PrintStream = System.out) =
                             })
                         }
                     }
+
                     else -> response
                 }
             } catch (e: Exception) {

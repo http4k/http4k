@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.NoOp
+import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.routing.RoutingHttpHandler
@@ -33,15 +34,15 @@ object DebuggingFilters {
      * Print details of the response before it is returned.
      */
     object PrintResponse {
-        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter =
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream, shouldReport: (Response) -> Boolean = { true }): Filter =
             Filter { next ->
                 {
                     try {
                         next(it).let { response ->
                             out.println(
-                                listOf(
+                                listOfNotNull(
                                     "***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****",
-                                    response.printable(debugStream)
+                                    response.printable(debugStream).takeIf { shouldReport(response) }
                                 ).joinToString("\n")
                             )
                             response

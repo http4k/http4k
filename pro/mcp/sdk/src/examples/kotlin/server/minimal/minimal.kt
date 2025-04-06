@@ -1,5 +1,6 @@
 package server.minimal
 
+import org.http4k.filter.debugMcpStream
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
@@ -21,6 +22,6 @@ fun main() {
         Tool("time", "get the time") bind {
             ToolResponse.Ok(listOf(Content.Text(Instant.now().toString())))
         }
-    ).asServer(Helidon(4001)).start()
+    ).debugMcpStream(debugStream = true).asServer(Helidon(4001)).start()
 }
 
