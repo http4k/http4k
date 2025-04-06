@@ -30,8 +30,8 @@ class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<Resou
         items.map { it.toResource() }.filter { it.uri != null }
     )
 
-    override fun listTemplates(req: McpResource.Template.List.Request, client: Client, http: Request) =
-        McpResource.Template.List.Response(
+    override fun listTemplates(req: McpResource.ListTemplates.Request, client: Client, http: Request) =
+        McpResource.ListTemplates.Response(
             items.map { it.toResource() }.filter { it.uriTemplate != null }
         )
 

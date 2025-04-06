@@ -82,6 +82,7 @@ interface McpClient : AutoCloseable {
     interface Resources {
         fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
+        fun listTemplates(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
         fun read(request: ResourceRequest, overrideDefaultTimeout: Duration? = null): McpResult<ResourceResponse>
         fun subscribe(uri: Uri, fn: () -> Unit)
         fun unsubscribe(uri: Uri)

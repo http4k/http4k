@@ -144,8 +144,8 @@ class McpProtocol<Transport>(
                             prompts.list(it, c, httpReq)
                         }
 
-                    McpResource.Template.List.Method ->
-                        transport.respondTo<McpResource.Template.List.Request>(session, jsonReq, httpReq) { it, c ->
+                    McpResource.ListTemplates.Method ->
+                        transport.respondTo<McpResource.ListTemplates.Request>(session, jsonReq, httpReq) { it, c ->
                             resources.listTemplates(it, c, httpReq)
                         }
 

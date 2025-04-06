@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.5.3.0
 - **http4k-***: Upgrade some dependency versions.
+- **http4k-mcp-sdk**: Updates to support objects in new spec.
 - **http4k-connect-amazon-s3***: More support for keys containing hash (#). H/T @aharin
 
 ### v6.5.2.0

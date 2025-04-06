@@ -288,10 +288,10 @@ class McpProtocolTest {
 
             assertNextMessage(McpResource.List.Response(listOf()))
 
-            mcp.sendToMcp(McpResource.Template.List, McpResource.Template.List.Request(null))
+            mcp.sendToMcp(McpResource.ListTemplates, McpResource.ListTemplates.Request(null))
 
             assertNextMessage(
-                McpResource.Template.List.Response(
+                McpResource.ListTemplates.Response(
                     listOf(
                         McpResource(
                             null,

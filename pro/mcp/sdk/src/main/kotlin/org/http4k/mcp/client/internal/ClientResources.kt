@@ -50,6 +50,15 @@ internal class ClientResources(
         .flatMap { it.first().asOrFailure<McpResource.List.Response>() }
         .map { it.resources }
 
+    override fun listTemplates(overrideDefaultTimeout: Duration?) = sender(
+        McpResource.ListTemplates, McpResource.ListTemplates.Request(),
+        overrideDefaultTimeout ?: defaultTimeout,
+        McpMessageId.random(random)
+    )
+        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+        .flatMap { it.first().asOrFailure<McpResource.ListTemplates.Response>() }
+        .map { it.resourceTemplates }
+
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpResource.Read,

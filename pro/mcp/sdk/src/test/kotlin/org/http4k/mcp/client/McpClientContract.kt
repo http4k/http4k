@@ -73,7 +73,15 @@ interface McpClientContract<T> : PortBasedTest {
                     "description"
                 ) bind {
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-                }),
+                },
+                Resource.Templated(
+                    Uri.of("https://http4k.org"),
+                    ResourceName.of("HTTP4K"),
+                    "templated resource"
+                ) bind {
+                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                }
+            ),
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
@@ -106,6 +114,11 @@ interface McpClientContract<T> : PortBasedTest {
 
         assertThat(
             mcpClient.resources().list().valueOrNull()!!.size,
+            equalTo(1)
+        )
+
+        assertThat(
+            mcpClient.resources().listTemplates().valueOrNull()!!.size,
             equalTo(1)
         )
 

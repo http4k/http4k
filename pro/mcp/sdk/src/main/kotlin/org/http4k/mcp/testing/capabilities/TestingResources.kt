@@ -45,6 +45,12 @@ class TestingResources(
                  resources
             }.map { it.second }
 
+    override fun listTemplates(overrideDefaultTimeout: Duration?) =
+        sender(McpResource.ListTemplates, McpResource.ListTemplates.Request()).first()
+            .nextEvent<List<McpResource>, McpResource.ListTemplates.Response> {
+                 resourceTemplates
+            }.map { it.second }
+
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(McpResource.Read, McpResource.Read.Request(request.uri, request.meta)).first()
             .nextEvent<ResourceResponse, McpResource.Read.Response>( {

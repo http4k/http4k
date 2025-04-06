@@ -103,6 +103,10 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
             http.send<McpResource.List.Response>(McpResource.List, McpResource.List.Request())
                 .map { it.resources }
 
+        override fun listTemplates(overrideDefaultTimeout: Duration?) =
+            http.send<McpResource.ListTemplates.Response>(McpResource.ListTemplates, McpResource.ListTemplates.Request())
+                .map { it.resourceTemplates }
+
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?

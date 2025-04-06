@@ -250,6 +250,11 @@ class HttpStreamingMcpClient(
                 .flatMap { it.first().asAOrFailure<McpResource.List.Response>() }
                 .map { it.resources }
 
+        override fun listTemplates(overrideDefaultTimeout: Duration?) =
+            http.send(McpResource.ListTemplates, McpResource.ListTemplates.Request())
+                .flatMap { it.first().asAOrFailure<McpResource.ListTemplates.Response>() }
+                .map { it.resourceTemplates }
+
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?

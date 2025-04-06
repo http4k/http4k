@@ -63,11 +63,29 @@ data class McpResource(
         }
     }
 
+    object ListTemplates : McpRpc {
+        override val Method = of("resources/templates/list")
+
+        @JsonSerializable
+        data class Request(
+            override val cursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
+
+        @JsonSerializable
+        data class Response(
+            val resourceTemplates: kotlin.collections.List<McpResource>,
+            override val nextCursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ServerMessage.Response, PaginatedResponse, HasMeta
+    }
+
     data object Updated : McpRpc {
         override val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
         @JsonSerializable
-        data class Notification(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification, HasMeta
+        data class Notification(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification,
+            HasMeta
     }
 
     object Subscribe : McpRpc {
@@ -90,22 +108,4 @@ data class McpResource(
         ) : ClientMessage.Request, HasMeta
     }
 
-    object Template {
-        object List : McpRpc {
-            override val Method = of("resources/templates/list")
-
-            @JsonSerializable
-            data class Request(
-                override val cursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
-
-            @JsonSerializable
-            data class Response(
-                val resourceTemplates: kotlin.collections.List<McpResource>,
-                override val nextCursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, PaginatedResponse, HasMeta
-        }
-    }
 }

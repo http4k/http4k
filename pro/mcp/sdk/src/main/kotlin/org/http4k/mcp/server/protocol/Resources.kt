@@ -12,7 +12,11 @@ interface Resources {
 
     fun listResources(req: McpResource.List.Request, client: Client, http: Request): McpResource.List.Response
 
-    fun listTemplates(req: McpResource.Template.List.Request, client: Client, http: Request): McpResource.Template.List.Response
+    fun listTemplates(
+        req: McpResource.ListTemplates.Request,
+        client: Client,
+        http: Request
+    ): McpResource.ListTemplates.Response
 
     fun read(req: McpResource.Read.Request, client: Client, http: Request): McpResource.Read.Response
 
