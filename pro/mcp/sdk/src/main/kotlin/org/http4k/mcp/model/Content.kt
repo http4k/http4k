@@ -17,6 +17,10 @@ sealed class Content {
     }
 
     @JsonSerializable
+    @PolymorphicLabel("audio")
+    data class Audio(val data: Base64Blob, val mimeType: MimeType, val annotations: Annotations) : Content()
+
+    @JsonSerializable
     @PolymorphicLabel("image")
     data class Image(val data: Base64Blob, val mimeType: MimeType) : Content()
 

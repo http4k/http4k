@@ -25,13 +25,11 @@ import org.http4k.format.ThrowableAdapter
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
-import org.http4k.mcp.model.CostPriority
-import org.http4k.mcp.model.IntelligencePriority
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.model.Priority
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.SpeedPriority
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
@@ -53,16 +51,14 @@ object McpJson : ConfigurableMoshi(
         .withStandardMappings()
         .withAiMappings()
         .value(Base64Blob)
-        .value(CostPriority)
-        .value(IntelligencePriority)
         .value(McpEntity)
         .value(McpRpcMethod)
         .value(McpMessageId)
+        .value(Priority)
         .value(ProtocolVersion)
         .value(PromptName)
         .value(ResourceName)
         .value(SessionId)
-        .value(SpeedPriority)
         .value(Version)
         .done()
 )
