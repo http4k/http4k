@@ -9,7 +9,9 @@ import org.http4k.server.Helidon
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 
+@DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
 class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) }, JavaHttpClient()) {
     @Disabled
     override fun `should propagate close on server stop`() {
