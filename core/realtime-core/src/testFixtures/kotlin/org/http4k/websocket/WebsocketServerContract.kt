@@ -244,7 +244,6 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
     open fun `should propagate close on server stop`() {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null
