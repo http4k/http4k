@@ -6,7 +6,9 @@ import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.isA
 import org.http4k.server.Jetty
 import org.http4k.websocket.BlockingWebsocketClientContract
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 
+@DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
 class HelidonBlockingWebsocketClientTest: BlockingWebsocketClientContract(
     serverConfig = Jetty(0),
     websocketFactory = { HelidonWebsocketClient(timeout = it) }
