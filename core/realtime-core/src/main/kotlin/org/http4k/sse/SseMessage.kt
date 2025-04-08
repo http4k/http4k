@@ -15,7 +15,7 @@ sealed interface SseMessage {
         override fun toMessage() = "data: $data\n\n"
     }
 
-    data class Event(val event: String, val data: String, val id: SseEventId? = null) : SseMessage {
+    data class Event(val event: String, val data: String = "", val id: SseEventId? = null) : SseMessage {
         constructor(event: String, data: ByteArray, id: SseEventId? = null) : this(
             event,
             data.base64Encode(),
