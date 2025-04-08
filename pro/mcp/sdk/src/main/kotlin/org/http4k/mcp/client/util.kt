@@ -28,6 +28,8 @@ internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, 
 
     when {
         data["method"] != null -> Failure(Protocol(InvalidRequest))
+        data["error"] != null -> Failure(Protocol(convert<MoshiNode, ErrorMessage>(data.attributes["error"]!!)))
+
         else -> {
             resultFrom {
                 convert<MoshiNode, T>(data.attributes["result"] ?: nullNode())

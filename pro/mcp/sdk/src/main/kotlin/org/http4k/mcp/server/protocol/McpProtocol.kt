@@ -247,13 +247,17 @@ class McpProtocol<Transport>(
                 else -> {
                     val context = ClientCall(progress, session)
                     sessions.assign(context, this, httpReq)
-                    fn(it, ProgressClient(progress, context, sessions, random) { clientTracking[session] })
-                        .also { sessions.end(context) }
+                    try {
+                        fn(it, ProgressClient(progress, context, sessions, random) { clientTracking[session] })
+                    } finally {
+                        sessions.end(context)
+                    }
                 }
             }
         }
         .map { it.toJsonRpc(jsonReq.id) }
         .recover {
+            System.err.println(it)
             when (it) {
                 is McpException -> it.error.toJsonRpc(jsonReq.id)
                 else -> {
