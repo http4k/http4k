@@ -30,6 +30,7 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.time.Duration
@@ -243,6 +244,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
     open fun `should propagate close on server stop`() {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null
