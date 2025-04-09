@@ -306,9 +306,17 @@ class McpProtocolTest {
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uriTemplate))
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://www.http4k.org/bob")))
 
             assertNextMessage(McpResource.Read.Response(listOf(content)))
+
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://not-http4k/bob")))
+
+            assertNextMessage(InvalidParams)
+
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("otherprotocol://www.http4k.org/bob")))
+
+            assertNextMessage(InvalidParams)
         }
     }
 

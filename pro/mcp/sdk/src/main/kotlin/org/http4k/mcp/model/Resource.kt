@@ -41,7 +41,7 @@ sealed class Resource : CapabilitySpec {
         override val mimeType: MimeType? = null,
         override val size: Size? = null,
         override val annotations: Annotations? = null,
-        internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.authority == it.authority }
+        internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.scheme == it.scheme && uriTemplate.authority == it.authority }
     ) : Resource() {
         constructor(
             uriTemplate: String, name: String, description: String? = null,
