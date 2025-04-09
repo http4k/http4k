@@ -17,7 +17,7 @@ data class SendMessage(
     @Json(name = "QueueUrl") val queueUrl: Uri,
     @Json(name = "MessageBody") val messageBody: String,
     @Json(name = "DelaySeconds") val delaySeconds: Int? = null,
-    @Json(name = "MessageDeDuplicationId") val messageDeduplicationId: String? = null,
+    @Json(name = "MessageDeduplicationId") val messageDeduplicationId: String? = null,
     @Json(name = "MessageGroupId") val messageGroupId: String? = null,
     @Json(name = "MessageAttributes") val messageAttributes: Map<String, MessageFieldsDto>? = null,
     @Json(name = "MessageSystemAttributes") val messageSystemAttributes: Map<String, MessageFieldsDto>? = null
