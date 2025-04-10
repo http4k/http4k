@@ -19,3 +19,5 @@ class McpMessageId private constructor(value: Long) : LongValue(value) {
  * message ID, so we need to limit the range of the message ID to this value.
  */
 private const val MAX_MCP_MESSAGE_ID = 9_007_199_254_740_991L
+
+

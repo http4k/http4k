@@ -30,6 +30,7 @@ import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Priority
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Size
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
@@ -60,6 +61,7 @@ object McpJson : ConfigurableMoshi(
         .value(ProtocolVersion)
         .value(PromptName)
         .value(ResourceName)
+        .value(ResourceUriTemplate)
         .value(SessionId)
         .value(Size)
         .value(Version)

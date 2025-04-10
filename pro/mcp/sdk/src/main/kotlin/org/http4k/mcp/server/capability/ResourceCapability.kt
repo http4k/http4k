@@ -5,6 +5,8 @@ import org.http4k.core.Uri
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
+import org.http4k.mcp.model.Resource.Static
+import org.http4k.mcp.model.Resource.Templated
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.server.protocol.Client
 
@@ -17,8 +19,8 @@ interface ResourceCapability : ServerCapability, ResourceHandler {
 fun ResourceCapability(resource: Resource, handler: ResourceHandler) = object : ResourceCapability {
     override fun toResource() = with(resource) {
         McpResource(
-            if (this is Resource.Static) uri else null,
-            if (this is Resource.Templated) uriTemplate else null,
+            if (this is Static) uri else null,
+            if (this is Templated) uriTemplate else null,
             name,
             description,
             mimeType,

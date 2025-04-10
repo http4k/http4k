@@ -3,7 +3,7 @@ package org.http4k.mcp.model
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
-import org.http4k.core.matchesRfc6570
+import org.http4k.mcp.util.Rfc6570UriTemplateMatcher.matches
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -36,20 +36,20 @@ sealed class Resource : CapabilitySpec {
     }
 
     data class Templated(
-        val uriTemplate: Uri,
+        val uriTemplate: ResourceUriTemplate,
         override val name: ResourceName,
         override val description: String? = null,
         override val mimeType: MimeType? = null,
         override val size: Size? = null,
         override val annotations: Annotations? = null,
-        internal val matchFn: Uri.(Uri) -> Boolean = { matchesRfc6570(it) }
+        internal val matchFn: ResourceUriTemplate.(Uri) -> Boolean = { matches(it) }
     ) : Resource() {
         constructor(
             uriTemplate: String, name: String, description: String? = null,
             mimeType: MimeType? = null,
             annotations: Annotations? = null,
             size: Size? = null,
-        ) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations)
+        ) : this(ResourceUriTemplate.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations)
 
         override fun matches(uri: Uri) = matchFn(uriTemplate, uri)
     }
@@ -84,29 +84,3 @@ sealed class Resource : CapabilitySpec {
         ) : Content()
     }
 }
-
-private fun matches(uriTemplate: Uri): (Uri) -> Boolean = {
-    try {
-        when {
-            it.toString().isEmpty() -> false
-            else -> {
-                val regex = uriTemplate.toString()
-                    .replace(".", "\\.")
-                    .replace("?", "\\?")
-                    .replace("*", "\\*")
-                    .replace("+", "\\+")
-                    .replace("(", "\\(")
-                    .replace(")", "\\)")
-                    .replace("[", "\\[")
-                    .replace("]", "\\]")
-                    .replace("|", "\\|")
-                    .replace(Regex("\\{[^}]+}"), "([^/]+)")
-
-                Regex("^$regex$").matches(it.toString())
-            }
-        }
-    } catch (e: Exception) {
-        false
-    }
-}
-

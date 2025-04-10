@@ -26,6 +26,7 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
@@ -75,7 +76,7 @@ interface McpClientContract<T> : PortBasedTest {
                     ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 },
                 Resource.Templated(
-                    Uri.of("https://http4k.org"),
+                    ResourceUriTemplate.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
                     "templated resource"
                 ) bind {

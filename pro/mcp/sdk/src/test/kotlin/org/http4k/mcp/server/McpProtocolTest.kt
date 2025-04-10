@@ -50,6 +50,7 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -268,11 +269,13 @@ class McpProtocolTest {
     @Test
     fun `deal with templated resources`() {
         val resource =
-            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description",
+            Resource.Templated(
+                ResourceUriTemplate.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description",
                 IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)))
-        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
 
-        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(
+            Resource.Content.Blob(Base64Blob.encode("image"), it.uri)
+        )) }))
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
@@ -308,7 +311,7 @@ class McpProtocolTest {
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://www.http4k.org/bob")))
 
-            assertNextMessage(McpResource.Read.Response(listOf(content)))
+            assertNextMessage(McpResource.Read.Response(listOf(Resource.Content.Blob(Base64Blob.encode("image"), Uri.of("https://www.http4k.org/bob")))))
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://not-http4k/bob")))
 

@@ -37,6 +37,7 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
@@ -211,9 +212,11 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with templated resources`() {
+
+        val uri = Uri.of("https://www.http4k.org/value")
         val resource =
-            Resource.Templated(Uri.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
-        val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uriTemplate)
+            Resource.Templated(ResourceUriTemplate.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
+        val content = Resource.Content.Blob(Base64Blob.encode("image"), uri)
 
         val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
 
@@ -229,7 +232,7 @@ class TestMcpClientTest {
             assertThat(resources().list(), equalTo(Success(emptyList())))
 
             assertThat(
-                resources().read(ResourceRequest(resource.uriTemplate)),
+                resources().read(ResourceRequest(uri)),
                 equalTo(Success(ResourceResponse(listOf(content))))
             )
         }

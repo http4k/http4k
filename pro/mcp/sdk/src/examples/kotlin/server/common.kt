@@ -18,6 +18,7 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
+import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ToolCapability
@@ -92,7 +93,7 @@ fun liveWeatherTool(): ToolCapability {
 }
 
 fun templatedResource() = Resource.Templated(
-    Uri.of("https://www.http4k.org/ecosystem/{+ecosystem}/"),
+    ResourceUriTemplate.of("https://www.http4k.org/ecosystem/{+ecosystem}/"),
     ResourceName.of("HTTP4K ecosystem page"),
     "view ecosystem"
 ) bind LinksOnPage(JavaHttpClient())
