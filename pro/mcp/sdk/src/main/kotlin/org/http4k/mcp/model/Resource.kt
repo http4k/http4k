@@ -42,7 +42,7 @@ sealed class Resource : CapabilitySpec {
         override val mimeType: MimeType? = null,
         override val size: Size? = null,
         override val annotations: Annotations? = null,
-        internal val matchFn: ((Uri) -> Boolean) = uriTemplate::matchesRfc6570
+        internal val matchFn: Uri.(Uri) -> Boolean = { matchesRfc6570(it) }
     ) : Resource() {
         constructor(
             uriTemplate: String, name: String, description: String? = null,
@@ -51,7 +51,7 @@ sealed class Resource : CapabilitySpec {
             size: Size? = null,
         ) : this(Uri.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations)
 
-        override fun matches(uri: Uri) = matchFn(uri)
+        override fun matches(uri: Uri) = matchFn(uriTemplate, uri)
     }
 
     @JsonSerializable
