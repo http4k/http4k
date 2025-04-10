@@ -48,6 +48,7 @@ object McpJson : ConfigurableMoshi(
         .addLast(SetAdapter)
         .addLast(MapAdapter)
         .addLast(MoshiNodeAdapter)
+        .addLast(ErrorMessageAdapter)
         .asConfigurable()
         .withStandardMappings()
         .withAiMappings()
