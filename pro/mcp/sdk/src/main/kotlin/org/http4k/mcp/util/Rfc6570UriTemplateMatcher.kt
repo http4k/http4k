@@ -28,11 +28,9 @@ object Rfc6570UriTemplateMatcher {
     fun ResourceUriTemplate.matches(testUri: Uri): Boolean {
         val template = value
         val uri = testUri.toString()
+
         // Special case for templates with empty values
         if (uri == template) return true
-
-        // Handle templates without expressions
-        if (!template.contains("{")) return uri == template
 
         // This is a more complex approach to match templates with expressions
         val pattern = convertTemplateToPattern(template)
@@ -195,11 +193,9 @@ object Rfc6570UriTemplateMatcher {
      * Percent-encodes a string for normal template expansion
      * Encodes all characters except unreserved (RFC 3986)
      */
-    private fun percentEncode(value: String): String {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8)
-            .replace("+", "%20") // Replace space encoding from + to %20
-            .replace("%7E", "~") // Don't encode tilde as it's unreserved
-    }
+    private fun percentEncode(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8)
+        .replace("+", "%20") // Replace space encoding from + to %20
+        .replace("%7E", "~") // Don't encode tilde as it's unreserved
 
     /**
      * Percent-encodes a string for reserved expansion, preserving reserved characters
@@ -227,16 +223,13 @@ object Rfc6570UriTemplateMatcher {
     /**
      * Checks if a character is in the unreserved set (RFC 3986)
      */
-    private fun Char.isUnreservedChar(): Boolean {
-        return this.isLetterOrDigit() || this == '-' || this == '.' || this == '_' || this == '~'
-    }
+    private fun Char.isUnreservedChar(): Boolean =
+        isLetterOrDigit() || this == '-' || this == '.' || this == '_' || this == '~'
 
     /**
      * Checks if a character is in the reserved set (RFC 3986)
      */
-    private fun Char.isReservedChar(): Boolean {
-        return this in "/:?#[]@!$&'()*+,;="
-    }
+    private fun Char.isReservedChar(): Boolean = this in "/:?#[]@!$&'()*+,;="
 
     /**
      * Escapes special regex characters for pattern matching
