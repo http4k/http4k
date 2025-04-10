@@ -270,7 +270,7 @@ class McpProtocolTest {
     fun `deal with templated resources`() {
         val resource =
             Resource.Templated(
-                ResourceUriTemplate.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description",
+                "https://www.http4k.org/{+template}", "HTTP4K", "description",
                 IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)))
 
         val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(

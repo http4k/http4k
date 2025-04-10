@@ -21,8 +21,8 @@ object Rfc6570UriTemplateMatcher {
     /**
      * Checks if a URI matches a template
      *
-     * @param templateUri The URI template to match against
-     * @param testUri The URI to check
+     * @param template The URI template to match against
+     * @param uri The URI to check
      * @return true if the URI matches the template, false otherwise
      */
     fun ResourceUriTemplate.matches(testUri: Uri): Boolean {
@@ -30,6 +30,9 @@ object Rfc6570UriTemplateMatcher {
         val uri = testUri.toString()
         // Special case for templates with empty values
         if (uri == template) return true
+
+        // Handle templates without expressions
+        if (!template.contains("{")) return uri == template
 
         // This is a more complex approach to match templates with expressions
         val pattern = convertTemplateToPattern(template)
@@ -68,6 +71,7 @@ object Rfc6570UriTemplateMatcher {
                         result.append("#").append(expanded)
                     }
                 }
+
                 else -> result.append(expandSimple(variableList, variables))
             }
 
@@ -102,9 +106,9 @@ object Rfc6570UriTemplateMatcher {
             val variablePattern = when (operator) {
                 // Level 2: Reserved expansion
                 "+" -> {
-                    // Handle path case especially carefully - allow empty segments
+                    // Handle path case especially carefully - allow nested paths
                     if (variableSpec == "path") {
-                        "((?:/[^/]*)*)"
+                        "([^/]+(?:/[^/]+)*|/[^/]*(?:/[^/]*)*|)"
                     } else {
                         // Handle other reserved expansions
                         "([^/]*)"
@@ -191,9 +195,11 @@ object Rfc6570UriTemplateMatcher {
      * Percent-encodes a string for normal template expansion
      * Encodes all characters except unreserved (RFC 3986)
      */
-    private fun percentEncode(value: String) = URLEncoder.encode(value, StandardCharsets.UTF_8)
-        .replace("+", "%20") // Replace space encoding from + to %20
-        .replace("%7E", "~") // Don't encode tilde as it's unreserved
+    private fun percentEncode(value: String): String {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8)
+            .replace("+", "%20") // Replace space encoding from + to %20
+            .replace("%7E", "~") // Don't encode tilde as it's unreserved
+    }
 
     /**
      * Percent-encodes a string for reserved expansion, preserving reserved characters
@@ -221,13 +227,16 @@ object Rfc6570UriTemplateMatcher {
     /**
      * Checks if a character is in the unreserved set (RFC 3986)
      */
-    private fun Char.isUnreservedChar(): Boolean =
-        isLetterOrDigit() || this == '-' || this == '.' || this == '_' || this == '~'
+    private fun Char.isUnreservedChar(): Boolean {
+        return this.isLetterOrDigit() || this == '-' || this == '.' || this == '_' || this == '~'
+    }
 
     /**
      * Checks if a character is in the reserved set (RFC 3986)
      */
-    private fun Char.isReservedChar(): Boolean = this in "/:?#[]@!$&'()*+,;="
+    private fun Char.isReservedChar(): Boolean {
+        return this in "/:?#[]@!$&'()*+,;="
+    }
 
     /**
      * Escapes special regex characters for pattern matching

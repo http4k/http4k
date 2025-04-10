@@ -46,6 +46,7 @@ class Rfc6570UriTemplateMatcherTest {
     fun `template matches tests Rfc6570 level 2 templates`() {
         // Reserved expansion with + operator
         assertMatch("http://example.com/{+path}/here", "http://example.com//foo/bar/here")
+        assertMatch("http://example.com/{+path}", "http://example.com/foo/bar/here")
         assertMatch("here?ref={+path}", "here?ref=/foo/bar")
 
         // Fragment expansion with # operator

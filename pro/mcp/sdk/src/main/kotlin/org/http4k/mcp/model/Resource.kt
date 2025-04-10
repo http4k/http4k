@@ -47,8 +47,8 @@ sealed class Resource : CapabilitySpec {
         constructor(
             uriTemplate: String, name: String, description: String? = null,
             mimeType: MimeType? = null,
-            annotations: Annotations? = null,
             size: Size? = null,
+            annotations: Annotations? = null,
         ) : this(ResourceUriTemplate.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations)
 
         override fun matches(uri: Uri) = matchFn(uriTemplate, uri)
