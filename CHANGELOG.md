@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.5.6.1
+### v6.5.5.1
 - **http4k-mcp-sdk-***: Fixing up resource template matching to better resemble RFC 6570.
 
 ### v6.5.5.0
