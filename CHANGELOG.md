@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.5.6.0 (uncut)
+- **http4k-mcp-sdk-***: Fixing up resource template matching to better resemble RFC 6570.
+
 ### v6.5.5.0
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-mcp-sdk-***: Add better matching around ResourceTemplates.

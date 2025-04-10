@@ -26,7 +26,7 @@ sealed class Resource : CapabilitySpec {
     ) : Resource() {
         constructor(
             uri: String, name: String, description: String? = null,
-            mimeType: MimeType? = null,size: Size? = null,
+            mimeType: MimeType? = null, size: Size? = null,
 
             annotations: Annotations? = null,
         ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations)
@@ -41,7 +41,7 @@ sealed class Resource : CapabilitySpec {
         override val mimeType: MimeType? = null,
         override val size: Size? = null,
         override val annotations: Annotations? = null,
-        internal val matchFn: ((Uri) -> Boolean) = { uriTemplate.scheme == it.scheme && uriTemplate.authority == it.authority }
+        internal val matchFn: ((Uri) -> Boolean) = uriTemplate::matchesRfc6570
     ) : Resource() {
         constructor(
             uriTemplate: String, name: String, description: String? = null,
@@ -82,4 +82,52 @@ sealed class Resource : CapabilitySpec {
             override val mimeType: MimeType? = null,
         ) : Content()
     }
+}
+
+private fun matches(uriTemplate: Uri): (Uri) -> Boolean = {
+    try {
+        when {
+            it.toString().isEmpty() -> false
+            else -> {
+                val regex = uriTemplate.toString()
+                    .replace(".", "\\.")
+                    .replace("?", "\\?")
+                    .replace("*", "\\*")
+                    .replace("+", "\\+")
+                    .replace("(", "\\(")
+                    .replace(")", "\\)")
+                    .replace("[", "\\[")
+                    .replace("]", "\\]")
+                    .replace("|", "\\|")
+                    .replace(Regex("\\{[^}]+}"), "([^/]+)")
+
+                Regex("^$regex$").matches(it.toString())
+            }
+        }
+    } catch (e: Exception) {
+        false
+    }
+}
+
+private fun Uri.matchesRfc6570(value: Uri) = try {
+    when {
+        value.toString().isEmpty() -> false
+        else -> {
+            val regex = toString()
+                .replace(".", "\\.")
+                .replace("?", "\\?")
+                .replace("*", "\\*")
+                .replace("+", "\\+")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+                .replace("|", "\\|")
+                .replace(Regex("\\{[^}]+}"), "([^/]+)")
+
+            Regex("^$regex$").matches(value.toString())
+        }
+    }
+} catch (e: Exception) {
+    false
 }
