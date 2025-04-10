@@ -3,6 +3,7 @@ package org.http4k.mcp.model
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
+import org.http4k.core.matchesRfc6570
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -109,25 +110,3 @@ private fun matches(uriTemplate: Uri): (Uri) -> Boolean = {
     }
 }
 
-private fun Uri.matchesRfc6570(value: Uri) = try {
-    when {
-        value.toString().isEmpty() -> false
-        else -> {
-            val regex = toString()
-                .replace(".", "\\.")
-                .replace("?", "\\?")
-                .replace("*", "\\*")
-                .replace("+", "\\+")
-                .replace("(", "\\(")
-                .replace(")", "\\)")
-                .replace("[", "\\[")
-                .replace("]", "\\]")
-                .replace("|", "\\|")
-                .replace(Regex("\\{[^}]+}"), "([^/]+)")
-
-            Regex("^$regex$").matches(value.toString())
-        }
-    }
-} catch (e: Exception) {
-    false
-}
