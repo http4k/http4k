@@ -1,7 +1,9 @@
 package org.http4k.mcp
 
+import org.http4k.connect.model.Role
 import org.http4k.core.Request
 import org.http4k.lens.McpLensTarget
+import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.server.protocol.Client
@@ -32,4 +34,5 @@ data class PromptRequest(
 
 data class PromptResponse(val messages: List<Message>, val description: String? = null) {
     constructor(vararg messages: Message, description: String? = null) : this(messages.toList(), description)
+    constructor(role: Role, content: String) : this(listOf(Message(role, Text(content))))
 }

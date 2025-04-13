@@ -6,9 +6,11 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
 import org.http4k.mcp.model.Content
+import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.server.protocol.Client
 import org.http4k.mcp.server.protocol.Client.Companion.NoOp
+import java.util.stream.Collectors.toList
 
 /**
  * A tool handler invokes a tool with an input and returns a response
@@ -17,6 +19,7 @@ typealias ToolHandler = (ToolRequest) -> ToolResponse
 
 fun interface ToolFilter {
     operator fun invoke(request: ToolHandler): ToolHandler
+
     companion object
 }
 
@@ -41,7 +44,10 @@ sealed interface ToolResponse {
 
     data class Ok(val content: List<Content>, override val meta: Meta = Meta.default) : ToolResponse {
         constructor(vararg content: Content, meta: Meta = Meta.default) : this(content.toList(), meta)
+        constructor(vararg content: String, meta: Meta = Meta.default) : this(content.map(::Text).toList(), meta)
     }
 
-    data class Error(val error: ErrorMessage, override val meta: Meta = Meta.default) : ToolResponse
+    data class Error(val error: ErrorMessage, override val meta: Meta = Meta.default) : ToolResponse {
+        constructor(code: Int, message: String, meta: Meta = Meta.default) : this(ErrorMessage(code, message), meta)
+    }
 }
