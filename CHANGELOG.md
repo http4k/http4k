@@ -3,7 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.5.6.2
+### v6.6.0.0
+- **http4k-***: Upgrade some dependency versions.
+- **http4k-mcp-sdk-***: [Breaking] Repackaging of MCP code to avoid cross-module dependencies. It's just imports that need to be changed.
+- **http4k-mcp-client-***: [New module] New module purely for projects that need an MCP client without the server side code. 
+- **http4k-mcp-core-***: [New module] New module for the core of the MCP domain. 
 - **http4k-template-freemarker-***: [Fix #1337] FreemarkerTemplates sets incompatibleImprovements
 
 ### v6.5.6.1
