@@ -15,6 +15,7 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.McpMessageId
+import org.http4k.mcp.Client
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ServerMetaData
@@ -42,7 +43,7 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.protocol.Client.Companion.NoOp
+import org.http4k.mcp.Client.Companion.NoOp
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.util.McpJson

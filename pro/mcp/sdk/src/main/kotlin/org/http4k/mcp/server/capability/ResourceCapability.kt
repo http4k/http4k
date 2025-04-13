@@ -8,7 +8,7 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Resource.Static
 import org.http4k.mcp.model.Resource.Templated
 import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.server.protocol.Client
+import org.http4k.mcp.Client
 
 interface ResourceCapability : ServerCapability, ResourceHandler {
     fun toResource(): McpResource

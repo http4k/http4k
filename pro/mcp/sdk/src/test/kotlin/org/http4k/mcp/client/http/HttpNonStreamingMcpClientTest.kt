@@ -14,10 +14,10 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
+import org.http4k.mcp.renderRequest
 import org.http4k.mcp.server.http.HttpNonStreamingMcpConnection
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.renderRequest
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.sse.Sse

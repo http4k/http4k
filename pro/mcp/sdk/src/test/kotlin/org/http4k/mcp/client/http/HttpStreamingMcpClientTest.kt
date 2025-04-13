@@ -34,6 +34,7 @@ import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClientContract
+import org.http4k.mcp.firstDeterministicSessionId
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
@@ -52,7 +53,6 @@ import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.firstDeterministicSessionId
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol

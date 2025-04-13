@@ -1,6 +1,7 @@
 package org.http4k.mcp.server.protocol
 
 import org.http4k.core.Request
+import org.http4k.mcp.Client
 import org.http4k.mcp.protocol.messages.McpTool
 
 /**

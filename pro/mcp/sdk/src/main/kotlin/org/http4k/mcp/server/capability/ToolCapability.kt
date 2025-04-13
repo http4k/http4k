@@ -26,7 +26,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.asMcp
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.server.protocol.Client
+import org.http4k.mcp.Client
 
 interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool

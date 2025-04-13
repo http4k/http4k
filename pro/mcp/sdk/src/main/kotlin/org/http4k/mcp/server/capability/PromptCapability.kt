@@ -9,7 +9,7 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpPrompt
-import org.http4k.mcp.server.protocol.Client
+import org.http4k.mcp.Client
 
 interface PromptCapability : ServerCapability, PromptHandler {
     fun toPrompt(): McpPrompt

@@ -17,6 +17,7 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.McpError
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
@@ -25,7 +26,6 @@ import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.client.McpError
 import org.http4k.mcp.model.CompletionArgument
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
@@ -215,7 +215,11 @@ class TestMcpClientTest {
 
         val uri = Uri.of("https://www.http4k.org/value")
         val resource =
-            Resource.Templated(ResourceUriTemplate.of("https://www.http4k.org/{+template}"), ResourceName.of("HTTP4K"), "description")
+            Resource.Templated(
+                ResourceUriTemplate.of("https://www.http4k.org/{+template}"),
+                ResourceName.of("HTTP4K"),
+                "description"
+            )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), uri)
 
         val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))

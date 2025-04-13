@@ -2,14 +2,10 @@ package org.http4k.mcp.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import dev.forkhandles.result4k.Success
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.StopReason
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method.GET
@@ -31,8 +27,6 @@ import org.http4k.lens.int
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingRequest
-import org.http4k.mcp.SamplingResponse
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Annotations
 import org.http4k.mcp.model.Completion
@@ -41,7 +35,6 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.LogLevel
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
-import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Priority
@@ -50,8 +43,8 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Root
+import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
@@ -72,7 +65,6 @@ import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpResponse
 import org.http4k.mcp.protocol.messages.McpRoot
 import org.http4k.mcp.protocol.messages.McpRpc
-import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.server.capability.ServerCompletions
@@ -80,8 +72,6 @@ import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.protocol.ClientRequestTarget.Entity
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
@@ -95,10 +85,8 @@ import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.testing.TestSseClient
 import org.http4k.testing.testSseClient
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.Duration
 import kotlin.random.Random
 
 class McpProtocolTest {
@@ -336,7 +324,7 @@ class McpProtocolTest {
             val stringArg1 = stringArg(it)
             val intArg1 = intArg(it)
 
-            it.meta.progress?.let { p ->
+            it.meta.progress?.let { _ ->
                 it.client.progress(1, 5.0, "d1")
                 it.client.progress(2, 5.0, "d2")
             }
@@ -444,7 +432,7 @@ class McpProtocolTest {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind {
-                it.meta.progress?.let { p ->
+                it.meta.progress?.let { _ ->
                     it.client.progress(1, 5.0, "d1")
                     it.client.progress(2, 5.0, "d2")
                 }
@@ -511,63 +499,6 @@ class McpProtocolTest {
             assertNextMessage(McpPrompt.List.Response(listOf()))
             assertNextMessage(McpResource.List.Response(listOf()))
             assertNextMessage(McpTool.List.Response(listOf()))
-        }
-    }
-
-    @Test
-    @Disabled
-    fun `deal with client sampling`() {
-        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-
-        val model = ModelName.of("name")
-        val sampling = ServerSampling(Random(0))
-
-        val mcp = HttpStreamingMcp(
-            McpProtocol(
-                metadata, SseSessions(SessionProvider.Random(Random(0))),
-            )
-        )
-
-        with(mcp.testSseClient(Request(GET, "/sse"))) {
-
-            assertInitializeLoop(mcp)
-
-            val received = sampling.sampleClient(
-                Entity(metadata.entity.name),
-                SamplingRequest(listOf(), MaxTokens.of(1)),
-                Duration.ofSeconds(5)
-            )
-
-            assertNextMessage(
-                McpSampling,
-                McpSampling.Request(listOf(), MaxTokens.of(1)),
-                McpMessageId.of(7425097216252813)
-            )
-
-            mcp.sendToMcp(
-                McpSampling.Response(model, null, Assistant, content),
-                McpMessageId.of(7425097216252813)
-            )
-
-            mcp.sendToMcp(
-                McpSampling.Response(model, StopReason.of("bored"), Assistant, content),
-                McpMessageId.of(7425097216252813)
-            )
-
-            // this is ignored!
-            mcp.sendToMcp(
-                McpSampling.Response(model, StopReason.of("another stop reason"), Assistant, content),
-                McpMessageId.of(7425097216252813)
-            )
-
-            assertThat(
-                received.toList(), equalTo(
-                    listOf(
-                        Success(SamplingResponse(model, Assistant, content, null)),
-                        Success(SamplingResponse(model, Assistant, content, StopReason.of("bored")))
-                    )
-                )
-            )
         }
     }
 

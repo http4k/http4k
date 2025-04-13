@@ -5,7 +5,7 @@ import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.server.protocol.Client
+import org.http4k.mcp.Client
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.util.ObservableList
