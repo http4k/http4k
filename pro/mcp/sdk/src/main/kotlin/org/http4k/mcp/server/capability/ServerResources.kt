@@ -3,32 +3,31 @@ package org.http4k.mcp.server.capability
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.mcp.Client
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.Client
-import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Session
+import org.http4k.mcp.server.protocol.ObservableResources
 import org.http4k.mcp.util.ObservableList
 import java.util.concurrent.ConcurrentHashMap
 
 
-class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list), Resources {
+class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list),
+    ObservableResources {
     constructor(vararg list: ResourceCapability) : this(list.toList())
 
     private val subscriptions = ConcurrentHashMap<Pair<Uri, Session>, Set<(Uri) -> Unit>>()
 
-    /**
-     * Trigger all subscriptions for the given URI as it has been updated.
-     */
     override fun triggerUpdated(uri: Uri) {
         subscriptions.filterKeys { it.first == uri }.forEach { (uri, _), callbacks ->
             callbacks.forEach { it(uri) }
         }
     }
 
-    override fun listResources(req: McpResource.List.Request, client: Client, http: Request) = McpResource.List.Response(
-        items.map { it.toResource() }.filter { it.uri != null }
-    )
+    override fun listResources(req: McpResource.List.Request, client: Client, http: Request) =
+        McpResource.List.Response(
+            items.map { it.toResource() }.filter { it.uri != null }
+        )
 
     override fun listTemplates(req: McpResource.ListTemplates.Request, client: Client, http: Request) =
         McpResource.ListTemplates.Response(

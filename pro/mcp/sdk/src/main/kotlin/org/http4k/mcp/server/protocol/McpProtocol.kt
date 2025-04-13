@@ -13,9 +13,10 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.mcp.model.LogLevel
-import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.Client
+import org.http4k.mcp.Client.Companion.NoOp
+import org.http4k.mcp.model.LogLevel.error
+import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ServerMetaData
@@ -43,7 +44,6 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerRoots
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.Client.Companion.NoOp
 import org.http4k.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.mcp.util.McpJson
@@ -162,15 +162,22 @@ class McpProtocol<Transport>(
                     }
 
                     McpResource.Subscribe.Method -> {
-                        val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
-                        resources.subscribe(session, subscribeRequest) {
-                            sessions.respond(
-                                transport,
-                                session,
-                                McpResource.Updated.Notification(subscribeRequest.uri).toJsonRpc(McpResource.Updated)
-                            )
+                        when (resources) {
+                            is ObservableResources -> {
+                                val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
+                                resources.subscribe(session, subscribeRequest) {
+                                    sessions.respond(
+                                        transport,
+                                        session,
+                                        McpResource.Updated.Notification(subscribeRequest.uri)
+                                            .toJsonRpc(McpResource.Updated)
+                                    )
+                                }
+                                ok()
+                            }
+
+                            else -> ok()
                         }
-                        ok()
                     }
 
                     McpLogging.SetLevel.Method -> {
@@ -179,8 +186,14 @@ class McpProtocol<Transport>(
                     }
 
                     McpResource.Unsubscribe.Method -> {
-                        resources.unsubscribe(session, jsonReq.fromJsonRpc())
-                        ok()
+                        when (resources) {
+                            is ObservableResources -> {
+                                resources.unsubscribe(session, jsonReq.fromJsonRpc())
+                                ok()
+                            }
+
+                            else -> ok()
+                        }
                     }
 
                     McpInitialize.Initialized.Method -> ok()
@@ -273,34 +286,45 @@ class McpProtocol<Transport>(
         clientTracking[session] = ClientTracking(request)
 
         val context = Subscription(session)
-        logger.subscribe(session, LogLevel.error) { level, logger, data ->
+
+        logger.subscribe(session, error) { level, logger, data ->
             sessions.request(
                 context,
                 McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage)
             )
         }
-        prompts.onChange(session) {
-            sessions.request(
-                context,
-                McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
-            )
+
+        if (prompts is ObservableCapability) {
+            prompts.onChange(session) {
+                sessions.request(
+                    context,
+                    McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
+                )
+            }
         }
-        resources.onChange(session) {
-            sessions.request(
-                context,
-                McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
-            )
+
+        if (resources is ObservableCapability) {
+            resources.onChange(session) {
+                sessions.request(
+                    context,
+                    McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
+                )
+            }
         }
-        tools.onChange(session) {
-            sessions.request(
-                context,
-                McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
-            )
+
+        if (tools is ObservableCapability) {
+            tools.onChange(session) {
+                sessions.request(
+                    context,
+                    McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
+                )
+            }
         }
+
         sessions.onClose(context) {
-            prompts.remove(session)
-            resources.remove(session)
-            tools.remove(session)
+            if (prompts is ObservableCapability) prompts.remove(session)
+            if (resources is ObservableCapability) resources.remove(session)
+            if (tools is ObservableCapability) tools.remove(session)
             logger.unsubscribe(session)
         }
         return McpInitialize.Response(

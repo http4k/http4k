@@ -11,9 +11,5 @@ interface Tools {
     fun list(req: McpTool.List.Request, client: Client, http: Request): McpTool.List.Response
 
     fun call(req: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response
-
-    fun onChange(session: Session, handler: () -> Any)
-
-    fun remove(session: Session)
 }
 
