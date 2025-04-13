@@ -112,3 +112,4 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
 }
 
 class UnmappedValue(type: Type) : Exception("unmapped type $type")
+
