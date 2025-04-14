@@ -2,13 +2,13 @@ package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.mcp.Client
 import org.http4k.mcp.ResourceHandler
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Resource.Static
 import org.http4k.mcp.model.Resource.Templated
 import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.Client
 
 interface ResourceCapability : ServerCapability, ResourceHandler {
     fun toResource(): McpResource
@@ -18,15 +18,10 @@ interface ResourceCapability : ServerCapability, ResourceHandler {
 
 fun ResourceCapability(resource: Resource, handler: ResourceHandler) = object : ResourceCapability {
     override fun toResource() = with(resource) {
-        McpResource(
-            if (this is Static) uri else null,
-            if (this is Templated) uriTemplate else null,
-            name,
-            description,
-            mimeType,
-            size,
-            annotations
-        )
+        when (this) {
+            is Static -> McpResource(uri, name, description, mimeType, size, annotations)
+            is Templated -> McpResource(uriTemplate, name, description, mimeType, size, annotations)
+        }
     }
 
     override fun matches(uri: Uri) = resource.matches(uri)

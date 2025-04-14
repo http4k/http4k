@@ -16,6 +16,8 @@ dependencies {
     testImplementation(project(":http4k-client-websocket"))
 
     testImplementation("org.jsoup:jsoup:_")
+    testImplementation("dev.forkhandles:fs4k")
+
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-helidon"))
     testImplementation(project(":http4k-security-core"))

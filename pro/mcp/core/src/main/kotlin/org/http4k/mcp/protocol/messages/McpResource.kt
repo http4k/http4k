@@ -14,15 +14,32 @@ import org.http4k.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class McpResource(
+data class McpResource internal constructor(
     val uri: Uri?,
     val uriTemplate: ResourceUriTemplate?,
     val name: ResourceName,
-    val description: String?,
-    val mimeType: MimeType?,
-    val size: Size?,
-    val annotations: Annotations?,
+    val description: String? = null,
+    val mimeType: MimeType? = null,
+    val size: Size? = null,
+    val annotations: Annotations? = null
 ) {
+    constructor(
+        uri: Uri,
+        name: ResourceName,
+        description: String? = null,
+        mimeType: MimeType? = null,
+        size: Size? = null,
+        annotations: Annotations? = null
+    ) : this(uri, null, name, description, mimeType, size, annotations)
+
+    constructor(
+        uriTemplate: ResourceUriTemplate,
+        name: ResourceName,
+        description: String? = null,
+        mimeType: MimeType? = null,
+        size: Size? = null,
+        annotations: Annotations? = null
+    ) : this(null, uriTemplate, name, description, mimeType, size, annotations)
 
     object Read : McpRpc {
         override val Method = of("resources/read")

@@ -222,7 +222,6 @@ class McpProtocolTest {
                     listOf(
                         McpResource(
                             resource.uri,
-                            null,
                             ResourceName.of("HTTP4K"),
                             "description",
                             IMAGE_GIF,
@@ -285,7 +284,6 @@ class McpProtocolTest {
                 McpResource.ListTemplates.Response(
                     listOf(
                         McpResource(
-                            null,
                             resource.uriTemplate,
                             ResourceName.of("HTTP4K"),
                             "description",

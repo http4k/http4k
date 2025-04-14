@@ -6,8 +6,8 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.mcp.Client
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.protocol.ObservableResources
+import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.util.ObservableList
 import java.util.concurrent.ConcurrentHashMap
 
@@ -54,3 +54,4 @@ class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<Resou
         subscriptions.keys.removeIf { it.second == session }
     }
 }
+

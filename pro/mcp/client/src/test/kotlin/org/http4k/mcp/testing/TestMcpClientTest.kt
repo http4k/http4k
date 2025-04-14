@@ -169,19 +169,7 @@ class TestMcpClientTest {
         mcp.useClient {
             assertThat(
                 resources().list(), equalTo(
-                    Success(
-                        listOf(
-                            McpResource(
-                                resource.uri,
-                                null,
-                                ResourceName.of("HTTP4K"),
-                                "description",
-                                null,
-                                null,
-                                null
-                            )
-                        )
-                    )
+                    Success(listOf(McpResource(resource.uri, ResourceName.of("HTTP4K"), "description")))
                 )
             )
 
