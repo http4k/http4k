@@ -9,6 +9,7 @@ plugins {
 }
 
 dependencies {
+    api(project(":http4k-mcp-core"))
     api(project(":http4k-mcp-client"))
 
     testImplementation(project(":http4k-serverless-lambda"))
