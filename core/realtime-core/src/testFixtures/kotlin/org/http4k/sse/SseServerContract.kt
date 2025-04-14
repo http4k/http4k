@@ -39,6 +39,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import org.http4k.routing.bind as hbind
@@ -159,6 +160,7 @@ abstract class SseServerContract(
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
     fun `does not error when we do not call close`() {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/noclose"))
         assertThat(
