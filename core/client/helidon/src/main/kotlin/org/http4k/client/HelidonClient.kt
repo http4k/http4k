@@ -1,6 +1,8 @@
 package org.http4k.client
 
 import io.helidon.http.Method
+import io.helidon.webclient.api.ClientRequest
+import io.helidon.webclient.api.HttpClientRequest
 import io.helidon.webclient.api.HttpClientResponse
 import io.helidon.webclient.api.WebClient
 import org.http4k.core.BodyMode
@@ -25,9 +27,11 @@ object HelidonClient {
     operator fun invoke(
         client: WebClient = WebClient.builder().followRedirects(false).build(),
         bodyMode: BodyMode = Memory,
+        requestModifier: (ClientRequest<HttpClientRequest>) -> ClientRequest<HttpClientRequest> = { it }
     ): HttpHandler = object : HttpHandler {
         override fun invoke(request: Request) = try {
             client.makeHelidonRequest(request)
+                .let(requestModifier)
                 .submit(request.body.payload.array())
                 .asHttp4k()
         } catch (e: IllegalArgumentException) {
