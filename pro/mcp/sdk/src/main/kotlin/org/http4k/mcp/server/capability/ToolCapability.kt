@@ -23,10 +23,10 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.asMcp
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.Client
+import org.http4k.mcp.model.toSchema
 
 interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
@@ -34,7 +34,7 @@ interface ToolCapability : ServerCapability, ToolHandler {
 }
 
 fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
-    override fun toTool() = tool.asMcp()
+    override fun toTool() = McpTool(tool.name, tool.description, tool.toSchema(), tool.annotations)
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta, client, http) }

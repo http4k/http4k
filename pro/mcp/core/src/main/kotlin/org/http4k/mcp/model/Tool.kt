@@ -23,12 +23,7 @@ class Tool private constructor(
         description: String,
         vararg arguments: BiDiLens<ToolRequest, *>,
         annotations: ToolAnnotations? = null
-    ) : this(
-        ToolName.of(name),
-        description,
-        arguments.toList(),
-        annotations
-    )
+    ) : this(ToolName.of(name), description, arguments.toList(), annotations)
 
     object Arg : BiDiLensSpec<ToolRequest, String>(
         "toolRequest", StringParam,
@@ -42,8 +37,6 @@ class Tool private constructor(
         LensSet { name, values, target -> values.fold(target) { m, v -> m.copy(args = m + (name to v)) } }
     )
 }
-
-fun Tool.asMcp() = McpTool(name, description, toSchema(), annotations)
 
 fun Tool.toSchema() = mapOf(
     "type" to "object",
