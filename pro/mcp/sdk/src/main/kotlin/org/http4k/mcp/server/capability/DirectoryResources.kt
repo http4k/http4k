@@ -59,7 +59,7 @@ class DirectoryResources(
                     }
                 ),
                 ResourceName.of(dir.name),
-                "Files in $dir, recursively: $recursive",
+                "Files in ${dir.name}, recursively: $recursive",
             )
         )
     )

@@ -23,7 +23,8 @@ import java.io.File
 
 class DirectoryResourcesTest {
 
-    private val directory = dir("tmp") {
+    val path = "build/tmp_test"
+    private val directory = dir(path) {
         text("plainfile.txt") {
             content = "hello"
         }
@@ -40,7 +41,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can list files non-recursive`() {
         assertThat(
-            DirectoryResources(File("tmp"), Flat).listResources(McpResource.List.Request(), NoOp, Request(GET, "")),
+            DirectoryResources(File(path), Flat).listResources(McpResource.List.Request(), NoOp, Request(GET, "")),
             equalTo(
                 McpResource.List.Response(
                     listOf(
@@ -63,7 +64,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can list files recursive`() {
         assertThat(
-            DirectoryResources(File("tmp"), Recursive).listResources(
+            DirectoryResources(File(path), Recursive).listResources(
                 McpResource.List.Request(),
                 NoOp,
                 Request(GET, "")
@@ -95,7 +96,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can get templates non-recursive`() {
         assertThat(
-            DirectoryResources(File("tmp"), Flat).listTemplates(
+            DirectoryResources(File(path), Flat).listTemplates(
                 McpResource.ListTemplates.Request(),
                 NoOp,
                 Request(GET, "")
@@ -105,8 +106,8 @@ class DirectoryResourcesTest {
                     listOf(
                         McpResource(
                             uriTemplate = ResourceUriTemplate.of("file://{filename}"),
-                            name = ResourceName.of("tmp"),
-                            description = "Files in tmp, recursively: Flat"
+                            name = ResourceName.of("tmp_test"),
+                            description = "Files in tmp_test, recursively: Flat"
                         )
                     )
                 )
@@ -117,7 +118,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can get templates recursive`() {
         assertThat(
-            DirectoryResources(File("tmp"), Recursive).listTemplates(
+            DirectoryResources(File(path), Recursive).listTemplates(
                 McpResource.ListTemplates.Request(),
                 NoOp,
                 Request(GET, "")
@@ -127,8 +128,8 @@ class DirectoryResourcesTest {
                     listOf(
                         McpResource(
                             uriTemplate = ResourceUriTemplate.of("file://{+path}"),
-                            name = ResourceName.of("tmp"),
-                            description = "Files in tmp, recursively: Recursive"
+                            name = ResourceName.of("tmp_test"),
+                            description = "Files in tmp_test, recursively: Recursive"
                         )
                     )
                 )
@@ -139,7 +140,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can read text non-recursive`() {
         assertThat(
-            DirectoryResources(File("tmp"), Flat).read(
+            DirectoryResources(File(path), Flat).read(
                 McpResource.Read.Request(Uri.of("file://plainfile.txt")),
                 NoOp,
                 Request(GET, "")
@@ -161,7 +162,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can read binary non-recursive`() {
         assertThat(
-            DirectoryResources(File("tmp"), Flat).read(
+            DirectoryResources(File(path), Flat).read(
                 McpResource.Read.Request(Uri.of("file://binary.png")),
                 NoOp,
                 Request(GET, "")
@@ -183,7 +184,7 @@ class DirectoryResourcesTest {
     @Test
     fun `can read recursive text`() {
         assertThat(
-            DirectoryResources(File("tmp"), Recursive).read(
+            DirectoryResources(File(path), Recursive).read(
                 McpResource.Read.Request(Uri.of("file://directory/file2.html")),
                 NoOp,
                 Request(GET, "")
@@ -205,7 +206,7 @@ class DirectoryResourcesTest {
     @Test
     fun `cannot read recursive when not`() {
         assertThrows<McpException> {
-            DirectoryResources(File("tmp"), Flat).read(
+            DirectoryResources(File(path), Flat).read(
                 McpResource.Read.Request(Uri.of("file://directory/file2.html")),
                 NoOp,
                 Request(GET, "")
