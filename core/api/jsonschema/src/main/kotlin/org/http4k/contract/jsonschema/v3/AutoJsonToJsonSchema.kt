@@ -1,22 +1,15 @@
 package org.http4k.contract.jsonschema.v3
 
 import org.http4k.contract.jsonschema.EmptyArray
-import org.http4k.contract.jsonschema.IllegalSchemaException
 import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.contract.jsonschema.OneOfArray
 import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.contract.jsonschema.v3.SchemaModelNamer.Companion.Simple
 import org.http4k.format.AutoMarshallingJson
-import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
-import org.http4k.lens.ParamMeta.BooleanParam
-import org.http4k.lens.ParamMeta.IntegerParam
-import org.http4k.lens.ParamMeta.NullParam
-import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.unquoted
 
 class AutoJsonToJsonSchema<NODE : Any>(
@@ -202,30 +195,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return json.textValueOf(json.asJsonObject(MapKey(it)), "keyAsString")!!
     }
 }
+
 data class MapKey(val keyAsString: Any)
 
-fun interface SchemaModelNamer : (Any) -> String {
-    companion object {
-        val Simple: SchemaModelNamer = SchemaModelNamer { it.javaClass.simpleName }
-        val Full: SchemaModelNamer = SchemaModelNamer { it.javaClass.name }
-        val Canonical: SchemaModelNamer = SchemaModelNamer { it.javaClass.canonicalName }
-    }
-}
+data class FieldHolder(@JvmField val value: Any)
 
-private fun items(obj: Any) = when (obj) {
+internal fun items(obj: Any) = when (obj) {
     is Array<*> -> obj.asList()
     is Iterable<*> -> obj.toList()
     else -> listOf(obj)
 }.filterNotNull()
-
-private fun JsonType.toParam() = when (this) {
-    JsonType.String -> StringParam
-    JsonType.Integer -> IntegerParam
-    JsonType.Number -> NumberParam
-    JsonType.Boolean -> BooleanParam
-    JsonType.Array -> ArrayParam(NullParam)
-    JsonType.Object -> ObjectParam
-    JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-}
-
-data class FieldHolder(@JvmField val value: Any)
