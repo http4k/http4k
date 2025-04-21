@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo",
-    "example": null,
-    "format": null
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
   },
   "definitions": [
     {
@@ -13,7 +11,6 @@
           "value1",
           "value2"
         ],
-        "format": null,
         "type": "string",
         "nullable": false
       }

@@ -14,7 +14,6 @@
         "value": "value1_2"
       }
     ],
-    "format": null,
     "type": "array",
     "nullable": false
   },
@@ -24,15 +23,12 @@
       "second": {
         "properties": {
           "value": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Enum1",
-            "example": null,
-            "format": null
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Enum1"
           }
         },
         "example": {
           "value": "value1_1"
         },
-        "format": null,
         "type": "object",
         "required": [
           "value"
@@ -47,7 +43,6 @@
           "value1_1",
           "value1_2"
         ],
-        "format": null,
         "type": "string",
         "nullable": false
       }

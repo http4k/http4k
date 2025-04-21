@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
-private fun standardConfig(
+fun standardConfig(
     configFn: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>
 ) = KotlinModule.Builder().build()
     .asConfigurable()

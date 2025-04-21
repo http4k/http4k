@@ -120,7 +120,7 @@ data class MetaDataValueHolder(val i: MyInt, val j: JacksonFieldWithMetadata)
 @ExtendWith(JsonApprovalTest::class)
 abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
 
-    abstract val json: AutoMarshallingJson<NODE>
+    abstract fun autoJson(): AutoMarshallingJson<NODE>
 
     @Test
     fun `can override definition id`(approver: Approver) {
@@ -137,7 +137,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         approver.assertApproved(
             ArbObjectWithInnerClasses(),
             prefix = "prefix",
-            creator = autoJsonToJsonSchema(json, SchemaModelNamer.Canonical)
+            creator = autoJsonToJsonSchema(autoJson(), SchemaModelNamer.Canonical)
         )
     }
 
@@ -162,7 +162,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
     @Test
     fun `can write extra properties to map`(approver: Approver) {
         val creator = AutoJsonToJsonSchema(
-            json,
+            autoJson(),
             { _, name ->
                 if (name == "str") {
                     Field(
@@ -205,7 +205,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
     @Test
     fun `can add extra properties to a root component`(approver: Approver) {
         val creator = AutoJsonToJsonSchema(
-            json,
+            autoJson(),
             metadataRetrieval = { obj ->
                 if (obj is ArbObject3) {
                     FieldMetadata(
@@ -388,7 +388,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         obj: Any,
         name: String? = null,
         prefix: String? = null,
-        creator: AutoJsonToJsonSchema<NODE> = autoJsonToJsonSchema(json)
+        creator: AutoJsonToJsonSchema<NODE> = autoJsonToJsonSchema(autoJson())
     ) {
         assertApproved(
             Response(Status.OK)
@@ -413,4 +413,20 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         schemaModelNamer,
         "locationPrefix"
     )
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun `renders schema for a data4k container with metadata`(approver: Approver) {
+        approver.assertApproved(
+            Data4kContainer().apply {
+                anInt = MyInt.of(123)
+                anString = "helloworld"
+            },
+            creator = autoJsonToJsonSchema(
+                autoJson(), strategy = PrimitivesFieldMetadataRetrievalStrategy
+                    .then(Values4kFieldMetadataRetrievalStrategy)
+                    .then(Data4kFieldMetadataRetrievalStrategy)
+            )
+        )
+    }
 }

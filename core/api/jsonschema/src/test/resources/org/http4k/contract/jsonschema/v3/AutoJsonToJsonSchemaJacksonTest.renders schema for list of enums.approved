@@ -7,7 +7,6 @@
       "value1",
       "value2"
     ],
-    "format": null,
     "type": "array",
     "nullable": false
   },
@@ -20,7 +19,6 @@
           "value1",
           "value2"
         ],
-        "format": null,
         "type": "string",
         "nullable": false
       }

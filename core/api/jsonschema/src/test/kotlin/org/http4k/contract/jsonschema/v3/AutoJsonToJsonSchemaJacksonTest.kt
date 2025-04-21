@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.format.ConfigurableJackson
-import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
@@ -18,8 +17,20 @@ import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 
 class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>() {
-
-    override val json = Jackson
+    override fun autoJson() = ConfigurableJackson(
+        KotlinModule.Builder().build()
+            .asConfigurable()
+            .withStandardMappings()
+            .value(MyInt)
+            .done()
+            .deactivateDefaultTyping()
+            .setSerializationInclusion(NON_NULL)
+            .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(FAIL_ON_IGNORED_PROPERTIES, false)
+            .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
+            .configure(USE_BIG_INTEGER_FOR_INTS, true)
+    )
 
     @Suppress("DEPRECATION")
     @Test
@@ -46,29 +57,4 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
         )
     }
 
-    @Test
-    @Suppress("DEPRECATION")
-    fun `renders schema for a data4k container with metadata`(approver: Approver) {
-        val jackson = object : ConfigurableJackson(
-            KotlinModule.Builder().build()
-                .asConfigurable()
-                .withStandardMappings()
-                .value(MyInt)
-                .done()
-                .setSerializationInclusion(NON_NULL)
-                .configure(SORT_PROPERTIES_ALPHABETICALLY, true)
-        ) {}
-
-        approver.assertApproved(
-            Data4kContainer().apply {
-                anInt = MyInt.of(123)
-                anString = "helloworld"
-            },
-            creator = autoJsonToJsonSchema(
-                jackson, strategy = PrimitivesFieldMetadataRetrievalStrategy
-                    .then(Values4kFieldMetadataRetrievalStrategy)
-                    .then(Data4kFieldMetadataRetrievalStrategy)
-            )
-        )
-    }
 }

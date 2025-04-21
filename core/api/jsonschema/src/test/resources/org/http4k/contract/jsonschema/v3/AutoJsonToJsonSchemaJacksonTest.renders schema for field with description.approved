@@ -1,8 +1,6 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata",
-    "example": null,
-    "format": null
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.JacksonFieldWithMetadata"
   },
   "definitions": [
     {
@@ -12,13 +10,11 @@
           "field1": {
             "example": "field1",
             "description": "Field 1 description",
-            "format": null,
             "type": "string",
             "nullable": false
           },
           "field2": {
             "example": "field2",
-            "format": null,
             "type": "string",
             "nullable": false
           }
@@ -27,7 +23,6 @@
           "field1": "field1",
           "field2": "field2"
         },
-        "format": null,
         "type": "object",
         "required": [
           "field1",
