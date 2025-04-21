@@ -1,9 +1,10 @@
-<h2 class="github">Changelog</h2>
+CHAN<h2 class="github">Changelog</h2>
 
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
 ### v6.6.1.0 (uncut)
+- **http4k-***: Upgrade some dependency versions.
 - **http4k-mcp-core-***: Added `DirectoryResources` to be able to read from a directory of files.
 
 ### v6.6.0.1
