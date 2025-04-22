@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Test
 
 class SchemaModelNamerTest {
     @Test
+    fun `default namer`() {
+        assertThat(SchemaModelNamer.Default("bob"), equalTo("String"))
+    }
+    @Test
     fun `simple namer`() {
         assertThat(SchemaModelNamer.Simple("bob"), equalTo("String"))
     }

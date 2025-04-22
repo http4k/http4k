@@ -3,7 +3,6 @@ package org.http4k.contract.jsonschema.v3
 import org.http4k.contract.jsonschema.IllegalSchemaException
 import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.JsonSchemaCreator
-import org.http4k.contract.jsonschema.v3.SchemaModelNamer.Companion.Simple
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
@@ -23,7 +22,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             metadataRetrievalStrategy = PrimitivesFieldMetadataRetrievalStrategy
         )
     ),
-    private val modelNamer: SchemaModelNamer = Simple,
+    private val modelNamer: SchemaModelNamer = SchemaModelNamer.Default,
     private val refLocationPrefix: String = "components/schemas",
     private val metadataRetrieval: MetadataRetrieval = MetadataRetrieval.compose(SimpleMetadataLookup(emptyMap()))
 ) : JsonSchemaCreator<Any, NODE> {
@@ -207,6 +206,7 @@ fun interface SchemaModelNamer : (Any) -> String {
         val Simple: SchemaModelNamer = SchemaModelNamer { it.javaClass.simpleName }
         val Full: SchemaModelNamer = SchemaModelNamer { it.javaClass.name }
         val Canonical: SchemaModelNamer = SchemaModelNamer { it.javaClass.canonicalName }
+        val Default = Simple
     }
 }
 

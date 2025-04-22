@@ -7,6 +7,7 @@ import org.http4k.contract.jsonschema.v3.JacksonJsonNamingAnnotated
 import org.http4k.contract.jsonschema.v3.JacksonJsonPropertyAnnotated
 import org.http4k.contract.jsonschema.v3.MetadataRetrieval
 import org.http4k.contract.jsonschema.v3.PrimitivesFieldMetadataRetrievalStrategy
+import org.http4k.contract.jsonschema.v3.SchemaModelNamer
 import org.http4k.contract.jsonschema.v3.SimpleLookup
 import org.http4k.contract.jsonschema.v3.SimpleMetadataLookup
 import org.http4k.contract.jsonschema.v3.then
@@ -27,11 +28,23 @@ fun OpenApi3(
     extensions: List<OpenApiExtension> = emptyList(),
     servers: List<ApiServer> = emptyList(),
     version: OpenApiVersion = OpenApiVersion._3_0_0,
-    typeToMetadata: Map<KType, FieldMetadata> = emptyMap()
+    typeToMetadata: Map<KType, FieldMetadata> = emptyMap(),
+    modelNamer: SchemaModelNamer? = null,
 ) =
-    OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json, typeToMetadata)), servers = servers, version = version)
+    OpenApi3(
+        apiInfo,
+        json,
+        extensions,
+        ApiRenderer.Auto(json, AutoJsonToJsonSchema(json, typeToMetadata, modelNamer)),
+        servers = servers,
+        version = version
+    )
 
-fun AutoJsonToJsonSchema(json: ConfigurableJackson, typeToMetadata: Map<KType, FieldMetadata> = emptyMap()) = org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema(
+fun AutoJsonToJsonSchema(
+    json: ConfigurableJackson,
+    typeToMetadata: Map<KType, FieldMetadata> = emptyMap(),
+    modelNamer: SchemaModelNamer? = null,
+) = org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema(
     json,
     FieldRetrieval.compose(
         SimpleLookup(
@@ -40,5 +53,6 @@ fun AutoJsonToJsonSchema(json: ConfigurableJackson, typeToMetadata: Map<KType, F
         ),
         FieldRetrieval.compose(JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated(json))
     ),
-    metadataRetrieval = MetadataRetrieval.compose(SimpleMetadataLookup(typeToMetadata = typeToMetadata))
+    metadataRetrieval = MetadataRetrieval.compose(SimpleMetadataLookup(typeToMetadata = typeToMetadata)),
+    modelNamer = modelNamer ?: SchemaModelNamer.Default
 )
