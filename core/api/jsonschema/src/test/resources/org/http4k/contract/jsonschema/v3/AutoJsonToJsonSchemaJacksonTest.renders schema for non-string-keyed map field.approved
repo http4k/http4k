@@ -2,45 +2,42 @@
   "node": {
     "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.MapHolder"
   },
-  "definitions": [
-    {
-      "first": "org.http4k.contract.jsonschema.v3.MapHolder",
-      "second": {
-        "properties": {
-          "value": {
-            "additionalProperties": {
-              "properties": {
-                "value1": {
-                  "example": "value",
-                  "type": "string",
-                  "nullable": true
-                },
-                "1970-01-01": {
-                  "example": "value",
-                  "type": "string",
-                  "nullable": true
-                }
+  "definitions": {
+    "org.http4k.contract.jsonschema.v3.MapHolder": {
+      "properties": {
+        "value": {
+          "additionalProperties": {
+            "properties": {
+              "value1": {
+                "example": "value",
+                "type": "string",
+                "nullable": true
               },
-              "example": {
-                "value1": "value",
-                "1970-01-01": "value"
-              },
-              "type": "object"
+              "1970-01-01": {
+                "example": "value",
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "example": {
+              "value1": "value",
+              "1970-01-01": "value"
             },
             "type": "object"
-          }
-        },
-        "example": {
-          "value": {
-            "value1": "value",
-            "1970-01-01": "value"
-          }
-        },
-        "type": "object",
-        "required": [
-          "value"
-        ]
-      }
+          },
+          "type": "object"
+        }
+      },
+      "example": {
+        "value": {
+          "value1": "value",
+          "1970-01-01": "value"
+        }
+      },
+      "type": "object",
+      "required": [
+        "value"
+      ]
     }
-  ]
+  }
 }

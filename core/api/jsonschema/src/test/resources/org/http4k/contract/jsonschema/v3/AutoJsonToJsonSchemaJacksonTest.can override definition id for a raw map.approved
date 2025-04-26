@@ -2,70 +2,64 @@
   "node": {
     "$ref": "#/locationPrefix/foobar"
   },
-  "definitions": [
-    {
-      "first": "foobar",
-      "second": {
-        "properties": {
-          "key": {
-            "example": "value",
-            "type": "string",
-            "nullable": true
-          },
-          "key2": {
-            "example": 123,
-            "format": "int32",
-            "type": "integer",
-            "nullable": true
-          },
-          "key3": {
-            "additionalProperties": {
-              "properties": {
-                "inner": {
-                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
-                }
-              },
-              "example": {
-                "inner": {
-                  "uri": "foobar"
-                }
-              },
-              "type": "object"
+  "definitions": {
+    "foobar": {
+      "properties": {
+        "key": {
+          "example": "value",
+          "type": "string",
+          "nullable": true
+        },
+        "key2": {
+          "example": 123,
+          "format": "int32",
+          "type": "integer",
+          "nullable": true
+        },
+        "key3": {
+          "additionalProperties": {
+            "properties": {
+              "inner": {
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              }
+            },
+            "example": {
+              "inner": {
+                "uri": "foobar"
+              }
             },
             "type": "object"
+          },
+          "type": "object"
+        }
+      },
+      "example": {
+        "key": "value",
+        "key2": 123,
+        "key3": {
+          "inner": {
+            "uri": "foobar"
           }
-        },
-        "example": {
-          "key": "value",
-          "key2": 123,
-          "key3": {
-            "inner": {
-              "uri": "foobar"
-            }
-          }
-        },
-        "type": "object"
-      }
+        }
+      },
+      "type": "object"
     },
-    {
-      "first": "org.http4k.contract.jsonschema.v3.ArbObject2",
-      "second": {
-        "properties": {
-          "uri": {
-            "example": "foobar",
-            "format": "uri",
-            "type": "string",
-            "nullable": false
-          }
-        },
-        "example": {
-          "uri": "foobar"
-        },
-        "type": "object",
-        "required": [
-          "uri"
-        ]
-      }
+    "org.http4k.contract.jsonschema.v3.ArbObject2": {
+      "properties": {
+        "uri": {
+          "example": "foobar",
+          "format": "uri",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "example": {
+        "uri": "foobar"
+      },
+      "type": "object",
+      "required": [
+        "uri"
+      ]
     }
-  ]
+  }
 }

@@ -29,7 +29,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             json.asJsonObject(obj).toSchema(obj, overrideDefinitionId, true, refModelNamePrefix.orEmpty(), metadataRetrieval(obj))
         return JsonSchema(
             json.asJsonObject(schema),
-            schema.definitions.map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet()
+            schema.definitions.map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toMap()
         )
     }
 
