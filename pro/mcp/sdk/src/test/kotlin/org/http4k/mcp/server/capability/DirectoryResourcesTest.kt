@@ -71,25 +71,23 @@ class DirectoryResourcesTest {
                 McpResource.List.Request(),
                 NoOp,
                 Request(GET, "")
-            ),
+            ).resources.toSet(),
             equalTo(
-                McpResource.List.Response(
-                    listOf(
-                        McpResource(
-                            uri = Uri.of("file://plainfile.txt"),
-                            name = ResourceName.of("plainfile.txt"),
-                            mimeType = MimeType.of("text/plain")
-                        ),
-                        McpResource(
-                            uri = Uri.of("file://directory/file2.html"),
-                            name = ResourceName.of("file2.html"),
-                            mimeType = MimeType.of("text/html")
-                        ),
-                        McpResource(
-                            uri = Uri.of("file://binary.png"),
-                            name = ResourceName.of("binary.png"),
-                            mimeType = MimeType.of("image/png")
-                        )
+                setOf(
+                    McpResource(
+                        uri = Uri.of("file://plainfile.txt"),
+                        name = ResourceName.of("plainfile.txt"),
+                        mimeType = MimeType.of("text/plain")
+                    ),
+                    McpResource(
+                        uri = Uri.of("file://directory/file2.html"),
+                        name = ResourceName.of("file2.html"),
+                        mimeType = MimeType.of("text/html")
+                    ),
+                    McpResource(
+                        uri = Uri.of("file://binary.png"),
+                        name = ResourceName.of("binary.png"),
+                        mimeType = MimeType.of("image/png")
                     )
                 )
             )
