@@ -1,9 +1,10 @@
 package org.http4k.format
 
 import org.http4k.contract.jsonschema.SchemaNode
+import org.http4k.contract.jsonschema.SchemaNode.Companion.Enum
 import org.http4k.contract.jsonschema.SchemaNode.Companion.Primitive
+import org.http4k.contract.jsonschema.SchemaNode.Companion.Reference
 import org.http4k.contract.jsonschema.v3.FieldMetadata
-import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.format.Moshi.asFormatString
 import org.http4k.format.SchemaNodeJsonAdapterFactoryTest.TestEnum.A
@@ -26,7 +27,7 @@ class SchemaNodeJsonAdapterFactoryTest {
     @Test
     fun reference(approver: Approver) {
         approver.assertApproved(
-            SchemaNode.Reference(
+            Reference(
                 "name", "reffed", Primitive("reffed", IntegerParam, false, "foo", metadata),
                 metadata
             )
@@ -36,8 +37,17 @@ class SchemaNodeJsonAdapterFactoryTest {
     @Test
     fun enum(approver: Approver) {
         approver.assertApproved(
-            SchemaNode.Enum(
+            Enum(
                 "name", ParamMeta.StringParam, false, A, TestEnum.entries.map { it.name }, metadata
+            )
+        )
+    }
+
+    @Test
+    fun primitive(approver: Approver) {
+        approver.assertApproved(
+            SchemaNode.Primitive(
+                "name", ParamMeta.StringParam, false, 123, metadata
             )
         )
     }
