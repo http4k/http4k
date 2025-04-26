@@ -6,6 +6,8 @@ import org.http4k.contract.jsonschema.v3.FieldMetadata
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.format.Moshi.asFormatString
+import org.http4k.format.SchemaNodeJsonAdapterFactoryTest.TestEnum.A
+import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -17,12 +19,25 @@ import org.junit.jupiter.api.extension.ExtendWith
 class SchemaNodeJsonAdapterFactoryTest {
     private val metadata = FieldMetadata(mapOf("foo" to "bar"))
 
+    enum class TestEnum {
+        A, B
+    }
+
     @Test
     fun reference(approver: Approver) {
         approver.assertApproved(
             SchemaNode.Reference(
                 "name", "reffed", Primitive("reffed", IntegerParam, false, "foo", metadata),
                 metadata
+            )
+        )
+    }
+
+    @Test
+    fun enum(approver: Approver) {
+        approver.assertApproved(
+            SchemaNode.Enum(
+                "name", ParamMeta.StringParam, false, A, TestEnum.entries.map { it.name }, metadata
             )
         )
     }
