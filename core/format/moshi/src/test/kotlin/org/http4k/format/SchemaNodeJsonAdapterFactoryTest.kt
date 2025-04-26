@@ -3,6 +3,8 @@ package org.http4k.format
 import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.contract.jsonschema.SchemaNode.Companion.Primitive
 import org.http4k.contract.jsonschema.v3.FieldMetadata
+import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.format.Moshi.asFormatString
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.testing.Approver
@@ -25,5 +27,5 @@ class SchemaNodeJsonAdapterFactoryTest {
         )
     }
 
-    private fun Approver.assertApproved(input: SchemaNode) = assertApproved(asFormatString(input))
+    private fun Approver.assertApproved(input: SchemaNode) = assertApproved(asFormatString(input), APPLICATION_JSON)
 }
