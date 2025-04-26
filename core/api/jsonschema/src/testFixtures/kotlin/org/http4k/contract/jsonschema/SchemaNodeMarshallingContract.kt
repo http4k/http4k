@@ -1,9 +1,8 @@
-package org.http4k.format
+package org.http4k.contract.jsonschema
 
-import org.http4k.contract.jsonschema.ArrayItem
-import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.contract.jsonschema.v3.FieldMetadata
 import org.http4k.core.ContentType
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.ParamMeta
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest

@@ -21,8 +21,9 @@ dependencies {
     testImplementation(project(":http4k-core"))
     testImplementation(Square.moshi)
 
-    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-testing-approval"))
     testImplementation(project(":http4k-testing-strikt"))
+    testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))
+    testImplementation(testFixtures(project(":http4k-api-jsonschema")))
 }
