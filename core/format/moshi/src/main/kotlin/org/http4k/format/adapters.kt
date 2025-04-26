@@ -115,27 +115,28 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
 class UnmappedValue(type: Type) : Exception("unmapped type $type")
 
 object SchemaNodeJsonAdapterFactory : JsonAdapter.Factory {
-    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
-        return if (Types.getRawType(type) == SchemaNode::class.java) {
-            SchemaNodeJsonAdapter(moshi)
-        } else null
-    }
+    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? =
+        when {
+            SchemaNode::class.java == Types.getRawType(type) -> SchemaNodeJsonAdapter(moshi)
+            else -> null
+        }
+
     private class SchemaNodeJsonAdapter(private val moshi: Moshi) : JsonAdapter<SchemaNode>() {
         override fun toJson(writer: JsonWriter, value: SchemaNode?) {
-            if (value == null) {
-                writer.nullValue()
-                return
-            }
-
-            writer.beginObject()
-            value.entries
-                .forEach { (key, mapValue) ->
-                    if (mapValue != null) {
-                        writer.name(key)
-                        moshi.adapter<Any>(mapValue::class.java).toJson(writer, mapValue)
-                    }
+            when (value) {
+                null -> writer.nullValue()
+                else -> {
+                    writer.beginObject()
+                    value.entries
+                        .forEach { (key, mapValue) ->
+                            if (mapValue != null) {
+                                writer.name(key)
+                                moshi.adapter<Any>(mapValue::class.java).toJson(writer, mapValue)
+                            }
+                        }
+                    writer.endObject()
                 }
-            writer.endObject()
+            }
         }
 
         override fun fromJson(reader: JsonReader): SchemaNode {
