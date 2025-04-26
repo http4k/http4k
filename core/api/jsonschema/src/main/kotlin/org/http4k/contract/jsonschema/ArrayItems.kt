@@ -8,6 +8,7 @@ import org.http4k.lens.ParamMeta.NullParam
 interface ArrayItems {
     fun definitions(): Iterable<SchemaNode>
 }
+
 sealed interface ArrayItem : ArrayItems {
     class Array(val items: ArrayItems, val format: Any?, private val definitions: Iterable<SchemaNode>) : ArrayItem {
         @Suppress("unused")
