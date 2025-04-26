@@ -5,11 +5,13 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import com.squareup.moshi.Types.getRawType
 import dev.forkhandles.values.AbstractValue
 import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.core.Status
 import org.http4k.events.Event
 import org.http4k.websocket.WsStatus
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
@@ -21,7 +23,7 @@ open class SimpleMoshiAdapterFactory(vararg typesToAdapters: Pair<String, (Moshi
     private val mappings = typesToAdapters.toMap()
 
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
-        mappings[Types.getRawType(type).typeName]?.let { it(moshi) }
+        mappings[getRawType(type).typeName]?.let { it(moshi) }
 }
 
 /**
@@ -48,7 +50,7 @@ abstract class IsAnInstanceOfAdapter<T : Any>(
     private val resolveAdapter: Moshi.(KClass<T>) -> JsonAdapter<T> = { adapter(it.java) }
 ) : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
-        with(Types.getRawType(type)) {
+        with(getRawType(type)) {
             when {
                 isA(clazz.java) -> moshi.resolveAdapter(clazz)
                 else -> null
@@ -94,7 +96,7 @@ object ProhibitUnknownValuesAdapter : JsonAdapter.Factory {
 
 object MoshiNodeAdapter : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
-        with(Types.getRawType(type)) {
+        with(getRawType(type)) {
             when {
                 isA(MoshiNode::class.java) -> object : JsonAdapter<MoshiNode>() {
                     override fun fromJson(p0: JsonReader) = MoshiNode.wrap(p0.readJsonValue())
@@ -115,33 +117,63 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
 class UnmappedValue(type: Type) : Exception("unmapped type $type")
 
 object SchemaNodeJsonAdapterFactory : JsonAdapter.Factory {
-    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? =
-        when {
-            SchemaNode::class.java == Types.getRawType(type) -> SchemaNodeJsonAdapter(moshi)
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? {
+        val rawType = getRawType(type)
+
+        return when {
+            SchemaNode::class.java == rawType -> SchemaNodeJsonAdapter(moshi)
+            rawType.isAssignableFrom(Iterable::class.java) -> {
+                (type as? ParameterizedType)?.actualTypeArguments
+                    ?.firstOrNull()
+                    ?.takeIf { getRawType(it) == SchemaNode::class.java }
+                    ?.let { SchemaNodeListJsonAdapter(moshi) }
+            }
+
             else -> null
         }
 
-    private class SchemaNodeJsonAdapter(private val moshi: Moshi) : JsonAdapter<SchemaNode>() {
-        override fun toJson(writer: JsonWriter, value: SchemaNode?) {
-            when (value) {
-                null -> writer.nullValue()
-                else -> {
-                    writer.beginObject()
-                    value.entries
-                        .forEach { (key, mapValue) ->
-                            if (mapValue != null) {
-                                writer.name(key)
-                                moshi.adapter<Any>(mapValue::class.java).toJson(writer, mapValue)
-                            }
-                        }
-                    writer.endObject()
-                }
-            }
-        }
+    }
+}
 
-        override fun fromJson(reader: JsonReader): SchemaNode {
-            throw UnsupportedOperationException("SchemaNode deserialization is not supported")
+private class SchemaNodeJsonAdapter(private val moshi: Moshi) : JsonAdapter<SchemaNode>() {
+    override fun toJson(writer: JsonWriter, value: SchemaNode?) {
+        when (value) {
+            null -> writer.nullValue()
+            else -> {
+                writer.beginObject()
+                value.entries
+                    .forEach { (key, mapValue) ->
+                        if (mapValue != null) {
+                            writer.name(key)
+                            moshi.adapter<Any>(mapValue::class.java).toJson(writer, mapValue)
+                        }
+                    }
+                writer.endObject()
+            }
         }
     }
 
+    override fun fromJson(reader: JsonReader): SchemaNode {
+        throw UnsupportedOperationException("SchemaNode deserialization is not supported")
+    }
+}
+
+private class SchemaNodeListJsonAdapter(moshi: Moshi) : JsonAdapter<List<SchemaNode>>() {
+    private val nodeAdapter = SchemaNodeJsonAdapter(moshi)
+
+    override fun toJson(writer: JsonWriter, value: List<SchemaNode>?) {
+        when (value) {
+            null -> writer.nullValue()
+            else -> {
+                writer.beginArray()
+                value.forEach { nodeAdapter.toJson(writer, it) }
+                writer.endArray()
+            }
+        }
+
+    }
+
+    override fun fromJson(reader: JsonReader): List<SchemaNode> {
+        throw UnsupportedOperationException("SchemaNode list deserialization is not supported")
+    }
 }

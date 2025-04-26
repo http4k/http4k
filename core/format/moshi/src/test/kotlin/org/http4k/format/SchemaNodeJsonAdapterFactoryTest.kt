@@ -79,6 +79,16 @@ class SchemaNodeJsonAdapterFactoryTest {
 
     @Test
     @Disabled
+    fun `array of array of refs`(approver: Approver) {
+        approver.assertApproved(
+            SchemaNode.Array(
+                "name", false, ArrayItem.Array(ArrayItem.Ref("reffed", listOf()), "format", emptyList()), listOf("foo"), metadata
+            )
+        )
+    }
+
+    @Test
+    @Disabled
     fun `array of non objects`(approver: Approver) {
         approver.assertApproved(
             SchemaNode.Array(

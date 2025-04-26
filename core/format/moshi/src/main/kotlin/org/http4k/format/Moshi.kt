@@ -11,7 +11,7 @@ fun standardConfig(kotlinFactory: JsonAdapter.Factory = KotlinJsonAdapterFactory
     .addLast(SetAdapter)
     .addLast(MapAdapter)
     .addLast(MoshiNodeAdapter)
-    .add(SchemaNodeJsonAdapterFactory)
+    .addLast(SchemaNodeJsonAdapterFactory)
     .addLast(ProtocolStatusAdapter)
     .asConfigurable(kotlinFactory)
     .withStandardMappings()
