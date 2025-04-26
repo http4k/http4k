@@ -4,9 +4,12 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import com.squareup.moshi.Types.getRawType
 import dev.forkhandles.values.AbstractValue
+import org.http4k.contract.jsonschema.ArrayItem
+import org.http4k.contract.jsonschema.ArrayItems
+import org.http4k.contract.jsonschema.EmptyArray
+import org.http4k.contract.jsonschema.OneOfArray
 import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.core.Status
 import org.http4k.events.Event
@@ -175,5 +178,64 @@ private class SchemaNodeListJsonAdapter(moshi: Moshi) : JsonAdapter<List<SchemaN
 
     override fun fromJson(reader: JsonReader): List<SchemaNode> {
         throw UnsupportedOperationException("SchemaNode list deserialization is not supported")
+    }
+}
+
+object ArrayItemsJsonAdapterFactory : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? {
+        val rawType = getRawType(type)
+
+        return when {
+            ArrayItems::class.java.isAssignableFrom(rawType) -> ArrayItemsJsonAdapter(moshi)
+            else -> null
+        }
+    }
+}
+
+
+private class ArrayItemsJsonAdapter(private val moshi: Moshi) : JsonAdapter<ArrayItems>() {
+    override fun toJson(writer: JsonWriter, value: ArrayItems?) {
+        when (value) {
+            null -> writer.nullValue()
+            is EmptyArray -> writer.beginObject().endObject()
+            is OneOfArray -> {
+                writer.beginObject()
+                writer.name("oneOf")
+                moshi.adapter<Any>(value.oneOf::class.java).toJson(writer, value.oneOf)
+                writer.endObject()
+            }
+            is ArrayItem.Ref -> {
+                writer.beginObject()
+                writer.name("\$ref")
+                moshi.adapter<Any>(String::class.java).toJson(writer, value.`$ref`)
+                writer.endObject()
+            }
+            is ArrayItem.NonObject -> {
+                writer.beginObject()
+                writer.name("type")
+                moshi.adapter<Any>(String::class.java).toJson(writer, value.type)
+                if (value.format != null) {
+                    writer.name("format")
+                    moshi.adapter<Any>(value.format!!::class.java).toJson(writer, value.format)
+                }
+                writer.endObject()
+            }
+            is ArrayItem.Array -> {
+                writer.beginObject()
+                writer.name("type")
+                moshi.adapter<Any>(String::class.java).toJson(writer, value.type)
+                writer.name("items")
+                moshi.adapter(ArrayItems::class.java).toJson(writer, value.items)
+                if (value.format != null) {
+                    writer.name("format")
+                    moshi.adapter<Any>(value.format!!::class.java).toJson(writer, value.format)
+                }
+                writer.endObject()
+            }
+        }
+    }
+
+    override fun fromJson(reader: JsonReader): ArrayItems {
+        throw UnsupportedOperationException("ArrayItems deserialization is not supported")
     }
 }

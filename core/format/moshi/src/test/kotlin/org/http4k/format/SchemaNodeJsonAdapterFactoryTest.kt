@@ -68,7 +68,6 @@ class SchemaNodeJsonAdapterFactoryTest {
     }
 
     @Test
-    @Disabled
     fun `array of refs`(approver: Approver) {
         approver.assertApproved(
             SchemaNode.Array(
@@ -78,7 +77,6 @@ class SchemaNodeJsonAdapterFactoryTest {
     }
 
     @Test
-    @Disabled
     fun `array of array of refs`(approver: Approver) {
         approver.assertApproved(
             SchemaNode.Array(

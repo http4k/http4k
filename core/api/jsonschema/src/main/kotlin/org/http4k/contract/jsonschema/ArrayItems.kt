@@ -10,7 +10,11 @@ interface ArrayItems {
 }
 
 sealed interface ArrayItem : ArrayItems {
-    class Array(val items: ArrayItems, val format: Any?, private val definitions: Iterable<SchemaNode>) : ArrayItem {
+    class Array(
+        val items: ArrayItems, val format: Any?,
+        @Transient
+        private val definitions: Iterable<SchemaNode> = emptyList()
+    ) : ArrayItem {
         @Suppress("unused")
         val type = ArrayParam(NullParam).value
 
@@ -24,7 +28,11 @@ sealed interface ArrayItem : ArrayItems {
         override fun hashCode(): Int = items.hashCode()
     }
 
-    class NonObject(paramMeta: ParamMeta, val format: Any?, private val definitions: Iterable<SchemaNode>) : ArrayItem {
+    class NonObject(
+        paramMeta: ParamMeta, val format: Any?,
+        @Transient
+        private val definitions: Iterable<SchemaNode> = emptyList()
+    ) : ArrayItem {
         val type = paramMeta.value
 
         override fun equals(other: Any?): Boolean {
@@ -43,7 +51,8 @@ sealed interface ArrayItem : ArrayItems {
     class Ref(
         @Suppress("unused")
         val `$ref`: String,
-        private val definitions: Iterable<SchemaNode>
+        @Transient
+        private val definitions: Iterable<SchemaNode> = emptyList()
     ) : ArrayItem {
         override fun definitions(): Iterable<SchemaNode> = definitions
         override fun equals(other: Any?): Boolean = when (other) {
@@ -59,7 +68,10 @@ object EmptyArray : ArrayItems {
     override fun definitions(): Iterable<SchemaNode> = emptyList()
 }
 
-class OneOfArray(private val schemas: Set<ArrayItem>) : ArrayItems {
+class OneOfArray(
+    @Transient
+    private val schemas: Set<ArrayItem> = emptySet()
+) : ArrayItems {
     @Suppress("unused")
     val oneOf = schemas.toSet().sortedBy { it.javaClass.simpleName }
 
