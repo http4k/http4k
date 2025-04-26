@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import org.http4k.contract.jsonschema.ArrayItem
 import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.contract.jsonschema.SchemaNode.Companion.Enum
 import org.http4k.contract.jsonschema.SchemaNode.Companion.Primitive
@@ -13,6 +14,7 @@ import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -46,8 +48,45 @@ class SchemaNodeJsonAdapterFactoryTest {
     @Test
     fun primitive(approver: Approver) {
         approver.assertApproved(
-            SchemaNode.Primitive(
+            Primitive(
                 "name", ParamMeta.StringParam, false, 123, metadata
+            )
+        )
+    }
+
+    @Test
+    fun `an object`(approver: Approver) {
+        approver.assertApproved(
+            SchemaNode.Object(
+                "name", false, mapOf(
+                    "node1" to Primitive(
+                        "name", ParamMeta.StringParam, false, 123, metadata
+                    )
+                ), mapOf<String, Any>(), metadata
+            )
+        )
+    }
+
+    @Test
+    @Disabled
+    fun `array of refs`(approver: Approver) {
+        approver.assertApproved(
+            SchemaNode.Array(
+                "name", false, ArrayItem.Ref("reffed", listOf()), listOf("foo"), metadata
+            )
+        )
+    }
+
+    @Test
+    @Disabled
+    fun `array of non objects`(approver: Approver) {
+        approver.assertApproved(
+            SchemaNode.Array(
+                "name",
+                false,
+                ArrayItem.NonObject(ParamMeta.StringParam, "format", emptyList()),
+                listOf("asd"),
+                metadata
             )
         )
     }
