@@ -24,16 +24,19 @@ import java.io.File
 class DirectoryResourcesTest {
 
     val path = "build/tmp_test"
-    private val directory = dir(path) {
-        text("plainfile.txt") {
-            content = "hello"
-        }
-        binary("binary.png") {
-            content = "goodbye".byteInputStream()
-        }
-        dir("directory") {
-            text("file2.html") {
-                content = "<html/>"
+
+    init {
+        dir(path) {
+            text("plainfile.txt") {
+                content = "hello"
+            }
+            binary("binary.png") {
+                content = "goodbye".byteInputStream()
+            }
+            dir("directory") {
+                text("file2.html") {
+                    content = "<html/>"
+                }
             }
         }
     }

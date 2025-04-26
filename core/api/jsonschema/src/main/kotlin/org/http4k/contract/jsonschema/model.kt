@@ -7,7 +7,7 @@ import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.NullParam
 import org.http4k.lens.ParamMeta.ObjectParam
 
-internal class SchemaNode(
+class SchemaNode private constructor(
     private val name: String,
     private val paramMeta: ParamMeta,
     private val isNullable: Boolean,
@@ -155,11 +155,11 @@ internal class SchemaNode(
     }
 }
 
-internal interface ArrayItems {
+interface ArrayItems {
     fun definitions(): Iterable<SchemaNode>
 }
 
-internal sealed interface ArrayItem : ArrayItems {
+sealed interface ArrayItem : ArrayItems {
     class Array(val items: ArrayItems, val format: Any?, private val definitions: Iterable<SchemaNode>) : ArrayItem {
         @Suppress("unused")
         val type = ArrayParam(NullParam).value
@@ -216,7 +216,7 @@ internal class OneOfArray(private val schemas: Set<ArrayItem>) : ArrayItems {
     override fun definitions() = schemas.flatMap { it.definitions() }
 }
 
-internal abstract class SchemaSortingMap(private val map: MutableMap<String, Any?>) : MutableMap<String, Any?> by map {
+abstract class SchemaSortingMap(private val map: MutableMap<String, Any?>) : MutableMap<String, Any?> by map {
     override val entries
         get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
 

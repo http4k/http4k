@@ -14,6 +14,7 @@ dependencies {
     api(Square.moshi)
     api(Square.moshi.kotlinReflect)
 
+    api(project(":http4k-api-jsonschema"))
     implementation("dev.forkhandles:values4k:_")
     implementation("dev.forkhandles:data4k:_")
 

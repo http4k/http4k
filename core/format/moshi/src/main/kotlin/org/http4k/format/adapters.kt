@@ -6,6 +6,7 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dev.forkhandles.values.AbstractValue
+import org.http4k.contract.jsonschema.SchemaNode
 import org.http4k.core.Status
 import org.http4k.events.Event
 import org.http4k.websocket.WsStatus
@@ -113,3 +114,33 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
 
 class UnmappedValue(type: Type) : Exception("unmapped type $type")
 
+object SchemaNodeJsonAdapterFactory : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
+        return if (Types.getRawType(type) == SchemaNode::class.java) {
+            SchemaNodeJsonAdapter(moshi)
+        } else null
+    }
+    private class SchemaNodeJsonAdapter(private val moshi: Moshi) : JsonAdapter<SchemaNode>() {
+        override fun toJson(writer: JsonWriter, value: SchemaNode?) {
+            if (value == null) {
+                writer.nullValue()
+                return
+            }
+
+            writer.beginObject()
+            value.entries
+                .forEach { (key, mapValue) ->
+                    if (mapValue != null) {
+                        writer.name(key)
+                        moshi.adapter<Any>(mapValue::class.java).toJson(writer, mapValue)
+                    }
+                }
+            writer.endObject()
+        }
+
+        override fun fromJson(reader: JsonReader): SchemaNode {
+            throw UnsupportedOperationException("SchemaNode deserialization is not supported")
+        }
+    }
+
+}
