@@ -1,0 +1,39 @@
+{
+  "resource": "https://api.example.com",
+  "authorizationServers": [
+    "https://auth.example.com",
+    "https://login.example.org"
+  ],
+  "jwksUri": "https://api.example.com/.well-known/jwks.json",
+  "scopesSupported": [
+    "read",
+    "write",
+    "delete",
+    "admin"
+  ],
+  "bearerMethodsSupported": [
+    "header",
+    "body"
+  ],
+  "resourceSigningAlgValuesSupported": [
+    "RS256",
+    "ES256",
+    "PS256"
+  ],
+  "resourceName": "Example API Service",
+  "resourceDocumentation": "https://docs.example.com/api",
+  "resourcePolicyUri": "https://api.example.com/policy",
+  "resourceTosUri": "https://api.example.com/terms",
+  "tlsClientCertificateBoundAccessTokens": true,
+  "authorizationDetailsTypesSupported": [
+    "payment",
+    "account_info",
+    "subscription"
+  ],
+  "dpopSigningAlgValuesSupported": [
+    "ES256",
+    "RS256"
+  ],
+  "dpopBoundAccessTokensRequired": false,
+  "signedMetadata": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImV4YW1wbGUta2V5LWlkIn0.eyJyZXNvdXJjZSI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tIiwiYXV0aG9yaXphdGlvbl9zZXJ2ZXJzIjpbImh0dHBzOi8vYXV0aC5leGFtcGxlLmNvbSIsImh0dHBzOi8vbG9naW4uZXhhbXBsZS5vcmciXSwic2NvcGVzX3N1cHBvcnRlZCI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiLCJhZG1pbiJdLCJpc3MiOiJodHRwczovL2FwaS5leGFtcGxlLmNvbSJ9.signature"
+}
