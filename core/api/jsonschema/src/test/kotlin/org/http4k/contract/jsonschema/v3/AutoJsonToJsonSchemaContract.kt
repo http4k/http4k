@@ -16,7 +16,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
-import org.http4k.format.Jackson
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -357,7 +356,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         assertApproved(
             Response(OK)
                 .with(CONTENT_TYPE of APPLICATION_JSON)
-                .body(Jackson.asFormatString(input))
+                .body(autoJson().asFormatString(input))
         )
     }
 

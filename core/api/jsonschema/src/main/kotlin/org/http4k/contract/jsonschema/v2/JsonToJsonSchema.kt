@@ -15,7 +15,7 @@ class JsonToJsonSchema<NODE>(
     private val json: Json<NODE>,
     private val refLocationPrefix: String = "definitions"
 ) : JsonSchemaCreator<NODE, NODE> {
-    override fun toSchema(obj: NODE, overrideDefinitionId: String?, refModelNamePrefix: String?) = JsonSchema(obj, json.obj()).toSchema(overrideDefinitionId, refModelNamePrefix.orEmpty())
+    override fun toSchema(obj: NODE, overrideDefinitionId: String?, refModelNamePrefix: String?) = JsonSchema(obj, emptyMap()).toSchema(overrideDefinitionId, refModelNamePrefix.orEmpty())
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null, prefix: String): JsonSchema<NODE> =
         when (json.typeOf(node)) {
@@ -53,7 +53,7 @@ class JsonToJsonSchema<NODE>(
 
         val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
         val definitionId = prefix + (overrideDefinitionId ?: ("object" + newDefinition!!.hashCode()))
-        val allDefinitions = json.obj(json.fields(subDefinitions) + (definitionId to newDefinition))
+        val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
         return JsonSchema(json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, allDefinitions)
     }
 

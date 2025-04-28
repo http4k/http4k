@@ -1,0 +1,60 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "basePath": "/",
+  "tags": [
+  ],
+  "paths": {
+    "/example": {
+      "get": {
+        "tags": [
+          ""
+        ],
+        "summary": "<unknown>",
+        "operationId": "getExample",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "implicit",
+      "authorizationUrl": "",
+      "x-google-issuer": "example-google-issuer",
+      "x-google-jwks_uri": "http://example.org/jwks",
+      "x-google-audiences": "client-id1,client-id2"
+    }
+  },
+  "definitions": {
+  },
+  "host": "example.org:8000",
+  "schemes": [
+    "http"
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}

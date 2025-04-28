@@ -17,14 +17,14 @@ class KondorJsonSchemaCreator(
             if (obj is Enum<*>) return toEnumSchema(obj, refModelNamePrefix, overrideDefinitionId)
 
             val schema = json.converterFor(obj).schema()
-            val definitionId = overrideDefinitionId ?: obj::class.simpleName ?: return JsonSchema(schema, json.obj())
+            val definitionId = overrideDefinitionId ?: obj::class.simpleName ?: return JsonSchema(schema)
 
             val reference = (refModelNamePrefix ?: "") + definitionId
             val schemaRef = json {
                 obj("\$ref" to string("#/$refLocationPrefix/$reference"))
             }
 
-            return JsonSchema(schemaRef, json.obj(reference to schema))
+            return JsonSchema(schemaRef, mapOf(reference to schema))
         } catch (e: Exception) {
             return delegate.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
         }
@@ -44,7 +44,7 @@ class KondorJsonSchemaCreator(
             (refModelNamePrefix.orEmpty()) + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         return JsonSchema(
             json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) },
-            json.obj(definitionId to newDefinition)
+            mapOf(definitionId to newDefinition)
         )
     }
 }

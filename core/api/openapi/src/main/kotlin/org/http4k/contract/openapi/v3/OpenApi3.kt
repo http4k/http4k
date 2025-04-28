@@ -101,10 +101,7 @@ class OpenApi3<NODE : Any>(
                     }
                     .toSortedMap(),
                 Components(
-                    json.obj(
-                        paths.fold(emptyList<Pair<String, NODE>>()) { a, b ->
-                            a + b.pathSpec.definitions().flatMap { json.fields(it) }
-                        }),
+                    json.obj(paths.flatMap { it.pathSpec.definitions() }),
                     json(allSecurities.filterNotNull().combineFull())
                 ),
                 servers,
@@ -215,13 +212,11 @@ class OpenApi3<NODE : Any>(
                     listOf(
                         "type" to string("array"),
                         "items" to when (itemType) {
-                            is EnumParam<*> -> json.fields(
-                                apiRenderer.toSchema(
-                                    itemType.clz.java.enumConstants[0],
-                                    meta.name,
-                                    null
-                                ).definitions
-                            ).first().second
+                            is EnumParam<*> -> apiRenderer.toSchema(
+                                itemType.clz.java.enumConstants[0],
+                                meta.name,
+                                null
+                            ).definitions.entries.first().value
 
                             else -> obj("type" to string(itemType.value))
                         }
@@ -283,8 +278,7 @@ class OpenApi3<NODE : Any>(
                 when (this?.withNoDirectives()) {
                     APPLICATION_FORM_URLENCODED.withNoDirectives() -> value to
                         (body?.metas?.let {
-                            FormContent(
-                                FormSchema(
+                            FormContent(FormSchema(
                                 it.associateWith {
                                     (req.example as? WebForm)?.let { form -> form.fields[it.name] }
                                 }
@@ -293,8 +287,7 @@ class OpenApi3<NODE : Any>(
 
                     MULTIPART_FORM_DATA.withNoDirectives() -> value to
                         (body?.metas?.let {
-                            FormContent(
-                                FormSchema(
+                            FormContent(FormSchema(
                                 it.associateWith {
                                     (req.example as? MultipartForm)
                                         ?.let { form -> form.fields[it.name]?.map { it.value } }
@@ -337,7 +330,6 @@ class OpenApi3<NODE : Any>(
                     )
                 }
             )
-
             else -> {
                 val schema = example
                     ?.let { apiRenderer.toSchema(it, definitionId, schemaPrefix) }
@@ -350,7 +342,7 @@ class OpenApi3<NODE : Any>(
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
         ?.let { apiRenderer.toSchema(it, definitionId, null) }
-        ?: JsonSchema(json.obj(), json.obj())
+        ?: JsonSchema(json.obj(), emptyMap())
 
     private fun List<Security>.combineFull(): Render<NODE> = {
         obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) })

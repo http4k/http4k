@@ -63,7 +63,7 @@ sealed class ApiPath<NODE>(
     val deprecated: Boolean?,
     val callbacks: Map<String, Map<Uri, Map<String, ApiPath<NODE>>>>?
 ) {
-    open fun definitions(): List<NODE> = listOfNotNull(
+    open fun definitions(): List<Pair<String, NODE>> = listOfNotNull(
         responses.flatMap { it.value.definitions() },
         parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() },
         callbacks?.flatMap { it.value.values.flatMap { it.values.flatMap { it.definitions() } } }
@@ -98,7 +98,7 @@ sealed class ApiPath<NODE>(
 }
 
 fun interface HasSchema<NODE> {
-    fun definitions(): Iterable<NODE>
+    fun definitions(): Iterable<Pair<String, NODE>>
 }
 
 sealed class BodyContent {
@@ -108,7 +108,7 @@ sealed class BodyContent {
     class SchemaContent<NODE : Any>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(),
         HasSchema<NODE> {
         val schema = jsonSchema?.node
-        override fun definitions() = listOfNotNull(jsonSchema?.definitions)
+        override fun definitions() = jsonSchema?.definitions.orEmpty().toList()
     }
 
     class OneOfSchemaContent<NODE : Any>(private val schemas: List<BodyContent>) : BodyContent(), HasSchema<NODE> {
@@ -176,7 +176,7 @@ sealed class RequestParameter<NODE>(
     class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) :
         RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
         val schema: NODE? = jsonSchema?.node
-        override fun definitions() = listOfNotNull(jsonSchema?.definitions)
+        override fun definitions() = jsonSchema?.definitions.orEmpty().toList()
     }
 
     class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) :

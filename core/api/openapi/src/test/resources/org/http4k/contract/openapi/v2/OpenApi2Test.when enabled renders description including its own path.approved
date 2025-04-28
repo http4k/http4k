@@ -1,0 +1,85 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "basePath": "/",
+  "tags": [
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          ""
+        ],
+        "summary": "<unknown>",
+        "operationId": "get",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/docs": {
+      "get": {
+        "tags": [
+          ""
+        ],
+        "summary": "<unknown>",
+        "operationId": "description",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "the_api_key"
+    }
+  },
+  "definitions": {
+  },
+  "host": "example.org:8000",
+  "schemes": [
+    "http"
+  ],
+  "x-extension": [
+    "extensionField"
+  ]
+}

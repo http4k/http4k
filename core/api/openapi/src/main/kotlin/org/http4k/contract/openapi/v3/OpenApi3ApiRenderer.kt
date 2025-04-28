@@ -257,7 +257,7 @@ class OpenApi3ApiRenderer<NODE : Any>(
             (refModelNamePrefix.orEmpty()) + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         return JsonSchema(
             json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) },
-            json.obj(definitionId to newDefinition)
+            mapOf(definitionId to newDefinition)
         )
     }
 }
