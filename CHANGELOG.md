@@ -3,125 +3,85 @@ CHAN<h2 class="github">Changelog</h2>
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.8.1.0
-- **http4k-***: Upgrade some dependency versio.
-- **http4k-mdk-sdk**: Added support for auto-marshalled Tool args. You will need Kotlin Reflect on the classpath to use this feature.
+### v6.7.0.0 (uncut)
+- **http4k-api-openapi***: [Breaking] Remove OpenApi2 support. OpenApi3 is the only supported version. This is required for ongoing upgrades to OpenApi3.
 
-### v6.8.0.0
-- **http4k-***: Upgrade some dependency versio.
-- **http4k-realtime-core**: Added `PolyFilter` and convenience filter for common `CorsAndRebindProtection`
-- **http4k-mcp-sdk**: [Breaking] Rework Tool Args to better support JSON schema definitions and for every arg to require an explicit type. To fix breaking
-  changes, simply make `Tool.Arg` with `Tool.Arg.string()`.
-- **http4k-mcp-client**: Added scopes to OAuth2 client credentials client filter.
-
-### v6.7.0.0
-
+### v6.6.1.0 (uncut)
 - **http4k-***: Upgrade some dependency versions.
-- **http4k-mcp-sdk**: Improved support for MCP security models, including new Protected Resource OAuth Standard which is present in the latest MCP Draft. This
-  is a much more convenient way to use OAuth2 with the MCP.
-- **http4k-security-oauth**: [Breaking] Can now retrieve Auth Server in various ways, using Protected Resource standard. Implementation of automatic auth
-  server discovery.
-- **http4k-api-openapi**: Add modelNamer to Jackson extension for OpenApi3 renderer. H/T @mbcltd
-- **http4k-api-graphql**: Add support for root-level GraphQL extensions field in GraphQLResponse H/T @joostbaas
-
-### v6.6.1.0
-
-- **http4k-***: Upgrade some dependency versions.
-- **http4k-security-oauth**: Add some WellKnown endpoints for serving metadata for OAuth2 providers.
-- **http4k-mcp-core-**: Added `DirectoryResources` to be able to read from a directory of files.
+- **http4k-mcp-core-***: Added `DirectoryResources` to be able to read from a directory of files.
 
 ### v6.6.0.1
-
-- **http4k-mcp-core-**: [Fix] Missing BOM for ForkHandles caused break in dependencies when using BOM
+- **http4k-mcp-core-***: [Fix] Missing BOM for Forkhandles caused break in dependencies when using BOM
 
 ### v6.6.0.0
-
 - **http4k-***: Upgrade some dependency versions.
-- **http4k-mcp-sdk**: [Breaking] Repackaging of MCP code to avoid cross-module dependencies. It's just imports that need to be changed.
-- **http4k-mcp-client**: [New module] New module purely for projects that need an MCP client without the server side code.
-- **http4k-mcp-core**: [New module] New module for the core of the MCP domain.
-- **http4k-template-freemarker**: [Fix #1337] FreemarkerTemplates sets incompatibleImprovements
+- **http4k-mcp-sdk-***: [Breaking] Repackaging of MCP code to avoid cross-module dependencies. It's just imports that need to be changed.
+- **http4k-mcp-client-***: [New module] New module purely for projects that need an MCP client without the server side code. 
+- **http4k-mcp-core-***: [New module] New module for the core of the MCP domain. 
+- **http4k-template-freemarker-***: [Fix #1337] FreemarkerTemplates sets incompatibleImprovements
 
 ### v6.5.6.1
-
 - **http4k-mcp-sdk-***: [Fix] Fixes to RFC 6570 support in Resource URI Template.
 
 ### v6.5.6.0
-
 - **http4k-mcp-sdk-***: Proper RFC 6570 support in Resource URI Template.
 
 ### v6.5.5.1
-
 - **http4k-mcp-sdk-***: Fixing up resource template matching to better resemble RFC 6570.
 
 ### v6.5.5.0
-
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-mcp-sdk-***: Add better matching around ResourceTemplates.
 
 ### v6.5.4.0
-
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-format-***: Some convenience functions for JSON rendering.
 - **http4k-connect-amazon-sqs-***: [Fix] Correct SQS SendMessage request DTO (#1336) H/T @mghwang
 
 ### v6.5.3.0
-
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-mcp-sdk**: Updates to support objects in new spec.
 - **http4k-connect-amazon-s3***: More support for keys containing hash (#). H/T @aharin
 
 ### v6.5.2.0
-
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-connect-amazon-s3***: Added support for s3 bucket keys containing hash (#). H/T @aharin
 - **http4k-mcp-sdk**: Updates to support sampling callbacks in Tool and other requests.
 - **http4k-mcp-sdk**: Add filters for all common MCP Request types
 
 ### v6.5.1.0
-
 - **http4k-mcp-sdk**: Tidy up completions API.
 
 ### v6.5.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-mcp-sdk** [Breaking]: Protocol negotiation and turning on Server and Client capabilities by default.
 - **http4k-mcp-sdk** Add in-band sampling and progress to most client requests
 
 ### v6.4.1.0
-
-- **http4k-mcp-sdk** [DevEx]: Capabilities now implement their Handler type, allowing you to call through directly to the handler,
+- **http4k-mcp-sdk*** [DevEx]: Capabilities now implement their Handler type, allowing you to call through directly to the handler,
 
 ### v6.4.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-mcp-sdk** : [NEW PRO MODULE] A fully-featured SDK for the [MCP](https://modelcontextprotocol.io) platform. See
-  the [MCP microsite](https://mcp.http4k.org) for more details.
+- **http4k-mcp-sdk** : [NEW PRO MODULE] A fully-featured SDK for the [MCP](https://modelcontextprotocol.io) platform. See the [MCP microsite](https://mcp.http4k.org) for more details.
 
 ### v6.3.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v6.2.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-realtime-core** : Add Router binding for all Websockets and SSE handlers
-- **http4k-connect-** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
+- **http4k-connect-*** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
 - **http4k-connect-openai-*** : [Breaking] Rename `FinishReason` to `StopReason`
-- **http4k-connect-ai-anthropic-*** : [Breaking] Replaced `Schema` with a simple `Map<String, Any>`, as we are unifying the types across all AI modules. A new
-  Schema type will be introduced in a future release. Replace existing Schema usage with a Map<String, Any> for now.
+- **http4k-connect-ai-anthropic-*** : [Breaking] Replaced `Schema` with a simple `Map<String, Any>`, as we are unifying the types across all AI modules. A new Schema type will be introduced in a future release. Replace existing Schema usage with a Map<String, Any> for now.
 - **http4k-connect-ai-anthropic-*** : [Fix] Correct name of input_schema field in Tool.
 - **http4k-client-helidon** : Add Helidon Websocket client. H/T @oharaandrew314
 - **http4k-server-helidon** : [Fix] Support headers for websocket upgrade request. H/T @oharaandrew314
-- **http4k-connect-storage-redis** : Changes to allow Storage instance to act as a ReadWriteCache H/T @ollieabbey
+- **http4k-connect-storage-redis** : Changes to allow Storage instance to act as a ReadWriteCache H/T @ollieabbey 
 
 ### v6.1.0.1
-
 - **http4k-core** : Return null value rather than throw exception if `Request.path(name)` cannot find a path parameter in a valid (routed) request.
--
-
+- 
 ### v6.1.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-tools-hotreload** :[Fix] Hot Reload Module does not work in Windows - again :) H/T @haaloworld
 - **http4k-security-oauth** :[Breaking] Reorganised filter argument order for OAuth filters to pass scopes through to token endpoint.
@@ -131,18 +91,13 @@ changes with their rationale when appropriate:
 - **http4k-realtime-core** : Added PolyHandlerTestClient for testing poly servers in a single place
 
 ### v6.0.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-moshi** : [Fix #1291] Moshi + ProtocolStatus Serialization Exception
+- **http4k-format-moshi** : [Fix #1291] Moshi + ProtocolStatus Serialization Exception 
 - **http4k-tools-hotreload** : [Fix #1290] Hot Reload Module does not work in Windows
 
 ### v6.0.0.0
-
-- **http4k-*** : [License update] Selected "Pro-tier" modules will start to be introduced under the new
-  http4k [commercial license](https://github.com/http4k/http4k/blob/master/pro/LICENSE). These modules remain freely available for personal and academic
-  purposes, and bear the new `org.http4k.pro` Maven coordinate group to distinguish them from the open-source modules.
-- **http4k-*** : [Breaking] Minimum Java version is now 21. Java versions 8-20 support is provided through our LTS programme available through the commercial
-  version of http4k. Please see: https://www.http4k.org/enterprise/
+- **http4k-*** : [License update] Selected "Pro-tier" modules will start to be introduced under the new http4k [commercial license](https://github.com/http4k/http4k/blob/master/pro/LICENSE). These modules remain freely available for personal and academic purposes, and bear the new `org.http4k.pro` Maven coordinate group to distinguish them from the open-source modules.
+- **http4k-*** : [Breaking] Minimum Java version is now 21. Java versions 8-20 support is provided through our LTS programme available through the commercial version of http4k. Please see: https://www.http4k.org/enterprise/
 - **http4k-*** : [Breaking] Repackaging/splitting code into new modules coordinates. See the mapping grid below:
 
 | SOURCE MODULE - v5.X.X.X   | DESTINATION MODULE(S) - v6.X.X.X                                    |
@@ -164,112 +119,88 @@ changes with their rationale when appropriate:
 | http4k-opentelemetry       | http4k-ops-opentelemetry                                            |
 | http4k-resilience4j        | http4k-ops-resilience4j                                             |
 
-- **http4k-*** : [Breaking] Complete rewrite of the routing logic to work identically across HTTP, WS and SSE. Mostly backwards compatible, but some small may
-  be required if you are referencing low level routing classes.
+- **http4k-*** : [Breaking] Complete rewrite of the routing logic to work identically across HTTP, WS and SSE. Mostly backwards compatible, but some small may be required if you are referencing low level routing classes.
 - **http4k-*** : [Breaking] Removal of all deprecations. See the migration guide for more details.
 - **http4k-core** : [Breaking] `regex` lens now returns the entire matched string. To match groups, use `regexGroup` instead.
 - **http4k-contract** : [Breaking] `withPostSecurityFilter()` removed as is part of the contract DSL.
 - **http4k-realtime-core** : [Breaking] From above, repackaging of SSE and Websocket routing and filters.
 - **http4k-connect-amazon-kms** : [Breaking] `CustomerKeySpec` removed and replaced with `KeySpec` (as per AWS deprecations)
-- **http4k-server** : [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted
-  should be handled by user implementations.
-- **http4k-api-contract** : [Breaking] Security implementations moved from contract to security-core. This has involved repackaging them, but the APIs remain
-  the same.
+- **http4k-server** : [Breaking] For consistency, all server configurations have been simplified to only support only simple examples. Anything more convoluted should be handled by user implementations.
+- **http4k-api-contract** : [Breaking] Security implementations moved from contract to security-core. This has involved repackaging them, but the APIs remain the same.
 - **http4k-api-jsonrpc** : [Breaking] Repackaging of some classes - APIs remain the same.
 - **http4k-cloudnative** : [Breaking] Code has moved to a combination of `http4k-config`, `http4k-platform-core` and `http4k-platform-k8s` modules.
 - **http4k-*** : [Unlikely Break] Upgrades all dependencies to latest versions. This may involve API changes if you are reliant on APIs in previous versions.
-- **http4k-format-moshi** : [Unlikely break/Enhancement] Support for `MoshiLong` as well as `MoshiInteger`. This has improved the handling of longs when using
-  the `MoshiNode` types.
+- **http4k-format-moshi** : [Unlikely break/Enhancement] Support for `MoshiLong` as well as `MoshiInteger`. This has improved the handling of longs when using the `MoshiNode` types.
 - **http4k-serverless-*** : [Unlikely break] Replacement of serverless `Context` system to use new `RequestKey` mechanism.
-- **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey` lenses. This obliviates the need for the old
-  `InitializeRequestContext` mechanism and filter
+- **http4k-core** : [Replacement/Upgrade] `RequestContextKey` mechanism replaced with new simpler `RequestKey` lenses. This obliviates the need for the old `InitializeRequestContext` mechanism and filter
 - **http4k-server-helidon** : [Fix] SSE implementation now cleans up SSE connections correctly on close.
 - **http4k-*** : [Enhancement] Unified the Events for HTTP, WS and SSE to use the same `ProtocolEvent` type for tracing and logging transactions.
 - **http4k-realtime-core** : [Enhancement] Added ability to use debugging filters for both SSE and WebSockets.
-- **http4k-realtime-core** : [Enhancement] New DSL for defining Polyhandlers for routing to different types of HTTP/SSE/Websocket protocols connections. Use
-  `poly()`.
-- **http4k-realtime-core** : [Enhancement] SSE client for connecting to Server-sent events. Includes configurable auto-reconnection modes.
-- **http4k-format-moshi** : [Enhancement] Support for Data4k containers for Moshi.
-- **http4k-tools-hotreload** : [New Pro module!] Work with any http4k-based application without restarting the server. Includes browser reloading when working
-  with web-based code, assets and templates. Extensible with custom rebuild logic - ships with Gradle support.
+- **http4k-realtime-core** : [Enhancement] New DSL for defining Polyhandlers for routing to different types of HTTP/SSE/Websocket protocols connections. Use `poly()`.
+- **http4k-realtime-core** : [Enhancement] SSE client for connecting to Server-sent events. Includes  configurable auto-reconnection modes.
+- **http4k-format-moshi** : [Enhancement] Support for Data4k containers for Moshi. 
+- **http4k-tools-hotreload** : [New Pro module!] Work with any http4k-based application without restarting the server. Includes browser reloading when working with web-based code, assets and templates. Extensible with custom rebuild logic - ships with Gradle support.
 - **http4k-bridge-jakarta** : [New module!] Easy migrations from/to Jakarta-based servers.
 - **http4k-bridge-spring** : [New module!] Easy migrations from/to Spring-based servers.
 - **http4k-bridge-vertx** : [New module!] Easy migrations from/to Vertx-based servers.
 - **http4k-bridge-ktor** : [New module!] Easy migrations from/to Ktor-based servers.
 - **http4k-bridge-micronaut** : [New module!] Easy migrations from/to Micronaut-based servers.
 - **http4k-bridge-ratpack** : [New module!] Easy migrations from/to Ratpack-based servers.
-- **http4k-web-datastar** : [New module!] Deep support for the super-powerful [Datastar](https://data-star.dev) Hypermedia library, which helps you build
-  reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework..
+- **http4k-web-datastar** : [New module!] Deep support for the super-powerful [Datastar](https://data-star.dev) Hypermedia library, which helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework..
 - **http4k-tools-traffic-capture** : [New module!] A set of tools to help the capture and replay of traffic from any HTTP server.
 
 ### v5.47.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4-aws** : Fix AWS signature when path contains plus symbol. H/T @aharin
-- **http4k-template-core** : [Unlikely break] Fix classpath template resolution on Windows. H/T @oharaandrew314
+- **http4k-template-core** : [Unlikely break] Fix classpath template resolution on Windows.  H/T @oharaandrew314
 
 ### v5.46.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4-connect-amazon-s3** : [Unlikely break] Make name and region parameters of S3Bucket. H/T @oharaandrew314
+- **http4-connect-amazon-s3** : [Unlikely break] Make name and region parameters of S3Bucket.  H/T @oharaandrew314
 - **http4-contract** : Add ClientCredentialsOAuthSecurity. H/T @ashcor
 
 ### v5.45.2.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4-core** : Support `Query.noValue()` lenses for query parameters.
 
 ### v5.45.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-undertow** : [Fix #1259] POST requests have empty body with Undertow if an SSE handler is registered
+- **http4k-server-undertow*** : [Fix #1259] POST requests have empty body with Undertow if an SSE handler is registered
 
 ### v5.45.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-bridge-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this
-  new module as a migration step before the upgrade to v6, so module changes can be dealt with separately.
+- **http4k-bridge-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately.
 - **http4k-server-servlet** : [Breaking] Renamed as above.
 
 ### v5.44.3.0
-
-- **http4k-server-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this
-  new module as a migration step before the upgrade to v6, so module changes can be dealt with separately.
-- **http4k-tools-traffic-capture** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Traffic Capture functionality from http4k-core in
-  http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately.
+- **http4k-server-servlet** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Servlet integrations in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately. 
+- **http4k-tools-traffic-capture** : [PRE RELEASE PREPARATION] This will be the ultimate destination of the Traffic Capture functionality from http4k-core in http4k v6. We are providing this new module as a migration step before the upgrade to v6, so module changes can be dealt with separately. 
 
 ### v5.44.2.0
-
 - **http4k-template-thymeleaf** : Support template fragments. H/T @mikaelstaldal
 
 ### v5.44.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-template-thymeleaf** : Support template fragments. H/T @mikaelstaldal
 
 ### v5.44.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : [Possible Break] `HtmlApprovalTest` formatter improved handling of HTML attributes which may require re-approving files.
 - **http4k-connect-amazon-iamidentitycenter*** : Read AWS profile configuration both from credentials and config files. H/T @aharin
 - **http4k-core** : Deprecate lens' `regex()` in favour of `regexGroup`. In v6 `regex()` will match fully, changing its current behaviour.
 
 ### v5.43.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-connect-amazon-iamidentitycenter*** : Files containing tokens should only be readable by owner. H/T @aharin
 - **http4k-connect-slack** : [New module!] Minimal support for Slack and Slack Webhooks.
 
 ### v5.42.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-template** : Fix line separators for templates to allow working across platform with templates.
 - **http4k-connect-amazon-iamidentitycenter*** :[Fix 1239] CredentialsProvider.SSO - Credentials caching issue.
-- **http4k-connect-amazon-iamidentitycenter*** : [Unlikely break] PKCE-based Authorization for AWS SSO. Tweaks should be easy to remedy in previous SSO
-  implementation. H/T @aharin
+- **http4k-connect-amazon-iamidentitycenter*** : [Unlikely break] PKCE-based Authorization for AWS SSO. Tweaks should be easy to remedy in previous SSO implementation. H/T @aharin
 
 ### v5.41.0.0
-
 - **http4k-format-xml** : [Fix CVE-2024-55875: Possible Break] Fixed XML processing by disabling entity expansion in DocumentBuilderFactory configuration.
   **Note:** This change affects how XML entity references are handled. If your code relies on XML entity expansion (like
   replacing &entity; references with their defined content), it will need to be updated to provide the correct configuration when deserialising the XML body.
@@ -280,20 +211,15 @@ Full details at: https://www.http4k.org/security/cve-2024-12345/
 H/T to @@JAckLosingHeart for the report.
 
 ### v5.40.0.0
-
 - **http4k-core** : Allow invalidation of cookie with a path. H/T @ollieabbey
 - **http4k-core** : Allow setting cookie value without quotes. H/T @ollieabbey
 - **http4k-core** : Fix cookie format for cookie with no attributes. H/T @ollieabbey
 - **http4k-testing-webdriver** : Remove usages of deprecated getAttribute API. Now use getDomAttribute instead.
-- **http4k-cloudnative** : [Breaking] Deprecation of various functions and re-homing into http4k-platform-k8s module. Some classes and functions have been
-  repackaged.
-- **http4k-*** : [PRE RELEASE PREPARATION] As a part of the upcoming V6, several modules are being rehoused to new Maven coordinates within http4k Community
-  edition (and retaining the Apache2 license). In preparation, we have introduced these modules to give users the time to migrate without taking on-board other
-  breaking changes from v6 - essentially allowing the upgrade cycle to be:
+- **http4k-cloudnative** : [Breaking] Deprecation of various functions and re-homing into http4k-platform-k8s module. Some classes and functions have been repackaged.
+- **http4k-*** : [PRE RELEASE PREPARATION] As a part of the upcoming V6, several modules are being rehoused to new Maven coordinates within http4k Community edition (and retaining the Apache2 license). In preparation, we have introduced these modules to give users the time to migrate without taking on-board other breaking changes from v6 - essentially allowing the upgrade cycle to be:
 
 1. Upgrade to latest v5 release. Deal with deprecations and module changes.
-2. Upgrade to v6 when it is released. Deal with other breaking changes. We expect these to be mainly imports and will be detailed in the v6 release note when we
-   have the chance. In the meantime, this is the list of modules that are being rehoused:
+2. Upgrade to v6 when it is released. Deal with other breaking changes. We expect these to be mainly imports and will be detailed in the v6 release note when we have the chance. In the meantime, this is the list of modules that are being rehoused:
 
 | SOURCE MODULE - v5.X.X.X   | DESTINATION MODULE(S) - v6.X.X.X                                    |
 |----------------------------|---------------------------------------------------------------------|
@@ -315,27 +241,22 @@ H/T to @@JAckLosingHeart for the report.
 | http4k-resilience4j        | http4k-ops-resilience4j                                             |
 
 ### v5.39.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-amazon-*-fake** : [Unlikely break] Rename `AmazonRestfulFake` to `AmazonRestJsonFake`
 - **http4k-amazon-evidently-fake** : Fixed Project status value to be a valid value instead of an empty string
 
 ### v5.38.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-core** : [Unlikely break] Split of RequestWithRoute into Request and RoutedMessage
+- **http4k-core** : [Unlikely break] Split of RequestWithRoute into Request and RoutedMessage 
 - **http4k-realtime-core-*** : Further rework on Sse and Ws to add functionalities missing (which are present in HTTP)
 
 ### v5.37.1.1
-
 - **http4k-format-*** : [Fix 1225] Issue with Datastar module being required on the classpath. Causes NoClassDefFoundError.
 
 ### v5.37.1.0
-
 - **http4k-format-jackson** : Fixed issue with Jackson pulling in a dependency that it didn't need.
 
 ### v5.37.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract-*** :  Ability to model binary downloads in OpenAPI format. H/T @hektorKS
 - **http4k-server-*** : [Possible Break] The return type to sse.send() is now `Sse` instead of `Unit`
@@ -343,131 +264,105 @@ H/T to @@JAckLosingHeart for the report.
 - **http4k-server-*** : Fixes to SSE support for various servers.
 
 ### v5.36.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-realtime-core** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in
-  SSE. SSE now also returns a 404 if the route is unbound.
-- **http4k-server-helidon** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
-- **http4k-server-helidon** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
-- **http4k-server-jetty** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
-- **http4k-server-jetty11** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
-- **http4k-server-netty** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
-- **http4k-server-undertow** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-realtime-core*** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in SSE. SSE now also returns a 404 if the route is unbound.
+- **http4k-server-helidon*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-helidon*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
+- **http4k-server-jetty*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-jetty11*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-netty*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
+- **http4k-server-undertow*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
 
 ### v5.35.5.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon** : Fixes to SSE support
-- **http4k-server-helidon** : Throw exception if configured with `Graceful` stop mode as it's not supported.
-- **http4k-server-undertow** : Fixes to SSE support
+- **http4k-server-helidon*** : Fixes to SSE support
+- **http4k-server-helidon*** : Throw exception if configured with `Graceful` stop mode as it's not supported.
+- **http4k-server-undertow*** : Fixes to SSE support
 
 ### v5.35.4.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon** : Add support for SSE. There are some limitations - see HelidonSseTest for details.
-- **http4k-server-helidon** : Add support for SSE. There are some limitations - see HelidonSseTest for details.
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details. 
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details. 
 
 ### v5.35.4.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon** : Add support for SSE. There are some limitations - see HeliconSseTest for details.
-- **http4k-realtime-core** : Added Debugging for Websocket and SSE connections.
-- **http4k-realtime-core** : Can now route SSE based on the method as well as the path.
+- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HeliconSseTest for details. 
+- **http4k-realtime-core*** : Added Debugging for Websocket and SSE connections.
+- **http4k-realtime-core*** : Can now route SSE based on the method as well as the path.
 
 ### v5.35.3.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-gcp** : [New module!] SDK support for GCP services.
 
 ### v5.35.2.0
-
 - **http4k-server-ktorcio** : Upgrade to Ktor 3
 - **http4k-server-ktornetty** : Upgrade to Ktor 3
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v5.35.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*** - [Fix again!] Missing dependencies in various modules
 - **http4k-connect*** - [Fix again!] Missing dependencies in various modules
 
 ### v5.35.0.0
-
-- **http4k-bom** : Now includes all http4k-connect modules.
+- **http4k-bom** : Now includes all http4k-connect modules.  
 
 ### v5.34.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v5.34.0.0
-
 - **http4k-core** : [Unlikely break] Fix parsing of accept header. It may break direct usages of `Accept` class
 - **http4k-core** : Fix tracking of uri templates during in-memory request redirection
 - **http4k-core** : Make LocalCookie serialisable
 - **http4k-testing-tracerbullet** : Render other types of participant in PlantUML diagrams
 
 ### v5.33.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v5.33.0.1
-
-- **http4k-multipart** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
+- **http4k-multipart*** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
 
 ### v5.33.0.0
-
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 2.0.21
-- **http4k-core** : [Unlikely break] Adding start time to HTTP Transaction. Should be a simple fix if you are already creating your own for some reason. :) H/T
-  @npryce
+- **http4k-core** : [Unlikely break] Adding start time to HTTP Transaction. Should be a simple fix if you are already creating your own for some reason. :) H/T @npryce
 - **http4k-resilience4j** : Add resilience4j timeout filter. H/T @ollieabbey
 - **http4k-format-*** : Adding ability to create BiDiMapping lens. H/T @potfur
 - **http4k-server-apache** - [Fix] Apache httpcomponents server throws when returning 204.
 
 ### v5.32.4.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** Better diffing of failures in the IDE. @H/T @frednordin
 - **http4k-core** Gzip mixed compression mode H/T @IlyaNerd
--
-
+- 
 ### v5.32.3.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** Support for binary comparisons using BinaryApprovalTest. @H/T @oharaandrew314
 
 ### v5.32.2.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : Fix `withNameSuffix` which wasn't checking the content type when you overrode the name suffix.§
 
 ### v5.32.1.0
-
 - **http4k-core** : Fix ordering of params on `Body.webForm()`
 - **http4k-*** : Tightened up nullable types and data class constructor visibility on various APIs
 
 ### v5.32.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-apache*** : [Unlikely break]: Removed `insecureApacheHttpClient()` due to deprecated API.
 - **http4k-webdriver*** : [Unlikely break]: New Nullable types on WebDriver API led to tightening up our implementations.
 
 ### v5.31.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v5.31.0.0
-
-- **http4k-server-apache** : [Possible Break] Upgrade httpcore to 5.3, which introduces stricter authority validation. This may break projects with custom
-  version of ApacheServer.
+- **http4k-server-apache** : [Possible Break] Upgrade httpcore to 5.3, which introduces stricter authority validation. This may break projects with custom version of ApacheServer.
 
 ### v5.30.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-client-jetty** : [Fix] encoding of binary content in Jetty client. H/T @kwydler
 - **http4k-client-*** : All websocket implementations implement a unified `WebsocketFactory`. @H/T @oharaandrew314
 
 ### v5.30.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. Should fix memory leak. @H/T @oharaandrew314
 - **http4k-server-jetty11** : [Fix] Received binary Websocket frames will no longer have their content coerced to text. @H/T @oharaandrew314
@@ -477,8 +372,7 @@ H/T to @@JAckLosingHeart for the report.
 
 Previously, a `WsMessage` was sent in either `TEXT` or `BINARY` mode based on whether the `Body` was a `MemoryBody` or `StreamBody`, respectively.
 
-:warning: **Warning:** If you were using the primary constructor of `WsMessage`, you will need to explicitly provide a `WsMessage.Mode` to resolve the new
-compiler errors.
+:warning: **Warning:** If you were using the primary constructor of `WsMessage`, you will need to explicitly provide a `WsMessage.Mode` to resolve the new compiler errors.
 
 ```kotlin
 val textMessage = WsMessage(MemoryBody("hi"), WsMessage.Mode.Text)
@@ -503,28 +397,21 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 ```
 
 ### v5.29.0.0
-
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.20
-- **http4k-security-oauth** : [Breaking] OAuthProvider support for PKCE. This may break code because of the addition of an extra parameter in the OAuth
-  construction. H/T @dkandalov
+- **http4k-security-oauth** : [Breaking] OAuthProvider support for PKCE. This may break code because of the addition of an extra parameter in the OAuth construction. H/T @dkandalov
 - **http4k-*** : [New module] Azure SDK integration - use an http4k client with the official libraries
 - **http4k-server-*** : [Fix #1163] Request.version is always HTTP/1.1 for server requests, even when using HTTP/2.0
 
 ### v5.28.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. @H/T @oharaandrew314
 
 ### v5.28.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Include Vary header on CORS responses. H/T @ollieabbey
-- **http4k-multipart** : [Fix Break] Multipart form files were all calling deleteOnExit() instead of being deleted when the Body is closed. Possible memory leak
-  for long running processes. The fix MAY be a change of OS files-system usage if you are not closing your MultiPart form body. @H/T @oharaandrew314 for the
-  report.
+- **http4k-multipart** : [Fix Break] Multipart form files were all calling deleteOnExit() instead of being deleted when the Body is closed. Possible memory leak for long running processes. The fix MAY be a change of OS files-system usage if you are not closing your MultiPart form body. @H/T @oharaandrew314 for the report.
 
 ### v5.27.0.0
-
 - **http4k-*** : Upgrade some dependency versions including Kotlin to 2.0.10
 - **http4k-core** New HTTP status codes. H/T @torfinnberset
 - **http4k-core** Added helper method for dealing with forms. H/T @tim-mortimer
@@ -532,191 +419,150 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 - **http4k-testing-kotest** Fix haveSetCookie and haveCookie to work when cookie isn't present. H/T @bagguley
 
 ### v5.26.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-*** : Fix transformer is lost when adding name suffix to Approver H/T @ilya.aliaksandrovich
 
 ### v5.26.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Response caching extensions. H/T @ollieabbey
 - **http4k-config** : [New Module!] Extraction of typesafe configuration module from http4k-cloudnative.
-- **http4k-cloudnative** : [Breaking!] Repackaging of typesafe configuration module classes (org.http4k.cloudnative.env) to http4k-config (org.http4k.config).
-  New imports are required.
+- **http4k-cloudnative** : [Breaking!] Repackaging of typesafe configuration module classes (org.http4k.cloudnative.env) to http4k-config (org.http4k.config). New imports are required.
 - **http4k-contract** : Adds ApiKeySecurity that identifies a consumer and makes it available for later use. H/T @dhs3000
 
 ### v5.25.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-serverless-lambda*** : [Breaking Fix] Incorrect lambda request context variable is passed - we now pass the incoming reqeust object instead of the
-  converted http4k request. If you were using the LAMBDA_REQUEST_KEY, you can just use the request passed into the handler instead.
+- **http4k-serverless-lambda*** : [Breaking Fix] Incorrect lambda request context variable is passed - we now pass the incoming reqeust object instead of the converted http4k request. If you were using the LAMBDA_REQUEST_KEY, you can just use the request passed into the handler instead.
 
 ### v5.24.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-serverless-lambda*** : [Fix] AWS adapter throws on invalid URLs.
 - **http4k-testing-webdriver** : [Fix] Base path replacement logic for same-dir-path and dot-path URLs. H/T jweidler
 
-### v5.24.0.0
-
+### v5.24.0.0 
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Allow removal of all queries for a URI. H/T @dhs3000
 - **http4k-format-kondor** : Upgrade to new version of Kondor. H/T @uberto
-- **http4k-testing-strikt** [Break] The upgrade to the latest version drops Java <17 support. If you are still using Java 8, you will need to stick with the
-  previous version of this module.
+- **http4k-testing-strikt** [Break] The upgrade to the latest version drops Java <17 support. If you are still using Java 8, you will need to stick with the previous version of this module.
 
 ### v5.23.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-contract** : [Approval test break]  Addition of "nullable" field to every model property. This improves JSON output compatability with various
-  tooling for generating types from the definitions.
+- **http4k-contract** : [Approval test break]  Addition of "nullable" field to every model property. This improves JSON output compatability with various tooling for generating types from the definitions.
 
 ### v5.22.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-dataframe** : [Break] Move classes to alternative package to not clash with existing format objects.
+- **http4k-format-dataframe** : [Break] Move classes to alternative package to not clash with existing format objects. 
 
 ### v5.21.2.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-format-dataframe** : [New module] Support for KotlinX DataFrame.
+- **http4k-format-dataframe** : [New module] Support for KotlinX DataFrame. 
 
 ### v5.21.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-multipart** : [Fix #1113] Disk-backed multipart form field data is now cleaned up when the body is closed, including the parent form directory.
+- **http4k-multipart*** : [Fix #1113] Disk-backed multipart form field data is now cleaned up when the body is closed, including the parent form directory.
 
 ### v5.21.0.0
-
 - **http4k-*** : Upgrade some dependency versions including Kotlin to v2
 - **http4k-testing-chaos** : [Breaking] Changed Trigger to be a fun interface instead of a typealias. Should be no-op or a simple fix to the type.
-- **http4k-core** : [Possible Break] Renamed `CachingFilters.Request/Response`to `CachingFilters.CacheRequest/CacheResponse`. If you have imports then they may
-  break and need to be updated.
+- **http4k-core** : [Possible Break] Renamed `CachingFilters.Request/Response`to `CachingFilters.CacheRequest/CacheResponse`. If you have imports then they may break and need to be updated. 
 
 ### v5.20.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-testing-chaos*** : [Unlikely break]: remove Hamkrest dependency so that it does not appear randomly in your projects. If you were accidentally
-  relying on this it will need to be re-added manually.
+- **http4k-testing-chaos*** : [Unlikely break]: remove Hamkrest dependency so that it does not appear randomly in your projects. If you were accidentally relying on this it will need to be re-added manually.
 
 ### v5.19.0.0
-
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.24
 - **http4k-core** : Add support for the timesource typealias `() -> Instant` where a Clock is used. H/T @kwydler
 
 ### v5.18.2.0
-
 - **http4k-core** : Add convenience methods to read bodies from HttpMessages as JSON/XML/CSV etc.. `request.json<MyType>()`
 
 ### v5.18.1.0
-
 - **http4k-core** : Add convenience methods to set common headers to HTTP message.
 
 ### v5.18.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-core** : [Behaviour break] We now do not set the legacy Expires header in CachingFilters. Modern caches should use the Cache-Control header instead (
-  max-age).
+- **http4k-core** : [Behaviour break] We now do not set the legacy Expires header in CachingFilters. Modern caches should use the Cache-Control header instead (max-age).
 
 ### v5.17.0.0
-
 - **http4k-*** : Tweaks to make the K2 compiler happy
-- **http4k** : Added convenience methods to set the body of an HTTP message. The works for both standard body types and with automarshallers.
+- **http4k** : Added convenience methods to set the body of an HTTP message. The works for both standard body types and with automarshallers. 
 - **http4k-core** : Fix request source in SunHttp. H/T @dkandalov
 - **http4k-contract** : Added top-level MetadataRetrieval to schema objects. H/T @BBB
-- **http4k-format-*** : [Unlikely break] rename `with()` functions on auto-marshallers to match content type, so you can now do `req.json(myObj)` and get the
-  content type and body set in one go. Likewise for other content types
+- **http4k-format-*** : [Unlikely break] rename `with()` functions on auto-marshallers to match content type, so you can now do `req.json(myObj)` and get the content type and body set in one go. Likewise for other content types
 
 ### v5.16.2.0
-
 - **http4k-*** : Upgrade some dependency versions.
 
 ### v5.16.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core**: Add support for surrogate-key headers in EtagSupport. H/T @jason-annadani-springer
 
 ### v5.16.0.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-approval** : [Unlikely break] Rename typo in an ApprovalSource instance
-- **http4k-testing-approval** : Addition of optional suffix to the approval file name, and added ApprovalTransformer for varying the compared content from the
-  InputStream
+- **http4k-testing-approval** : Addition of optional suffix to the approval file name, and added ApprovalTransformer for varying the compared content from the InputStream
 - **http4k-core** : [Fix #1084] Route name without a beginning / works for everything except static resources. H/T @ArthurS1
 
 ### v5.15.1.0
-
-- **http4k-core** : [Unlikely break] Change to Meta to remove default params
-- **http4k-testing-approval** : Add ability to add a suffix to the approval file name.
+- **http4k-core** : [Unlikely break] Change to Meta to remove default params 
+- **http4k-testing-approval** : Add ability to add a suffix to the approval file name. 
 
 ### v5.15.0.0
-
-- **http4k-core** : [Unlikely break] Change to Meta to remove default params
+- **http4k-core** : [Unlikely break] Change to Meta to remove default params 
 
 ### v5.14.5.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-core** : Make Lenses support metadata passed through the LensBuilder construction methods. H/T @BBB, @ivanmoore @jack-bolles
-- **http4k-testing-tracerbullet** : Account for spans across traces with same spanId. H/T @IvanPavlov1995
+- **http4k-testing-tracerbullet** : Account for spans across traces with same spanId. H/T @IvanPavlov1995 
 
 ### v5.14.4.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-tracerbullet** : Improve identification of actor for incoming traces.
 - **http4k-client-helidon** : Various fixes H/T @dkandalov
 
 ### v5.14.2.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-testing-tracerbullet** : Improve identification of actor for incoming traces.
 - **http4k-client-helidon** : Various fixes H/T @dkandalov
 
 ### v5.14.1.0
-
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-contract** : Validator optimisation. H/T @dkandalov
-- **http4k-testing-webdriver** : Adding a space between method name and URI when naming spans H/T @ReinholdsB
+- **http4k-testing-webdriver** : Adding a space between method name and URI when naming spans  H/T @ReinholdsB
 - **http4k-testing-webdriver** : Multipart forms in the webdriver, including sending files. H/T @gypsydave5
 - **http4k-testing-webdriver** : Fix bug in webdriver form submission + a method for relative Uri resolution. H/T @gypsydave5
 
 ### v5.14.0.0
-
 - **http4k-*** : Upgrade some dependency versions, including Kotlin to 1.9.23
 - **http4k-*** : Static handlers serve an index.html file from a subdirectory. H/T @mbcltd
 
 ### v5.13.9.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** : Implement Kondor Schema creator. H/T @tamj0rd2
-- **http4k-cloudnative** : Read environment properties from yaml resources. H/T @dzappold
+- **http4k-cloudnative** : Read environment properties from yaml resources.  H/T @dzappold
 - **http4k-webdriver** : [Fix] Bug when submitting with inputs of type submit. H/T @gypsydave5
 - **http4k-testing-approval** : Allow adding a suffix to an approval test file name. H/T @becky-sequence
 
 ### v5.13.8.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-format-kondor** : Expose converterFor method. H/T @tamj0rd2
 
 ### v5.13.7.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** : Allow user to provide schema creation implementation. H/T @tamj0rd2
 - **http4k-core** : [Fix #1053]:  Add BiDiLensSpec defaulted with factory method
 - **http4k-core** : [Fix #1059]:  Update kondor-json to 2.2.2. H/T @asadmanji
 
 ### v5.13.6.1
-
 - **http4k-core** : FollowRedirects also sets port on redirect.
 
 ### v5.13.6.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-serverless-lambda** :[Fix #1057] Error when parsing AWS lambda event from S3 bucket
 - **http4k-testing-webdriver** :[Fix #1050]  Http4kWebDriver does not work on Windows due to path issues. H/T @cmh-dev
 - **http4k-core** :[Fix #1055]  Host header should contain host with port. H/T @obecker
 
 ### v5.13.5.0
-
 - **http4k-client-core** : Ensure consistent content-length behaviour across clients
 - **http4k-client-apache** : Ensure consistent content-length behaviour across clients
 - **http4k-client-apache4** : Ensure consistent content-length behaviour across clients
@@ -724,33 +570,27 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 - **http4k-client-jetty** : Ensure consistent content-length behaviour across clients
 
 ### v5.13.4.1
-
 - **http4k-*** : Fix broken POM dependencies.
 
 ### v5.13.4.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-contract** : Support for data4k progressive data models with field metadata via delegate properties
 
 ### v5.13.3.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-cloudnative*** : Ability to override separator in `Environment`.
 
 ### v5.13.2.0
-
 - **http4k-*** : Upgrade some dependency versions
-- **http4k-contract*** : [Fix] Enums do not pick up custom prefixes in model naming. H/T @ashcor for the tip-off!
+- **http4k-contract*** : [Fix] Enums do not pick up custom prefixes in model naming. H/T @ashcor for the tip-off! 
 - **http4k-opentelemetry*** : [Fix] Fix to set HTTP_REQUEST_BODY_SIZE attribute in OpenTelemetryTracing. H/T @dkandalov
 - **http4k-contract*** : Added Canonical model-namer.
 
 ### v5.13.1.0
-
 - **http4k-*** : Upgrade some dependency versions
 - **http4k-client-helidon** : [Fix #1037] Improve support for query parameters. H/T @franckrasolo
 
 ### v5.13.0.1
-
 - **http4k-testing-tracerbullet** : [Fix] Mermaid sequence diagram generation was constantly changing by default editorconfig files and people committing with
   different IDE settings
 - **http4k-server-jetty** : [Fix #1023] Header values in quotes lose their quotes. H/T @efasel, @dhs3000
@@ -878,7 +718,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 ### v5.8.2.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-core** : Added extension function `ExecutionService.withRequestTracing()` to propagate Zipkin traces across
+- **http4k-core*** : Added extension function `ExecutionService.withRequestTracing()` to propagate Zipkin traces across
   threads
 
 ### v5.8.1.0
@@ -1028,17 +868,17 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 
 ### v5.1.1.0
 
-- **http4k-realtime-core** : Readd test client methods for SSE and WS
+- **http4k-realtime-core*** : Readd test client methods for SSE and WS
 
 ### v5.1.0.0
 
-- **http4k-server-realtime-core** : [Breaking - Fix #931] Change Websocket and SSE interfaces to return `WsResponse`
+- **http4k-server-realtime-core*** : [Breaking - Fix #931] Change Websocket and SSE interfaces to return `WsResponse`
   and `SseResponse` objects. This makes it easier to set response headers and control if a connection is made from the
   incoming request as it is no-longer hidden (it is exposed at the top level instead of being hidden in the SSE and
   Websocket objects). It also means that the interfaces for the protocols follow the same pattern.
-- **http4k-server-jetty** : As above
-- **http4k-server-undertow** : As above
-- **http4k-core** : [Fix #930] Update content-length header after GZipping it. H/T @bjornbugge
+- **http4k-server-jetty*** : As above
+- **http4k-server-undertow*** : As above
+- **http4k-core*** : [Fix #930] Update content-length header after GZipping it. H/T @bjornbugge
 
 ### v5.0.0.0
 
@@ -1068,10 +908,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 - **http4k-contract**: Allow RouteMetaDsl to be marked as hidden H/T @oharaandrew314
 
 ### v4.48.2.0
-
-- **http4k-*** : [Commercially licensed](https://http4k.org/commercial-license) LTS version of http4k v4. This is a marker release only and is covered by
-  the [http4k Enterprise Edition](https://http4k.org/enterprise) subscription. Non-licensed parties should NOT use this version of http4k libraries. Either
-  downgrade to the Apache2 licensed v4.48.0.0, or contact us to arrange an http4k Enterprise Edition subscription.
+- **http4k-*** : [Commercially licensed](https://http4k.org/commercial-license) LTS version of http4k v4. This is a marker release only and is covered by the [http4k Enterprise Edition](https://http4k.org/enterprise) subscription. Non-licensed parties should NOT use this version of http4k libraries. Either downgrade to the Apache2 licensed v4.48.0.0, or contact us to arrange an http4k Enterprise Edition subscription.
 
 ### v4.48.0.0
 
@@ -1173,7 +1010,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 
 ### v4.41.0.0
 
-- **http4k-core** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This
+- **http4k-core*** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This
   shouldn't cause any problems that we know about, but we are bumping the breaking version number just in case.
 
 ### v4.40.2.0
