@@ -3,10 +3,14 @@ package org.http4k.mcp.client.http
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.Credentials
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import org.http4k.format.renderResult
+import org.http4k.lens.basicAuthentication
 import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
@@ -18,7 +22,7 @@ import org.http4k.mcp.renderRequest
 import org.http4k.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.mcp.server.security.McpSecurity.Companion.BasicAuth
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.sse.Sse
@@ -30,13 +34,15 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
 
     override fun clientSessions() = HttpStreamingSessions()
 
+    private val creds = Credentials("user", "password")
+
     override fun clientFor(port: Int) = HttpNonStreamingMcpClient(
         Uri.of("http://localhost:${port}/mcp"),
-        JavaHttpClient()
+        ClientFilters.BasicAuth(creds).then(JavaHttpClient()),
     )
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
-        poly(HttpNonStreamingMcp(protocol, None))
+        poly(HttpNonStreamingMcp(protocol, BasicAuth("", { creds == it })))
 
     @Test
     fun `can handle batched messages`() {
@@ -46,6 +52,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
             )
         ).http!!(
             Request(POST, "/mcp")
+                .basicAuthentication(creds)
                 .body(
                     with(McpJson) {
                         compact(

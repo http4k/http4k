@@ -13,6 +13,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ClientFilters
+import org.http4k.lens.Header
 import org.http4k.lens.with
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
@@ -24,7 +26,7 @@ import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.mcp.server.security.McpSecurity.Companion.ApiKey
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.routing.bind
@@ -40,13 +42,14 @@ class SseMcpClientTest : McpClientContract<Sse> {
     override fun clientFor(port: Int) = SseMcpClient(
         clientName, Version.of("1.0.0"),
         Request(GET, Uri.of("http://localhost:${port}/sse")),
-        JavaHttpClient(responseBodyMode = Stream),
+        ClientFilters.ApiKeyAuth(Header.required("KEY") of "123").then(JavaHttpClient(responseBodyMode = Stream)),
         ClientCapabilities()
     )
 
     override fun clientSessions() = SseSessions().apply { start() }
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse>) = SseMcp(protocol, None)
+    override fun toPolyHandler(protocol: McpProtocol<Sse>) =
+        SseMcp(protocol, ApiKey(Header.required("KEY"), { it == "123" }))
 
     @Test
     fun `deals with error`() {

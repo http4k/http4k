@@ -37,7 +37,7 @@ interface McpSecurity : Security {
             override val filter = ServerFilters.ApiKeyAuth(lens, validate)
         }
 
-        fun <T> BearerAuth(checkToken: (String) -> Boolean) = object : McpSecurity {
+        fun BearerAuth(checkToken: (String) -> Boolean) = object : McpSecurity {
             override val routes = emptyList<RoutingHttpHandler>()
             override val filter = ServerFilters.BearerAuth(checkToken)
         }
