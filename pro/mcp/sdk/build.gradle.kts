@@ -11,6 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-mcp-core"))
     api(project(":http4k-mcp-client"))
+    api(project(":http4k-security-oauth"))
 
     testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))
@@ -20,6 +21,7 @@ dependencies {
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-helidon"))
-    testImplementation(project(":http4k-security-core"))
+    testImplementation(project(":http4k-config"))
+    testImplementation(project(":http4k-security-oauth"))
     testImplementation(project(":http4k-testing-approval"))
 }

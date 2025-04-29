@@ -15,9 +15,10 @@ import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpResource
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.renderRequest
-import org.http4k.mcp.server.http.HttpNonStreamingMcpConnection
+import org.http4k.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.sse.Sse
@@ -34,9 +35,8 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse>) = poly(
-        HttpNonStreamingMcpConnection(protocol)
-    )
+    override fun toPolyHandler(protocol: McpProtocol<Sse>) =
+        poly(HttpNonStreamingMcp(protocol, None))
 
     @Test
     fun `can handle batched messages`() {

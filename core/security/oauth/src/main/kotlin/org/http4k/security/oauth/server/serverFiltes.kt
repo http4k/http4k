@@ -11,25 +11,18 @@ import org.http4k.lens.bearerToken
  * A filter that checks for a valid Bearer token in the Authorization header of incoming requests.
  */
 fun ServerFilters.BearerAuthWithAuthServerDiscovery(
-    realm: String,
     authServerUri: Uri,
-    check: (String) -> Boolean
+    vararg contents: Pair<String, String>,
+    checkToken: (String) -> Boolean
 ) = Filter { next ->
     {
+        val headerValue = (listOf("auth_server" to authServerUri.toString()) + contents.toList())
+            .joinToString(", ") { (k, v) -> "$k=\"$v\"" }
         val body = Response(UNAUTHORIZED)
-            .header(
-                "WWW-Authenticate",
-                """Bearer realm="$realm", error="invalid_token", auth_server="$authServerUri" """
-            )
+            .header("WWW-Authenticate", "Bearer $headerValue")
         when (val bearerToken = it.bearerToken()) {
             null -> body
-            else -> if (check(bearerToken)) next(it) else body
+            else -> if (checkToken(bearerToken)) next(it) else body
         }
     }
 }
-
-fun ServerFilters.BearerAuthWithAuthServerDiscovery(
-    realm: String,
-    authServerUri: Uri,
-    check: String
-) = ServerFilters.BearerAuthWithAuthServerDiscovery(realm, authServerUri) { it == check }

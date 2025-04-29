@@ -11,8 +11,6 @@ import org.http4k.mcp.client.http.HttpStreamingMcpClient
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Resource.Content
-import org.http4k.mcp.model.Resource.Static
-import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.bind
@@ -20,9 +18,6 @@ import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import java.io.File
-import java.net.URI
-import java.nio.file.Paths
-import kotlin.io.path.exists
 
 fun main() {
 

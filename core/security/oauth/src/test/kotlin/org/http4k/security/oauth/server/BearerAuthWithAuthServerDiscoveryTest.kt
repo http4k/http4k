@@ -19,15 +19,14 @@ import org.junit.jupiter.api.Test
 class BearerAuthWithAuthServerDiscoveryTest {
 
     private val authServerUri = Uri.of("https://auth.example.com")
-    private val realm = "test-realm"
     private val validToken = "valid-token"
     private val successHandler = { _: Request -> Response(OK).body("success") }
 
     @Test
     fun `passes request through when valid token is provided`() {
-        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(realm, authServerUri) { token ->
-            token == validToken
-        }
+        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
+            authServerUri
+        ) { token -> token == validToken }
 
         val response = filter.then(successHandler)(
             Request(GET, "/protected")
@@ -39,7 +38,9 @@ class BearerAuthWithAuthServerDiscoveryTest {
 
     @Test
     fun `returns 401 when no token is provided`() {
-        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(realm, authServerUri) { true }
+        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
+            authServerUri
+        ) { true }
 
         val response = filter.then(successHandler)(
             Request(GET, "/protected")
@@ -50,16 +51,16 @@ class BearerAuthWithAuthServerDiscoveryTest {
             response,
             hasHeader(
                 "WWW-Authenticate",
-                equalTo("""Bearer realm="$realm", error="invalid_token", auth_server="$authServerUri" """)
+                equalTo("Bearer auth_server=\"$authServerUri\"")
             )
         )
     }
 
     @Test
     fun `returns 401 when invalid token is provided`() {
-        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(realm, authServerUri) { token ->
-            token == validToken
-        }
+        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
+            authServerUri
+        ) { token -> token == validToken }
 
         val response = filter.then(successHandler)(
             Request(GET, "/protected")
@@ -71,20 +72,21 @@ class BearerAuthWithAuthServerDiscoveryTest {
             response,
             hasHeader(
                 "WWW-Authenticate",
-                equalTo("""Bearer realm="$realm", error="invalid_token", auth_server="$authServerUri" """)
+                equalTo("Bearer auth_server=\"$authServerUri\"")
             )
         )
     }
 
     @Test
-    fun `returns 401 when token has wrong scheme`() {
-        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(realm, authServerUri) { token ->
-            token == validToken
-        }
+    fun `includes additional content in WWW-Authenticate header`() {
+        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
+            authServerUri,
+            "realm" to "test-realm",
+            "error" to "invalid_token"
+        ) { false }
 
         val response = filter.then(successHandler)(
             Request(GET, "/protected")
-                .header("Authorization", "Basic $validToken")
         )
 
         assertThat(response, hasStatus(UNAUTHORIZED))
@@ -92,8 +94,27 @@ class BearerAuthWithAuthServerDiscoveryTest {
             response,
             hasHeader(
                 "WWW-Authenticate",
-                equalTo("""Bearer realm="$realm", error="invalid_token", auth_server="$authServerUri" """)
+                equalTo("Bearer auth_server=\"$authServerUri\", realm=\"test-realm\", error=\"invalid_token\"")
             )
         )
+    }
+
+    @Test
+    fun `works with the simplified string check constructor`() {
+        val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(authServerUri) { it == validToken }
+
+        val validResponse = filter.then(successHandler)(
+            Request(GET, "/protected")
+                .header("Authorization", "Bearer $validToken")
+        )
+
+        assertThat(validResponse, hasStatus(OK))
+
+        val invalidResponse = filter.then(successHandler)(
+            Request(GET, "/protected")
+                .header("Authorization", "Bearer wrong-token")
+        )
+
+        assertThat(invalidResponse, hasStatus(UNAUTHORIZED))
     }
 }

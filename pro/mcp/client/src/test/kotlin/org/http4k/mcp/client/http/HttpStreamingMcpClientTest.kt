@@ -57,6 +57,7 @@ import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
@@ -87,7 +88,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     override fun clientSessions() = HttpStreamingSessions().apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
-        HttpStreamingMcp(protocol)
+        HttpStreamingMcp(protocol, None)
 
     @Test
     fun `deals with error`() {

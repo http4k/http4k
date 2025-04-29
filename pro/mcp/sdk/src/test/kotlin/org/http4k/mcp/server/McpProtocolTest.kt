@@ -75,6 +75,7 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
@@ -103,7 +104,8 @@ class McpProtocolTest {
             McpProtocol(
                 metadata,
                 SseSessions(SessionProvider.Random(Random(0)))
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -125,7 +127,8 @@ class McpProtocolTest {
                 SseSessions(SessionProvider.Random(Random(0))),
                 roots = roots,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -164,7 +167,8 @@ class McpProtocolTest {
                     )
                 ),
                 random = random
-            ))
+            ),
+            None)
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
@@ -198,8 +202,10 @@ class McpProtocolTest {
 
     @Test
     fun `deal with static resources`() {
-        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description",
-            IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)))
+        val resource = Resource.Static(
+            Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description",
+            IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0))
+        )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
         val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
@@ -209,7 +215,8 @@ class McpProtocolTest {
                 metadata, SseSessions(SessionProvider.Random(Random(0))),
                 resources = resources,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -258,17 +265,23 @@ class McpProtocolTest {
         val resource =
             Resource.Templated(
                 "https://www.http4k.org/{+template}", "HTTP4K", "description",
-                IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)))
+                IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0))
+            )
 
-        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(
-            Resource.Content.Blob(Base64Blob.encode("image"), it.uri)
-        )) }))
+        val resources = ServerResources(listOf(resource bind {
+            ResourceResponse(
+                listOf(
+                    Resource.Content.Blob(Base64Blob.encode("image"), it.uri)
+                )
+            )
+        }))
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
                 resources = resources,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -297,7 +310,16 @@ class McpProtocolTest {
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://www.http4k.org/bob")))
 
-            assertNextMessage(McpResource.Read.Response(listOf(Resource.Content.Blob(Base64Blob.encode("image"), Uri.of("https://www.http4k.org/bob")))))
+            assertNextMessage(
+                McpResource.Read.Response(
+                    listOf(
+                        Resource.Content.Blob(
+                            Base64Blob.encode("image"),
+                            Uri.of("https://www.http4k.org/bob")
+                        )
+                    )
+                )
+            )
 
             mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://not-http4k/bob")))
 
@@ -336,7 +358,8 @@ class McpProtocolTest {
                 SseSessions(SessionProvider.Random(random)),
                 tools = tools,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -405,7 +428,8 @@ class McpProtocolTest {
                 SseSessions(SessionProvider.Random(random)),
                 logger = logger,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -444,7 +468,8 @@ class McpProtocolTest {
                 metadata, SseSessions(SessionProvider.Random(random)),
                 completions = completions,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -476,7 +501,8 @@ class McpProtocolTest {
                 metadata, SseSessions(SessionProvider.Random(random)),
                 completions = completions,
                 random = random
-            )
+            ),
+            None
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {

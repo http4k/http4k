@@ -35,8 +35,7 @@ class ImplicitOAuthSecurity(
     name: String = "oauthSecurityImplicit",
     refreshUrl: Uri? = null,
     extraFields: Map<String, String> = emptyMap()
-) :
-    OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
+) : OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
 
     companion object
 }

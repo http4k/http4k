@@ -24,8 +24,9 @@ import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.sse.SseSessions
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.server.sse.SseMcp
+import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -45,7 +46,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
 
     override fun clientSessions() = SseSessions().apply { start() }
 
-    override fun toPolyHandler(protocol: McpProtocol<Sse>) = SseMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Sse>) = SseMcp(protocol, None)
 
     @Test
     fun `deals with error`() {

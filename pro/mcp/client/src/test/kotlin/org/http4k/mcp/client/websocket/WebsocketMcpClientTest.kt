@@ -13,6 +13,7 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.server.protocol.Resources
 import org.http4k.mcp.server.protocol.Tools
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.server.websocket.WebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketSessions
 import org.http4k.websocket.Websocket
@@ -39,5 +40,5 @@ class WebsocketMcpClientTest : McpClientContract<Websocket> {
         ClientCapabilities(),
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Websocket>) = WebsocketMcp(protocol)
+    override fun toPolyHandler(protocol: McpProtocol<Websocket>) = WebsocketMcp(protocol, None)
 }

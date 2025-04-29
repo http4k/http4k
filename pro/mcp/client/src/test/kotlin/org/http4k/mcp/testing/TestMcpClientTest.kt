@@ -54,6 +54,8 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
+import org.http4k.mcp.server.security.McpSecurity
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
@@ -110,7 +112,7 @@ class TestMcpClientTest {
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
-            )
+            ), None
         ).testMcpClient()
 
         mcp.useClient {
@@ -163,7 +165,8 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 resources = serverResources,
                 random = random
-            )
+            ),
+            None
         ).testMcpClient()
 
         mcp.useClient {
@@ -217,7 +220,8 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 resources = serverResources,
                 random = random
-            )
+            ),
+            None
         ).testMcpClient()
 
         mcp.useClient {
@@ -253,7 +257,8 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 tools = serverTools,
                 random = random
-            )
+            ),
+            None
         ).testMcpClient()
 
         mcp.useClient {
@@ -319,7 +324,8 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 completions = serverCompletions,
                 random = random
-            )
+            ),
+            None
         ).testMcpClient()
 
         mcp.useClient {
@@ -348,7 +354,8 @@ class TestMcpClientTest {
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 completions = serverCompletions,
                 random = random
-            )
+            ),
+            None
         ).testMcpClient()
 
         mcp.useClient {
@@ -391,6 +398,7 @@ class TestMcpClientTest {
                 ),
                 random = random
             ),
+            None
         ).testMcpClient()
 
         mcp.useClient {

@@ -31,6 +31,8 @@ import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
+import org.http4k.mcp.server.security.McpSecurity
+import org.http4k.mcp.server.security.McpSecurity.Companion.None
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.stdio.StdIoMcpSessions
@@ -42,6 +44,26 @@ import java.io.Writer
 import java.util.UUID
 
 /**
+ * Create an HTTP (+ SSE) MCP app from a set of feature bindings.
+ *
+ *  The standard paths used are:
+ *      /mcp (accept EventStream) <-- setup streaming connection to an MCP client
+ *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
+ *      /mcp (DELETE) <-- delete a session
+ */
+fun mcpHttpStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+    HttpStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
+
+/**
+ * Create an HTTP (non-streaming) MCP app from a set of feature bindings.
+ *
+ *  The standard paths used are:
+ *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
+ */
+fun mcpHttpNonStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+    HttpNonStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
+
+/**
  * Create an SSE MCP app from a set of feature bindings.
  *
  * This is the main entry point for the MCP server. It sets up the SSE connection and then provides a
@@ -51,10 +73,8 @@ import java.util.UUID
  *      /sse <-- setup the SSE connection to an MCP client
  *      /messages (POST) <-- receive messages from connected MCP clients
  */
-fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    SseMcp(
-        McpProtocol(serverMetaData, SseSessions().apply { start() }, *capabilities)
-    )
+fun mcpSse(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+    SseMcp(McpProtocol(metadata, SseSessions().apply { start() }, *capabilities), security)
 
 /**
  * Create an HTTP MCP app from a set of feature bindings.
@@ -62,8 +82,8 @@ fun mcpSse(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability
  *  The standard paths used are:
  *      /ws <-- setup the WS connection to an MCP client
  */
-fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    WebsocketMcp(McpProtocol(serverMetaData, WebsocketSessions().apply { start() }, *capabilities))
+fun mcpWebsocket(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+    WebsocketMcp(McpProtocol(metadata, WebsocketSessions().apply { start() }, *capabilities), security)
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
@@ -71,44 +91,20 @@ fun mcpWebsocket(serverMetaData: ServerMetaData, vararg capabilities: ServerCapa
  *  The standard paths used are:
  *      /jsonrpc (POST) <-- receive messages from connected MCP clients
  */
-fun mcpJsonRpc(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    JsonRpcMcp(McpProtocol(serverMetaData, JsonRpcSessions(), *capabilities))
-
-/**
- * Create an HTTP (+ SSE) MCP app from a set of feature bindings.
- *
- *  The standard paths used are:
- *      /mcp (accept EventStream) <-- setup streaming connection to an MCP client
- *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
- *      /mcp (DELETE) <-- delete a session
- */
-fun mcpHttpStreaming(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    HttpStreamingMcp(
-        McpProtocol(serverMetaData, HttpStreamingSessions().apply { start() }, *capabilities)
-    )
-
-/**
- * Create an HTTP (non-streaming) MCP app from a set of feature bindings.
- *
- *  The standard paths used are:
- *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
- */
-fun mcpHttpNonStreaming(serverMetaData: ServerMetaData, vararg capabilities: ServerCapability) =
-    HttpNonStreamingMcp(
-        McpProtocol(serverMetaData, HttpStreamingSessions().apply { start() }, *capabilities)
-    )
+fun mcpJsonRpc(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+    JsonRpcMcp(McpProtocol(metadata, JsonRpcSessions(), *capabilities), security)
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.
  */
 fun mcpStdIo(
-    serverMetaData: ServerMetaData,
+    metadata: ServerMetaData,
     vararg capabilities: ServerCapability,
     reader: Reader = System.`in`.reader(),
     writer: Writer = System.out.writer(),
     executor: SimpleScheduler = SimpleSchedulerService(1)
 ) = McpProtocol(
-    serverMetaData,
+    metadata,
     StdIoMcpSessions(writer),
     ServerTools(capabilities.filterIsInstance<ToolCapability>()),
     ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
