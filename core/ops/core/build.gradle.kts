@@ -10,5 +10,8 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(platform("io.opentelemetry:opentelemetry-bom:_"))
+    api("io.opentelemetry:opentelemetry-sdk-metrics")
+    api("io.opentelemetry.semconv:opentelemetry-semconv:_")
 }
 
