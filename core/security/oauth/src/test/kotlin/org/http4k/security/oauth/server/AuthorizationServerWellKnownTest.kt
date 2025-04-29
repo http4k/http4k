@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.util.Locale
 
 @ExtendWith(JsonApprovalTest::class)
-class AuthorizationServerWellKnownWellKnownTest {
+class AuthorizationServerWellKnownTest {
 
     private val server = ServerMetadata(
         issuer = "https://example.com",
