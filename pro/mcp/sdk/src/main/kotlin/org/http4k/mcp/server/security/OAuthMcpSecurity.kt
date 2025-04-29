@@ -7,14 +7,13 @@ import org.http4k.security.oauth.server.BearerAuthWithResourceMetadata
 import org.http4k.security.oauth.server.OAuthProtectedResourceMetadata
 
 /**
- * Standard OAuthSecurity implementation for MCP.
+ * Standard OAuthSecurity implementation for MCP. Based around the OAuth protected resource metadata endpoint.
  */
-class BearerAuthWithResourceMetadataMcpSecurity(
+class OAuthMcpSecurity(
     resourceMetadata: ResourceMetadata,
     vararg contents: Pair<String, String>,
     private val checkToken: (String) -> Boolean
 ) : McpSecurity {
-
     /**
      * Bare bones MCP Security implementation that uses the OAuth protected resource metadata endpoint
      */
