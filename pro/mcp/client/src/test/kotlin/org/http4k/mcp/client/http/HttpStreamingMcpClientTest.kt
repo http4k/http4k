@@ -83,6 +83,7 @@ import kotlin.random.Random
 class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = true
+
     private val http = ClientFilters.BearerAuth("123").then(
         JavaHttpClient(responseBodyMode = Stream)
     )

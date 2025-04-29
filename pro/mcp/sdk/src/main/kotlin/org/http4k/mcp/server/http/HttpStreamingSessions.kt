@@ -42,25 +42,20 @@ class HttpStreamingSessions(
 
         when (sse) {
             null -> {}
-            else -> {
-                SseMessage.Event("message", compact(message), sessionEventTracking.next(context.session)).also {
-                    sse.send(it)
-                    eventStore.write(context.session, it)
-                }
-            }
+            else -> sse.sendAndStore(message, context.session)
         }
     }
 
-    override fun respond(
-        transport: Sse,
-        session: Session,
-        message: McpNodeType
-    ): Result4k<McpNodeType, McpNodeType> {
-        SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
-            eventStore.write(session, it)
-            transport.send(it)
-        }
+    override fun respond(transport: Sse, session: Session, message: McpNodeType): Result4k<McpNodeType, McpNodeType> {
+        transport.sendAndStore(message, session)
         return Success(message)
+    }
+
+    private fun Sse.sendAndStore(message: McpNodeType, session: Session) {
+        SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
+            send(it)
+            eventStore.write(session, it)
+        }
     }
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) {
@@ -95,7 +90,8 @@ class HttpStreamingSessions(
     private fun pruneDeadConnections() =
         clientConnections
             .filterKeys { it is Subscription }
-            .toList().forEach { (session, sse) ->
+            .toList()
+            .forEach { (session, sse) ->
                 try {
                     sse.send(SseMessage.Event("ping", ""))
                 } catch (e: Exception) {

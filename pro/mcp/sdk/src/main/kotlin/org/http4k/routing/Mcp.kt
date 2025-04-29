@@ -38,9 +38,9 @@ import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.stdio.StdIoMcpSessions
 import org.http4k.mcp.server.websocket.WebsocketMcp
 import org.http4k.mcp.server.websocket.WebsocketSessions
-import org.http4k.mcp.util.readLines
 import java.io.Reader
 import java.io.Writer
+import java.time.Duration.ZERO
 import java.util.UUID
 
 /**
@@ -126,13 +126,14 @@ fun mcpStdIo(
     ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),
     ServerCompletions(capabilities.filterIsInstance<CompletionCapability>()),
 ).apply {
-    executor.readLines(reader) {
+    executor.schedule({ reader.buffered().lineSequence().forEach { it: String ->
         try {
             receive(Unit, Session(SessionId.of(UUID(0, 0).toString())), Request(POST, "").body(it))
         } catch (e: Exception) {
             e.printStackTrace(System.err)
         }
     }
+    }, ZERO)
 }
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)

@@ -28,13 +28,11 @@ class AutoDiscoveryOAuthTokenTest {
     private val requests = mutableListOf<Request>()
     private val scopes = listOf("read", "write")
 
-    @Test
-    fun `uses discovered endpoints when metadata is available`() {
-        val backend = { request: Request ->
-            requests.add(request)
-            when (request.uri.path) {
-                "/.well-known/oauth-authorization-server" -> Response(OK).body(
-                    """
+    private val backend = { request: Request ->
+        requests.add(request)
+        when (request.uri.path) {
+            "/.well-known/oauth-authorization-server" -> Response(OK).body(
+                """
                     {
                         "issuer": "https://example.com",
                         "authorization_endpoint": "https://example.com/custom/auth",
@@ -42,24 +40,27 @@ class AutoDiscoveryOAuthTokenTest {
                         "token_endpoint_auth_methods_supported": ["client_secret_basic"]
                     }
                     """.trimIndent()
-                )
+            )
 
-                "/custom/token" -> Response(OK).body(
-                    """
+            "/custom/token" -> Response(OK).body(
+                """
                     {
                         "access_token": "test-token",
                         "token_type": "bearer",
                         "expires_in": 3600
                     }
                     """.trimIndent()
-                )
+            )
 
-                else -> Response(NOT_FOUND)
-            }
+            else -> Response(NOT_FOUND)
         }
+    }
+
+    @Test
+    fun `uses discovered endpoints when metadata is available`() {
 
         val app = ClientFilters.AutoDiscoveryOAuthToken(
-            serverUri = baseUri,
+            authServerUri = baseUri,
             credentials = credentials,
             backend = backend,
             scopes = scopes
@@ -105,7 +106,7 @@ class AutoDiscoveryOAuthTokenTest {
         }
 
         val app = ClientFilters.AutoDiscoveryOAuthToken(
-            serverUri = baseUri,
+            authServerUri = baseUri,
             credentials = credentials,
             backend = backend,
             scopes = scopes
