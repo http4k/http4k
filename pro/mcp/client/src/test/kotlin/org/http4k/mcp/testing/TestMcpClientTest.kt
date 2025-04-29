@@ -54,8 +54,7 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.security.McpSecurity
-import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
@@ -112,7 +111,7 @@ class TestMcpClientTest {
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
-            ), None
+            ), NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {
@@ -166,7 +165,7 @@ class TestMcpClientTest {
                 resources = serverResources,
                 random = random
             ),
-            None
+            NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {
@@ -221,7 +220,7 @@ class TestMcpClientTest {
                 resources = serverResources,
                 random = random
             ),
-            None
+            NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {
@@ -258,7 +257,7 @@ class TestMcpClientTest {
                 tools = serverTools,
                 random = random
             ),
-            None
+            NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {
@@ -325,7 +324,7 @@ class TestMcpClientTest {
                 completions = serverCompletions,
                 random = random
             ),
-            None
+            NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {
@@ -355,7 +354,7 @@ class TestMcpClientTest {
                 completions = serverCompletions,
                 random = random
             ),
-            None
+            NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {
@@ -398,7 +397,7 @@ class TestMcpClientTest {
                 ),
                 random = random
             ),
-            None
+            NoMcpSecurity
         ).testMcpClient()
 
         mcp.useClient {

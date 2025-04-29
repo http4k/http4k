@@ -22,7 +22,7 @@ import org.http4k.mcp.renderRequest
 import org.http4k.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.security.McpSecurity.Companion.BasicAuth
+import org.http4k.mcp.server.security.BasicAuthMcpSecurity
 import org.http4k.mcp.util.McpJson
 import org.http4k.routing.poly
 import org.http4k.sse.Sse
@@ -42,7 +42,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
     )
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
-        poly(HttpNonStreamingMcp(protocol, BasicAuth("", { creds == it })))
+        poly(HttpNonStreamingMcp(protocol, BasicAuthMcpSecurity("", { creds == it })))
 
     @Test
     fun `can handle batched messages`() {

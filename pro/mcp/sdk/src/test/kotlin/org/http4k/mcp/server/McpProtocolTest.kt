@@ -75,7 +75,7 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.ServerLogger
 import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
@@ -105,7 +105,7 @@ class McpProtocolTest {
                 metadata,
                 SseSessions(SessionProvider.Random(Random(0)))
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -128,7 +128,7 @@ class McpProtocolTest {
                 roots = roots,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -168,7 +168,7 @@ class McpProtocolTest {
                 ),
                 random = random
             ),
-            None)
+            NoMcpSecurity)
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
@@ -216,7 +216,7 @@ class McpProtocolTest {
                 resources = resources,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -281,7 +281,7 @@ class McpProtocolTest {
                 resources = resources,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -359,7 +359,7 @@ class McpProtocolTest {
                 tools = tools,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -429,7 +429,7 @@ class McpProtocolTest {
                 logger = logger,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -469,7 +469,7 @@ class McpProtocolTest {
                 completions = completions,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
@@ -502,7 +502,7 @@ class McpProtocolTest {
                 completions = completions,
                 random = random
             ),
-            None
+            NoMcpSecurity
         )
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {

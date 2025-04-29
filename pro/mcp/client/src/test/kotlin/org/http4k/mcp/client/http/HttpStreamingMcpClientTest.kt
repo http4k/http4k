@@ -19,11 +19,11 @@ import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.debug
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
@@ -60,23 +60,26 @@ import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.security.McpSecurity.Companion.BearerAuthWithAuthServerDiscovery
+import org.http4k.mcp.server.security.BearerAuthWithResourceMetadataMcpSecurity
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
-import org.http4k.security.oauth.metadata.ResourceMetadata
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
+import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
+@ExtendWith(JsonApprovalTest::class)
 class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = true
@@ -98,9 +101,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
         HttpStreamingMcp(
-            protocol, BearerAuthWithAuthServerDiscovery(
-                ResourceMetadata(Uri.of(""), listOf(Uri.of("")))
-            ) { it == "123" })
+            protocol, BearerAuthWithResourceMetadataMcpSecurity(Uri.of("http://auth1")) { it == "123" })
 
     @Test
     fun `deals with error`() {
@@ -126,6 +127,23 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         mcpClient.stop()
         server.stop()
+    }
+
+    @Test
+    fun `can get to auth server details`(approver: Approver) {
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions()
+        )
+
+        val server = toPolyHandler(protocol)
+            .asServer(Helidon(0)).start()
+
+        val javaHttpClient = JavaHttpClient()
+        val message = javaHttpClient(Request(GET, "http://localhost:${server.port()}/mcp"))
+        assertThat(message.status, equalTo(UNAUTHORIZED))
+
+        approver.assertApproved(javaHttpClient(Request(GET, "http://localhost:${server.port()}/.well-known/oauth-protected-resource")))
     }
 
     @Test

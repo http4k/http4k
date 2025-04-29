@@ -26,7 +26,7 @@ import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.security.McpSecurity.Companion.ApiKey
+import org.http4k.mcp.server.security.ApiKeyMcpSecurity
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.routing.bind
@@ -49,7 +49,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
     override fun clientSessions() = SseSessions().apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
-        SseMcp(protocol, ApiKey(Header.required("KEY"), { it == "123" }))
+        SseMcp(protocol, ApiKeyMcpSecurity(Header.required("KEY"), { it == "123" }))
 
     @Test
     fun `deals with error`() {

@@ -8,7 +8,7 @@ import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.security.McpSecurity
+import org.http4k.mcp.server.security.BearerAuthMcpSecurity
 import org.http4k.routing.poly
 
 class JsonRpcMcpClientTest : McpClientContract<Unit> {
@@ -25,7 +25,7 @@ class JsonRpcMcpClientTest : McpClientContract<Unit> {
     override fun toPolyHandler(protocol: McpProtocol<Unit>) = poly(
         JsonRpcMcp(
             protocol,
-            McpSecurity.BearerAuth { it == "123" }
+            BearerAuthMcpSecurity { it == "123" }
         )
     )
 }

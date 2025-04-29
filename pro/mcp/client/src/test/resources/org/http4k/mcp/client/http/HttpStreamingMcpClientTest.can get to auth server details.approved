@@ -1,0 +1,6 @@
+{
+  "resource": "/mcp",
+  "authorization_servers": [
+    "http://auth1"
+  ]
+}

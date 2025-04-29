@@ -32,7 +32,7 @@ import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.security.McpSecurity
-import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.server.stdio.StdIoMcpSessions
@@ -51,7 +51,7 @@ import java.util.UUID
  *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
  *      /mcp (DELETE) <-- delete a session
  */
-fun mcpHttpStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+fun mcpHttpStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = NoMcpSecurity) =
     HttpStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
 
 /**
@@ -60,7 +60,7 @@ fun mcpHttpStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapabi
  *  The standard paths used are:
  *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
  */
-fun mcpHttpNonStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+fun mcpHttpNonStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = NoMcpSecurity) =
     HttpNonStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
 
 /**
@@ -73,7 +73,7 @@ fun mcpHttpNonStreaming(metadata: ServerMetaData, vararg capabilities: ServerCap
  *      /sse <-- setup the SSE connection to an MCP client
  *      /messages (POST) <-- receive messages from connected MCP clients
  */
-fun mcpSse(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+fun mcpSse(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = NoMcpSecurity) =
     SseMcp(McpProtocol(metadata, SseSessions().apply { start() }, *capabilities), security)
 
 /**
@@ -82,7 +82,7 @@ fun mcpSse(metadata: ServerMetaData, vararg capabilities: ServerCapability, secu
  *  The standard paths used are:
  *      /ws <-- setup the WS connection to an MCP client
  */
-fun mcpWebsocket(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+fun mcpWebsocket(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = NoMcpSecurity) =
     WebsocketMcp(McpProtocol(metadata, WebsocketSessions().apply { start() }, *capabilities), security)
 
 /**
@@ -91,7 +91,7 @@ fun mcpWebsocket(metadata: ServerMetaData, vararg capabilities: ServerCapability
  *  The standard paths used are:
  *      /jsonrpc (POST) <-- receive messages from connected MCP clients
  */
-fun mcpJsonRpc(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = None) =
+fun mcpJsonRpc(metadata: ServerMetaData, vararg capabilities: ServerCapability, security: McpSecurity = NoMcpSecurity) =
     JsonRpcMcp(McpProtocol(metadata, JsonRpcSessions(), *capabilities), security)
 
 /**
