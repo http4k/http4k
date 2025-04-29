@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.6.2.0 (uncut)
+- **http4k-mcp-sdk***: Improved support for MCP security models, including new Protected Resource OAuth Standard
 - **http4k-api-openapi***: Add modelNamer to Jackson extension for OpenApi3 renderer. H/T @mbcltd
 - **http4k-api-graphql***: Add support for root-level GraphQL extensions field in GraphQLResponse H/T @joostbaas
 
