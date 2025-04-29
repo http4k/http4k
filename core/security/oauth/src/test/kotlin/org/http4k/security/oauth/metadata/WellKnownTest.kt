@@ -72,7 +72,25 @@ class WellKnownTest {
         )
     )
 
-    val http = WellKnown(server, resource, keySet)
+    val oidc = OpenIdConfiguration(
+        issuer = Uri.of("https://auth.example.com"),
+        authorizationEndpoint = Uri.of("https://auth.example.com/authorize"),
+        tokenEndpoint = Uri.of("https://auth.example.com/token"),
+        jwksUri = Uri.of("https://auth.example.com/jwks.json"),
+        responseTypesSupported = ResponseType.entries,
+        subjectTypesSupported = listOf("public", "pairwise"),
+        idTokenSigningAlgValuesSupported = listOf("RS256", "ES256"),
+        userinfoEndpoint = Uri.of("https://auth.example.com/userinfo"),
+        registrationEndpoint = Uri.of("https://auth.example.com/register"),
+        scopesSupported = listOf("openid", "profile", "email", "address", "phone"),
+        claimsSupported = listOf("sub", "name", "given_name", "family_name", "email"),
+        grantTypesSupported = listOf("authorization_code", "implicit", "refresh_token"),
+        tokenEndpointAuthMethodsSupported = listOf("client_secret_basic", "client_secret_post"),
+        codeChallengeMethodsSupported = listOf("S256", "plain"),
+        endSessionEndpoint = Uri.of("https://auth.example.com/logout")
+    )
+
+    val http = WellKnown(server, resource, keySet, oidc)
 
     @Test
     fun `gets server metadata`(approver: Approver) {
@@ -92,6 +110,13 @@ class WellKnownTest {
     fun `gets jwks`(approver: Approver) {
         approver.assertApproved(
             http(Request(GET, "/.well-known/jwks.json"))
+        )
+    }
+
+    @Test
+    fun `gets oidc configuration`(approver: Approver) {
+        approver.assertApproved(
+            http(Request(GET, "/.well-known/openid-configuration"))
         )
     }
 }
