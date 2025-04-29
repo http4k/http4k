@@ -27,6 +27,9 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.McpError
+import org.http4k.mcp.McpError.Http
+import org.http4k.mcp.McpResult
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
@@ -38,9 +41,6 @@ import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.McpError
-import org.http4k.mcp.McpError.Http
-import org.http4k.mcp.McpResult
 import org.http4k.mcp.client.asAOrFailure
 import org.http4k.mcp.client.internal.McpCallback
 import org.http4k.mcp.client.toHttpRequest

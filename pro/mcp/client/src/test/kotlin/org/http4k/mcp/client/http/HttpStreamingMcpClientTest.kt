@@ -20,7 +20,10 @@ import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.debug
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
@@ -57,10 +60,11 @@ import org.http4k.mcp.server.http.HttpStreamingMcp
 import org.http4k.mcp.server.http.HttpStreamingSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.mcp.server.security.McpSecurity.Companion.BearerAuthWithAuthServerDiscovery
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
+import org.http4k.security.oauth.metadata.ResourceMetadata
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
@@ -76,19 +80,27 @@ import kotlin.random.Random
 class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = true
-
-    override fun clientFor(port: Int) = HttpStreamingMcpClient(
-        clientName, Version.of("1.0.0"),
-        Uri.of("http://localhost:${port}/mcp"),
-        JavaHttpClient(responseBodyMode = Stream),
-        ClientCapabilities(),
-        notificationSseReconnectionMode = Disconnect,
+    private val http = ClientFilters.BearerAuth("123").then(
+        JavaHttpClient(responseBodyMode = Stream)
     )
+
+    override fun clientFor(port: Int): HttpStreamingMcpClient {
+        return HttpStreamingMcpClient(
+            clientName, Version.of("1.0.0"),
+            Uri.of("http://localhost:${port}/mcp"),
+            http,
+            ClientCapabilities(),
+            notificationSseReconnectionMode = Disconnect,
+        )
+    }
 
     override fun clientSessions() = HttpStreamingSessions().apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
-        HttpStreamingMcp(protocol, None)
+        HttpStreamingMcp(
+            protocol, BearerAuthWithAuthServerDiscovery(
+                ResourceMetadata(Uri.of(""), listOf(Uri.of("")))
+            ) { it == "123" })
 
     @Test
     fun `deals with error`() {
@@ -168,7 +180,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         mcpClient.resources().list().orThrow { error("bad things") }
         mcpClient.prompts().list().orThrow { error("bad things") }
 
-        val messages = JavaHttpClient(responseBodyMode = Stream)(
+        val messages = http(
             Request(GET, Uri.of("http://localhost:${server.port()}/mcp"))
                 .accept(TEXT_EVENT_STREAM)
                 .with(Header.MCP_SESSION_ID of firstDeterministicSessionId)
