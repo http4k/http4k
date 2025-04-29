@@ -11,9 +11,7 @@ import org.http4k.sse.Sse
 import org.http4k.sse.then
 
 /**
- * Draft MCP server setup for Streaming HTTP-based MCP Servers which use HTTP + SSE
- *
- * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOCOL AND IS SUBJECT TO CHANGE
+ * MCP server setup for Streaming HTTP-based MCP Servers which use HTTP + SSE
  */
 fun HttpStreamingMcp(mcpProtocol: McpProtocol<Sse>) = poly(
     ServerFilters.CatchAllSse().then(HttpStreamingMcpConnection(mcpProtocol)),

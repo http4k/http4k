@@ -7,9 +7,7 @@ import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.sse.Sse
 
 /**
- * Draft MCP server setup for Non-streaming HTTP-based MCP Servers
- *
- * NOTE THAT THIS IMPLEMENTATION IS BASED ON THE DRAFT MCP PROTOCOL AND IS SUBJECT TO CHANGE
+ * MCP server setup for Non-streaming HTTP-based MCP Servers
  */
 fun HttpNonStreamingMcp(mcpProtocol: McpProtocol<Sse>) =
     CatchAll().then(CatchLensFailure()).then(HttpNonStreamingMcpConnection(mcpProtocol))
