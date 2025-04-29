@@ -5,11 +5,11 @@ changes with their rationale when appropriate:
 
 ### v6.6.1.0
 - **http4k-***: Upgrade some dependency versions.
-- **http4k-security-oauth***: Add some WellKnown endpoints for serving metatadata for OAuth2 providers.
+- **http4k-security-oauth***: Add some WellKnown endpoints for serving metadata for OAuth2 providers.
 - **http4k-mcp-core-***: Added `DirectoryResources` to be able to read from a directory of files.
 
 ### v6.6.0.1
-- **http4k-mcp-core-***: [Fix] Missing BOM for Forkhandles caused break in dependencies when using BOM
+- **http4k-mcp-core-***: [Fix] Missing BOM for ForkHandles caused break in dependencies when using BOM
 
 ### v6.6.0.0
 - **http4k-***: Upgrade some dependency versions.
