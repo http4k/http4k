@@ -5,13 +5,13 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Credentials
 import org.http4k.core.HttpMessage
-import org.http4k.core.Method
 import org.http4k.core.Parameters
 import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.WwwAuthenticate
 import org.http4k.core.findSingle
 import org.http4k.core.with
 import org.http4k.lens.Header.ACCEPT
@@ -90,6 +90,9 @@ object Header : BiDiLensSpec<HttpMessage, String>(
                 }
             }
         }
+
+    val WWW_AUTHENTICATE =
+        map(WwwAuthenticate::parseHeader, WwwAuthenticate::toHeaderValue).optional("WWW-Authenticate")
 }
 
 private fun Pair<String, Parameters>.toAcceptContentType() =

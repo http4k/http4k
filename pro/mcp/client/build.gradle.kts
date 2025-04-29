@@ -10,6 +10,8 @@ plugins {
 
 dependencies {
     api(project(":http4k-mcp-core"))
+    api(project(":http4k-security-oauth"))
+    
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-mcp-sdk"))
     testImplementation(project(":http4k-server-helidon"))

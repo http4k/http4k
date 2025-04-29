@@ -9,6 +9,7 @@ import org.http4k.security.OAuthProviderConfig
 import java.time.Clock
 import java.time.Duration
 
+
 fun ClientFilters.AutoDiscoveryOAuthToken(
     authServerDiscovery: AuthServerDiscovery,
     credentials: Credentials,
