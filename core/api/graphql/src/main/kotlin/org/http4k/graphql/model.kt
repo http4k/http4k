@@ -21,7 +21,10 @@ data class GraphQLRequest(
     }
 }
 
-data class GraphQLResponse(val data: Any?, val errors: List<Map<String, Any>>?) {
+data class GraphQLResponse(
+    val data: Any?,
+    val errors: List<Map<String, Any>>?,
+    val extensions: Map<String, Any>? = null) {
     companion object {
         fun from(executionResult: ExecutionResult) = with(executionResult) {
             val errorList: List<Map<String, Any>>? = executionResult.errors
@@ -35,7 +38,10 @@ data class GraphQLResponse(val data: Any?, val errors: List<Map<String, Any>>?) 
                 } catch (e: Exception) {
                     null
                 },
-                errorList
+                errorList,
+                extensions
+                    ?.takeIf {it.isNotEmpty() }
+                    ?.let { asJsonObject(it).asA() }
             )
         }
 
