@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.6.2.0 (uncut)
 - **http4k-api-openapi***: Add modelNamer to Jackson extension for OpenApi3 renderer. H/T @mbcltd
+- **http4k-api-graphql***: Add support for root-level GraphQL extensions field in GraphQLResponse H/T @joostbaas
 
 ### v6.6.1.0
 - **http4k-***: Upgrade some dependency versions.
