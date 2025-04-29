@@ -7,6 +7,7 @@ import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.security.McpSecurity.Companion.None
+import org.http4k.routing.poly
 
 class JsonRpcMcpClientTest : McpClientContract<Unit> {
 
@@ -19,5 +20,5 @@ class JsonRpcMcpClientTest : McpClientContract<Unit> {
         JavaHttpClient()
     )
 
-    override fun toPolyHandler(protocol: McpProtocol<Unit>) = JsonRpcMcp(protocol, None)
+    override fun toPolyHandler(protocol: McpProtocol<Unit>) = poly(JsonRpcMcp(protocol, None))
 }
