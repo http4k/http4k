@@ -42,7 +42,7 @@ interface McpClient : AutoCloseable {
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
         fun call(
             name: ToolName,
-            request: ToolRequest,
+            request: ToolRequest = ToolRequest(),
             overrideDefaultTimeout: Duration? = null
         ): McpResult<ToolResponse>
     }

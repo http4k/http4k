@@ -12,17 +12,16 @@ import org.http4k.security.oauth.server.OAuthProtectedResourceMetadata
 class OAuthMcpSecurity(
     resourceMetadata: ResourceMetadata,
     vararg contents: Pair<String, String>,
-    mcpPath: String = "/mcp",
     private val checkToken: (String) -> Boolean
 ) : McpSecurity {
     /**
      * Bare bones MCP Security implementation that uses the OAuth protected resource metadata endpoint
      */
     constructor(authorizationServerUri: Uri, mcpPath: String = "/mcp", checkToken: (String) -> Boolean) :
-            this(ResourceMetadata(Uri.of(mcpPath), listOf(authorizationServerUri)), checkToken = checkToken)
+        this(ResourceMetadata(Uri.of(mcpPath), listOf(authorizationServerUri)), checkToken = checkToken)
 
     override val filter = ServerFilters.BearerAuthWithResourceMetadata(
-        Uri.of(".well-known/oauth-protected-resource/$mcpPath"),
+        Uri.of(".well-known/oauth-protected-resource"),
         *contents,
         checkToken = checkToken
     )

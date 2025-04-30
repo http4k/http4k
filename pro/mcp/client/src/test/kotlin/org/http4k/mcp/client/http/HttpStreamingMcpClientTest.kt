@@ -88,15 +88,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         JavaHttpClient(responseBodyMode = Stream)
     )
 
-    override fun clientFor(port: Int): HttpStreamingMcpClient {
-        return HttpStreamingMcpClient(
-            clientName, Version.of("1.0.0"),
-            Uri.of("http://localhost:${port}/mcp"),
-            http,
-            ClientCapabilities(),
-            notificationSseReconnectionMode = Disconnect,
-        )
-    }
+    override fun clientFor(port: Int) = HttpStreamingMcpClient(
+        clientName, Version.of("1.0.0"),
+        Uri.of("http://localhost:${port}/mcp"),
+        http,
+        ClientCapabilities(),
+        notificationSseReconnectionMode = Disconnect,
+    )
 
     override fun clientSessions() = HttpStreamingSessions().apply { start() }
 
@@ -144,7 +142,14 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         val message = javaHttpClient(Request(GET, "http://localhost:${server.port()}/mcp"))
         assertThat(message.status, equalTo(UNAUTHORIZED))
 
-        approver.assertApproved(javaHttpClient(Request(GET, "http://localhost:${server.port()}/.well-known/oauth-protected-resource")))
+        approver.assertApproved(
+            javaHttpClient(
+                Request(
+                    GET,
+                    "http://localhost:${server.port()}/.well-known/oauth-protected-resource"
+                )
+            )
+        )
     }
 
     @Test
