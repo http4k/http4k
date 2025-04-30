@@ -29,20 +29,19 @@ fun ClientFilters.DiscoveredMcpOAuth(clientCredentials: Credentials) = object : 
                 response.status == UNAUTHORIZED ->
                     when (val wwwAuthenticate = WWW_AUTHENTICATE(response)) {
                         null -> response
-                        else -> {
-                            when {
-                                wwwAuthenticate["resource_metadata"] != null -> {
-                                    auth = authFromProtectedResource(wwwAuthenticate, next)
-                                    auth.then(next)(it)
-                                }
 
-                                wwwAuthenticate["auth_server"] != null -> {
-                                    auth = authFromAuthServer(wwwAuthenticate, next)
-                                    auth.then(next)(it)
-                                }
-
-                                else -> response
+                        else -> when {
+                            wwwAuthenticate["resource_metadata"] != null -> {
+                                auth = authFromProtectedResource(wwwAuthenticate, next, it.uri)
+                                auth.then(next)(it)
                             }
+
+                            wwwAuthenticate["auth_server"] != null -> {
+                                auth = authFromAuthServer(wwwAuthenticate, next)
+                                auth.then(next)(it)
+                            }
+
+                            else -> response
                         }
                     }
 
@@ -58,10 +57,18 @@ fun ClientFilters.DiscoveredMcpOAuth(clientCredentials: Credentials) = object : 
             next
         )
 
-    private fun authFromProtectedResource(wwwAuthenticate: WwwAuthenticate, next: HttpHandler) =
-        ClientFilters.AutoDiscoveryOAuthToken(
-            fromProtectedResource(Uri.of(wwwAuthenticate["resource_metadata"]!!)),
+    private fun authFromProtectedResource(
+        wwwAuthenticate: WwwAuthenticate,
+        next: HttpHandler,
+        originalUri: Uri
+    ): Filter {
+        val resourceUri = Uri.of(wwwAuthenticate["resource_metadata"]!!)
+        val uriToUse = if (resourceUri.scheme == "") originalUri.path(resourceUri.path) else resourceUri
+
+        return ClientFilters.AutoDiscoveryOAuthToken(
+            fromProtectedResource(uriToUse),
             clientCredentials,
             next
         )
+    }
 }

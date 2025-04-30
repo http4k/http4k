@@ -30,8 +30,6 @@ fun SseOutboundMcpConnection(protocol: McpProtocol<Sse>) =
                 )
             }
 
-            is InvalidSession -> SseResponse(NOT_FOUND) {
-                it.close()
-            }
+            is InvalidSession -> SseResponse(NOT_FOUND) { it.close() }
         }
     }

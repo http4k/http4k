@@ -6,7 +6,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.bearerToken
-
+ 
 /**
  * A filter that checks for a valid Bearer token in the Authorization header of incoming requests.
  */

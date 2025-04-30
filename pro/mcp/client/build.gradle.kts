@@ -15,6 +15,7 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-mcp-sdk"))
     testImplementation(project(":http4k-server-helidon"))
+    testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-security-core"))
     testImplementation(project(":http4k-testing-approval"))
 }
