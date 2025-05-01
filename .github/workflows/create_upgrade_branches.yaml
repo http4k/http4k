@@ -7,13 +7,16 @@ jobs:
     strategy:
       matrix:
         repo:
-          - 'http4k/www'
-          - 'http4k/toolbox'
           - 'http4k/demo'
-          - 'http4k/lts-examples'
           - 'http4k/examples'
-          - 'http4k/http4k-by-example'
           - 'http4k/http4k-bin'
+          - 'http4k/http4k-by-example'
+          - 'http4k/http4k-oidc'
+          - 'http4k/mcp-desktop'
+          - 'http4k/intellij-plugin'
+          - 'http4k/lts-examples'
+          - 'http4k/toolbox'
+          - 'http4k/www'
 
     runs-on: ubuntu-latest
     steps:
