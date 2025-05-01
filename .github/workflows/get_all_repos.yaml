@@ -12,8 +12,13 @@ jobs:
         id: fetch-repos
         run: |
           repos=$(gh repo list http4k --json name -q '.[].name' | jq -r '.[]')
-          matrix="{\"repo\":[$(echo $repos | sed 's/ /\",\"/g')]}"
-          echo "::set-output name=matrix::$matrix"
+          if [ -z "$repos" ]; then
+            echo "No repositories found."
+            echo "::set-output name=matrix::{}"
+          else
+            matrix="{\"repo\":[$(echo $repos | sed 's/ /\",\"/g')]}"
+            echo "::set-output name=matrix::$matrix"
+          fi
 
   dispatch-events:
     needs: create-upgrade-branches
