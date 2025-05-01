@@ -13,13 +13,18 @@ import org.http4k.lens.Header.WWW_AUTHENTICATE
 import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromKnownAuthServer
 import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromProtectedResource
 import org.http4k.security.oauth.client.AutoDiscoveryOAuthToken
+import java.time.Clock
 
 /**
  * MCP OAuth Client filter that handles the authentication process for MCP resources.
  * It expects the server to provide the authorization server URL or protected resource in the WWW-Authenticate header.
  * It then retrieves the token using the provided client credentials and retries the request.
  */
-fun ClientFilters.DiscoveredMcpOAuth(clientCredentials: Credentials) = object : Filter {
+fun ClientFilters.DiscoveredMcpOAuth(
+    clientCredentials: Credentials,
+    scopes: List<String> = emptyList(),
+    clock: Clock = Clock.systemUTC()
+) = object : Filter {
     private var auth = Filter.NoOp
 
     override fun invoke(next: HttpHandler): HttpHandler {
@@ -60,7 +65,7 @@ fun ClientFilters.DiscoveredMcpOAuth(clientCredentials: Credentials) = object : 
     private fun authFromProtectedResource(
         wwwAuthenticate: WwwAuthenticate,
         next: HttpHandler,
-        originalUri: Uri
+        originalUri: Uri,
     ): Filter {
         val resourceUri = Uri.of(wwwAuthenticate["resource_metadata"]!!)
         val uriToUse = if (resourceUri.scheme == "") originalUri.path(resourceUri.path) else resourceUri
@@ -68,7 +73,9 @@ fun ClientFilters.DiscoveredMcpOAuth(clientCredentials: Credentials) = object : 
         return ClientFilters.AutoDiscoveryOAuthToken(
             fromProtectedResource(uriToUse),
             clientCredentials,
-            next
+            next,
+            clock,
+            scopes
         )
     }
 }

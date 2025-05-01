@@ -40,6 +40,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
 
     private val authServer = routes(
         "/token" bind {
+            println(it)
             Response(OK)
                 .contentType(APPLICATION_JSON)
                 .body(
@@ -82,7 +83,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
         HttpStreamingMcpClient(
             McpEntity.of("client"), Version.of("1.0.0"),
             Uri.of("http://localhost:${mcpServer.port()}/mcp"),
-            ClientFilters.DiscoveredMcpOAuth(Credentials("123", "123")).then(http),
+            ClientFilters.DiscoveredMcpOAuth(Credentials("123", "123"), listOf("read", "write")).then(http),
             ClientCapabilities(),
             notificationSseReconnectionMode = Disconnect,
         ).use {
