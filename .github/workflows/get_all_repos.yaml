@@ -12,13 +12,14 @@ jobs:
         id: fetch-repos
         run: |
           repos=$(gh repo list http4k --json name -q '.[].name' | jq -r '.[]')
-          echo "matrix={\"repo\":[$(echo $repos | sed 's/ /\",\"/g')]}" >> $GITHUB_ENV
+          matrix="{\"repo\":[$(echo $repos | sed 's/ /\",\"/g')]}"
+          echo "::set-output name=matrix::$matrix"
 
   dispatch-events:
     needs: create-upgrade-branches
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(env.matrix) }}
+      matrix: ${{ fromJson(needs.create-upgrade-branches.outputs.matrix) }}
     steps:
       - name: Trigger ${{ matrix.repo }}
         run: echo ${{ matrix.repo }}
