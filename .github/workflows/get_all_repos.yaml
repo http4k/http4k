@@ -1,0 +1,25 @@
+name: New Release - Update other projects
+on:
+  workflow_dispatch:
+jobs:
+  create-upgrade-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
+      - name: Fetch all repositories in the http4k organization
+        id: fetch-repos
+        run: |
+          repos=$(gh repo list http4k --json name -q '.[].name' | jq -r '.[]')
+          echo "matrix={\"repo\":[$(echo $repos | sed 's/ /\",\"/g')]}" >> $GITHUB_ENV
+
+  dispatch-events:
+    needs: create-upgrade-branches
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(env.matrix) }}
+    steps:
+      - name: Trigger ${{ matrix.repo }}
+        run: echo ${{ matrix.repo }}
+        shell: bash
