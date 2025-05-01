@@ -1,4 +1,4 @@
-name: New Release - Update other projects
+name: TEST WORKFLOW
 on:
   workflow_dispatch:
 jobs:
