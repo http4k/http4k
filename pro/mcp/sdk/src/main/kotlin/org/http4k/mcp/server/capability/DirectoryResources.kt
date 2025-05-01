@@ -22,7 +22,6 @@ import org.http4k.mcp.server.capability.RecursionMode.Flat
 import org.http4k.mcp.server.capability.RecursionMode.Recursive
 import org.http4k.mcp.server.protocol.Resources
 import java.io.File
-import java.io.File.pathSeparatorChar
 import java.io.File.separatorChar
 
 /**

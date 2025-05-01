@@ -16,7 +16,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
 
@@ -56,4 +56,4 @@ val congoDotCom = mcpHttpStreaming(
     ServerMetaData("CongoDotCom", "1.0.0"),
     getPurchases(),
     getInvoiceForPurchase()
-).asServer(Helidon(8500)).start()
+).asServer(JettyLoom(8500)).start()

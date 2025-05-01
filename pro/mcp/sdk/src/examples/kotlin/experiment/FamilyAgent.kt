@@ -12,7 +12,7 @@ import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import java.io.File
 
@@ -37,4 +37,4 @@ val familyAgent = mcpSse(
     ServerMetaData("my family agent", "1.0.0"),
     getFamilyMembers(),
     saveToMyDisk()
-).asServer(Helidon(7500)).start()
+).asServer(JettyLoom(7500)).start()

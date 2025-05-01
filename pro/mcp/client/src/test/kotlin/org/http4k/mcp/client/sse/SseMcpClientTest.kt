@@ -30,7 +30,7 @@ import org.http4k.mcp.server.security.ApiKeyMcpSecurity
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.routing.bind
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.junit.jupiter.api.Test
@@ -64,7 +64,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
         )
 
         val server = blowUpWhenBoom().then(toPolyHandler(protocol))
-            .asServer(Helidon(0)).start()
+            .asServer(JettyLoom(0)).start()
 
         val mcpClient = clientFor(server.port())
 

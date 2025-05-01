@@ -1,12 +1,12 @@
 package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
+import org.http4k.mcp.Client
 import org.http4k.mcp.CompletionHandler
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.Reference
 import org.http4k.mcp.protocol.messages.McpCompletion
-import org.http4k.mcp.Client
 
 interface CompletionCapability : ServerCapability, CompletionHandler {
     fun toReference(): Reference

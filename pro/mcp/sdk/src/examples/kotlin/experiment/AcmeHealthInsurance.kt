@@ -13,7 +13,7 @@ import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
 import org.http4k.routing.mcpWebsocket
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
 fun raiseClaim(): ToolCapability {
@@ -54,4 +54,4 @@ val acmeHealthInsurance = mcpWebsocket(
     ServerMetaData("AcmeHealthInsurance", "1.0.0"),
     insuranceClaim(),
     raiseClaim()
-).asServer(Helidon(9500)).start()
+).asServer(JettyLoom(9500)).start()

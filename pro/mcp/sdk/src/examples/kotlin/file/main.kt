@@ -15,7 +15,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import java.io.File
 
@@ -35,7 +35,7 @@ fun main() {
         mcpHttpStreaming(
             ServerMetaData("http4k_mcp", "1"),
             Resource.Templated("home://{path}", "foo") bind dir(File("."))
-        ).asServer(Helidon(8000)).start()
+        ).asServer(JettyLoom(8000)).start()
 
     Thread.sleep(200)
 

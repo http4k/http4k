@@ -64,7 +64,7 @@ import org.http4k.mcp.server.security.OAuthMcpSecurity
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.routing.bind
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.http4k.sse.SseEventId
@@ -113,7 +113,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         )
 
         val server = toPolyHandler(protocol)
-            .asServer(Helidon(0)).start()
+            .asServer(JettyLoom(0)).start()
 
         val mcpClient = clientFor(server.port())
 
@@ -136,7 +136,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         )
 
         val server = toPolyHandler(protocol)
-            .asServer(Helidon(0)).start()
+            .asServer(JettyLoom(0)).start()
 
         val javaHttpClient = JavaHttpClient()
         val message = javaHttpClient(Request(GET, "http://localhost:${server.port()}/mcp"))
@@ -181,7 +181,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             })
         )
 
-        val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
 
         val mcpClient = clientFor(server.port())
 
@@ -251,7 +251,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             tools = tools,
         )
 
-        val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
+        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
 
         mcpClient.start()
 
@@ -295,7 +295,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             tools = tools
         )
 
-        val mcpClient = clientFor(toPolyHandler(protocol).asServer(Helidon(0)).start().port())
+        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
 
         mcpClient.start()
 

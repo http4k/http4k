@@ -36,7 +36,7 @@ import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Sessions
 import org.http4k.routing.bind
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
@@ -90,7 +90,7 @@ interface McpClientContract<T> : PortBasedTest {
             }),
         )
 
-        val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
 
         val mcpClient = clientFor(server.port())
 

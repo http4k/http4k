@@ -2,10 +2,10 @@ package org.http4k.mcp.server.capability
 
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.mcp.Client
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpPrompt
 import org.http4k.mcp.protocol.messages.McpPrompt.Get
-import org.http4k.mcp.Client
 import org.http4k.mcp.server.protocol.Prompts
 import org.http4k.mcp.util.ObservableList
 

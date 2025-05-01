@@ -5,24 +5,22 @@ import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.security.BasicAuthMcpSecurity
 import org.http4k.routing.mcpHttpStreaming
-import org.http4k.security.BasicAuthSecurity
-import org.http4k.security.then
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
 /**
  * This example demonstrates how to secure an MCP server with basic auth built into the server.
  */
 fun main() {
-    val baseMcpServer = mcpHttpStreaming(
-        ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0"))
+    val secureMcpServer = mcpHttpStreaming(
+        ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
+        BasicAuthMcpSecurity("realm") { it == Credentials("foo", "bar") }
     )
 
-    val secureMcpServer = BasicAuthSecurity("realm", Credentials("foo", "bar"))
-        .then(baseMcpServer)
     secureMcpServer
         .debug(debugStream = true)
-        .asServer(Helidon(3001))
+        .asServer(JettyLoom(3001))
         .start()
 }

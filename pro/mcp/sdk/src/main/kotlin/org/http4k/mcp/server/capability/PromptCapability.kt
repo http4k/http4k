@@ -4,12 +4,12 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
+import org.http4k.mcp.Client
 import org.http4k.mcp.PromptHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpPrompt
-import org.http4k.mcp.Client
 
 interface PromptCapability : ServerCapability, PromptHandler {
     fun toPrompt(): McpPrompt

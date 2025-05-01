@@ -7,11 +7,11 @@ import org.http4k.core.Request
 import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpHttpStreaming
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import server.completions
 import server.prompts
@@ -33,7 +33,7 @@ fun main() {
         completions()
     )
 
-    mcpServer.asServer(Helidon(4001)).start()
+    mcpServer.asServer(JettyLoom(4001)).start()
 
     // you can use straight HTTP to interact with the server
     JavaHttpClient().debug()(

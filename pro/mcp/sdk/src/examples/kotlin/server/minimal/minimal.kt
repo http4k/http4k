@@ -9,7 +9,7 @@ import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import java.time.Instant
 
@@ -22,6 +22,6 @@ fun main() {
         Tool("time", "get the time") bind {
             ToolResponse.Ok(listOf(Content.Text(Instant.now().toString())))
         }
-    ).debugMcp().asServer(Helidon(4001)).start()
+    ).debugMcp().asServer(JettyLoom(4001)).start()
 }
 

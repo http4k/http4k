@@ -3,7 +3,6 @@ package server.extensive
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.Content

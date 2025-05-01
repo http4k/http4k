@@ -8,10 +8,11 @@ import org.http4k.security.oauth.server.OAuthProtectedResourceMetadata
 
 /**
  * Standard OAuthSecurity implementation for MCP. Based around the OAuth protected resource metadata endpoint.
+ * You can pass in specific contents of the ResourceMetadata, or extra fields to be added to the WWW-Authenticate header.
  */
 class OAuthMcpSecurity(
     resourceMetadata: ResourceMetadata,
-    vararg contents: Pair<String, String>,
+    vararg extraWwwAuthenticateFields: Pair<String, String>,
     private val checkToken: (String) -> Boolean
 ) : McpSecurity {
     /**
@@ -22,7 +23,7 @@ class OAuthMcpSecurity(
 
     override val filter = ServerFilters.BearerAuthWithResourceMetadata(
         Uri.of(".well-known/oauth-protected-resource"),
-        *contents,
+        *extraWwwAuthenticateFields,
         checkToken = checkToken
     )
 

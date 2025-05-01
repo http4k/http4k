@@ -2,11 +2,11 @@ package server.websocket
 
 import org.http4k.filter.debug
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpWebsocket
-import org.http4k.server.Helidon
+import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import server.completions
 import server.prompts
@@ -28,5 +28,5 @@ fun main() {
         completions()
     )
 
-    mcpServer.debug().asServer(Helidon(5001)).start()
+    mcpServer.debug().asServer(JettyLoom(5001)).start()
 }

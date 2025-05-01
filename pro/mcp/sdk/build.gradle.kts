@@ -20,7 +20,7 @@ dependencies {
     testImplementation("dev.forkhandles:fs4k")
 
     testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation(project(":http4k-server-helidon"))
+    testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-config"))
     testImplementation(project(":http4k-security-oauth"))
     testImplementation(project(":http4k-testing-approval"))

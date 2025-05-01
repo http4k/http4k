@@ -1,8 +1,8 @@
 package server.stdio
 
 import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.ServerMetaData
+import org.http4k.mcp.protocol.ServerProtocolCapability
 import org.http4k.mcp.protocol.Version
 import org.http4k.routing.mcpStdIo
 import server.prompts

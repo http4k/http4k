@@ -17,16 +17,16 @@ import org.http4k.format.MoshiString
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
+import org.http4k.mcp.Client
 import org.http4k.mcp.ToolHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.toSchema
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
-import org.http4k.mcp.Client
-import org.http4k.mcp.model.toSchema
 
 interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
