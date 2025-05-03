@@ -6,10 +6,8 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.then
 import java.io.PrintStream
 
-fun PolyHandler.debugMcp(out: PrintStream = System.out): PolyHandler {
-    return DebuggingFilters.PrintSseRequest(out, true)
-        .then(DebuggingFilters.PrintSseResponse(out, notAPing))
-        .then(this)
-}
+fun PolyHandler.debugMcp(out: PrintStream = System.out) = DebuggingFilters.PrintSseRequest(out, true)
+    .then(DebuggingFilters.PrintSseResponse(out, notAPing))
+    .then(this)
 
 private val notAPing: (SseMessage) -> Boolean = { it is SseMessage.Event && it.event != "ping" }
