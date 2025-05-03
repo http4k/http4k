@@ -22,4 +22,14 @@ class WwwAuthenticateTest {
         assertThat(parsed, equalTo(expected))
         assertThat(expected.toHeaderValue(), equalTo(headerValue))
     }
+
+    @Test
+    fun `when no map values`() {
+        val headerValue = "Bearer"
+        val parsed = WwwAuthenticate.parseHeader(headerValue)
+        val expected = WwwAuthenticate(token = "Bearer", contents = mapOf())
+
+        assertThat(parsed, equalTo(expected))
+        assertThat(expected.toHeaderValue(), equalTo(headerValue))
+    }
 }
