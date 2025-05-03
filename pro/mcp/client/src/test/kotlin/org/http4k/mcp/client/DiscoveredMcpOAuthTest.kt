@@ -40,7 +40,6 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
 
     private val authServer = routes(
         "/token" bind {
-            println(it)
             Response(OK)
                 .contentType(APPLICATION_JSON)
                 .body(
@@ -70,11 +69,13 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
     fun `can discover auth token from protected resource`() {
         authServer.start()
 
+        var count = 0
+
         val mcpServer = mcpHttpStreaming(
             ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
             OAuthMcpSecurity(Uri.of("http://localhost:${authServer.port()}")) { it == "test-token" },
             Tool("hello", "say hello") bind {
-                Ok(listOf(Content.Text("helloworld")))
+                Ok(listOf(Content.Text("helloworld${count++}")))
             }
         ).asServer(JettyLoom(0)).start()
 
@@ -87,7 +88,8 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
             ClientCapabilities(),
             notificationSseReconnectionMode = Disconnect,
         ).use {
-            assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld")))
+            assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld0")))
+            assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld1")))
         }
     }
 }
