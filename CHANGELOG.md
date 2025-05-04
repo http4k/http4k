@@ -84,6 +84,7 @@ changes with their rationale when appropriate:
 - **http4k-connect-ai-anthropic-*** : [Fix] Correct name of input_schema field in Tool.
 - **http4k-client-helidon** : Add Helidon Websocket client. H/T @oharaandrew314
 - **http4k-server-helidon** : [Fix] Support headers for websocket upgrade request. H/T @oharaandrew314
+- **http4k-realtime-core** : Add `WsFilter.Tap`. H/T @oharaandrew314
 - **http4k-connect-storage-redis** : Changes to allow Storage instance to act as a ReadWriteCache H/T @ollieabbey 
 
 ### v6.1.0.1
