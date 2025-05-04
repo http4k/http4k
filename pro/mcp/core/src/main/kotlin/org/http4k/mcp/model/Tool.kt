@@ -3,11 +3,17 @@ package org.http4k.mcp.model
 import org.http4k.connect.model.ToolName
 import org.http4k.lens.BiDiLens
 import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.Lens
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.EnumParam
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.protocol.messages.McpTool
+import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpNodeType
 
 /**
  * Description of a Tool capability.
@@ -38,16 +44,29 @@ class Tool private constructor(
     )
 }
 
-fun Tool.toSchema() = mapOf(
-    "type" to "object",
-    "required" to args.filter { it.meta.required }.map { it.meta.name },
-    "properties" to mapOf(
-        *args.map {
-            it.meta.name to mapOf(
-                "type" to it.meta.paramMeta.description,
-                "description" to it.meta.description,
+inline fun <reified T> Lens<ToolRequest, T>.toSchema(): McpNodeType =
+    meta.paramMeta.toSchema(meta.description)
+
+fun ParamMeta.toSchema(description: String? = null): McpNodeType =
+    McpJson.asJsonObject(
+        when (this) {
+            is ArrayParam, ObjectParam -> mapOf(
+                "type" to this.description,
+                "items" to (this as ArrayParam).itemType().toSchema(),
+                "description" to description,
             )
-        }.toTypedArray()
+
+            is EnumParam<*> -> mapOf(
+                "type" to this.description,
+                "enum" to clz.java.enumConstants?.map { it.name },
+                "description" to description,
+            )
+
+            else -> mapOf(
+                "type" to this.description,
+                "description" to description,
+            )
+        }
     )
-)
+
 

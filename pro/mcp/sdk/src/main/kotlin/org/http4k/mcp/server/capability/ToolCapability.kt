@@ -27,6 +27,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.toSchema
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
+import org.http4k.mcp.util.McpJson
 
 interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
@@ -34,7 +35,7 @@ interface ToolCapability : ServerCapability, ToolHandler {
 }
 
 fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
-    override fun toTool() = McpTool(tool.name, tool.description, tool.toSchema(), tool.annotations)
+    override fun toTool() = McpTool(tool.name, tool.description, McpJson.convert(tool.toSchema()), tool.annotations)
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta, client, http) }
@@ -75,4 +76,12 @@ private fun MoshiNode.asString(): Any? = when (this) {
     is MoshiInteger -> value.toString()
     is MoshiLong -> value.toString()
     is MoshiObject -> attributes.mapValues { it.value.asString() }
+}
+
+fun Tool.toSchema() = McpJson {
+    obj(
+        "type" to string("object"),
+        "required" to array(args.filter { it.meta.required }.map { string(it.meta.name) }),
+        "properties" to obj(args.map { it.meta.name to it.toSchema() })
+    )
 }
