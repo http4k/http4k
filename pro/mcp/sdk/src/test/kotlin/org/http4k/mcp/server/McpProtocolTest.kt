@@ -8,6 +8,7 @@ import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
 import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -46,6 +47,8 @@ import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.int
+import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
 import org.http4k.mcp.protocol.ServerMetaData
@@ -84,12 +87,18 @@ import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
+import org.http4k.sse.SseMessage.Ping.toMessage
+import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.TestSseClient
+import org.http4k.testing.assertApproved
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.random.Random
 
+@ExtendWith(JsonApprovalTest::class)
 class McpProtocolTest {
     private val serverName = McpEntity.of("server")
     private val clientName = McpEntity.of("server")
@@ -333,7 +342,7 @@ class McpProtocolTest {
 
     @Test
     fun `deal with tools`() {
-        val stringArg = Tool.Arg.required("foo", "description1")
+        val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
 
         val tool = Tool("name", "description", stringArg, intArg)
@@ -341,15 +350,17 @@ class McpProtocolTest {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val tools = ServerTools(listOf(tool bind {
-            val stringArg1 = stringArg(it)
-            val intArg1 = intArg(it)
+            runCatching {
+                val stringArg1 = stringArg(it)
+                val intArg1 = intArg(it)
 
-            it.meta.progress?.let { _ ->
-                it.client.progress(1, 5.0, "d1")
-                it.client.progress(2, 5.0, "d2")
-            }
+                it.meta.progress?.let { _ ->
+                    it.client.progress(1, 5.0, "d1")
+                    it.client.progress(2, 5.0, "d2")
+                }
 
-            ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
+                ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
+            }.onFailure { println(it.printStackTrace()) }.getOrThrow()
         }))
 
         val mcp = SseMcp(
@@ -526,6 +537,34 @@ class McpProtocolTest {
         }
     }
 
+    @Test
+    fun `reports expected tool input schema`(approver: Approver) {
+        val stringArg = Tool.Arg.string().required("foo", "description1")
+        val intArg = Tool.Arg.int().optional("bar", "description2")
+        val arrayArg = Tool.Arg.int().multi.required("baz", "description3")
+
+        val tool = Tool("name", "description", stringArg, intArg, arrayArg)
+
+        val mcp = SseMcp(
+            McpProtocol(
+                metadata, SseSessions(SessionProvider.Random(random)),
+                tools = ServerTools(listOf(tool bind { ToolResponse.Ok("") })),
+                random = random
+            ),
+            NoMcpSecurity
+        )
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            with(McpJson) {
+                mcp.sendToMcp(renderRequest(McpTool.List, McpTool.List.Request()))
+
+                approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
+            }
+        }
+    }
+
     private fun TestSseClient.assertInitializeLoop(mcp: PolyHandler) {
         assertThat(status, equalTo(OK))
 
@@ -590,6 +629,7 @@ class McpProtocolTest {
             )
         )
     }
+
 
 }
 

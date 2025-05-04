@@ -1,11 +1,10 @@
 package org.http4k.mcp.server.capability
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.lens.enum
-import org.http4k.lens.int
-import org.http4k.lens.string
-import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.enum
+import org.http4k.mcp.model.int
+import org.http4k.mcp.model.string
 import org.http4k.mcp.util.McpJson.asFormatString
 import org.http4k.security.ResponseType
 import org.http4k.testing.Approver
@@ -25,8 +24,8 @@ class ToolCapabilityTest {
                     "tool", "description",
                     Tool.Arg.string().optional("foo", "bar"),
                     Tool.Arg.int().required("bar", "foo"),
-                    Tool.Arg.enum<ToolRequest, ResponseType>().required("enum", "foo"),
-                    Tool.Arg.multi.required("multibar", "foo")
+                    Tool.Arg.enum<ResponseType>().required("enum", "foo"),
+                    Tool.Arg.string().multi.required("multibar", "foo")
                 ).toSchema()
             ), APPLICATION_JSON
         )

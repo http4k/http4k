@@ -39,6 +39,8 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.int
+import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ServerCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.ServerProtocolCapability.Experimental
@@ -235,7 +237,7 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with tools`() {
-        val stringArg = Tool.Arg.required("foo", "description1")
+        val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
 
         val tool = Tool("name", "description", stringArg, intArg)

@@ -8,6 +8,7 @@ import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ToolCapability
@@ -17,9 +18,9 @@ import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
 fun raiseClaim(): ToolCapability {
-    val claimant = Tool.Arg.required("claimant")
-    val item = Tool.Arg.required("item")
-    val invoice = Tool.Arg.required("invoice")
+    val claimant = Tool.Arg.string().required("claimant")
+    val item = Tool.Arg.string().required("item")
+    val invoice = Tool.Arg.string().required("invoice")
     return Tool("raiseClaim", "Raise a claim for items", claimant, item, invoice) bind { req ->
         ToolResponse.Ok(Text("Claim raised ${claimant(req)} for item ${item(req)} invoice ${invoice(req)}"))
     }

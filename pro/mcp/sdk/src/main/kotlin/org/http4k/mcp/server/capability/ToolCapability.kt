@@ -24,7 +24,6 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.toSchema
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
@@ -38,7 +37,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     override fun toTool() = McpTool(tool.name, tool.description, McpJson.convert(tool.toSchema()), tool.annotations)
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoStrings(), mcp._meta, client, http) }
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
@@ -64,18 +63,18 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     override fun invoke(p1: ToolRequest) = handler(p1)
 }
 
-private fun Map<String, MoshiNode>.coerceIntoStrings() =
+private fun Map<String, MoshiNode>.coerceIntoRawTypes() =
     mapNotNull { it.value.asString()?.let { value -> it.key to value } }.toMap()
 
 private fun MoshiNode.asString(): Any? = when (this) {
     MoshiNull -> null
     is MoshiArray -> elements.mapNotNull { it.asString() }
-    is MoshiBoolean -> value.toString()
-    is MoshiString -> value
-    is MoshiDecimal -> value.toString()
-    is MoshiInteger -> value.toString()
-    is MoshiLong -> value.toString()
     is MoshiObject -> attributes.mapValues { it.value.asString() }
+    is MoshiBoolean -> value
+    is MoshiString -> value
+    is MoshiDecimal -> value
+    is MoshiInteger -> value
+    is MoshiLong -> value
 }
 
 fun Tool.toSchema() = McpJson {

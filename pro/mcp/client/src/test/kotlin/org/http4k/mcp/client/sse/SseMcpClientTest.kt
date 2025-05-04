@@ -22,6 +22,7 @@ import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
@@ -53,7 +54,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
 
     @Test
     fun `deals with error`() {
-        val toolArg = Tool.Arg.required("name")
+        val toolArg = Tool.Arg.string().required("name")
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),

@@ -27,6 +27,7 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.server.capability.ServerCompletions
@@ -54,7 +55,7 @@ interface McpClientContract<T> : PortBasedTest {
     @Test
     fun `can interact with server`() {
 
-        val toolArg = Tool.Arg.required("name")
+        val toolArg = Tool.Arg.string().required("name")
 
         val tools = ServerTools(
             Tool("reverse", "description", toolArg) bind {

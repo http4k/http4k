@@ -49,6 +49,7 @@ import org.http4k.mcp.model.Reference
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
@@ -104,7 +105,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     @Test
     fun `deals with error`() {
-        val toolArg = Tool.Arg.required("name")
+        val toolArg = Tool.Arg.string().required("name")
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
@@ -154,7 +155,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     @Test
     fun `resume a stream`() {
-        val toolArg = Tool.Arg.required("name")
+        val toolArg = Tool.Arg.string().required("name")
         val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
         })

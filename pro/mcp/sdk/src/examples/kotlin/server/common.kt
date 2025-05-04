@@ -20,6 +20,8 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.int
+import org.http4k.mcp.model.string
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
@@ -73,7 +75,7 @@ fun countingTool(): ToolCapability {
 }
 
 fun reverseTool(): ToolCapability {
-    val input = Tool.Arg.required("name")
+    val input = Tool.Arg.string().required("name")
 
     return Tool("reverse", "description", input) bind {
         ToolResponse.Ok(listOf(Content.Text(input(it).reversed())))
@@ -81,7 +83,7 @@ fun reverseTool(): ToolCapability {
 }
 
 fun liveWeatherTool(): ToolCapability {
-    val input = Tool.Arg.required("city")
+    val input = Tool.Arg.string().required("city")
 
     return Tool(
         "weather",

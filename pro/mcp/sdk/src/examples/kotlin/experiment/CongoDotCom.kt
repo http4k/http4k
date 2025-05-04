@@ -12,6 +12,7 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.int
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind

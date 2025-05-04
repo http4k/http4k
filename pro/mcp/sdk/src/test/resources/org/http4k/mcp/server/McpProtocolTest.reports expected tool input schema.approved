@@ -1,0 +1,38 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "tools": [
+      {
+        "name": "name",
+        "description": "description",
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "foo",
+            "baz"
+          ],
+          "properties": {
+            "foo": {
+              "type": "string",
+              "description": "description1"
+            },
+            "bar": {
+              "type": "integer",
+              "description": "description2"
+            },
+            "baz": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "description3"
+            }
+          }
+        }
+      }
+    ],
+    "_meta": {
+    }
+  },
+  "id": 1
+}
