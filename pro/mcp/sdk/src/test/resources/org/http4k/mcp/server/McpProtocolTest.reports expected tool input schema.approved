@@ -44,6 +44,14 @@
             "anInstant": {
               "type": "string",
               "description": "description5"
+            },
+            "aStringValue": {
+              "type": "string",
+              "description": "description6"
+            },
+            "aIntValue": {
+              "type": "integer",
+              "description": "description5"
             }
           }
         }

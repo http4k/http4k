@@ -1,5 +1,7 @@
 package org.http4k.mcp.model
 
+import dev.forkhandles.values.Value
+import dev.forkhandles.values.ValueFactory
 import org.http4k.lens.BiDiLensBuilder
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiMultiLensSpec
@@ -177,6 +179,21 @@ fun Tool.Arg.boolean() = mapWithNewMeta({ it as Boolean }, { it }, BooleanParam)
 fun Tool.Arg.double() = mapWithNewMeta({ it as Double }, { it }, NumberParam)
 fun Tool.Arg.float() = mapWithNewMeta({ it as Float }, { it }, NumberParam)
 fun Tool.Arg.int() = mapWithNewMeta({ it as Int }, { it }, IntegerParam)
+fun Tool.Arg.value() = mapWithNewMeta({ it as Int }, { it }, IntegerParam)
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified VALUE : Value<T>, reified T : Any> Tool.Arg.value(vf: ValueFactory<VALUE, T>) =
+    mapWithNewMeta(
+        { vf.of(it as T) }, { it.value }, when (T::class) {
+            String::class -> StringParam
+            Int::class -> IntegerParam
+            Long::class -> IntegerParam
+            Boolean::class -> BooleanParam
+            Double::class -> NumberParam
+            Float::class -> NumberParam
+            else -> ObjectParam
+        }
+    )
 
 fun Tool.Arg.long() = mapWithNewMeta({ it as Long }, { it }, IntegerParam)
 fun Tool.Arg.uuid() = string().map(StringBiDiMappings.uuid())

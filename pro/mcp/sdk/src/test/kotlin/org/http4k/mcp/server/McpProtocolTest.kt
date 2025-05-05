@@ -3,8 +3,10 @@ package org.http4k.mcp.server
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
+import org.http4k.connect.model.Role
 import org.http4k.connect.model.Role.Companion.Assistant
 import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
@@ -51,6 +53,7 @@ import org.http4k.mcp.model.enum
 import org.http4k.mcp.model.instant
 import org.http4k.mcp.model.int
 import org.http4k.mcp.model.string
+import org.http4k.mcp.model.value
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
 import org.http4k.mcp.protocol.ServerMetaData
@@ -539,15 +542,19 @@ class McpProtocolTest {
         }
     }
 
+
     @Test
     fun `reports expected tool input schema`(approver: Approver) {
         val stringArg = Tool.Arg.string().required("aString", "description1")
         val intArg = Tool.Arg.int().optional("anInt", "description2")
         val arrayArg = Tool.Arg.int().multi.required("anArray", "description3")
-        val enumArg = Tool.Arg.enum< ResponseType>().multi.required("anEnum", "description4")
+        val enumArg = Tool.Arg.enum<ResponseType>().multi.required("anEnum", "description4")
         val instantArg = Tool.Arg.instant().optional("anInstant", "description5")
+        val stringValueArg = Tool.Arg.value(Role).optional("aStringValue", "description6")
+        val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description5")
 
-        val tool = Tool("name", "description", stringArg, intArg, arrayArg, enumArg, instantArg)
+        val tool =
+            Tool("name", "description", stringArg, intArg, arrayArg, enumArg, instantArg, stringValueArg, dateValueArg)
 
         val mcp = SseMcp(
             McpProtocol(
