@@ -47,6 +47,8 @@ import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.Root
 import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.enum
+import org.http4k.mcp.model.instant
 import org.http4k.mcp.model.int
 import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ClientCapabilities
@@ -85,9 +87,9 @@ import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
+import org.http4k.security.ResponseType
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
-import org.http4k.sse.SseMessage.Ping.toMessage
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.TestSseClient
@@ -539,11 +541,13 @@ class McpProtocolTest {
 
     @Test
     fun `reports expected tool input schema`(approver: Approver) {
-        val stringArg = Tool.Arg.string().required("foo", "description1")
-        val intArg = Tool.Arg.int().optional("bar", "description2")
-        val arrayArg = Tool.Arg.int().multi.required("baz", "description3")
+        val stringArg = Tool.Arg.string().required("aString", "description1")
+        val intArg = Tool.Arg.int().optional("anInt", "description2")
+        val arrayArg = Tool.Arg.int().multi.required("anArray", "description3")
+        val enumArg = Tool.Arg.enum< ResponseType>().multi.required("anEnum", "description4")
+        val instantArg = Tool.Arg.instant().optional("anInstant", "description5")
 
-        val tool = Tool("name", "description", stringArg, intArg, arrayArg)
+        val tool = Tool("name", "description", stringArg, intArg, arrayArg, enumArg, instantArg)
 
         val mcp = SseMcp(
             McpProtocol(

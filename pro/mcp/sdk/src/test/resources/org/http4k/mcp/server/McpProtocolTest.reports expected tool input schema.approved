@@ -8,24 +8,42 @@
         "inputSchema": {
           "type": "object",
           "required": [
-            "foo",
-            "baz"
+            "aString",
+            "anArray",
+            "anEnum"
           ],
           "properties": {
-            "foo": {
+            "aString": {
               "type": "string",
               "description": "description1"
             },
-            "bar": {
+            "anInt": {
               "type": "integer",
               "description": "description2"
             },
-            "baz": {
+            "anArray": {
               "type": "array",
               "items": {
                 "type": "integer"
               },
               "description": "description3"
+            },
+            "anEnum": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Code",
+                  "Token",
+                  "CodeIdToken",
+                  "CodeToken"
+                ]
+              },
+              "description": "description4"
+            },
+            "anInstant": {
+              "type": "string",
+              "description": "description5"
             }
           }
         }
