@@ -9,7 +9,7 @@ import org.http4k.routing.path
 import org.http4k.routing.sse.bind
 import org.junit.jupiter.api.Test
 
-class SseFilterTest {
+class PolyFilterTest {
 
     private val messages = mutableListOf<String>()
 
