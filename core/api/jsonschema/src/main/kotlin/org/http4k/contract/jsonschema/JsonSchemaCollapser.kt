@@ -3,7 +3,7 @@ package org.http4k.contract.jsonschema
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 
-class SchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
+class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
     fun collapseToNode(schema: JsonSchema<NODE>): NODE = collapseNodeWithRefs(
         schema.node,
         schema.definitions.mapValues { (_, node) -> collapseNodeWithRefs(node, schema.definitions, mutableSetOf()) },

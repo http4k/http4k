@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
-class SchemaCollapserTest {
+class JsonSchemaCollapserTest {
 
     @Test
     fun `can collapse schema by inlining refs`(approver: Approver) {
         val original = AutoJsonToJsonSchema(Jackson).toSchema(ArbObject())
-        approver.assertApproved(Jackson.pretty(SchemaCollapser(Jackson).collapseToNode(original)), APPLICATION_JSON)
+        approver.assertApproved(Jackson.pretty(JsonSchemaCollapser(Jackson).collapseToNode(original)), APPLICATION_JSON)
     }
 }
