@@ -1,4 +1,7 @@
 {
   "type": "number",
-  "description": "bar"
+  "description": "bar",
+  "int": 1,
+  "string": "test",
+  "bool": true
 }

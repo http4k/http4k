@@ -11,37 +11,15 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 
-open class ToolArgLens<OUT>(
+class ToolArgLens<OUT>(
     meta: Meta,
     get: (ToolRequest) -> OUT,
     private val set: (OUT, ToolRequest) -> ToolRequest,
-    private val toSchema: (Meta) -> McpNodeType
+    private val toSchema: (ToolArgLens<*>) -> McpNodeType
 ) : LensInjectorExtractor<ToolRequest, OUT>, BiDiLens<ToolRequest, OUT>(meta, get, set) {
 
     @Suppress("UNCHECKED_CAST")
     override fun <R : ToolRequest> invoke(value: OUT, target: R): R = set(value, target) as R
 
-    open fun toSchema() = toSchema(meta)
+    fun toSchema() = toSchema(this)
 }
-
-fun ParamMeta.toSchema(description: String? = null): McpNodeType =
-    McpJson.asJsonObject(
-        when (this) {
-            is ArrayParam, ObjectParam -> mapOf(
-                "type" to this.description,
-                "items" to (this as ArrayParam).itemType().toSchema(),
-                "description" to description,
-            )
-
-            is EnumParam<*> -> mapOf(
-                "type" to this.description,
-                "enum" to clz.java.enumConstants?.map { it.name },
-                "description" to description,
-            )
-
-            else -> mapOf(
-                "type" to this.description,
-                "description" to description,
-            )
-        }
-    )

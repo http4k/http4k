@@ -83,6 +83,8 @@ class ToolArgTest {
         assertThat(defaultedLens(defaultedInjected), equalTo(value))
         assertThat(defaultedLens(ToolRequest()), equalTo(value))
 
-        assertApproved(McpJson.asFormatString(requiredLens.toSchema()), APPLICATION_JSON)
+        val checkSchemaLens = spec.required("foo", "bar", mapOf("int" to 1, "string" to "test", "bool" to true))
+
+        assertApproved(McpJson.asFormatString(checkSchemaLens.toSchema()), APPLICATION_JSON)
     }
 }

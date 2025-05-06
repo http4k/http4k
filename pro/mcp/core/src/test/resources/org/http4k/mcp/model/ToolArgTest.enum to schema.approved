@@ -4,5 +4,8 @@
     "FOO",
     "BAR"
   ],
-  "description": "bar"
+  "description": "bar",
+  "int": 1,
+  "string": "test",
+  "bool": true
 }
