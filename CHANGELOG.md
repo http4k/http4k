@@ -3,7 +3,7 @@ CHAN<h2 class="github">Changelog</h2>
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.8.1.0 (uncut)
+### v6.8.1.0
 - **http4k-***: Upgrade some dependency versio.
 - **http4k-mdk-sdk***: Added support for auto-marshalled Tool args. You will need Kotlin Reflect on the classpath to use this feature.
 
