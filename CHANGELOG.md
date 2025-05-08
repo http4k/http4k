@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.8.1.0 (uncut)
+- **http4k-***: Upgrade some dependency versio.
 - **http4k-mdk-sdk***: Added support for auto-marshalled Tool args. You will need Kotlin Reflect on the classpath to use this feature.
 
 ### v6.8.0.0
