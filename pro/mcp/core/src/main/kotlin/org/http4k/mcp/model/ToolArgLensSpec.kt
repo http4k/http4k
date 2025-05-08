@@ -1,9 +1,6 @@
 package org.http4k.mcp.model
 
-import dev.forkhandles.values.Value
-import dev.forkhandles.values.ValueFactory
 import org.http4k.lens.BiDiLensBuilder
-import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiMultiLensSpec
 import org.http4k.lens.Lens
 import org.http4k.lens.LensExtractor
@@ -14,25 +11,10 @@ import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
-import org.http4k.lens.ParamMeta.BooleanParam
-import org.http4k.lens.ParamMeta.IntegerParam
-import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.ParamMeta.StringParam
-import org.http4k.lens.StringBiDiMappings
-import org.http4k.lens.StringBiDiMappings.nonBlank
-import org.http4k.lens.StringBiDiMappings.nonEmpty
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.model.Tool.ArgList
-import org.http4k.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
 import org.http4k.mcp.util.McpNodeType
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
-import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
-import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
-import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
 
 open class ToolArgLensSpec<OUT>(

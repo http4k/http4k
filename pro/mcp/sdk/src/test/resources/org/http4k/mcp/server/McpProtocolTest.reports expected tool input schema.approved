@@ -51,7 +51,74 @@
             },
             "aIntValue": {
               "type": "integer",
-              "description": "description5"
+              "description": "description7"
+            },
+            "complexValue": {
+              "properties": {
+                "foo": {
+                  "example": 123,
+                  "format": "int32",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "bar": {
+                  "properties": {
+                    "name": {
+                      "example": "hello",
+                      "type": "string",
+                      "nullable": false
+                    }
+                  },
+                  "example": {
+                    "name": "hello"
+                  },
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ]
+                },
+                "baz": {
+                  "example": true,
+                  "type": "boolean",
+                  "nullable": true
+                }
+              },
+              "example": {
+                "foo": 123,
+                "bar": {
+                  "name": "hello"
+                },
+                "baz": true
+              },
+              "type": "object",
+              "required": [
+                "bar"
+              ]
+            },
+            "listArg": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "example": "hello",
+                    "type": "string",
+                    "nullable": false
+                  }
+                },
+                "example": {
+                  "name": "hello"
+                },
+                "type": "object",
+                "required": [
+                  "name"
+                ]
+              },
+              "example": [
+                {
+                  "name": "hello"
+                }
+              ],
+              "type": "array",
+              "nullable": false
             }
           }
         }

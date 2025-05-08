@@ -88,6 +88,7 @@ import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.auto
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
@@ -542,6 +543,8 @@ class McpProtocolTest {
         }
     }
 
+    data class Bar(val name: String)
+    data class Foo(val foo: Int?, val bar: Bar, val baz: Boolean?)
 
     @Test
     fun `reports expected tool input schema`(approver: Approver) {
@@ -551,10 +554,23 @@ class McpProtocolTest {
         val enumArg = Tool.Arg.enum<ResponseType>().multi.required("anEnum", "description4")
         val instantArg = Tool.Arg.instant().optional("anInstant", "description5")
         val stringValueArg = Tool.Arg.value(Role).optional("aStringValue", "description6")
-        val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description5")
+        val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description7")
+        val objectValueArg = Tool.Arg.auto(Foo(123, Bar("hello"), true)).optional("complexValue", "description8")
+        val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).optional("listArg", "description9")
 
-        val tool =
-            Tool("name", "description", stringArg, intArg, arrayArg, enumArg, instantArg, stringValueArg, dateValueArg)
+        val tool = Tool(
+            "name",
+            "description",
+            stringArg,
+            intArg,
+            arrayArg,
+            enumArg,
+            instantArg,
+            stringValueArg,
+            dateValueArg,
+            objectValueArg,
+            listObjectValueArg
+        )
 
         val mcp = SseMcp(
             McpProtocol(
@@ -571,6 +587,53 @@ class McpProtocolTest {
             with(McpJson) {
                 mcp.sendToMcp(renderRequest(McpTool.List, McpTool.List.Request()))
 
+                approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
+            }
+        }
+    }
+
+    @Test
+    fun `can call tool with complex object`(approver: Approver) {
+        val example = Foo(123, Bar("hello"), true)
+
+        val objectValueArg = Tool.Arg.auto(example).required("complexValue")
+        val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).required("listArg", "description9")
+
+        val tool = Tool("name", "description", objectValueArg, listObjectValueArg)
+
+        val mcp = SseMcp(
+            McpProtocol(
+                metadata, SseSessions(SessionProvider.Random(random)),
+                tools = ServerTools(listOf(tool bind {
+                    ToolResponse.Ok(
+                        McpJson.asFormatString(
+                            mapOf(
+                                objectValueArg.meta.name to objectValueArg(it),
+                                listObjectValueArg.meta.name to listObjectValueArg(it),
+                            )
+                        )
+                    )
+                })),
+                random = random
+            ),
+            NoMcpSecurity
+        )
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            with(McpJson) {
+                mcp.sendToMcp(
+                    renderRequest(
+                        McpTool.Call, McpTool.Call.Request(
+                            tool.name,
+                            mapOf(
+                                objectValueArg.meta.name to asJsonObject(example),
+                                listObjectValueArg.meta.name to asJsonObject(listOf(Bar("123"))),
+                            )
+                        )
+                    )
+                )
                 approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
             }
         }
