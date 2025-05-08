@@ -554,8 +554,9 @@ class McpProtocolTest {
         val enumArg = Tool.Arg.enum<ResponseType>().multi.required("anEnum", "description4")
         val instantArg = Tool.Arg.instant().optional("anInstant", "description5")
         val stringValueArg = Tool.Arg.value(Role).optional("aStringValue", "description6")
-        val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description5")
-        val objectValueArg = Tool.Arg.auto(Foo(123, Bar("hello"), true)).optional("complexValue", "description5")
+        val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description7")
+        val objectValueArg = Tool.Arg.auto(Foo(123, Bar("hello"), true)).optional("complexValue", "description8")
+        val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).optional("listArg", "description9")
 
         val tool = Tool(
             "name",
@@ -567,7 +568,8 @@ class McpProtocolTest {
             instantArg,
             stringValueArg,
             dateValueArg,
-            objectValueArg
+            objectValueArg,
+            listObjectValueArg
         )
 
         val mcp = SseMcp(
@@ -595,15 +597,22 @@ class McpProtocolTest {
         val example = Foo(123, Bar("hello"), true)
 
         val objectValueArg = Tool.Arg.auto(example).required("complexValue")
+        val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).required("listArg", "description9")
 
-        val tool = Tool("name", "description", objectValueArg)
+        val tool = Tool("name", "description", objectValueArg, listObjectValueArg)
 
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
                 tools = ServerTools(listOf(tool bind {
-                    val input = objectValueArg(it)
-                    ToolResponse.Ok(McpJson.asFormatString(input))
+                    ToolResponse.Ok(
+                        McpJson.asFormatString(
+                            mapOf(
+                                objectValueArg.meta.name to objectValueArg(it),
+                                listObjectValueArg.meta.name to listObjectValueArg(it),
+                            )
+                        )
+                    )
                 })),
                 random = random
             ),
@@ -618,7 +627,10 @@ class McpProtocolTest {
                     renderRequest(
                         McpTool.Call, McpTool.Call.Request(
                             tool.name,
-                            mapOf(objectValueArg.meta.name to asJsonObject(example))
+                            mapOf(
+                                objectValueArg.meta.name to asJsonObject(example),
+                                listObjectValueArg.meta.name to asJsonObject(listOf(Bar("123"))),
+                            )
                         )
                     )
                 )

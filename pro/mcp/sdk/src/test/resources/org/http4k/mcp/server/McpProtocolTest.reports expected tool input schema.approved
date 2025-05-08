@@ -51,7 +51,7 @@
             },
             "aIntValue": {
               "type": "integer",
-              "description": "description5"
+              "description": "description7"
             },
             "complexValue": {
               "properties": {
@@ -94,6 +94,31 @@
               "required": [
                 "bar"
               ]
+            },
+            "listArg": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "example": "hello",
+                    "type": "string",
+                    "nullable": false
+                  }
+                },
+                "example": {
+                  "name": "hello"
+                },
+                "type": "object",
+                "required": [
+                  "name"
+                ]
+              },
+              "example": [
+                {
+                  "name": "hello"
+                }
+              ],
+              "type": "array",
+              "nullable": false
             }
           }
         }

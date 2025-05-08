@@ -74,18 +74,18 @@ object McpJson : ConfigurableMoshi(
         .value(Version)
         .done()
 ) {
+    /**
+     * Auto-marshalled lens for a tool argument. You will need Kotlin reflection on the classpath for this to work.
+     */
     inline fun <reified T : Any> Tool.Arg.auto(example: T): ToolArgLensSpec<T> {
-        val autoJsonToJsonSchema = AutoJsonToJsonSchema(McpJson)
-        val jsonSchemaCollapser = JsonSchemaCollapser(McpJson)
+        val autoJsonToJsonSchema = AutoJsonToJsonSchema(this@McpJson)
+        val jsonSchemaCollapser = JsonSchemaCollapser(this@McpJson)
 
         return ToolArgLensSpec(
             ObjectParam,
-            LensGet { name, target ->
-                @Suppress("UNCHECKED_CAST")
-                listOf(McpJson.convert<Map<String, Any>, T>(target.args[name]!! as Map<String, Any>))
-            },
+            LensGet { name, target -> listOf(convert<Any, T>(target.args[name]!!)) },
             LensSet { name, values, target ->
-                values.fold(target) { acc, next -> target.copy(args = target.args + (name to McpJson.asJsonObject(next))) }
+                values.fold(target) { acc, next -> target.copy(args = acc.args + (name to asJsonObject(next))) }
             },
             { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
         )

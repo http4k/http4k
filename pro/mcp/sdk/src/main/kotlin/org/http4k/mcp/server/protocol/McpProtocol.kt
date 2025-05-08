@@ -271,7 +271,6 @@ class McpProtocol<Transport>(
         }
         .map { it.toJsonRpc(jsonReq.id) }
         .recover {
-            System.err.println(it)
             when (it) {
                 is McpException -> it.error.toJsonRpc(jsonReq.id)
                 else -> {
