@@ -80,7 +80,10 @@ object McpJson : ConfigurableMoshi(
 
         return ToolArgLensSpec(
             ObjectParam,
-            LensGet { name, target -> listOf(McpJson.asA(target.args[name] as MoshiNode, T::class)) },
+            LensGet { name, target ->
+                @Suppress("UNCHECKED_CAST")
+                listOf(McpJson.convert<Map<String, Any>, T>(target.args[name]!! as Map<String, Any>))
+            },
             LensSet { name, values, target ->
                 values.fold(target) { acc, next -> target.copy(args = target.args + (name to McpJson.asJsonObject(next))) }
             },

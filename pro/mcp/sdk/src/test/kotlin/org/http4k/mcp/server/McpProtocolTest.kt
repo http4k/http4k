@@ -590,6 +590,43 @@ class McpProtocolTest {
         }
     }
 
+    @Test
+    fun `can call tool with complex object`(approver: Approver) {
+        val example = Foo(123, Bar("hello"), true)
+
+        val objectValueArg = Tool.Arg.auto(example).required("complexValue")
+
+        val tool = Tool("name", "description", objectValueArg)
+
+        val mcp = SseMcp(
+            McpProtocol(
+                metadata, SseSessions(SessionProvider.Random(random)),
+                tools = ServerTools(listOf(tool bind {
+                    val input = objectValueArg(it)
+                    ToolResponse.Ok(McpJson.asFormatString(input))
+                })),
+                random = random
+            ),
+            NoMcpSecurity
+        )
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            with(McpJson) {
+                mcp.sendToMcp(
+                    renderRequest(
+                        McpTool.Call, McpTool.Call.Request(
+                            tool.name,
+                            mapOf(objectValueArg.meta.name to asJsonObject(example))
+                        )
+                    )
+                )
+                approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
+            }
+        }
+    }
+
     private fun TestSseClient.assertInitializeLoop(mcp: PolyHandler) {
         assertThat(status, equalTo(OK))
 
