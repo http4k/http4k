@@ -10,7 +10,7 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Tag
 import org.http4k.contract.WebCallback
 import org.http4k.contract.jsonschema.JsonSchema
-import org.http4k.contract.jsonschema.v2.value
+import org.http4k.contract.jsonschema.v3.value
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
