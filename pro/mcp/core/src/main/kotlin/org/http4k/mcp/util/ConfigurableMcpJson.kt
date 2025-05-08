@@ -47,7 +47,13 @@ import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 typealias McpNodeType = MoshiNode
 
-abstract class ConfigurableMcpJson : ConfigurableMoshi(
+/**
+ * Builder for MCP JSON marshalling. You can pass your own [JsonAdapter.Factory] and configuration block to this class.
+ */
+abstract class ConfigurableMcpJson(
+    customJsonFactory: JsonAdapter.Factory = JsonAdapter.Factory { _, _, _ -> null },
+    customMappings: AutoMappingConfiguration<Moshi.Builder>.() -> AutoMappingConfiguration<Moshi.Builder> = { this }
+) : ConfigurableMoshi(
     Moshi.Builder()
         .add(McpJsonFactory)
         .addLast(ThrowableAdapter)
@@ -56,7 +62,9 @@ abstract class ConfigurableMcpJson : ConfigurableMoshi(
         .addLast(MapAdapter)
         .addLast(MoshiNodeAdapter)
         .addLast(ErrorMessageAdapter)
+        .addLast(customJsonFactory)
         .asConfigurable()
+        .apply { customMappings() }
         .withMcpMappings()
         .done()
 ) {
