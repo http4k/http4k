@@ -8,6 +8,8 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.withAiMappings
+import org.http4k.contract.jsonschema.JsonSchemaCollapser
+import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -25,6 +27,9 @@ import org.http4k.format.ThrowableAdapter
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
+import org.http4k.lens.LensGet
+import org.http4k.lens.LensSet
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Priority
@@ -32,6 +37,8 @@ import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.ResourceName
 import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Size
+import org.http4k.mcp.model.Tool
+import org.http4k.mcp.model.ToolArgLensSpec
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
@@ -66,7 +73,21 @@ object McpJson : ConfigurableMoshi(
         .value(Size)
         .value(Version)
         .done()
-)
+) {
+    inline fun <reified T : Any> Tool.Arg.auto(example: T): ToolArgLensSpec<T> {
+        val autoJsonToJsonSchema = AutoJsonToJsonSchema(McpJson)
+        val jsonSchemaCollapser = JsonSchemaCollapser(McpJson)
+
+        return ToolArgLensSpec(
+            ObjectParam,
+            LensGet { name, target -> listOf(McpJson.asA(target.args[name] as MoshiNode, T::class)) },
+            LensSet { name, values, target ->
+                values.fold(target) { acc, next -> target.copy(args = target.args + (name to McpJson.asJsonObject(next))) }
+            },
+            { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
+        )
+    }
+}
 
 @KotshiJsonAdapterFactory
 object McpJsonFactory : JsonAdapter.Factory by KotshiMcpJsonFactory

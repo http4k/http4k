@@ -88,6 +88,7 @@ import org.http4k.mcp.server.sessions.SessionProvider
 import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.auto
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
@@ -542,6 +543,8 @@ class McpProtocolTest {
         }
     }
 
+    data class Bar(val name: String)
+    data class Foo(val foo: Int?, val bar: Bar, val baz: Boolean?)
 
     @Test
     fun `reports expected tool input schema`(approver: Approver) {
@@ -552,9 +555,20 @@ class McpProtocolTest {
         val instantArg = Tool.Arg.instant().optional("anInstant", "description5")
         val stringValueArg = Tool.Arg.value(Role).optional("aStringValue", "description6")
         val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description5")
+        val objectValueArg = Tool.Arg.auto(Foo(123, Bar("hello"), true)).optional("complexValue", "description5")
 
-        val tool =
-            Tool("name", "description", stringArg, intArg, arrayArg, enumArg, instantArg, stringValueArg, dateValueArg)
+        val tool = Tool(
+            "name",
+            "description",
+            stringArg,
+            intArg,
+            arrayArg,
+            enumArg,
+            instantArg,
+            stringValueArg,
+            dateValueArg,
+            objectValueArg
+        )
 
         val mcp = SseMcp(
             McpProtocol(
