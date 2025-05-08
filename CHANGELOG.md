@@ -5,42 +5,42 @@ changes with their rationale when appropriate:
 
 ### v6.8.1.0
 - **http4k-***: Upgrade some dependency versio.
-- **http4k-mdk-sdk***: Added support for auto-marshalled Tool args. You will need Kotlin Reflect on the classpath to use this feature.
+- **http4k-mdk-sdk**: Added support for auto-marshalled Tool args. You will need Kotlin Reflect on the classpath to use this feature.
 
 ### v6.8.0.0
 - **http4k-***: Upgrade some dependency versio.
-- **http4k-realtime-core***: Added `PolyFilter` and convenience filter for common `CorsAndRebindProtection`
-- **http4k-mcp-sdk***: [Breaking] Rework Tool Args to better support JSON schema definitions and for every arg to require an explicit type. To fix breaking
+- **http4k-realtime-core**: Added `PolyFilter` and convenience filter for common `CorsAndRebindProtection`
+- **http4k-mcp-sdk**: [Breaking] Rework Tool Args to better support JSON schema definitions and for every arg to require an explicit type. To fix breaking
   changes, simply make `Tool.Arg` with `Tool.Arg.string()`.
-- **http4k-mcp-client***: Added scopes to OAuth2 client credentials client filter.
+- **http4k-mcp-client**: Added scopes to OAuth2 client credentials client filter.
 
 ### v6.7.0.0
 
 - **http4k-***: Upgrade some dependency versions.
-- **http4k-mcp-sdk***: Improved support for MCP security models, including new Protected Resource OAuth Standard which is present in the latest MCP Draft. This
+- **http4k-mcp-sdk**: Improved support for MCP security models, including new Protected Resource OAuth Standard which is present in the latest MCP Draft. This
   is a much more convenient way to use OAuth2 with the MCP.
-- **http4k-security-oauth***: [Breaking] Can now retrieve Auth Server in various ways, using Protected Resource standard. Implementation of automatic auth
+- **http4k-security-oauth**: [Breaking] Can now retrieve Auth Server in various ways, using Protected Resource standard. Implementation of automatic auth
   server discovery.
-- **http4k-api-openapi***: Add modelNamer to Jackson extension for OpenApi3 renderer. H/T @mbcltd
-- **http4k-api-graphql***: Add support for root-level GraphQL extensions field in GraphQLResponse H/T @joostbaas
+- **http4k-api-openapi**: Add modelNamer to Jackson extension for OpenApi3 renderer. H/T @mbcltd
+- **http4k-api-graphql**: Add support for root-level GraphQL extensions field in GraphQLResponse H/T @joostbaas
 
 ### v6.6.1.0
 
 - **http4k-***: Upgrade some dependency versions.
-- **http4k-security-oauth***: Add some WellKnown endpoints for serving metadata for OAuth2 providers.
-- **http4k-mcp-core-***: Added `DirectoryResources` to be able to read from a directory of files.
+- **http4k-security-oauth**: Add some WellKnown endpoints for serving metadata for OAuth2 providers.
+- **http4k-mcp-core-**: Added `DirectoryResources` to be able to read from a directory of files.
 
 ### v6.6.0.1
 
-- **http4k-mcp-core-***: [Fix] Missing BOM for ForkHandles caused break in dependencies when using BOM
+- **http4k-mcp-core-**: [Fix] Missing BOM for ForkHandles caused break in dependencies when using BOM
 
 ### v6.6.0.0
 
 - **http4k-***: Upgrade some dependency versions.
-- **http4k-mcp-sdk-***: [Breaking] Repackaging of MCP code to avoid cross-module dependencies. It's just imports that need to be changed.
-- **http4k-mcp-client-***: [New module] New module purely for projects that need an MCP client without the server side code.
-- **http4k-mcp-core-***: [New module] New module for the core of the MCP domain.
-- **http4k-template-freemarker-***: [Fix #1337] FreemarkerTemplates sets incompatibleImprovements
+- **http4k-mcp-sdk**: [Breaking] Repackaging of MCP code to avoid cross-module dependencies. It's just imports that need to be changed.
+- **http4k-mcp-client**: [New module] New module purely for projects that need an MCP client without the server side code.
+- **http4k-mcp-core**: [New module] New module for the core of the MCP domain.
+- **http4k-template-freemarker**: [Fix #1337] FreemarkerTemplates sets incompatibleImprovements
 
 ### v6.5.6.1
 
@@ -90,7 +90,7 @@ changes with their rationale when appropriate:
 
 ### v6.4.1.0
 
-- **http4k-mcp-sdk*** [DevEx]: Capabilities now implement their Handler type, allowing you to call through directly to the handler,
+- **http4k-mcp-sdk** [DevEx]: Capabilities now implement their Handler type, allowing you to call through directly to the handler,
 
 ### v6.4.0.0
 
@@ -106,7 +106,7 @@ changes with their rationale when appropriate:
 
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-realtime-core** : Add Router binding for all Websockets and SSE handlers
-- **http4k-connect-*** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
+- **http4k-connect-** : [Breaking] Repackage of common AI model classes into `org.http4k.connect`. Import changes will be required.
 - **http4k-connect-openai-*** : [Breaking] Rename `FinishReason` to `StopReason`
 - **http4k-connect-ai-anthropic-*** : [Breaking] Replaced `Schema` with a simple `Map<String, Any>`, as we are unifying the types across all AI modules. A new
   Schema type will be introduced in a future release. Replace existing Schema usage with a Map<String, Any> for now.
@@ -222,7 +222,7 @@ changes with their rationale when appropriate:
 ### v5.45.1.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-undertow*** : [Fix #1259] POST requests have empty body with Undertow if an SSE handler is registered
+- **http4k-server-undertow** : [Fix #1259] POST requests have empty body with Undertow if an SSE handler is registered
 
 ### v5.45.0.0
 
@@ -345,34 +345,34 @@ H/T to @@JAckLosingHeart for the report.
 ### v5.36.0.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-realtime-core*** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in
+- **http4k-realtime-core** : [Possible Break] SSE responses now contain a "handled" flag, so we can now fallback from SSE to HTTP if the route is unbound in
   SSE. SSE now also returns a 404 if the route is unbound.
-- **http4k-server-helidon*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
-- **http4k-server-helidon*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
-- **http4k-server-jetty*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
-- **http4k-server-jetty11*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
-- **http4k-server-netty*** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
-- **http4k-server-undertow*** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-helidon** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-helidon** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
+- **http4k-server-jetty** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-jetty11** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
+- **http4k-server-netty** : [Possible Break] Throw exception if configured with `Immediate` stop mode as it's not supported.
+- **http4k-server-undertow** : [Possible Break] Slight refactor of SSE code to support SSE -> HTTP fallback
 
 ### v5.35.5.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon*** : Fixes to SSE support
-- **http4k-server-helidon*** : Throw exception if configured with `Graceful` stop mode as it's not supported.
-- **http4k-server-undertow*** : Fixes to SSE support
+- **http4k-server-helidon** : Fixes to SSE support
+- **http4k-server-helidon** : Throw exception if configured with `Graceful` stop mode as it's not supported.
+- **http4k-server-undertow** : Fixes to SSE support
 
 ### v5.35.4.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details.
-- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HelidonSseTest for details.
+- **http4k-server-helidon** : Add support for SSE. There are some limitations - see HelidonSseTest for details.
+- **http4k-server-helidon** : Add support for SSE. There are some limitations - see HelidonSseTest for details.
 
 ### v5.35.4.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-server-helidon*** : Add support for SSE. There are some limitations - see HeliconSseTest for details.
-- **http4k-realtime-core*** : Added Debugging for Websocket and SSE connections.
-- **http4k-realtime-core*** : Can now route SSE based on the method as well as the path.
+- **http4k-server-helidon** : Add support for SSE. There are some limitations - see HeliconSseTest for details.
+- **http4k-realtime-core** : Added Debugging for Websocket and SSE connections.
+- **http4k-realtime-core** : Can now route SSE based on the method as well as the path.
 
 ### v5.35.3.0
 
@@ -412,7 +412,7 @@ H/T to @@JAckLosingHeart for the report.
 
 ### v5.33.0.1
 
-- **http4k-multipart*** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
+- **http4k-multipart** : [Fix #1188] MultiPartFormBody reads body into memory even when stream is available
 
 ### v5.33.0.0
 
@@ -584,7 +584,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 ### v5.21.1.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-multipart*** : [Fix #1113] Disk-backed multipart form field data is now cleaned up when the body is closed, including the parent form directory.
+- **http4k-multipart** : [Fix #1113] Disk-backed multipart form field data is now cleaned up when the body is closed, including the parent form directory.
 
 ### v5.21.0.0
 
@@ -878,7 +878,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 ### v5.8.2.0
 
 - **http4k-*** : Upgrade some dependency versions.
-- **http4k-core*** : Added extension function `ExecutionService.withRequestTracing()` to propagate Zipkin traces across
+- **http4k-core** : Added extension function `ExecutionService.withRequestTracing()` to propagate Zipkin traces across
   threads
 
 ### v5.8.1.0
@@ -1028,17 +1028,17 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 
 ### v5.1.1.0
 
-- **http4k-realtime-core*** : Readd test client methods for SSE and WS
+- **http4k-realtime-core** : Readd test client methods for SSE and WS
 
 ### v5.1.0.0
 
-- **http4k-server-realtime-core*** : [Breaking - Fix #931] Change Websocket and SSE interfaces to return `WsResponse`
+- **http4k-server-realtime-core** : [Breaking - Fix #931] Change Websocket and SSE interfaces to return `WsResponse`
   and `SseResponse` objects. This makes it easier to set response headers and control if a connection is made from the
   incoming request as it is no-longer hidden (it is exposed at the top level instead of being hidden in the SSE and
   Websocket objects). It also means that the interfaces for the protocols follow the same pattern.
-- **http4k-server-jetty*** : As above
-- **http4k-server-undertow*** : As above
-- **http4k-core*** : [Fix #930] Update content-length header after GZipping it. H/T @bjornbugge
+- **http4k-server-jetty** : As above
+- **http4k-server-undertow** : As above
+- **http4k-core** : [Fix #930] Update content-length header after GZipping it. H/T @bjornbugge
 
 ### v5.0.0.0
 
@@ -1173,7 +1173,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 
 ### v4.41.0.0
 
-- **http4k-core*** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This
+- **http4k-core** : [Unlikely break] Fix creation of UriTemplate when it starts/ends with multiple slashes. This
   shouldn't cause any problems that we know about, but we are bumping the breaking version number just in case.
 
 ### v4.40.2.0
