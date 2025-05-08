@@ -61,18 +61,7 @@ tasks {
         mustRunAfter("generateOpenApi3AutoClient")
     }
 
-    register<GenerateTask>("generateOpenApi2Client") {
-        generatorName = "kotlin"
-        outputDir = "./build"
-        validateSpec = false
-        inputSpec =
-            "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
-        inputs.file(inputSpec)
-        mustRunAfter("generateOpenApi3Client")
-    }
-
     named("checkLicense") {
-        dependsOn("generateOpenApi2Client")
         dependsOn("generateOpenApi3Client")
         dependsOn("generateOpenApi3AutoClient")
     }
@@ -80,21 +69,17 @@ tasks {
     named("compileKotlin").get().dependsOn(
         named("generateOpenApi3AutoClient").get(),
         named("generateOpenApi3Client").get(),
-        named("generateOpenApi2Client").get()
     )
     named("processResources").get().dependsOn(
         named("generateOpenApi3AutoClient").get(),
         named("generateOpenApi3Client").get(),
-        named("generateOpenApi2Client").get()
     )
     named("processTestResources").get().dependsOn(
         named("generateOpenApi3AutoClient").get(),
         named("generateOpenApi3Client").get(),
-        named("generateOpenApi2Client").get()
     )
 
     named("dokkaHtmlPartial", DokkaTaskPartial::class) {
-        dependsOn(named("generateOpenApi2Client"))
         dependsOn(named("generateOpenApi3Client"))
         dependsOn(named("generateOpenApi3AutoClient"))
     }

@@ -2,18 +2,23 @@ package org.http4k.contract.jsonschema
 
 import org.http4k.format.Json
 import org.http4k.format.JsonType
+import org.http4k.format.JsonType.Object
 
 class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
-    fun collapseToNode(schema: JsonSchema<NODE>): NODE = collapseNodeWithRefs(
-        schema.node,
-        schema.definitions.mapValues { (_, node) -> collapseNodeWithRefs(node, schema.definitions, mutableSetOf()) },
-        mutableSetOf(),
-    )
+    fun collapseToNode(schema: JsonSchema<NODE>): NODE {
+        val definitionsMap = json.fields(schema.definitions).toMap()
+
+        val processedDefinitions = definitionsMap.mapValues { (_, node) ->
+            collapseNodeWithRefs(node, definitionsMap, mutableSetOf())
+        }
+
+        return collapseNodeWithRefs(schema.node, processedDefinitions, mutableSetOf())
+    }
 
     private val traverseAndReplaceChildren: (NODE, (NODE) -> NODE) -> NODE = { node, processChild ->
         when (json.typeOf(node)) {
-            JsonType.Object -> json.fields(node)
-                .fold(node) { acc, (fieldName, field) ->
+            Object -> json.fields(node)
+                .fold(json.obj()) { acc, (fieldName, field) ->
                     when {
                         fieldName != "\$ref" -> json.obj(json.fields(acc) + (fieldName to processChild(field)))
                         else -> acc
@@ -46,5 +51,4 @@ class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
     private fun Json<NODE>.isRefNode(it: NODE) = textValueOf(it, "\$ref") != null
 
     private fun Json<NODE>.getRefName(it: NODE) = textValueOf(it, "\$ref")!!.substringAfterLast("/")
-
 }
