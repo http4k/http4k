@@ -9,6 +9,7 @@ import org.http4k.lens.contentType
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.mcpJsonRpc
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
@@ -23,6 +24,7 @@ import server.tools
 fun main() {
     val mcpServer = mcpJsonRpc(
         ServerMetaData(McpEntity.of("http4k mcp via jsonrpc"), Version.of("0.1.0")),
+        NoMcpSecurity,
         prompts(),
         resources(),
         tools(),

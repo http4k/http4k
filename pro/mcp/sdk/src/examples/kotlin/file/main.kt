@@ -13,6 +13,7 @@ import org.http4k.mcp.model.Resource
 import org.http4k.mcp.model.Resource.Content
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
@@ -34,6 +35,7 @@ fun main() {
     val server =
         mcpHttpStreaming(
             ServerMetaData("http4k_mcp", "1"),
+            NoMcpSecurity,
             Resource.Templated("home://{path}", "foo") bind dir(File("."))
         ).asServer(JettyLoom(8000)).start()
 

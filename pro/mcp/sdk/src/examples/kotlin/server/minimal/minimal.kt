@@ -7,6 +7,7 @@ import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.Version
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
@@ -19,6 +20,7 @@ import java.time.Instant
 fun main() {
     mcpHttpStreaming(
         ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
+        NoMcpSecurity,
         Tool("time", "get the time") bind {
             ToolResponse.Ok(listOf(Content.Text(Instant.now().toString())))
         }

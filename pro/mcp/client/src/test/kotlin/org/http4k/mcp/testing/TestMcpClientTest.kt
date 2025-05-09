@@ -78,6 +78,7 @@ class TestMcpClientTest {
                 PromptsChanged,
                 Experimental,
             ),
+            NoMcpSecurity,
         )
             .testMcpClient().start()
 

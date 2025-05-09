@@ -12,6 +12,7 @@ import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
 import org.http4k.routing.mcpWebsocket
 import org.http4k.server.JettyLoom
@@ -53,6 +54,7 @@ fun insuranceClaim(): PromptCapability {
 
 val acmeHealthInsurance = mcpWebsocket(
     ServerMetaData("AcmeHealthInsurance", "1.0.0"),
+    NoMcpSecurity,
     insuranceClaim(),
     raiseClaim()
 ).asServer(JettyLoom(9500)).start()

@@ -15,6 +15,7 @@ import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.int
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
@@ -55,6 +56,7 @@ fun getInvoiceForPurchase(): ToolCapability {
 
 val congoDotCom = mcpHttpStreaming(
     ServerMetaData("CongoDotCom", "1.0.0"),
+    NoMcpSecurity,
     getPurchases(),
     getInvoiceForPurchase()
 ).asServer(JettyLoom(8500)).start()

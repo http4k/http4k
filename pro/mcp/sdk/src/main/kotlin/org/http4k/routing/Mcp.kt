@@ -54,9 +54,6 @@ import java.util.UUID
 fun mcpHttpStreaming(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
     HttpStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
 
-fun mcpHttpStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability) =
-    mcpHttpStreaming(metadata, NoMcpSecurity, *capabilities)
-
 /**
  * Create an HTTP (non-streaming) MCP app from a set of feature bindings.
  *
@@ -65,9 +62,6 @@ fun mcpHttpStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapabi
  */
 fun mcpHttpNonStreaming(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
     HttpNonStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
-
-fun mcpHttpNonStreaming(metadata: ServerMetaData, vararg capabilities: ServerCapability) =
-    mcpHttpNonStreaming(metadata, NoMcpSecurity, *capabilities)
 
 /**
  * Create an SSE MCP app from a set of feature bindings.
@@ -82,9 +76,6 @@ fun mcpHttpNonStreaming(metadata: ServerMetaData, vararg capabilities: ServerCap
 fun mcpSse(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
     SseMcp(McpProtocol(metadata, SseSessions().apply { start() }, *capabilities), security)
 
-fun mcpSse(metadata: ServerMetaData, vararg capabilities: ServerCapability) =
-    mcpSse(metadata, NoMcpSecurity, *capabilities)
-
 /**
  * Create an HTTP MCP app from a set of feature bindings.
  *
@@ -94,9 +85,6 @@ fun mcpSse(metadata: ServerMetaData, vararg capabilities: ServerCapability) =
 fun mcpWebsocket(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
     WebsocketMcp(McpProtocol(metadata, WebsocketSessions().apply { start() }, *capabilities), security)
 
-fun mcpWebsocket(metadata: ServerMetaData, vararg capabilities: ServerCapability) =
-    mcpWebsocket(metadata, NoMcpSecurity, *capabilities)
-
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of feature bindings.
  *
@@ -105,9 +93,6 @@ fun mcpWebsocket(metadata: ServerMetaData, vararg capabilities: ServerCapability
  */
 fun mcpJsonRpc(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
     JsonRpcMcp(McpProtocol(metadata, JsonRpcSessions(), *capabilities), security)
-
-fun mcpJsonRpc(metadata: ServerMetaData, vararg capabilities: ServerCapability) =
-    mcpJsonRpc(metadata, NoMcpSecurity, *capabilities)
 
 /**
  * Create a StdIO MCP app from a set of feature bindings.

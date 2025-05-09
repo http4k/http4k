@@ -10,6 +10,7 @@ import org.http4k.mcp.model.string
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.ToolCapability
+import org.http4k.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.http4k.server.JettyLoom
@@ -35,6 +36,7 @@ fun saveToMyDisk(): ToolCapability {
 
 val familyAgent = mcpSse(
     ServerMetaData("my family agent", "1.0.0"),
+    NoMcpSecurity,
     getFamilyMembers(),
     saveToMyDisk()
 ).asServer(JettyLoom(7500)).start()
