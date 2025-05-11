@@ -2,6 +2,7 @@ package org.http4k.format
 
 import org.http4k.asString
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
@@ -70,10 +71,13 @@ interface Json<NODE> {
     fun <IN : Any> jsonLens(spec: BiDiLensSpec<IN, String>) = spec.mapWithNewMeta(::parse, ::compact, ObjectParam)
     fun <IN : Any> BiDiLensSpec<IN, String>.json() = jsonLens(this)
 
-    fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> =
+    fun body(description: String? = null,
+             contentNegotiation: ContentNegotiation = None,
+             contentType: ContentType = APPLICATION_JSON
+    ): BiDiBodyLensSpec<NODE> =
         httpBodyRoot(
             listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),
-            APPLICATION_JSON,
+            contentType,
             contentNegotiation
         )
             .map({ it.payload.asString() }, { Body(it) })
@@ -81,8 +85,9 @@ interface Json<NODE> {
 
     fun Body.Companion.json(
         description: String? = null,
-        contentNegotiation: ContentNegotiation = None
-    ): BiDiBodyLensSpec<NODE> = body(description, contentNegotiation)
+        contentNegotiation: ContentNegotiation = None,
+        contentType: ContentType = APPLICATION_JSON
+    ): BiDiBodyLensSpec<NODE> = body(description, contentNegotiation, contentType)
 
     fun WsMessage.Companion.json() = WsMessage.string().map({ parse(it) }, { compact(it) })
 
