@@ -52,51 +52,56 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
         res.header(it.key, *it.value.map { it.second ?: "" }.toTypedArray<String>())
     }
 
-    val sseSink = res.sink(TYPE)
+    when {
+        status.code < 400 -> {
+            val sseSink = res.sink(TYPE)
 
-    res.status(create(status.code, status.description))
+            res.status(create(status.code, status.description))
 
-    val latch = CountDownLatch(1)
+            val latch = CountDownLatch(1)
 
-    val sse = object : PushAdaptingSse(http4kRequest) {
-        override fun send(message: SseMessage) = apply {
+            val sse = object : PushAdaptingSse(http4kRequest) {
+                override fun send(message: SseMessage) = apply {
+                    try {
+                        sseSink.emit(
+                            when (message) {
+                                is Retry -> builder().reconnectDelay(message.backoff).data("")
+                                is Ping -> builder().data("")
+                                is Data -> builder().data(message.sanitizeForMultipleRecords())
+                                is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
+                                    .let { if (message.id == null) it else it.id(message.id?.value) }
+                            }.build()
+                        )
+                    } catch (e: Exception) {
+                        triggerClose()
+                        latch.countDown()
+                    }
+                }
+
+                private fun Data.sanitizeForMultipleRecords() = data.replace("\n", "\ndata:")
+
+                override fun close() {
+                    try {
+                        sseSink.close()
+                    } finally {
+                        triggerClose()
+                        latch.countDown()
+                    }
+                }
+            }
+
+            sse.onClose(latch::countDown)
+
             try {
-                sseSink.emit(
-                    when (message) {
-                        is Retry -> builder().reconnectDelay(message.backoff).data("")
-                        is Ping -> builder().data("")
-                        is Data -> builder().data(message.sanitizeForMultipleRecords())
-                        is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
-                            .let { if (message.id == null) it else it.id(message.id?.value) }
-                    }.build()
-                )
+                consumer(sse)
             } catch (e: Exception) {
-                triggerClose()
-                latch.countDown()
+                sse.close()
             }
+
+            latch.await()
         }
-
-        private fun Data.sanitizeForMultipleRecords() = data.replace("\n", "\ndata:")
-
-        override fun close() {
-            try {
-                sseSink.close()
-            } finally {
-                triggerClose()
-                latch.countDown()
-            }
-        }
+        else -> res.status(create(status.code, status.description)).send()
     }
-
-    sse.onClose(latch::countDown)
-
-    try {
-        consumer(sse)
-    } catch (e: Exception) {
-        sse.close()
-    }
-
-    latch.await()
 }
 
 private fun Request.isEventStream() =
