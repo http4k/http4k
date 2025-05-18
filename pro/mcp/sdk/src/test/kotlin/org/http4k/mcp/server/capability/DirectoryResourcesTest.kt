@@ -44,20 +44,19 @@ class DirectoryResourcesTest {
     @Test
     fun `can list files non-recursive`() {
         assertThat(
-            DirectoryResources(File(path), Flat).listResources(McpResource.List.Request(), NoOp, Request(GET, "")),
+            DirectoryResources(File(path), Flat).listResources(McpResource.List.Request(), NoOp, Request(GET, ""))
+                .resources.toSet(),
             equalTo(
-                McpResource.List.Response(
-                    listOf(
-                        McpResource(
-                            uri = Uri.of("file://plainfile.txt"),
-                            name = ResourceName.of("plainfile.txt"),
-                            mimeType = MimeType.of("text/plain")
-                        ),
-                        McpResource(
-                            uri = Uri.of("file://binary.png"),
-                            name = ResourceName.of("binary.png"),
-                            mimeType = MimeType.of("image/png")
-                        )
+                setOf(
+                    McpResource(
+                        uri = Uri.of("file://plainfile.txt"),
+                        name = ResourceName.of("plainfile.txt"),
+                        mimeType = MimeType.of("text/plain")
+                    ),
+                    McpResource(
+                        uri = Uri.of("file://binary.png"),
+                        name = ResourceName.of("binary.png"),
+                        mimeType = MimeType.of("image/png")
                     )
                 )
             )
@@ -101,15 +100,13 @@ class DirectoryResourcesTest {
                 McpResource.ListTemplates.Request(),
                 NoOp,
                 Request(GET, "")
-            ),
+            ).resourceTemplates.toSet(),
             equalTo(
-                McpResource.ListTemplates.Response(
-                    listOf(
-                        McpResource(
-                            uriTemplate = ResourceUriTemplate.of("file://{filename}"),
-                            name = ResourceName.of("tmp_test"),
-                            description = "Files in tmp_test, recursively: Flat"
-                        )
+                setOf(
+                    McpResource(
+                        uriTemplate = ResourceUriTemplate.of("file://{filename}"),
+                        name = ResourceName.of("tmp_test"),
+                        description = "Files in tmp_test, recursively: Flat"
                     )
                 )
             )
@@ -123,15 +120,13 @@ class DirectoryResourcesTest {
                 McpResource.ListTemplates.Request(),
                 NoOp,
                 Request(GET, "")
-            ),
+            ).resourceTemplates.toSet(),
             equalTo(
-                McpResource.ListTemplates.Response(
-                    listOf(
-                        McpResource(
-                            uriTemplate = ResourceUriTemplate.of("file://{+path}"),
-                            name = ResourceName.of("tmp_test"),
-                            description = "Files in tmp_test, recursively: Recursive"
-                        )
+                setOf(
+                    McpResource(
+                        uriTemplate = ResourceUriTemplate.of("file://{+path}"),
+                        name = ResourceName.of("tmp_test"),
+                        description = "Files in tmp_test, recursively: Recursive"
                     )
                 )
             )
