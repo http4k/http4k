@@ -3,10 +3,12 @@ package org.http4k.mcp
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
+import org.http4k.mcp.Client.Companion.NoOp
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Meta
-import org.http4k.mcp.Client.Companion.NoOp
+import org.http4k.mcp.model.Meta.Companion.default
+import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpNodeType
 
 /**
@@ -29,7 +31,7 @@ fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
 
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
-    val meta: Meta = Meta.default,
+    val meta: Meta = default,
     val client: Client = NoOp,
     val connectRequest: Request? = null
 ) :
@@ -42,13 +44,14 @@ sealed interface ToolResponse {
     data class Ok(
         val content: List<Content>? = null,
         val structuredContent: McpNodeType? = null,
-        override val meta: Meta = Meta.default
+        override val meta: Meta = default
     ) : ToolResponse {
-        constructor(vararg content: Content, meta: Meta = Meta.default) : this(content.toList(), null, meta)
-        constructor(vararg content: String, meta: Meta = Meta.default) : this(content.map(::Text).toList(),null,  meta)
+        constructor(structuredContent: McpNodeType, meta: Meta = default) : this(listOf(Text(McpJson.asFormatString(structuredContent))), structuredContent, meta)
+        constructor(vararg content: Content, meta: Meta = default) : this(content.toList(), null, meta)
+        constructor(vararg content: String, meta: Meta = default) : this(content.map(::Text).toList(), null, meta)
     }
 
-    data class Error(val error: ErrorMessage, override val meta: Meta = Meta.default) : ToolResponse {
-        constructor(code: Int, message: String, meta: Meta = Meta.default) : this(ErrorMessage(code, message), meta)
+    data class Error(val error: ErrorMessage, override val meta: Meta = default) : ToolResponse {
+        constructor(code: Int, message: String, meta: Meta = default) : this(ErrorMessage(code, message), meta)
     }
 }
