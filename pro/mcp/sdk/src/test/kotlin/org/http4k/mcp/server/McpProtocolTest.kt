@@ -412,7 +412,6 @@ class McpProtocolTest {
                 )
             )
 
-
             assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
             assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 2, 5.0, "d2"))
             assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))

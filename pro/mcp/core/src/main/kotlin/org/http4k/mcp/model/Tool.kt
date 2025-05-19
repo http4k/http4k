@@ -14,6 +14,7 @@ import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.nonBlank
 import org.http4k.lens.StringBiDiMappings.nonEmpty
 import org.http4k.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
+import org.http4k.mcp.util.McpNodeType
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -31,6 +32,8 @@ class Tool private constructor(
     val args: List<ToolArgLens<*>>,
     val annotations: ToolAnnotations? = null,
 ) : CapabilitySpec {
+    val outputSchema: McpNodeType? = null
+
     constructor(
         name: String,
         description: String,

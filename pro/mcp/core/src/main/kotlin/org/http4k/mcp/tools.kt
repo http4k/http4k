@@ -7,6 +7,7 @@ import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Content.Text
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.Client.Companion.NoOp
+import org.http4k.mcp.util.McpNodeType
 
 /**
  * A tool handler invokes a tool with an input and returns a response
@@ -38,9 +39,13 @@ data class ToolRequest(
 sealed interface ToolResponse {
     val meta: Meta
 
-    data class Ok(val content: List<Content>, override val meta: Meta = Meta.default) : ToolResponse {
-        constructor(vararg content: Content, meta: Meta = Meta.default) : this(content.toList(), meta)
-        constructor(vararg content: String, meta: Meta = Meta.default) : this(content.map(::Text).toList(), meta)
+    data class Ok(
+        val content: List<Content>? = null,
+        val structuredContent: McpNodeType? = null,
+        override val meta: Meta = Meta.default
+    ) : ToolResponse {
+        constructor(vararg content: Content, meta: Meta = Meta.default) : this(content.toList(), null, meta)
+        constructor(vararg content: String, meta: Meta = Meta.default) : this(content.map(::Text).toList(),null,  meta)
     }
 
     data class Error(val error: ErrorMessage, override val meta: Meta = Meta.default) : ToolResponse {

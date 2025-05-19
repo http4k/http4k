@@ -9,10 +9,11 @@ import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.McpMessageId
-import org.http4k.mcp.model.Meta
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.compact
+import org.http4k.mcp.util.McpJson.nullNode
 import org.http4k.mcp.util.McpNodeType
 import java.time.Duration
 import kotlin.random.Random
@@ -55,8 +56,19 @@ internal class ClientTools(
             .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }
             .map {
                 when (it.isError) {
-                    true -> Error(ErrorMessage(-1, it.content.joinToString()))
-                    else -> Ok(it.content)
+                    true -> Error(
+                        ErrorMessage(
+                            -1, it.content?.joinToString()
+                                ?: it.structuredContent?.let { McpJson.asFormatString(it) }
+                                ?: "<no message"
+                        )
+                    )
+
+                    else -> Ok(
+                        it.content,
+                        it.structuredContent?.let { McpJson.convert(it) },
+                        it._meta
+                    )
                 }
             }
 }
