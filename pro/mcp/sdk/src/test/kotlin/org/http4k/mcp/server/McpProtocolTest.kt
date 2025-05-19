@@ -89,6 +89,8 @@ import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.auto
+import org.http4k.mcp.util.McpJson.obj
+import org.http4k.mcp.util.McpJson.string
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
@@ -351,23 +353,26 @@ class McpProtocolTest {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
 
-        val tool = Tool("name", "description", stringArg, intArg)
+        val unstructuredTool = Tool("unstructured", "description", stringArg, intArg)
+        val structuredTool = Tool("structured", "description")
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = ServerTools(listOf(tool bind {
-            runCatching {
-                val stringArg1 = stringArg(it)
-                val intArg1 = intArg(it)
+        val tools = ServerTools(
+            listOf(
+                unstructuredTool bind {
+                    val stringArg1 = stringArg(it)
+                    val intArg1 = intArg(it)
 
-                it.meta.progress?.let { _ ->
-                    it.client.progress(1, 5.0, "d1")
-                    it.client.progress(2, 5.0, "d2")
-                }
+                    it.meta.progress?.let { _ ->
+                        it.client.progress(1, 5.0, "d1")
+                        it.client.progress(2, 5.0, "d2")
+                    }
 
-                ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
-            }.onFailure { println(it.printStackTrace()) }.getOrThrow()
-        }))
+                    ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
+                },
+                structuredTool bind { ToolResponse.Ok(obj("boo" to string("bar"))) })
+        )
 
         val mcp = SseMcp(
             McpProtocol(
@@ -388,7 +393,7 @@ class McpProtocolTest {
                 McpTool.List.Response(
                     listOf(
                         McpTool(
-                            ToolName.of("name"), "description",
+                            ToolName.of("unstructured"), "description",
                             mapOf(
                                 "type" to "object",
                                 "required" to listOf("foo"),
@@ -396,6 +401,14 @@ class McpProtocolTest {
                                     "foo" to mapOf("type" to "string", "description" to "description1"),
                                     "bar" to mapOf("type" to "integer", "description" to "description2")
                                 )
+                            )
+                        ),
+                        McpTool(
+                            ToolName.of("structured"), "description",
+                            mapOf(
+                                "type" to "object",
+                                "required" to listOf<String>(),
+                                "properties" to emptyMap<String, Any>()
                             )
                         )
                     )
@@ -407,7 +420,7 @@ class McpProtocolTest {
             mcp.sendToMcp(
                 McpTool.Call,
                 McpTool.Call.Request(
-                    tool.name,
+                    unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(progressToken)
                 )
             )
@@ -421,7 +434,7 @@ class McpProtocolTest {
             mcp.sendToMcp(
                 McpTool.Call,
                 McpTool.Call.Request(
-                    tool.name,
+                    unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
                     Meta(progress2)
                 )
