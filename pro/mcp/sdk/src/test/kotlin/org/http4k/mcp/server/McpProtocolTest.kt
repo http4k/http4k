@@ -442,6 +442,22 @@ class McpProtocolTest {
 
             assertNextMessage(InvalidParams)
 
+            mcp.sendToMcp(
+                McpTool.Call,
+                McpTool.Call.Request(
+                    structuredTool.name,
+                    mapOf(),
+                    Meta(progress2)
+                )
+            )
+
+            assertNextMessage(
+                McpTool.Call.Response(
+                    listOf(Content.Text("""{"boo":"bar"}""")),
+                    mapOf("boo" to "bar")
+                )
+            )
+
             tools.items = emptyList()
 
             assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
