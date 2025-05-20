@@ -15,6 +15,7 @@ data class McpTool(
     val name: ToolName,
     val description: String,
     val inputSchema: Map<String, Any> = emptyMap(),
+    val outputSchema: Map<String, Any>? = null,
     val annotations: ToolAnnotations? = null,
 ) {
     object List : McpRpc {
@@ -53,7 +54,8 @@ data class McpTool(
 
         @JsonSerializable
         data class Response(
-            val content: kotlin.collections.List<Content>,
+            val content: kotlin.collections.List<Content>?,
+            val structuredContent: Map<String, Any>? = null,
             val isError: Boolean? = false,
             override val _meta: Meta = Meta.default,
         ) : ServerMessage.Response, HasMeta

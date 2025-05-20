@@ -16,12 +16,11 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.model.Tool.ArgList
 import org.http4k.mcp.util.McpNodeType
 
-
 open class ToolArgLensSpec<OUT>(
     val paramMeta: ParamMeta,
     internal val get: LensGet<ToolRequest, OUT>,
     internal val set: LensSet<ToolRequest, OUT>,
-    private val toSchema: ToolArgLens<*>.() -> McpNodeType
+    private val toSchema: ToolLens<ToolRequest, *>.() -> McpNodeType
 ) : BiDiLensBuilder<ToolRequest, OUT> {
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
@@ -29,14 +28,14 @@ open class ToolArgLensSpec<OUT>(
     fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) =
         ToolArgLensSpec(paramMeta, get.map(nextIn), set.map(nextOut), toSchema)
 
-    fun <NEXT> mapWithNew(toSchema: ToolArgLens<*>.() -> McpNodeType) =
+    fun <NEXT> mapWithNew(toSchema: ToolLens<ToolRequest, *>.() -> McpNodeType) =
         ToolArgLensSpec(paramMeta, get, set, toSchema)
 
-    override fun optional(name: String, description: String?, metadata: Map<String, Any>): ToolArgLens<OUT?> {
+    override fun optional(name: String, description: String?, metadata: Map<String, Any>): ToolLens<ToolRequest, OUT?> {
         val meta = Meta(false, "toolRequest", paramMeta, name, description, metadata)
         val getLens = get(name)
         val setLens = set(name)
-        return ToolArgLens(
+        return ToolLens(
             meta, { getLens(it).firstOrNull() },
             { out: OUT?, target: ToolRequest -> setLens(out?.let { listOf(it) } ?: emptyList(), target) },
             toSchema
@@ -53,22 +52,22 @@ open class ToolArgLensSpec<OUT>(
     override fun defaulted(
         name: String, default: LensExtractor<ToolRequest, OUT>,
         description: String?, metadata: Map<String, Any>
-    ): ToolArgLens<OUT> {
+    ): ToolLens<ToolRequest, OUT> {
         val meta = Meta(false, "toolRequest", paramMeta, name, description, metadata)
         val getLens = get(name)
         val setLens = set(name)
-        return ToolArgLens(
+        return ToolLens(
             meta, { getLens(it).run { if (isEmpty()) default(it) else first() } },
             { out: OUT, target: ToolRequest -> setLens(out?.let { listOf(it) } ?: emptyList(), target) },
             toSchema
         )
     }
 
-    override fun required(name: String, description: String?, metadata: Map<String, Any>): ToolArgLens<OUT> {
+    override fun required(name: String, description: String?, metadata: Map<String, Any>): ToolLens<ToolRequest, OUT> {
         val meta = Meta(true, "toolRequest", paramMeta, name, description, metadata)
         val getLens = get(name)
         val setLens = set(name)
-        return ToolArgLens(
+        return ToolLens(
             meta, { getLens(it).firstOrNull() ?: throw LensFailure(listOf(Missing(meta)), target = it) },
             { out: OUT?, target: ToolRequest -> setLens(out?.let(::listOf) ?: emptyList(), target) },
             toSchema
@@ -83,7 +82,7 @@ open class ToolArgLensSpec<OUT>(
             default: List<OUT>,
             description: String?,
             metadata: Map<String, Any>
-        ): ToolArgLens<List<OUT>> =
+        ): ToolLens<ToolRequest, List<OUT>> =
             defaulted(
                 name,
                 Lens(Meta(false, "toolRequest", ArrayParam(paramMeta), name, description, metadata)) { default },
@@ -95,10 +94,10 @@ open class ToolArgLensSpec<OUT>(
             default: LensExtractor<ToolRequest, List<OUT>>,
             description: String?,
             metadata: Map<String, Any>
-        ): ToolArgLens<List<OUT>> {
+        ): ToolLens<ToolRequest, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
-            return ToolArgLens(
+            return ToolLens(
                 Meta(false, "toolRequest", ArrayParam(paramMeta), name, description, metadata),
                 { getLens(it).run { ifEmpty { default(it) } } },
                 { out: List<OUT>, target: ToolRequest -> setLens(ArgList(out), target) },
@@ -110,10 +109,10 @@ open class ToolArgLensSpec<OUT>(
             name: String,
             description: String?,
             metadata: Map<String, Any>
-        ): ToolArgLens<List<OUT>?> {
+        ): ToolLens<ToolRequest, List<OUT>?> {
             val getLens = get(name)
             val setLens = set(name)
-            return ToolArgLens(
+            return ToolLens(
                 Meta(false, "toolRequest", ArrayParam(paramMeta), name, description, metadata),
                 { getLens(it).run { ifEmpty { null } } },
                 { out: List<OUT>?, target: ToolRequest -> setLens(ArgList(out ?: emptyList()), target) },
@@ -121,11 +120,15 @@ open class ToolArgLensSpec<OUT>(
             )
         }
 
-        override fun required(name: String, description: String?, metadata: Map<String, Any>): ToolArgLens<List<OUT>> {
+        override fun required(
+            name: String,
+            description: String?,
+            metadata: Map<String, Any>
+        ): ToolLens<ToolRequest, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
             val meta = Meta(true, "toolRequest", ArrayParam(paramMeta), name, description, metadata)
-            return ToolArgLens(
+            return ToolLens(
                 meta, { getLens(it).run { ifEmpty { throw LensFailure(Missing(meta), target = it) } } },
                 { out: List<OUT>, target -> setLens(ArgList(out), target) },
                 toSchema
@@ -150,3 +153,4 @@ open class ToolArgLensSpec<OUT>(
             }
         }, { meta.toSchema() })
 }
+

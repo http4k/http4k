@@ -175,8 +175,19 @@ class HttpStreamingMcpClient(
                 }
                 .map {
                     when (it.isError) {
-                        true -> Error(ErrorMessage(-1, it.content.joinToString()))
-                        else -> Ok(it.content)
+                        true -> Error(
+                            ErrorMessage(
+                                -1, it.content?.joinToString()
+                                    ?: it.structuredContent?.let { McpJson.asFormatString(it) }
+                                    ?: "<no message"
+                            )
+                        )
+
+                        else -> Ok(
+                            it.content,
+                            it.structuredContent?.let { McpJson.convert(it) },
+                            it._meta
+                        )
                     }
                 }
         }

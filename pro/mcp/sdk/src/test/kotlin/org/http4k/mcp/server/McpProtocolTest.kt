@@ -27,10 +27,11 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
+import org.http4k.lens.with
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Annotations
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
@@ -56,6 +57,7 @@ import org.http4k.mcp.model.string
 import org.http4k.mcp.model.value
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.DRAFT
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
@@ -346,28 +348,34 @@ class McpProtocolTest {
         }
     }
 
+    data class FooBar(val foo: String)
+
     @Test
     fun `deal with tools`() {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
+        val output = Tool.Output.auto(FooBar("bar")).toLens()
 
-        val tool = Tool("name", "description", stringArg, intArg)
+        val unstructuredTool = Tool("unstructured", "description", stringArg, intArg)
+        val structuredTool = Tool("structured", "description", output = output)
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = ServerTools(listOf(tool bind {
-            runCatching {
-                val stringArg1 = stringArg(it)
-                val intArg1 = intArg(it)
+        val tools = ServerTools(
+            listOf(
+                unstructuredTool bind {
+                    val stringArg1 = stringArg(it)
+                    val intArg1 = intArg(it)
 
-                it.meta.progress?.let { _ ->
-                    it.client.progress(1, 5.0, "d1")
-                    it.client.progress(2, 5.0, "d2")
-                }
+                    it.meta.progress?.let { _ ->
+                        it.client.progress(1, 5.0, "d1")
+                        it.client.progress(2, 5.0, "d2")
+                    }
 
-                ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
-            }.onFailure { println(it.printStackTrace()) }.getOrThrow()
-        }))
+                    Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
+                },
+                structuredTool bind { Ok().with(output of FooBar("bar")) })
+        )
 
         val mcp = SseMcp(
             McpProtocol(
@@ -388,7 +396,7 @@ class McpProtocolTest {
                 McpTool.List.Response(
                     listOf(
                         McpTool(
-                            ToolName.of("name"), "description",
+                            ToolName.of("unstructured"), "description",
                             mapOf(
                                 "type" to "object",
                                 "required" to listOf("foo"),
@@ -396,6 +404,14 @@ class McpProtocolTest {
                                     "foo" to mapOf("type" to "string", "description" to "description1"),
                                     "bar" to mapOf("type" to "integer", "description" to "description2")
                                 )
+                            )
+                        ),
+                        McpTool(
+                            ToolName.of("structured"), "description",
+                            mapOf(
+                                "type" to "object",
+                                "required" to listOf<String>(),
+                                "properties" to emptyMap<String, Any>()
                             )
                         )
                     )
@@ -407,11 +423,10 @@ class McpProtocolTest {
             mcp.sendToMcp(
                 McpTool.Call,
                 McpTool.Call.Request(
-                    tool.name,
+                    unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(progressToken)
                 )
             )
-
 
             assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
             assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 2, 5.0, "d2"))
@@ -422,13 +437,25 @@ class McpProtocolTest {
             mcp.sendToMcp(
                 McpTool.Call,
                 McpTool.Call.Request(
-                    tool.name,
+                    unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
                     Meta(progress2)
                 )
             )
 
             assertNextMessage(InvalidParams)
+
+            mcp.sendToMcp(
+                McpTool.Call,
+                McpTool.Call.Request(structuredTool.name, mapOf(), Meta(progress2))
+            )
+
+            assertNextMessage(
+                McpTool.Call.Response(
+                    listOf(Content.Text("""{"foo":"bar"}""")),
+                    mapOf("foo" to "bar"),
+                )
+            )
 
             tools.items = emptyList()
 
@@ -575,7 +602,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
-                tools = ServerTools(listOf(tool bind { ToolResponse.Ok("") })),
+                tools = ServerTools(listOf(tool bind { Ok("") })),
                 random = random
             ),
             NoMcpSecurity
@@ -605,7 +632,7 @@ class McpProtocolTest {
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
                 tools = ServerTools(listOf(tool bind {
-                    ToolResponse.Ok(
+                    Ok(
                         McpJson.asFormatString(
                             mapOf(
                                 objectValueArg.meta.name to objectValueArg(it),

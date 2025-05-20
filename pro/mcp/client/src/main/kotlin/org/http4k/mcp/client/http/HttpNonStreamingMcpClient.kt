@@ -12,6 +12,8 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.accept
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.McpError.Http
+import org.http4k.mcp.McpResult
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
@@ -21,8 +23,6 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.McpError.Http
-import org.http4k.mcp.McpResult
 import org.http4k.mcp.client.asAOrFailure
 import org.http4k.mcp.client.toHttpRequest
 import org.http4k.mcp.model.Progress
@@ -37,6 +37,8 @@ import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.asFormatString
+import org.http4k.mcp.util.McpJson.convert
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 
@@ -70,8 +72,19 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
         )
             .map {
                 when (it.isError) {
-                    true -> Error(ErrorMessage(-1, it.content.joinToString()))
-                    else -> Ok(it.content)
+                    true -> Error(
+                        ErrorMessage(
+                            -1, it.content?.joinToString()
+                                ?: it.structuredContent?.let(::asFormatString)
+                                ?: "<no message"
+                        )
+                    )
+
+                    else -> Ok(
+                        it.content,
+                        it.structuredContent?.let(::convert),
+                        it._meta
+                    )
                 }
             }
     }
@@ -104,7 +117,10 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
                 .map { it.resources }
 
         override fun listTemplates(overrideDefaultTimeout: Duration?) =
-            http.send<McpResource.ListTemplates.Response>(McpResource.ListTemplates, McpResource.ListTemplates.Request())
+            http.send<McpResource.ListTemplates.Response>(
+                McpResource.ListTemplates,
+                McpResource.ListTemplates.Request()
+            )
                 .map { it.resourceTemplates }
 
         override fun read(

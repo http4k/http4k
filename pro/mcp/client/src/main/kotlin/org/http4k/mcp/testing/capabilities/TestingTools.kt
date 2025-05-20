@@ -5,6 +5,7 @@ import org.http4k.connect.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.protocol.messages.McpTool
@@ -48,11 +49,16 @@ class TestingTools(
         .nextEvent<ToolResponse, McpTool.Call.Response> {
             when (isError) {
                 true -> {
-                    val input = (content.first() as Content.Text).text
+                    val input = (content?.first() as Content.Text).text
                     ToolResponse.Error(McpJson.asA<ErrorMessage>(input))
                 }
 
-                else -> ToolResponse.Ok(content)
+                else -> Ok(
+                    content,
+                    structuredContent?.let(McpJson::convert),
+                    _meta
+                )
+
             }
         }.map { it.second }
 }

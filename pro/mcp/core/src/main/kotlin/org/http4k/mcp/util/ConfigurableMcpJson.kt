@@ -13,6 +13,8 @@ import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.with
 import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableMoshi
@@ -38,6 +40,7 @@ import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolArgLensSpec
+import org.http4k.mcp.model.ToolOutputLensBuilder
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
@@ -84,6 +87,19 @@ abstract class ConfigurableMcpJson(
             { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
         )
     }
+
+    /**
+     * Auto-marshalled lens for a tool argument. You will need Kotlin reflection on the classpath for this to work.
+     */
+    inline fun <reified T : Any> Tool.Output.auto(example: T): ToolOutputLensBuilder<T> {
+        val autoJsonToJsonSchema = AutoJsonToJsonSchema(this@ConfigurableMcpJson)
+        val jsonSchemaCollapser = JsonSchemaCollapser(this@ConfigurableMcpJson)
+
+        return ToolOutputLensBuilder(
+            LensGet { _, target -> listOf(convert(target.structuredContent!!)) },
+            { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
+        )
+    }
 }
 
 @KotshiJsonAdapterFactory
@@ -108,8 +124,8 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
 
 fun Result4k<McpNodeType, McpNodeType>.asHttp() =
     when (val response = this) {
-        is Success<McpNodeType> -> response.get().asHttp(org.http4k.core.Status.ACCEPTED)
-        is Failure<McpNodeType> -> response.get().asHttp(org.http4k.core.Status.BAD_REQUEST)
+        is Success<McpNodeType> -> response.get().asHttp(ACCEPTED)
+        is Failure<McpNodeType> -> response.get().asHttp(BAD_REQUEST)
     }
 
 private fun McpNodeType.asHttp(status: Status) = when (this) {

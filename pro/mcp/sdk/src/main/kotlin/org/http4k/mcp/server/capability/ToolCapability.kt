@@ -34,7 +34,12 @@ interface ToolCapability : ServerCapability, ToolHandler {
 }
 
 fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
-    override fun toTool() = McpTool(tool.name, tool.description, McpJson.convert(tool.toSchema()), tool.annotations)
+    override fun toTool() = McpTool(
+        tool.name, tool.description,
+        McpJson.convert(tool.toSchema()),
+        tool.outputSchema?.let { McpJson.convert(it) },
+        tool.annotations
+    )
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http) }
@@ -54,6 +59,10 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                     when (it) {
                         is Ok -> it.content
                         is Error -> listOf(Text("ERROR: " + it.error.code + " " + it.error.message))
+                    },
+                    when (it) {
+                        is Ok -> it.structuredContent?.let(McpJson::convert)
+                        is Error -> null
                     },
                     it is Error,
                     it.meta
