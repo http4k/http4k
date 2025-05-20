@@ -13,6 +13,8 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.nonBlank
 import org.http4k.lens.StringBiDiMappings.nonEmpty
+import org.http4k.mcp.ToolRequest
+import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
 import org.http4k.mcp.util.McpNodeType
 import java.time.format.DateTimeFormatter
@@ -29,7 +31,8 @@ import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 class Tool private constructor(
     val name: ToolName,
     val description: String,
-    val args: List<ToolArgLens<*>>,
+    val args: List<ToolLens<ToolRequest, *>>,
+    val output: ToolLens<ToolResponse.Ok, *>? = null,
     val annotations: ToolAnnotations? = null,
 ) : CapabilitySpec {
     val outputSchema: McpNodeType? = null
@@ -37,17 +40,22 @@ class Tool private constructor(
     constructor(
         name: String,
         description: String,
-        vararg arguments: ToolArgLens<*>,
+        vararg arguments: ToolLens<ToolRequest, *>,
+        output: ToolLens<ToolResponse.Ok, *>? = null,
         annotations: ToolAnnotations? = null
-    ) : this(ToolName.of(name), description, arguments.toList(), annotations)
+    ) : this(ToolName.of(name), description, arguments.toList(), output, annotations)
 
     /**
      * A typesafe tool argument lens. Use the extension functions below to create a lens for a specific type.
      */
-    object Arg
+    data object Arg
+
+    /**
+     * A typesafe tool response lens. Use the extension functions below to create a lens for a specific type.
+     */
+    data object Output
 
     class ArgList<T>(val delegate: List<T>) : List<T> by delegate
-
 }
 
 

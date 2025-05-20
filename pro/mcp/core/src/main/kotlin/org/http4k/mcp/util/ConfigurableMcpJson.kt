@@ -40,6 +40,7 @@ import org.http4k.mcp.model.ResourceUriTemplate
 import org.http4k.mcp.model.Size
 import org.http4k.mcp.model.Tool
 import org.http4k.mcp.model.ToolArgLensSpec
+import org.http4k.mcp.model.ToolOutputLensBuilder
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.SessionId
@@ -83,6 +84,19 @@ abstract class ConfigurableMcpJson(
             LensSet { name, values, target ->
                 values.fold(target) { acc, next -> target.copy(args = acc.args + (name to asJsonObject(next))) }
             },
+            { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
+        )
+    }
+
+    /**
+     * Auto-marshalled lens for a tool argument. You will need Kotlin reflection on the classpath for this to work.
+     */
+    inline fun <reified T : Any> Tool.Output.auto(example: T): ToolOutputLensBuilder<T> {
+        val autoJsonToJsonSchema = AutoJsonToJsonSchema(this@ConfigurableMcpJson)
+        val jsonSchemaCollapser = JsonSchemaCollapser(this@ConfigurableMcpJson)
+
+        return ToolOutputLensBuilder(
+            LensGet { _, target -> listOf(convert(target.structuredContent!!)) },
             { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
         )
     }

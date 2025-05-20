@@ -28,7 +28,6 @@ fun ToolFilter.then(next: ToolFilter): ToolFilter = ToolFilter { this(next(it)) 
 
 fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
 
-
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
     val meta: Meta = default,
