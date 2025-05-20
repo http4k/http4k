@@ -27,10 +27,11 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
+import org.http4k.lens.with
 import org.http4k.mcp.CompletionResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.ToolResponse
+import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.model.Annotations
 import org.http4k.mcp.model.Completion
 import org.http4k.mcp.model.CompletionArgument
@@ -56,6 +57,7 @@ import org.http4k.mcp.model.string
 import org.http4k.mcp.model.value
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
+import org.http4k.mcp.protocol.ProtocolVersion.Companion.DRAFT
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
@@ -89,8 +91,6 @@ import org.http4k.mcp.server.sse.SseMcp
 import org.http4k.mcp.server.sse.SseSessions
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.auto
-import org.http4k.mcp.util.McpJson.obj
-import org.http4k.mcp.util.McpJson.string
 import org.http4k.mcp.util.McpNodeType
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
@@ -348,13 +348,16 @@ class McpProtocolTest {
         }
     }
 
+    data class FooBar(val foo: String)
+
     @Test
     fun `deal with tools`() {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
+        val output = Tool.Output.auto(FooBar("bar")).toLens()
 
         val unstructuredTool = Tool("unstructured", "description", stringArg, intArg)
-        val structuredTool = Tool("structured", "description")
+        val structuredTool = Tool("structured", "description", output = output)
 
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
@@ -369,9 +372,9 @@ class McpProtocolTest {
                         it.client.progress(2, 5.0, "d2")
                     }
 
-                    ToolResponse.Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
+                    Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
                 },
-                structuredTool bind { ToolResponse.Ok(obj("boo" to string("bar"))) })
+                structuredTool bind { Ok().with(output of FooBar("bar")) })
         )
 
         val mcp = SseMcp(
@@ -444,17 +447,13 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(
-                    structuredTool.name,
-                    mapOf(),
-                    Meta(progress2)
-                )
+                McpTool.Call.Request(structuredTool.name, mapOf(), Meta(progress2))
             )
 
             assertNextMessage(
                 McpTool.Call.Response(
-                    listOf(Content.Text("""{"boo":"bar"}""")),
-                    mapOf("boo" to "bar")
+                    listOf(Content.Text("""{"foo":"bar"}""")),
+                    mapOf("foo" to "bar"),
                 )
             )
 
@@ -603,7 +602,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
-                tools = ServerTools(listOf(tool bind { ToolResponse.Ok("") })),
+                tools = ServerTools(listOf(tool bind { Ok("") })),
                 random = random
             ),
             NoMcpSecurity
@@ -633,7 +632,7 @@ class McpProtocolTest {
             McpProtocol(
                 metadata, SseSessions(SessionProvider.Random(random)),
                 tools = ServerTools(listOf(tool bind {
-                    ToolResponse.Ok(
+                    Ok(
                         McpJson.asFormatString(
                             mapOf(
                                 objectValueArg.meta.name to objectValueArg(it),

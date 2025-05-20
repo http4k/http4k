@@ -7,6 +7,7 @@ import org.http4k.mcp.ToolResponse.Ok
 import org.http4k.mcp.protocol.ProtocolVersion
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2025-03-26`
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.DRAFT
+import org.http4k.mcp.util.McpJson.asFormatString
 import org.http4k.mcp.util.McpJson.asJsonObject
 import org.http4k.mcp.util.McpNodeType
 
@@ -24,7 +25,10 @@ class ToolOutputLensBuilder<OUT : Any>(
         { value, target ->
             when (protocolCapability) {
                 DRAFT -> target.copy(structuredContent = asJsonObject(value), content = null)
-                else -> target.copy(structuredContent = asJsonObject(value), content = target.content)
+                else -> target.copy(
+                    structuredContent = asJsonObject(value),
+                    content = listOf(Content.Text(asFormatString(value)))
+                )
             }
         },
         { toSchema(it) }

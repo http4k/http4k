@@ -44,7 +44,7 @@ sealed interface ToolResponse {
         val content: List<Content>? = null,
         val structuredContent: McpNodeType? = null,
         override val meta: Meta = default
-    ) : ToolResponse {
+    ) : ToolResponse, McpLensTarget {
         constructor(structuredContent: McpNodeType, meta: Meta = default) : this(listOf(Text(McpJson.asFormatString(structuredContent))), structuredContent, meta)
         constructor(vararg content: Content, meta: Meta = default) : this(content.toList(), null, meta)
         constructor(vararg content: String, meta: Meta = default) : this(content.map(::Text).toList(), null, meta)
