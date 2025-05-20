@@ -3,8 +3,10 @@ CHAN<h2 class="github">Changelog</h2>
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.9.0.1 (uncut)
-- **http4k-web-datastar**: [Fix] Correctly handle templatew with Windows new-lines in.
+### v6.9.1.0 (uncut)
+- **http4k-***: Upgrade some dependency versio.
+- **http4k-mcp-sdk**: Support for `structuredContent` field and typesafe outputs in Tools. This is in the draft spec.
+- **http4k-web-datastar**: [Fix] Correctly handle templates with Windows new-lines in.
 
 ### v6.9.0.0
 - **http4k-mdk-sdk**: [Breaking] Removed options for running MCP servers without explicitly supplying a security implementation. This is now mandatory. If you wish to not supply a security implementation, please use the `NoMcpSecurity` object in place of one of the others (Basic, Bearer, ApiKey, OAuth).
