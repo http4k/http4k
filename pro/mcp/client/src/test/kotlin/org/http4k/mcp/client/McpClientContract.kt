@@ -36,6 +36,7 @@ import org.http4k.mcp.server.capability.ServerResources
 import org.http4k.mcp.server.capability.ServerTools
 import org.http4k.mcp.server.protocol.McpProtocol
 import org.http4k.mcp.server.protocol.Sessions
+import org.http4k.mcp.util.McpJson.auto
 import org.http4k.mcp.util.McpJson.obj
 import org.http4k.mcp.util.McpJson.string
 import org.http4k.routing.bind
@@ -54,17 +55,20 @@ interface McpClientContract<T> : PortBasedTest {
 
     fun clientSessions(): Sessions<T>
 
+    data class FooBar(val foo: String)
+
     @Test
     fun `can interact with server`() {
 
         val toolArg = Tool.Arg.string().required("name")
+        val output = Tool.Output.auto(FooBar("bar")).toLens()
 
         val tools = ServerTools(
             Tool("reverse", "description", toolArg) bind {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             },
             Tool("reverseStructured", "description", toolArg) bind {
-                ToolResponse.Ok(obj("message" to string(toolArg(it).reversed())))
+                ToolResponse.Ok().with(output of FooBar(toolArg(it).reversed()))
             },
         )
 
@@ -152,7 +156,7 @@ interface McpClientContract<T> : PortBasedTest {
         assertThat(
             mcpClient.tools().call(ToolName.of("reverseStructured"), ToolRequest().with(toolArg of "foobar"))
                 .valueOrNull()!!,
-            equalTo(ToolResponse.Ok(listOf(Content.Text("""{"message":"raboof"}""")),  obj("message" to string("raboof"))))
+            equalTo(ToolResponse.Ok(listOf(Content.Text("""{"foo":"raboof"}""")), obj("foo" to string("raboof"))))
         )
 
         if (doesNotifications) {
