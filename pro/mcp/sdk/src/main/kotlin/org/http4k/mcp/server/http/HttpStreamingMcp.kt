@@ -17,11 +17,11 @@ import org.http4k.sse.then
 /**
  * MCP server setup for Streaming HTTP-based MCP Servers which use HTTP + SSE
  */
-fun HttpStreamingMcp(mcpProtocol: McpProtocol<Sse>, security: McpSecurity) = poly(
-    ServerFilters.CatchAllSse().then(SseFilter(security).then(HttpStreamingMcpConnection(mcpProtocol))),
+fun HttpStreamingMcp(mcpProtocol: McpProtocol<Sse>, security: McpSecurity, path: String = "/mcp") = poly(
+    ServerFilters.CatchAllSse().then(SseFilter(security).then(HttpStreamingMcpConnection(mcpProtocol, path))),
     CatchAll()
         .then(CatchLensFailure())
-        .then(routes(security.routes + HttpFilter(security).then(HttpNonStreamingMcpConnection(mcpProtocol))))
+        .then(routes(security.routes + HttpFilter(security).then(HttpNonStreamingMcpConnection(mcpProtocol, path))))
 )
 
 

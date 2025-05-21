@@ -12,8 +12,8 @@ import org.http4k.sse.Sse
 /**
  * MCP server setup for Non-streaming HTTP-based MCP Servers
  */
-fun HttpNonStreamingMcp(mcpProtocol: McpProtocol<Sse>, security: McpSecurity) =
+fun HttpNonStreamingMcp(mcpProtocol: McpProtocol<Sse>, security: McpSecurity, path: String = "/mcp") =
     CatchAll()
         .then(CatchLensFailure())
-        .then(routes(security.routes + HttpFilter(security).then(HttpNonStreamingMcpConnection(mcpProtocol))))
+        .then(routes(security.routes + HttpFilter(security).then(HttpNonStreamingMcpConnection(mcpProtocol, path))))
 

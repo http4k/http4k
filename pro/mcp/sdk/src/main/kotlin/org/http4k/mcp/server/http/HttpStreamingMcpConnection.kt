@@ -24,8 +24,8 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.SseResponse
 
-fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>) =
-    "/mcp" bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
+fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp") =
+    path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
         when (val session = protocol.retrieveSession(req)) {
             is Session -> SseResponse(
                 OK, listOf(
