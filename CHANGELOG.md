@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.9.2.0
 - **http4k-core**: Add typesafe Uri builders using the lens system.
+- **http4k-realtime-core**: [Fix #1353] SSE Cors filter not setting CORs headers correctly.
 
 ### v6.9.1.0
 - **http4k-***: Upgrade some dependency versions.

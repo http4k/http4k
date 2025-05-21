@@ -2,8 +2,9 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
@@ -11,6 +12,7 @@ import org.http4k.sse.SseHandler
 import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import org.junit.jupiter.api.Test
+import java.awt.SystemColor.control
 
 class SseRebindProtectionTest {
 
@@ -20,8 +22,9 @@ class SseRebindProtectionTest {
     private val corsPolicy = CorsPolicy(
         OriginPolicy.Only(allowedOrigin),
         listOf("Content-Type", "Authorization"),
-        listOf(GET, Method.POST, Method.OPTIONS),
-        credentials = true
+        listOf(GET, POST, OPTIONS),
+        true,
+        listOf("foo", "bar"),
     )
 
     private val testSseHandler: SseHandler = { SseResponse(OK, emptyList(), false) {} }
@@ -30,10 +33,22 @@ class SseRebindProtectionTest {
 
     @Test
     fun `allows requests with valid origin`() {
-        val request = Request(GET, "/sse")
-            .header("Origin", allowedOrigin)
+        val request = Request(GET, "/sse").header("Origin", allowedOrigin)
 
-        assertThat(handler(request).status, equalTo(OK))
+        val response = handler(request)
+        assertThat(response.status, equalTo(OK))
+        assertThat(
+            response.headers, equalTo(
+                listOf(
+                    "access-control-allow-origin" to "https://allowed-origin.com",
+                    "access-control-allow-headers" to "Content-Type, Authorization",
+                    "access-control-allow-methods" to "GET, POST, OPTIONS",
+                    "access-control-allow-credentials" to "true",
+                    "access-control-expose-headers" to "foo, bar",
+                    "Vary" to "Origin"
+                )
+            )
+        )
     }
 
     @Test
@@ -49,4 +64,5 @@ class SseRebindProtectionTest {
 
         assertThat(handler(request).status, equalTo(FORBIDDEN))
     }
+
 }
