@@ -79,7 +79,7 @@ fun OpenAiChatLanguageModel(
                         else -> error("unknown message type")
                     }
                 },
-                MaxTokens.of(1),
+                maxTokens,
                 temperature,
                 top_p,
                 n,

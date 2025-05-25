@@ -17,7 +17,7 @@ class Http4kLangchainHttpClient(private val http: HttpHandler) : HttpClient {
     override fun execute(request: HttpRequest) = http(request.asHttp4k()).fromHttp4k()
 
     override fun execute(request: HttpRequest, parser: ServerSentEventParser, listener: ServerSentEventListener) {
-        TODO("Not yet implemented")
+        parser.parse(http(request.asHttp4k()).body.stream, listener)
     }
 }
 
