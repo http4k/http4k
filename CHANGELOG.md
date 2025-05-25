@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-testing-webdriver**: [Possible break]: Upgrade of JSoup dependency may cause issues with parsing of HTML content. [GitHub](https://github.com/jhy/jsoup/issues/2330)
 - **http4k-testing-approval**: [Possible break]: Upgrade of JSoup dependency may cause issues with parsing of HTML content. [GitHub](https://github.com/jhy/jsoup/issues/2330)
+- **http4k-mcp-sdk***: Add cancellation capability.
 
 ### v6.9.2.0
 - **http4k-core**: Add typesafe Uri builders using the lens system.

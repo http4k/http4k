@@ -20,7 +20,7 @@ import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.messages.Cancelled
+import org.http4k.mcp.protocol.messages.McpCancelled
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpInitialize
@@ -37,6 +37,7 @@ import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.server.capability.CompletionCapability
 import org.http4k.mcp.server.capability.PromptCapability
 import org.http4k.mcp.server.capability.ResourceCapability
+import org.http4k.mcp.server.capability.ServerCancellations
 import org.http4k.mcp.server.capability.ServerCapability
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
@@ -66,6 +67,7 @@ class McpProtocol<Transport>(
     private val completions: Completions = ServerCompletions(),
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
+    private val cancellations: Cancellations = ServerCancellations(),
     private val random: Random = Random,
     private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) }
 ) {
@@ -198,7 +200,10 @@ class McpProtocol<Transport>(
 
                     McpInitialize.Initialized.Method -> ok()
 
-                    Cancelled.Method -> ok()
+                    McpCancelled.Method -> {
+                        cancellations.cancel(jsonReq.fromJsonRpc<McpCancelled.Notification>())
+                        ok()
+                    }
 
                     McpProgress.Method -> ok()
 
@@ -262,7 +267,7 @@ class McpProtocol<Transport>(
                     val context = ClientCall(progress, session)
                     sessions.assign(context, this, httpReq)
                     try {
-                        fn(it, ProgressClient(progress, context, sessions, random) { clientTracking[session] })
+                        fn(it, SessionBasedClient(progress, context, sessions, random) { clientTracking[session] })
                     } finally {
                         sessions.end(context)
                     }

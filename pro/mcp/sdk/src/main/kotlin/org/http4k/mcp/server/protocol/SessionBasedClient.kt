@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-class ProgressClient<Transport>(
+class SessionBasedClient<Transport>(
     private val progressToken: ProgressToken,
     private val context: ClientRequestContext,
     private val sessions: Sessions<Transport>,

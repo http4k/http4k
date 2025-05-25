@@ -57,12 +57,12 @@ import org.http4k.mcp.model.string
 import org.http4k.mcp.model.value
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
-import org.http4k.mcp.protocol.ProtocolVersion.Companion.DRAFT
 import org.http4k.mcp.protocol.ServerMetaData
 import org.http4k.mcp.protocol.SessionId
 import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
+import org.http4k.mcp.protocol.messages.McpCancelled
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpLogging
@@ -77,6 +77,7 @@ import org.http4k.mcp.protocol.messages.McpRoot
 import org.http4k.mcp.protocol.messages.McpRpc
 import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.protocol.messages.ServerMessage
+import org.http4k.mcp.server.capability.ServerCancellations
 import org.http4k.mcp.server.capability.ServerCompletions
 import org.http4k.mcp.server.capability.ServerPrompts
 import org.http4k.mcp.server.capability.ServerResources
@@ -160,6 +161,37 @@ class McpProtocolTest {
             mcp.sendToMcp(McpRoot.List.Response(newRoots), McpMessageId.of(7425097216252813))
 
             assertThat(roots.toList(), equalTo(newRoots))
+        }
+    }
+
+    @Test
+    fun `handles cancellations`() {
+        val cancellations = ServerCancellations()
+
+        val id = McpMessageId.of(123456789)
+
+        var cancelled = false
+        cancellations.onCancel { cancelledId, reason, _ ->
+            assertThat(cancelledId, equalTo(id))
+            assertThat(reason, equalTo("test cancellation"))
+            cancelled = true
+        }
+
+        val mcp = SseMcp(
+            McpProtocol(
+                metadata,
+                SseSessions(SessionProvider.Random(Random(0))),
+                cancellations = cancellations,
+                random = random
+            ),
+            NoMcpSecurity
+        )
+
+        with(mcp.testSseClient(Request(GET, "/sse"))) {
+            assertInitializeLoop(mcp)
+
+            mcp.sendToMcp(McpCancelled, McpCancelled.Notification(id, "test cancellation"))
+            assertThat(cancelled, equalTo(true))
         }
     }
 
