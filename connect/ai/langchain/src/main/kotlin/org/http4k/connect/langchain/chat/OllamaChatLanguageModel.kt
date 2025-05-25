@@ -9,7 +9,9 @@ import dev.langchain4j.data.message.ImageContent
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.TextContent
 import dev.langchain4j.data.message.UserMessage
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.chat.request.ChatRequest
+import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.output.Response
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.ModelName
@@ -30,20 +32,18 @@ fun OllamaChatLanguageModel(
     format: ResponseFormat? = null,
     keep_alive: String? = null,
     options: ModelOptions? = null,
-) = object : ChatLanguageModel {
-    override fun generate(p0: List<ChatMessage>) = generate(p0, emptyList())
-
-    override fun generate(
-        messages: List<ChatMessage>,
-        toolSpecifications: List<ToolSpecification>
-    ): Response<AiMessage> {
-        if (toolSpecifications.isNotEmpty()) error("ToolSpecifications are not supported")
-
-        return Response(
-            ollama.chatCompletion(model, messages.map { it.toHttp4k() }, stream, format, keep_alive, options)
-                .map { AiMessage(it.mapNotNull { it.message?.content }.joinToString("")) }
+) = object : ChatModel {
+    override fun doChat(chatRequest: ChatRequest): ChatResponse {
+        with(chatRequest) {
+            ollama.chatCompletion(model, messages().map { it.toHttp4k() }, stream, format, keep_alive, options)
+                .map {
+                    ChatResponse.builder()
+                        .aiMessage(AiMessage(it.mapNotNull { it.message?.content }.joinToString("")))
+                        .build()
+                }
                 .orThrow()
-        )
+        }
+        return super.doChat(chatRequest)
     }
 }
 
