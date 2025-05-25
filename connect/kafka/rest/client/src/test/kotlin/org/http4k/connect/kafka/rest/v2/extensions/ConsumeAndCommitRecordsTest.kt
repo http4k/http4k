@@ -41,7 +41,7 @@ class ConsumeAndCommitRecordsTest {
     private val topic = Topic.of("topic")
 
     @Test
-    fun `consumer completes and commits successful records`() {
+    fun `consumer completes and commits successful records`() = runBlocking {
         consumeAndCommitUsing { Success(Unit) }.successValue()
 
         assertThat(
@@ -52,7 +52,7 @@ class ConsumeAndCommitRecordsTest {
     }
 
     @Test
-    fun `on failure, consumer seeks failed record`() {
+    fun `on failure, consumer seeks failed record`() = runBlocking {
         consumeAndCommitUsing {
             when (it.toInt()) {
                 0 -> Success(Unit)

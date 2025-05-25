@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class WsRoutingTest {
 
     @Test
-    fun `uses router for matching`() {
+    fun `uses router for matching`() = runBlocking {
         val app = websockets(
             query("goodbye") bind websockets {
                 it.send(WsMessage("query"))

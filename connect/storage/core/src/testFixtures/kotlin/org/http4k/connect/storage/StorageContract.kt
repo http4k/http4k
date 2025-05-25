@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +28,7 @@ abstract class StorageContract {
     }
 
     @Test
-    fun `item lifecycle`() {
+    fun `item lifecycle`() = runBlocking {
         val key = prefix1 + UUID.randomUUID().toString()
         assertThat(storage[key], absent())
 
@@ -45,7 +46,7 @@ abstract class StorageContract {
     }
 
     @Test
-    fun `2 storages do not interfere`() {
+    fun `2 storages do not interfere`() = runBlocking {
         val key1 = prefix1 + UUID.randomUUID().toString()
         val key2 = prefix2 + UUID.randomUUID().toString()
         assertThat(storage[key1], absent())
@@ -73,7 +74,7 @@ abstract class StorageContract {
     }
 
     @Test
-    fun `collection operations`() {
+    fun `collection operations`() = runBlocking {
         val key1 = prefix1 + UUID.randomUUID().toString()
         val key2 = prefix1 + UUID.randomUUID().toString()
         assertFalse(storage.removeAll(prefix1))

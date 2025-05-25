@@ -16,12 +16,12 @@ class LocalCookieTest {
     private val cookie = Cookie("foo", "bar")
 
     @Test
-    fun `cookie without time attributes does not expire`() {
+    fun `cookie without time attributes does not expire`() = runBlocking {
         assertThat(LocalCookie(cookie, MAX.toInstant(UTC)).isExpired(MIN.toInstant(UTC)), equalTo(false))
     }
 
     @Test
-    fun `cookie with maxAge zero expires straight away`() {
+    fun `cookie with maxAge zero expires straight away`() = runBlocking {
         val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2)
         val localCookie = LocalCookie(cookie.maxAge(0), created.toInstant(UTC))
 
@@ -29,7 +29,7 @@ class LocalCookieTest {
     }
 
     @Test
-    fun `expiration for cookie with maxAge only`() {
+    fun `expiration for cookie with maxAge only`() = runBlocking {
         val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2)
         val localCookie = LocalCookie(cookie.maxAge(5), created.toInstant(UTC))
 
@@ -38,7 +38,7 @@ class LocalCookieTest {
     }
 
     @Test
-    fun `expiration for cookies with expires only`() {
+    fun `expiration for cookies with expires only`() = runBlocking {
         val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2).toInstant(UTC)
         val expires = created.plusSeconds(5)
         val localCookie = LocalCookie(cookie.expires(expires), created)

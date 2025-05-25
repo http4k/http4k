@@ -20,17 +20,17 @@ class GzipBodyTest {
     inner class InMemoryGzip {
 
         @Test
-        fun `a round-trip of a body works`() {
+        fun `a round-trip of a body works`() = runBlocking {
             assertThat(Body("foo").gzipped().body.gunzipped(), equalTo(Body("foo")))
         }
 
         @Test
-        fun `the content-encoding for a compressed body is correct`() {
+        fun `the content-encoding for a compressed body is correct`() = runBlocking {
             assertThat(Body("foo").gzipped().contentEncoding, equalTo("gzip"))
         }
 
         @Test
-        fun `the content-encoding for an unmodified body is correct`() {
+        fun `the content-encoding for an unmodified body is correct`() = runBlocking {
             assertThat(Body.EMPTY.gzipped().contentEncoding, absent())
         }
     }
@@ -38,7 +38,7 @@ class GzipBodyTest {
     @Nested
     inner class StreamingGzip {
         @Test
-        fun `a gzipped body can be decompressed by the standard library`() {
+        fun `a gzipped body can be decompressed by the standard library`() = runBlocking {
             val gzipped = Body("foo").gzippedStream()
 
             val decompressedOutput = InputStreamReader(GZIPInputStream(gzipped.body.stream), Charsets.UTF_8).use {
@@ -49,7 +49,7 @@ class GzipBodyTest {
         }
 
         @Test
-        fun `a large randomised gzipped body can be decompressed by the standard library`() {
+        fun `a large randomised gzipped body can be decompressed by the standard library`() = runBlocking {
             val expectedBody = randomContent(512 * 1024)
             val gzipped = Body(expectedBody).gzippedStream()
 
@@ -69,7 +69,7 @@ class GzipBodyTest {
             }
 
         @Test
-        fun `a body gzipped by the standard library can be decompressed`() {
+        fun `a body gzipped by the standard library can be decompressed`() = runBlocking {
             val compressedBody = ByteArrayOutputStream().run {
                 GZIPOutputStream(this).use { it.write("foo".toByteArray(Charsets.UTF_8)) }
                 Body(ByteBuffer.wrap(toByteArray()))
@@ -81,7 +81,7 @@ class GzipBodyTest {
         }
 
         @Test
-        fun `a empty in-memory body can be decompressed`() {
+        fun `a empty in-memory body can be decompressed`() = runBlocking {
             val compressedBody = Body.EMPTY
 
             val gunzipped = compressedBody.gunzippedStream()
@@ -90,7 +90,7 @@ class GzipBodyTest {
         }
 
         @Test
-        fun `a empty stream body can be decompressed`() {
+        fun `a empty stream body can be decompressed`() = runBlocking {
             val compressedBody = Body("".byteInputStream(Charsets.UTF_8))
 
             val gunzipped = compressedBody.gunzippedStream()
@@ -99,28 +99,28 @@ class GzipBodyTest {
         }
 
         @Test
-        fun `a round-trip of an empty body works`() {
+        fun `a round-trip of an empty body works`() = runBlocking {
             assertThat(Body.EMPTY.gzippedStream().body.gunzippedStream(), equalTo(Body.EMPTY))
         }
 
         @Test
-        fun `a round-trip of a memory body works`() {
+        fun `a round-trip of a memory body works`() = runBlocking {
             assertThat(Body("foo").gzippedStream().body.gunzippedStream(), equalTo(Body("foo")))
         }
 
         @Test
-        fun `a round-trip of a streaming body works`() {
+        fun `a round-trip of a streaming body works`() = runBlocking {
             assertThat(Body("foo".byteInputStream(Charsets.UTF_8)).gzippedStream().body.gunzippedStream().payload,
                 equalTo(Body("foo").payload))
         }
 
         @Test
-        fun `the content-encoding for a compressed body is correct`() {
+        fun `the content-encoding for a compressed body is correct`() = runBlocking {
             assertThat(Body("foo".byteInputStream(Charsets.UTF_8)).gzippedStream().contentEncoding, equalTo("gzip"))
         }
 
         @Test
-        fun `the content-encoding for an unmodified body is correct`() {
+        fun `the content-encoding for an unmodified body is correct`() = runBlocking {
             assertThat(Body("".byteInputStream(Charsets.UTF_8)).gzipped().contentEncoding, absent())
         }
     }

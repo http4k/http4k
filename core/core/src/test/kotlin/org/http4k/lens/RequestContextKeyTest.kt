@@ -17,7 +17,7 @@ class RequestContextKeyTest {
     private val request = contexts(RequestContext(UUID.randomUUID()), Request(GET, ""))
 
     @Test
-    fun `required key behaviour`() {
+    fun `required key behaviour`() = runBlocking {
         val key = RequestContextKey.required<String>(contexts)
         assertThat({ key(request) }, throws(targetIsA<RequestContext>()))
         key("hello", request)
@@ -25,7 +25,7 @@ class RequestContextKeyTest {
     }
 
     @Test
-    fun `optional key behaviour`() {
+    fun `optional key behaviour`() = runBlocking {
         val key = RequestContextKey.optional<String>(contexts)
         assertThat(key(request), absent())
         key("hello", request)
@@ -33,7 +33,7 @@ class RequestContextKeyTest {
     }
 
     @Test
-    fun `defaulted key behaviour`() {
+    fun `defaulted key behaviour`() = runBlocking {
         val key = RequestContextKey.defaulted(contexts, "world")
         assertThat(key(request), equalTo("world"))
         key("hello", request)

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 class ApplicationLoadBalancerHttpAdapterTest {
 
     @Test
-    fun `converts into http4k request`() {
+    fun `converts into http4k request`() = runBlocking {
         val request = mapOf(
             "path" to "/path",
             "queryStringParameters" to mapOf("query" to "value"),
@@ -35,7 +35,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
     }
 
     @Test
-    fun `handles binary data`() {
+    fun `handles binary data`() = runBlocking {
         val imageBytes = this::class.java.getResourceAsStream("/test.png").readBytes()
 
         val request = mapOf(
@@ -53,7 +53,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
     }
 
     @Test
-    fun `converts into http4k request when body is base 64 encoded`() {
+    fun `converts into http4k request when body is base 64 encoded`() = runBlocking {
         val request = mapOf(
             "path" to "/path",
             "queryStringParameters" to mapOf("query" to "value"),
@@ -73,7 +73,7 @@ class ApplicationLoadBalancerHttpAdapterTest {
     }
 
     @Test
-    fun `converts from http4k response`() {
+    fun `converts from http4k response`() = runBlocking {
         assertThat(
             ApplicationLoadBalancerAwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")

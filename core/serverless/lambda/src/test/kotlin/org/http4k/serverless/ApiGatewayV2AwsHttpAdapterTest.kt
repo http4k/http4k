@@ -23,7 +23,7 @@ import java.nio.ByteBuffer
 class ApiGatewayV2AwsHttpAdapterTest {
 
     @Test
-    fun `converts into http4k request`() {
+    fun `converts into http4k request`() = runBlocking {
         val inputCookie = Cookie("name", "value")
         val inputCookie2 = Cookie("name1", "value1")
 
@@ -47,7 +47,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
     }
 
     @Test
-    fun `handles binary data`() {
+    fun `handles binary data`() = runBlocking {
         val imageBytes = this::class.java.getResourceAsStream("/test.png").readBytes()
 
         val request = mapOf(
@@ -65,7 +65,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
     }
 
     @Test
-    fun `converts into http4k request when body is base 64 encoded`() {
+    fun `converts into http4k request when body is base 64 encoded`() = runBlocking {
         val inputCookie = Cookie("name", "value")
         val inputCookie2 = Cookie("name1", "value1")
 
@@ -90,7 +90,7 @@ class ApiGatewayV2AwsHttpAdapterTest {
     }
 
     @Test
-    fun `converts from http4k response`() {
+    fun `converts from http4k response`() = runBlocking {
         assertThat(
             ApiGatewayV2AwsHttpAdapter(Response(I_M_A_TEAPOT)
                 .header("c", "d")

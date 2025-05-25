@@ -1,6 +1,7 @@
 package org.http4k.bridge
 
 import io.vertx.ext.web.RoutingContext
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 
 /**
@@ -8,6 +9,8 @@ import org.http4k.core.HttpHandler
  */
 fun VertxToHttp4kHandler(http: HttpHandler): (RoutingContext) -> Unit = { ctx ->
     ctx.request().asHttp4k()
-        .map(http)
+        .map {
+            runBlocking { http(it) } // FIXME coroutine blocking
+        }
         .map { it.into(ctx.response()) }
 }

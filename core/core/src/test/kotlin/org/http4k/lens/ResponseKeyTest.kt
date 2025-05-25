@@ -21,12 +21,12 @@ class ResponseKeyTest {
     private val response = ResponseWithContext(Response(OK), mapOf("hello" to "world"))
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(ResponseKey.of<String>("hello")(response), equalTo("world"))
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         val requiredResponseKey = ResponseKey.of<String>("world")
         assertThat(
             { requiredResponseKey(response) },
@@ -35,14 +35,14 @@ class ResponseKeyTest {
     }
 
     @Test
-    fun `sets value on response`() {
+    fun `sets value on response`() = runBlocking {
         val key = ResponseKey.of<String>("bob")
         val withResponseKey = response.with(key of "hello")
         assertThat(key(withResponseKey), equalTo("hello"))
     }
 
     @Test
-    fun `context value makes it through routing`() {
+    fun `context value makes it through routing`() = runBlocking {
         val app: HttpHandler =
             routes("" bind GET to { req: Request -> Response(OK).with(ResponseKey.of<String>("foo") of "bar") })
         val resp = Filter { next ->

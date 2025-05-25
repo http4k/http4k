@@ -10,7 +10,7 @@ class FormFieldTest {
     private val form = WebForm(mapOf("hello" to listOf("world", "world2")), emptyList())
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(FormField.optional("hello")(form), equalTo("world"))
         assertThat(FormField.required("hello")(form), equalTo("world"))
         assertThat(FormField.map { it.length }.required("hello")(form), equalTo(5))
@@ -22,7 +22,7 @@ class FormFieldTest {
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         assertThat(FormField.optional("world")(form), absent())
         val requiredFormField = FormField.required("world")
         assertThat({ requiredFormField(form) }, throws(lensFailureWith<WebForm>(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
@@ -33,7 +33,7 @@ class FormFieldTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = FormField.required("world")
         assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
 
@@ -43,7 +43,7 @@ class FormFieldTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val requiredFormField = FormField.map(String::toInt).required("hello")
         assertThat({ requiredFormField(form) }, throws(lensFailureWith<WebForm>(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
 
@@ -58,14 +58,14 @@ class FormFieldTest {
     }
 
     @Test
-    fun `sets value on form`() {
+    fun `sets value on form`() = runBlocking {
         val formField = FormField.required("bob")
         val withFormField = formField("hello", form)
         assertThat(formField(withFormField), equalTo("hello"))
     }
 
     @Test
-    fun `can create a custom type and get and set on request`() {
+    fun `can create a custom type and get and set on request`() = runBlocking {
         val custom = FormField.map(::MyCustomType, { it.value }).required("bob")
 
         val instance = MyCustomType("hello world!")
@@ -77,7 +77,7 @@ class FormFieldTest {
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(FormField.required("hello").toString(), equalTo("Required formData 'hello'"))
         assertThat(FormField.optional("hello").toString(), equalTo("Optional formData 'hello'"))
         assertThat(FormField.multi.required("hello").toString(), equalTo("Required formData 'hello'"))

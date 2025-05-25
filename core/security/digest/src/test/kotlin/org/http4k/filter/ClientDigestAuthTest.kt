@@ -23,7 +23,7 @@ class ClientDigestAuthTest {
     private val nonceGenerator = { nextNonce }
 
     @Test
-    fun `ignore if no challenge`() {
+    fun `ignore if no challenge`() = runBlocking {
         // handler returns Authorization header as body
         val handler: HttpHandler = { Response(OK).body(it.header("Authorization") ?: "") }
 
@@ -35,7 +35,7 @@ class ClientDigestAuthTest {
     }
 
     @Test
-    fun `ignore if 401 with no challenge`() {
+    fun `ignore if 401 with no challenge`() = runBlocking {
         // handler returns Authorization header as body
         val handler: HttpHandler = { Response(UNAUTHORIZED).body(it.header("Authorization") ?: "") }
 
@@ -47,7 +47,7 @@ class ClientDigestAuthTest {
     }
 
     @Test
-    fun `respond to challenge and verify digest`() {
+    fun `respond to challenge and verify digest`() = runBlocking {
         val handler: HttpHandler = { request ->
             if (request.header("Authorization") == null) {
                 // if no authorization given, present challenge

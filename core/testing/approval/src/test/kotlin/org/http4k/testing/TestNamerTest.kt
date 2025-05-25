@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class TestNamerTest {
 
     @Test
-    fun `method only`() {
+    fun `method only`() = runBlocking {
         assertThat(
             MethodOnly.nameFor(javaClass, javaClass.getMethod("method only")),
             equalTo("org/http4k/testing/method only")
@@ -18,7 +18,7 @@ class TestNamerTest {
     }
 
     @Test
-    fun `class and method`() {
+    fun `class and method`() = runBlocking {
         assertThat(
             ClassAndMethod.nameFor(javaClass, javaClass.getMethod("class and method")),
             equalTo("org/http4k/testing/TestNamerTest.class and method")
@@ -26,7 +26,7 @@ class TestNamerTest {
     }
 
     @Test
-    fun `class dir and method`() {
+    fun `class dir and method`() = runBlocking {
         assertThat(
             ClassDirAndMethod.nameFor(javaClass, javaClass.getMethod("class dir and method")),
             equalTo("org/http4k/testing/TestNamerTest/class dir and method")

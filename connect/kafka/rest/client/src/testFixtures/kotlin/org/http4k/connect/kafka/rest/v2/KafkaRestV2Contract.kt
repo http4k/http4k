@@ -59,19 +59,19 @@ interface KafkaRestV2Contract {
     private val kafkaRest get() = KafkaRest.Http(Credentials("", ""), uri, http)
 
     @BeforeEach
-    fun `can get to proxy v2`() {
+    fun `can get to proxy v2`() = runBlocking {
         assumeTrue(http(Request(GET, uri)).status == OK)
     }
 
     @Test
-    fun `can send JSON messages and get them back`() {
+    fun `can send JSON messages and get them back`() = runBlocking {
         kafkaRest.testSending(json, { it.records.first() }) {
             Records.Json(listOf(Record(it, Message(randomString()))))
         }
     }
 
     @Test
-    open fun `can send AVRO messages and get them back`() {
+    open fun `can send AVRO messages and get them back`() = runBlocking {
         kafkaRest.testSending(
             avro,
             { it.records.first() },
@@ -94,14 +94,14 @@ interface KafkaRestV2Contract {
     }
 
     @Test
-    fun `can send BINARY messages and get them back`() {
+    fun `can send BINARY messages and get them back`() = runBlocking {
         kafkaRest.testSending(binary, { it.records.first() }) {
             Records.Binary(listOf(Record(Base64Blob.encode(it), Base64Blob.encode(randomString()))))
         }
     }
 
     @Test
-    fun `can create consumer client`() {
+    fun `can create consumer client`() = runBlocking {
         val topic1 = Topic.of("t1_${randomString()}")
 
         val group = ConsumerGroup.of(randomString())
@@ -134,7 +134,7 @@ interface KafkaRestV2Contract {
     }
 
     @Test
-    fun `can manually commit consumer offsets for group`() {
+    fun `can manually commit consumer offsets for group`() = runBlocking {
         val topic1 = Topic.of("t1_${randomString()}")
 
         val group = ConsumerGroup.of(randomString())
@@ -245,7 +245,7 @@ interface KafkaRestV2Contract {
     }
 
     @Test
-    fun `can seek back to earlier next point`() {
+    fun `can seek back to earlier next point`() = runBlocking {
         val topic1 = Topic.of("t1_${randomString()}")
 
         val group = ConsumerGroup.of(randomString())

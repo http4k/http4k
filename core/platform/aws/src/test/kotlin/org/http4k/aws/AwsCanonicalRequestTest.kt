@@ -20,7 +20,7 @@ class AwsCanonicalRequestTest {
         CanonicalPayload(HmacSha256.hash(Body.EMPTY.payload.array()), Body.EMPTY.payload.array().size.toLong())
 
     @Test
-    fun `creates canonical version of simple request`() {
+    fun `creates canonical version of simple request`() = runBlocking {
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a/b").query("foo", "bar").header("abc", "def"), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
 /a/b
@@ -32,7 +32,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `creates canonical version of request with null parameter`() {
+    fun `creates canonical version of request with null parameter`() = runBlocking {
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a/b").query("foo", null), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
 /a/b
@@ -44,7 +44,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `normalises path`() {
+    fun `normalises path`() = runBlocking {
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/a%3Ab%3Ac/d%20e/%2Af/~g"), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
 /a%3Ab%3Ac/d%20e/%2Af/~g
@@ -56,7 +56,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `normalises path without leading slash`() {
+    fun `normalises path without leading slash`() = runBlocking {
         val withLeadingSlash =
             AwsCanonicalRequest.of(Request(GET, Uri.of("http://www.google.com/foo")), canonicalPayload)
         val withoutLeadingSlash =
@@ -66,7 +66,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `normalises short path`() {
+    fun `normalises short path`() = runBlocking {
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com/"), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
 /
@@ -78,7 +78,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `normalises empty path`() {
+    fun `normalises empty path`() = runBlocking {
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com"), canonicalPayload)
         assertThat(canonical.value, equalTo("""GET
 /
@@ -90,7 +90,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `generates payload hash of binary body`() {
+    fun `generates payload hash of binary body`() = runBlocking {
         val image = this::class.java.getResourceAsStream("/test.png").readBytes()
         val body = Body(ByteBuffer.wrap(image))
         val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com").body(body), CanonicalPayload(HmacSha256.hash(body.payload.array()), body.payload.array().size.toLong()))
@@ -104,7 +104,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
 
     @Test
-    fun `converts headers to canonical form`() {
+    fun `converts headers to canonical form`() = runBlocking {
         val request = Request(GET, "http://www.google.com/")
             .header("duplicate", "a")
             .header("duplicate", "b")

@@ -16,12 +16,12 @@ class ApprovalContentTest {
         .body("hello")
 
     @Test
-    fun `body only`() {
+    fun `body only`() = runBlocking {
         assertThat(HttpTextBody()(input).reader().use { it.readText() }, equalTo("hello"))
     }
 
     @Test
-    fun `body in message only`() {
+    fun `body in message only`() = runBlocking {
         assertThat(
             HttpTextMessage { it.reversed() }(input).reader().use { it.readText() }, equalTo(
                 "HTTP/1.1 200 OK\r\n" +
@@ -33,12 +33,12 @@ class ApprovalContentTest {
     }
 
     @Test
-    fun `body only with formatter`() {
+    fun `body only with formatter`() = runBlocking {
         assertThat(HttpTextBody { it.reversed() }(input).reader().use { it.readText() }, equalTo("olleh"))
     }
 
     @Test
-    fun `entire message`() {
+    fun `entire message`() = runBlocking {
         assertThat(
             EntireHttpMessage()(input).reader().use { it.readText() }, equalTo(
                 ("HTTP/1.1 200 OK\r\n" +

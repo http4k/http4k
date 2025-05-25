@@ -10,6 +10,7 @@ import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier.SUSPEND
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
@@ -96,6 +97,7 @@ private fun generateExtensionFunction(
 ): FunSpec {
     val baseFunction = FunSpec.builder(
         actionClazz.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) } + suffix)
+        .addModifiers(SUSPEND)
         .addKdoc("@see ${actionClazz.qualifiedName!!.asString().replace('/', '.')}")
         .receiver(adapterClazz.toClassName())
         .returns(returnType)

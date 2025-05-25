@@ -18,7 +18,7 @@ abstract class MattermostContract {
     }
 
     @Test
-    fun `can trigger webhook`() {
+    fun `can trigger webhook`() = runBlocking {
         assertThat(
             mattermost.triggerWebhook(UUID.randomUUID().toString(), TriggerWebhookPayload(text = "Hello world !")),
             equalTo(Success("ok"))

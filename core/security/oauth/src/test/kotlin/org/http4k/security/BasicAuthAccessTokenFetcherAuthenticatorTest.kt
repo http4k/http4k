@@ -18,7 +18,7 @@ class BasicAuthAccessTokenFetcherAuthenticatorTest {
     val provider = OAuthProviderConfig(Uri.of("irrelevant"), "/", "/path", credentials)
 
     @Test
-    fun `sends credentials as expected`() {
+    fun `sends credentials as expected`() = runBlocking {
         val authenticator = BasicAuthAccessTokenFetcherAuthenticator(provider)
         val server = ServerFilters.BasicAuth("irrelevant", credentials).then { Response(OK) }
 
@@ -26,7 +26,7 @@ class BasicAuthAccessTokenFetcherAuthenticatorTest {
     }
 
     @Test
-    fun `invalid credentials`() {
+    fun `invalid credentials`() = runBlocking {
         val authenticator = BasicAuthAccessTokenFetcherAuthenticator(provider)
         val server = ServerFilters.BasicAuth("irrelevant", Credentials("something", "else")).then { Response(OK) }
 

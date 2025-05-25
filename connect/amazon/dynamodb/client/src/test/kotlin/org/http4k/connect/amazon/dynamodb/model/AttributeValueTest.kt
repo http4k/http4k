@@ -9,7 +9,7 @@ import java.math.BigDecimal
 class AttributeValueTest {
 
     @Test
-    fun `int = decimal for N`() {
+    fun `int = decimal for N`() = runBlocking {
         val int = AttributeValue.Num(123)
         val decimal = AttributeValue.Num(BigDecimal("123.0"))
 
@@ -17,7 +17,7 @@ class AttributeValueTest {
     }
 
     @Test
-    fun `int = decimal in NS`() {
+    fun `int = decimal in NS`() = runBlocking {
         val intSet = AttributeValue.NumSet(setOf(123))
         val decimalSet = AttributeValue.NumSet(setOf(BigDecimal("123.0")))
 
@@ -25,7 +25,7 @@ class AttributeValueTest {
     }
 
     @Test
-    fun `comparing numbers not done lexicographically`() {
+    fun `comparing numbers not done lexicographically`() = runBlocking {
         val higher = AttributeValue.Num(123)
         val lower = AttributeValue.Num(45)
 

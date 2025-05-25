@@ -16,7 +16,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     ) : Base()
 
     @Test
-    fun `extract description from annotated field`() {
+    fun `extract description from annotated field`() = runBlocking {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "someField"),
             equalTo(FieldMetadata(mapOf("description" to "Some Field Description")))
@@ -24,7 +24,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     }
 
     @Test
-    fun `extract description from annotated field in base class`() {
+    fun `extract description from annotated field in base class`() = runBlocking {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "parentField"),
             equalTo(FieldMetadata(mapOf("description" to "Parent Field Description")))
@@ -32,7 +32,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     }
 
     @Test
-    fun `returns empty value when field is not annotated`() {
+    fun `returns empty value when field is not annotated`() = runBlocking {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "fieldWithoutMeta"),
             equalTo(FieldMetadata.empty)
@@ -40,7 +40,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     }
 
     @Test
-    fun `returns empty value when field is not found`() {
+    fun `returns empty value when field is not found`() = runBlocking {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(Model(), "unknownField"),
             equalTo(FieldMetadata.empty)
@@ -68,7 +68,7 @@ class JacksonFieldMetadataRetrievalStrategyTest {
     }
 
     @Test
-    fun `extract description when multiple constructors are present`() {
+    fun `extract description when multiple constructors are present`() = runBlocking {
         assertThat(
             JacksonFieldMetadataRetrievalStrategy(ModelWithMultipleConstructors(""), "describedField"),
             equalTo(FieldMetadata(mapOf("description" to "My description")))

@@ -18,7 +18,7 @@ interface ContainerCredentialsContract : AwsContract {
     val fullUri: Uri
 
     @Test
-    fun `get credentials`() {
+    fun `get credentials`() = runBlocking {
         val result = containerCredentials.getCredentials(fullUri)
 
         assertTrue(

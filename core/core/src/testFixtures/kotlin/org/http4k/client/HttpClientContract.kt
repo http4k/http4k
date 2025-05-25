@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -48,17 +49,19 @@ abstract class HttpClientContract(
 ) : AbstractHttpClientContract(serverConfig) {
 
     @Test
-    open fun `can forward response body to another request`() {
+    open fun `can forward response body to another request`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/stream"))
         val echoResponse = client(Request(POST, "http://localhost:$port/echo").body(response.body))
         assertThat(echoResponse.bodyString(), equalTo("stream"))
     }
 
     @Test
-    fun `can make call`() {
-        val response = client(Request(POST, "http://localhost:$port/someUri")
-            .query("query", "123")
-            .header("header", "value").body("body"))
+    fun `can make call`() = runBlocking {
+        val response = client(
+            Request(POST, "http://localhost:$port/someUri")
+                .query("query", "123")
+                .header("header", "value").body("body")
+        )
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("uri"), equalTo("/someUri?query=123"))
@@ -68,7 +71,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `performs simple GET request`() {
+    fun `performs simple GET request`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/echo").query("name", "John Doe 12:34"))
 
         assertThat(response.status, equalTo(OK))
@@ -76,7 +79,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `performs simple POST request`() {
+    fun `performs simple POST request`() = runBlocking {
         val response = client(Request(POST, "http://localhost:$port/echo").body("foobar"))
 
         assertThat(response.status, equalTo(OK))
@@ -84,7 +87,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    open fun `performs simple POST request - stream`() {
+    open fun `performs simple POST request - stream`() = runBlocking {
         val response = client(Request(POST, "http://localhost:$port/echo").body("foobar".byteInputStream(), 6))
 
         assertThat(response.status, equalTo(OK))
@@ -92,7 +95,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `performs simple DELETE request`() {
+    fun `performs simple DELETE request`() = runBlocking {
 
         val response = client(Request(DELETE, "http://localhost:$port/echo"))
 
@@ -101,7 +104,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `does not follow redirects`() {
+    fun `does not follow redirects`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/redirect"))
 
         assertThat(response.status, equalTo(FOUND))
@@ -109,7 +112,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `does not store cookies`() {
+    fun `does not store cookies`() = runBlocking {
         client(Request(GET, "http://localhost:$port/cookies-set").query("name", "foo").query("value", "bar"))
 
         val response = client(Request(GET, "http://localhost:$port/cookies"))
@@ -119,24 +122,26 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `filters enable cookies and redirects`() {
+    fun `filters enable cookies and redirects`() = runBlocking {
         val enhancedClient = ClientFilters.FollowRedirects().then(ClientFilters.Cookies()).then(client)
 
-        val response = enhancedClient(Request(GET, "http://localhost:$port/cookies-set").query("name", "foo").query("value", "bar"))
+        val response = enhancedClient(
+            Request(GET, "http://localhost:$port/cookies-set").query("name", "foo").query("value", "bar")
+        )
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), containsSubstring("foo"))
     }
 
     @Test
-    fun `empty body`() {
+    fun `empty body`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/empty"))
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), equalTo(""))
     }
 
     @Test
-    fun `redirection response`() {
+    fun `redirection response`() = runBlocking {
         val response = ClientFilters.FollowRedirects()
             .then(client)(Request(GET, "http://localhost:$port/relative-redirect").query("times", "5"))
         assertThat(response.status, equalTo(OK))
@@ -144,42 +149,43 @@ abstract class HttpClientContract(
     }
 
     @Test
-    open fun `send binary data`() {
-        val response = client(Request(POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
+    open fun `send binary data`() = runBlocking {
+        val response =
+            client(Request(POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
         assertThat(response.bodyString(), equalTo(""))
         assertThat(response.status, equalTo(OK))
     }
 
     @OptIn(ExperimentalEncodingApi::class)
     @Test
-    open fun `download binary data`() {
+    open fun `download binary data`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/image"))
         assertThat(Base64.encode(response.body.payload.array()), equalTo(Base64.encode(testImageBytes())))
     }
 
     @Test
-    open fun `socket timeouts are converted into 504`() {
+    open fun `socket timeouts are converted into 504`() = runBlocking {
         val response = timeoutClient(Request(GET, "http://localhost:$port/delay?millis=150"))
 
         assertThat(response.status, equalTo(CLIENT_TIMEOUT))
     }
 
     @Test
-    open fun `connection refused are converted into 503`() {
+    open fun `connection refused are converted into 503`() = runBlocking {
         val response = client(Request(GET, "http://localhost:1"))
 
         assertThat(response.status, equalTo(CONNECTION_REFUSED))
     }
 
     @Test
-    open fun `unknown host are converted into 503`() {
+    open fun `unknown host are converted into 503`() = runBlocking {
         val response = client(Request(GET, "http://foobar.bill"))
 
         assertThat(response.status, equalTo(UNKNOWN_HOST))
     }
 
     @Test
-    fun `can retrieve body for different statuses`() {
+    fun `can retrieve body for different statuses`() = runBlocking {
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status").query("status", statusCode.toString()))
             assertThat(response.status, equalTo(Status(statusCode, "")))
@@ -188,7 +194,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    open fun `handles response with custom status message`() {
+    open fun `handles response with custom status message`() = runBlocking {
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status").query("status", statusCode.toString()))
             response.use {
@@ -198,17 +204,18 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `handles empty response body for different statuses`() {
+    fun `handles empty response body for different statuses`() = runBlocking {
         listOf(200, 301, 400, 404, 500).forEach { statusCode ->
-            val response = client(Request(GET, "http://localhost:$port/status-no-body").query("status", statusCode.toString()))
+            val response =
+                client(Request(GET, "http://localhost:$port/status-no-body").query("status", statusCode.toString()))
             assertThat(response.status, equalTo(Status(statusCode, "")))
             assertThat(response.bodyString(), equalTo(""))
         }
     }
 
     @Test
-    fun `requests have expected headers`() {
-        fun checkNoBannedHeaders(m: Method, vararg banned: String) {
+    fun `requests have expected headers`() = runBlocking {
+        suspend fun checkNoBannedHeaders(m: Method, vararg banned: String) {
             val response = client(Request(m, "http://localhost:$port/headers"))
             val bannedHeaders = banned.intersect(response.bodyString().split(","))
             assertThat("$m contained banned headers $bannedHeaders", bannedHeaders.isEmpty(), equalTo(true))
@@ -223,42 +230,50 @@ abstract class HttpClientContract(
     }
 
     @Test
-    open fun `can send multiple headers with same name`() {
-        val response = client(Request(POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo").header("echo", "bar"))
+    open fun `can send multiple headers with same name`() = runBlocking {
+        val response = client(
+            Request(POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo").header("echo", "bar")
+        )
 
         assertThat(response, hasBody("echo: bar\necho: foo"))
     }
 
     @Test
-    open fun `can receive multiple headers with same name`() {
+    open fun `can receive multiple headers with same name`() = runBlocking {
         val response = client(Request(POST, "http://localhost:$port/multiResponseHeader"))
 
         assertThat(response.headerValues("serverHeader").toSet(), equalTo(setOf("foo", "bar")))
     }
 
     @Test
-    open fun `can send multiple cookies`() {
-        val response = client(Request(POST, "http://localhost:$port/multiRequestCookies").cookie(Cookie("foo", "vfoo")).cookie(Cookie("bar", "vbar")))
+    open fun `can send multiple cookies`() = runBlocking {
+        val response = client(
+            Request(POST, "http://localhost:$port/multiRequestCookies").cookie(Cookie("foo", "vfoo"))
+                .cookie(Cookie("bar", "vbar"))
+        )
 
         assertThat(response, hasBody("bar: vbar\nfoo: vfoo"))
     }
 
     @Test
-    open fun `can receive multiple cookies`() {
+    open fun `can receive multiple cookies`() = runBlocking {
         val response = client(Request(POST, "http://localhost:$port/multiResponseCookies"))
 
-        assertThat(response.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" }, equalTo("bar: vbar\nfoo: vfoo"))
+        assertThat(
+            response.cookies().sortedBy(Cookie::name).joinToString("\n") { "${it.name}: ${it.value}" },
+            equalTo("bar: vbar\nfoo: vfoo")
+        )
     }
 
     @Test
-    open fun `unhandled exceptions converted into 500`() {
+    open fun `unhandled exceptions converted into 500`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/boom"))
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
     }
 
     @Test
-    open fun `unknown host is correctly reported`() {
+    open fun `unknown host is correctly reported`() = runBlocking {
         val response = client(Request(GET, "http://reallynotarealserver.bob"))
 
         assertThat(response.status.code, equalTo(SERVICE_UNAVAILABLE.code))
@@ -266,55 +281,59 @@ abstract class HttpClientContract(
     }
 
     @Test
-    open fun `fails with no protocol`() {
+    open fun `fails with no protocol`() = runBlocking {
         assertThat(
-            { client(Request(GET, "/boom").header("host", "localhost:$port")) }, throws<Exception>()
+            { suspend { client(Request(GET, "/boom").header("host", "localhost:$port")) } }, throws<Exception>()
         )
     }
 
     @Test
-    fun `host header not abusable`() {
+    fun `host header not abusable`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/hostheaders").header("host", "foobar:$port"))
         assertThat(response.bodyString(), !containsSubstring("foobar").and(containsSubstring(",")))
     }
 
     @Test
-    open fun `supports query parameter list`() {
+    open fun `supports query parameter list`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/echo").query("p1", "foo").query("p1", "bar"))
         val uriFromResponse = Uri.of(response.bodyString())
         assertThat(uriFromResponse.queries(), equalTo(listOf("p1" to "foo", "p1" to "bar")))
     }
 
     @Test
-    open fun `supports zero content-length`() {
+    open fun `supports zero content-length`() = runBlocking {
         val response = client(Request(PUT, "http://localhost:$port/headerValues").header("content-length", "0"))
         assertThat(response.bodyString().lowercase(), containsSubstring("content-length=0"))
     }
 
     @Test
-    open fun `supports explicit content-length`() {
-        val response = client(Request(PUT, "http://localhost:$port/headerValues")
-            .header("content-length", "3")
-            .body("foo"))
+    open fun `supports explicit content-length`() = runBlocking {
+        val response = client(
+            Request(PUT, "http://localhost:$port/headerValues")
+                .header("content-length", "3")
+                .body("foo")
+        )
         assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
     }
 
     @Test
-    open fun `supports content-length set in body`() {
-        val response = client(Request(PUT, "http://localhost:$port/headerValues")
-            .body(StreamBody("foo".byteInputStream(), 3)))
+    open fun `supports content-length set in body`() = runBlocking {
+        val response = client(
+            Request(PUT, "http://localhost:$port/headerValues")
+                .body(StreamBody("foo".byteInputStream(), 3))
+        )
         assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
     }
 
     @Test
-    open fun `includes content-length for regular requests`() {
+    open fun `includes content-length for regular requests`() = runBlocking {
         val response = client(Request(PUT, "http://localhost:$port/headerValues").body("foo"))
         assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
     }
 
     @Test
     @Disabled
-    fun `sanitises uri`() {
+    fun `sanitises uri`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/encoded-uri/foo, bar & baz!"))
         assertThat(response.bodyString(), equalTo("foo, bar & baz!"))
     }

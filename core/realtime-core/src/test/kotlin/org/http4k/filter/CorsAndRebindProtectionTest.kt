@@ -45,7 +45,7 @@ class CorsAndRebindProtectionTest {
     private val httpHandler = protectedPolyHandler.http!!
 
     @Test
-    fun `allows HTTP requests with valid origin`() {
+    fun `allows HTTP requests with valid origin`() = runBlocking {
         val request = Request(GET, "/api")
             .header("Origin", allowedOrigin)
 
@@ -56,7 +56,7 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `allows HTTP requests with no origin header`() {
+    fun `allows HTTP requests with no origin header`() = runBlocking {
         val request = Request(GET, "/api")
 
         val response = httpHandler(request)
@@ -66,7 +66,7 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `handles preflight requests correctly`() {
+    fun `handles preflight requests correctly`() = runBlocking {
         val request = Request(OPTIONS, "/api")
             .header("Origin", allowedOrigin)
             .header("Access-Control-Request-Method", "POST")
@@ -81,7 +81,7 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `blocks HTTP requests with disallowed origin`() {
+    fun `blocks HTTP requests with disallowed origin`() = runBlocking {
         val request = Request(GET, "/api")
             .header("Origin", disallowedOrigin)
 
@@ -94,7 +94,7 @@ class CorsAndRebindProtectionTest {
     private val sseHandler = protectedPolyHandler.sse!!
 
     @Test
-    fun `allows SSE requests with valid origin`() {
+    fun `allows SSE requests with valid origin`() = runBlocking {
         val request = Request(GET, "/sse")
             .header("Origin", allowedOrigin)
 
@@ -104,7 +104,7 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `blocks SSE requests with disallowed origin`() {
+    fun `blocks SSE requests with disallowed origin`() = runBlocking {
         val request = Request(GET, "/sse")
             .header("Origin", disallowedOrigin)
 
@@ -114,7 +114,7 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `blocks SSE requests with missing origin header`() {
+    fun `blocks SSE requests with missing origin header`() = runBlocking {
         val request = Request(GET, "/sse")
 
         val response = sseHandler(request)
@@ -123,7 +123,7 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `can be composed with other poly filters`() {
+    fun `can be composed with other poly filters`() = runBlocking {
         val loggingFilter = PolyFilter { next ->
             PolyHandler(
                 http = next.http?.let { http -> { req: Request -> http(req) } },

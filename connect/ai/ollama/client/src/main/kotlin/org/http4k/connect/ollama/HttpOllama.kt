@@ -11,5 +11,5 @@ fun Ollama.Companion.Http(http: HttpHandler = JavaHttpClient()) = object : Ollam
     private val routedHttp = SetBaseUriFrom(Uri.of("http://localhost:11434"))
         .then(http)
 
-    override fun <R> invoke(action: OllamaAction<R>) = action.toResult(routedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: OllamaAction<R>) = action.toResult(routedHttp(action.toRequest()))
 }

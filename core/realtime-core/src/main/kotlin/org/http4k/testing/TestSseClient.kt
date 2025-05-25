@@ -45,8 +45,8 @@ class TestSseClient internal constructor(sseResponse: SseResponse, request: Requ
     }
 }
 
-fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request), request)
-fun PolyHandler.testSseClient(request: Request): TestSseClient =
+suspend fun SseHandler.testSseClient(request: Request): TestSseClient = TestSseClient(invoke(request), request)
+suspend fun PolyHandler.testSseClient(request: Request): TestSseClient =
     sse?.testSseClient(request) ?: error("No SSE handler set.")
 
 /**

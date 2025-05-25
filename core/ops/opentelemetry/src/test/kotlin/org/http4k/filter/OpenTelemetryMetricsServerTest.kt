@@ -10,6 +10,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.metrics.data.MetricData
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -63,7 +64,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `routes with timer generate request timing metrics tagged with path and method and status`() {
+    fun `routes with timer generate request timing metrics tagged with path and method and status`() = runBlocking {
         assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
         repeat(2) {
             assertThat(server(Request(POST, "/timed/two/bob")), (hasStatus(OK) and hasBody("bob")))
@@ -97,7 +98,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `routes with counter generate request count metrics tagged with path and method and status`() {
+    fun `routes with counter generate request count metrics tagged with path and method and status`() = runBlocking {
         assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
         repeat(2) {
             assertThat(server(Request(POST, "/counted/two/bob")), (hasStatus(OK) and hasBody("bob")))
@@ -128,7 +129,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `routes without metrics generate nothing`() {
+    fun `routes without metrics generate nothing`() = runBlocking {
         assertThat(server(Request(GET, "/unmetered/one")), hasStatus(OK))
         assertThat(server(Request(DELETE, "/unmetered/two")), hasStatus(INTERNAL_SERVER_ERROR))
 
@@ -141,7 +142,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `request timer meter names and request id formatter can be configured`() {
+    fun `request timer meter names and request id formatter can be configured`() = runBlocking {
         requestTimer = ServerFilters.OpenTelemetryMetrics.RequestTimer(
             name = "custom.requests",
             description = "custom.description",
@@ -162,7 +163,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `request counter meter names and request id formatter can be configured`() {
+    fun `request counter meter names and request id formatter can be configured`() = runBlocking {
         requestCounter = ServerFilters.OpenTelemetryMetrics.RequestCounter(
             name = "custom.requests2",
             description = "custom.description",
@@ -181,7 +182,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
+    fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() = runBlocking {
         assertThat(server(Request(GET, "/otherTimed/test.json")), hasStatus(OK))
 
         assertThat(
@@ -195,7 +196,7 @@ class OpenTelemetryMetricsServerTest {
     }
 
     @Test
-    fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
+    fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() = runBlocking {
         assertThat(server(Request(GET, "/otherCounted/test.json")), hasStatus(OK))
         assertThat(
             exportMetricsFromOpenTelemetry(),

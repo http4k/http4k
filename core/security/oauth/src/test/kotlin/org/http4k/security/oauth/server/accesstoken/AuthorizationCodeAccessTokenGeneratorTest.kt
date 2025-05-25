@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 
 internal class AuthorizationCodeAccessTokenGeneratorTest {
     @Test
-    fun `grant type=authorization code - can generate request`() {
+    fun `grant type=authorization code - can generate request`() = runBlocking {
         val request = AuthorizationCodeAccessTokenGenerator.extract(
             ClientId("a-client-id"),
             TokenRequest(
@@ -40,7 +40,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
     }
 
     @Test
-    fun `grant type=authorization code - copes with missing redirect uri`() {
+    fun `grant type=authorization code - copes with missing redirect uri`() = runBlocking {
         val error = AuthorizationCodeAccessTokenGenerator.extract(
             ClientId("a-client-id"),
             TokenRequest(
@@ -60,7 +60,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
     }
 
     @Test
-    fun `grant type=authorization code - copes with missing code`() {
+    fun `grant type=authorization code - copes with missing code`() = runBlocking {
         val error = AuthorizationCodeAccessTokenGenerator.extract(
             ClientId("a-client-id"),
             TokenRequest(

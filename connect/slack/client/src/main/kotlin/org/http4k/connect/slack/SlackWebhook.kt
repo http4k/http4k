@@ -6,7 +6,7 @@ import org.http4k.connect.RemoteFailure
 
 @Http4kConnectApiClient
 interface SlackWebhook {
-    operator fun <R> invoke(action: SlackWebhookAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: SlackWebhookAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

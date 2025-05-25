@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 class GoogleCloudHttpFunctionTest {
     @Test
-    fun `calls the handler and returns proper body`() {
+    fun `calls the handler and returns proper body`() = runBlocking {
         val app = { req: Request -> Response(OK).body(req.bodyString()) }
         val request = FakeGCFRequest(Request(GET, "").body("hello gcf"))
         val response = FakeGCFResponse()

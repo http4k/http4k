@@ -46,7 +46,7 @@ class RedirectTest {
     private val driver = Http4kWebDriver(redirectingHandler)
 
     @Test
-    fun `follows redirects and sets cookies`() {
+    fun `follows redirects and sets cookies`() = runBlocking {
         val someOtherCookie = Cookie("foo", "bar")
         val redirectAddedCookie = Cookie(cookieKey, cookieValue)
 
@@ -65,7 +65,7 @@ class RedirectTest {
     }
 
     @Test
-    fun `follows redirects on a refresh`() {
+    fun `follows redirects on a refresh`() = runBlocking {
         redirect = false
         driver.get(startingUrl)
         redirect = true

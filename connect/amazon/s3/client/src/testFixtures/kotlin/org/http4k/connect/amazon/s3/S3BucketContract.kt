@@ -75,13 +75,13 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
-    fun `bucket properties`() {
+    fun `bucket properties`() = runBlocking {
         assertThat(s3Bucket.bucketRegion, equalTo(aws.region))
         assertThat(s3Bucket.bucketName, equalTo(bucket))
     }
 
     @Test
-    fun `bucket key lifecycle`() {
+    fun `bucket key lifecycle`() = runBlocking {
         waitForBucketCreation()
         try {
             assertThat(s3Bucket.headBucket().successValue(), equalTo(Unit))
@@ -136,7 +136,7 @@ interface S3BucketContract : AwsContract {
 
 
     @Test
-    fun `bucket key with non ascii characters`() {
+    fun `bucket key with non ascii characters`() = runBlocking {
         val http = SetXForwardedHost().then(http)
         waitForBucketCreation()
 
@@ -163,7 +163,7 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
-    fun `pre signed request`() {
+    fun `pre signed request`() = runBlocking {
         val http = SetXForwardedHost().then(http)
 
         waitForBucketCreation()
@@ -200,7 +200,7 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
-    fun `glacier lifecycle`() {
+    fun `glacier lifecycle`() = runBlocking {
         waitForBucketCreation()
         val newKey = BucketKey.of("newKey")
         try {
@@ -244,7 +244,7 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
-    fun `glacier instant retrieval lifecycle`() {
+    fun `glacier instant retrieval lifecycle`() = runBlocking {
         waitForBucketCreation()
         try {
             s3Bucket.putObject(key, "lukewarmStuff".byteInputStream(), storageClass = StorageClass.GLACIER_IR)
@@ -265,7 +265,7 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
-    fun `glacier deep archive lifecycle`() {
+    fun `glacier deep archive lifecycle`() = runBlocking {
         waitForBucketCreation()
         val newKey = BucketKey.of("newKey")
         try {
@@ -285,7 +285,7 @@ interface S3BucketContract : AwsContract {
     }
 
     @Test
-    fun `tag lifecycle`() {
+    fun `tag lifecycle`() = runBlocking {
         waitForBucketCreation()
 
         try {

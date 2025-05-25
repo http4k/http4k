@@ -22,7 +22,7 @@ interface SlackContract {
     val channelId: ChannelId
 
     @Test
-    fun `can post message to slack`() {
+    fun `can post message to slack`() = runBlocking {
         val slack = Slack.Http({ SlackToken.of("token") }, http.debug())
 
         val message = SlackMessage("message", channel = channelId)
@@ -32,7 +32,7 @@ interface SlackContract {
     }
 
     @Test
-    fun `can post message to webhook`() {
+    fun `can post message to webhook`() = runBlocking {
         val webhooks = SlackWebhook.Http(Uri.of("services/a/b/c"), http.debug())
 
         val message = SlackMessage("message")

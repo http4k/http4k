@@ -12,7 +12,7 @@ class EventFiltersTest {
     private val recording = RecordingEvents()
 
     @Test
-    fun `AddEventName captures name of event`() {
+    fun `AddEventName captures name of event`() = runBlocking {
         val events = EventFilters.AddEventName().then(recording)
         val event = MyEvent()
 
@@ -22,7 +22,7 @@ class EventFiltersTest {
     }
 
     @Test
-    fun `AddServiceName captures name of event`() {
+    fun `AddServiceName captures name of event`() = runBlocking {
         val events = EventFilters.AddServiceName("bob").then(recording)
         val event = MyEvent()
 
@@ -32,7 +32,7 @@ class EventFiltersTest {
     }
 
     @Test
-    fun `AddEventName captures name of metadata wrapped event`() {
+    fun `AddEventName captures name of metadata wrapped event`() = runBlocking {
         val events = EventFilters.AddEventName().then(recording)
         val event = MyEvent()
 
@@ -42,7 +42,7 @@ class EventFiltersTest {
     }
 
     @Test
-    fun `AddTimestamp captures instant`() {
+    fun `AddTimestamp captures instant`() = runBlocking {
         val clock = FixedClock
         val events = EventFilters.AddTimestamp(clock).then(recording)
         val event = MyEvent()
@@ -53,7 +53,7 @@ class EventFiltersTest {
     }
 
     @Test
-    fun `AddZipkinTraces captures traces`() {
+    fun `AddZipkinTraces captures traces`() = runBlocking {
         val expected = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
         val events = EventFilters.AddZipkinTraces().then(recording)
         val event = MyEvent()

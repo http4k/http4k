@@ -237,7 +237,7 @@ class AwsLambdaMoshiTest {
     }
 
     @Test
-    fun `SNS event - read null subject`() {
+    fun `SNS event - read null subject`() = runBlocking {
         val actual = javaClass.getResourceAsStream("AwsLambdaMoshiTest.SNS event - read null subject.approved")!!
             .reader().readText()
             .let { asA<SNSEvent>(it) }
@@ -272,7 +272,7 @@ class AwsLambdaMoshiTest {
     }
 
     @Test
-    fun `SQS event with no message attributes`() {
+    fun `SQS event with no message attributes`() = runBlocking {
         assertNull(
             asA<SQSEvent>(
                 """
@@ -300,7 +300,7 @@ class AwsLambdaMoshiTest {
     }
 
     @Test
-    fun `SQS event with null message attributes`() {
+    fun `SQS event with null message attributes`() = runBlocking {
         val json = """
             {
               "Records": [

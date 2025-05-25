@@ -13,7 +13,7 @@ interface AppRunnerContract : AwsContract {
     private val appRunner get() = AppRunner.Http(aws.region, { aws.credentials }, http)
 
     @Test
-    fun `service lifecycle`() {
+    fun `service lifecycle`() = runBlocking {
         val arn =
             appRunner.createService(ServiceName.of("foobar"), SourceConfiguration()).successValue().Service.ServiceArn
 

@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.present
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.fail
 class StreamingMultipartFormSadTest {
 
     @Test
-    fun `fails when no boundary in stream`() {
+    fun `fails when no boundary in stream`() = runBlocking {
         val boundary = "---1234"
         var form = getMultipartFormParts(boundary, "No boundary anywhere".byteInputStream())
 
@@ -29,7 +30,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails when getting next past end of parts`() {
+    fun `fails when getting next past end of parts`() = runBlocking {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
@@ -46,7 +47,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails when getting next past end of parts after has next`() {
+    fun `fails when getting next past end of parts after has next`() = runBlocking {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
@@ -65,7 +66,7 @@ class StreamingMultipartFormSadTest {
 
     @Test
     @Disabled("this is not a valid test case according to the RFC - we should blow up..")
-    fun `part has no headers`() {
+    fun `part has no headers`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .field("multi", "value0", emptyList())
@@ -84,7 +85,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `overwrites part header if header is repeated`() {
+    fun `overwrites part header if header is repeated`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("contents of StreamingPart",
@@ -99,7 +100,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if found boundary but no field separator`() {
+    fun `fails if found boundary but no field separator`() = runBlocking {
         val boundary = "---2345"
 
         val form = getMultipartFormParts(boundary, ("-----2345" + // no CR_LF
@@ -113,7 +114,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if header missing field separator`() {
+    fun `fails if header missing field separator`() = runBlocking {
         val boundary = "---2345"
 
         assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
@@ -131,7 +132,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if contents missing field separator`() {
+    fun `fails if contents missing field separator`() = runBlocking {
         val boundary = "---2345"
 
         val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
@@ -147,7 +148,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if contents missing field separator and has read to end of content`() {
+    fun `fails if contents missing field separator and has read to end of content`() = runBlocking {
         val boundary = "---2345"
 
         val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
@@ -163,7 +164,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if closing boundary is missing field separator`() {
+    fun `fails if closing boundary is missing field separator`() = runBlocking {
         val boundary = "---2345"
 
         val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
@@ -177,7 +178,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if closing boundary is missing`() {
+    fun `fails if closing boundary is missing`() = runBlocking {
         val boundary = "---2345"
 
         val form = getMultipartFormParts(boundary, ("-----2345" + CR_LF +
@@ -191,7 +192,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if heading too long`() {
+    fun `fails if heading too long`() = runBlocking {
         val boundary = "---2345"
 
         val chars = CharArray(StreamingMultipartFormParts.HEADER_SIZE_MAX)
@@ -203,7 +204,7 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
-    fun `fails if too many headings`() {
+    fun `fails if too many headings`() = runBlocking {
         val boundary = "---2345"
 
         val chars = CharArray(1024)

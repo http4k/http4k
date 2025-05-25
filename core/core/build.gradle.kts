@@ -12,6 +12,7 @@ dependencies {
     api(Kotlin.stdlib)
     implementation("dev.forkhandles:result4k:_")
     implementation("dev.forkhandles:values4k:_")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter-params")
 

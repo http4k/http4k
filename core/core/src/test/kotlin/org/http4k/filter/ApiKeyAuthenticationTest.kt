@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 
 class ApiKeyAuthenticationTest {
     @Test
-    fun `lens key`() {
+    fun `lens key`() = runBlocking {
         val lens = Query.int().required("foobar")
         val handler = ServerFilters.ApiKeyAuth(lens) { it == 5 }.then { Response(OK) }
         assertThat(handler(Request(GET, "/").query("foobar", "5")), hasStatus(OK))
@@ -23,19 +23,19 @@ class ApiKeyAuthenticationTest {
     }
 
     @Test
-    fun `is success`() {
+    fun `is success`() = runBlocking {
         val handler = ServerFilters.ApiKeyAuth { true }.then { Response(OK) }
         assertThat(handler(Request(GET, "/")), hasStatus(OK))
     }
 
     @Test
-    fun `is failure`() {
+    fun `is failure`() = runBlocking {
         val handler = ServerFilters.ApiKeyAuth { false }.then { Response(OK) }
         assertThat(handler(Request(GET, "/")), hasStatus(UNAUTHORIZED))
     }
 
     @Test
-    fun `client sets value on request`() {
+    fun `client sets value on request`() = runBlocking {
         val apiKey = "hello"
         val lens = Query.required("foo")
 

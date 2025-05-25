@@ -17,7 +17,7 @@ class ReverseProxyHandlerTest {
     private val handler = reverseProxy("host" to { Response(OK) })
 
     @Test
-    fun `applies filter before routing`() {
+    fun `applies filter before routing`() = runBlocking {
         val app = Filter { next ->
             {
                 next(it.header("host", "host1"))
@@ -37,7 +37,7 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     private val otherHandler = reverseProxyRouting(hostFor("host1"), hostFor("host2"))
 
     @Test
-    override fun `does not match a particular route`() {
+    override fun `does not match a particular route`() = runBlocking {
         assertThat(handler(Request(GET, "/not-found").header("host", "host")), hasStatus(NOT_FOUND))
         assertThat(
             handler(Request(GET, "/not-found").header("host", "host")),
@@ -46,7 +46,7 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `matching handler`() {
+    fun `matching handler`() = runBlocking {
         assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
         assertThat(otherHandler(requestWithHost("host1", "http://host2/foo")), hasBody("host1host1"))
         assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
@@ -55,7 +55,7 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `with base path`() {
+    fun `with base path`() = runBlocking {
         val handler2 = otherHandler.withBasePath("/bar")
         assertThat(handler2(requestWithHost("host1", "/bar/foo")), hasBody("host1host1"))
         assertThat(handler2(requestWithHost("host2", "/bar/foo")), hasBody("host2host2"))
@@ -64,7 +64,7 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `with filter`() {
+    fun `with filter`() = runBlocking {
         val handler2 = otherHandler.withFilter { next ->
             {
                 next(it.replaceHeader("host", "foobar"))
@@ -76,7 +76,7 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `applies filter after routing`() {
+    fun `applies filter after routing`() = runBlocking {
         val app = Filter { next ->
             {
                 next(it.replaceHeader("host", "host2"))

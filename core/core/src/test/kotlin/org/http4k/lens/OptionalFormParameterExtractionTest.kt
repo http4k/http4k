@@ -20,19 +20,19 @@ class OptionalFormParameterExtractionTest {
         .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
 
     @Test
-    fun `int string should parse`() {
+    fun `int string should parse`() = runBlocking {
         val form = bodyLens(baseRequest.form("anInt", "42"))
         assertEquals(42, intLens(form))
     }
 
     @Test
-    fun `no field should yield null`() {
+    fun `no field should yield null`() = runBlocking {
         val form = bodyLens(baseRequest)
         assertEquals(null, intLens(form))
     }
 
     @Test
-    fun `empty string yield parse to null`() {
+    fun `empty string yield parse to null`() = runBlocking {
         val form = bodyLens(baseRequest.form("anInt", ""))
         assertNull(intLens(form)) // throws LensFailure: formData 'anInt' must be integer
     }

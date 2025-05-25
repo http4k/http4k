@@ -1,6 +1,7 @@
 package org.http4k.security.oauth.client
 
 import dev.forkhandles.result4k.onFailure
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -25,9 +26,9 @@ class OAuthOfflineRequestAuthorizer(
     private val clock: Clock = Clock.systemUTC(),
     private val accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
 ) {
-    private val authClient = authRequestFilter.then(backend)
+    private val authClient = runBlocking { authRequestFilter.then(backend) }
 
-    private fun refresh(refreshToken: RefreshToken): ExpiringCredentials<AccessToken>? {
+    private suspend fun refresh(refreshToken: RefreshToken): ExpiringCredentials<AccessToken>? {
         val body = TokenRequest.refreshToken(refreshToken)
 
         val request = Request(POST, config.tokenUri)

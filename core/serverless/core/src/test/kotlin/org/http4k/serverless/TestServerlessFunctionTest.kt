@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 class TestServerlessFunctionTest {
     @Test
-    fun `can invoke handler`() {
+    fun `can invoke handler`() = runBlocking {
         val app = TestServerlessFunction(emptyMap())
 
         assertThat(app(Request(Method.POST, "/echo").body("hello")), hasStatus(Status.OK) and hasBody("hello"))

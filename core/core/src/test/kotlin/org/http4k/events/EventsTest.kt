@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test
 
 class EventsTest {
     @Test
-    fun `error has correct category`() {
+    fun `error has correct category`() = runBlocking {
         assertThat(Error("oh no", RuntimeException("foo")).category, equalTo(EventCategory("error")))
     }
 
     @Test
-    fun `can combine events implementations with and()`() {
+    fun `can combine events implementations with and()`() = runBlocking {
         val first = RecordingEvents()
         val second = RecordingEvents()
         val error = Error("foo")

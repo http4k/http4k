@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 class SignWebhookTest {
 
     @Test
-    fun `signing populates request`() {
+    fun `signing populates request`() = runBlocking {
         val webhookId = WebhookId.of("123")
         val signature = WebhookSignature.of(SignatureIdentifier.v1, SignedPayload.encode("payload"))
         val app = ClientFilters.SignWebhookPayload(

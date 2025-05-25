@@ -10,7 +10,7 @@ import org.http4k.connect.amazon.AwsServiceCompanion
  */
 @Http4kConnectApiClient
 interface STS {
-    operator fun <R> invoke(action: STSAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: STSAction<R>): Result<R, RemoteFailure>
 
     companion object : AwsServiceCompanion("sts")
 }

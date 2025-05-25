@@ -49,7 +49,7 @@ class ServerDigestAuthTest {
         .then { Response(OK) }
 
     @Test
-    fun `no credentials - returns challenge`() {
+    fun `no credentials - returns challenge`() = runBlocking {
         val response = handler(Request(GET, "/"))
 
         assertThat(response, hasStatus(UNAUTHORIZED))
@@ -63,7 +63,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `basic credentials - returns challenge`() {
+    fun `basic credentials - returns challenge`() = runBlocking {
         val request = Request(GET, "/")
             .header("Authorization", "Basic hunter2")
 
@@ -80,7 +80,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `digest credentials with invalid response - returns 401`() {
+    fun `digest credentials with invalid response - returns 401`() = runBlocking {
         val credentials = DigestCredential(
             realm = realm,
             digestUri = "/",
@@ -104,7 +104,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `digest credentials with invalid username - returns 401`() {
+    fun `digest credentials with invalid username - returns 401`() = runBlocking {
         val credentials = DigestCredential(
             realm = realm,
             digestUri = "/",
@@ -128,7 +128,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `digest credentials with mismatched realm - returns 401`() {
+    fun `digest credentials with mismatched realm - returns 401`() = runBlocking {
         val credentials = DigestCredential(
             realm = "missing-realm",
             digestUri = "/",
@@ -152,7 +152,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `digest credentials with mismatched method - returns 401`() {
+    fun `digest credentials with mismatched method - returns 401`() = runBlocking {
         val credentials = DigestCredential(
             realm = "missing-realm",
             digestUri = "/",
@@ -188,7 +188,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `digest credentials with mismatched password - returns 401`() {
+    fun `digest credentials with mismatched password - returns 401`() = runBlocking {
         val credentials = DigestCredential(
             realm = realm,
             digestUri = "/",
@@ -223,7 +223,7 @@ class ServerDigestAuthTest {
     }
 
     @Test
-    fun `valid digest credentials - returns 200`() {
+    fun `valid digest credentials - returns 200`() = runBlocking {
         val credentials = DigestCredential(
             realm = realm,
             digestUri = "/",

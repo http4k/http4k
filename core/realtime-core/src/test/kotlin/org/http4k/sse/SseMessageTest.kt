@@ -9,18 +9,18 @@ import java.time.Duration
 class SseMessageTest {
 
     @Test
-    fun `encodes binary as base 64`() {
+    fun `encodes binary as base 64`() = runBlocking {
         assertThat(SseMessage.Data("body".byteInputStream()).data, equalTo("body".base64Encode()))
     }
 
     @Test
-    fun `converts data toMessage`() {
+    fun `converts data toMessage`() = runBlocking {
         assertRoundtrip(SseMessage.Data("body"), "data: body\n\n")
         assertThat(SseMessage.parse("data: body\n\n"), equalTo(SseMessage.Data("body")))
     }
 
     @Test
-    fun `converts event toMessage`() {
+    fun `converts event toMessage`() = runBlocking {
         assertRoundtrip(
             SseMessage.Event("event", "data1\ndata2", SseEventId("id")), """event: event
 data: data1
@@ -33,7 +33,7 @@ id: id
     }
 
     @Test
-    fun `converts retry toMessage`() {
+    fun `converts retry toMessage`() = runBlocking {
         assertRoundtrip(SseMessage.Retry(Duration.ofMillis(1000)), "retry: 1000\n\n")
         assertThat(SseMessage.parse("retry: 1000\n\n"), equalTo(SseMessage.Retry(Duration.ofMillis(1000))))
 

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class AwsServiceTest {
     @Test
-    fun `can construct uri`() {
+    fun `can construct uri`() = runBlocking {
         assertThat(
             AwsService.of("foobar").toUri(Region.of("eu-west-1")),
             equalTo(Uri.of("https://foobar.eu-west-1.amazonaws.com"))

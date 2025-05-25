@@ -19,7 +19,7 @@ data class OAuthAuthorizationServer(val serverUri: Uri, val serverMetadata: Serv
  * How an authentication client can get the information about the authorization server
  */
 fun interface AuthServerDiscovery {
-    operator fun invoke(http: HttpHandler): Result<OAuthAuthorizationServer, Exception>
+    suspend operator fun invoke(http: HttpHandler): Result<OAuthAuthorizationServer, Exception>
 
     companion object {
         fun fromKnownAuthServer(serverUri: Uri) = AuthServerDiscovery { http: HttpHandler ->

@@ -13,7 +13,7 @@ data class MyEvent(val value: String)
 class GoogleCloudEventFunctionTest {
 
     @Test
-    fun `can build function and call it`() {
+    fun `can build function and call it`() = runBlocking {
         val captured = AtomicReference<MyEvent>()
         val input = MyEvent("hello")
         val function = object : GoogleCloudEventFunction(FnLoader {

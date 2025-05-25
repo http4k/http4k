@@ -22,7 +22,7 @@ class RequestTracingTest {
     }
 
     @Test
-    fun `request traces are copied correctly from inbound to outbound requests`() {
+    fun `request traces are copied correctly from inbound to outbound requests`() = runBlocking {
         val originalTraceId = TraceId("originalTrace")
         val originalSpanId = TraceId("originalSpan")
         val originalParentSpanId = TraceId("originalParentSpanId")
@@ -47,7 +47,7 @@ class RequestTracingTest {
     }
 
     @Test
-    fun `client should create new span_id even if parent null`() {
+    fun `client should create new span_id even if parent null`() = runBlocking {
         val cliWithEvents = ClientFilters.RequestTracing()
             .then {
                 val actual = ZipkinTraces(it)
@@ -63,7 +63,7 @@ class RequestTracingTest {
     }
 
     @Test
-    fun `request traces may be copied to child threads`() {
+    fun `request traces may be copied to child threads`() = runBlocking {
         val originalTraceId = TraceId("originalTrace")
         val originalSpanId = TraceId("originalSpan")
         val originalParentSpanId = TraceId("originalParentSpanId")

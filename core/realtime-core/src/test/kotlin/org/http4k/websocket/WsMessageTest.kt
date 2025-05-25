@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class WsMessageTest {
 
     @Test
-    fun `calls through to create correct body`() {
+    fun `calls through to create correct body`() = runBlocking {
         val memoryBody = MemoryBody("body")
         assertThat(WsMessage("body").body, equalTo(memoryBody as Body))
         assertThat(WsMessage(memoryBody, WsMessage.Mode.Binary).body, equalTo(memoryBody as Body))

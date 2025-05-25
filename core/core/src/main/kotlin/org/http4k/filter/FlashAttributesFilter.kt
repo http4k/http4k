@@ -11,15 +11,15 @@ import org.http4k.core.cookie.cookies
 const val FLASH_COOKIE = "flash-cookie"
 
 object FlashAttributesFilter : Filter {
-    override fun invoke(handler: HttpHandler) =
-        { request: Request ->
+    override suspend fun invoke(handler: HttpHandler): HttpHandler {
+        return { request: Request ->
             handler(request).let { response ->
                 if (request.flash() != null && response.flash() == null)
                     response.removeFlash()
-                else
-                    response
+                else response
             }
         }
+    }
 }
 
 fun Request.flash(): String? = cookie(FLASH_COOKIE)?.value

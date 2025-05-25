@@ -19,7 +19,7 @@ class VerifyGitHubSignatureSha256Test {
     private val app = ServerFilters.VerifyGitHubSignatureSha256 { GitHubToken.of("secret") }.then { Response(OK) }
 
     @Test
-    fun `if valid lets through`() {
+    fun `if valid lets through`() = runBlocking {
         assertThat(
             app(
                 Request(POST, "")
@@ -30,7 +30,7 @@ class VerifyGitHubSignatureSha256Test {
     }
 
     @Test
-    fun `if missing gives 401`() {
+    fun `if missing gives 401`() = runBlocking {
         assertThat(
             app(
                 Request(POST, "")
@@ -40,7 +40,7 @@ class VerifyGitHubSignatureSha256Test {
     }
 
     @Test
-    fun `if invalid gives 401`() {
+    fun `if invalid gives 401`() = runBlocking {
         assertThat(
             app(
                 Request(POST, "")

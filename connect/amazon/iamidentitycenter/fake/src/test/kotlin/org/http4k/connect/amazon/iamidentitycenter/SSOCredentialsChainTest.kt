@@ -48,7 +48,7 @@ class SSOCredentialsChainTest {
     }
 
     @Test
-    fun `should not provide credentials for unknown profile`() {
+    fun `should not provide credentials for unknown profile`() = runBlocking {
         val http = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to FakeOIDC(),
@@ -69,7 +69,7 @@ class SSOCredentialsChainTest {
 
 
     @Test
-    fun `should use config profile profile`() {
+    fun `should use config profile profile`() = runBlocking {
         val http = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to FakeOIDC(),

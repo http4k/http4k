@@ -1,5 +1,6 @@
 package org.http4k.bridge
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.lens.Path
 import org.http4k.lens.int
 import org.junit.jupiter.api.Test
@@ -21,7 +22,7 @@ class SpringToHttp4kFallbackControllerLensFailureTest {
     val mvc = MockMvcBuilders.standaloneSetup(Controller()).build()
     
     @Test
-    fun `catches LensFailure and returns 400`() {
+    fun `catches LensFailure and returns 400`() = runBlocking {
         mvc.get(URI("/")) {}
             .andExpect { status { isBadRequest() } }
             .andExpect { content { contentTypeCompatibleWith(APPLICATION_PROBLEM_JSON) } }

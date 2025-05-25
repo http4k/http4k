@@ -39,7 +39,7 @@ class STSWebIdentityCredentialsProviderTest {
     private val clock = TestClock(now)
 
     @Test
-    fun `gets credentials using file`() {
+    fun `gets credentials using file`() = runBlocking {
         checkCanAssumeRole(
             EMPTY
                 .with(
@@ -51,7 +51,7 @@ class STSWebIdentityCredentialsProviderTest {
     }
 
     @Test
-    fun `gets credentials using hardcoded token`() {
+    fun `gets credentials using hardcoded token`() = runBlocking {
         checkCanAssumeRole(
             EMPTY
                 .with(

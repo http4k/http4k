@@ -3,6 +3,7 @@ package org.http4k.template
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 abstract class TemplatesContract<out T : Templates>(protected val templates: T) {
@@ -15,7 +16,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     )
 
     @Test
-    fun `caching classpath`() {
+    fun `caching classpath`() = runBlocking {
         val renderer = templates.CachingClasspath()
         checkOnClasspath(renderer)
         if (supportsRoot) checkAtRoot(renderer)
@@ -23,7 +24,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     }
 
     @Test
-    fun `caching classpath not at root`() {
+    fun `caching classpath not at root`() = runBlocking {
         val renderer = templates.CachingClasspath("org.http4k.template")
         assertThat(
             renderer(onClasspathNotAtRootViewModel(items)).trim(),
@@ -34,7 +35,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     open fun onClasspathNotAtRootViewModel(items: List<Item>): ViewModel = OnClasspathNotAtRoot(items)
 
     @Test
-    fun `caching file-based`() {
+    fun `caching file-based`() = runBlocking {
         val renderer = templates.Caching("src/test/resources")
         checkOnClasspath(renderer)
         if (supportsRoot) checkAtRoot(renderer)
@@ -42,7 +43,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     }
 
     @Test
-    fun `hot reload`() {
+    fun `hot reload`() = runBlocking {
         val renderer = templates.HotReload("src/test/resources")
         checkOnClasspath(renderer)
         if (supportsRoot) checkAtRoot(renderer)

@@ -15,6 +15,7 @@ import dev.failsafe.FailsafeException
 import dev.failsafe.Fallback
 import dev.failsafe.RateLimiter
 import dev.failsafe.Timeout
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -33,14 +34,14 @@ import kotlin.concurrent.thread
 class FailsafeFilterTest {
 
     @Test
-    fun `response is returned when failsafe policies pass`() {
+    fun `response is returned when failsafe policies pass`() = runBlocking {
         val withFailsafe = FailsafeFilter(Failsafe.none()).then { Response(OK).body("All OK") }
 
         assertThat(withFailsafe(Request(GET, "")), hasStatus(OK) and hasBody("All OK"))
     }
 
     @Test
-    fun `default response is returned on circuit breaker error`() {
+    fun `default response is returned on circuit breaker error`() = runBlocking {
         val executor = Failsafe.with(
             CircuitBreaker.builder<Response>()
                 .withFailureThreshold(1)
@@ -55,7 +56,7 @@ class FailsafeFilterTest {
     }
 
     @Test
-    fun `default response is returned on bulkhead error`() {
+    fun `default response is returned on bulkhead error`() = runBlocking {
         val executor = Failsafe.with(Bulkhead.of<Response>(1))
 
         val latch = CountDownLatch(1)
@@ -66,7 +67,7 @@ class FailsafeFilterTest {
         }
 
         thread {
-            withFailsafe(Request(GET, ""))
+            runBlocking { withFailsafe(Request(GET, "")) }
         }
         latch.await()
 
@@ -74,7 +75,7 @@ class FailsafeFilterTest {
     }
 
     @Test
-    fun `default response is returned on timeout error`() {
+    fun `default response is returned on timeout error`() = runBlocking {
         val executor = Failsafe.with(Timeout.of<Response>(Duration.ofMillis(10)))
 
         val withFailsafe = FailsafeFilter(executor).then {
@@ -86,7 +87,7 @@ class FailsafeFilterTest {
     }
 
     @Test
-    fun `default response is returned on rate limiter error`() {
+    fun `default response is returned on rate limiter error`() = runBlocking {
         val executor = Failsafe.with(
             RateLimiter.smoothBuilder<Response>(1, Duration.ofMillis(100)).build()
         )
@@ -98,7 +99,7 @@ class FailsafeFilterTest {
     }
 
     @Test
-    fun `uses result of fallback policy on error`() {
+    fun `uses result of fallback policy on error`() = runBlocking {
         val executor = Failsafe.with(
             Fallback.of(Response(OK).body("Fallback")),
             RateLimiter.smoothBuilder<Response>(1, Duration.ofMillis(100)).build()
@@ -111,11 +112,11 @@ class FailsafeFilterTest {
     }
 
     @Test
-    fun `default error handler propagates unhandled failsafe errors`() {
+    fun `default error handler propagates unhandled failsafe errors`() = runBlocking {
         val withFailsafe = FailsafeFilter(Failsafe.none()).then { throw IOException("Boom") }
 
         assertThat(
-            { withFailsafe(Request(GET, "")) },
+            { runBlocking { withFailsafe(Request(GET, "")) } },
             throws(has(FailsafeException::cause, present(isA(has(IOException::message, equalTo("Boom"))))))
         )
     }

@@ -17,7 +17,7 @@ class MicronautToHttp4kFallbackControllerTest {
     class TestController(override val http4k: HttpHandler) : MicronautToHttp4kFallbackController
 
     @Test
-    fun `passes requests through and adapts to servlet`() {
+    fun `passes requests through and adapts to servlet`() = runBlocking {
         val controller = TestController { req: Request -> Response(Status.OK).body(req.body).headers(req.headers) }
 
         val mn = HttpRequestFactory.INSTANCE.get<InputStream>("/bob").header("foo", "bar")

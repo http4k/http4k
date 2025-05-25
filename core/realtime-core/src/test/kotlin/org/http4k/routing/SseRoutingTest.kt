@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class SseRoutingTest {
 
     @Test
-    fun `can route to method`() {
+    fun `can route to method`() = runBlocking {
         setOf(GET, POST).forEach {
             val sseClient = sse("/routeMethod/{name}" bind sse(
                 POST to { SseResponse(OK, listOf("METHOD" to it.method.name + it.path("name"))) { it.close() } },

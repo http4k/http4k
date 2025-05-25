@@ -2,6 +2,7 @@ package org.http4k.serverless
 
 import com.aliyun.fc.runtime.Context
 import com.aliyun.fc.runtime.HttpRequestHandler
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
@@ -20,13 +21,15 @@ val ALIBABA_CONTEXT_KEY = RequestKey.required<Context>("HTTP4K_ALIBABA_CONTEXT")
 abstract class AlibabaCloudHttpFunction(appLoader: AppLoader) : HttpRequestHandler {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val app = appLoader(System.getenv())
+    private val app = runBlocking { appLoader(System.getenv()) }
 
     override fun handleRequest(request: HttpServletRequest, response: HttpServletResponse, context: Context?) {
-        CatchAll()
-            .then(AddAlibabaRequest(request, context))
-            .then(app)(request.asHttp4kRequest())
-            .transferTo(response)
+        runBlocking { // FIXME coroutine blocking
+            CatchAll()
+                .then(AddAlibabaRequest(request, context))
+                .then(app)(request.asHttp4kRequest())
+                .transferTo(response)
+        }
     }
 }
 

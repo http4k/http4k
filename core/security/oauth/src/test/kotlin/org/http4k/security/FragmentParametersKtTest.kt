@@ -11,25 +11,25 @@ import org.junit.jupiter.api.Test
 class FragmentParametersTest {
 
     @Test
-    fun `can correctly add fragment parameter to uri`() {
+    fun `can correctly add fragment parameter to uri`() = runBlocking {
         assertThat(Uri.of("http://localhost").fragmentParameter("foo", "bar").toString(), equalTo("http://localhost#foo=bar"))
     }
 
     @Test
-    fun `can correctly add fragment parameter to uri, when one exists`() {
+    fun `can correctly add fragment parameter to uri, when one exists`() = runBlocking {
         assertThat(Uri.of("http://localhost#code=12345").fragmentParameter("foo", "bar").toString(), equalTo("http://localhost#code=12345&foo=bar"))
         assertThat(Uri.of("http://localhost#code=12345").fragmentParameter("code", "some different code").toString(), equalTo("http://localhost#code=12345&code=some+different+code"))
     }
 
     @Test
-    fun `can remove parameter from uri`() {
+    fun `can remove parameter from uri`() = runBlocking {
         assertThat(Uri.of("http://localhost#code=12345").removeFragmentParameter("code").toString(), equalTo("http://localhost"))
         assertThat(Uri.of("http://localhost#code=12345").removeFragmentParameter("foo").toString(), equalTo("http://localhost#code=12345"))
         assertThat(Uri.of("http://localhost").removeFragmentParameter("foo").toString(), equalTo("http://localhost"))
     }
 
     @Test
-    fun `can retrieve form parameter from request`() {
+    fun `can retrieve form parameter from request`() = runBlocking {
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("code"), equalTo("12345"))
         assertThat(Request(GET, "http://localhost#code=12345&code=some+different+code").fragmentParameter("code"), equalTo("12345"))
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("foo"), absent())
@@ -40,14 +40,14 @@ class FragmentParametersTest {
     }
 
     @Test
-    fun `can retrieve multiple form parameters from request`() {
+    fun `can retrieve multiple form parameters from request`() = runBlocking {
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameters("code"), equalTo(listOf<String?>("12345")))
         assertThat(Request(GET, "http://localhost#code=12345&code=some+different+code").fragmentParameters("code"), equalTo(listOf<String?>("12345", "some different code")))
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameters("foo"), equalTo(emptyList()))
     }
 
     @Test
-    fun `can add form parameter to request`() {
+    fun `can add form parameter to request`() = runBlocking {
         assertThat(Request(GET, "http://localhost").fragmentParameter("code", "12345"), equalTo(Request(GET, "http://localhost#code=12345")))
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("code", "some different code"), equalTo(Request(GET, "http://localhost#code=12345&code=some+different+code")))
         assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("foo", null), equalTo(Request(GET, "http://localhost#code=12345&foo")))

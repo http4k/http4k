@@ -39,7 +39,7 @@ abstract class DynamoDbBatchWriteItemTest : DynamoDbSource {
     }
 
     @Test
-    fun `batch put multiple items`() {
+    fun `batch put multiple items`() = runBlocking {
         val item1 = Item(attrS of "item1")
         val item2 = Item(attrS of "item2")
         val item3 = Item(attrS of "item3")

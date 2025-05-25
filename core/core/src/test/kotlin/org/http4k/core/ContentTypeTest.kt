@@ -13,7 +13,7 @@ class ContentTypeTest {
     private val contentType3 = ContentType("bar", listOf("bob" to null, "bob2" to "jim"))
 
     @Test
-    fun `compare content types without directive`() {
+    fun `compare content types without directive`() = runBlocking {
         assertThat(contentType0.equalsIgnoringDirectives(contentType0), equalTo(true))
         assertThat(contentType1.equalsIgnoringDirectives(contentType1), equalTo(true))
         assertThat(contentType1.equalsIgnoringDirectives(contentType2), equalTo(true))
@@ -21,7 +21,7 @@ class ContentTypeTest {
     }
 
     @Test
-    fun `directive to header value`() {
+    fun `directive to header value`() = runBlocking {
         assertThat(ContentType.TEXT_PLAIN.toHeaderValue(), equalTo("text/plain; charset=utf-8"))
         assertThat(MultipartFormWithBoundary("foobar").toHeaderValue(), equalTo("multipart/form-data; boundary=foobar"))
         assertThat(contentType1.toHeaderValue(), equalTo("foo; bob=bill"))
@@ -31,7 +31,7 @@ class ContentTypeTest {
     }
 
     @Test
-    fun `structure returns null when there is no +suffix`() {
+    fun `structure returns null when there is no +suffix`() = runBlocking {
         assertThat(ContentType("foo").structure(), equalTo(null))
         assertThat(ContentType("foo/bar").structure(), equalTo(null))
         assertThat(ContentType("foo/bar.baz").structure(), equalTo(null))
@@ -39,7 +39,7 @@ class ContentTypeTest {
     }
 
     @Test
-    fun `structure returns the structure suffix when there is a +suffix`() {
+    fun `structure returns the structure suffix when there is a +suffix`() = runBlocking {
         assertThat(ContentType("foo+json").structure(), equalTo("json"))
         assertThat(ContentType("foo/bar+xml").structure(), equalTo("xml"))
         assertThat(ContentType("foo/bar.baz+zip").structure(), equalTo("zip"))

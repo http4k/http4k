@@ -12,13 +12,13 @@ import org.junit.jupiter.api.Test
 class CodeGenerationTest {
 
     @Test
-    fun `correct code is generated for adapter`() {
+    fun `correct code is generated for adapter`() = runBlocking {
         assertThat(TestClient.Impl().testFooAction("hello", one), equalTo(Success("hello")))
         assertThat(TestClient.Impl().testBarAction("hello"), equalTo(Success("hello")))
     }
 
     @Test
-    fun `correct code is generated for adapter with paged action`() {
+    fun `correct code is generated for adapter with paged action`() = runBlocking {
         assertThat(
             TestClient.Impl().testFooPagedActionPaginated("hello", one).toList(),
             equalTo(listOf(Success(listOf())))
@@ -26,7 +26,7 @@ class CodeGenerationTest {
     }
 
     @Test
-    fun `correct code is generated for JSON factory`() {
+    fun `correct code is generated for JSON factory`() = runBlocking {
         assertThat(
             TestMoshi.asFormatString(TestBean("hello")),
             equalTo("""{"value":"hello"}""")

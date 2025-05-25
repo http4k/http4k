@@ -12,5 +12,5 @@ fun LmStudio.Companion.Http(
 ) = object : LmStudio {
     private val routedHttp = SetBaseUriFrom(baseUri).then(http)
 
-    override fun <R> invoke(action: LmStudioAction<R>) = action.toResult(routedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: LmStudioAction<R>) = action.toResult(routedHttp(action.toRequest()))
 }

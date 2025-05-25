@@ -23,7 +23,7 @@ class PushAdaptingSseTest {
     }
 
     @Test
-    fun `outbound comms are pushed to client`() {
+    fun `outbound comms are pushed to client`() = runBlocking {
         val adapter = TestAdapter()
         adapter.send(SseMessage.Data("hello"))
         assertThat(adapter.received, equalTo(listOf(SseMessage.Data("hello"))))

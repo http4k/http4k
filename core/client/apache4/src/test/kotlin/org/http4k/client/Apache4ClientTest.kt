@@ -1,6 +1,7 @@
 package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
+import kotlinx.coroutines.runBlocking
 import org.apache.http.HttpHost
 import org.apache.http.HttpRequest
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -31,7 +32,7 @@ class Apache4ClientTest : HttpClientContract(
     HttpClientWithMemoryModeContract {
 
     @Test
-    fun `connect timeout is handled`() {
+    fun `connect timeout is handled`() = runBlocking {
         assertThat(Apache4Client(object : CloseableHttpClient() {
             @Deprecated("Deprecated in Java", ReplaceWith("TODO(\"not implemented\")"))
             override fun getParams() = TODO("not implemented")

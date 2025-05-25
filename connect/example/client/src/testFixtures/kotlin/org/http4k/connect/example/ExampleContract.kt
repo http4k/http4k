@@ -13,22 +13,22 @@ interface ExampleContract {
     val http: HttpHandler
 
     @Test
-    fun `can echo`() {
+    fun `can echo`() = runBlocking {
         assertThat(Example.Http(http).echo("hello"), equalTo(Success(Echoed("hello"))))
     }
 
     @Test
-    fun `can reverse`() {
+    fun `can reverse`() = runBlocking {
         assertThat(Example.Http(http).reverse("hello"), equalTo(Success(Reversed("olleh"))))
     }
 
     @Test
-    fun `can double reverse`() {
+    fun `can double reverse`() = runBlocking {
         assertThat(Example.Http(http).doubleReverse("hello"), equalTo(Success(Reversed("hello"))))
     }
 
     @Test
-    fun `can split`() {
+    fun `can split`() = runBlocking {
         assertThat(Example.Http(http).splitPaginated("splitme").toList(), equalTo(listOf(Success("splitme".toList()))))
     }
 }

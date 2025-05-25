@@ -13,7 +13,7 @@ class ServerlessFiltersTest {
     val response = 999
 
     @Test
-    fun `reporting latency for function`() {
+    fun `reporting latency for function`() = runBlocking {
         var called = false
 
         ServerlessFilters.ReportFnTransaction<String, String, Int>(TickingClock()) { (req, resp, duration) ->
@@ -27,7 +27,7 @@ class ServerlessFiltersTest {
     }
 
     @Test
-    fun `request tracing when set`() {
+    fun `request tracing when set`() = runBlocking {
         val storage = ZipkinTracesStorage.THREAD_LOCAL
         val before = storage.forCurrentThread()
         ServerlessFilters.RequestTracing<String, String, Int>(storage = storage)

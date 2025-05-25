@@ -33,7 +33,7 @@ class AwsClientFilterTest: PortBasedTest {
     private val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)
 
     @Test
-    fun `adds authorization header`() {
+    fun `adds authorization header`() = runBlocking {
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(
@@ -43,7 +43,7 @@ class AwsClientFilterTest: PortBasedTest {
     }
 
     @Test
-    fun `adds authorization header with session token`() {
+    fun `adds authorization header with session token`() = runBlocking {
         val client = ClientFilters.AwsAuth(scope, iamSessionCredentials, clock).then(audit)
 
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
@@ -55,14 +55,14 @@ class AwsClientFilterTest: PortBasedTest {
     }
 
     @Test
-    fun `adds time header`() {
+    fun `adds time header`() = runBlocking {
         client(Request(GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(audit.captured?.header("x-amz-date"), equalTo("20160127T153250Z"))
     }
 
     @Test
-    fun `stream body is send correctly after signing`() {
+    fun `stream body is send correctly after signing`() = runBlocking {
         val client = ClientFilters.AwsAuth(scope, credentials, clock)
             .then { Response(OK).body(it.body.stream) }
 
@@ -72,7 +72,7 @@ class AwsClientFilterTest: PortBasedTest {
     }
 
     @Test
-    fun `stream body is send correctly after signing - over socket`() {
+    fun `stream body is send correctly after signing - over socket`() = runBlocking {
         val http = { req: Request -> Response(OK).body(req.bodyString()) }
 
         http.asServer(SunHttp(0)).start().use {

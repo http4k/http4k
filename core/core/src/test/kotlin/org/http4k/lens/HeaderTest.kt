@@ -26,7 +26,7 @@ class HeaderTest {
     private val request = Request(GET, of("/")).header("hello", "world").header("hello", "world2")
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(Header.optional("hello")(request), equalTo("world"))
         assertThat(Header.required("hello")(request), equalTo("world"))
         assertThat(Header.defaulted("hello", "moon")(request), equalTo("world"))
@@ -41,7 +41,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = Header.required("world")
         assertThat(single("value2", single("value1", request)), equalTo(request.header("world", "value2")))
 
@@ -51,7 +51,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         assertThat(Header.optional("world")(request), absent())
         val requiredHeader = Header.required("world")
         assertThat({ requiredHeader(request) }, throws(lensFailureWith<Request>(Missing(requiredHeader.meta), overallType = Failure.Type.Missing)))
@@ -66,7 +66,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val requiredHeader = Header.map(String::toInt).required("hello")
         assertThat({ requiredHeader(request) }, throws(lensFailureWith<Request>(Invalid(requiredHeader.meta), overallType = Failure.Type.Invalid)))
 
@@ -81,14 +81,14 @@ class HeaderTest {
     }
 
     @Test
-    fun `sets value on request`() {
+    fun `sets value on request`() = runBlocking {
         val header = Header.required("bob")
         val withHeader = request.with(header of "hello")
         assertThat(header(withHeader), equalTo("hello"))
     }
 
     @Test
-    fun `can create a custom type and get and set on request`() {
+    fun `can create a custom type and get and set on request`() = runBlocking {
         val custom = Header.map(::MyCustomType, MyCustomType::value).required("bob")
 
         val instance = MyCustomType("hello world!")
@@ -100,7 +100,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(Header.required("hello").toString(), equalTo("Required header 'hello'"))
         assertThat(Header.optional("hello").toString(), equalTo("Optional header 'hello'"))
         assertThat(Header.multi.required("hello").toString(), equalTo("Required header 'hello'"))
@@ -108,7 +108,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `content type serialises and deserialises correctly to message - with directive`() {
+    fun `content type serialises and deserialises correctly to message - with directive`() = runBlocking {
         val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").with(lens of ContentType.TEXT_HTML)
         assertThat(reqWithHeader.header("Content-Type"), equalTo("text/html; charset=utf-8"))
@@ -116,7 +116,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() {
+    fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() = runBlocking {
         val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").header("Content-Type", "bob; charset=UTF-8 ;boundary=asd; foomanchu; media-type=a/b")
         assertThat(lens(reqWithHeader), equalTo(ContentType("bob",
@@ -124,7 +124,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `content type serialises and deserialises correctly to message - no directive`() {
+    fun `content type serialises and deserialises correctly to message - no directive`() = runBlocking {
         val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").with(lens of ContentType("value"))
         assertThat(reqWithHeader.header("Content-Type"), equalTo("value"))
@@ -132,7 +132,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `accept content header deserialises correctly from message`() {
+    fun `accept content header deserialises correctly from message`() = runBlocking {
         val accept = Header.ACCEPT(Request(GET, "").header("Accept", "text/html, application/pdf, application/xml;q=0.9, image/webp, */*;q=0.8"))!!
 
         assertThat(accept, equalTo(Accept(listOf(
@@ -148,7 +148,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `accept content header serialises correctly from message`() {
+    fun `accept content header serialises correctly from message`() = runBlocking {
         val accept = Accept(listOf(
                 QualifiedContent(TEXT_HTML.withNoDirectives()),
                 QualifiedContent(APPLICATION_PDF.withNoDirectives()),
@@ -166,7 +166,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `accept content header ignores charset directive`() {
+    fun `accept content header ignores charset directive`() = runBlocking {
         val accept = Accept(
             listOf(
                 QualifiedContent(ContentType("text/*", listOf("charset" to "utf-8")), 0.3),
@@ -206,7 +206,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `multiple directives are parsed correctly`() {
+    fun `multiple directives are parsed correctly`() = runBlocking {
         assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
         assertThat(Header.parseValueAndDirectives("some value; bob"), equalTo("some value" to listOf<Parameter>("bob" to null)))
@@ -216,7 +216,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `enum`() {
+    fun `enum`() = runBlocking {
         val requiredLens = Header.enum<Method>().required("method")
         assertThat(requiredLens(Request(GET, "/").header("method", "GET")), equalTo(GET))
 
@@ -226,19 +226,19 @@ class HeaderTest {
     }
 
     @Test
-    fun `mapped enum`() {
+    fun `mapped enum`() = runBlocking {
         val requiredLens = Header.enum(MappedEnum::from, MappedEnum::to).required("whatevs")
         assertThat(requiredLens(Request(GET, "/").header("whatevs", "eulav")), equalTo(MappedEnum.value))
     }
 
     @Test
-    fun `case-insensitive enum`() {
+    fun `case-insensitive enum`() = runBlocking {
         val lens = Header.enum<Method>(caseSensitive = false).required("method")
         assertThat(lens(Request(GET, "/").header("method", "delete")), equalTo(Method.DELETE))
     }
 
     @Test
-    fun `link header can get parsed and injected`() {
+    fun `link header can get parsed and injected`() = runBlocking {
         val links = mapOf(
             "previous" to of("prevLink"),
             "next" to of("nextLink")
@@ -252,14 +252,14 @@ class HeaderTest {
     }
 
     @Test
-    fun `basic auth header parsed correctly from message`() {
+    fun `basic auth header parsed correctly from message`() = runBlocking {
         val credentials = Header.AUTHORIZATION_BASIC(Request(GET, "").header("Authorization", "Basic YWRtaW46aHVudGVyMg=="))
 
         assertThat(credentials, equalTo(Credentials("admin", "hunter2")))
     }
 
     @Test
-    fun `basic auth header added correctly to message`() {
+    fun `basic auth header added correctly to message`() = runBlocking {
         val credentials = Credentials("admin", "hunter2")
         val request = Request(GET, "").basicAuthentication(credentials)
 
@@ -268,7 +268,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `bearer auth header added correctly to message`() {
+    fun `bearer auth header added correctly to message`() = runBlocking {
         val token = "foo"
         val request = Request(GET, ""). bearerAuth(token)
 

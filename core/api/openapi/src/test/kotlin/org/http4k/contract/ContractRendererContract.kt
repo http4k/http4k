@@ -74,7 +74,7 @@ abstract class ContractRendererContract<NODE : Any>(
     protected val rendererToUse: ContractRenderer
 ) {
     @Test
-    fun `can build 400`() {
+    fun `can build 400`() = runBlocking {
         val response = rendererToUse.badRequest(
             LensFailure(
                 listOf(
@@ -90,7 +90,7 @@ abstract class ContractRendererContract<NODE : Any>(
     }
 
     @Test
-    fun `can build 404`() {
+    fun `can build 404`() = runBlocking {
         val response = rendererToUse.notFound()
         assertThat(
             response.bodyString(),

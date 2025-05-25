@@ -18,7 +18,7 @@ class ExecutionServiceExtensionsKtTest {
     private val ref = AtomicReference<ZipkinTraces>()
 
     @Test
-    fun `propagates traces`() {
+    fun `propagates traces`() = runBlocking {
         assertPropagation { execute(runnable(ref, latch)) }
         assertPropagation { submit(runnable(ref, latch)) }
         assertPropagation { submit(callable(ref, latch)) }

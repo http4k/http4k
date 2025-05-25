@@ -19,7 +19,7 @@ class SecretTest {
     }
 
     @Test
-    fun `can use the value, after which it is cleared`() {
+    fun `can use the value, after which it is cleared`() = runBlocking {
         val inputBytes = "mySecret".toByteArray()
         val secretWithBytes = Secret(inputBytes)
 
@@ -32,13 +32,13 @@ class SecretTest {
     }
 
     @Test
-    fun `using the value twice throws up`() {
+    fun `using the value twice throws up`() = runBlocking {
         aSecret.use { it }
         assertThat({ aSecret.use { it.also {} } }, throws<IllegalStateException>())
     }
 
     @Test
-    fun `toString value doesn't reveal value`() {
+    fun `toString value doesn't reveal value`() = runBlocking {
         assertThat(aSecret.toString(), equalTo("Secret(hashcode = 1666631293)"))
     }
 

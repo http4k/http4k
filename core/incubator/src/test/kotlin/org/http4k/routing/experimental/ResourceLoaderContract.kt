@@ -21,34 +21,34 @@ import org.junit.jupiter.api.Test
 abstract class ResourceLoaderContract(private val loader: RouteMatcher<Response, Filter>) {
 
     @Test
-    fun `loads existing file`() {
+    fun `loads existing file`() = runBlocking {
         checkContents("mybob.xml", "<xml>content</xml>", APPLICATION_XML)
     }
 
     @Test
-    fun `loads root index file`() {
+    fun `loads root index file`() = runBlocking {
         checkContents("", "hello from the root index.html", TEXT_HTML)
         checkContents("/", "hello from the root index.html", TEXT_HTML)
     }
 
     @Test
-    open fun `loads embedded index file`() {
+    open fun `loads embedded index file`() = runBlocking {
         checkContents("org", "hello from the io index.html", TEXT_HTML)
         checkContents("org/", "hello from the io index.html", TEXT_HTML)
     }
 
     @Test
-    fun `loads existing child file`() {
+    fun `loads existing child file`() = runBlocking {
         checkContents("org/index.html", "hello from the io index.html", TEXT_HTML)
     }
 
     @Test
-    fun `missing file`() {
+    fun `missing file`() = runBlocking {
         checkContents("notAFile", null, TEXT_HTML)
     }
 
     @Test
-    fun `does not serve below route`() {
+    fun `does not serve below route`() = runBlocking {
         checkContents("../../../../.java-version", null, TEXT_HTML)
     }
 

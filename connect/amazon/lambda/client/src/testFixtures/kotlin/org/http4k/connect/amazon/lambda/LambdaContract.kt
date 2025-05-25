@@ -27,7 +27,7 @@ interface LambdaContract : AwsContract, PortBasedTest {
         Lambda.Http(aws.region, { aws.credentials }, http)
 
     @Test
-    fun `can use invokeFunction with an automarshalled event`() {
+    fun `can use invokeFunction with an automarshalled event`() = runBlocking {
         val input = ScheduledEvent().apply {
             account = "hello world"
         }
@@ -35,7 +35,7 @@ interface LambdaContract : AwsContract, PortBasedTest {
     }
 
     @Test
-    fun `can use invokeStreamFunction`() {
+    fun `can use invokeStreamFunction`() = runBlocking {
         assertThat(
             lambda.invokeStreamFunction(FunctionName.of("stream"), "hello".byteInputStream())
                 .map { it.reader().readText() },
@@ -44,7 +44,7 @@ interface LambdaContract : AwsContract, PortBasedTest {
     }
 
     @Test
-    fun `can invoke function over http`() {
+    fun `can invoke function over http`() = runBlocking {
         http.asServer(SunHttp(0)).start().use { it ->
             assertThat(
                 JavaHttpClient()(

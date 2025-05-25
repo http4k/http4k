@@ -14,7 +14,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 @DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
 class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) }, JavaHttpClient()) {
     @Disabled
-    override fun `should propagate close on server stop`() {
+    override fun `should propagate close on server stop`() = runBlocking {
         super.`should propagate close on server stop`()
     }
 
@@ -23,7 +23,7 @@ class HelidonWebsocketTest : WebsocketServerContract({ Helidon(it, Immediate) },
      * If not true, the helidon listener will throw an error
      */
     @Test
-    fun `can create multiple simultaneous connections`() {
+    fun `can create multiple simultaneous connections`() = runBlocking {
         val client1 = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
         val client2 = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=bar"))
 

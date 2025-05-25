@@ -19,7 +19,7 @@ class TV<T : Any>(value: T) : AbstractValue<T>(value)
 class Values4kExtensionTest {
 
     @Test
-    fun `type checks ok`() {
+    fun `type checks ok`() = runBlocking {
         val mapping = object : AutoMappingConfiguration<String> by mock(Relaxed) {}
 
         mapping.value(IntValueFactory(::TV))

@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -27,13 +28,13 @@ data class Items(
 interface BarAction<R> : Action<Result<R, RemoteFailure>>
 
 interface BarSystem {
-    operator fun <R : Any> invoke(action: BarAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R : Any> invoke(action: BarAction<R>): Result<R, RemoteFailure>
 
     companion object
 }
 
 fun BarSystem.Companion.Http(http: HttpHandler) = object : BarSystem {
-    override fun <R : Any> invoke(action: BarAction<R>) =
+    override suspend fun <R : Any> invoke(action: BarAction<R>) =
         action.toResult(http(action.toRequest()))
 }
 
@@ -56,7 +57,7 @@ class ABarPageAction(private val token: String? = null) : BarAction<Items>,
 class PagedTest {
 
     @Test
-    fun `pagination works ok when all good`() {
+    fun `pagination works ok when all good`() = runBlocking {
         var count = 2
         val bar = BarSystem.Http {
             when {
@@ -72,7 +73,7 @@ class PagedTest {
     }
 
     @Test
-    fun `pagination stops when failure occurs`() {
+    fun `pagination stops when failure occurs`() = runBlocking {
         var count = 5
         val bar = BarSystem.Http {
             when {

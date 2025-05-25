@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class OAuthClientCredentialsTest {
 
     @Test
-    fun `auths with correct form`() {
+    fun `auths with correct form`() = runBlocking {
         val app = ClientFilters.OAuthClientCredentials(
             Credentials(user = "hello", password = "world"),
             scopes = listOf("someactivity.write")
@@ -26,7 +26,7 @@ class OAuthClientCredentialsTest {
     }
 
     @Test
-    fun `omits scope if not provided`() {
+    fun `omits scope if not provided`() = runBlocking {
         val app = ClientFilters.OAuthClientCredentials(
             Credentials("hello", "world"),
             scopes = emptyList()

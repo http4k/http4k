@@ -71,7 +71,7 @@ class TestMcpClientTest {
     private val random = Random(0)
 
     @Test
-    fun `can use mcp client to connect and get responses`() {
+    fun `can use mcp client to connect and get responses`() = runBlocking {
         val capabilities = mcpHttpStreaming(
             ServerMetaData(
                 serverName, Version.of("1"),
@@ -94,7 +94,7 @@ class TestMcpClientTest {
     private val metadata = ServerMetaData(serverName, Version.of("1"))
 
     @Test
-    fun `deal with prompts`() {
+    fun `deal with prompts`() = runBlocking {
         val intArg = Prompt.Arg.int().required("name", "description")
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
@@ -156,7 +156,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with static resources`() {
+    fun `deal with static resources`() = runBlocking {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
@@ -204,7 +204,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with templated resources`() {
+    fun `deal with templated resources`() = runBlocking {
 
         val uri = Uri.of("https://www.http4k.org/value")
         val resource =
@@ -237,7 +237,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with tools`() {
+    fun `deal with tools`() = runBlocking {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
 
@@ -315,7 +315,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with completions`() {
+    fun `deal with completions`() = runBlocking {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val serverCompletions = ServerCompletions(
             listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
@@ -339,7 +339,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with progress`() {
+    fun `deal with progress`() = runBlocking {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
 
         val progress = Progress("hello", 1, 1.0)
@@ -380,7 +380,7 @@ class TestMcpClientTest {
     }
 
     @Test
-    fun `deal with client sampling`() {
+    fun `deal with client sampling`() = runBlocking {
         val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val model = ModelName.of("name")

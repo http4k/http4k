@@ -26,7 +26,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `when match, passes a consumer with the matching request`() {
+    fun `when match, passes a consumer with the matching request`() = runBlocking {
         val consumer = TestConsumer();
 
         { req: Request ->
@@ -36,7 +36,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `when match passes HTTP headers back`() {
+    fun `when match passes HTTP headers back`() = runBlocking {
         val consumer = TestConsumer();
 
         val client = { req: Request ->
@@ -49,7 +49,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `sends inbound messages to the client`() {
+    fun `sends inbound messages to the client`() = runBlocking {
         val client = { _: Request ->
             SseResponse { sse: Sse ->
                 sse.send(message)
@@ -63,7 +63,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `closed sse`() {
+    fun `closed sse`() = runBlocking {
         val client = { _: Request ->
             SseResponse { sse: Sse ->
                 sse.close()
@@ -74,7 +74,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `no match is just closed`() {
+    fun `no match is just closed`() = runBlocking {
         val actual = object : SseHandler {
             override fun invoke(request: Request) = SseResponse { it.close() }
         }.testSseClient(Request(GET, "/"))
@@ -83,7 +83,7 @@ class SseClientTest {
     }
 
     @Test
-    fun `when no messages`() {
+    fun `when no messages`() = runBlocking {
         val client = { _: Request ->
             SseResponse { sse: Sse ->
                 sse.close()

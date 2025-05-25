@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class HandlebarsTemplatesTest : TemplatesContract<HandlebarsTemplates>(HandlebarsTemplates()) {
 
     @Test
-    fun `hot reload multiple loaders`() {
+    fun `hot reload multiple loaders`() = runBlocking {
         val renderer = templates.HotReload("src/test/resources/a", "src/test/resources/b")
         assertThat(renderer(TemplateA), equalTo("a"))
         assertThat(renderer(TemplateB), equalTo("b"))
@@ -15,7 +15,7 @@ class HandlebarsTemplatesTest : TemplatesContract<HandlebarsTemplates>(Handlebar
     }
 
     @Test
-    fun `multiple loaders, first loaded wins`() {
+    fun `multiple loaders, first loaded wins`() = runBlocking {
         val rendererBFirst = templates.HotReload("src/test/resources/b", "src/test/resources/a")
         assertThat(rendererBFirst(TemplateC), equalTo("c2"))
     }

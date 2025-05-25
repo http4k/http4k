@@ -16,7 +16,7 @@ class AwsReverseProxyTest {
     object Service2 : AwsServiceCompanion("service2")
 
     @Test
-    fun `routes to correct AWS handler based on host header`() {
+    fun `routes to correct AWS handler based on host header`() = runBlocking {
         val reverseProxy = AwsReverseProxy(
             Service1 to { Response(OK) },
             Service2 to { Response(I_M_A_TEAPOT) }

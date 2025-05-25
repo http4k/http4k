@@ -1,5 +1,6 @@
 package org.http4k.server.websocket
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
 import org.http4k.core.Method.GET
@@ -101,7 +102,9 @@ private fun createServer(
         }
 
         conn.setAttachment(wsAdapter)
-        wsHandler(upgradeRequest)(wsAdapter)
+        runBlocking {
+            wsHandler(upgradeRequest)(wsAdapter)
+        }
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) {

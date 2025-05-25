@@ -10,7 +10,7 @@ import org.http4k.connect.amazon.AwsServiceCompanion
  */
 @Http4kConnectApiClient
 interface SNS {
-    operator fun <R> invoke(action: SNSAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: SNSAction<R>): Result<R, RemoteFailure>
 
     companion object : AwsServiceCompanion("sns")
 }

@@ -68,7 +68,7 @@ object DebuggingFilters {
     }
 }
 
-fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
+suspend fun HttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     PrintRequestAndResponse(out, debugStream).then(this)
 
 fun RoutingHttpHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =

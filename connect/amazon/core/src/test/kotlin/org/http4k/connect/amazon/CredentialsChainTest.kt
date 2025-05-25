@@ -13,7 +13,7 @@ class CredentialsChainTest {
     private val credentials456 = AwsCredentials("key456", "secret456")
 
     @Test
-    fun `second element has credentials`() {
+    fun `second element has credentials`() = runBlocking {
         val chain = CredentialsChain { null } orElse CredentialsChain { credentials456 }
 
         assertThat(
@@ -23,7 +23,7 @@ class CredentialsChainTest {
     }
 
     @Test
-    fun `first element has credentials`() {
+    fun `first element has credentials`() = runBlocking {
         val chain = CredentialsChain { credentials123 } orElse CredentialsChain { credentials456 }
 
         assertThat(
@@ -33,7 +33,7 @@ class CredentialsChainTest {
     }
 
     @Test
-    fun `no element has credentials`() {
+    fun `no element has credentials`() = runBlocking {
         val chain = CredentialsChain { null } orElse CredentialsChain { null }
 
         assertThat(
@@ -43,7 +43,7 @@ class CredentialsChainTest {
     }
 
     @Test
-    fun `as provider - with credentials`() {
+    fun `as provider - with credentials`() = runBlocking {
         val provider = CredentialsChain { credentials123 }.provider()
 
         assertThat(
@@ -53,7 +53,7 @@ class CredentialsChainTest {
     }
 
     @Test
-    fun `as provider no credentials`() {
+    fun `as provider no credentials`() = runBlocking {
         val provider = CredentialsChain { null }.provider()
 
         assertThrows<java.lang.IllegalArgumentException> {

@@ -13,7 +13,7 @@ interface TracePersistenceContract {
     val persistence: TracePersistence
 
     @Test
-    fun `can store and retrieve traces`() {
+    fun `can store and retrieve traces`() = runBlocking {
         with(persistence) {
             store(ScenarioTraces("trace3", listOf(entire_trace_1)))
             store(ScenarioTraces("trace2", listOf(bidi_b)))

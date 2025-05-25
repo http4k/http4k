@@ -19,7 +19,7 @@ class TokenRequestMoshiAdatperTest {
     private val marshaller = OAuthMoshi
 
     @Test
-    fun `deserialize with explicit nulls`() {
+    fun `deserialize with explicit nulls`() = runBlocking {
         val json = """{
             "grant_type":"authorization_code",
             "refresh_token":null,
@@ -38,7 +38,7 @@ class TokenRequestMoshiAdatperTest {
     }
 
     @Test
-    fun `deserialize with implicit nulls`() {
+    fun `deserialize with implicit nulls`() = runBlocking {
         val json = """{"grant_type":"authorization_code"}"""
 
         assertThat(marshaller.asA(json), equalTo(TokenRequest(
@@ -51,7 +51,7 @@ class TokenRequestMoshiAdatperTest {
     }
 
     @Test
-    fun `deserialize full json`() {
+    fun `deserialize full json`() = runBlocking {
         val json = """{
             "grant_type":"authorization_code",
             "refresh_token":"i_am_refreshed",

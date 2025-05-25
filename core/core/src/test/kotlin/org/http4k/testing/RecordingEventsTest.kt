@@ -13,7 +13,7 @@ class RecordingEventsTest {
     }
 
     @Test
-    fun `can get list of events back from recording events`() {
+    fun `can get list of events back from recording events`() = runBlocking {
         val recordingEvents = RecordingEvents()
         val first = MyEvent("foo")
         val second = MyEvent("bar")

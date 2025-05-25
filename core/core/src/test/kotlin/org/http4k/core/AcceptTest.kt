@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class AcceptTest {
 
     @Test
-    fun `checks accept headers for content type`() {
+    fun `checks accept headers for content type`() = runBlocking {
         val req = Request(GET, "").header("Accept", "application/json; q=0.9, application/x-www-form-urlencoded; q=0.8")
             .header("Accept", "application/xml")
 

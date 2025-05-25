@@ -2,6 +2,7 @@ package org.http4k.servlet.jakarta
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Parameters
@@ -19,7 +20,9 @@ import java.util.Enumeration
  */
 class Http4kJakartaServletAdapter(private val handler: HttpHandler) {
     fun handle(req: HttpServletRequest, resp: HttpServletResponse) {
-        (req.asHttp4kRequest()?.let(handler) ?: Response(NOT_IMPLEMENTED)).transferTo(resp)
+        (req.asHttp4kRequest()?.let {
+            runBlocking { handler(it) } // FIXME coroutine blocking
+        } ?: Response(NOT_IMPLEMENTED)).transferTo(resp)
     }
 }
 

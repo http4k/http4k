@@ -29,7 +29,7 @@ class SseCoreExtensionsTest {
     private val credentials = Credentials("123", "456")
 
     @Test
-    fun `can initialise and populate sse request context`() {
+    fun `can initialise and populate sse request context`() = runBlocking {
         val found = AtomicReference<Credentials>(null)
         val handler = ServerFilters.InitialiseSseRequestContext(contexts)
             .then(SseFilter { next ->
@@ -48,7 +48,7 @@ class SseCoreExtensionsTest {
     }
 
     @Test
-    fun `debug request`() {
+    fun `debug request`() = runBlocking {
         val os = ByteArrayOutputStream()
         val req = Request(GET, "").body("anything".byteInputStream())
 
@@ -67,7 +67,7 @@ class SseCoreExtensionsTest {
     }
 
     @Test
-    fun `debug response`() {
+    fun `debug response`() = runBlocking {
         val os = ByteArrayOutputStream()
         val req = Request(GET, "").body("anything".byteInputStream())
 
@@ -89,7 +89,7 @@ class SseCoreExtensionsTest {
     }
 
     @Test
-    fun `catch all`() {
+    fun `catch all`() = runBlocking {
         val error = AtomicReference<Throwable>()
         val e = Exception("foo")
 
@@ -105,7 +105,7 @@ class SseCoreExtensionsTest {
     }
 
     @Test
-    fun `reporting latency for request`() {
+    fun `reporting latency for request`() = runBlocking {
         var called = false
         val request = Request(GET, "")
         val response = SseResponse { it.close() }

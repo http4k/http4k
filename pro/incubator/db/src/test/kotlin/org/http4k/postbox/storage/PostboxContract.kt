@@ -36,7 +36,7 @@ abstract class PostboxContract {
     private val request = Request(GET, "/1")
 
     @Test
-    fun `store request`() {
+    fun `store request`() = runBlocking {
         val now = timeSource()
         store(requestId, request)
 
@@ -45,7 +45,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `store request is idempotent`() {
+    fun `store request is idempotent`() = runBlocking {
         val requestTwo = Request(GET, "/2")
 
         val firstPending = store(requestId, request)
@@ -56,7 +56,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `store request does not update previous request`() {
+    fun `store request does not update previous request`() = runBlocking {
         val requestTwo = Request(GET, "/2")
 
         store(requestId, request)
@@ -69,7 +69,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `store request multiple times does not affect pending retrieval order`() {
+    fun `store request multiple times does not affect pending retrieval order`() = runBlocking {
         val requestId2 = id(2)
         val request2 = Request(GET, "/2")
 
@@ -87,7 +87,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `mark request as processed`() {
+    fun `mark request as processed`() = runBlocking {
         store(requestId, request)
 
         markProcessed(requestId, Response(I_M_A_TEAPOT))
@@ -96,12 +96,12 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `cannot mark a request as processed if it does not exist`() {
+    fun `cannot mark a request as processed if it does not exist`() = runBlocking {
         markProcessed(requestId, Response(I_M_A_TEAPOT), Failure(RequestNotFound))
     }
 
     @Test
-    fun `cannot mark request as processed after it has already been processed`() {
+    fun `cannot mark request as processed after it has already been processed`() = runBlocking {
         store(requestId, request)
 
         markProcessed(requestId, Response(CONTINUE))
@@ -112,7 +112,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `cannot mark request as processed after it has been marked as failed`() {
+    fun `cannot mark request as processed after it has been marked as failed`() = runBlocking {
         store(requestId, request)
 
         markDead(requestId, Response(BAD_REQUEST))
@@ -122,7 +122,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `mark request as dead`() {
+    fun `mark request as dead`() = runBlocking {
         store(requestId, request)
 
         markDead(requestId, Response(I_M_A_TEAPOT))
@@ -132,12 +132,12 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `cannot mark a request as dead if it does not exist`() {
+    fun `cannot mark a request as dead if it does not exist`() = runBlocking {
         markDead(requestId, Response(I_M_A_TEAPOT), Failure(RequestNotFound))
     }
 
     @Test
-    fun `mark request as dead without a response`() {
+    fun `mark request as dead without a response`() = runBlocking {
         store(requestId, request)
 
         markDead(requestId)
@@ -147,7 +147,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `marks request as dead multiple times does not update an existing response`() {
+    fun `marks request as dead multiple times does not update an existing response`() = runBlocking {
         store(requestId, request)
 
         markDead(requestId, Response(I_M_A_TEAPOT))
@@ -158,7 +158,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `marks request as dead multiple times store response if previous was null`() {
+    fun `marks request as dead multiple times store response if previous was null`() = runBlocking {
         store(requestId, request)
 
         markDead(requestId, null)
@@ -169,7 +169,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `cannot mark request as dead after it has been processed`() {
+    fun `cannot mark request as dead after it has been processed`() = runBlocking {
         store(requestId, request)
 
         markProcessed(requestId, Response(I_M_A_TEAPOT))
@@ -179,12 +179,12 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `check status of a non existing request`() {
+    fun `check status of a non existing request`() = runBlocking {
         checkStatus(requestId, Failure(RequestNotFound))
     }
 
     @Test
-    fun `check status of a pending request`() {
+    fun `check status of a pending request`() = runBlocking {
         val now = timeSource()
         store(requestId, request)
 
@@ -192,7 +192,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `check status of a processed request`() {
+    fun `check status of a processed request`() = runBlocking {
         store(requestId, request)
         markProcessed(requestId, Response(I_M_A_TEAPOT), Success(Unit))
 
@@ -200,7 +200,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `check status of a dead request`() {
+    fun `check status of a dead request`() = runBlocking {
         val now = timeSource()
         store(requestId, request)
 
@@ -212,7 +212,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `mark request as failed`() {
+    fun `mark request as failed`() = runBlocking {
         val now = timeSource()
         val later = Duration.ofSeconds(10)
 
@@ -226,7 +226,7 @@ abstract class PostboxContract {
     }
 
     @Test
-    fun `mark request as failed multiple times increases counter and processing time`() {
+    fun `mark request as failed multiple times increases counter and processing time`() = runBlocking {
         val now = timeSource()
         val later = Duration.ofSeconds(10)
 

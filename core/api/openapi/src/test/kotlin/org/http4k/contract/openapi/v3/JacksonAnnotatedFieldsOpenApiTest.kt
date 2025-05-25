@@ -24,7 +24,7 @@ class JacksonAnnotatedFieldsOpenApiTest {
     }
 
     @Test
-    fun `does not blow up when rendering open api`() {
+    fun `does not blow up when rendering open api`() = runBlocking {
         app(Request(GET, "/"))
     }
 }

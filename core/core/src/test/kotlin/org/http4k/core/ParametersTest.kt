@@ -26,7 +26,7 @@ class ParametersTest {
     }
 
     @Test
-    fun `can convert parameters to map`() {
+    fun `can convert parameters to map`() = runBlocking {
         val map: Map<String, List<String?>> = listOf("a" to "A", "b" to "B", "a" to null).toParametersMap()
 
         assertThat(map["a"], equalTo(listOf("A", null)))
@@ -39,7 +39,7 @@ class ParametersTest {
     }
 
     @Test
-    fun `should split query param only into 2 strings`() {
+    fun `should split query param only into 2 strings`() = runBlocking {
         assertThat("q1=value1=10&q2=value2=10".toParameters(), equalTo(listOf("q1" to "value1=10", "q2" to "value2=10")))
     }
 }

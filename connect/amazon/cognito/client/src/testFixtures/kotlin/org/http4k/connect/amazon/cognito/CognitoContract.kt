@@ -62,21 +62,21 @@ interface CognitoContract : AwsContract {
 
     @Test
     @Disabled
-    fun `delete pools`() {
+    fun `delete pools`() = runBlocking {
         cognito.listUserPools(60).successValue().UserPools.forEach {
             cognito.deleteUserPool(it.Id)
         }
     }
 
     @Test
-    fun `can load well known keys`() {
+    fun `can load well known keys`() = runBlocking {
         withCognitoPool { id ->
             assertThat(cognito.getJwks(id).successValue().keys.size, equalTo(2))
         }
     }
 
     @Test
-    fun `user pool domain lifecycle`() {
+    fun `user pool domain lifecycle`() = runBlocking {
         withCognitoPool { id ->
             cognito.createResourceServer(id)
             val domain = CloudFrontDomain.of(randomUUID().toString())
@@ -91,7 +91,7 @@ interface CognitoContract : AwsContract {
     }
 
     @Test
-    fun `can get access token using client credentials grant`() {
+    fun `can get access token using client credentials grant`() = runBlocking {
         withCognitoPool { id ->
             val poolClient = createUserPoolClient(id)
 
@@ -108,7 +108,7 @@ interface CognitoContract : AwsContract {
     }
 
     @Test
-    fun `can get access token using auth code grant`() {
+    fun `can get access token using auth code grant`() = runBlocking {
         withCognitoPool { id ->
             val poolClient = createUserPoolClient(id)
 
@@ -162,7 +162,7 @@ interface CognitoContract : AwsContract {
 
     @Test
     @Disabled("WIP")
-    fun `user pool operations`() {
+    fun `user pool operations`() = runBlocking {
         withCognitoPool { id ->
             val username = Username.of(randomUUID().toString())
             adminCreateUser(
@@ -187,7 +187,7 @@ interface CognitoContract : AwsContract {
 
     @Test
     @Disabled("WIP")
-    fun `user auth lifecycle`() {
+    fun `user auth lifecycle`() = runBlocking {
         withCognitoPool { id ->
             val username = Username.of(randomUUID().toString())
 

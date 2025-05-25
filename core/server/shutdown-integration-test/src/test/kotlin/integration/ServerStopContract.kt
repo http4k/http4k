@@ -125,17 +125,17 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `immediate stop mode is blocking on stop`() {
+    fun `immediate stop mode is blocking on stop`() = runBlocking {
         startServerOrSkip(Immediate).testBlockingStop()
     }
 
     @Test
-    fun `graceful stop mode is blocking on stop`() {
+    fun `graceful stop mode is blocking on stop`() = runBlocking {
         startServerOrSkip(defaultGracefulStopMode).testBlockingStop()
     }
 
     @Test
-    fun `immediate stop mode is quick`() {
+    fun `immediate stop mode is quick`() = runBlocking {
         val server = startServerOrSkip(Immediate)
 
         assertTimeout(timeoutTolerance) {
@@ -144,7 +144,7 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `graceful stop mode takes at most the specified timeout to stop`() {
+    fun `graceful stop mode takes at most the specified timeout to stop`() = runBlocking {
         val modeInTest = defaultGracefulStopMode
         val server = startServerOrSkip(modeInTest)
 
@@ -154,7 +154,7 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `immediate stop mode is cancelling inflight requests`() {
+    fun `immediate stop mode is cancelling inflight requests`() = runBlocking {
         val server = startServerOrSkip(Immediate)
 
         val assertion = assertThrows<AssertionError> {
@@ -165,12 +165,12 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `graceful stop mode is waiting for inflight requests to succeed`() {
+    fun `graceful stop mode is waiting for inflight requests to succeed`() = runBlocking {
         startServerOrSkip(defaultGracefulStopMode).testInflightRequestsCompleteDuringServerStop()
     }
 
     @Test
-    fun `server config throws when invoked with unsupported stop mode`() {
+    fun `server config throws when invoked with unsupported stop mode`() = runBlocking {
         val illegalConfigurationAttempts: Array<() -> Unit> =
             listOf(Immediate, defaultGracefulStopMode)
                 .subtract(supportedStopModes)

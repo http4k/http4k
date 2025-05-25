@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.contract.PreFlightExtraction.Companion.All
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -10,22 +11,28 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.security.Security
 import org.http4k.util.Appendable
 
-fun contract(fn: ContractBuilder.() -> Unit): RoutingHttpHandler = ContractBuilder().apply(fn).run {
-    RoutingHttpHandler(
-        listOf(
-            ContractRouteMatcher(
-                renderer, security, tags.all.toSet(),
-                descriptionSecurity,
-                descriptionPath,
-                preFlightExtraction,
-                routes.all,
-                preSecurityFilter = preSecurityFilter,
-                postSecurityFilter = postSecurityFilter,
-                includeDescriptionRoute = includeDescriptionRoute,
-                webhooks = webhooks
+fun contract(fn: suspend ContractBuilder.() -> Unit): RoutingHttpHandler {
+    val contractBuilder = ContractBuilder()
+
+    runBlocking { contractBuilder.fn() }
+
+    return with(contractBuilder) {
+        RoutingHttpHandler(
+            listOf(
+                ContractRouteMatcher(
+                    renderer, security, tags.all.toSet(),
+                    descriptionSecurity,
+                    descriptionPath,
+                    preFlightExtraction,
+                    routes.all,
+                    preSecurityFilter = preSecurityFilter,
+                    postSecurityFilter = postSecurityFilter,
+                    includeDescriptionRoute = includeDescriptionRoute,
+                    webhooks = webhooks
+                )
             )
         )
-    )
+    }
 }
 
 class ContractBuilder internal constructor() {

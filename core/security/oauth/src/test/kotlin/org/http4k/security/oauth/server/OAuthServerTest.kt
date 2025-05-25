@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 class OAuthServerTest {
 
     @Test
-    fun `can follow authorization code flow`() {
+    fun `can follow authorization code flow`() = runBlocking {
         val authenticationServer = customOauthAuthorizationServer()
         val consumerApp = oauthClientApp(authenticationServer)
 
@@ -39,7 +39,7 @@ class OAuthServerTest {
     }
 
     @Test
-    fun `authorization flow with oauth request persistence`() {
+    fun `authorization flow with oauth request persistence`() = runBlocking {
         val authenticationServer = customOauthAuthorizationServerWithPersistence()
         val consumerApp = oauthClientApp(authenticationServer)
 

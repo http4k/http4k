@@ -19,7 +19,7 @@ class WebFormTest {
     private val emptyRequest = Request(GET, "")
 
     @Test
-    fun `web form serialized into request`() {
+    fun `web form serialized into request`() = runBlocking {
         val stringField = FormField.required("hello")
         val intField = FormField.int().required("another")
 
@@ -34,7 +34,7 @@ class WebFormTest {
     }
 
     @Test
-    fun `web form blows up if not URL content type`() {
+    fun `web form blows up if not URL content type`() = runBlocking {
         val request = emptyRequest.header("Content-Type", "unknown").body(Body("hello=world&another=123"))
 
         assertThat({
@@ -46,7 +46,7 @@ class WebFormTest {
     }
 
     @Test
-    fun `web form extracts ok form values`() {
+    fun `web form extracts ok form values`() = runBlocking {
         val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("hello=world&another=123"))
 
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
@@ -58,7 +58,7 @@ class WebFormTest {
     }
 
     @Test
-    fun `feedback web form extracts ok form values and errors`() {
+    fun `feedback web form extracts ok form values and errors`() = runBlocking {
         val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("another=123"))
 
         val requiredString = FormField.required("hello")
@@ -69,7 +69,7 @@ class WebFormTest {
     }
 
     @Test
-    fun `strict web form blows up with invalid form values`() {
+    fun `strict web form blows up with invalid form values`() = runBlocking {
         val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("another=notANumber"))
 
         val stringRequiredField = FormField.required("hello")
@@ -81,7 +81,7 @@ class WebFormTest {
     }
 
     @Test
-    fun `can set multiple values on a form`() {
+    fun `can set multiple values on a form`() = runBlocking {
         val stringField = FormField.required("hello")
         val intField = FormField.int().required("another")
 

@@ -53,7 +53,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
         SseMcp(protocol, ApiKeyMcpSecurity(Header.required("KEY"), { it == "123" }))
 
     @Test
-    fun `deals with error`() {
+    fun `deals with error`() = runBlocking {
         val toolArg = Tool.Arg.string().required("name")
 
         val protocol = McpProtocol(

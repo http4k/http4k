@@ -20,7 +20,7 @@ interface FirehoseContract : AwsContract {
     private val deliveryStreamName get() = DeliveryStreamName.of(uuid().toString())
 
     @Test
-    fun `delivery stream lifecycle`() {
+    fun `delivery stream lifecycle`() = runBlocking {
         with(firehose) {
             try {
                 createDeliveryStream(

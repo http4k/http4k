@@ -24,7 +24,7 @@ import java.util.Optional
 class AwsSdkClientTest {
 
     @Test
-    fun `converts formats correctly`() {
+    fun `converts formats correctly`() = runBlocking {
         val headers = listOf("bar" to null, "foo" to "bar1")
         val request = Request(POST, "https://foobar/123")
             .query("foo", "bar1")

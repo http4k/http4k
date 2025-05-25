@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test
 
 class WsStatusTest {
     @Test
-    fun `can override description`() {
+    fun `can override description`() = runBlocking {
         val description = EXTENSION.description("all good")
         assertThat(description.description, equalTo("all good"))
         assertThat(description.toString(), equalTo("1010 all good"))
     }
 
     @Test
-    fun `equality does not include description`() {
+    fun `equality does not include description`() = runBlocking {
         assertThat(EXTENSION.description("foo") == EXTENSION.description("bar"), equalTo(true))
     }
 }

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class StorageExplorerTest {
 
     @Test
-    fun `can serve API spec and UI`() {
+    fun `can serve API spec and UI`() = runBlocking {
         val explorer = Storage.InMemory<Entry>().asHttpHandler()
         assertThat(explorer(Request(GET, "/api/openapi")), hasStatus(OK))
         assertThat(explorer(Request(GET, "/")), hasStatus(OK) and hasBody(containsSubstring("html")))

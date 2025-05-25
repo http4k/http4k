@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 abstract class TransactorWithRetryContract: TransactorContract() {
 
     @Test
-    open fun `retries serialisable transaction`() {
+    open fun `retries serialisable transaction`() = runBlocking {
         val transactor = transactor()
         val executor = Executors.newVirtualThreadPerTaskExecutor()
 
@@ -35,7 +35,7 @@ abstract class TransactorWithRetryContract: TransactorContract() {
     }
 
     @Test
-    open fun `throw if exceeds retries attempts`() {
+    open fun `throw if exceeds retries attempts`() = runBlocking {
         val transactor = transactor()
         val executor = Executors.newVirtualThreadPerTaskExecutor()
 

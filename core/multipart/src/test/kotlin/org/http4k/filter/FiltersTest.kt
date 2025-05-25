@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType
 import org.http4k.core.Method.POST
 import org.http4k.core.MultipartFormBody
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Test
 class FiltersTest {
 
     @Test
-    fun `process files filter and convert form from multipart webform`() {
+    fun `process files filter and convert form from multipart webform`() = runBlocking {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
             ("file" to MultipartFormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())) +
             ("field" to "bar")

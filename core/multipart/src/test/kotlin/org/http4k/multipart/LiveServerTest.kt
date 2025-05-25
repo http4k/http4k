@@ -3,6 +3,7 @@ package org.http4k.multipart
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.POST
 import org.http4k.core.MultipartFormBody
@@ -20,7 +21,7 @@ import java.nio.file.Files
 class LiveServerTest : PortBasedTest {
 
     @Test
-    fun `can send multipart over wire`() {
+    fun `can send multipart over wire`() = runBlocking {
 
         val diskDir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 

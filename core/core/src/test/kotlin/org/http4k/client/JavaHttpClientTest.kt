@@ -21,12 +21,12 @@ class JavaHttpClientTest : HttpClientContract(
     HttpClientWithMemoryModeContract {
 
     @Disabled("unsupported by the underlying java client")
-    override fun `handles response with custom status message`() {
+    override fun `handles response with custom status message`() = runBlocking {
         super.`handles response with custom status message`()
     }
 
     @Test
-    fun `supports gzipped content`() {
+    fun `supports gzipped content`() = runBlocking {
         val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp(0))
         asServer.start()
         val client = JavaHttpClient()
@@ -40,6 +40,6 @@ class JavaHttpClientTest : HttpClientContract(
 
     @Override
     @Disabled("unsupported - we can't tell the difference between unknown host and connection refused")
-    override fun `unknown host is correctly reported`() {
+    override fun `unknown host is correctly reported`() = runBlocking {
     }
 }

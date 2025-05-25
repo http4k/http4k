@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 
 class DataFrameJsonTest {
     @Test
-    fun `can extract a set of typed JSON records from an HTTP message`() {
+    fun `can extract a set of typed JSON records from an HTTP message`() = runBlocking {
         val request = Request(GET, "").body(javaClass.getResourceAsStream("/services.json")!!)
         val services = request.dataFrameJson<Service>()
         assertThat(services.size(), equalTo(DataFrameSize(2, 2)))

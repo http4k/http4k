@@ -46,7 +46,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     }
 
     @Test
-    fun `if no request jwt then do nothing, just treat it as a normal request`() {
+    fun `if no request jwt then do nothing, just treat it as a normal request`() = runBlocking {
         assertThat(
             underTest().extract(Request(GET, "/?client_id=12345&response_type=code&redirect_uri=https://somehost")),
             equalTo(
@@ -64,7 +64,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     }
 
     @Test
-    fun `if has request jwt but not valid then error`() {
+    fun `if has request jwt but not valid then error`() = runBlocking {
         assertThat(
             underTest().extract(
                 Request(
@@ -77,7 +77,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     }
 
     @Test
-    fun `if has 'valid' request jwt but fails parsing then error`() {
+    fun `if has 'valid' request jwt but fails parsing then error`() = runBlocking {
         assertThat(
             underTest().extract(
                 Request(
@@ -90,7 +90,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     }
 
     @Test
-    fun `if no client_id on request uri but in request jwt then error`() {
+    fun `if no client_id on request uri but in request jwt then error`() = runBlocking {
         val requestObject = RequestObject(client = ClientId("12345"))
         val requestObjectJwt = requestJwt(requestObject)
         assertThat(
@@ -104,7 +104,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     }
 
     @Test
-    fun `if client_id on request uri but has different on in request jwt then error`() {
+    fun `if client_id on request uri but has different on in request jwt then error`() = runBlocking {
         val requestObject = RequestObject(client = ClientId("54321"))
         val requestObjectJwt = requestJwt(requestObject)
         assertThat(
@@ -122,7 +122,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     inner class CombineAuthRequestAndRequestObject {
 
         @Test
-        fun `if client_id on request uri and has same one in request jwt then success`() {
+        fun `if client_id on request uri and has same one in request jwt then success`() = runBlocking {
             val requestObject = RequestObject(client = ClientId("12345"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -148,7 +148,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if redirect_uri is null on request but available on request object user that one`() {
+        fun `if redirect_uri is null on request but available on request object user that one`() = runBlocking {
             val requestObject = RequestObject(redirectUri = Uri.of("https://somehost"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -170,7 +170,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `scopes are the same on request and request object but in different order than it is correct`() {
+        fun `scopes are the same on request and request object but in different order than it is correct`() = runBlocking {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -196,7 +196,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if scopes on the request are missing but available on the request jwt`() {
+        fun `if scopes on the request are missing but available on the request jwt`() = runBlocking {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -222,7 +222,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if scopes on the request are missing but missing on the request jwt`() {
+        fun `if scopes on the request are missing but missing on the request jwt`() = runBlocking {
             val requestObject = RequestObject(state = State("some state"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -253,7 +253,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     inner class AuthRequestOnly {
 
         @Test
-        fun `if client_id on request uri and has same one in request jwt then success`() {
+        fun `if client_id on request uri and has same one in request jwt then success`() = runBlocking {
             val requestObject = RequestObject(client = ClientId("12345"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -279,7 +279,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if redirect_uri is null on request but available on request object user that one`() {
+        fun `if redirect_uri is null on request but available on request object user that one`() = runBlocking {
             val requestObject = RequestObject(redirectUri = Uri.of("https://somehost"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -305,7 +305,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `scopes are the same on request and request object but in different order than it is correct`() {
+        fun `scopes are the same on request and request object but in different order than it is correct`() = runBlocking {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -331,7 +331,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if scopes on the request are missing but available on the request jwt, only use the auth request one`() {
+        fun `if scopes on the request are missing but available on the request jwt, only use the auth request one`() = runBlocking {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -357,7 +357,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if scopes on the request are missing but missing on the request jwt, only use the auth request one`() {
+        fun `if scopes on the request are missing but missing on the request jwt, only use the auth request one`() = runBlocking {
             val requestObject = RequestObject(state = State("some state"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -388,7 +388,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     inner class RequestObjectOnly {
 
         @Test
-        fun `if client_id on request uri and has same one in request jwt then success`() {
+        fun `if client_id on request uri and has same one in request jwt then success`() = runBlocking {
             val requestObject = RequestObject(client = ClientId("12345"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -414,7 +414,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if redirect_uri is null on request but available on request object user that one`() {
+        fun `if redirect_uri is null on request but available on request object user that one`() = runBlocking {
             val requestObject = RequestObject(redirectUri = Uri.of("https://somehost"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -440,7 +440,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `scopes are the same on request and request object but in different order than it is correct`() {
+        fun `scopes are the same on request and request object but in different order than it is correct`() = runBlocking {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -466,7 +466,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if scopes on the request are missing but available on the request jwt, only use the request object one`() {
+        fun `if scopes on the request are missing but available on the request jwt, only use the request object one`() = runBlocking {
             val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(
@@ -492,7 +492,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         }
 
         @Test
-        fun `if scopes on the request are missing but missing on the request jwt, only use the request object one`() {
+        fun `if scopes on the request are missing but missing on the request jwt, only use the request object one`() = runBlocking {
             val requestObject = RequestObject(state = State("some state"))
             val requestObjectJwt = requestJwt(requestObject)
             assertThat(

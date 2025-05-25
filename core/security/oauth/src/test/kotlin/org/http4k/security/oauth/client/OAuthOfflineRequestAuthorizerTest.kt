@@ -99,7 +99,7 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `call with valid refresh token`() {
+    fun `call with valid refresh token`() = runBlocking {
         val client = client(validRefreshToken)
 
         val response = client(request)
@@ -110,7 +110,7 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `access token will be reused if caching enabled`() {
+    fun `access token will be reused if caching enabled`() = runBlocking {
         val client = client(validRefreshToken, accessTokens = AccessTokens.InMemory())
 
         // make first call
@@ -129,7 +129,7 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `subsequent calls without access token cache will request new access token each time`() {
+    fun `subsequent calls without access token cache will request new access token each time`() = runBlocking {
         val client = client(validRefreshToken)
 
         // make first call
@@ -152,7 +152,7 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `call with invalid refresh token - unauthorized`() {
+    fun `call with invalid refresh token - unauthorized`() = runBlocking {
         val client = client("not_refreshing")
 
         val response = client(request)
@@ -161,7 +161,7 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `call with invalid client credentials - unauthorized`() {
+    fun `call with invalid client credentials - unauthorized`() = runBlocking {
         val config = providerConfig.copy(credentials = Credentials("wrong", "credentials"))
         val client = client(validRefreshToken, config = config)
 
@@ -170,7 +170,7 @@ class OAuthOfflineRequestAuthorizerTest {
     }
 
     @Test
-    fun `call with expired cached access token - should be refreshed`() {
+    fun `call with expired cached access token - should be refreshed`() = runBlocking {
         val client = client(validRefreshToken, accessTokens = AccessTokens.InMemory())
 
         val response = client(request)

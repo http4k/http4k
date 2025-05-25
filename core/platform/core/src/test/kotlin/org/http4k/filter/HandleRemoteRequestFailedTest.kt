@@ -21,7 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class HandleRemoteRequestFailedTest {
 
     @Test
-    fun `when server and client filters are used together, converts errors as expected`() {
+    fun `when server and client filters are used together, converts errors as expected`() = runBlocking {
         assertServerResponseForClientStatus(Status.OK, org.http4k.hamkrest.hasStatus(Status.OK))
         assertServerResponseForClientStatus(
             Status.CLIENT_TIMEOUT,
@@ -55,7 +55,7 @@ class HandleRemoteRequestFailedTest {
     }
 
     @Test
-    fun `client throws when filter fails`() {
+    fun `client throws when filter fails`() = runBlocking {
         assertThat({
             ClientFilters.HandleRemoteRequestFailed({ false }).then { Response(Status.NOT_FOUND) }(
                 Request(
@@ -67,7 +67,7 @@ class HandleRemoteRequestFailedTest {
     }
 
     @Test
-    fun `server handles custom exception`() {
+    fun `server handles custom exception`() = runBlocking {
         assertThat(
             ServerFilters.HandleRemoteRequestFailed().then { throw CustomUpstreamFailure }(
                 Request(

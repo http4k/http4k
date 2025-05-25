@@ -25,7 +25,7 @@ class OAuthCallback(
     private val accessTokenFetcher: AccessTokenFetcher
 ) : HttpHandler {
 
-    override fun invoke(request: Request) = request.callbackParameters()
+    override suspend fun invoke(request: Request) = request.callbackParameters()
         .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
         .flatMap { parameters -> validateNonce(parameters, oAuthPersistence.retrieveNonce(request)) }
         .flatMap { parameters -> consumeIdToken(parameters) }

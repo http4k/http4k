@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 class ProduceMessagesWithPartitionsTest {
 
     @Test
-    fun `writing to a list of partitions using a partitioner`() {
+    fun `writing to a list of partitions using a partitioner`() = runBlocking {
         val kafkaRest = KafkaRest.Http(
             Credentials("", ""), Uri.of(""), FakeKafkaRest()
         )

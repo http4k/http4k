@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test
 class RouterMatchingTest {
 
     @Test
-    fun `lens router`() {
+    fun `lens router`() = runBlocking {
         val router = Query.int().required("foo").matches { it > 5 }
         assertThat(router(Request(GET, "").query("foo", "6")), isA<Matched>())
         assertThat(router(Request(GET, "").query("foo", "5")), isA<NotMatched>())
@@ -32,7 +32,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `path router`() {
+    fun `path router`() = runBlocking {
         val router = "/bob" and GET.asRouter()
         assertThat(router(Request(GET, "bob")), isA<Matched>())
         assertThat(router(Request(GET, "/bob")), isA<Matched>())
@@ -40,7 +40,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `accepting content type with a path`() {
+    fun `accepting content type with a path`() = runBlocking {
         val router = "bob".accepting(APPLICATION_JSON)
         assertThat(router(Request(GET, "bob")), isA<NotMatched>())
         assertThat(router(Request(GET, "/bob").accept(TEXT_EVENT_STREAM)), isA<NotMatched>())
@@ -48,7 +48,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `headers router`() {
+    fun `headers router`() = runBlocking {
         val router = headers("foo", "bar")
         assertThat(router(Request(GET, "").header("foo", "1").header("bar", "2")), isA<Matched>())
         assertThat(router(Request(GET, "").header("foo", "1")), isA<NotMatched>())
@@ -57,7 +57,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `header predicate router`() {
+    fun `header predicate router`() = runBlocking {
         val router = header("foo") { it == "bar" }
         assertThat(router(Request(GET, "").header("foo", "1").header("foo", "bar")), isA<Matched>())
         assertThat(router(Request(GET, "").header("foo", "1")), isA<NotMatched>())
@@ -65,7 +65,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `header value router`() {
+    fun `header value router`() = runBlocking {
         val router = header("foo", "bar")
         assertThat(router(Request(GET, "").header("foo", "1").header("foo", "bar")), isA<Matched>())
         assertThat(router(Request(GET, "").header("foo", "1")), isA<NotMatched>())
@@ -73,7 +73,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `query predicate router`() {
+    fun `query predicate router`() = runBlocking {
         val router = query("foo") { it == "bar" }
         assertThat(router(Request(GET, "").query("foo", "1").query("foo", "bar")), isA<Matched>())
         assertThat(router(Request(GET, "").query("foo", "1")), isA<NotMatched>())
@@ -81,7 +81,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `query value router`() {
+    fun `query value router`() = runBlocking {
         val router = query("foo", "bar")
         assertThat(router(Request(GET, "").query("foo", "1").query("foo", "bar")), isA<Matched>())
         assertThat(router(Request(GET, "").query("foo", "1")), isA<NotMatched>())
@@ -89,14 +89,14 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `query present router`() {
+    fun `query present router`() = runBlocking {
         val router = query("foo")
         assertThat(router(Request(GET, "").query("foo", null)), isA<Matched>())
         assertThat(router(Request(GET, "")), isA<NotMatched>())
     }
 
     @Test
-    fun `queries router`() {
+    fun `queries router`() = runBlocking {
         val router = queries("foo", "bar")
         assertThat(router(Request(GET, "").query("foo", "1").query("bar", "2")), isA<Matched>())
         assertThat(router(Request(GET, "").query("foo", "1")), isA<NotMatched>())
@@ -105,7 +105,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `queriesFrom router`() {
+    fun `queriesFrom router`() = runBlocking {
         val router = queriesFrom(Uri.of("http://localhost:8080?foo=boo&bar"))
 
         assertThat(router(Request(GET, "http://localhost:8080?foo=bar")), isA<NotMatched>())
@@ -113,7 +113,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `generic router`() {
+    fun `generic router`() = runBlocking {
         val router = Router("foo", NOT_FOUND, { r: Request -> r.method == GET })
         assertThat(router(Request(GET, "")), isA<Matched>())
         assertThat(router(Request(POST, "")), isA<NotMatched>())
@@ -121,7 +121,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `method router`() {
+    fun `method router`() = runBlocking {
         val router = GET.asRouter()
         assertThat(router(Request(GET, "")), isA<Matched>())
         assertThat(
@@ -131,13 +131,13 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `all router`() {
+    fun `all router`() = runBlocking {
         assertThat(All(Request(GET, "")), isA<Matched>())
         assertThat(All(Request(POST, "")), isA<Matched>())
     }
 
     @Test
-    fun `body string router`() {
+    fun `body string router`() = runBlocking {
         val router = body { it: String -> it == "hello" }
         assertThat(router(Request(POST, "")), isA<NotMatched>())
         assertThat(router(Request(POST, "").body("anything")), isA<NotMatched>())
@@ -145,7 +145,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `body router`() {
+    fun `body router`() = runBlocking {
         val router = body { it: Body -> it.length?.toInt() == 3 }
         assertThat(router(Request(POST, "")), isA<NotMatched>())
         assertThat(router(Request(POST, "").body("anything")), isA<NotMatched>())
@@ -154,7 +154,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `composite router`() {
+    fun `composite router`() = runBlocking {
         val router = GET.and(header("foo", "bar").and(query("bar", "foo")))
         assertThat(router(Request(GET, "").header("foo", "bar").query("bar", "foo")), isA<Matched>())
         assertThat(router(Request(POST, "").header("foo", "bar").query("bar", "foo")), isA<NotMatched>())
@@ -163,7 +163,7 @@ class RouterMatchingTest {
     }
 
     @Test
-    fun `composite router with a bound router`() {
+    fun `composite router with a bound router`() = runBlocking {
         val router = GET.asRouter().and(header("foo", "bar"))
 
         assertThat(router(Request(GET, "")), isA<NotMatched>())

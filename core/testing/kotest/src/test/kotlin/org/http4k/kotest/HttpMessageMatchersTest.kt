@@ -78,7 +78,7 @@ class HttpMessageMatchersTest {
         )
 
     @Test
-    fun `body string matcher`() {
+    fun `body string matcher`() = runBlocking {
         val be: Matcher<Body> = be(Body("bob"))
         val be1 = be(Body("bill"))
         assertMatchAndNonMatch(

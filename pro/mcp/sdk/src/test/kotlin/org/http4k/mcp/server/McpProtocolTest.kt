@@ -117,7 +117,7 @@ class McpProtocolTest {
     private val random = Random(0)
 
     @Test
-    fun `performs init loop on startup`() {
+    fun `performs init loop on startup`() = runBlocking {
         val mcp = SseMcp(
             McpProtocol(
                 metadata,
@@ -136,7 +136,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `update roots`() {
+    fun `update roots`() = runBlocking {
         val roots = ServerRoots()
 
         val mcp = SseMcp(
@@ -165,7 +165,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `handles cancellations`() {
+    fun `handles cancellations`() = runBlocking {
         val cancellations = ServerCancellations()
 
         val id = McpMessageId.of(123456789)
@@ -196,7 +196,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `deal with prompts`() {
+    fun `deal with prompts`() = runBlocking {
         val intArg = Prompt.Arg.int().required("name", "description")
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
 
@@ -250,7 +250,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `deal with static resources`() {
+    fun `deal with static resources`() = runBlocking {
         val resource = Resource.Static(
             Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description",
             IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0))
@@ -310,7 +310,7 @@ class McpProtocolTest {
         assertThrows<NoSuchElementException> { received().first() }
 
     @Test
-    fun `deal with templated resources`() {
+    fun `deal with templated resources`() = runBlocking {
         val resource =
             Resource.Templated(
                 "https://www.http4k.org/{+template}", "HTTP4K", "description",
@@ -383,7 +383,7 @@ class McpProtocolTest {
     data class FooBar(val foo: String)
 
     @Test
-    fun `deal with tools`() {
+    fun `deal with tools`() = runBlocking {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
         val output = Tool.Output.auto(FooBar("bar")).toLens()
@@ -496,7 +496,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `deal with logger`() {
+    fun `deal with logger`() = runBlocking {
         val logger = ServerLogger()
         val mcp = SseMcp(
             McpProtocol(
@@ -526,7 +526,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `deal with completions`() {
+    fun `deal with completions`() = runBlocking {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind {
@@ -566,7 +566,7 @@ class McpProtocolTest {
     }
 
     @Test
-    fun `can handle batched messages`() {
+    fun `can handle batched messages`() = runBlocking {
         val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })

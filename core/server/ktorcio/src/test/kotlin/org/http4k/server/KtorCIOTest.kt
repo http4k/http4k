@@ -10,11 +10,11 @@ class KtorCIOTest :
     ServerContract({ _, stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) }, ClientForServerTesting()) {
 
     @Test
-    override fun `ok when length already set`() {
+    override fun `ok when length already set`() = runBlocking {
     }
 
     @Test
-    override fun `can start on port zero and then get the port`() {
+    override fun `can start on port zero and then get the port`() = runBlocking {
     }
 
     override fun clientAddress(): Matcher<String?> = present()

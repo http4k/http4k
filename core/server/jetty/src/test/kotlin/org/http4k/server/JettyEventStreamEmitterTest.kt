@@ -25,14 +25,14 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     private val connectRequest = Request(Method.GET, "")
 
     @Test
-    fun `sse connectRequest is returned`() {
+    fun `sse connectRequest is returned`() = runBlocking {
         val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
         assertThat(emitter.connectRequest, equalTo(connectRequest))
     }
 
     @Test
-    fun `can send Retry message`() {
+    fun `can send Retry message`() = runBlocking {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
@@ -43,7 +43,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `can send Data message`() {
+    fun `can send Data message`() = runBlocking {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
@@ -54,7 +54,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `can send Data message containing multiple lines`() {
+    fun `can send Data message containing multiple lines`() = runBlocking {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
@@ -65,7 +65,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `can send Event message with an id`() {
+    fun `can send Event message with an id`() = runBlocking {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
@@ -76,7 +76,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `can send Event message without an id`() {
+    fun `can send Event message without an id`() = runBlocking {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
@@ -87,7 +87,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `can send Event message with multiline data`() {
+    fun `can send Event message with multiline data`() = runBlocking {
         val output = FakeOutput()
         val emitter = JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), FakeScheduler(), nothingOnClose)
 
@@ -98,7 +98,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `schedules a heart beat on creation with provided duration`() {
+    fun `schedules a heart beat on creation with provided duration`() = runBlocking {
         val scheduler = FakeScheduler()
         val emitter = JettyEventStreamEmitter(connectRequest, FakeOutput(), Duration.ofMillis(5), scheduler, nothingOnClose)
 
@@ -115,7 +115,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `when a heart beat triggers a blank line is written to the output and a new heart beat is scheduled`() {
+    fun `when a heart beat triggers a blank line is written to the output and a new heart beat is scheduled`() = runBlocking {
         val scheduler = FakeScheduler()
         val output = FakeOutput()
         JettyEventStreamEmitter(connectRequest, output, Duration.ofMillis(5), scheduler, nothingOnClose)
@@ -128,7 +128,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `close cancels the heart beat and invokes the onClose callbacks`() {
+    fun `close cancels the heart beat and invokes the onClose callbacks`() = runBlocking {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
@@ -144,7 +144,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `close called multiple times only cancels the heart beat and invokes the onClose callbacks once`() {
+    fun `close called multiple times only cancels the heart beat and invokes the onClose callbacks once`() = runBlocking {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
@@ -162,7 +162,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `close is called on lifeCycleStopping`() {
+    fun `close is called on lifeCycleStopping`() = runBlocking {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)
@@ -178,7 +178,7 @@ class JettyEventStreamEmitterTest: InMemoryTest {
     }
 
     @Test
-    fun `close is called when the heart beat cannot write to the output`() {
+    fun `close is called when the heart beat cannot write to the output`() = runBlocking {
         val scheduler = FakeScheduler()
         val emitterOnCloseCallCount = AtomicInteger(0)
         val sseOnCloseCallCount = AtomicInteger(0)

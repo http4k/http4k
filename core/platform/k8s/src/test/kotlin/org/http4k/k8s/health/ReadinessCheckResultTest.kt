@@ -10,14 +10,14 @@ class ReadinessCheckResultTest {
     private val failure = Failed("name2", "foobar")
 
     @Test
-    fun `simple result`() {
+    fun `simple result`() = runBlocking {
         assertThat(success.pass, equalTo(true))
         assertThat(failure.pass, equalTo(false))
         assertThat(success, equalTo(Completed("name")))
     }
 
     @Test
-    fun `composite result collects results`() {
+    fun `composite result collects results`() = runBlocking {
         assertThat((success + success).pass, equalTo(true))
         assertThat((failure + success).pass, equalTo(false))
     }

@@ -24,7 +24,7 @@ class OAuthProvidersTest {
     private val oAuthPersistence = FakeOAuthPersistence()
 
     @Test
-    fun `configures correctly`() {
+    fun `configures correctly`() = runBlocking {
         assertProvider(OAuthProvider.auth0(uri, client("foo"), credentials, uri, oAuthPersistence), "https://foo/authorize")
         assertProvider(OAuthProvider.dropbox(client("api.dropboxapi.com"), credentials, uri, oAuthPersistence), "https://www.dropbox.com/oauth2/authorize")
         assertProvider(OAuthProvider.facebook(client("graph.facebook.com"), credentials, uri, oAuthPersistence), "https://www.facebook.com/dialog/oauth")

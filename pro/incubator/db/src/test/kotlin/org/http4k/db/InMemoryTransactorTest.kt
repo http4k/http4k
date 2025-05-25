@@ -9,7 +9,7 @@ import strikt.assertions.isEqualTo
 class InMemoryTransactorTest {
 
     @Test
-    fun `performs read operation`() {
+    fun `performs read operation`() = runBlocking {
         val transactor = InMemoryTransactor("hello")
 
         val result = transactor.perform(ReadOnly) { it }
@@ -18,7 +18,7 @@ class InMemoryTransactorTest {
     }
 
     @Test
-    fun `performs write operation`() {
+    fun `performs write operation`() = runBlocking {
         val transactor = InMemoryTransactor("hello")
 
         val result = transactor.perform(ReadWrite) { it }

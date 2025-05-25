@@ -59,7 +59,7 @@ class ApiKeySecurity<out T> private constructor(
             validateAndReturnResult: (T) -> R,
             failureResult: R,
             authorizeOptionsRequests: Boolean = true,
-            onSuccess: (next: HttpHandler, request: Request, R) -> Response?
+            onSuccess: suspend (next: HttpHandler, request: Request, R) -> Response?
         ) = Filter { next ->
             {
                 if (!authorizeOptionsRequests && it.method == Method.OPTIONS) {
@@ -75,6 +75,5 @@ class ApiKeySecurity<out T> private constructor(
             }
         }
     }
-
 }
 

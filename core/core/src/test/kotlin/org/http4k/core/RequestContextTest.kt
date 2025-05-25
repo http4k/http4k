@@ -9,14 +9,14 @@ import java.util.UUID
 class RequestContextTest {
 
     @Test
-    fun `can set and get a typed value from a RequestContext`() {
+    fun `can set and get a typed value from a RequestContext`() = runBlocking {
         val requestContext = RequestContext(UUID.randomUUID())
         requestContext["foo"] = 123
         assertThat(requestContext.get<Int>("foo"), equalTo(123))
     }
 
     @Test
-    fun `updating a value to null removes it`() {
+    fun `updating a value to null removes it`() = runBlocking {
         val requestContext = RequestContext(UUID.randomUUID())
         requestContext["foo"] = 123
         requestContext["foo"] = null
@@ -24,7 +24,7 @@ class RequestContextTest {
     }
 
     @Test
-    fun `returns null when missing`() {
+    fun `returns null when missing`() = runBlocking {
         assertThat(RequestContext(UUID.randomUUID())["foo"], absent<Int>())
     }
 }

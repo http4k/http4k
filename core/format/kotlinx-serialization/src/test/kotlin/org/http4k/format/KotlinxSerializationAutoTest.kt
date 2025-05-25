@@ -97,20 +97,20 @@ data class SecondChild(val somethingElse: String) : PolymorphicParent()
 
 class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerialization) {
     @Test
-    override fun `roundtrip arbitrary object to and from string`() {
+    override fun `roundtrip arbitrary object to and from string`() = runBlocking {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = KotlinxSerialization.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResult))
         assertThat(KotlinxSerialization.asA(out, ArbObject::class), equalTo(obj))
     }
 
-    override fun `roundtrip arbitrary object through convert`() {
+    override fun `roundtrip arbitrary object through convert`() = runBlocking {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         assertThat(KotlinxSerialization.convert(obj), equalTo(obj))
     }
 
     @Test
-    override fun `roundtrip object with common java primitive types`() {
+    override fun `roundtrip object with common java primitive types`() = runBlocking {
         val localDate = LocalDate.of(2000, 1, 1)
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
@@ -135,7 +135,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    override fun `roundtrip regex special as equals isn't comparable`() {
+    override fun `roundtrip regex special as equals isn't comparable`() = runBlocking {
         val obj = RegexHolder(".*".toRegex())
         val out = KotlinxSerialization.asFormatString(obj)
         assertThat(out, equalTo(expectedRegexSpecial))
@@ -143,7 +143,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    override fun `roundtrip wrapped map`() {
+    override fun `roundtrip wrapped map`() = runBlocking {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
         assertThat(KotlinxSerialization.asFormatString(wrapper), equalTo(expectedWrappedMap))
         assertThat(
@@ -154,18 +154,18 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @Test
     @Disabled("kotlinx.serialization does not BigInteger")
-    override fun `roundtrip custom number`() {
+    override fun `roundtrip custom number`() = runBlocking {
         super.`roundtrip custom number`()
     }
 
     @Test
     @Disabled("kotlinx.serialization does not support BigDecimal")
-    override fun `roundtrip custom decimal`() {
+    override fun `roundtrip custom decimal`() = runBlocking {
         super.`roundtrip custom decimal`()
     }
 
     @Test
-    override fun `convert to inputstream`() {
+    override fun `convert to inputstream`() = runBlocking {
         assertThat(
             KotlinxSerialization.asInputStream(StringHolder("hello")).reader().use { it.readText() },
             equalTo(expectedConvertToInputStream)
@@ -173,39 +173,39 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Disabled()
-    override fun `roundtrip custom value`() {
+    override fun `roundtrip custom value`() = runBlocking {
     }
 
     @Test
     @Disabled("kotlinx.serialization does not support serialization auto-fallback to parent class")
-    override fun `throwable is marshalled`() {
+    override fun `throwable is marshalled`() = runBlocking {
     }
 
     @Test
     @Disabled("kotlinx.serialization does not support serialization auto-fallback to parent class")
-    override fun `exception is marshalled`() {
+    override fun `exception is marshalled`() = runBlocking {
     }
 
     @Disabled
-    override fun `serialises enum as a key correctly`() {
+    override fun `serialises enum as a key correctly`() = runBlocking {
     }
 
     @Test
-    override fun `fails decoding when a required value is null`() {
+    override fun `fails decoding when a required value is null`() = runBlocking {
         assertThat({ KotlinxSerialization.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
 
     @Disabled
-    override fun `fails decoding when a extra key found`() {
+    override fun `fails decoding when a extra key found`() = runBlocking {
     }
 
     @Test
-    override fun `does not fail decoding when unknown value is encountered`() {
+    override fun `does not fail decoding when unknown value is encountered`() = runBlocking {
         assertThat(KotlinxSerialization.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 
     @Test
-    override fun `out only string`() {
+    override fun `out only string`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = OutOnlyHolder(OutOnly("foobar"))
@@ -215,7 +215,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    override fun `in only string`() {
+    override fun `in only string`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = InOnlyHolder(InOnly("foobar"))
@@ -224,7 +224,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    override fun `prohibit strings`() {
+    override fun `prohibit strings`() = runBlocking {
         val marshaller = customMarshallerProhibitStrings()
 
         assertThat(marshaller.asFormatString(StringHolder("hello")), equalTo(expectedConvertToInputStream))
@@ -232,7 +232,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    override fun `roundtrip custom mapped number`() {
+    override fun `roundtrip custom mapped number`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
@@ -242,14 +242,14 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
 
     @ExperimentalSerializationApi
     @Test
-    fun `roundtrip arbitrary object to and from JSON element`() {
+    fun `roundtrip arbitrary object to and from JSON element`() = runBlocking {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = KotlinxSerialization.asJsonObject(obj)
         assertThat(KotlinxSerialization.asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrip list of arbitrary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() = runBlocking {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -258,7 +258,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    fun `roundtrip array of arbitrary objects to and from body`() {
+    fun `roundtrip array of arbitrary objects to and from body`() = runBlocking {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -267,7 +267,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    fun `roundtrip polymorphic object to and from body`() {
+    fun `roundtrip polymorphic object to and from body`() = runBlocking {
         val body = Body.auto<PolymorphicParent>().toLens()
 
         val firstChild: PolymorphicParent = FirstChild("hello")
@@ -278,7 +278,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Test
-    fun `roundtrip list of polymorphic objects to and from body`() {
+    fun `roundtrip list of polymorphic objects to and from body`() = runBlocking {
         val body = Body.auto<List<PolymorphicParent>>().toLens()
 
         val list = listOf(FirstChild("hello"), SecondChild("world"))
@@ -286,14 +286,14 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat(body(Response(Status.OK).with(body of list)), equalTo(list))
     }
 
-    override fun `roundtrip zones and locale`() {
+    override fun `roundtrip zones and locale`() = runBlocking {
         val obj = ZonesAndLocale(zoneId = ZoneId.of("America/Toronto"), zoneOffset = ZoneOffset.of("-04:00"), locale = Locale.CANADA)
         val out = KotlinxSerialization.asFormatString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingZonesAndLocale))
         assertThat(KotlinxSerialization.asA(out, ZonesAndLocale::class), equalTo(obj))
     }
 
-    override fun `roundtrip arbitrary map`() {
+    override fun `roundtrip arbitrary map`() = runBlocking {
         val wrapper = mapOf(
             "str" to "val1",
             "num" to BigDecimal("123.1"),
@@ -306,7 +306,7 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat(KotlinxSerialization.asA(asString), equalTo(wrapper))
     }
 
-    override fun `roundtrip arbitrary array`() {
+    override fun `roundtrip arbitrary array`() = runBlocking {
         val wrapper = listOf(
             "foo",
             BigDecimal("123.1"),
@@ -320,17 +320,17 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
     }
 
     @Disabled
-    override fun `roundtrip arbitrary set`() {
+    override fun `roundtrip arbitrary set`() = runBlocking {
     }
 
     @Test
-    override fun `automarshalling failure has expected message`() {
+    override fun `automarshalling failure has expected message`() = runBlocking {
         assertThat(runCatching { KotlinxSerialization.autoBody<ArbObject>().toLens()(invalidArbObjectRequest) }
             .exceptionOrNull()!!.message!!, startsWith("Fields [string, child, numbers, bool]"))
     }
 
     @Test
-    fun `roundtrip list of arbitrary objects to and from with BiDi lens`() {
+    fun `roundtrip list of arbitrary objects to and from with BiDi lens`() = runBlocking {
         val lens = KotlinxSerialization.asBiDiMapping<ArbObject>()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)

@@ -87,7 +87,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `click checkbox or radio`() {
+    fun `click checkbox or radio`() = runBlocking {
         fun assertCheckableSetsValue(type: String) {
             val input = input(type)
             input.click()
@@ -99,7 +99,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `click checkbox to clear`() {
+    fun `click checkbox to clear`() = runBlocking {
         val input = input("checkbox")
         input.click()
         assertThat(input.isSelected, equalTo(true))
@@ -108,7 +108,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `click radio to remain checked`() {
+    fun `click radio to remain checked`() = runBlocking {
         val input = input("radio")
         input.click()
         assertThat(input.isSelected, equalTo(true))
@@ -117,7 +117,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `click radio to clear others in radio group`() {
+    fun `click radio to clear others in radio group`() = runBlocking {
         val form = radioGroupForm()
 
         form.findElement(By.id("radio12")).click()
@@ -127,31 +127,31 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `click link`() {
+    fun `click link`() = runBlocking {
         element("a").click()
         assertThat(newLocation, equalTo(GET to "/link"))
     }
 
     @Test
-    fun `click non-link`() {
+    fun `click non-link`() = runBlocking {
         element("foo").click()
         assertThat(newLocation, absent())
     }
 
     @Test
-    fun `submit a form`() {
+    fun `submit a form`() = runBlocking {
         form().submit()
         assertThat(newLocation, equalTo(POST to "/posted"))
     }
 
     @Test
-    fun `submit an element inside the form`() {
+    fun `submit an element inside the form`() = runBlocking {
         form(DELETE).findElement(By.tagName("p"))!!.submit()
         assertThat(newLocation, equalTo(DELETE to "/posted?checkedCheckbox=checkedCheckbox&radio=checkedRadio"))
     }
 
     @Test
-    fun `submit a non-form`() {
+    fun `submit a non-form`() = runBlocking {
         element().submit()
         assertThat(newLocation, absent())
     }
@@ -163,7 +163,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `send keys to an input`() {
+    fun `send keys to an input`() = runBlocking {
         fun assertKeysSetValue(type: String) {
             val input = input(type)
             input.sendKeys("hello")
@@ -176,7 +176,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `send keys to an single select`() {
+    fun `send keys to an single select`() = runBlocking {
         val select = select(false)
         select.findElements(By.tagName("option")).first().click()
         select.findElements(By.tagName("option")).last().click()
@@ -185,7 +185,7 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `send keys to a multi select`() {
+    fun `send keys to a multi select`() = runBlocking {
         val select = select(true)
         select.findElements(By.tagName("option")).first().click()
         select.findElements(By.tagName("option")).last().click()
@@ -194,14 +194,14 @@ class JSoupWebElementTest {
     }
 
     @Test
-    fun `send keys to an textArea`() {
+    fun `send keys to an textArea`() = runBlocking {
         val input = form().findElement(By.id("textarea"))
         input.sendKeys("hello")
         assertThat(input.text, equalTo("hello"))
     }
 
     @Test
-    fun `unsupported features`() {
+    fun `unsupported features`() = runBlocking {
         isNotImplemented { element().isDisplayed }
         isNotImplemented { element().location }
         isNotImplemented { element().rect }

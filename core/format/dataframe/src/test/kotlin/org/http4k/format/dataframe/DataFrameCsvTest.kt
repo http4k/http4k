@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 
 class DataFrameCsvTest {
     @Test
-    fun `can extract a set of typed CSV records from an HTTP message`() {
+    fun `can extract a set of typed CSV records from an HTTP message`() = runBlocking {
         val request = Request(GET, "").body(javaClass.getResourceAsStream("/repositories.csv")!!)
         val repos = request.dataFrameCsv<Repository>()
         assertThat(repos.size(), equalTo(DataFrameSize(5, 4)))

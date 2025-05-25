@@ -6,17 +6,17 @@ import org.junit.jupiter.api.Test
 
 class SchemaModelNamerTest {
     @Test
-    fun `simple namer`() {
+    fun `simple namer`() = runBlocking {
         assertThat(SchemaModelNamer.Simple("bob"), equalTo("String"))
     }
 
     @Test
-    fun `full namer`() {
+    fun `full namer`() = runBlocking {
         assertThat(SchemaModelNamer.Full("bob"), equalTo("java.lang.String"))
     }
 
     @Test
-    fun `canonical namer`() {
+    fun `canonical namer`() = runBlocking {
         assertThat(SchemaModelNamer.Canonical(FooBar.BarFoo()), equalTo("org.http4k.contract.jsonschema.v3.FooBar.BarFoo"))
     }
 }

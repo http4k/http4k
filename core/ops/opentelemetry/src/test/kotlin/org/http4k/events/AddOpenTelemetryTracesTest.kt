@@ -2,6 +2,7 @@ package org.http4k.events
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.TraceId
 import org.http4k.filter.ZipkinTraces
@@ -13,7 +14,7 @@ class AddOpenTelemetryTracesTest {
     private val recording = RecordingEvents()
 
     @Test
-    fun `AddOpenTelemetryTraces captures traces`() {
+    fun `AddOpenTelemetryTraces captures traces`() = runBlocking {
         val expected = ZipkinTraces(
             TraceId("00000000000000000000000000000000"),
             TraceId("0000000000000000"),

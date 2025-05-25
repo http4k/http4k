@@ -18,7 +18,7 @@ class EnvironmentKeyTest {
     private val env = Environment.EMPTY
 
     @Test
-    fun `custom key roundtrip`() {
+    fun `custom key roundtrip`() = runBlocking {
 
         val lens = EnvironmentKey.int().required("some-value")
         assertThrows<LensFailure> { lens(env) }
@@ -32,7 +32,7 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `custom multi key roundtrip`() {
+    fun `custom multi key roundtrip`() = runBlocking {
         val lens = EnvironmentKey.int().multi.required("some-value")
         assertThrows<LensFailure> { lens(env) }
 
@@ -48,7 +48,7 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `custom multi key roundtrip with non-standard separator`() {
+    fun `custom multi key roundtrip with non-standard separator`() = runBlocking {
         val customEnv = MapEnvironment.from(Properties(), separator = ";")
         val lens = EnvironmentKey.int().multi.required("some-value")
         assertThrows<LensFailure> { lens(customEnv) }
@@ -68,7 +68,7 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = EnvironmentKey.int().required("value")
 
         val original = env.with(EnvironmentKey.k8s.HEALTH_PORT of 81)
@@ -82,20 +82,20 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `using property method`() {
+    fun `using property method`() = runBlocking {
         val MY_GREAT_ENV_VARIABLE by EnvironmentKey.long().of().required()
         assertThat(MY_GREAT_ENV_VARIABLE(Environment.from("MY_GREAT_ENV_VARIABLE" to "123")), equalTo(123))
     }
 
     @Test
-    fun `can get ports from env`() {
+    fun `can get ports from env`() = runBlocking {
         val withPorts = env.with(EnvironmentKey.k8s.SERVICE_PORT of 80, EnvironmentKey.k8s.HEALTH_PORT of 81)
         assertThat(EnvironmentKey.k8s.SERVICE_PORT(withPorts), equalTo(80))
         assertThat(EnvironmentKey.k8s.HEALTH_PORT(withPorts), equalTo(81))
     }
 
     @Test
-    fun `get uri for a service`() {
+    fun `get uri for a service`() = runBlocking {
         assertThat(
             EnvironmentKey.k8s.serviceUriFor("myservice")(
                 Environment.from("MYSERVICE_SERVICE_PORT" to "8000")
@@ -133,7 +133,7 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `falls back to value when using environment key`() {
+    fun `falls back to value when using environment key`() = runBlocking {
         val finalEnv = Environment.EMPTY overrides Environment.from("FOO" to "bill")
 
         val key = EnvironmentKey.required("FOO")
@@ -142,7 +142,7 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `composite can use a mixture of overridden and non overridden values`() {
+    fun `composite can use a mixture of overridden and non overridden values`() = runBlocking {
         data class Target(val foo: String, val bar: Int, var foobar: Int?)
 
         val finalEnv = Environment.from("bar" to "123") overrides Environment.from("FOO" to "bill")
@@ -163,7 +163,7 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `enum support`() {
+    fun `enum support`() = runBlocking {
         val key = EnvironmentKey.enum<Foo>().required("foo")
         assertThat(key(Environment.EMPTY.with(key of Foo.bar)), equalTo(Foo.bar))
     }

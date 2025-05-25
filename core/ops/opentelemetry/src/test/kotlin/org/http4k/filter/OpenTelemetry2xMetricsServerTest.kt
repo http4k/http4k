@@ -6,6 +6,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.semconv.HttpAttributes
 import io.opentelemetry.semconv.NetworkAttributes
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -49,7 +50,7 @@ class OpenTelemetry2xMetricsServerTest {
     }
 
     @Test
-    fun `routes with duration generate request duration metrics tagged with path and method and status`() {
+    fun `routes with duration generate request duration metrics tagged with path and method and status`() = runBlocking {
         assertThat(server(Request(GET, "/duration/one")), hasStatus(OK))
         repeat(2) {
             assertThat(server(Request(POST, "/duration/two/bob")), (hasStatus(OK) and hasBody("bob")))
@@ -87,7 +88,7 @@ class OpenTelemetry2xMetricsServerTest {
     }
 
     @Test
-    fun `routes without metrics generate nothing`() {
+    fun `routes without metrics generate nothing`() = runBlocking {
         assertThat(server(Request(GET, "/unmetered/one")), hasStatus(OK))
         assertThat(server(Request(DELETE, "/unmetered/two")), hasStatus(INTERNAL_SERVER_ERROR))
 

@@ -10,6 +10,6 @@ class FakeDynamoDbTest : DynamoDbContract, FakeAwsContract {
     override val duration: Duration get() = ZERO
 
     @Disabled
-    override fun `partiSQL operations`() {
+    override fun `partiSQL operations`() = runBlocking {
     }
 }

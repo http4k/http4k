@@ -34,4 +34,4 @@ class TestWebsocket(response: WsResponse) : PushPullAdaptingWebSocket() {
     override fun close(status: WsStatus) = server.triggerClose(status)
 }
 
-fun WsHandler.testWebsocket(request: Request): Websocket = TestWebsocket(invoke(request))
+suspend fun WsHandler.testWebsocket(request: Request): Websocket = TestWebsocket(invoke(request))

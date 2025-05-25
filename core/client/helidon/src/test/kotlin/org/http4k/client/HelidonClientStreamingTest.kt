@@ -20,6 +20,6 @@ class HelidonClientStreamingTest : HttpClientContract(
     override fun `supports query parameter list`() = assumeTrue(false, "Unsupported client feature")
 
     @Disabled
-    override fun `fails with no protocol`() {
+    override fun `fails with no protocol`() = runBlocking {
     }
 }

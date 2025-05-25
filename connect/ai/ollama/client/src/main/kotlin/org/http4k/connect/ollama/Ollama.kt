@@ -9,7 +9,7 @@ import org.http4k.connect.RemoteFailure
  */
 @Http4kConnectApiClient
 interface Ollama {
-    operator fun <R> invoke(action: OllamaAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: OllamaAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

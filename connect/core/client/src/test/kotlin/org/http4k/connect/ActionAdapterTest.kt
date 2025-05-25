@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -42,7 +43,7 @@ class ActionAdapterTest {
     private val boom = BoomAction(uri)
 
     @Test
-    fun `converting to result4k`() {
+    fun `converting to result4k`() = runBlocking {
         assertThat(ok.asResult4k(), equalTo(ok))
         assertThat(ok.asResult4k().toRequest(), equalTo(ok.toRequest()))
         assertThat(ok.asResult4k().toResult(Response(OK)), equalTo(Success(ok.toResult(Response(OK)))))
@@ -53,7 +54,7 @@ class ActionAdapterTest {
     }
 
     @Test
-    fun `converting to result`() {
+    fun `converting to result`() = runBlocking {
         assertThat(ok.asResult(), equalTo(ok))
         assertThat(ok.asResult().toRequest(), equalTo(ok.toRequest()))
         assertThat(ok.asResult().toResult(Response(OK)), equalTo(Result.success(ok.toResult(Response(OK)))))

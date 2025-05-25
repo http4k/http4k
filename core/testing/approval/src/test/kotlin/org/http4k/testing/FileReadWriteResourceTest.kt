@@ -11,14 +11,14 @@ import kotlin.random.Random
 class FileReadWriteResourceTest {
 
     @Test
-    fun `non existent file cannot be read`() {
+    fun `non existent file cannot be read`() = runBlocking {
         val target = File("/tmp", javaClass.name + Random(1).nextLong().toString())
         assertThat(FileReadWriteResource(target).input(), absent())
         target.delete()
     }
 
     @Test
-    fun `non existent file can be written to`() {
+    fun `non existent file can be written to`() = runBlocking {
         val target = File("/tmp", javaClass.name + Random(1).nextLong().toString())
         with(FileReadWriteResource(target)) {
             output().writer().use { it.write("goodbye") }
@@ -28,13 +28,13 @@ class FileReadWriteResourceTest {
     }
 
     @Test
-    fun `existing file can be read`() {
+    fun `existing file can be read`() = runBlocking {
         val file = FileReadWriteResource(existingFile("hello"))
         assertThat(file.input()!!.reader().use { it.readText() }, equalTo("hello"))
     }
 
     @Test
-    fun `existing file can be written to`() {
+    fun `existing file can be written to`() = runBlocking {
         with(FileReadWriteResource(existingFile("hello"))) {
             output().writer().use { it.write("goodbye") }
             assertThat(input()!!.reader().use { it.readText() }, equalTo("goodbye"))

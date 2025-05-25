@@ -11,12 +11,12 @@ class JettyTest : ServerContract(::Jetty, ClientForServerTesting()) {
     override fun requestScheme() = equalTo("http")
 
     @Disabled
-    override fun `illegal url doesn't expose stacktrace`() {
+    override fun `illegal url doesn't expose stacktrace`() = runBlocking {
 
     }
 
     @Test
-    fun `returns status with pre-defined standardized description`() {
+    fun `returns status with pre-defined standardized description`() = runBlocking {
         val response = client(Request(Method.GET, "${baseUrl}/status-with-foobar-description"))
 
         assertThat(response.status.code, equalTo(201))
@@ -24,7 +24,7 @@ class JettyTest : ServerContract(::Jetty, ClientForServerTesting()) {
     }
 
     @Disabled
-    override fun `treats multiple request headers as single item comma-separated list`() {
+    override fun `treats multiple request headers as single item comma-separated list`() = runBlocking {
 
     }
 }

@@ -21,7 +21,7 @@ interface SecretsManagerContract : AwsContract {
     val propogateTime: Long get() = 0
 
     @Test
-    fun `secret lifecycle`() {
+    fun `secret lifecycle`() = runBlocking {
         try {
             val lookupNothing = sm.getSecretValue(SecretId.of(nameOrArn)).failureOrNull()
             assertThat(lookupNothing?.status, equalTo(BAD_REQUEST))

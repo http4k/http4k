@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch
 class AwsLambdaRuntimeTest {
 
     @Test
-    fun `enters the loop correctly`() {
+    fun `enters the loop correctly`() = runBlocking {
         val latch = CountDownLatch(2)
 
         val lambdaRuntimeApi = FakeLambdaRuntimeApi().apply {

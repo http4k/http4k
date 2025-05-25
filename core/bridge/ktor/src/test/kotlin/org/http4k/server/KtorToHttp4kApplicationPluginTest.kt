@@ -25,7 +25,7 @@ import java.util.Random
 class KtorToHttp4kApplicationPluginTest : PortBasedTest {
 
     @Test
-    fun `translates request to http4k and back again`() {
+    fun `translates request to http4k and back again`() = runBlocking {
 
         val port = Random().nextInt(1000) + 10000
 

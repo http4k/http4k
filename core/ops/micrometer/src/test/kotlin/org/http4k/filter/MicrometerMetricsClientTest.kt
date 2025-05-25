@@ -32,7 +32,7 @@ class MicrometerMetricsClientTest {
     private val countedClient by lazy { requestCounter.then(remoteServerMock) }
 
     @Test
-    fun `timed requests generate timing metrics tagged with method and status and host`() {
+    fun `timed requests generate timing metrics tagged with method and status and host`() = runBlocking {
         assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
         repeat(2) {
             assertThat(timedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
@@ -45,7 +45,7 @@ class MicrometerMetricsClientTest {
     }
 
     @Test
-    fun `counted requests generate count metrics tagged with method and status and host`() {
+    fun `counted requests generate count metrics tagged with method and status and host`() = runBlocking {
         assertThat(countedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
         repeat(2) {
             assertThat(countedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
@@ -58,7 +58,7 @@ class MicrometerMetricsClientTest {
     }
 
     @Test
-    fun `request timer meter names and transaction labelling can be configured`() {
+    fun `request timer meter names and transaction labelling can be configured`() = runBlocking {
         requestTimer = ClientFilters.MicrometerMetrics.RequestTimer(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") }, clock)
 
@@ -70,7 +70,7 @@ class MicrometerMetricsClientTest {
     }
 
     @Test
-    fun `request counter meter names and transaction labelling can be configured`() {
+    fun `request counter meter names and transaction labelling can be configured`() = runBlocking {
         requestCounter = ClientFilters.MicrometerMetrics.RequestCounter(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") })
 

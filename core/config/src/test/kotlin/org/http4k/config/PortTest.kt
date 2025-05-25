@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test
 class PortTest {
 
     @Test
-    fun `random port value`() {
+    fun `random port value`() = runBlocking {
         assertThat(Port.RANDOM, equalTo(Port(0)))
     }
 
     @Test
-    fun `max port value`() {
+    fun `max port value`() = runBlocking {
         Port(65535)
         assertThat({ Port(65536) }, throws<IllegalArgumentException>())
     }

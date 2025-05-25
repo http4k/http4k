@@ -84,7 +84,7 @@ class ProfileRegionProviderTest {
     )
 
     @Test
-    fun `default profile region in config file`() {
+    fun `default profile region in config file`() = runBlocking {
         credentialsFile.toFile().delete()
         assertThat(
             getRegion(ProfileName.of("default")),

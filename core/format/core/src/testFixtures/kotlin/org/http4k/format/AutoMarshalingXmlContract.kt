@@ -15,27 +15,27 @@ data class NullableListContainer(val children: List<String>? = null)
 abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
 
     @Test
-    fun `deserialise simple container with attribute`() {
+    fun `deserialise simple container with attribute`() = runBlocking {
         assertThat(x.asA("""<container field="value"/>""", Container::class), equalTo(Container("value")))
     }
 
     @Test
-    fun `deserialise simple container with attribute from stream`() {
+    fun `deserialise simple container with attribute from stream`() = runBlocking {
         assertThat(x.asA("""<container field="value"/>""".byteInputStream(), Container::class), equalTo(Container("value")))
     }
 
     @Test
-    fun `deserialise simple container with element`() {
+    fun `deserialise simple container with element`() = runBlocking {
         assertThat(x.asA("""<container><field>value</field></container>""", Container::class), equalTo(Container("value")))
     }
 
     @Test
-    fun `serialise simple container defaults to using child element`() {
+    fun `serialise simple container defaults to using child element`() = runBlocking {
         assertThat(x.asFormatString(Container("value")), equalTo("""<Container><field>value</field></Container>"""))
     }
 
     @Test
-    fun `roundtripping supports registered (de)serialisers`() {
+    fun `roundtripping supports registered (de)serialisers`() = runBlocking {
         val xml = """<UriContainer><field>foo.com</field></UriContainer>"""
         val expected = UriContainer(Uri.of("foo.com"))
         assertThat(x.asA(xml, UriContainer::class), equalTo(expected))
@@ -43,23 +43,23 @@ abstract class AutoMarshalingXmlContract(private val x: AutoMarshallingXml) {
     }
 
     @Test
-    fun `serialize lists with items`() {
+    fun `serialize lists with items`() = runBlocking {
         assertThat(x.asFormatString(ListContainer(listOf("boo", "asdas"))),
             equalTo("<ListContainer><children>boo</children><children>asdas</children></ListContainer>"))
     }
 
     @Test
-    fun `serialize lists with no items`() {
+    fun `serialize lists with no items`() = runBlocking {
         assertThat(x.asFormatString(ListContainer(emptyList())), equalTo("<ListContainer/>"))
     }
 
     @Test
-    fun `nullable fields are supported`() {
+    fun `nullable fields are supported`() = runBlocking {
         assertThat(x.asA("<NullableListContainer/>"), equalTo(NullableListContainer(null)))
     }
 
     @Test
-    fun `missing fields blow up`() {
+    fun `missing fields blow up`() = runBlocking {
         assertThat({ x.asA<ListContainer>("<ListContainer/>") }, throws<Exception>())
     }
 

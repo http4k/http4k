@@ -15,25 +15,25 @@ class MimeTypesTest {
     private val standardTypes = MimeTypes()
 
     @Test
-    fun `uses known content types from mime types file`() {
+    fun `uses known content types from mime types file`() = runBlocking {
         assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.xml", APPLICATION_XML.withNoDirectives())
         assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.html", TEXT_HTML.withNoDirectives())
         assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.txt", TEXT_PLAIN.withNoDirectives())
     }
 
     @Test
-    fun `defaults back to octet stream for unknown file type`() {
+    fun `defaults back to octet stream for unknown file type`() = runBlocking {
         assertCorrectContentTypeFoundFor(standardTypes, "txt", OCTET_STREAM.withNoDirectives())
         assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.foobar", OCTET_STREAM.withNoDirectives())
     }
 
     @Test
-    fun `reuses standard types`() {
+    fun `reuses standard types`() = runBlocking {
         assertTrue(standardTypes === MimeTypes())
     }
 
     @Test
-    fun `can override content type`() {
+    fun `can override content type`() = runBlocking {
         assertCorrectContentTypeFoundFor(MimeTypes(mapOf("foobar" to TEXT_HTML)), "/foo/bob.foobar", TEXT_HTML)
     }
 

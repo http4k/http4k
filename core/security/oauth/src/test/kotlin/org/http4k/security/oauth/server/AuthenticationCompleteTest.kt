@@ -39,7 +39,7 @@ class AuthenticationCompleteTest {
     private fun isFailure(request: Request): Boolean = request.query("fail") == "true"
 
     @Test
-    fun `redirects on successful login`() {
+    fun `redirects on successful login`() = runBlocking {
         val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest))
 
         assertThat(response, hasStatus(SEE_OTHER)
@@ -50,7 +50,7 @@ class AuthenticationCompleteTest {
     }
 
     @Test
-    fun `redirects on successful login, with a fragment if requested`() {
+    fun `redirects on successful login, with a fragment if requested`() = runBlocking {
         val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest.copy(responseMode = Fragment), responseMode = Fragment))
 
         assertThat(response, hasStatus(SEE_OTHER)
@@ -61,7 +61,7 @@ class AuthenticationCompleteTest {
     }
 
     @Test
-    fun `includes id_token if response_type requires it`() {
+    fun `includes id_token if response_type requires it`() = runBlocking {
         val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest, CodeIdToken))
 
         assertThat(response, hasStatus(SEE_OTHER)
@@ -73,7 +73,7 @@ class AuthenticationCompleteTest {
     }
 
     @Test
-    fun `includes id_token if response_type requires it, with code if requested`() {
+    fun `includes id_token if response_type requires it, with code if requested`() = runBlocking {
         val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest, CodeIdToken, Query))
 
         assertThat(response, hasStatus(SEE_OTHER)
@@ -85,7 +85,7 @@ class AuthenticationCompleteTest {
     }
 
     @Test
-    fun `redirects with error details if login is not successful`() {
+    fun `redirects with error details if login is not successful`() = runBlocking {
         val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
 
         assertThat(response, hasStatus(SEE_OTHER)
@@ -97,7 +97,7 @@ class AuthenticationCompleteTest {
     }
 
     @Test
-    fun `redirects with error details including error_uri if provided`() {
+    fun `redirects with error details including error_uri if provided`() = runBlocking {
         val errorUri = "SomeUri"
         val underTest = AuthenticationComplete(
             DummyAuthorizationCodes(authorizationRequest, this::isFailure, "jdoe"),

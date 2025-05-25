@@ -58,7 +58,7 @@ interface McpClientContract<T> : PortBasedTest {
     data class FooBar(val foo: String)
 
     @Test
-    fun `can interact with server`() {
+    fun `can interact with server`() = runBlocking {
 
         val toolArg = Tool.Arg.string().required("name")
         val output = Tool.Output.auto(FooBar("bar")).toLens()

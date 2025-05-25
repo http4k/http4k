@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 class Http4kLangChainHttpClientTest {
 
     @Test
-    fun `can call through to model using http4k adapter`() {
+    fun `can call through to model using http4k adapter`() = runBlocking {
         val model = OpenAiChatModel
             .builder()
             .modelName("model")
@@ -36,7 +36,7 @@ class Http4kLangChainHttpClientTest {
     }
 
     @Test
-    fun `can call through to streaming model using http4k adapter`() {
+    fun `can call through to streaming model using http4k adapter`() = runBlocking {
         val model = OpenAiStreamingChatModel
             .builder()
             .modelName("model")

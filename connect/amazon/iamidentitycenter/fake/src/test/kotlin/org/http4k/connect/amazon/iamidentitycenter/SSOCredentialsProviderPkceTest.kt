@@ -48,7 +48,7 @@ class SSOCredentialsProviderPkceTest : PortBasedTest {
     }
 
     @Test
-    fun `support pkce flow`() {
+    fun `support pkce flow`() = runBlocking {
 
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),

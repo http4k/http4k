@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class WildcardTest {
 
     @Test
-    fun `can get out multiple parts`() {
+    fun `can get out multiple parts`() = runBlocking {
         val a = routes("/{first}" bind routes("/{wildcard:.*}" bind GET to { r: Request ->
             Response(Status.OK).body(r.path("first") + r.path("wildcard"))
         }))
@@ -20,7 +20,7 @@ class WildcardTest {
     }
 
     @Test
-    fun `can get out path and headers`() {
+    fun `can get out path and headers`() = runBlocking {
         val a =
             routes("/name" bind (
                 headers("bob") bind routes("/{wildcard:.*}" bind GET to { r: Request ->

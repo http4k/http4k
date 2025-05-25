@@ -2,6 +2,7 @@ package org.http4k.multipart
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.FileInputStream
@@ -12,7 +13,7 @@ import java.nio.charset.StandardCharsets
 class StreamingMultipartFormHappyTest {
 
     @Test
-    fun `upload empty contents`() {
+    fun `upload empty contents`() = runBlocking {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary).stream())
 
@@ -20,7 +21,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload empty file`() {
+    fun `upload empty file`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "", "doesnt/matter", "".byteInputStream(), emptyList()).stream())
@@ -31,7 +32,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `has next is idempotent`() {
+    fun `has next is idempotent`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "", "application/octet-stream", "".byteInputStream(), emptyList())
@@ -52,7 +53,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload empty field`() {
+    fun `upload empty field`() = runBlocking {
         val boundary = "-----3456"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .field("aField", "", emptyList()).stream())
@@ -63,7 +64,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload small file`() {
+    fun `upload small file`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
@@ -74,7 +75,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload file with lowercase content disposition`() {
+    fun `upload file with lowercase content disposition`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("File contents here".byteInputStream(),
@@ -90,7 +91,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload small file as attachment`() {
+    fun `upload small file as attachment`() = runBlocking {
         val boundary = "-----4567"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("beforeFile", "before.txt", "application/json", "[]".byteInputStream(), emptyList())
@@ -110,7 +111,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload small field`() {
+    fun `upload small field`() = runBlocking {
         val boundary = "-----3456"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .field("aField", "Here is the value of the field\n", emptyList()).stream())
@@ -121,7 +122,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload multiple files and fields`() {
+    fun `upload multiple files and fields`() = runBlocking {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             MultipartFormBuilder(boundary)
@@ -142,7 +143,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `upload fields with multiline headers`() {
+    fun `upload fields with multiline headers`() = runBlocking {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             MultipartFormBuilder(boundary)
@@ -165,7 +166,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `parts can have lots of headers`() {
+    fun `parts can have lots of headers`() = runBlocking {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             MultipartFormBuilder(boundary)
@@ -197,7 +198,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `closed parts cannot be read from`() {
+    fun `closed parts cannot be read from`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
@@ -220,7 +221,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `reading parts contents as string closes stream`() {
+    fun `reading parts contents as string closes stream`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList()).stream())
@@ -239,7 +240,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `getting next part closes old part`() {
+    fun `getting next part closes old part`() = runBlocking {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream(), emptyList())
@@ -264,7 +265,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `can load complex real life safari example`() {
+    fun `can load complex real life safari example`() = runBlocking {
         val parts = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(StandardCharsets.UTF_8),
             FileInputStream("examples/safari-example.multipart"),
@@ -280,7 +281,7 @@ class StreamingMultipartFormHappyTest {
     }
 
     @Test
-    fun `can load complex real life chrome example`() {
+    fun `can load complex real life chrome example`() = runBlocking {
         val parts = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundaryft3FGhOMTYoOkCCc".toByteArray(StandardCharsets.UTF_8),
             FileInputStream("examples/chrome-example.multipart"),

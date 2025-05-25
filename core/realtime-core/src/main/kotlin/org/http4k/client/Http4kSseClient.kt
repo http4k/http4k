@@ -1,5 +1,6 @@
 package org.http4k.client
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -39,24 +40,27 @@ class Http4kSseClient(
 
     override fun received(): Sequence<SseMessage> = sequence {
         thread {
-            do {
-                try {
-                    val response = http(
-                        sseRequest
-                            .with(Header.LAST_EVENT_ID of lastEventId.get())
-                            .accept(TEXT_EVENT_STREAM)
-                    )
+            runBlocking {
+                // FIXME coroutine blocking
+                do {
+                    try {
+                        val response = http(
+                            sseRequest
+                                .with(Header.LAST_EVENT_ID of lastEventId.get())
+                                .accept(TEXT_EVENT_STREAM)
+                        )
 
-                    when {
-                        response.status.successful ->
-                            response.body.stream.chunkedSseSequence().forEach(messageQueue::put)
+                        when {
+                            response.status.successful ->
+                                response.body.stream.chunkedSseSequence().forEach(messageQueue::put)
 
-                        else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
+                            else -> error("Failed to connect to ${sseRequest.uri} ${response.status}")
+                        }
+                    } catch (e: Exception) {
+                        reportError(e)
                     }
-                } catch (e: Exception) {
-                    reportError(e)
-                }
-            } while (reconnectionMode.doReconnect())
+                } while (reconnectionMode.doReconnect())
+            }
         }
 
         while (running.get()) {

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
     @Test
-    fun `default usage`() {
+    fun `default usage`() = runBlocking {
         val requestBodyMode = BodyMode.Memory
         bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
             .then(awsClientFilter(Payload.Mode.Signed))
@@ -31,7 +31,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
     @Test
     @Disabled
-    fun `streaming usage`() {
+    fun `streaming usage`() = runBlocking {
         val requestBodyMode = BodyMode.Stream
         bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
             .then(awsClientFilter(Payload.Mode.Unsigned))

@@ -25,7 +25,7 @@ interface SNSContract : AwsContract {
     val topicName get() = TopicName.of(uuid().toString())
 
     @Test
-    fun `topic lifecycle`() {
+    fun `topic lifecycle`() = runBlocking {
         with(sns) {
             val topicArn = createTopic(
                 topicName,

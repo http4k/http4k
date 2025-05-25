@@ -17,7 +17,7 @@ class CookieMatchersTest {
     fun value() = assertMatchAndNonMatch(Cookie("name", "bob"), hasCookieValue("bob"), hasCookieValue("bill"))
 
     @Test
-    fun `value with matcher`() {
+    fun `value with matcher`() = runBlocking {
         assertMatchAndNonMatch(Cookie("name", "bob"), hasCookieValue(equalTo("bob")), hasCookieValue(containsSubstring("bill")))
     }
 

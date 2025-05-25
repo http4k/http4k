@@ -31,7 +31,7 @@ class GenerateAccessToken(
             grantTypes
         )
 
-    override fun invoke(request: Request) = generator.generate(request)
+    override suspend fun invoke(request: Request) = generator.generate(request)
         .map(tokenResponseRenderer)
         .mapFailure(errorRenderer::response).get()
 }

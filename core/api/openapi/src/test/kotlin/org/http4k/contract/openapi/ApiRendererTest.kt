@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class ApiRendererTest {
 
     @Test
-    fun `can convert any api renderer to cached form`() {
+    fun `can convert any api renderer to cached form`() = runBlocking {
         var called = 0
         val delegate = object : ApiRenderer<Any, Any> {
             override fun api(api: Any): Any = apply { called++ }

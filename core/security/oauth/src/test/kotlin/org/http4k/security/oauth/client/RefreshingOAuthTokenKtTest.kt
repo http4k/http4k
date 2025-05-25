@@ -22,7 +22,7 @@ import java.time.Duration
 class RefreshingOAuthTokenTest {
 
     @Test
-    fun `always gets access token when no refresh token`() {
+    fun `always gets access token when no refresh token`() = runBlocking {
         val config =
             OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/oauth/token", Credentials("hello", "world"))
 
@@ -60,7 +60,7 @@ class RefreshingOAuthTokenTest {
     }
 
     @Test
-    fun `user refresh token when presence`() {
+    fun `user refresh token when presence`() = runBlocking {
         val config =
             OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/oauth/token", Credentials("hello", "world"))
 
@@ -107,7 +107,7 @@ class RefreshingOAuthTokenTest {
     }
 
     @Test
-    fun `when no expiry returned`() {
+    fun `when no expiry returned`() = runBlocking {
         val config =
             OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/oauth/token", Credentials("hello", "world"))
 

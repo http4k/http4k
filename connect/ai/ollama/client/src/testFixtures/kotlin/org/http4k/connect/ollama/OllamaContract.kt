@@ -19,7 +19,7 @@ interface OllamaContract {
     val ollama: Ollama
 
     @Test
-    fun `get models`() {
+    fun `get models`() = runBlocking {
         assertThat(
             ollama.getModels().successValue().models.isEmpty(),
             equalTo(false)
@@ -34,7 +34,7 @@ interface OllamaContract {
     val modelName get() = ModelName.of("gemma:2b")
 
     @Test
-    fun `get completion response non-stream`() {
+    fun `get completion response non-stream`() = runBlocking {
         val responses = ollama.completion(
             modelName,
             Prompt.of("count to five"),
@@ -52,7 +52,7 @@ interface OllamaContract {
     }
 
     @Test
-    fun `get completion response stream`() {
+    fun `get completion response stream`() = runBlocking {
         val responses = ollama.completion(
             modelName,
             Prompt.of("count to five"),
@@ -70,7 +70,7 @@ interface OllamaContract {
     }
 
     @Test
-    fun `get chat response non-stream`() {
+    fun `get chat response non-stream`() = runBlocking {
         val responses = ollama.chatCompletion(
             modelName,
             listOf(Message.User("count to five")),
@@ -84,7 +84,7 @@ interface OllamaContract {
     }
 
     @Test
-    fun `get chat response stream`() {
+    fun `get chat response stream`() = runBlocking {
         val responses = ollama.chatCompletion(
             modelName,
             listOf(Message.User("count to five")),
@@ -98,7 +98,7 @@ interface OllamaContract {
     }
 
     @Test
-    fun `get embeddings`() {
+    fun `get embeddings`() = runBlocking {
         assertThat(
             ollama.createEmbeddings(
                 modelName,

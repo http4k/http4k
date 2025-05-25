@@ -4,7 +4,7 @@ import org.http4k.connect.WithRunningFake
 import org.http4k.connect.amazon.FakeAwsContract
 
 class RunningFakeCognitoTest : CognitoContract, FakeAwsContract, WithRunningFake(::FakeCognito) {
-    override fun `can get access token using auth code grant`() {
+    override fun `can get access token using auth code grant`() = runBlocking {
         super.`can get access token using auth code grant`()
     }
 }

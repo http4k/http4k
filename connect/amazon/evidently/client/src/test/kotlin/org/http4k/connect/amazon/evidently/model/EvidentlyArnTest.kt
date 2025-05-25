@@ -18,12 +18,12 @@ class EvidentlyArnTest {
     )
 
     @Test
-    fun `get project name`() {
+    fun `get project name`() = runBlocking {
         assertThat(ProjectName.of(arn), equalTo(ProjectName.of("my_project")))
     }
 
     @Test
-    fun `get feature name`() {
+    fun `get feature name`() = runBlocking {
         assertThat(FeatureName.of(arn), equalTo(FeatureName.of("my_feature")))
     }
 }

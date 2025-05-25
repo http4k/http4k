@@ -38,12 +38,12 @@ class Http4kK8sServerTest : PortBasedTest {
     private val client = JavaHttpClient()
 
     @Test
-    fun `app is available on port`() {
+    fun `app is available on port`() = runBlocking {
         assertThat(client(Request(GET, "http://localhost:${server.port()}")), hasStatus(I_M_A_TEAPOT))
     }
 
     @Test
-    fun `health is available`() {
+    fun `health is available`() = runBlocking {
         assertThat(client(Request(GET, "http://localhost:${server.healthPort()}/liveness")), hasStatus(OK))
         assertThat(client(Request(GET, "http://localhost:${server.healthPort()}/readiness")), hasStatus(OK))
     }

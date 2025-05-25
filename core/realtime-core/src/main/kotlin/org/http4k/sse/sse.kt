@@ -12,9 +12,9 @@ interface Sse : AutoCloseable {
 
 typealias SseConsumer = (Sse) -> Unit
 
-typealias SseHandler = (Request) -> SseResponse
+typealias SseHandler = suspend (Request) -> SseResponse
 
-fun interface SseFilter : (SseHandler) -> SseHandler {
+fun interface SseFilter : suspend (SseHandler) -> SseHandler {
     companion object
 }
 

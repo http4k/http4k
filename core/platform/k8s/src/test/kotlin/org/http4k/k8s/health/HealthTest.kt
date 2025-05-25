@@ -28,12 +28,12 @@ class HealthTest {
     }
 
     @Test
-    fun `extra routes are callable`() {
+    fun `extra routes are callable`() = runBlocking {
         assertThat(health(Request(GET, "/other")), hasStatus(I_M_A_TEAPOT))
     }
 
     @Test
-    fun `readiness with extra checks`() {
+    fun `readiness with extra checks`() = runBlocking {
         assertThat(
             Health(checks = listOf(check(true, "first"), check(false, "second")))(
                 Request(
@@ -46,7 +46,7 @@ class HealthTest {
     }
 
     @Test
-    fun `readiness continues to run when check fails`() {
+    fun `readiness continues to run when check fails`() = runBlocking {
         assertThat(
             Health(checks = listOf(throws("boom"), check(true, "second")))(
                 Request(
@@ -59,7 +59,7 @@ class HealthTest {
     }
 
     @Test
-    fun `readiness with three checks`() {
+    fun `readiness with three checks`() = runBlocking {
         val checks = listOf(check(true, "first"), check(true, "second"), check(false, "third"))
         assertThat(
             Health(checks = checks)(Request(GET, "/readiness")),
@@ -68,7 +68,7 @@ class HealthTest {
     }
 
     @Test
-    fun `readiness with four checks`() {
+    fun `readiness with four checks`() = runBlocking {
         val checks = listOf(check(true, "first"), check(true, "second"), check(true, "third"), check(false, "fourth"))
         assertThat(
             Health(checks = checks)(Request(GET, "/readiness")),
@@ -77,7 +77,7 @@ class HealthTest {
     }
 
     @Test
-    fun `readiness with three passing checks`() {
+    fun `readiness with three passing checks`() = runBlocking {
         val checks = listOf(check(true, "first"), check(true, "second"), check(true, "third"))
         assertThat(
             Health(checks = checks)(Request(GET, "/readiness")),

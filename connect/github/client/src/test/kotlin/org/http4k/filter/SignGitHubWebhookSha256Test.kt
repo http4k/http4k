@@ -25,7 +25,7 @@ class SignGitHubWebhookSha256Test {
         }
 
     @Test
-    fun `signs correctly`() {
+    fun `signs correctly`() = runBlocking {
         assertThat(
             app(
                 Request(POST, "")

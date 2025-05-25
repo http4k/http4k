@@ -14,7 +14,7 @@ import org.junit.jupiter.api.assertThrows
 class LambdaServerlessCoreExtensionsTest {
 
     @Test
-    fun `compose many functions`() {
+    fun `compose many functions`() = runBlocking {
         val functions = functions(
             "function1" bind FnLoader {
                 FnHandler { _: ScheduledEvent, _: Context ->

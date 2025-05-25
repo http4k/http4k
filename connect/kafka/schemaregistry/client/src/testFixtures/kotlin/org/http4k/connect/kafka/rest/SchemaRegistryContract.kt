@@ -42,12 +42,12 @@ abstract class SchemaRegistryContract {
     }
 
     @BeforeEach
-    fun `can get to proxy`() {
+    fun `can get to proxy`() = runBlocking {
         assumeTrue(http(Request(GET, uri)).status == OK)
     }
 
     @Test
-    fun `schema lifecycle`() {
+    fun `schema lifecycle`() = runBlocking {
         with(schemaRegistry) {
             assertThat(checkSchemaRegistered(subject, `SCHEMA$`).successValue(), equalTo(null))
 

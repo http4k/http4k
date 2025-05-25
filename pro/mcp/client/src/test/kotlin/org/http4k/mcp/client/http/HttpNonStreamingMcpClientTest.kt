@@ -45,7 +45,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
         poly(HttpNonStreamingMcp(protocol, BasicAuthMcpSecurity("", { creds == it })))
 
     @Test
-    fun `can handle batched messages`() {
+    fun `can handle batched messages`() = runBlocking {
         val response = toPolyHandler(
             McpProtocol(
                 ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")), HttpStreamingSessions(),

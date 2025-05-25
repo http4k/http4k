@@ -27,7 +27,7 @@ class GitHubContract {
     )
 
     @Test
-    fun `test action`() {
+    fun `test action`() = runBlocking {
         assertThat(gitHub(TestAction()), equalTo(Success(mapOf("hello" to "world"))))
     }
 }

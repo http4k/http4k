@@ -165,7 +165,7 @@ object ClientFilters {
     }
 
     class FollowRedirects : Filter {
-        private fun makeRequest(
+        private suspend fun makeRequest(
             next: HttpHandler,
             request: Request,
             attempt: Int = 1,
@@ -233,7 +233,7 @@ object ClientFilters {
                 if (host.isBlank()) authority(uri.authority).scheme(uri.scheme) else this
             }
 
-        override fun invoke(next: HttpHandler): HttpHandler = { makeRequest(next, it) }
+        override suspend fun invoke(next: HttpHandler): HttpHandler = { makeRequest(next, it) }
 
         /**
          * This filter requires special treatment for routing handlers.

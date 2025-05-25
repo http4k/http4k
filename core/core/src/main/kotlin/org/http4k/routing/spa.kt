@@ -33,7 +33,7 @@ internal data class SinglePageAppRouteMatcher(
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request) = when (val m = router(request)) {
+    override suspend fun match(request: Request) = when (val m = router(request)) {
         is Matched -> {
             handler(request).let {
                 when {

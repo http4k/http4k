@@ -110,28 +110,28 @@ class RequestMatchersTest {
         { shouldHaveCookie("name", "bob") }, { shouldHaveCookie("name", "bill") })
 
     @Test
-    fun `should haveCookie(Cookie), cookie does not exist`() {
+    fun `should haveCookie(Cookie), cookie does not exist`() = runBlocking {
         assertThrows<AssertionError> {
             Request(GET, "").cookie(Cookie("name", "bob")) should haveCookie(Cookie("planet", "Earth"))
         }
     }
 
     @Test
-    fun `shouldNot haveCookie(Cookie), cookie does not exist`() {
+    fun `shouldNot haveCookie(Cookie), cookie does not exist`() = runBlocking {
         assertDoesNotThrow {
             Request(GET, "").cookie(Cookie("name", "bob")) shouldNot haveCookie(Cookie("planet", "Earth"))
         }
     }
 
     @Test
-    fun `should haveCookie(String), cookie does not exist`() {
+    fun `should haveCookie(String), cookie does not exist`() = runBlocking {
         assertThrows<AssertionError> {
             Request(GET, "").cookie(Cookie("name", "bob")) should haveCookie("planet", "Earth")
         }
     }
 
     @Test
-    fun `shouldNot haveCookie(String), cookie does not exist`() {
+    fun `shouldNot haveCookie(String), cookie does not exist`() = runBlocking {
         assertDoesNotThrow {
             Request(GET, "").cookie(Cookie("name", "bob")) shouldNot haveCookie("planet", "Earth")
         }

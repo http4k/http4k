@@ -44,7 +44,7 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `put item`() {
+    fun `put item`() = runBlocking {
         val item = Item(attrS of "hash1", attrN of 1)
 
         dynamo.putItem(table, item)
@@ -56,7 +56,7 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `replace item`() {
+    fun `replace item`() = runBlocking {
         val original = Item(attrS of "hash1", attrN of 1)
         val updated = Item(attrS of "hash1", attrN of 2)
 
@@ -70,7 +70,7 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `conditional put item - key does not exist`() {
+    fun `conditional put item - key does not exist`() = runBlocking {
         val item = Item(attrS of "hash1", attrN of 1)
 
         dynamo.putItem(table, item).successValue()
@@ -93,7 +93,7 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `conditional put item - comparison`() {
+    fun `conditional put item - comparison`() = runBlocking {
         val item = Item(attrS of "hash1", attrN of 1)
 
         dynamo.putItem(table, item).successValue()

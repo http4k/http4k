@@ -23,7 +23,7 @@ import java.time.ZoneOffset.UTC
 class ClientCookiesTest {
 
     @Test
-    fun `can store and send cookies across multiple calls`() {
+    fun `can store and send cookies across multiple calls`() = runBlocking {
         val server = { request: Request -> Response(OK).counterCookie(request.counterCookie() + 1) }
 
         val client = ClientFilters.Cookies().then(server)
@@ -35,7 +35,7 @@ class ClientCookiesTest {
     }
 
     @Test
-    fun `expired cookies are removed from storage and not sent`() {
+    fun `expired cookies are removed from storage and not sent`() = runBlocking {
         val server = { request: Request ->
             when (request.uri.path) {
                 "/set" -> Response(OK).cookie(Cookie("foo", "bar", 5))
@@ -69,7 +69,7 @@ class ClientCookiesTest {
     }
 
     @Test
-    fun `cookie expiry uses the same timezone as cookie parsing`() {
+    fun `cookie expiry uses the same timezone as cookie parsing`() = runBlocking {
         val zoneId = ZoneId.of("Europe/London")
 
         val cookie = Cookie.parse("foo=bar;Path=/;Expires=Thu, 25-Oct-2018 10:00:00 GMT;HttpOnly")

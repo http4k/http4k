@@ -38,7 +38,7 @@ object JavaHttpClient {
         responseBodyMode: BodyMode = Memory,
         requestModifier: (HttpRequest.Builder) -> HttpRequest.Builder = { it },
     ) = object : HttpHandler {
-        override fun invoke(request: Request): Response = try {
+        override suspend fun invoke(request: Request): Response = try {
             val javaRequest = request.fromHttp4k(requestBodyMode, requestModifier)
             when (responseBodyMode) {
                 is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())

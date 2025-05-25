@@ -29,22 +29,26 @@ import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 object JettyWebsocketClient {
 
     operator fun invoke(
-        timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
+        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
         wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient())
-    ) = object: WebsocketFactory {
-        override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
+    ) = object : WebsocketFactory {
+        override suspend fun nonBlocking(
+            uri: Uri,
+            headers: Headers,
+            onError: (Throwable) -> Unit,
+            onConnect: WsConsumer
+        ): Websocket {
             if (!wsClient.isRunning) wsClient.start()
 
             return JettyNonBlockingWebsocket(uri, headers, timeout, wsClient, onError, onConnect)
         }
 
-        override fun blocking(uri: Uri, headers: Headers): WsClient {
+        override suspend fun blocking(uri: Uri, headers: Headers): WsClient {
             if (!wsClient.isRunning) wsClient.start()
 
             return JettyBlockingWebsocket(uri, headers, timeout, wsClient).awaitConnected()
@@ -52,15 +56,17 @@ object JettyWebsocketClient {
     }
 
     // backwards compatibility
-    fun nonBlocking(
+    suspend fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,
-        wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient()
-        ), onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}) =
+        wsClient: WebSocketClient = WebSocketClient(
+            defaultJettyHttpClient()
+        ), onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}
+    ) =
         JettyWebsocketClient(timeout, wsClient).nonBlocking(uri, headers, onError, onConnect)
 
-    fun blocking(
+    suspend fun blocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.of(5, ChronoUnit.SECONDS)

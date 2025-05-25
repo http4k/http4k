@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.or
+import kotlinx.coroutines.runBlocking
 import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
@@ -138,12 +139,12 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can do standard http traffic`() {
+    fun `can do standard http traffic`() = runBlocking {
         assertThat(client(Request(GET, "http://localhost:${server.port()}/hello/bob")), hasBody("bob"))
     }
 
     @Test
-    fun `sse does not eat body when falling back to http handler`() {
+    fun `sse does not eat body when falling back to http handler`() = runBlocking {
         assertThat(client(
             Request(POST, "http://localhost:${server.port()}/postBody")
                 .contentType(TEXT_EVENT_STREAM)
@@ -152,7 +153,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `sse does not eat body when standard request is sent to the http handler`() {
+    fun `sse does not eat body when standard request is sent to the http handler`() = runBlocking {
         assertThat(client(
             Request(POST, "http://localhost:${server.port()}/postBody")
                 .body("bob")
@@ -161,7 +162,7 @@ abstract class SseServerContract(
 
     @Test
     @DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
-    fun `does not error when we do not call close`() {
+    fun `does not error when we do not call close`() = runBlocking {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/noclose"))
         assertThat(
             client.received().take(1).toList(),
@@ -174,7 +175,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can receive messages from sse`() {
+    fun `can receive messages from sse`() = runBlocking {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob"))
 
         assertThat(
@@ -190,7 +191,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `supports methods`() {
+    fun `supports methods`() = runBlocking {
         setOf(GET, PUT, DELETE, PATCH, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/method")
@@ -201,7 +202,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `supports bodies`() {
+    fun `supports bodies`() = runBlocking {
         val response = JavaHttpClient()(
             Request(POST, "http://localhost:${server.port()}/body")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -211,7 +212,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can route to method`() {
+    fun `can route to method`() = runBlocking {
         setOf(GET, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/routeMethod")
@@ -222,7 +223,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can fallback to HTTP when SSE doesn't find anything`() {
+    fun `can fallback to HTTP when SSE doesn't find anything`() = runBlocking {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/fallback")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -232,7 +233,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `returns 404 when route is not found in SSE or HTTP`() {
+    fun `returns 404 when route is not found in SSE or HTTP`() = runBlocking {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/notfound")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -241,7 +242,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `returns 404 when route is not found in SSE`() {
+    fun `returns 404 when route is not found in SSE`() = runBlocking {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${serverOnlySse.port()}/notfound")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -250,7 +251,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can handle multiple messages`() {
+    fun `can handle multiple messages`() = runBlocking {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/hello/leia")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -266,7 +267,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    open fun `can handle newlines`() {
+    open fun `can handle newlines`() = runBlocking {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/newline")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -278,7 +279,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    open fun `can modify status`() {
+    open fun `can modify status`() = runBlocking {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/modify")
                 .header("Accept", TEXT_EVENT_STREAM.value)
@@ -287,7 +288,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can route by method`() {
+    fun `can route by method`() = runBlocking {
         setOf(GET, POST).forEach {
             val response = JavaHttpClient()(
                 Request(it, "http://localhost:${server.port()}/routeMethod")
@@ -299,7 +300,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can reject request`() {
+    fun `can reject request`() = runBlocking {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/bob?reject=true"))
 
         assertThat(
@@ -309,7 +310,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    fun `can receive messages from sse using multiple clients`() {
+    fun `can receive messages from sse using multiple clients`() = runBlocking {
         val client1 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/leia"))
         val client2 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/luke"))
         val client3 = BlockingSseClient(Uri.of("http://localhost:${server.port()}/hello/anakin"))
@@ -353,7 +354,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    open fun `when no http handler messages without the event stream header don't blow up`() {
+    open fun `when no http handler messages without the event stream header don't blow up`() = runBlocking {
         poly(sse).asServer(serverConfig(0)).start().use {
             assertThat(
                 client(Request(GET, "http://localhost:${it.port()}/hello/bob")),

@@ -29,7 +29,7 @@ object BarAdapter : JsonAdapter<Bar>() {
 
 class SimpleMoshiAdapterFactoryTest {
     @Test
-    fun `register adapter`() {
+    fun `register adapter`() = runBlocking {
         val moshi = SMoshi.Builder()
             .add(FooAdapter.asFactory())
             .add(SimpleMoshiAdapterFactory(adapter { BarAdapter }))

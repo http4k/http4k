@@ -27,7 +27,7 @@ class GitLabContract {
     )
 
     @Test
-    fun `test action`() {
+    fun `test action`() = runBlocking {
         assertThat(gitLab(TestAction()), equalTo(Success(mapOf("hello" to "world"))))
     }
 }

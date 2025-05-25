@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class PostActionStyleTest {
 
     @Test
-    fun `must be valid string`() {
+    fun `must be valid string`() = runBlocking {
         assertThat(PostActionStyle.ofOrNull(""), absent())
         assertThat(PostActionStyle.ofOrNull("123456"), absent())
         assertThat(PostActionStyle.ofOrNull("#ASDasd"), absent())

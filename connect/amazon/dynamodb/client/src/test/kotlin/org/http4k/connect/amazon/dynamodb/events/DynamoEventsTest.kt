@@ -48,7 +48,7 @@ class DynamoEventsTest: PortBasedTest {
     }
 
     @Test
-    fun `can launch a custom function`() {
+    fun `can launch a custom function`() = runBlocking {
         val fnLoader = FnLoader(DynamoDbMoshi) {
             FnHandler { e: DynamoDbEvent, _: Context ->
                 e.Records!![0].eventSourceARN!!

@@ -39,12 +39,12 @@ class AndSecurityTest {
             .and(ApiKeySecurity(Query.required("third"), { true }))
 
     @Test
-    fun `toString makes sense`() {
+    fun `toString makes sense`() = runBlocking {
         assertThat(FooBar.and(BarFoo).and(FooBar).toString(), equalTo("AndSecurity(all=[FooBar, BarFoo, FooBar])"))
     }
 
     @Test
-    fun `requires both securities to pass to succeed`() {
+    fun `requires both securities to pass to succeed`() = runBlocking {
         val handler = composite.filter(next)
         assertThat(handler(Request(GET, "")), hasStatus(UNAUTHORIZED))
         assertThat(handler(Request(GET, "?first=true")), hasStatus(UNAUTHORIZED))

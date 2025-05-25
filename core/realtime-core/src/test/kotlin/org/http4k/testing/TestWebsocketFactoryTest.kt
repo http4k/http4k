@@ -29,7 +29,7 @@ class TestWebsocketFactoryTest {
     private val factory = TestWebsocketFactory(wsHandler)
 
     @Test
-    fun `blocking client`() {
+    fun `blocking client`() = runBlocking {
         val ws = factory.blocking("/echo")
         ws.send(WsMessage("hello"))
         assertThat(
@@ -40,7 +40,7 @@ class TestWebsocketFactoryTest {
 
     @Test
     @Timeout(2, unit = TimeUnit.SECONDS)
-    fun `non-blocking client`() {
+    fun `non-blocking client`() = runBlocking {
         val latch = CountDownLatch(1)
         val ws = factory.nonBlocking("/echo")
         ws.onMessage {

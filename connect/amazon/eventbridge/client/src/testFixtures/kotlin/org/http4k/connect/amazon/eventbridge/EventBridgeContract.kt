@@ -15,7 +15,7 @@ interface EventBridgeContract : AwsContract {
     private val eventBridge get() = EventBridge.Http(aws.region, { aws.credentials }, http)
 
     @Test
-    fun `delivery stream lifecycle`() {
+    fun `delivery stream lifecycle`() = runBlocking {
         val eventBusName = EventBusName.of(uuid().toString().take(8))
 
         with(eventBridge) {

@@ -19,7 +19,7 @@ class HmacSha256Test {
     private val payload = Body("helloworld")
 
     @Test
-    fun `signing secret validates`() {
+    fun `signing secret validates`() = runBlocking {
         assertThrows<Exception> { HmacSha256SigningSecret.encode("A".repeat(23)) }
         HmacSha256SigningSecret.encode("A".repeat(24))
         HmacSha256SigningSecret.encode("A".repeat(64))
@@ -27,7 +27,7 @@ class HmacSha256Test {
     }
     
     @Test
-    fun `can sign and verify`() {
+    fun `can sign and verify`() = runBlocking {
         val signer = HmacSha256.Signer(secret)
         val verifier = HmacSha256.Verifier(secret)
         val signature = signer(webhookId, timestamp, payload)

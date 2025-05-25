@@ -30,7 +30,7 @@ class ChatCompletionGeneratorTest {
     }
 
     @Test
-    fun `reverse input`() {
+    fun `reverse input`() = runBlocking {
         assertThat(
             ChatCompletionGenerator.ReverseInput(input),
             equalTo(
@@ -40,7 +40,7 @@ class ChatCompletionGeneratorTest {
     }
 
     @Test
-    fun `echo input`() {
+    fun `echo input`() = runBlocking {
         assertThat(
             ChatCompletionGenerator.Echo(input),
             equalTo(

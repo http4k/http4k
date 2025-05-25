@@ -27,7 +27,7 @@ object WebsocketClient {
         autoReconnection: Boolean = false,
         draft: Draft = Draft_6455(),
     ) = object: WebsocketFactory {
-        override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
+        override suspend fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
             val socket = AtomicReference<PushPullAdaptingWebSocket>()
             val client = nonBlockingClient(uri, headers, timeout, onConnect, draft, socket)
             socket.set(AdaptingWebSocket(client, autoReconnection).apply { onError(onError) })
@@ -36,7 +36,7 @@ object WebsocketClient {
             return socket.get()
         }
 
-        override fun blocking(uri: Uri, headers: Headers): WsClient {
+        override suspend fun blocking(uri: Uri, headers: Headers): WsClient {
             val queue = LinkedBlockingQueue<() -> WsMessage?>()
             val client = BlockingQueueClient(uri, headers, timeout, draft, queue).apply {
                 if (!connectBlocking(timeout.toMillis(), MILLISECONDS)) {
@@ -48,7 +48,7 @@ object WebsocketClient {
     }
 
     // backwards compatibility
-    fun nonBlocking(
+    suspend fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ofSeconds(5),
@@ -57,7 +57,7 @@ object WebsocketClient {
         onConnect: WsConsumer = {}
     ) = WebsocketClient(timeout, false, draft).nonBlocking(uri, headers, onError, onConnect)
 
-    fun blocking(
+    suspend fun blocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ofSeconds(5),

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class HexColourTest {
 
     @Test
-    fun `must be hex string`() {
+    fun `must be hex string`() = runBlocking {
         assertThat(HexColour.ofOrNull(""), absent())
         assertThat(HexColour.ofOrNull("123456"), absent())
         assertThat(HexColour.ofOrNull("#ASDasd"), absent())

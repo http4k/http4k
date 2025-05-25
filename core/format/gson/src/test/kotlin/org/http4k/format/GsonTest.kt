@@ -16,21 +16,21 @@ import org.junit.jupiter.api.Test
 class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
 
     @Test
-    fun ` roundtrip arbitrary object to and from JSON element`() {
+    fun ` roundtrip arbitrary object to and from JSON element`() = runBlocking {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = Gson.asJsonObject(obj)
         assertThat(asA(out, ArbObject::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrip list of arbitrary objects to and from node`() {
+    fun `roundtrip list of arbitrary objects to and from node`() = runBlocking {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(Gson.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
     }
 
     @Test
-    fun `roundtrip list of arbitrary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() = runBlocking {
         val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -39,7 +39,7 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     }
 
     @Test
-    fun `roundtrip array of arbitrary objects to and from body`() {
+    fun `roundtrip array of arbitrary objects to and from body`() = runBlocking {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -49,43 +49,43 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
 
     @Test
     @Disabled("for j19")
-    override fun `throwable is marshalled`() {
+    override fun `throwable is marshalled`() = runBlocking {
 
     }
 
     @Test
     @Disabled("for j19")
-    override fun `roundtrip zones and locale`() {
+    override fun `roundtrip zones and locale`() = runBlocking {
 
     }
 
     @Test
     @Disabled("for j19")
-    override fun `exception is marshalled`() {
+    override fun `exception is marshalled`() = runBlocking {
     }
 
     @Test
     @Disabled("GSON does not currently have Kotlin class support")
-    override fun `fails decoding when a required value is null`() {
+    override fun `fails decoding when a required value is null`() = runBlocking {
     }
 
     @Test
     @Disabled("GSON does not currently have this support")
-    override fun `fails decoding when a extra key found`() {
+    override fun `fails decoding when a extra key found`() = runBlocking {
     }
 
     @Test
     @Disabled("GSON does not currently have this support")
-    override fun `automarshalling failure has expected message`() {
+    override fun `automarshalling failure has expected message`() = runBlocking {
     }
 
     @Test
     @Disabled("no support for this")
-    override fun `serialises enum as a key correctly`() {
+    override fun `serialises enum as a key correctly`() = runBlocking {
     }
 
     @Test
-    fun ` roundtrip arbitrary object to and from with BiDi lens`() {
+    fun ` roundtrip arbitrary object to and from with BiDi lens`() = runBlocking {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val lens = Gson.asBiDiMapping<ArbObject>()
         assertThat(lens(lens(obj)), equalTo(obj))

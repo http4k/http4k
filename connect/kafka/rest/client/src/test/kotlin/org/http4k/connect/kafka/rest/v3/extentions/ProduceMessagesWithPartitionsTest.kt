@@ -28,7 +28,7 @@ import java.time.Instant.EPOCH
 class ProduceRecordeWithPartitionsTest {
 
     @Test
-    fun `writing to a list of partitions using a partitioner`() {
+    fun `writing to a list of partitions using a partitioner`() = runBlocking {
         val kafkaRest = KafkaRest.Http(Credentials("", ""), Uri.of(""), FakeKafkaRest())
 
         val clusterId = ClusterId.of("foobar")

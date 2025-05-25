@@ -1,5 +1,6 @@
 package org.http4k.bridge
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ class SpringToHttp4kFallbackControllerSuccessTest {
     val mvc = MockMvcBuilders.standaloneSetup(Controller()).build()
     
     @Test
-    fun `passes requests through and adapts to servlet`() {
+    fun `passes requests through and adapts to servlet`() = runBlocking {
         mvc.post(URI("/")) {
             header("header", "value")
             contentType = MediaType.TEXT_PLAIN

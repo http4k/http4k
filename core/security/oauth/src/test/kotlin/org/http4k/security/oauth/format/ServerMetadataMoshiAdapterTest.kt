@@ -19,7 +19,7 @@ class ServerMetadataMoshiAdapterTest {
     private val marshaller = OAuthMoshi
 
     @Test
-    fun `deserialize full metadata`() {
+    fun `deserialize full metadata`() = runBlocking {
         val json = """
     {
         "issuer": "https://example.com",
@@ -60,7 +60,7 @@ class ServerMetadataMoshiAdapterTest {
     }
 
     @Test
-    fun `deserialize minimal metadata`() {
+    fun `deserialize minimal metadata`() = runBlocking {
         val json = """
     {
         "issuer": "https://example.com",
@@ -89,7 +89,7 @@ class ServerMetadataMoshiAdapterTest {
     }
 
     @Test
-    fun `ignores unknown fields`() {
+    fun `ignores unknown fields`() = runBlocking {
         val json = """
     {
         "issuer": "https://example.com",

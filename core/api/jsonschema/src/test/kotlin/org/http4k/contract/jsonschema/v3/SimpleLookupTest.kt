@@ -17,7 +17,7 @@ class SimpleLookupTest {
     )
 
     @Test
-    fun `finds value from object`() {
+    fun `finds value from object`() = runBlocking {
         assertThat("nonNullable", SimpleLookup()(KotlinBean(), "nonNullable"), equalTo(Field("hello", false, FieldMetadata.empty)))
         assertThat("aNullable", SimpleLookup()(KotlinBean(), "aNullable"), equalTo(Field("aNullable", true, FieldMetadata.empty)))
         assertThat(
@@ -28,12 +28,12 @@ class SimpleLookupTest {
     }
 
     @Test
-    fun `finds value from java object`() {
+    fun `finds value from java object`() = runBlocking {
         assertThat("nonNullable", SimpleLookup()(JavaBean("hello"), "name"), equalTo(Field("hello", true, FieldMetadata.empty)))
     }
 
     @Test
-    fun `recovers and responds with empty FieldMetadata when there are generics in the class`() {
+    fun `recovers and responds with empty FieldMetadata when there are generics in the class`() = runBlocking {
         assertThat("non existent", { SimpleLookup()(KotlinBean(), "non existent") }, throws<NoFieldFound>())
     }
 }

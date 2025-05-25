@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.isEmpty
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion
@@ -37,7 +38,7 @@ class MultipartFormTest {
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     @Test
-    fun `multipart form serialized into request`() {
+    fun `multipart form serialized into request`() = runBlocking {
         val populatedRequest = emptyRequest.with(
             multipartFormLens(Strict, ::MultipartMixedWithBoundary) of MultipartForm().with(
                 stringRequiredField of "world",
@@ -54,7 +55,7 @@ class MultipartFormTest {
     }
 
     @Test
-    fun `multipart form blows up if not correct content type`() {
+    fun `multipart form blows up if not correct content type`() = runBlocking {
         val request = emptyRequest.with(
             multipartFormLens(Strict) of MultipartForm().with(
                 stringRequiredField of "world",
@@ -69,7 +70,7 @@ class MultipartFormTest {
     }
 
     @Test
-    fun `multipart form extracts ok form values`() {
+    fun `multipart form extracts ok form values`() = runBlocking {
         val request = emptyRequest.with(
             multipartFormLens(Strict) of MultipartForm().with(
                 stringRequiredField of "world",
@@ -89,7 +90,7 @@ class MultipartFormTest {
     }
 
     @Test
-    fun `feedback multipart form extracts ok form values and errors`() {
+    fun `feedback multipart form extracts ok form values and errors`() = runBlocking {
 
         val request = emptyRequest.with(
             multipartFormLens(Feedback) of MultipartForm().with(
@@ -111,7 +112,7 @@ class MultipartFormTest {
     }
 
     @Test
-    fun `strict multipart form blows up with invalid form values`() {
+    fun `strict multipart form blows up with invalid form values`() = runBlocking {
         val intStringField = MultipartFormField.string().required("another")
 
         val request = emptyRequest.with(
@@ -136,7 +137,7 @@ class MultipartFormTest {
     }
 
     @Test
-    fun `can set multiple values on a form`() {
+    fun `can set multiple values on a form`() = runBlocking {
         val stringField = MultipartFormField.string().required("hello")
         val intField = MultipartFormField.string().int().required("another")
 
@@ -163,7 +164,7 @@ class MultipartFormTest {
     ).toLens()
 
     @Test
-    fun `backing disk location deleted after close`() {
+    fun `backing disk location deleted after close`() = runBlocking {
         val tempDir = Files.createTempDirectory("http4k-override").toFile().apply { deleteOnExit() }
         val lens = Body.multipartForm(Strict, diskThreshold = 1, getDiskLocation = { DiskLocation.Temp(tempDir) }).toLens()
 

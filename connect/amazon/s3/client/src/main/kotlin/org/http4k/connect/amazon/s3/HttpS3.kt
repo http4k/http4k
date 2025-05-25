@@ -37,7 +37,7 @@ fun S3.Companion.Http(
         )
         .then(http)
 
-    override fun <R> invoke(action: S3Action<R>) = action.toResult(signedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: S3Action<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
 /**

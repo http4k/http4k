@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class DatastarEventTest {
 
     @Test
-    fun `merge fragment to event`() {
+    fun `merge fragment to event`() = runBlocking {
         assertThat(
             DatastarEvent.MergeFragments(Fragment.of("foo"), Fragment.of("bar")).toSseEvent(),
             equalTo(
@@ -22,7 +22,7 @@ class DatastarEventTest {
     }
 
     @Test
-    fun `merge signals to event`() {
+    fun `merge signals to event`() = runBlocking {
         assertThat(
             DatastarEvent.MergeSignals(Signal.of("foo"), Signal.of("bar")).toSseEvent(),
             equalTo(
@@ -36,7 +36,7 @@ class DatastarEventTest {
     }
 
     @Test
-    fun `execute script to event`() {
+    fun `execute script to event`() = runBlocking {
         assertThat(
             DatastarEvent.ExecuteScript(Script.of("foo"), true, listOf("foo" to "bar", "foo2" to "bar2")).toSseEvent(),
             equalTo(
@@ -50,7 +50,7 @@ class DatastarEventTest {
     }
 
     @Test
-    fun `remove fragments to event`() {
+    fun `remove fragments to event`() = runBlocking {
         assertThat(
             DatastarEvent.RemoveFragments(Selector.of("#foo")).toSseEvent(),
             equalTo(
@@ -64,7 +64,7 @@ class DatastarEventTest {
     }
 
     @Test
-    fun `remove signals to event`() {
+    fun `remove signals to event`() = runBlocking {
         assertThat(
             DatastarEvent.RemoveSignals(SignalPath.of("foo"), SignalPath.of("bar")).toSseEvent(),
             equalTo(

@@ -122,7 +122,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
-    open fun `roundtrip arbitrary object to and from string`() {
+    open fun `roundtrip arbitrary object to and from string`() = runBlocking {
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
         assertThat(marshaller.asA(out, ArbObject::class), equalTo(obj))
@@ -133,19 +133,19 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     abstract fun `automarshalling failure has expected message`()
 
     @Test
-    open fun `roundtrip arbitrary object through convert`() {
+    open fun `roundtrip arbitrary object through convert`() = runBlocking {
         assertThat(marshaller.convert(obj), equalTo(obj))
     }
 
     @Test
-    open fun `roundtrip arbitrary object to and from inputstream`() {
+    open fun `roundtrip arbitrary object to and from inputstream`() = runBlocking {
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedAutoMarshallingResult.normaliseJson()))
         assertThat(marshaller.asA(out.byteInputStream(), ArbObject::class), equalTo(obj))
     }
 
     @Test
-    open fun `roundtrip object with common java primitive types`() {
+    open fun `roundtrip object with common java primitive types`() = runBlocking {
         val localDate = LocalDate.of(2000, 1, 1)
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
@@ -170,7 +170,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip zones and locale`() {
+    open fun `roundtrip zones and locale`() = runBlocking {
         val obj = ZonesAndLocale(
             zoneId = ZoneId.of("America/Toronto"),
             zoneOffset = ZoneOffset.of("-04:00"),
@@ -182,7 +182,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip regex special as equals isn't comparable`() {
+    open fun `roundtrip regex special as equals isn't comparable`() = runBlocking {
         val obj = RegexHolder(".*".toRegex())
         val out = marshaller.asFormatString(obj)
         assertThat(out.normaliseJson(), equalTo(expectedRegexSpecial.normaliseJson()))
@@ -190,7 +190,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip map`() {
+    open fun `roundtrip map`() = runBlocking {
         val wrapper = mapOf("key" to "value", "key2" to "123")
         val asString = marshaller.asFormatString(wrapper)
         assertThat(asString.normaliseJson(), equalTo(expectedMap))
@@ -198,7 +198,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip arbitrary map`() {
+    open fun `roundtrip arbitrary map`() = runBlocking {
         val wrapper = mapOf(
             "str" to "val1",
             "num" to 123.1,
@@ -212,7 +212,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip arbitrary array`() {
+    open fun `roundtrip arbitrary array`() = runBlocking {
         val wrapper = listOf(
             "foo",
             123.1,
@@ -226,7 +226,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip arbitrary set`() {
+    open fun `roundtrip arbitrary set`() = runBlocking {
         val wrapper = setOf(
             "foo",
             "bar",
@@ -238,14 +238,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip wrapped map`() {
+    open fun `roundtrip wrapped map`() = runBlocking {
         val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
         assertThat(marshaller.asFormatString(wrapper).normaliseJson(), equalTo(expectedWrappedMap.normaliseJson()))
         assertThat(marshaller.asA(marshaller.asFormatString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
     @Test
-    open fun `roundtrip custom number`() {
+    open fun `roundtrip custom number`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
@@ -254,7 +254,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip custom decimal`() {
+    open fun `roundtrip custom decimal`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
@@ -263,7 +263,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip custom value`() {
+    open fun `roundtrip custom value`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = MyValueHolder(MyValue("foobar"))
@@ -274,7 +274,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `roundtrip custom boolean`() {
+    open fun `roundtrip custom boolean`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
@@ -283,13 +283,13 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `convert to inputstream`() {
+    open fun `convert to inputstream`() = runBlocking {
         assertThat(marshaller.asInputStream(StringHolder("hello")).reader().use { it.readText() }
             .normaliseJson(), equalTo(expectedConvertToInputStream.normaliseJson()))
     }
 
     @Test
-    open fun `throwable is marshalled`() {
+    open fun `throwable is marshalled`() = runBlocking {
         assertThat(
             marshaller.asFormatString(ExceptionHolder(CustomException("foobar"))).normaliseJson(),
             startsWith(expectedThrowable.normaliseJson())
@@ -297,7 +297,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `exception is marshalled`() {
+    open fun `exception is marshalled`() = runBlocking {
         assertThat(
             marshaller.asFormatString(RuntimeException("foobar")).normaliseJson(),
             containsSubstring("foobar")
@@ -305,17 +305,17 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `fails decoding when a required value is null`() {
+    open fun `fails decoding when a required value is null`() = runBlocking {
         assertThat({ marshaller.asA(inputEmptyObject, ArbObject::class) }, throws<Exception>())
     }
 
     @Test
-    open fun `does not fail decoding when unknown value is encountered`() {
+    open fun `does not fail decoding when unknown value is encountered`() = runBlocking {
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 
     @Test
-    fun `marshall a lens to a type`() {
+    fun `marshall a lens to a type`() = runBlocking {
         val o = StringHolder("foo")
         val request = Request(GET, "").query("foo", marshaller.asFormatString(o))
         val lens = marshaller.autoLens<Request, StringHolder>(Query.string()).required("foo")
@@ -324,12 +324,12 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     }
 
     @Test
-    open fun `auto marshall any lens`() {
+    open fun `auto marshall any lens`() = runBlocking {
         assertThat(marshaller.asA(inputUnknownValue, StringHolder::class), equalTo(StringHolder("value")))
     }
 
     @Test
-    open fun `fails decoding when a extra key found`() {
+    open fun `fails decoding when a extra key found`() = runBlocking {
         assertThat({ strictMarshaller().asA(inputUnknownValue, StringHolder::class) }, throws<Exception>())
     }
 

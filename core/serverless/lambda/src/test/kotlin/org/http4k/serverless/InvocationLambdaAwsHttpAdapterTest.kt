@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class InvocationLambdaAwsHttpAdapterTest {
 
     @Test
-    fun `converts into http4k request`() {
+    fun `converts into http4k request`() = runBlocking {
         val request = "helloworld"
         assertThat(
             InvocationLambdaAwsHttpAdapter(request.byteInputStream(), LambdaContextMock()).getOrThrow(),
@@ -23,7 +23,7 @@ class InvocationLambdaAwsHttpAdapterTest {
     }
 
     @Test
-    fun `converts from http4k response - throws everything away`() {
+    fun `converts from http4k response - throws everything away`() = runBlocking {
         assertThat(
             InvocationLambdaAwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")

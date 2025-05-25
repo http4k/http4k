@@ -31,7 +31,7 @@ internal class JacksonJsonNamingAnnotatedTest {
     private val standard = JacksonJsonNamingAnnotated()
 
     @Test
-    fun `finds value from object`() {
+    fun `finds value from object`() = runBlocking {
         assertThat(
             "nonNullable",
             standard(Renamed(), "RenamedValue"),
@@ -46,7 +46,7 @@ internal class JacksonJsonNamingAnnotatedTest {
     }
 
     @Test
-    fun `throws on no field found`() {
+    fun `throws on no field found`() = runBlocking {
         assertThat(
             "non existent",
             { JacksonJsonNamingAnnotated(Jackson)(Renamed(), "non existent") },
@@ -62,7 +62,7 @@ internal class JacksonJsonNamingAnnotatedTest {
     )
 
     @Test
-    fun `use custom Jackson naming strategy`() {
+    fun `use custom Jackson naming strategy`() = runBlocking {
         assertThat(
             JacksonJsonNamingAnnotated(CustomJackson)(Snake(), "renamed_value"),
             equalTo(Field("bob", false, FieldMetadata.empty))

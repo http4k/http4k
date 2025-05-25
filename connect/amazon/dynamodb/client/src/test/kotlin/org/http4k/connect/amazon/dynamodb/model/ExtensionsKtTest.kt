@@ -27,7 +27,7 @@ class IntType private constructor(value: Int) : IntValue(value) {
 class ExtensionsKtTest {
 
     @Test
-    fun `int value list`() {
+    fun `int value list`() = runBlocking {
         val lens = Attribute.list(IntType).required("foo")
         val input = listOf(IntType.of(123))
         val target = Item().with(lens of input)
@@ -35,7 +35,7 @@ class ExtensionsKtTest {
     }
 
     @Test
-    fun `non-string value list`() {
+    fun `non-string value list`() = runBlocking {
         val lens = Attribute.list(InstantType).required("foo")
         val input = listOf(InstantType.of(Instant.now()))
         val target = Item().with(lens of input)
@@ -43,7 +43,7 @@ class ExtensionsKtTest {
     }
 
     @Test
-    fun `non-string value set`() {
+    fun `non-string value set`() = runBlocking {
         val lens = Attribute.set(InstantType).required("foo")
         val input = setOf(InstantType.of(EPOCH), InstantType.of(Instant.now()))
         val target = Item().with(lens of input)

@@ -19,7 +19,7 @@ class RefreshingCredentialsProviderTest {
     private val clock = TestClock(now)
 
     @Test
-    fun `gets credentials first time only`() {
+    fun `gets credentials first time only`() = runBlocking {
         var calls = 0
 
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
@@ -36,7 +36,7 @@ class RefreshingCredentialsProviderTest {
     }
 
     @Test
-    fun `gets credentials when expired time only`() {
+    fun `gets credentials when expired time only`() = runBlocking {
         var calls = 0
 
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
@@ -68,7 +68,7 @@ class RefreshingCredentialsProviderTest {
     }
 
     @Test
-    fun `on failure to refresh returns previous creds and then throws`() {
+    fun `on failure to refresh returns previous creds and then throws`() = runBlocking {
         var calls = 0
 
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
@@ -93,7 +93,7 @@ class RefreshingCredentialsProviderTest {
     }
 
     @Test
-    fun `uses almost-stale credentials when there is more than half of the grace period left`() {
+    fun `uses almost-stale credentials when there is more than half of the grace period left`() = runBlocking {
         var completedCalls = 0
 
         val firstCreds = credentialsExpiringAt(now.plusSeconds(11), 1)

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class DatastarFragmentRendererTest {
 
     @Test
-    fun `renders template into a merge fragment event`() {
+    fun `renders template into a merge fragment event`() = runBlocking {
         val viewModel1 = object : ViewModel {
             override fun toString() = """<foo>bar</foo>
         |<bar>foo</bar>

@@ -60,7 +60,7 @@ class DynamoDbTableMapperTest {
     private fun table() = storage["cats"]!!
 
     @Test
-    fun `verify cats table`() {
+    fun `verify cats table`() = runBlocking {
         val tableData = table().table
 
         assertThat(tableData.TableName, equalTo(TableName.of("cats")))
@@ -81,7 +81,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `scan table`() {
+    fun `scan table`() = runBlocking {
         assertThat(
             tableMapper.primaryIndex().scan().toSet(),
             equalTo(setOf(toggles, smokie, bandit, kratos, athena))
@@ -89,17 +89,17 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `get item`() {
+    fun `get item`() = runBlocking {
         assertThat(tableMapper[toggles.id], equalTo(toggles))
     }
 
     @Test
-    fun `get missing item`() {
+    fun `get missing item`() = runBlocking {
         assertThat(tableMapper[UUID.randomUUID()], absent())
     }
 
     @Test
-    fun `query for index`() {
+    fun `query for index`() = runBlocking {
         assertThat(
             tableMapper.index(byOwner).query(owner2).toList(),
             equalTo(listOf(bandit, smokie))
@@ -107,7 +107,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `query for index - reverse order`() {
+    fun `query for index - reverse order`() = runBlocking {
         assertThat(
             tableMapper.index(byOwner).query(owner2, ScanIndexForward = false).toList(),
             equalTo(listOf(smokie, bandit))
@@ -115,48 +115,48 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `delete item`() {
+    fun `delete item`() = runBlocking {
         tableMapper -= toggles
 
         assertThat(table().items, hasSize(equalTo(4)))
     }
 
     @Test
-    fun `delete missing item`() {
+    fun `delete missing item`() = runBlocking {
         tableMapper.delete(UUID.randomUUID())
 
         assertThat(table().items, hasSize(equalTo(5)))
     }
 
     @Test
-    fun `delete batch`() {
+    fun `delete batch`() = runBlocking {
         tableMapper -= listOf(smokie, bandit)
 
         assertThat(table().items, hasSize(equalTo(3)))
     }
 
     @Test
-    fun `delete batch by ids`() {
+    fun `delete batch by ids`() = runBlocking {
         tableMapper.batchDelete(smokie.id, bandit.id)
 
         assertThat(table().items, hasSize(equalTo(3)))
     }
 
     @Test
-    fun `delete batch by keys`() {
+    fun `delete batch by keys`() = runBlocking {
         tableMapper.batchDelete(listOf(smokie.id to null, bandit.id to null))
 
         assertThat(table().items, hasSize(equalTo(3)))
     }
 
     @Test
-    fun `delete table`() {
+    fun `delete table`() = runBlocking {
         tableMapper.deleteTable().successValue()
         assertThat(storage["cats"], absent())
     }
 
     @Test
-    fun `custom query`() {
+    fun `custom query`() = runBlocking {
         val results = tableMapper.index(byDob).query(
             KeyConditionExpression = "$bornAttr = :val1",
             ExpressionAttributeValues = mapOf(":val1" to bornAttr.asValue(smokie.born))
@@ -166,7 +166,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `custom query with DSL`() {
+    fun `custom query with DSL`() = runBlocking {
         val results = tableMapper.index(byOwner).query {
             keyCondition {
                 hashKey eq owner1
@@ -183,7 +183,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `custom query with filter functions in DSL`() {
+    fun `custom query with filter functions in DSL`() = runBlocking {
         val results = tableMapper.index(byOwner).query {
             keyCondition {
                 hashKey eq owner1
@@ -197,7 +197,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `custom scan with DSL filter expression`() {
+    fun `custom scan with DSL filter expression`() = runBlocking {
         val results = tableMapper.index(byOwner).scan {
             filterExpression {
                 (nameAttr ne nickNameAttr) and (ownerIdAttr eq owner1)
@@ -208,7 +208,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `query page`() {
+    fun `query page`() = runBlocking {
         // page 1 of 2
         assertThat(
             tableMapper.index(byOwner).queryPage(owner1, Limit = 2), equalTo(
@@ -243,7 +243,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `custom query page`() {
+    fun `custom query page`() = runBlocking {
         // page 1 of 2
         assertThat(tableMapper.index(byDob).queryPage(
             KeyConditionExpression = "$bornAttr = :val1",
@@ -273,7 +273,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `custom query page with DSL condition`() {
+    fun `custom query page with DSL condition`() = runBlocking {
         // page 1 of 2
         val page1 = tableMapper.index(byDob).queryPage(Limit = 1) {
             keyCondition {
@@ -307,7 +307,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `scan page - secondary index`() {
+    fun `scan page - secondary index`() = runBlocking {
         // page 1 of 1
         assertThat(
             tableMapper.index(byOwner).scanPage(Limit = 3), equalTo(
@@ -341,7 +341,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `scan page - primary index with no sort key`() {
+    fun `scan page - primary index with no sort key`() = runBlocking {
         // page 1 of 1
         assertThat(
             tableMapper.primaryIndex().scanPage(Limit = 3), equalTo(
@@ -371,13 +371,13 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `get empty batch`() {
+    fun `get empty batch`() = runBlocking {
         val batchGetResult = tableMapper.batchGet(emptyList()).toList()
         assertThat(batchGetResult, isEmpty)
     }
 
     @Test
-    fun `get batch`() {
+    fun `get batch`() = runBlocking {
         val cats = (1..150).map { index ->
             Cat(
                 ownerId = UUID.randomUUID(),
@@ -394,13 +394,13 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `count (via scan)`() {
+    fun `count (via scan)`() = runBlocking {
         val totalCount = tableMapper.primaryIndex().count()
         assertThat(totalCount, equalTo(5))
     }
 
     @Test
-    fun `count (via scan with filter)`() {
+    fun `count (via scan with filter)`() = runBlocking {
         val totalCount = tableMapper.primaryIndex().count {
             filterExpression {
                 bornAttr gt LocalDate.of(2010, 1, 1)
@@ -410,7 +410,7 @@ class DynamoDbTableMapperTest {
     }
 
     @Test
-    fun `count (via query)`() {
+    fun `count (via query)`() = runBlocking {
         val totalCount = tableMapper.index(byOwner).count {
             keyCondition {
                 hashKey eq owner1

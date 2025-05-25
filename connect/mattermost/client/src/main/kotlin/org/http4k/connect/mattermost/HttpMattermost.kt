@@ -13,5 +13,5 @@ fun Mattermost.Companion.Http(
     private val routedHttp = ClientFilters.SetBaseUriFrom(baseUri)
         .then(http)
 
-    override fun <R> invoke(action: MattermostAction<R>) = action.toResult(routedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: MattermostAction<R>) = action.toResult(routedHttp(action.toRequest()))
 }

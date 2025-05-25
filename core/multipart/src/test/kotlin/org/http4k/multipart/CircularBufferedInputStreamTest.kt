@@ -3,6 +3,7 @@ package org.http4k.multipart
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.ByteArrayInputStream
@@ -12,7 +13,7 @@ import java.nio.InvalidMarkException
 class CircularBufferedInputStreamTest {
 
     @Test
-    fun `returns a byte at a time`() {
+    fun `returns a byte at a time`() = runBlocking {
         val bytes = "hello my name is Tiest".toByteArray()
         val inputStream = createInputStream(bytes, 3)
 
@@ -24,7 +25,7 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    fun `returns bytes`() {
+    fun `returns bytes`() = runBlocking {
         val bytes = "hello my name is Tiest".toByteArray()
         val inputStream = createInputStream(bytes, 3)
 
@@ -56,7 +57,7 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    fun `cannot mark further then buffer size`() {
+    fun `cannot mark further then buffer size`() = runBlocking {
         val bytes = "hello my name is Tiest".toByteArray()
         val inputStream = createInputStream(bytes, 3)
 
@@ -69,7 +70,7 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    fun `marks and resets`() {
+    fun `marks and resets`() = runBlocking {
         val bytes = "My name is Tiest don't you know".toByteArray()
         val inputStream = createInputStream(bytes, 7)
 
@@ -116,7 +117,7 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    fun `resetting after reading past readlimit fails`() {
+    fun `resetting after reading past readlimit fails`() = runBlocking {
         val bytes = "My name is Tiest don't you know".toByteArray()
         val inputStream = createInputStream(bytes, 7)
 
@@ -142,7 +143,7 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    fun `resetting after reading past readlimit fails 2`() {
+    fun `resetting after reading past readlimit fails 2`() = runBlocking {
         val bytes = "My name is Tiest don't you know".toByteArray()
         val inputStream = createInputStream(bytes, 7)
 

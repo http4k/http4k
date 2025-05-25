@@ -61,7 +61,7 @@ internal class ClientValidationFilterTest {
             .then(loginPage)
 
     @Test
-    fun `allow accessing the login page`() {
+    fun `allow accessing the login page`() = runBlocking {
         val response = filter(Request(GET, "/auth")
             .query("response_type", Code.queryParameterValue)
             .query("client_id", validClientId.value)
@@ -72,7 +72,7 @@ internal class ClientValidationFilterTest {
     }
 
     @Test
-    fun `validates presence of client_id`() {
+    fun `validates presence of client_id`() = runBlocking {
         val response = filter(Request(GET, "/auth")
             .query("response_type", Code.queryParameterValue)
             .query("redirect_uri", validRedirectUri.toString())
@@ -83,7 +83,7 @@ internal class ClientValidationFilterTest {
     }
 
     @Test
-    fun `validates presence of redirect_uri`() {
+    fun `validates presence of redirect_uri`() = runBlocking {
         val response = filter(Request(GET, "/auth")
             .query("response_type", Code.queryParameterValue)
             .query("client_id", validClientId.value)
@@ -94,7 +94,7 @@ internal class ClientValidationFilterTest {
     }
 
     @Test
-    fun `validates client_id value`() {
+    fun `validates client_id value`() = runBlocking {
         val response = filter(Request(GET, "/auth")
             .query("response_type", Code.queryParameterValue)
             .query("client_id", "invalid-client")
@@ -106,7 +106,7 @@ internal class ClientValidationFilterTest {
     }
 
     @Test
-    fun `validates presence of resonse_type`() {
+    fun `validates presence of resonse_type`() = runBlocking {
         val response = filter(Request(GET, "/auth")
             .query("response_type", "something invalid")
             .query("client_id", validClientId.value)
@@ -117,7 +117,7 @@ internal class ClientValidationFilterTest {
     }
 
     @Test
-    fun `validates presence of resonse_type, even taking into account response mode, and with state`() {
+    fun `validates presence of resonse_type, even taking into account response mode, and with state`() = runBlocking {
         val response = filter(Request(GET, "/auth")
             .query("response_type", "something invalid")
             .query("response_mode", "fragment")

@@ -38,7 +38,7 @@ data class OrSecurity(private val all: List<Security>) : Security, Iterable<Secu
 
     override val filter = Filter { next ->
         {
-            all.asSequence().map { sec -> sec.filter.then(next)(it) }
+            all.map { sec -> sec.filter.then(next)(it) }
                 .firstOrNull { it.status != UNAUTHORIZED } ?: Response(UNAUTHORIZED)
         }
     }

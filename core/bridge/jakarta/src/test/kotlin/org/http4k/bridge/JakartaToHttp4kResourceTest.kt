@@ -24,7 +24,7 @@ class JakartaToHttp4kResourceTest {
     }
 
     @Test
-    fun `bridges between jakarta and http4k`() {
+    fun `bridges between jakarta and http4k`() = runBlocking {
 
         MyResource().get(
             object : JRequest by mock() {

@@ -23,7 +23,7 @@ fun OpenAI.Companion.Http(
         .then(org?.let(::AddOrg) ?: Filter.NoOp)
         .then(http)
 
-    override fun <R> invoke(action: OpenAIAction<R>) = action.toResult(routedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: OpenAIAction<R>) = action.toResult(routedHttp(action.toRequest()))
 }
 
 private fun AddOrg(org: OpenAIOrg) = Filter { next ->

@@ -10,7 +10,7 @@ import java.util.UUID
 class RequestContextsTest {
 
     @Test
-    fun `can get and set and remove a request context using just the request`() {
+    fun `can get and set and remove a request context using just the request`() = runBlocking {
         val requestContexts = RequestContexts()
         val value = RequestContext(UUID.randomUUID())
         val updated = requestContexts.inject(value, Request(GET, ""))
@@ -24,7 +24,7 @@ class RequestContextsTest {
     }
 
     @Test
-    fun `you can roll your own`() {
+    fun `you can roll your own`() = runBlocking {
         @Suppress("unused")
         class MyVeryOwnContextStore : Store<RequestContext> {
             override fun invoke(target: Request): RequestContext = TODO()

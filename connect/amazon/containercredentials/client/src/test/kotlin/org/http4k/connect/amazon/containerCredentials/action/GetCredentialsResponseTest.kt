@@ -17,7 +17,7 @@ import java.time.ZonedDateTime
 class GetCredentialsResponseTest {
 
     @Test
-    fun `converts credentials response to credentials`() {
+    fun `converts credentials response to credentials`() = runBlocking {
         val token = SessionToken.of("SessionToken")
         val accessKeyId = AccessKeyId.of("access-AccessKey")
         val secretAccessKey = SecretAccessKey.of("SecretAccessKey")

@@ -17,19 +17,19 @@ class InMemorySessionEventStoreTest {
     private val event2 = SseMessage.Event("message", "message", id = SseEventId("2"))
 
     @Test
-    fun `returns empty sequence when session does not exist`() {
+    fun `returns empty sequence when session does not exist`() = runBlocking {
         assertThat(store.read(Session(SessionId.of("whatever")), null).toList(), equalTo(emptyList()))
     }
 
     @Test
-    fun `does not store events without id`() {
+    fun `does not store events without id`() = runBlocking {
         val eventWithoutId = SseMessage.Event("message", "message")
         store.write(session, eventWithoutId)
         assertThat(store.read(session, null).toList(), equalTo(emptyList()))
     }
 
     @Test
-    fun `returns all events when last event id is not passed`() {
+    fun `returns all events when last event id is not passed`() = runBlocking {
         store.write(session, event1)
         store.write(session, dataMessage)
         store.write(session, event2)
@@ -38,7 +38,7 @@ class InMemorySessionEventStoreTest {
     }
 
     @Test
-    fun `returns only events after the last event id`() {
+    fun `returns only events after the last event id`() = runBlocking {
         store.write(session, event1)
         store.write(session, dataMessage)
         store.write(session, event2)
@@ -47,7 +47,7 @@ class InMemorySessionEventStoreTest {
     }
 
     @Test
-    fun `respects memory size limit`() {
+    fun `respects memory size limit`() = runBlocking {
         store.write(session, event1)
         store.write(session, dataMessage)
         store.write(session, event2)

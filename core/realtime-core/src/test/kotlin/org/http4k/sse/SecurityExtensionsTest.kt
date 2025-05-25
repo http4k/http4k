@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test
 class SecurityExtensionsTest {
 
     @Test
-    fun `passed security returns ok`() {
+    fun `passed security returns ok`() = runBlocking {
         val app = SseFilter(BasicAuthSecurity("") { true }).then { SseResponse(OK) {} }
         assertThat(app(Request(GET, "").basicAuthentication(Credentials("", ""))).status, equalTo(OK))
     }
 
     @Test
-    fun `failed security returns error`() {
+    fun `failed security returns error`() = runBlocking {
         val app = SseFilter(BasicAuthSecurity("") { true }).then { SseResponse(OK) {} }
         val response = app(Request(GET, ""))
         assertThat(response.status, equalTo(UNAUTHORIZED))

@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream
 class InvocationLambdaFunctionTest {
 
     @Test
-    fun `adapts Direct request and response and receives context`() {
+    fun `adapts Direct request and response and receives context`() = runBlocking {
         val lambdaContext = LambdaContextMock("myFunction")
 
         val request = "input body"

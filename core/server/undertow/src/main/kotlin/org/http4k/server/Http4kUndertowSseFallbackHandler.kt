@@ -3,6 +3,7 @@ package org.http4k.server
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -18,15 +19,17 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
         when {
             exchange.hasEventStreamContentType() -> {
                 val request = exchange.asRequest() ?: error("Cannot create request from exchange")
-                with(sse(request)) {
-                    if (handled) {
-                        exchange.setStatusCode(status.code)
-                        headers.toParametersMap().forEach { (name, values) ->
-                            exchange.responseHeaders.putAll(HttpString(name), values.toList())
+                runBlocking {
+                    with(sse(request)) { // FIXME coroutine blocking
+                        if (handled) {
+                            exchange.setStatusCode(status.code)
+                            headers.toParametersMap().forEach { (name, values) ->
+                                exchange.responseHeaders.putAll(HttpString(name), values.toList())
+                            }
+                            Http4kUndertowSseHandler(request, consumer).handleRequest(exchange)
+                        } else {
+                            fallback.handleRequest(exchange)
                         }
-                        Http4kUndertowSseHandler(request, consumer).handleRequest(exchange)
-                    } else {
-                        fallback.handleRequest(exchange)
                     }
                 }
             }

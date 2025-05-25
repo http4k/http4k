@@ -12,7 +12,7 @@ class KtorNettyTest : ServerContract(
 ) {
 
     @Disabled
-    override fun `ok when length already set`() {
+    override fun `ok when length already set`() = runBlocking {
     }
 
     override fun clientAddress(): Matcher<String?> = present()

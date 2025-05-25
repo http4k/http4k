@@ -37,7 +37,7 @@ class Http4kWebDriverTest {
     })
 
     @Test
-    fun `page details`() {
+    fun `page details`() = runBlocking {
         driver.get("/bob")
         assertThat(driver.currentUrl, equalTo("/bob"))
         assertThat(driver.title, equalTo("Page title"))
@@ -72,7 +72,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `single window lifecycle`() {
+    fun `single window lifecycle`() = runBlocking {
         assertThat(driver.windowHandles.size, equalTo(0))
         driver.get("/bill")
         assertThat(driver.windowHandles.size, equalTo(1))
@@ -87,13 +87,13 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `active element`() {
+    fun `active element`() = runBlocking {
         driver.get("/bill")
         assertThat(driver.switchTo().activeElement().tagName, equalTo("div"))
     }
 
     @Test
-    fun `normalise links when clicking`() {
+    fun `normalise links when clicking`() = runBlocking {
         assertLinkGoesTo("/bill", By.tagName("a"), "/link")
         assertLinkGoesTo("/bill", By.id("noPath"), "/bill")
         assertLinkGoesTo("/bill", By.id("sameDirPath"), "/bob")
@@ -121,7 +121,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `cookie adding and deleting`() {
+    fun `cookie adding and deleting`() = runBlocking {
         val cookie1 = Cookie("foo1", "bar")
         val cookie2 = Cookie("foo2", "bar")
         val cookie3 = Cookie("foo3", "bar")
@@ -141,7 +141,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `cookies are added to request`() {
+    fun `cookies are added to request`() = runBlocking {
         val driver = Http4kWebDriver({ req ->
             Response(OK).body(req.cookies().joinToString("; \n") { it.name + "=" + it.value })
         })
@@ -154,7 +154,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `service set cookies are stored in the driver`() {
+    fun `service set cookies are stored in the driver`() = runBlocking {
         val driver = Http4kWebDriver({
             Response(OK).cookie(HCookie("name", "value", 100, Instant.EPOCH, "domain", "path", true, true))
         })
@@ -168,7 +168,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `unsupported features`() {
+    fun `unsupported features`() = runBlocking {
         driver.get("/bill")
 
         val windowHandle = driver.windowHandle
@@ -184,7 +184,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `Set the host header when navigating to a URL`() {
+    fun `Set the host header when navigating to a URL`() = runBlocking {
         val driver = Http4kWebDriver({ req ->
             Response(OK).body(req.header("host") ?: "none")
         })
@@ -199,7 +199,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `Set the host header when redirecting to a URL`() {
+    fun `Set the host header when redirecting to a URL`() = runBlocking {
         val driver = Http4kWebDriver({ req ->
             when (req.header("host")) {
                 "redirect.com" -> Response(SEE_OTHER).header("location", "http://destination.com")
@@ -212,7 +212,7 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `set the basic auth header when the url navigated to contains userinfo`() {
+    fun `set the basic auth header when the url navigated to contains userinfo`() = runBlocking {
         var receivedRequest: Request? = null
         val driver = Http4kWebDriver({ req ->
             receivedRequest = req

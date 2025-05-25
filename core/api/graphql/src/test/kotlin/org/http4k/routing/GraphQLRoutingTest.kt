@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 class GraphQLRoutingTest {
 
     @Test
-    fun `with no context`() {
+    fun `with no context`() = runBlocking {
         val uri = Uri.of("/bob")
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
@@ -35,7 +35,7 @@ class GraphQLRoutingTest {
     }
 
     @Test
-    fun `with context`() {
+    fun `with context`() = runBlocking {
         val path = "/bob"
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))

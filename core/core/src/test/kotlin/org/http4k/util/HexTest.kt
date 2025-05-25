@@ -15,30 +15,30 @@ import java.nio.charset.StandardCharsets
 class HexTest {
 
     @Test
-    fun `converts byte array to hex`() {
+    fun `converts byte array to hex`() = runBlocking {
         assertThat(Hex.hex(ByteArray(10) { (it * 2).toByte() }), equalTo("00020406080a0c0e1012"))
     }
 
     @Test
-    fun `converts hex to byte array`() {
+    fun `converts hex to byte array`() = runBlocking {
         val expected = ByteBuffer.wrap("http4k".toByteArray(StandardCharsets.UTF_8))
         assertThat(ByteBuffer.wrap(Hex.unhex("68747470346B")), equalTo(expected))
     }
 
     @Test
-    fun `checks for even input length`() {
+    fun `checks for even input length`() = runBlocking {
         val exception = assertThrows<IllegalStateException> { Hex.unhex("4") }
         assertThat(exception.message, equalTo("Must have an even length"))
     }
 
     @Test
-    internal fun `converts to hex and back again`() {
+    internal fun `converts to hex and back again`() = runBlocking {
         val data = "some random text".toByteArray(StandardCharsets.UTF_8)
         assertThat(Hex.unhex(Hex.hex(data)), contentEquals(data))
     }
 
     @Test
-    internal fun `converts from hex string and back again`() {
+    internal fun `converts from hex string and back again`() = runBlocking {
         val data = "00020590feffab"
         assertThat(Hex.hex(Hex.unhex(data)), equalTo(data))
     }

@@ -28,12 +28,12 @@ class WsEventTest {
     )
 
     @Test
-    fun `outgoing equals`() {
+    fun `outgoing equals`() = runBlocking {
         assertThat(Outgoing(tx), equalTo(Outgoing(tx)))
     }
 
     @Test
-    fun `outgoing uses template if available`() {
+    fun `outgoing uses template if available`() = runBlocking {
         assertThat(
             Outgoing(
                 WsTransaction(
@@ -61,7 +61,7 @@ class WsEventTest {
     }
 
     @Test
-    fun `incoming uses template if available`() {
+    fun `incoming uses template if available`() = runBlocking {
         assertThat(
             WsEvent.Incoming(
                 WsTransaction(
@@ -89,7 +89,7 @@ class WsEventTest {
     }
 
     @Test
-    fun `incoming equals`() {
+    fun `incoming equals`() = runBlocking {
         assertThat(WsEvent.Incoming(tx), equalTo(WsEvent.Incoming(tx)))
     }
 }

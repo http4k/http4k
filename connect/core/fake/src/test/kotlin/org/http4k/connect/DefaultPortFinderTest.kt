@@ -16,7 +16,7 @@ class FakeSystem2 : ChaoticHttpHandler() {
 
 class DefaultPortFinderTest {
     @Test
-    fun `find default port numbers`() {
+    fun `find default port numbers`() = runBlocking {
         assertThat(FakeSystem1::class.defaultPort, equalTo(59155))
         assertThat(FakeSystem2::class.defaultPort, equalTo(25393))
     }

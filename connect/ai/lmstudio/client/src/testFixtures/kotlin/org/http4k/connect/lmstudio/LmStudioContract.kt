@@ -21,7 +21,7 @@ interface LmStudioContract {
     val lmStudio: LmStudio
 
     @Test
-    fun `get models`() {
+    fun `get models`() = runBlocking {
         assertThat(
             lmStudio.getModels().successValue().data
                 .first().owned_by,
@@ -30,7 +30,7 @@ interface LmStudioContract {
     }
 
     @Test
-    fun `get chat response non-stream`() {
+    fun `get chat response non-stream`() = runBlocking {
         val responses = lmStudio.chatCompletion(
             ModelName.CHAT_MODEL,
             listOf(
@@ -46,7 +46,7 @@ interface LmStudioContract {
     }
 
     @Test
-    fun `get chat response streaming`() {
+    fun `get chat response streaming`() = runBlocking {
         val responses = lmStudio.chatCompletion(
             ModelName.CHAT_MODEL,
             listOf(
@@ -62,7 +62,7 @@ interface LmStudioContract {
     }
 
     @Test
-    fun `get embeddings`() {
+    fun `get embeddings`() = runBlocking {
         assertThat(
             lmStudio.createEmbeddings(
                 ModelName.EMBEDDING_MODEL,

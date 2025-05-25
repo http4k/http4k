@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 class InitialiseRequestContextFilterTest {
 
     @Test
-    fun `initialises request context for use further down the stack`() {
+    fun `initialises request context for use further down the stack`() = runBlocking {
         val contexts = RequestContexts()
         val handler = InitialiseRequestContext(contexts)
             .then(Filter { next ->
@@ -32,7 +32,7 @@ class InitialiseRequestContextFilterTest {
     }
 
     @Test
-    fun `can use request context keys with nested contexts`() {
+    fun `can use request context keys with nested contexts`() = runBlocking {
         val contexts1 = RequestContexts()
         val contexts2 = RequestContexts("second")
 

@@ -36,7 +36,7 @@ class InstanceMetadataServiceTest {
     )
 
     @Test
-    fun `get credentials`() {
+    fun `get credentials`() = runBlocking {
         val credentials = client.getSecurityCredentials(profile).successValue()
 
         assertThat(
@@ -57,7 +57,7 @@ class InstanceMetadataServiceTest {
     )
 
     @Test
-    fun `get credentials - renew if expired`() {
+    fun `get credentials - renew if expired`() = runBlocking {
         val oldCredentials = client.getSecurityCredentials(profile).successValue()
         now += Duration.ofHours(2)
 

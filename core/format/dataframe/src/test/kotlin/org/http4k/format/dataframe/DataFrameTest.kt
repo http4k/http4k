@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class DataFrameTest {
 
     @Test
-    fun `can extract a set of untyped records from an HTTP message`() {
+    fun `can extract a set of untyped records from an HTTP message`() = runBlocking {
         val request = Request(GET, "").body(javaClass.getResourceAsStream("/repositories.csv")!!)
         val repos = request.dataFrame(CSV())
 

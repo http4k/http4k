@@ -29,7 +29,7 @@ interface S3GlobalContract : AwsContract {
     }
 
     @Test
-    fun `bucket lifecycle`() {
+    fun `bucket lifecycle`() = runBlocking {
         assertThat(s3.listBuckets().successValue().items.contains(bucket), equalTo(false))
         assertThat(s3.createBucket(bucket, aws.region), equalTo(Success(Unit)))
         try {
@@ -42,7 +42,7 @@ interface S3GlobalContract : AwsContract {
     }
 
     @Test
-    fun `create bucket in default (us-east-1) region`() {
+    fun `create bucket in default (us-east-1) region`() = runBlocking {
         assertThat(s3.createBucket(bucket, Region.US_EAST_1), equalTo(Success(Unit)))
 
         val s3Bucket = S3Bucket.Http(bucket, Region.US_EAST_1, { aws.credentials }, http)

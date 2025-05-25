@@ -29,7 +29,7 @@ object HelidonClient {
         bodyMode: BodyMode = Memory,
         requestModifier: (ClientRequest<HttpClientRequest>) -> ClientRequest<HttpClientRequest> = { it }
     ): HttpHandler = object : HttpHandler {
-        override fun invoke(request: Request) = try {
+        override suspend fun invoke(request: Request) = try {
             client.makeHelidonRequest(request)
                 .let(requestModifier)
                 .submit(request.body.payload.array())

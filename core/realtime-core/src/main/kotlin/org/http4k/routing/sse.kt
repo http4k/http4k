@@ -57,7 +57,7 @@ class RoutingSseHandler(
     ::RoutingSseHandler
 )
 
-infix fun PathMethod.to(handler: SseHandler) = when (handler) {
+infix suspend fun PathMethod.to(handler: SseHandler) = when (handler) {
     is RoutingSseHandler -> handler.withRouter(method.asRouter()).withBasePath(path)
     else -> RoutingSseHandler(listOf(TemplatedSseRoute(UriTemplate.from(path), handler, method.asRouter())))
 }
@@ -92,7 +92,7 @@ data class SimpleSseRouteMatcher(
     private val filter: SseFilter = SseFilter.NoOp
 ) : RouteMatcher<SseResponse, SseFilter> {
 
-    override fun match(request: Request) = when (val result = router(request)) {
+    override suspend fun match(request: Request) = when (val result = router(request)) {
         is Matched -> RoutingMatch(0, result.description, filter.then(handler))
         is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request ->
             SseResponse(result.status) {

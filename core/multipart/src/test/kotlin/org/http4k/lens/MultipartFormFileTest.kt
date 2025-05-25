@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType
 import org.junit.jupiter.api.Test
 
@@ -16,7 +17,7 @@ class MultipartFormFileTest {
         .plus("hello" to file2())
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(MultipartFormFile.optional("hello")(form()), equalTo(file1()))
         assertThat(MultipartFormFile.required("hello")(form()), equalTo(file1()))
         assertThat(MultipartFormFile.map { it.filename }.required("hello")(form()), equalTo(file1().filename))
@@ -27,7 +28,7 @@ class MultipartFormFileTest {
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         assertThat(MultipartFormFile.optional("world")(form()), absent())
         val requiredFormFile = MultipartFormFile.required("world")
         assertThat({ requiredFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Missing(requiredFormFile.meta), overallType = Failure.Type.Missing)))
@@ -38,7 +39,7 @@ class MultipartFormFileTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = MultipartFormFile.required("world")
         assertThat(single(file2(), single(file1(), MultipartForm())), equalTo(MultipartForm() + ("world" to file2())))
 
@@ -48,7 +49,7 @@ class MultipartFormFileTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val requiredFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).required("hello")
         assertThat({ requiredFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredFormFile.meta), overallType = Failure.Type.Invalid)))
 
@@ -63,14 +64,14 @@ class MultipartFormFileTest {
     }
 
     @Test
-    fun `sets value on form`() {
+    fun `sets value on form`() = runBlocking {
         val formFile = MultipartFormFile.required("bob")
         val withFormFile = formFile(file1(), form())
         assertThat(formFile(withFormFile), equalTo(file1()))
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(MultipartFormFile.required("hello").toString(), equalTo("Required form 'hello'"))
         assertThat(MultipartFormFile.optional("hello").toString(), equalTo("Optional form 'hello'"))
         assertThat(MultipartFormFile.multi.required("hello").toString(), equalTo("Required form 'hello'"))

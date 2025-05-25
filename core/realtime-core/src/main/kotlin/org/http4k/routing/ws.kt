@@ -88,7 +88,7 @@ data class SimpleWsRouteMatcher(
     private val filter: WsFilter = WsFilter.NoOp
 ) : RouteMatcher<WsResponse, WsFilter> {
 
-    override fun match(request: Request) = when (val result = router(request)) {
+    override suspend fun match(request: Request) = when (val result = router(request)) {
         is Matched -> RoutingMatch(0, result.description, filter.then(handler))
         is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request -> WsResponse { it.close(
             NEVER_CONNECTED)} })

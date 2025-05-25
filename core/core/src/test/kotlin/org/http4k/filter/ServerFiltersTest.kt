@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -61,31 +62,35 @@ class ServerFiltersTest {
     @Nested
     inner class ZipkinTraceFilters {
         @Test
-        fun `initialises request tracing on request and sets on outgoing response when not present`() {
-            var newThreadLocal: ZipkinTraces? = null
-            val svc = ServerFilters.RequestTracing().then {
-                newThreadLocal = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
-                assertThat(newThreadLocal!!.traceId, present())
-                assertThat(newThreadLocal!!.spanId, present())
-                assertThat(newThreadLocal!!.parentSpanId, absent())
-                assertThat(newThreadLocal!!.samplingDecision, equalTo(SAMPLE))
+        fun `initialises request tracing on request and sets on outgoing response when not present`() =
+            runBlockingUnit {
+                var newThreadLocal: ZipkinTraces? = null
+                val svc = ServerFilters.RequestTracing().then {
+                    newThreadLocal = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
+                    assertThat(newThreadLocal!!.traceId, present())
+                    assertThat(newThreadLocal!!.spanId, present())
+                    assertThat(newThreadLocal!!.parentSpanId, absent())
+                    assertThat(newThreadLocal!!.samplingDecision, equalTo(SAMPLE))
 
-                val setOnRequest = ZipkinTraces(it)
-                assertThat(setOnRequest.traceId, equalTo(newThreadLocal!!.traceId))
-                assertThat(setOnRequest.spanId, equalTo(newThreadLocal!!.spanId))
-                assertThat(setOnRequest.parentSpanId, absent())
-                assertThat(setOnRequest.samplingDecision, equalTo(newThreadLocal!!.samplingDecision))
-                Response(OK)
+                    val setOnRequest = ZipkinTraces(it)
+                    assertThat(setOnRequest.traceId, equalTo(newThreadLocal!!.traceId))
+                    assertThat(setOnRequest.spanId, equalTo(newThreadLocal!!.spanId))
+                    assertThat(setOnRequest.parentSpanId, absent())
+                    assertThat(setOnRequest.samplingDecision, equalTo(newThreadLocal!!.samplingDecision))
+                    Response(OK)
+                }
+
+                val received = ZipkinTraces(svc(Request(GET, "")))
+
+                assertThat(
+                    received,
+                    equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE))
+                )
             }
-
-            val received = ZipkinTraces(svc(Request(GET, "")))
-
-            assertThat(received, equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE)))
-        }
 
 
         @Test
-        fun `uses a new request trace every time`() {
+        fun `uses a new request trace every time`() = runBlockingUnit {
             val traces = mutableListOf<ZipkinTraces>()
 
             val svc = ServerFilters.RequestTracing().then {
@@ -100,7 +105,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `uses existing request tracing from request and sets on outgoing response`() {
+        fun `uses existing request tracing from request and sets on outgoing response`() = runBlockingUnit {
             val originalTraceId = TraceId("originalTrace")
             val originalSpanId = TraceId("originalSpan")
             val originalParentSpanId = TraceId("originalParentSpanId")
@@ -135,13 +140,13 @@ class ServerFiltersTest {
 
         private val trace_id = "x-b3-traceid"
 
-        private fun appExpecting(headerValue: String) = ValidateRequestTracingHeaders().then {
+        private suspend fun appExpecting(headerValue: String) = ValidateRequestTracingHeaders().then {
             assertThat(it.header(trace_id), equalTo(headerValue))
             Response(OK)
         }
 
         @Test
-        fun `passes valid zipkin trace id on`() {
+        fun `passes valid zipkin trace id on`() = runBlockingUnit {
             val value = "abcdefabcdef"
             val app = appExpecting(value)
 
@@ -149,46 +154,46 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `passes valid zipkin trace id on - longer transaction id`() {
+        fun `passes valid zipkin trace id on - longer transaction id`() = runBlockingUnit {
             val value = "a780af1043fb429ea1cd8e9dd7ee1c70"
             val app = appExpecting(value)
             app(Request(GET, Uri.of("/")).header(trace_id, value))
         }
 
-        val appExpectingNoHeader = ValidateRequestTracingHeaders().then {
-            assertThat(it.header(trace_id), absent())
+        suspend fun appExpectingNoHeader() = ValidateRequestTracingHeaders().then { req ->
+            assertThat(req.header(trace_id), absent())
             Response(OK)
         }
 
         @Test
-        fun `filters invalid zipkin trace ids - invalid chars`() {
-            appExpectingNoHeader(Request(GET, Uri.of("/")).header(trace_id, "012345678z012345"))
+        fun `filters invalid zipkin trace ids - invalid chars`() = runBlockingUnit {
+            appExpectingNoHeader()(Request(GET, Uri.of("/")).header(trace_id, "012345678z012345"))
         }
 
         @Test
-        fun `filters invalid zipkin trace ids - too short`() {
-            appExpectingNoHeader(Request(GET, Uri.of("/")).header(trace_id, "abcdef"))
+        fun `filters invalid zipkin trace ids - too short`() = runBlockingUnit {
+            appExpectingNoHeader()(Request(GET, Uri.of("/")).header(trace_id, "abcdef"))
         }
 
         @Test
-        fun `filters invalid zipkin span ids`() {
+        fun `filters invalid zipkin span ids`() = runBlockingUnit {
             val header = Request(GET, Uri.of("/"))
                 .header(trace_id, "a780af1043fb429ea1cd8e9dd7ee1c70") // valid
                 .header("x-b3-spanid", "11111") // too short
-            appExpectingNoHeader(header)
+            appExpectingNoHeader()(header)
         }
 
         @Test
-        fun `filters invalid zipkin parent span ids`() {
+        fun `filters invalid zipkin parent span ids`() = runBlockingUnit {
             val header = Request(GET, Uri.of("/"))
                 .header(trace_id, "a780af1043fb429ea1cd8e9dd7ee1c70") // valid
                 .header("x-b3-parentspanid", "11111") // too short
-            appExpectingNoHeader(header)
+            appExpectingNoHeader()(header)
         }
 
         @Test
-        fun `filters invalid zipkin trace ids - too long`() {
-            appExpectingNoHeader(
+        fun `filters invalid zipkin trace ids - too long`() = runBlockingUnit {
+            appExpectingNoHeader()(
                 Request(GET, Uri.of("/")).header(
                     trace_id,
                     "01234567890123456789012345678901234567890"
@@ -197,7 +202,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `filters invalid zipkin trace ids - rejection`() {
+        fun `filters invalid zipkin trace ids - rejection`() = runBlockingUnit {
             val app = ValidateRequestTracingHeaders(BAD_REQUEST).then { Response(OK) }
             val response =
                 app(Request(GET, Uri.of("/")).header(trace_id, "01234567890123456789012345678901234567890"))
@@ -205,7 +210,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `is compatible with our own tracing`() {
+        fun `is compatible with our own tracing`() = runBlockingUnit {
             val traced = ClientFilters.RequestTracing()
                 .then(ValidateRequestTracingHeaders(BAD_REQUEST))
                 .then { Response(OK) }
@@ -218,7 +223,7 @@ class ServerFiltersTest {
     inner class CorsFilters {
 
         @Test
-        fun `GET - Cors headers are set correctly`() {
+        fun `GET - Cors headers are set correctly`() = runBlockingUnit {
             val handler = ServerFilters.Cors(UnsafeGlobalPermissive).then { Response(I_M_A_TEAPOT) }
             val response = handler(Request(GET, "/"))
 
@@ -240,7 +245,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `GET - with exposed headers`() {
+        fun `GET - with exposed headers`() = runBlockingUnit {
             val policy =
                 CorsPolicy(OriginPolicy.AllowAll(), emptyList(), emptyList(), exposedHeaders = listOf("foo", "bar"))
             val handler = ServerFilters.Cors(policy).then { Response(I_M_A_TEAPOT) }
@@ -253,7 +258,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `GET - with max age`() {
+        fun `GET - with max age`() = runBlockingUnit {
             val policy = CorsPolicy(OriginPolicy.AllowAll(), emptyList(), emptyList(), maxAge = 86400)
             val handler = ServerFilters.Cors(policy).then { Response(I_M_A_TEAPOT) }
             val response = handler(Request(GET, "/"))
@@ -265,7 +270,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `OPTIONS - requests are intercepted and returned with expected headers`() {
+        fun `OPTIONS - requests are intercepted and returned with expected headers`() = runBlockingUnit {
             val handler = ServerFilters.Cors(
                 CorsPolicy(
                     OriginPolicy.AnyOf("foo", "bar"),
@@ -286,7 +291,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `OPTIONS - requests are returned with expected headers when origin does not match`() {
+        fun `OPTIONS - requests are returned with expected headers when origin does not match`() = runBlockingUnit {
             val handler = ServerFilters.Cors(
                 CorsPolicy(
                     OriginPolicy.AnyOf("foo", "bar"),
@@ -307,7 +312,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `OPTIONS - requests are returned with expected headers when origin is not set`() {
+        fun `OPTIONS - requests are returned with expected headers when origin is not set`() = runBlockingUnit {
             val handler = ServerFilters.Cors(
                 CorsPolicy(
                     OriginPolicy.AnyOf("foo", "bar"),
@@ -328,28 +333,29 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `OPTIONS - requests are returned with expected headers when AllowAll OriginPolicy is used`() {
-            val handler = ServerFilters.Cors(
-                CorsPolicy(
-                    OriginPolicy.AllowAll(),
-                    listOf("rita", "sue", "bob"),
-                    listOf(DELETE, POST)
-                )
-            ).then { Response(INTERNAL_SERVER_ERROR) }
-            val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
+        fun `OPTIONS - requests are returned with expected headers when AllowAll OriginPolicy is used`() =
+            runBlockingUnit {
+                val handler = ServerFilters.Cors(
+                    CorsPolicy(
+                        OriginPolicy.AllowAll(),
+                        listOf("rita", "sue", "bob"),
+                        listOf(DELETE, POST)
+                    )
+                ).then { Response(INTERNAL_SERVER_ERROR) }
+                val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
-            assertThat(
-                response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "*"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
-                    .and(!hasHeader("access-control-allow-credentials"))
-                    .and(!hasHeader("vary"))
-            )
-        }
+                assertThat(
+                    response, hasStatus(OK)
+                        .and(hasHeader("access-control-allow-origin", "*"))
+                        .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+                        .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                        .and(!hasHeader("access-control-allow-credentials"))
+                        .and(!hasHeader("vary"))
+                )
+            }
 
         @Test
-        fun `OPTIONS - requests are returned with expected headers when Only OriginPolicy is used`() {
+        fun `OPTIONS - requests are returned with expected headers when Only OriginPolicy is used`() = runBlockingUnit {
             val handler = ServerFilters.Cors(
                 CorsPolicy(
                     OriginPolicy.Only("foo"),
@@ -370,49 +376,51 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `OPTIONS - requests are returned with expected headers when AnyOf OriginPolicy is used`() {
-            val handler = ServerFilters.Cors(
-                CorsPolicy(
-                    OriginPolicy.AnyOf(listOf("foo", "bar")),
-                    listOf("rita", "sue", "bob"),
-                    listOf(DELETE, POST)
-                )
-            ).then { Response(INTERNAL_SERVER_ERROR) }
-            val response = handler(Request(OPTIONS, "/").header("Origin", "bar"))
+        fun `OPTIONS - requests are returned with expected headers when AnyOf OriginPolicy is used`() =
+            runBlockingUnit {
+                val handler = ServerFilters.Cors(
+                    CorsPolicy(
+                        OriginPolicy.AnyOf(listOf("foo", "bar")),
+                        listOf("rita", "sue", "bob"),
+                        listOf(DELETE, POST)
+                    )
+                ).then { Response(INTERNAL_SERVER_ERROR) }
+                val response = handler(Request(OPTIONS, "/").header("Origin", "bar"))
 
-            assertThat(
-                response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "bar"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
-                    .and(!hasHeader("access-control-allow-credentials"))
-                    .and(hasHeader("vary", "Origin"))
-            )
-        }
+                assertThat(
+                    response, hasStatus(OK)
+                        .and(hasHeader("access-control-allow-origin", "bar"))
+                        .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+                        .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                        .and(!hasHeader("access-control-allow-credentials"))
+                        .and(hasHeader("vary", "Origin"))
+                )
+            }
 
         @Test
-        fun `OPTIONS - requests are returned with expected headers when Pattern OriginPolicy is used`() {
-            val handler = ServerFilters.Cors(
-                CorsPolicy(
-                    OriginPolicy.Pattern(Regex(".*.bar")),
-                    listOf("rita", "sue", "bob"),
-                    listOf(DELETE, POST)
-                )
-            ).then { Response(INTERNAL_SERVER_ERROR) }
-            val response = handler(Request(OPTIONS, "/").header("Origin", "foo.bar"))
+        fun `OPTIONS - requests are returned with expected headers when Pattern OriginPolicy is used`() =
+            runBlockingUnit {
+                val handler = ServerFilters.Cors(
+                    CorsPolicy(
+                        OriginPolicy.Pattern(Regex(".*.bar")),
+                        listOf("rita", "sue", "bob"),
+                        listOf(DELETE, POST)
+                    )
+                ).then { Response(INTERNAL_SERVER_ERROR) }
+                val response = handler(Request(OPTIONS, "/").header("Origin", "foo.bar"))
 
-            assertThat(
-                response, hasStatus(OK)
-                    .and(hasHeader("access-control-allow-origin", "foo.bar"))
-                    .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                    .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
-                    .and(!hasHeader("access-control-allow-credentials"))
-                    .and(hasHeader("vary", "Origin"))
-            )
-        }
+                assertThat(
+                    response, hasStatus(OK)
+                        .and(hasHeader("access-control-allow-origin", "foo.bar"))
+                        .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+                        .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+                        .and(!hasHeader("access-control-allow-credentials"))
+                        .and(hasHeader("vary", "Origin"))
+                )
+            }
 
         @Test
-        fun `GET - should append 'Origin' to the existing 'Vary' list if present`() {
+        fun `GET - should append 'Origin' to the existing 'Vary' list if present`() = runBlockingUnit {
             val handler = ServerFilters.Cors(
                 CorsPolicy(
                     OriginPolicy.Only("foo"),
@@ -426,39 +434,41 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `GET - should not append 'Origin' to the existing 'Vary' list if 'Origin' is already present`() {
-            val handler = ServerFilters.Cors(
-                CorsPolicy(
-                    OriginPolicy.Only("foo"),
-                    listOf("rita", "sue", "bob"),
-                    listOf(DELETE, POST)
-                )
-            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "x, Origin, y") }
-            val response = handler(Request(GET, "/").header("Origin", "foo"))
+        fun `GET - should not append 'Origin' to the existing 'Vary' list if 'Origin' is already present`() =
+            runBlockingUnit {
+                val handler = ServerFilters.Cors(
+                    CorsPolicy(
+                        OriginPolicy.Only("foo"),
+                        listOf("rita", "sue", "bob"),
+                        listOf(DELETE, POST)
+                    )
+                ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "x, Origin, y") }
+                val response = handler(Request(GET, "/").header("Origin", "foo"))
 
-            assertThat(response, hasHeader("vary", "x, Origin, y"))
-        }
+                assertThat(response, hasHeader("vary", "x, Origin, y"))
+            }
 
         @Test
-        fun `GET - should not append 'Origin' to the existing 'Vary' list if the wildcard value is present`() {
-            val handler = ServerFilters.Cors(
-                CorsPolicy(
-                    OriginPolicy.Only("foo"),
-                    listOf("rita", "sue", "bob"),
-                    listOf(DELETE, POST)
-                )
-            ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "*") }
-            val response = handler(Request(GET, "/").header("Origin", "foo"))
+        fun `GET - should not append 'Origin' to the existing 'Vary' list if the wildcard value is present`() =
+            runBlockingUnit {
+                val handler = ServerFilters.Cors(
+                    CorsPolicy(
+                        OriginPolicy.Only("foo"),
+                        listOf("rita", "sue", "bob"),
+                        listOf(DELETE, POST)
+                    )
+                ).then { Response(INTERNAL_SERVER_ERROR).header("Vary", "*") }
+                val response = handler(Request(GET, "/").header("Origin", "foo"))
 
-            assertThat(response, hasHeader("vary", "*"))
-        }
+                assertThat(response, hasHeader("vary", "*"))
+            }
     }
 
     @Nested
     inner class CatchAllFilters {
 
         @Test
-        fun `catch all exceptions`() {
+        fun `catch all exceptions`() = runBlockingUnit {
             val e = RuntimeException("boom!")
             val handler = ServerFilters.CatchAll().then { throw e }
 
@@ -471,7 +481,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `catch all exceptions but let out just throwables`() {
+        fun `catch all exceptions but let out just throwables`() = runBlockingUnit {
             val e = Throwable("boom!")
             val handler = ServerFilters.CatchAll().then { throw e }
 
@@ -488,7 +498,7 @@ class ServerFiltersTest {
     inner class CopyHeadersFilters {
 
         @Test
-        fun `copy headers from request to response`() {
+        fun `copy headers from request to response`() = runBlockingUnit {
             val handler = ServerFilters.CopyHeaders("foo", "bar").then { Response(OK) }
 
             val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
@@ -498,7 +508,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `copy only headers specified in filter`() {
+        fun `copy only headers specified in filter`() = runBlockingUnit {
             val handler = ServerFilters.CopyHeaders("a", "b").then { Response(OK) }
 
             val response = handler(Request(GET, "/").header("b", "2").header("c", "3"))
@@ -510,7 +520,7 @@ class ServerFiltersTest {
     @Nested
     inner class GzipFilters {
         @Test
-        fun `gunzip request and gzip response`() {
+        fun `gunzip request and gzip response`() = runBlockingUnit {
             val handler = ServerFilters.GZip().then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(it.body)
@@ -526,7 +536,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `handle empty messages with incorrect content-encoding`() {
+        fun `handle empty messages with incorrect content-encoding`() = runBlockingUnit {
             val handler = ServerFilters.GZip().then {
                 assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)))
                 Response(OK).body(it.body)
@@ -542,7 +552,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `passes through non-gzipped request`() {
+        fun `passes through non-gzipped request`() = runBlockingUnit {
             val handler = ServerFilters.GZip().then {
                 assertThat(it, hasBody("hello"))
                 Response(OK).body("hello")
@@ -552,7 +562,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `gunzip request and gzip response with matching content type`() {
+        fun `gunzip request and gzip response with matching content type`() = runBlockingUnit {
             val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
@@ -568,7 +578,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `gunzip request and do not gzip response with unmatched content type`() {
+        fun `gunzip request and do not gzip response with unmatched content type`() = runBlockingUnit {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
@@ -584,7 +594,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `passes through non-gzipped request despite content type`() {
+        fun `passes through non-gzipped request despite content type`() = runBlockingUnit {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
                 assertThat(it, hasBody("hello"))
                 Response(OK).body("hello")
@@ -597,7 +607,7 @@ class ServerFiltersTest {
     @Nested
     inner class GzipStreamFilters {
         @Test
-        fun `gunzip request and gzip response`() {
+        fun `gunzip request and gzip response`() = runBlockingUnit {
             val handler = ServerFilters.GZip(Streaming()).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(Body("hello"))
@@ -613,7 +623,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `gzip stream request in mixed should return gzip stream body`() {
+        fun `gzip stream request in mixed should return gzip stream body`() = runBlockingUnit {
             val handler = ServerFilters.GZip(Mixed()).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(Body("world".byteInputStream()))
@@ -632,7 +642,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `gzip memory request in mixed should return gzip memory body`() {
+        fun `gzip memory request in mixed should return gzip memory body`() = runBlockingUnit {
             val handler = ServerFilters.GZip(Mixed()).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).body(Body("world"))
@@ -651,7 +661,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `handle empty messages with incorrect content-encoding`() {
+        fun `handle empty messages with incorrect content-encoding`() = runBlockingUnit {
             val handler = ServerFilters.GZip(Streaming()).then {
                 assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)))
                 Response(OK).body(it.body)
@@ -667,7 +677,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `passes through non-gzipped request`() {
+        fun `passes through non-gzipped request`() = runBlockingUnit {
             val handler = ServerFilters.GZip(Streaming()).then {
                 assertThat(it, hasBody("hello"))
                 Response(OK).body("hello")
@@ -677,7 +687,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `gunzip request and gzip response with matching content type`() {
+        fun `gunzip request and gzip response with matching content type`() = runBlockingUnit {
             val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN), Streaming()).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(Body("hello"))
@@ -693,7 +703,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `gunzip request and do not gzip response with unmatched content type`() {
+        fun `gunzip request and do not gzip response with unmatched content type`() = runBlockingUnit {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), Streaming()).then {
                 assertThat(it, hasBody(equalTo<String>("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
@@ -709,7 +719,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `passes through non-gzipped request despite content type`() {
+        fun `passes through non-gzipped request despite content type`() = runBlockingUnit {
             val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), Streaming()).then {
                 assertThat(it, hasBody("hello"))
                 Response(OK).body("hello")
@@ -722,7 +732,7 @@ class ServerFiltersTest {
     @Nested
     inner class CatchLensFailureFilter {
         @Test
-        fun `catch lens failure - custom response`() {
+        fun `catch lens failure - custom response`() = runBlockingUnit {
             val e = LensFailure(
                 Invalid(Header.required("bob").meta),
                 Missing(Header.required("bill").meta),
@@ -737,7 +747,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `catch lens failure - custom response with request`() {
+        fun `catch lens failure - custom response with request`() = runBlockingUnit {
             val e = LensFailure(
                 Invalid(Header.required("bob").meta),
                 Missing(Header.required("bill").meta),
@@ -762,7 +772,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `catch lens failure - invalid`() {
+        fun `catch lens failure - invalid`() = runBlockingUnit {
             val e = LensFailure(
                 Invalid(Header.required("bob").meta),
                 Missing(Header.required("bill").meta),
@@ -777,29 +787,29 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `catch lens failure - invalid from Response is rethrown`() {
+        fun `catch lens failure - invalid from Response is rethrown`() = runBlockingUnit {
             val e = LensFailure(
                 Invalid(Header.required("bob").meta),
                 Missing(Header.required("bill").meta),
                 target = Response(OK)
             )
             val handler = ServerFilters.CatchLensFailure().then { throw e }
-            assertThat({ handler(Request(GET, "/")) }, throws(equalTo(e)))
+            assertThat({ runBlocking { handler(Request(GET, "/")) } }, throws(equalTo(e)))
         }
 
         @Test
-        fun `catch lens failure - invalid from RequestContext is rethrown`() {
+        fun `catch lens failure - invalid from RequestContext is rethrown`() = runBlockingUnit {
             val e = LensFailure(
                 Invalid(Header.required("bob").meta),
                 Missing(Header.required("bill").meta),
                 target = RequestContext()
             )
             val handler = ServerFilters.CatchLensFailure().then { throw e }
-            assertThat({ handler(Request(GET, "/")) }, throws(equalTo(e)))
+            assertThat({ runBlocking { handler(Request(GET, "/")) } }, throws(equalTo(e)))
         }
 
         @Test
-        fun `catch lens failure - unsupported`() {
+        fun `catch lens failure - unsupported`() = runBlockingUnit {
             val e = LensFailure(Unsupported(Header.required("bob").meta), target = Request(GET, ""))
             val handler = ServerFilters.CatchLensFailure().then { throw e }
 
@@ -810,8 +820,8 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `replace response contents with static file`() {
-        fun returning(status: Status) =
+    fun `replace response contents with static file`() = runBlockingUnit {
+        suspend fun returning(status: Status) =
             ServerFilters.ReplaceResponseContentsWithStaticFile().then { Response(status).body(status.toString()) }
 
         assertThat(returning(NOT_FOUND)(Request(GET, "/")), hasBody("404 contents"))
@@ -819,7 +829,7 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `set content type`() {
+    fun `set content type`() = runBlockingUnit {
         val handler = ServerFilters.SetContentType(OCTET_STREAM).then { Response(OK) }
 
         assertThat(handler(Request(GET, "/")), hasContentType(OCTET_STREAM))
@@ -829,7 +839,7 @@ class ServerFiltersTest {
     inner class FlashAttributesFilters {
 
         @Test
-        fun `get flash attributes are null if not set`() {
+        fun `get flash attributes are null if not set`() = runBlockingUnit {
 
             val handler = FlashAttributesFilter.then { request -> Response(OK).body(request.flash().orEmpty()) }
 
@@ -838,7 +848,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `retrieve flash attributes if set`() {
+        fun `retrieve flash attributes if set`() = runBlockingUnit {
             val handler = FlashAttributesFilter.then { _ -> Response(OK).body("abc").withFlash("Error 123") }
 
             val response = handler(Request(GET, "/"))
@@ -846,7 +856,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `remove flash attributes after usage`() {
+        fun `remove flash attributes after usage`() = runBlockingUnit {
             val handler = FlashAttributesFilter.then { _ -> Response(OK).body("abc") }
 
             val request = Request(GET, "/").withFlash("input flash")
@@ -858,7 +868,7 @@ class ServerFiltersTest {
     @Nested
     inner class ContentDispositionFilters {
         @Test
-        fun `does not add content disposition if response is not 2xx`() {
+        fun `does not add content disposition if response is not 2xx`() = runBlockingUnit {
             val handler = ServerFilters.ContentDispositionAttachment().then { _ -> Response(NOT_FOUND) }
 
             val response = handler(Request(GET, "/"))
@@ -866,7 +876,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `adds content disposition attachment for all extensions by default`() {
+        fun `adds content disposition attachment for all extensions by default`() = runBlockingUnit {
             val handler = ServerFilters.ContentDispositionAttachment().then { _ -> Response(OK).body("abc") }
 
             assertThat(
@@ -888,7 +898,7 @@ class ServerFiltersTest {
         }
 
         @Test
-        fun `adds content disposition for selected types`() {
+        fun `adds content disposition for selected types`() = runBlockingUnit {
             val handler =
                 ServerFilters.ContentDispositionAttachment(setOf("pdf")).then { _ -> Response(OK).body("abc") }
 
@@ -908,5 +918,11 @@ class ServerFiltersTest {
                 equalTo("attachment; filename=file.pdf")
             )
         }
+    }
+}
+
+fun runBlockingUnit(block: suspend () -> Unit) {
+    runBlocking {
+        block()
     }
 }

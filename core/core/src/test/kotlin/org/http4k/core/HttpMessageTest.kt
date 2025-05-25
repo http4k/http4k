@@ -94,7 +94,7 @@ class HttpMessageTest {
     }
 
     @Test
-    fun `multiple headers with different cases are all retreived`() {
+    fun `multiple headers with different cases are all retreived`() = runBlocking {
         fun checkHeaderInsensitivity(request: HttpMessage) {
             val req = request
                 .header("foo", "one")

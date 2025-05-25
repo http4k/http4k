@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.base64Encode
 import org.http4k.core.MemoryBody
 import org.http4k.core.StreamBody
@@ -24,7 +25,7 @@ abstract class BlockingWebsocketClientContract(
     abstract fun <T: Throwable> connectionClosedErrorMatcher(): Matcher<T>
 
     @Test
-    fun `send and receive in text mode`() {
+    fun `send and receive in text mode`() = runBlocking {
         val ws = websockets.blocking(Uri.of("ws://localhost:$port/bob"))
         ws.send(WsMessage("hello"))
 
@@ -34,7 +35,7 @@ abstract class BlockingWebsocketClientContract(
     }
 
     @Test
-    fun `send and receive in binary mode - memoryBody`() {
+    fun `send and receive in binary mode - memoryBody`() = runBlocking {
         val ws = websockets.blocking(Uri.of("ws://localhost:$port/bin"))
 
         val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
@@ -50,7 +51,7 @@ abstract class BlockingWebsocketClientContract(
     }
 
     @Test
-    fun `send and receive in binary mode - StreamBody`() {
+    fun `send and receive in binary mode - StreamBody`() = runBlocking {
         val ws = websockets.blocking(Uri.of("ws://localhost:$port/bin"))
 
         val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
@@ -66,13 +67,13 @@ abstract class BlockingWebsocketClientContract(
     }
 
     @Test
-    open fun `exception is thrown on connection error`() {
-        assertThat({ websocketFactory(connectionErrorTimeout).blocking(Uri.of("ws://does-not-exist:12345")) },
+    open fun `exception is thrown on connection error`() = runBlocking {
+        assertThat({ runBlocking { websocketFactory(connectionErrorTimeout).blocking(Uri.of("ws://does-not-exist:12345")) } },
             throws(connectErrorMatcher()))
     }
 
     @Test
-    fun `exception is thrown on sending after connection is closed`() {
+    fun `exception is thrown on sending after connection is closed`() = runBlocking {
         val ws = websockets.blocking(Uri.of("ws://localhost:$port/bob"))
         ws.send(WsMessage("hello"))
 
@@ -83,7 +84,7 @@ abstract class BlockingWebsocketClientContract(
     }
 
     @Test
-    fun `headers are sent to the server`() {
+    fun `headers are sent to the server`() = runBlocking {
         val ws = websockets.blocking(Uri.of("ws://localhost:$port/headers"), headers = listOf("testOne" to "1", "testTwo" to "2"))
         ws.send(WsMessage(""))
 

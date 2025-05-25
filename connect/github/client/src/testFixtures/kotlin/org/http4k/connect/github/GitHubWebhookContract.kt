@@ -28,7 +28,7 @@ class GitHubWebhookContract {
     private val webhook = GitHubWebhook.Http(Uri.of("/foobar"), secret, server)
 
     @Test
-    fun `test webhook`() {
+    fun `test webhook`() = runBlocking {
         assertThat(webhook(TestWebhookAction()), equalTo(Success(Unit)))
     }
 }

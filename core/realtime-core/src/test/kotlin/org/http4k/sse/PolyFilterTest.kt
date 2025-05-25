@@ -47,7 +47,7 @@ class PolyFilterTest {
     }
 
     @Test
-    fun `can manipulate value on way in and out of service`() {
+    fun `can manipulate value on way in and out of service`() = runBlocking {
         val svc = first.then(second).then(sse)
         val request = Request(GET, Uri.of("/path"))
 

@@ -31,7 +31,7 @@ class FnFilterTest {
     }
 
     @Test
-    fun `can manipulate value on way in and out of function`() {
+    fun `can manipulate value on way in and out of function`() = runBlocking {
         val svc = first.then(second).then(inner)
         assertThat(svc("hello", "ctx"), equalTo("helloollehhelloolleh!helloollehhelloolleh"))
         assertThat(

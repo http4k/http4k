@@ -1,5 +1,6 @@
 package org.http4k.server
 
+import kotlinx.coroutines.runBlocking
 import org.eclipse.jetty.http.HttpHeader
 import org.eclipse.jetty.http.HttpHeaderValue
 import org.eclipse.jetty.io.Content
@@ -33,37 +34,40 @@ class JettyEventStreamHandler(
                 val connectRequest = request.asHttp4kRequest()
                 when {
                     connectRequest != null -> {
-                        with(sse(connectRequest)) {
-                            when {
-                                handled -> {
-                                    response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
-                                        if (flushFailure == null) {
-                                            val output = Content.Sink.asOutputStream(response)
-                                            val scheduler = request.connectionMetaData.connector.scheduler
-                                            val server = request.connectionMetaData.connector.server
+                        runBlocking { // FIXME coroutine blocking
+                            with(sse(connectRequest)) {
+                                when {
+                                    handled -> {
+                                        response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
+                                            if (flushFailure == null) {
+                                                val output = Content.Sink.asOutputStream(response)
+                                                val scheduler = request.connectionMetaData.connector.scheduler
+                                                val server = request.connectionMetaData.connector.server
 
-                                            consumer(
-                                                JettyEventStreamEmitter(connectRequest,
-                                                    output,
-                                                    heartBeatDuration,
-                                                    scheduler,
-                                                    onClose = { emitter, emitterFailure ->
-                                                        if (emitterFailure == null) {
-                                                            callback.succeeded()
-                                                        } else {
-                                                            callback.failed(emitterFailure)
+                                                consumer(
+                                                    JettyEventStreamEmitter(
+                                                        connectRequest,
+                                                        output,
+                                                        heartBeatDuration,
+                                                        scheduler,
+                                                        onClose = { emitter, emitterFailure ->
+                                                            if (emitterFailure == null) {
+                                                                callback.succeeded()
+                                                            } else {
+                                                                callback.failed(emitterFailure)
+                                                            }
+                                                            server.removeEventListener(emitter)
                                                         }
-                                                        server.removeEventListener(emitter)
-                                                    }
-                                                ).also(server::addEventListener)
-                                            )
-                                        } else {
-                                            callback.failed(flushFailure)
+                                                    ).also(server::addEventListener)
+                                                )
+                                            } else {
+                                                callback.failed(flushFailure)
+                                            }
                                         }
                                     }
                                 }
+                                handled
                             }
-                            handled
                         }
                     }
 

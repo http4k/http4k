@@ -25,7 +25,7 @@ class TrafficFiltersTest : PortBasedTest {
     private val response = Response(OK)
 
     @Test
-    fun `RecordTo stores traffic in underlying storage`() {
+    fun `RecordTo stores traffic in underlying storage`() = runBlocking {
         val stream = ReadWriteStream.Memory()
 
         val handler = RecordTo(stream).then { response }
@@ -37,7 +37,7 @@ class TrafficFiltersTest : PortBasedTest {
     }
 
     @Test
-    fun `RecordTo stores traffic in underlying storage on server`() {
+    fun `RecordTo stores traffic in underlying storage on server`() = runBlocking {
         val stream = ReadWriteStream.Memory()
 
         val request1 = Request(POST, "").body("helloworld")
@@ -63,7 +63,7 @@ class TrafficFiltersTest : PortBasedTest {
         Response(OK).body(req.body.stream.reader().readText().reversed().byteInputStream())
 
     @Test
-    fun `ServeCachedFrom serves stored requests later or falls back`() {
+    fun `ServeCachedFrom serves stored requests later or falls back`() = runBlocking {
         val cache = ReadWriteCache.Memory()
         cache[request] = response
         val notFound = Response(Status.NOT_FOUND)
@@ -74,7 +74,7 @@ class TrafficFiltersTest : PortBasedTest {
     }
 
     @Test
-    fun `ReplayFrom serves stored requests later or returns 400`() {
+    fun `ReplayFrom serves stored requests later or returns 400`() = runBlocking {
         val cache = ReadWriteStream.Memory()
         cache[Request(GET, "/bob1")] = Response(OK)
         cache[Request(GET, "/bob2")] = Response(Status.ACCEPTED)

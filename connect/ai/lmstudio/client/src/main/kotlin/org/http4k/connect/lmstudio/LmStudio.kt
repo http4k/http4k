@@ -6,7 +6,7 @@ import org.http4k.connect.RemoteFailure
 
 @Http4kConnectApiClient
 interface LmStudio {
-    operator fun <R> invoke(action: LmStudioAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: LmStudioAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

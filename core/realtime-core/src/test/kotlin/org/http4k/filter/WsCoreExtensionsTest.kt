@@ -36,7 +36,7 @@ class WsCoreExtensionsTest {
     private val credentials = Credentials("123", "456")
 
     @Test
-    fun `can initialise and populate sse request context`() {
+    fun `can initialise and populate sse request context`() = runBlocking {
         val found = AtomicReference<Credentials>(null)
         val handler = ServerFilters.InitialiseWsRequestContext(contexts)
             .then(WsFilter { next ->
@@ -55,7 +55,7 @@ class WsCoreExtensionsTest {
     }
 
     @Test
-    fun `can initialise and populate ws request context`() {
+    fun `can initialise and populate ws request context`() = runBlocking {
         val found = AtomicReference<Credentials>(null)
         val handler = ServerFilters.InitialiseWsRequestContext(contexts)
             .then(WsFilter { next ->
@@ -74,14 +74,14 @@ class WsCoreExtensionsTest {
     }
 
     @Test
-    fun `can set subprotocol on WsResponse`() {
+    fun `can set subprotocol on WsResponse`() = runBlocking {
         val handler = ServerFilters.SetWsSubProtocol("foobar")
             .then { WsResponse { _ -> } }
         assertThat(handler(Request(GET, "/")).subprotocol, equalTo("foobar"))
     }
 
     @Test
-    fun `debug request`() {
+    fun `debug request`() = runBlocking {
         val os = ByteArrayOutputStream()
         val req = Request(POST, "").body("anything".byteInputStream())
 
@@ -101,7 +101,7 @@ class WsCoreExtensionsTest {
     }
 
     @Test
-    fun `debug response`() {
+    fun `debug response`() = runBlocking {
         val os = ByteArrayOutputStream()
         val req = Request(POST, "").body("anything".byteInputStream())
 
@@ -122,7 +122,7 @@ class WsCoreExtensionsTest {
     }
 
     @Test
-    fun `catch all`() {
+    fun `catch all`() = runBlocking {
         val error = AtomicReference<Throwable>()
         val e = Exception("foo")
 
@@ -142,7 +142,7 @@ class WsCoreExtensionsTest {
     }
 
     @Test
-    fun `reporting latency for request`() {
+    fun `reporting latency for request`() = runBlocking {
         var called = false
         val request = Request(GET, "")
         val response = WsResponse { it.close(NORMAL) }

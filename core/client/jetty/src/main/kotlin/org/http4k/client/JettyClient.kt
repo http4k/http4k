@@ -14,6 +14,7 @@ import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.Body
 import org.http4k.core.BodyMode
 import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -38,15 +39,11 @@ object JettyClient {
         client: HttpClient = defaultJettyHttpClient(),
         bodyMode: BodyMode = BodyMode.Memory,
         requestModifier: (JettyRequest) -> JettyRequest = { it }
-    ): DualSyncAsyncHttpHandler {
+    ): HttpHandler {
         if (!client.isRunning) client.start()
 
-        return object : DualSyncAsyncHttpHandler {
-            override fun close() = client.stop()
-
-            override fun invoke(request: Request): Response = client.send(request)
-
-            override fun invoke(request: Request, fn: (Response) -> Unit) = client.sendAsync(request, fn)
+        return object : HttpHandler {
+            override suspend fun invoke(request: Request): Response = client.send(request)
 
             private fun HttpClient.send(request: Request): Response = with(newRequest(request)) {
                 try {
@@ -65,37 +62,6 @@ object JettyClient {
                     }
                 } catch (e: TimeoutException) {
                     Response(CLIENT_TIMEOUT.toClientStatus(e))
-                }
-            }
-
-            private fun HttpClient.sendAsync(request: Request, fn: (Response) -> Unit) {
-                with(newRequest(request)) {
-                    when (bodyMode) {
-                        BodyMode.Memory -> send(object : BufferingResponseListener() {
-                            override fun onComplete(result: Result) {
-                                val response = if (result.isFailed) {
-                                    result.failure.asHttp4kResponse()
-                                } else {
-                                    result.response.toHttp4kResponse().body(contentAsString)
-                                }
-                                fn(response)
-                            }
-                        })
-
-                        BodyMode.Stream -> send(object : InputStreamResponseListener() {
-                            override fun onHeaders(response: JettyResponse) {
-                                super.onHeaders(response)
-                                executor.execute {
-                                    fn(response.toHttp4kResponse().body(inputStream))
-                                }
-                            }
-
-                            override fun onFailure(response: JettyResponse, failure: Throwable) {
-                                super.onFailure(response, failure)
-                                fn(failure.asHttp4kResponse())
-                            }
-                        })
-                    }
                 }
             }
 

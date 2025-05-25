@@ -10,7 +10,7 @@ import org.junit.jupiter.api.assertThrows
 class RegionProviderTest {
 
     @Test
-    fun `second element has region`() {
+    fun `second element has region`() = runBlocking {
         val chain = RegionProvider { null } orElse RegionProvider { Region.CA_CENTRAL_1 }
 
         assertThat(
@@ -20,7 +20,7 @@ class RegionProviderTest {
     }
 
     @Test
-    fun `first element has region`() {
+    fun `first element has region`() = runBlocking {
         val chain = RegionProvider { Region.US_EAST_1 } orElse RegionProvider { Region.CA_CENTRAL_1 }
 
         assertThat(
@@ -30,7 +30,7 @@ class RegionProviderTest {
     }
 
     @Test
-    fun `no element has region`() {
+    fun `no element has region`() = runBlocking {
         val chain = RegionProvider { null } orElse RegionProvider { null }
 
         assertThat(
@@ -40,7 +40,7 @@ class RegionProviderTest {
     }
 
     @Test
-    fun `no element has region - thrown`() {
+    fun `no element has region - thrown`() = runBlocking {
         val chain = RegionProvider { null } orElse RegionProvider { null }
 
         assertThrows<IllegalArgumentException>(chain::orElseThrow)

@@ -18,14 +18,14 @@ class BodyTest {
     private val emptyRequest = Request(GET, "")
 
     @Test
-    fun `can get string body when lax`() {
+    fun `can get string body when lax`() = runBlocking {
         val laxContentType = Body.string(TEXT_PLAIN).toLens()
         assertThat(laxContentType(emptyRequest.body("some value")), equalTo("some value"))
         assertThat(laxContentType(emptyRequest.header("Content-type", TEXT_PLAIN.toHeaderValue()).body("some value")), equalTo("some value"))
     }
 
     @Test
-    fun `can get regex body`() {
+    fun `can get regex body`() = runBlocking {
         val regexBody = Body.regex("bob(.+)alice").toLens()
         assertThat(regexBody(emptyRequest.body("bobritaalice")), equalTo("rita"))
         assertThat(
@@ -40,7 +40,7 @@ class BodyTest {
     }
 
     @Test
-    fun `non empty string`() {
+    fun `non empty string`() = runBlocking {
         val nonEmpty = Body.nonEmptyString(TEXT_PLAIN).toLens()
         assertThat(nonEmpty(emptyRequest.body("123")), equalTo("123"))
         assertThat(
@@ -55,7 +55,7 @@ class BodyTest {
     }
 
     @Test
-    fun `non blank string`() {
+    fun `non blank string`() = runBlocking {
         val nonEmpty = Body.nonBlankString(TEXT_PLAIN).toLens()
         assertThat(nonEmpty(emptyRequest.body("123")), equalTo("123"))
         assertThat(
@@ -79,35 +79,35 @@ class BodyTest {
     }
 
     @Test
-    fun `rejects invalid or missing content type when ContentNegotiation Strict`() {
+    fun `rejects invalid or missing content type when ContentNegotiation Strict`() = runBlocking {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
         assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Any?>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
-    fun `rejects invalid or missing content type when ContentNegotiation StrictNoDirective`() {
+    fun `rejects invalid or missing content type when ContentNegotiation StrictNoDirective`() = runBlocking {
         val strictNoDirectiveBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.StrictNoDirective).toLens()
         assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Any?>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat(strictNoDirectiveBody(emptyRequest.header("content-type", "text/plain;  charset= not-utf-8  ").body("some value")), equalTo("some value"))
     }
 
     @Test
-    fun `rejects invalid content type when ContentNegotiation NonStrict`() {
+    fun `rejects invalid content type when ContentNegotiation NonStrict`() = runBlocking {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.NonStrict).toLens()
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat(strictBody(emptyRequest.body("some value")), equalTo("some value"))
     }
 
     @Test
-    fun `accept any content type when ContentNegotiation None`() {
+    fun `accept any content type when ContentNegotiation None`() = runBlocking {
         val noneBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.None).toLens()
         noneBody(emptyRequest.body("some value"))
         noneBody(emptyRequest.body("some value").header("content-type", "text/bob"))
     }
 
     @Test
-    fun `sets value on request`() {
+    fun `sets value on request`() = runBlocking {
         val body = Body.string(TEXT_PLAIN).toLens()
         val withBody = emptyRequest.with(body of "hello")
         assertThat(body(withBody), equalTo("hello"))
@@ -115,7 +115,7 @@ class BodyTest {
     }
 
     @Test
-    fun `synonym methods roundtrip`() {
+    fun `synonym methods roundtrip`() = runBlocking {
         val body = Body.string(TEXT_PLAIN).toLens()
         body.inject("hello", emptyRequest)
         val withBody = emptyRequest.with(body of "hello")
@@ -123,7 +123,7 @@ class BodyTest {
     }
 
     @Test
-    fun `can create a custom Body type and get and set on request`() {
+    fun `can create a custom Body type and get and set on request`() = runBlocking {
         val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType, MyCustomType::value).toLens()
 
         val custom = MyCustomType("hello world!")
@@ -135,7 +135,7 @@ class BodyTest {
     }
 
     @Test
-    fun `can create a one way custom Body type`() {
+    fun `can create a one way custom Body type`() = runBlocking {
         val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType).toLens()
         assertThat(customBody(emptyRequest
             .header("Content-type", TEXT_PLAIN.toHeaderValue())

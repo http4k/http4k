@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class ApiGatewayRestLambdaFunctionTest {
 
     @Test
-    fun `adapts API Gateway request and response and receives context`() {
+    fun `adapts API Gateway request and response and receives context`() = runBlocking {
         val lambdaContext = LambdaContextMock()
 
         val request = mapOf(

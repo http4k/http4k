@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Disabled
 class HelidonSseTest : SseServerContract({ Helidon(it, Immediate) }) {
 
     @Disabled("not available in Helidon")
-    override fun `can modify status`() {
+    override fun `can modify status`() = runBlocking {
         super.`can modify status`()
     }
 }

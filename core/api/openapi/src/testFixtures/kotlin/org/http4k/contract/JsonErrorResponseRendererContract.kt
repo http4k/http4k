@@ -2,6 +2,7 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.format.Json
 import org.http4k.lens.Invalid
 import org.http4k.lens.LensFailure
@@ -15,7 +16,7 @@ import org.junit.jupiter.api.Test
 abstract class JsonErrorResponseRendererContract<NODE : Any>(val j: Json<NODE>) {
 
     @Test
-    fun `can build 400`() {
+    fun `can build 400`() = runBlocking {
         val response = JsonErrorResponseRenderer(j).badRequest(LensFailure(listOf(
             Missing(Meta(true, "location1", ArrayParam(StringParam), "name1", null, emptyMap())),
             Invalid(Meta(false, "location2", NumberParam, "name2", null, emptyMap()))
@@ -27,7 +28,7 @@ abstract class JsonErrorResponseRendererContract<NODE : Any>(val j: Json<NODE>) 
     }
 
     @Test
-    fun `can build 404`() {
+    fun `can build 404`() = runBlocking {
         val response = JsonErrorResponseRenderer(j).notFound()
         assertThat(response.bodyString(),
             equalTo("""{"message":"No route found on this path. Have you used the correct HTTP verb?"}"""))

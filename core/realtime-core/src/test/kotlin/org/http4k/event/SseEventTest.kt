@@ -27,12 +27,12 @@ class SseEventTest {
     )
 
     @Test
-    fun `outgoing equals`() {
+    fun `outgoing equals`() = runBlocking {
         assertThat(Outgoing(tx), equalTo(Outgoing(tx)))
     }
 
     @Test
-    fun `outgoing uses template if available`() {
+    fun `outgoing uses template if available`() = runBlocking {
         assertThat(
             Outgoing(
                 SseTransaction(
@@ -58,7 +58,7 @@ class SseEventTest {
     }
 
     @Test
-    fun `incoming uses template if available`() {
+    fun `incoming uses template if available`() = runBlocking {
         assertThat(
             SseEvent.Incoming(
                 SseTransaction(
@@ -84,7 +84,7 @@ class SseEventTest {
     }
 
     @Test
-    fun `incoming equals`() {
+    fun `incoming equals`() = runBlocking {
         assertThat(SseEvent.Incoming(tx), equalTo(SseEvent.Incoming(tx)))
     }
 }

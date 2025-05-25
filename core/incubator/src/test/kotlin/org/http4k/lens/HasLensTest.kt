@@ -14,7 +14,7 @@ class HasLensTest {
     }
 
     @Test
-    fun `can use companion to provide an automatic lens to a class`() {
+    fun `can use companion to provide an automatic lens to a class`() = runBlocking {
         val item = Foo("bar")
         val injected = Request(GET, "").with(Foo.lens of item)
 

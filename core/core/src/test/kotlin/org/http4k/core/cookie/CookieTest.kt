@@ -18,7 +18,7 @@ import java.util.Locale
 class CookieTest {
 
     @Test
-    fun `full cookie creation`() {
+    fun `full cookie creation`() = runBlocking {
         val cookie = Cookie("my-cookie", "my-value")
             .maxAge(37)
             .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
@@ -33,7 +33,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookie expiry date is always in english`() {
+    fun `cookie expiry date is always in english`() = runBlocking {
         val currentSystemLocale = Locale.getDefault()
         try {
             Locale.setDefault(Locale.TAIWAN)
@@ -46,7 +46,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookie creation and parsing round trip`() {
+    fun `cookie creation and parsing round trip`() = runBlocking {
         val original = Cookie("my-cookie", "my-value")
             .maxAge(37)
             .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
@@ -62,17 +62,17 @@ class CookieTest {
     }
 
     @Test
-    fun `can parse cookie with ending with semicolon`() {
+    fun `can parse cookie with ending with semicolon`() = runBlocking {
         assertThat(Cookie.parse("foo=bar;"), equalTo(Cookie("foo", "bar")))
     }
 
     @Test
-    fun `cookies can be extracted from request`() {
+    fun `cookies can be extracted from request`() = runBlocking {
         assertThat(Request(GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
-    fun `cookies can be extracted from a http2 request with multiple cookie headers`() {
+    fun `cookies can be extracted from a http2 request with multiple cookie headers`() = runBlocking {
         assertThat(Request(GET, "/")
             .header("cookie", "foo=bar; voo=tar")
             .header("cookie", "roo=gar")
@@ -84,25 +84,25 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies with ending semicolon can be extracted from request`() {
+    fun `cookies with ending semicolon can be extracted from request`() = runBlocking {
         assertThat(Request(GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
-    fun `cookie values are quoted by default, and do not have a trailing semicolon`() {
+    fun `cookie values are quoted by default, and do not have a trailing semicolon`() = runBlocking {
         assertThat(Cookie("my-cookie", "my \"quoted\" value").toString(),
             equalTo("""my-cookie="my \"quoted\" value""""))
     }
 
     @Test
-    fun `cookies with equals signs inside quotes can be extracted from request`() {
+    fun `cookies with equals signs inside quotes can be extracted from request`() = runBlocking {
         assertThat(Request(GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
         assertThat(Request(GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
         assertThat(Request(GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
     }
 
     @Test
-    fun `cookies can be added to the response, quoted by default`() {
+    fun `cookies can be added to the response, quoted by default`() = runBlocking {
         val cookie = Cookie("my-cookie", "my value")
 
         val response = Response(OK).cookie(cookie)
@@ -111,7 +111,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be added to the response unquoted`() {
+    fun `cookies can be added to the response unquoted`() = runBlocking {
         val cookie = Cookie("my-cookie", "value")
 
         val response = Response(OK).cookie(cookie, true)
@@ -120,7 +120,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be removed from the response`() {
+    fun `cookies can be removed from the response`() = runBlocking {
         val response = Response(OK)
             .header("Set-Cookie", "other-cookie=\"other-value\"")
             .header("Set-Cookie", "a-cookie=\"a-value\"")
@@ -134,7 +134,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be removed from the request`() {
+    fun `cookies can be removed from the request`() = runBlocking {
         val request = Request(GET, "")
             .header("Cookie", "other-cookie=\"other-value\"")
             .header("Cookie", "a-cookie=\"a-value\"")
@@ -148,7 +148,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be replaced in the response`() {
+    fun `cookies can be replaced in the response`() = runBlocking {
         val cookie = Cookie("my-cookie", "my value")
         val replacement = Cookie("my-cookie", "my second value")
 
@@ -158,35 +158,35 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be stored in request`() {
+    fun `cookies can be stored in request`() = runBlocking {
         val request = Request(GET, "ignore").cookie("foo", "bar")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"bar\"") as Parameters))
     }
 
     @Test
-    fun `cookies can be retrieved from request`() {
+    fun `cookies can be retrieved from request`() = runBlocking {
         val request = Request(GET, "ignore").header("Cookie", "foo=\"bar\"")
 
         assertThat(request.cookie("foo"), equalTo(Cookie("foo", "bar")))
     }
 
     @Test
-    fun `request stores multiple cookies in single header`() {
+    fun `request stores multiple cookies in single header`() = runBlocking {
         val request = Request(GET, "ignore").cookie("foo", "one").cookie("bar", "two")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to """foo="one"; bar="two"""") as Parameters))
     }
 
     @Test
-    fun `request can store cookies with special characters`() {
+    fun `request can store cookies with special characters`() = runBlocking {
         val request = Request(GET, "ignore").cookie("foo", "\"one\"").cookie("bar", "two=three")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to """foo="\"one\""; bar="two=three"""") as Parameters))
     }
 
     @Test
-    fun `cookies can be extracted from response`() {
+    fun `cookies can be extracted from response`() = runBlocking {
         val cookies = listOf(Cookie("foo", "one"), Cookie("bar", "two").maxAge(3))
 
         val response = cookies.fold(Response(OK), Response::cookie)
@@ -195,36 +195,36 @@ class CookieTest {
     }
 
     @Test
-    fun `cookie without quoted value can be parsed`() {
+    fun `cookie without quoted value can be parsed`() = runBlocking {
         assertThat(Cookie.parse("foo=bar; Path=/"), equalTo(Cookie("foo", "bar").path("/")))
     }
 
     @Test
-    fun `cookie can be invalidated`() {
+    fun `cookie can be invalidated`() = runBlocking {
         assertThat(Cookie("foo", "bar").invalidate(),
             equalTo(Cookie("foo", "").maxAge(0).expires(Instant.EPOCH)))
     }
 
     @Test
-    fun `cookie can be invalidated at response level`() {
+    fun `cookie can be invalidated at response level`() = runBlocking {
         assertThat(Response(OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
             equalTo(Cookie("foo", "").invalidate()))
     }
 
     @Test
-    fun `cookie with domain can be invalidated at response level`() {
+    fun `cookie with domain can be invalidated at response level`() = runBlocking {
         assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
             equalTo(Cookie("foo", "", domain = "foo.com").invalidate()))
     }
 
     @Test
-    fun `cookie with path can be invalidated at response level`() {
+    fun `cookie with path can be invalidated at response level`() = runBlocking {
         assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "baz.com", path = "/test").maxAge(10)).invalidateCookie("foo", "foo.com", "/other").cookies().first(),
             equalTo(Cookie("foo", "", domain = "foo.com", path = "/other").invalidate()))
     }
 
     @Test
-    fun `cookie with various expires date formats parsed`() {
+    fun `cookie with various expires date formats parsed`() = runBlocking {
         val expected = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21).toInstant(ZoneOffset.UTC))
 
         assertThat(Cookie.parse("foo=bar; Expires=Sat, 11 Mar 2017 12:15:21 GMT"), equalTo(expected))
@@ -237,14 +237,14 @@ class CookieTest {
     }
 
     @Test
-    fun `ignores unrecognized SameSite attribute`() {
+    fun `ignores unrecognized SameSite attribute`() = runBlocking {
         val expected = Cookie("foo", "bar")
 
         assertThat(Cookie.parse("foo=bar; SameSite=Unknown"), equalTo(expected))
     }
 
     @Test
-    fun `forgives SameSite attributes that aren't strictly correct`() {
+    fun `forgives SameSite attributes that aren't strictly correct`() = runBlocking {
         val expected = Cookie("foo", "bar", sameSite = Lax)
 
         assertThat(Cookie.parse("foo=bar; SameSite=lax"), equalTo(expected))

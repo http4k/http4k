@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class Rfc6570UriTemplateMatcherTest {
 
     @Test
-    fun `template matches tests Rfc6570 basic cases`() {
+    fun `template matches tests Rfc6570 basic cases`() = runBlocking {
         // Level 1 - Simple String Expansion
         assertMatch("http://localhost/{path}", "http://localhost/foobar")
         assertMatch("http://localhost:8080/{path}", "http://localhost:8080/foobar")
@@ -27,7 +27,7 @@ class Rfc6570UriTemplateMatcherTest {
     }
 
     @Test
-    fun `template matches tests Rfc6570 level 1 templates`() {
+    fun `template matches tests Rfc6570 level 1 templates`() = runBlocking {
         // Simple variable expansion
         assertMatch("http://example.com/{var}", "http://example.com/value")
         assertMatch("http://example.com/{hello}", "http://example.com/Hello%20World%21")
@@ -43,7 +43,7 @@ class Rfc6570UriTemplateMatcherTest {
     }
 
     @Test
-    fun `template matches tests Rfc6570 level 2 templates`() {
+    fun `template matches tests Rfc6570 level 2 templates`() = runBlocking {
         // Reserved expansion with + operator
         assertMatch("http://example.com/{+path}/here", "http://example.com//foo/bar/here")
         assertMatch("http://example.com/{+path}", "http://example.com/foo/bar/here")
@@ -55,7 +55,7 @@ class Rfc6570UriTemplateMatcherTest {
     }
 
     @Test
-    fun `template matches tests with real-world examples`() {
+    fun `template matches tests with real-world examples`() = runBlocking {
         // API endpoints
         assertMatch("/api/v1/users/{userId}", "/api/v1/users/12345")
         assertMatch("/api/v1/users/{userId}/posts/{postId}", "/api/v1/users/12345/posts/6789")
@@ -74,7 +74,7 @@ class Rfc6570UriTemplateMatcherTest {
     }
 
     @Test
-    fun `template matches tests with edge cases`() {
+    fun `template matches tests with edge cases`() = runBlocking {
         // Empty path segments
         assertMatch("http://example.com/{empty}/test", "http://example.com//test")
 
@@ -95,7 +95,7 @@ class Rfc6570UriTemplateMatcherTest {
     }
 
     @Test
-    fun `template expansion with level 1 templates`() {
+    fun `template expansion with level 1 templates`() = runBlocking {
         // Level 1 - Simple String Expansion
         assertExpansion(
             template = "{var}",
@@ -141,7 +141,7 @@ class Rfc6570UriTemplateMatcherTest {
     }
 
     @Test
-    fun `template expansion with level 2 templates`() {
+    fun `template expansion with level 2 templates`() = runBlocking {
         // Level 2 - Reserved expansion with + operator
         assertExpansion(
             template = "{+var}",

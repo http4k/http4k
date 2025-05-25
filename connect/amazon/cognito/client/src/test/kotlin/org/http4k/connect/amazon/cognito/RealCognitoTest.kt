@@ -8,13 +8,13 @@ class RealCognitoTest : CognitoContract, RealAwsContract {
 
     @Test
     @Disabled("takes ages to create a domain in AWS")
-    override fun `can get access token using client credentials grant`() {
+    override fun `can get access token using client credentials grant`() = runBlocking {
         super.`can get access token using client credentials grant`()
     }
 
     @Test
     @Disabled("takes ages to create a domain in AWS")
-    override fun `can get access token using auth code grant`() {
+    override fun `can get access token using auth code grant`() = runBlocking {
         super.`can get access token using auth code grant`()
     }
 

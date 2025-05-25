@@ -1,5 +1,6 @@
 package org.http4k.connect.github.api
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.github.GitHubToken
 import org.http4k.core.HttpHandler
@@ -13,10 +14,10 @@ fun GitHub.Companion.Http(
     authScheme: String = "token"
 ) =
     object : GitHub {
-        private val routedHttp = SetBaseUriFrom(Uri.of("https://api.github.com"))
-            .then(http)
+        private val routedHttp = runBlocking { SetBaseUriFrom(Uri.of("https://api.github.com"))
+            .then(http) }
 
-        override fun <R> invoke(action: GitHubAction<R>) = action.toResult(
+        override suspend fun <R> invoke(action: GitHubAction<R>) = action.toResult(
             routedHttp(
                 action.toRequest()
                     .header("Authorization", "$authScheme ${token()}")

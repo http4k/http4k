@@ -25,7 +25,7 @@ class FakeSESTest : SESContract, FakeAwsContract {
     }
 
     @Test
-    fun `send and validate simple email`() {
+    fun `send and validate simple email`() = runBlocking {
         val response = http.client().sendEmail(
             fromEmailAddress = from,
             destination = Destination(
@@ -61,7 +61,7 @@ class FakeSESTest : SESContract, FakeAwsContract {
     }
 
     @Test
-    fun `send and validate raw email`() {
+    fun `send and validate raw email`() = runBlocking {
         val response = http.client().sendEmail(
             fromEmailAddress = from,
             destination = Destination(

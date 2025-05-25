@@ -142,7 +142,7 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
 
     override fun close() {}
 
-    private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
+    inline suspend fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
         val response = this(message.toHttpRequest(baseUri, rpc).accept(APPLICATION_JSON))
 
         return when {

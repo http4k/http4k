@@ -20,7 +20,7 @@ class DynamoDbConditionalGrammarTest {
     private val attr3 = Attribute.strings().required("attr3")
 
     @Test
-    fun `=`() {
+    fun `=`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("attr1 = :foo", item, mapOf(":foo" to attr1.asValue("123")))
@@ -30,7 +30,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `!=`() {
+    fun `!=`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("attr1 <> :foo", item, mapOf(":foo" to attr1.asValue("789")))
@@ -40,7 +40,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `less than`() {
+    fun `less than`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("attr1 < :foo", item, mapOf(":foo" to attr1.asValue("789")))
@@ -50,7 +50,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `less than or equal`() {
+    fun `less than or equal`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("attr1 <= :foo", item, mapOf(":foo" to attr1.asValue("123")))
@@ -62,7 +62,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `greater than`() {
+    fun `greater than`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("attr1 > :foo", item, mapOf(":foo" to attr1.asValue("122")))
@@ -72,7 +72,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `greater than or equal`() {
+    fun `greater than or equal`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("attr1 >= :foo", item, mapOf(":foo" to attr1.asValue("122")))
@@ -84,7 +84,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `size of field`() {
+    fun `size of field`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("size(attr1) = :foo", item, mapOf(":foo" to attrNum.asValue(3)))
@@ -92,21 +92,21 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `attribute exists`() {
+    fun `attribute exists`() = runBlocking {
         val item = Item(attr1 of "123")
         assertTrue("attribute_exists(attr1)", item)
         assertFalse("attribute_exists(attr2)", item)
     }
 
     @Test
-    fun `attribute exists - substitution of names`() {
+    fun `attribute exists - substitution of names`() = runBlocking {
         val item = Item(attr1 of "123")
         assertTrue("attribute_exists(#key1)", item, names = mapOf("#key1" to attr1.name))
         assertFalse("attribute_exists(#key1)", item, names = mapOf("#key1" to attr2.name))
     }
 
     @Test
-    fun `attribute value`() {
+    fun `attribute value`() = runBlocking {
         assertThat(
             DynamoDbConditionalGrammar.parse("attr1").eval(ItemWithSubstitutions(Item(attr1 of "123"))),
             equalTo(attr1.asValue("123"))
@@ -114,7 +114,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `indexed attribute value`() {
+    fun `indexed attribute value`() = runBlocking {
         assertThat(
             DynamoDbConditionalGrammar.parse("attrList[1]").eval(
                 ItemWithSubstitutions(
@@ -131,7 +131,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `deeply indexed attribute value`() {
+    fun `deeply indexed attribute value`() = runBlocking {
         assertThat(
             DynamoDbConditionalGrammar.parse("attrList[0][1][2]").eval(
                 ItemWithSubstitutions(
@@ -158,7 +158,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `nested map attribute value`() {
+    fun `nested map attribute value`() = runBlocking {
         assertThat(
             DynamoDbConditionalGrammar.parse("attrMap.attrMap.attr1").eval(
                 ItemWithSubstitutions(Item(attrMap of Item(attrMap of Item(attr1 of "123", attrNum of 456))))
@@ -168,7 +168,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `map attribute value`() {
+    fun `map attribute value`() = runBlocking {
         assertThat(
             DynamoDbConditionalGrammar.parse("attrMap.attr1").eval(
                 ItemWithSubstitutions(Item(attrMap of Item(attr1 of "123", attrNum of 456)))
@@ -178,14 +178,14 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `attribute type`() {
+    fun `attribute type`() = runBlocking {
         val item = Item(attr1 of "123")
         assertTrue("attribute_type(attr1, S)", item)
         assertFalse("attribute_type(attr1, SS)", item)
     }
 
     @Test
-    fun `between function`() {
+    fun `between function`() = runBlocking {
         val item = Item(attrNum of 5)
         assertTrue(
             "attrNum BETWEEN :foo AND :bar", item,
@@ -198,7 +198,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `between composed function`() {
+    fun `between composed function`() = runBlocking {
         val item = Item(attrNum of 5)
         assertTrue(
             "attrNum <= :bar AND attrNum BETWEEN :foo AND :bar", item,
@@ -211,7 +211,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `IN function`() {
+    fun `IN function`() = runBlocking {
         val item = Item(attr1 of "123", attr3 of setOf("123", "456"))
 
         assertTrue(
@@ -229,28 +229,28 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `attribute not exists`() {
+    fun `attribute not exists`() = runBlocking {
         val item = Item(attr1 of "123")
         assertTrue("attribute_not_exists(attr2)", item)
         assertFalse("attribute_not_exists(attr1)", item)
     }
 
     @Test
-    fun `attributes not exists - substitution of names`() {
+    fun `attributes not exists - substitution of names`() = runBlocking {
         val item = Item(attr1 of "123")
         assertTrue("attribute_not_exists(#key1)", item, names = mapOf("#key1" to attr2.name))
         assertFalse("attribute_not_exists(#key1)", item, names = mapOf("#key1" to attr1.name))
     }
 
     @Test
-    fun `begins with`() {
+    fun `begins with`() = runBlocking {
         val item = Item(attr1 of "123")
         assertTrue("begins_with(attr1, :foo)", item, mapOf(":foo" to attr1.asValue("123")))
         assertFalse("begins_with(attr1, :foo)", item, mapOf(":foo" to attr1.asValue("124")))
     }
 
     @Test
-    fun `contains function`() {
+    fun `contains function`() = runBlocking {
         val item = Item(attr1 of "123", attr3 of setOf("123", "456"))
         assertTrue("contains(attr1, :foo)", item, mapOf(":foo" to attr1.asValue("123")))
         assertTrue("contains(attr3, :foo)", item, mapOf(":foo" to attr1.asValue("123")))
@@ -261,7 +261,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `logical NOT`() {
+    fun `logical NOT`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue("NOT attr1 = :foo", item, mapOf(":foo" to attr1.asValue("789")))
@@ -270,7 +270,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `logical AND`() {
+    fun `logical AND`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue(
@@ -296,7 +296,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `logical OR`() {
+    fun `logical OR`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue(
@@ -329,7 +329,7 @@ class DynamoDbConditionalGrammarTest {
     }
 
     @Test
-    fun `substitution of names`() {
+    fun `substitution of names`() = runBlocking {
         val item = Item(attr1 of "123", attr2 of ofSeconds(123))
 
         assertTrue(

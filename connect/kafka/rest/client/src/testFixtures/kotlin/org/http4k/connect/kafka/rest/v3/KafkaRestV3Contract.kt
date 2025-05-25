@@ -37,12 +37,12 @@ interface KafkaRestV3Contract {
     private val kafkaRest get() = KafkaRest.Http(Credentials("", ""), uri, http)
 
     @BeforeEach
-    fun `can get to proxy v3`() {
+    fun `can get to proxy v3`() = runBlocking {
         Assumptions.assumeTrue(http(Request(Method.GET, uri)).status == Status.OK)
     }
 
     @Test
-    fun `send and receive BINARY records`() {
+    fun `send and receive BINARY records`() = runBlocking {
         val clusterId = ClusterId.of("foo")
         val topic = Topic.of("bar")
         val kafkaTopic = kafkaRest.getTopic(clusterId, topic).successValue()
@@ -94,7 +94,7 @@ interface KafkaRestV3Contract {
     }
 
     @Test
-    fun `send and receive JSON records`() {
+    fun `send and receive JSON records`() = runBlocking {
         val clusterId = ClusterId.of("foo")
         val topic = Topic.of("bar")
         val kafkaTopic = kafkaRest.getTopic(clusterId, topic).successValue()

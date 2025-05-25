@@ -47,7 +47,7 @@ class SSOProfileLoadingTest {
     }
 
     @Test
-    fun `load SSO profile`() {
+    fun `load SSO profile`() = runBlocking {
 
         val profile = SSOProfile.loadProfiles(configPath)[ProfileName.of("dev")]
 
@@ -66,7 +66,7 @@ class SSOProfileLoadingTest {
 
 
     @Test
-    fun `load and merge SSO profile`() {
+    fun `load and merge SSO profile`() = runBlocking {
 
         val profile = SSOProfile.loadProfiles(configPath)[ProfileName.of("prod")]
 
@@ -85,7 +85,7 @@ class SSOProfileLoadingTest {
     }
 
     @Test
-    fun `load default profile and merge SSO profile`() {
+    fun `load default profile and merge SSO profile`() = runBlocking {
 
         configPath.toFile().writeText(
             """

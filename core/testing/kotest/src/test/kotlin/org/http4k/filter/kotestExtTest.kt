@@ -11,7 +11,7 @@ import org.junit.jupiter.api.assertThrows
 
 class ExtensionsTest {
     @Test
-    fun `request matching as a filter`() {
+    fun `request matching as a filter`() = runBlocking {
         val app = RequestFilters.Assert(haveHeader("bob")).then { Response(OK) }
 
         app(Request(GET, "").header("bob", "foo"))
@@ -20,14 +20,14 @@ class ExtensionsTest {
     }
 
     @Test
-    fun `response matching as a filter`() {
+    fun `response matching as a filter`() = runBlocking {
         ResponseFilters.Assert(haveHeader("bob").invert()).then { Response(OK) }(Request(GET, ""))
 
         assertThrows<AssertionError>  { ResponseFilters.Assert(haveHeader("bob")).then { Response(OK) }(Request(GET, "")) }
     }
 
     @Test
-    fun `request not matching as a filter`() {
+    fun `request not matching as a filter`() = runBlocking {
         val app = RequestFilters.AssertNot(haveHeader("bob")).then { Response(OK) }
 
         app(Request(GET, ""))
@@ -36,7 +36,7 @@ class ExtensionsTest {
     }
 
     @Test
-    fun `response not matching as a filter`() {
+    fun `response not matching as a filter`() = runBlocking {
         ResponseFilters.AssertNot(haveHeader("bob")).then { Response(OK) }(Request(GET, ""))
 
         assertThrows<AssertionError>  { ResponseFilters.AssertNot(haveHeader("bob").invert()).then { Response(OK) }(Request(GET, "")) }

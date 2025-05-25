@@ -71,7 +71,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `load missing profile`() {
+    fun `load missing profile`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("missing")),
             absent()
@@ -79,7 +79,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `cannot load invalid profile`() {
+    fun `cannot load invalid profile`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("invalid")),
             absent()
@@ -87,7 +87,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `load default profile - by credentials`() {
+    fun `load default profile - by credentials`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("default")),
             equalTo(AwsCredentials("key123", "secret123"))
@@ -95,7 +95,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `load profile - assume with credentials`() {
+    fun `load profile - assume with credentials`() = runBlocking {
         val credentials = getCredentials(ProfileName.of("dev"))
         assertThat(credentials, present())
         assertThat(credentials!!.accessKey, equalTo("accessKeyId"))
@@ -104,7 +104,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `load profile - assume with assumed profile`() {
+    fun `load profile - assume with assumed profile`() = runBlocking {
         val credentials = getCredentials(ProfileName.of("dev2"))
         assertThat(credentials, present())
         assertThat(credentials!!.accessKey, equalTo("accessKeyId"))
@@ -113,7 +113,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `load profile - cannot assume when source profile invalid`() {
+    fun `load profile - cannot assume when source profile invalid`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("invalidSource")),
             absent()
@@ -121,7 +121,7 @@ class StsProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `load profile from config - assume with credentials`() {
+    fun `load profile from config - assume with credentials`() = runBlocking {
         val credentials = getCredentials(ProfileName.of("prod"))
         assertThat(credentials, present())
         assertThat(credentials!!.accessKey, equalTo("accessKeyId"))

@@ -27,7 +27,7 @@ class RouterBasedHttpHandlerSpecialCaseTest {
     private val prefix = "/prefix"
 
     @Test
-    fun `multi param routes - verb first`() {
+    fun `multi param routes - verb first`() = runBlocking {
         val handler = routes(GET to routes("/{foo}" bind
             routes("/{bar}" bind { it: Request ->
                 Response(OK).body(it.path("foo")!! + " then " + it.path("bar"))
@@ -38,7 +38,7 @@ class RouterBasedHttpHandlerSpecialCaseTest {
     }
 
     @Test
-    fun `multi param routes - verb middle`() {
+    fun `multi param routes - verb middle`() = runBlocking {
         val handler = routes("/{foo}" bind GET to routes(
             "/{bar}" bind { r: Request -> Response(OK).body(r.path("foo")!! + " then " + r.path("bar")) }
         ))
@@ -47,7 +47,7 @@ class RouterBasedHttpHandlerSpecialCaseTest {
     }
 
     @Test
-    fun `multi param routes - verb second`() {
+    fun `multi param routes - verb second`() = runBlocking {
         val handler = routes("/{foo}" bind routes(
             "/{bar}" bind GET to { Response(OK).body(it.path("foo")!! + " then " + it.path("bar")) },
         ))
@@ -56,7 +56,7 @@ class RouterBasedHttpHandlerSpecialCaseTest {
     }
 
     @Test
-    fun `router + passthrough with filter`() {
+    fun `router + passthrough with filter`() = runBlocking {
         val filter = Filter { next ->
             {
                 next(it.body(it.query("foo").orEmpty()))
@@ -69,7 +69,7 @@ class RouterBasedHttpHandlerSpecialCaseTest {
     }
 
     @Test
-    fun `path element still recoverable`() {
+    fun `path element still recoverable`() = runBlocking {
         val criteria = present(hasStatus(OK).and(hasBody("somevalue")))
 
         val handler = routes("/{foobar}" bind GET to routes(headers("host") bind {
@@ -85,26 +85,26 @@ class RouterBasedHttpHandlerSpecialCaseTest {
     }
 
     @Test
-    fun `attempt to bind param handler without a verb - without header`() {
+    fun `attempt to bind param handler without a verb - without header`() = runBlocking {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
         assertThat(app(Request(GET, prefix)), hasStatus(NOT_FOUND))
     }
 
     @Test
-    fun `attempt to bind param handler without a verb - wrong route`() {
+    fun `attempt to bind param handler without a verb - wrong route`() = runBlocking {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
         val header = Request(GET, "/unknown").header("host", "foo")
         assertThat(app(header), hasStatus(NOT_FOUND))
     }
 
     @Test
-    fun `attempt to bind param handler without a verb - with header`() {
+    fun `attempt to bind param handler without a verb - with header`() = runBlocking {
         val app = routes(prefix bind (headers("host") bind { Response(OK) }))
         assertThat(app(Request(GET, prefix).header("host", "foo")), hasStatus(OK))
     }
 
     @Test
-    fun `attempt to bind fallback handler without a verb - wrong route`() {
+    fun `attempt to bind fallback handler without a verb - wrong route`() = runBlocking {
         val app = routes(prefix bind routes(
             header("host", "host1") bind { Response(OK) },
             header("host", "host2") bind { Response(INTERNAL_SERVER_ERROR) }

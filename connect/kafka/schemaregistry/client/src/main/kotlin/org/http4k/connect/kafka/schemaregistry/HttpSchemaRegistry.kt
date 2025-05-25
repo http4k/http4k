@@ -20,5 +20,5 @@ fun SchemaRegistry.Companion.Http(
         .then(SetHostFrom(baseUri))
         .then(http)
 
-    override fun <R> invoke(action: SchemaRegistryAction<R>) = action.toResult(this.http(action.toRequest()))
+    override suspend fun <R> invoke(action: SchemaRegistryAction<R>) = action.toResult(this.http(action.toRequest()))
 }

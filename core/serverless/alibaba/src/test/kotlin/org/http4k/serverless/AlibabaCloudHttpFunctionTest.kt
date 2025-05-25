@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 
 class AlibabaCloudHttpFunctionTest {
     @Test
-    fun `calls the handler and returns proper body`() {
+    fun `calls the handler and returns proper body`() = runBlocking {
         val app = { req: Request -> Response(OK).body(req.bodyString()) }
         val request = FakeHttpServletRequest(Request(GET, "").body("hello alibaba"))
         val response = FakeHttpServletResponse()

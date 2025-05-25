@@ -30,7 +30,7 @@ class TransactionalPostboxTest {
     private val statusHandler = handlers.status(fromPath("requestId"))
 
     @Test
-    fun `stores request for background processing`() {
+    fun `stores request for background processing`() = runBlocking {
         val aRequest = Request(POST, "/hello").body("hello")
 
         val interceptorResponse = requestHandler(aRequest)
@@ -44,7 +44,7 @@ class TransactionalPostboxTest {
     }
 
     @Test
-    fun `returns response if request has been already processed`() {
+    fun `returns response if request has been already processed`() = runBlocking {
         val aRequest = Request(POST, "/hello").body("hello")
         val aResponse = Response(OK).body("foo")
 
@@ -60,7 +60,7 @@ class TransactionalPostboxTest {
     }
 
     @Test
-    fun `updates status of request`() {
+    fun `updates status of request`() = runBlocking {
         val aRequest = Request(POST, "/hello").body("hello")
         postbox.store(aRequest.id(), aRequest)
 
@@ -71,7 +71,7 @@ class TransactionalPostboxTest {
     }
 
     @Test
-    fun `handles storage failures`() {
+    fun `handles storage failures`() = runBlocking {
         val postboxHandler = requestHandler
         val aRequest = Request(POST, "/hello").body("hello")
 
@@ -84,7 +84,7 @@ class TransactionalPostboxTest {
     }
 
     @Test
-    fun `handles status for unknown request`() {
+    fun `handles status for unknown request`() = runBlocking {
         assertThat(statusHandler(Request(GET, "/unknown")), hasStatus(NOT_FOUND))
     }
 

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 
 interface IAMIdentityCenterContract : AwsContract {
     @Test
-    fun `log in via SSO`() {
+    fun `log in via SSO`() = runBlocking {
         val credentials = CredentialsProvider.SSO(
             SSOProfile(
                 AwsAccount.of("01234567890"),

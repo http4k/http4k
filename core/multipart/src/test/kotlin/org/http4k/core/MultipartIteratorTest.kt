@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.POST
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 class MultipartIteratorTest {
 
     @Test
-    fun `can stream multiparts`() {
+    fun `can stream multiparts`() = runBlocking {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
             ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())) +
             ("field2" to "bar2")

@@ -15,7 +15,7 @@ class FakeSchemaRegistryTest : SchemaRegistryContract() {
     override val uri = Uri.of("http://schemaregistry")
 
     @Test
-    fun `schema lifecycle for auto registration`() {
+    fun `schema lifecycle for auto registration`() = runBlocking {
         with(FakeSchemaRegistry(auto).client()) {
             assertThat(
                 checkSchemaRegistered(subject, RandomKey.`SCHEMA$`).successValue()?.schema,

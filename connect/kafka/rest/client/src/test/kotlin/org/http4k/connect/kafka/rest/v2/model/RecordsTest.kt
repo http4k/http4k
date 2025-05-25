@@ -9,7 +9,7 @@ import java.util.UUID
 class RecordsTest {
 
     @Test
-    fun `sets key schema when key is an avro object`() {
+    fun `sets key schema when key is an avro object`() = runBlocking {
         val avroObject = RandomKey(UUID.randomUUID())
 
         assertThat(

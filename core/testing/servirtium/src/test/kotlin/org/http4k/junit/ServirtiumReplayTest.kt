@@ -18,7 +18,7 @@ class ServirtiumReplayTest {
     private val storage = InMemory()
 
     @Test
-    fun `replays traffic from the recording`() {
+    fun `replays traffic from the recording`() = runBlocking {
         javaClass.getResourceAsStream("/org/http4k/junit/storedTraffic.txt").reader().use { r ->
             storage("name.hashCode").accept(r.readText().toByteArray())
         }

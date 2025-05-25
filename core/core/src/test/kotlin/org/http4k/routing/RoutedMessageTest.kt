@@ -20,7 +20,7 @@ class RoutedMessageTest {
     private val template = from("an-uri-template")
 
     @Test
-    fun `routed request can be extended`() {
+    fun `routed request can be extended`() = runBlocking {
         class ExtendedRequest(val delegate: RequestWithContext) : Request by delegate, RoutedMessage by delegate {
             override fun query(name: String, value: String?): ExtendedRequest =
                 ExtendedRequest(delegate.query(name, value) as RequestWithContext)
@@ -35,7 +35,7 @@ class RoutedMessageTest {
     }
 
     @Test
-    fun `routed response can be extended`() {
+    fun `routed response can be extended`() = runBlocking {
         class ExtendedResponse(val delegate: ResponseWithContext) : Response by delegate, RoutedMessage by delegate {
             override fun header(name: String, value: String?): ExtendedResponse =
                 ExtendedResponse(delegate.header(name, value) as ResponseWithContext)
@@ -47,7 +47,7 @@ class RoutedMessageTest {
     }
 
     @Test
-    fun `request manipulations maintain the same type`() {
+    fun `request manipulations maintain the same type`() = runBlocking {
         val request = RequestWithContext(Request(GET, "/"), template)
 
         assertThat(request.method(POST), isA<RequestWithContext>())
@@ -62,7 +62,7 @@ class RoutedMessageTest {
     }
 
     @Test
-    fun `response manipulations maintain the same type`() {
+    fun `response manipulations maintain the same type`() = runBlocking {
         val response = ResponseWithContext(Response(NOT_FOUND), template)
 
         assertThat(response.status(OK), isA<ResponseWithContext>())

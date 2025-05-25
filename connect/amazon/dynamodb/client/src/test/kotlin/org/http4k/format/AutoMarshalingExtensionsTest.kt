@@ -27,7 +27,7 @@ data class ChildObject(val str: String)
 class AutoMarshalingExtensionsTest {
 
     @Test
-    fun `can roundtrip a dynamo item with autoDynamoLens`() {
+    fun `can roundtrip a dynamo item with autoDynamoLens`() = runBlocking {
 
         val input =
             AnObject("foobar", 123, false, Uri.of("http"), listOf(ChildObject("asd")), ChildObject("34534"), null)
@@ -70,7 +70,7 @@ class AutoMarshalingExtensionsTest {
     )
 
     @Test
-    fun `can create a lens with an updated marshaller`() {
+    fun `can create a lens with an updated marshaller`() = runBlocking {
         val obj = CustomContainer(
             a = CustomValue("valueA"),
             b = CustomValue("valueB")
@@ -93,7 +93,7 @@ class AutoMarshalingExtensionsTest {
     data class DynamoSetContainer(val names: Set<String>, val ids: Set<Int>)
 
     @Test
-    fun `can convert Item with SS and NS into object`() {
+    fun `can convert Item with SS and NS into object`() = runBlocking {
         val item = mapOf(
             AttributeName.of("names") to AttributeValue.StrSet(setOf("Kratos", "Athena")),
             AttributeName.of("ids") to AttributeValue.NumSet(setOf(1, 2))

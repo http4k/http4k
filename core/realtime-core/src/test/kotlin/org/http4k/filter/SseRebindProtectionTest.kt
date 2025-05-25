@@ -32,7 +32,7 @@ class SseRebindProtectionTest {
     private val handler = ServerFilters.SseRebindProtection(corsPolicy).then(testSseHandler)
 
     @Test
-    fun `allows requests with valid origin`() {
+    fun `allows requests with valid origin`() = runBlocking {
         val request = Request(GET, "/sse").header("Origin", allowedOrigin)
 
         val response = handler(request)
@@ -52,14 +52,14 @@ class SseRebindProtectionTest {
     }
 
     @Test
-    fun `blocks requests with disallowed origin`() {
+    fun `blocks requests with disallowed origin`() = runBlocking {
         val request = Request(GET, "/sse").header("Origin", disallowedOrigin)
 
         assertThat(handler(request).status, equalTo(FORBIDDEN))
     }
 
     @Test
-    fun `blocks requests with missing origin header`() {
+    fun `blocks requests with missing origin header`() = runBlocking {
         val request = Request(GET, "/sse")
 
         assertThat(handler(request).status, equalTo(FORBIDDEN))

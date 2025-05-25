@@ -29,7 +29,7 @@ class XmlTest {
     private val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><Xml>asd<SubWithText attr="attrValue">subText</SubWithText><SubWithText attr="attrValue3">subText4</SubWithText><subWithAttr attr="attr2"/></Xml>"""
 
     @Test
-    fun `roundtrip xml to and from body ext method`() {
+    fun `roundtrip xml to and from body ext method`() = runBlocking {
         val lens = Body.xml().toLens()
         val out = lens.extract(Request(GET, "").body(xml))
         val after = lens.inject(out, Request(GET, ""))
@@ -37,12 +37,12 @@ class XmlTest {
     }
 
     @Test
-    fun `roundtrip Xml node to and from String`() {
+    fun `roundtrip Xml node to and from String`() = runBlocking {
         assertThat(xml.asXmlDocument().asXmlString(), equalTo(xml))
     }
 
     @Test
-    fun `does not try to automatically convert numbers`() {
+    fun `does not try to automatically convert numbers`() = runBlocking {
         val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><value>1258421375.19</value>"""
         val lens = Body.auto<SimpleDocument>().toLens()
 
@@ -50,14 +50,14 @@ class XmlTest {
     }
 
     @Test
-    fun `convert XML to simple bean`() {
+    fun `convert XML to simple bean`() = runBlocking {
         val body = Body.auto<Base>().toLens()
         val expected = Base(XmlNode(listOf(SubWithText1("attrValue", "subText"), SubWithText1("attrValue3", "subText4")), SubWithAttr("attr2"), "asd"))
         assertThat(body(Response(OK).body(xml)), equalTo(expected))
     }
 
     @Test
-    fun `random lens supports XML marshalling`() {
+    fun `random lens supports XML marshalling`() = runBlocking {
         val xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><SomeXml/>"
         val original = Request(GET, "/").query("foo", xmlString)
         val lens = Query.xml().required("foo")
@@ -67,7 +67,7 @@ class XmlTest {
     }
 
     @Test
-    fun `roundtrip xml to and from with BiDi lens`() {
+    fun `roundtrip xml to and from with BiDi lens`() = runBlocking {
         val lens = Xml.asBiDiMapping()
         assertThat(lens(lens(xml)), equalTo(xml))
     }

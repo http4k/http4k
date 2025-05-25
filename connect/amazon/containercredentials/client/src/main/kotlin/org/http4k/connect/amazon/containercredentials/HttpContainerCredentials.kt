@@ -22,6 +22,6 @@ fun ContainerCredentials.Companion.Http(
         .then(SetXForwardedHost())
         .then(http)
 
-    override fun <R> invoke(action: ContainerCredentialsAction<R>) =
+    override suspend fun <R> invoke(action: ContainerCredentialsAction<R>) =
         action.toResult(credentialsHttp(action.toRequest()))
 }

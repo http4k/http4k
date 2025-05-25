@@ -22,7 +22,7 @@ class PushPullAdaptingWebSocketTest {
     }
 
     @Test
-    fun `outbound comms are pushed to client`() {
+    fun `outbound comms are pushed to client`() = runBlocking {
         val adapter = TestAdapter()
         adapter.send(WsMessage("hello"))
         assertThat(adapter.received, equalTo(listOf(WsMessage("hello"))))
@@ -31,7 +31,7 @@ class PushPullAdaptingWebSocketTest {
     }
 
     @Test
-    fun `inbound comms are pushed to socket`() {
+    fun `inbound comms are pushed to socket`() = runBlocking {
         val outboundClose = AtomicReference<WsStatus>(null)
         val outboundMessage = AtomicReference<WsMessage>(null)
         val outboundError = AtomicReference<Throwable>(null)

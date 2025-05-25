@@ -74,7 +74,7 @@ class HtmxJsoupWebElementTest {
     @Nested
     inner class `Handles hx-methods` {
         @Test
-        fun `issues a GET request on click with default swap`() {
+        fun `issues a GET request on click with default swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = null,
@@ -84,7 +84,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with innerHtml swap`() {
+        fun `issues a GET request on click with innerHtml swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "innerHTML",
@@ -94,7 +94,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a data-GET request on click with innerHtml swap`() {
+        fun `issues a data-GET request on click with innerHtml swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "data-hx-get",
                 htmxSwap = "innerHTML",
@@ -104,7 +104,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a POST request on click with default swap`() {
+        fun `issues a POST request on click with default swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-post",
                 htmxSwap = null,
@@ -114,7 +114,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a DELETE request on click with default swap`() {
+        fun `issues a DELETE request on click with default swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-delete",
                 htmxSwap = null,
@@ -124,7 +124,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a PATCH request on click with default swap`() {
+        fun `issues a PATCH request on click with default swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-patch",
                 htmxSwap = null,
@@ -134,7 +134,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a PUT request on click with default swap`() {
+        fun `issues a PUT request on click with default swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-put",
                 htmxSwap = null,
@@ -147,7 +147,7 @@ class HtmxJsoupWebElementTest {
     @Nested
     inner class `Handles hx-swap` {
         @Test
-        fun `issues a GET request on click with outerHTML swap`() {
+        fun `issues a GET request on click with outerHTML swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "outerHTML",
@@ -157,7 +157,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with beforebegin swap`() {
+        fun `issues a GET request on click with beforebegin swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "beforebegin",
@@ -167,7 +167,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with afterbegin swap`() {
+        fun `issues a GET request on click with afterbegin swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "afterbegin",
@@ -177,7 +177,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with beforeend swap`() {
+        fun `issues a GET request on click with beforeend swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "beforeend",
@@ -187,7 +187,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with afterend swap`() {
+        fun `issues a GET request on click with afterend swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "afterend",
@@ -197,7 +197,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with delete swap`() {
+        fun `issues a GET request on click with delete swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "delete",
@@ -207,7 +207,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `issues a GET request on click with none swap`() {
+        fun `issues a GET request on click with none swap`() = runBlocking {
             asssertClickResponds(
                 htmxVerb = "hx-get",
                 htmxSwap = "none",
@@ -223,7 +223,7 @@ class HtmxJsoupWebElementTest {
             contentTypePlainTextFilter.then { Response(Status.OK).body("responded") }
 
         @Test
-        fun `targets a parent with hx-target 'this'`() {
+        fun `targets a parent with hx-target 'this'`() = runBlocking {
             val html = Jsoup.parse(
                 """
                     |<body>
@@ -252,7 +252,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `targets a sibling by id`() {
+        fun `targets a sibling by id`() = runBlocking {
             val html = Jsoup.parse(
                 """
                     |<body>
@@ -282,7 +282,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `targets a sibling by class`() {
+        fun `targets a sibling by class`() = runBlocking {
             val html = Jsoup.parse(
                 """
                     |<body>
@@ -312,7 +312,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `inherits hx-swap`() {
+        fun `inherits hx-swap`() = runBlocking {
             val html = Jsoup.parse(
                 """
                     |<body>
@@ -347,7 +347,7 @@ class HtmxJsoupWebElementTest {
     @Nested
     inner class `Handles form data` {
         @Test
-        fun `single input field`() {
+        fun `single input field`() = runBlocking {
             val getHandler: HttpHandler = contentTypePlainTextFilter.then { req ->
                 if (req.method == Method.GET) {
                     Response(Status.OK)
@@ -384,7 +384,7 @@ class HtmxJsoupWebElementTest {
         }
 
         @Test
-        fun `post a form`() {
+        fun `post a form`() = runBlocking {
             val getHandler: HttpHandler = contentTypePlainTextFilter.then { req ->
                 if (req.method == Method.POST) {
                     Response(Status.OK)
@@ -427,7 +427,7 @@ class HtmxJsoupWebElementTest {
     @Nested
     inner class `Handles header values` {
         @Test
-        fun `sends headers for request`() {
+        fun `sends headers for request`() = runBlocking {
             val getHandler: HttpHandler = contentTypePlainTextFilter.then { req ->
                 Response(Status.OK)
                     .body(

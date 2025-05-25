@@ -1,5 +1,6 @@
 package org.http4k.bridge
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -13,7 +14,9 @@ import ratpack.http.TypedData
 
 fun RatpackToHttp4kHandler(httpHandler: HttpHandler) = Handler { context ->
     context.request.body.then { data ->
-        (context.toHttp4kRequest(data)?.let(httpHandler) ?: Response(NOT_IMPLEMENTED)).pushTo(context)
+        (context.toHttp4kRequest(data)?.let {
+            runBlocking { httpHandler(it) }
+        } ?: Response(NOT_IMPLEMENTED)).pushTo(context)
     }
 }
 

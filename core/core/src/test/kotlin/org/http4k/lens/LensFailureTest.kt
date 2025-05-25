@@ -13,27 +13,27 @@ class LensFailureTest {
     private val missing = Missing(Meta(true, "header", ParamMeta.BooleanParam, "name", null, emptyMap()))
 
     @Test
-    fun `overall returns invalid if there are no failures`() {
+    fun `overall returns invalid if there are no failures`() = runBlocking {
         assertThat(LensFailure(target = Request(GET, "")).overall(), equalTo(Failure.Type.Invalid))
     }
 
     @Test
-    fun `overall returns unsupported if there any unsupported failures`() {
+    fun `overall returns unsupported if there any unsupported failures`() = runBlocking {
         assertThat(LensFailure(unsupported, invalid, missing, target = Request(GET, "")).overall(), equalTo(Failure.Type.Unsupported))
     }
 
     @Test
-    fun `overall returns invalid if there only invalid and missing failures`() {
+    fun `overall returns invalid if there only invalid and missing failures`() = runBlocking {
         assertThat(LensFailure(unsupported, invalid, missing, target = Request(GET, "")).overall(), equalTo(Failure.Type.Unsupported))
     }
 
     @Test
-    fun `overall returns missing if there no invalid for unsupported ailures`() {
+    fun `overall returns missing if there no invalid for unsupported ailures`() = runBlocking {
         assertThat(LensFailure(missing, missing, target = Request(GET, "")).overall(), equalTo(Failure.Type.Missing))
     }
 
     @Test
-    fun `failures have descriptive toString`() {
+    fun `failures have descriptive toString`() = runBlocking {
         assertThat(missing.toString(), equalTo("header 'name' is required"))
         assertThat(invalid.toString(), equalTo("query 'name' must be boolean"))
         assertThat(unsupported.toString(), equalTo("header 'content-type' is not acceptable"))

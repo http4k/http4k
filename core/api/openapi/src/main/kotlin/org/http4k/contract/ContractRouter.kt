@@ -20,7 +20,7 @@ sealed class ContractRouterMatch(
         override val description: RouterDescription,
         private val httpHandler: HttpHandler,
     ) : ContractRouterMatch(0, description), HttpHandler {
-        override fun invoke(request: Request): Response = httpHandler(request)
+        override suspend fun invoke(request: Request): Response = httpHandler(request)
     }
 
     data object MatchedWithoutHandler : ContractRouterMatch(1, unavailable)

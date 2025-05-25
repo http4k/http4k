@@ -25,7 +25,7 @@ import kotlin.concurrent.thread
 class Http4kSseClientTest : PortBasedTest {
 
     @Test
-    fun `gets all messages`() {
+    fun `gets all messages`() = runBlocking {
         val server = sse {
             it.send(Event("event", "data1"))
             it.send(Data("data2"))
@@ -55,7 +55,7 @@ class Http4kSseClientTest : PortBasedTest {
     }
 
     @Test
-    fun `ignores illegal messages`() {
+    fun `ignores illegal messages`() = runBlocking {
         val goodMessage = Event("foo", "bar")
         val server = { _: Request -> Response(OK).body("foobar\n\n" + goodMessage.toMessage()) }
             .asServer(Helidon(0))

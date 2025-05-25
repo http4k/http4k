@@ -17,7 +17,7 @@ import java.util.Optional
 class AzureFunctionTest {
 
     @Test
-    fun `adapts Azure request and response and receives context`() {
+    fun `adapts Azure request and response and receives context`() = runBlocking {
         val context = mock<ExecutionContext>()
         val request: HttpRequestMessage<Optional<String>> = FakeAzureRequest(
             Request(GET, "/path")

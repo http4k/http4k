@@ -33,7 +33,7 @@ interface SQSContract : AwsContract {
     val expires: ZonedDateTime get() = ZonedDateTime.now().plus(Duration.ofMinutes(1))
 
     @Test
-    fun `queue lifecycle`() {
+    fun `queue lifecycle`() = runBlocking {
         with(sqs) {
             val created = createQueue(
                 queueName,
@@ -111,7 +111,7 @@ interface SQSContract : AwsContract {
     val retryTimeout: Duration get() = Duration.ZERO
 
     @Test
-    fun `batch operations`() {
+    fun `batch operations`() = runBlocking {
         val created = sqs.createQueue(queueName, emptyList(), emptyMap()).successValue()
         try {
             val (sent1, sent2, sent3) = sqs.sendMessageBatch(

@@ -2,6 +2,7 @@ package org.http4k.security.oauth.client
 
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -69,16 +70,18 @@ fun ClientFilters.RefreshingOAuthToken(
             ?.let { ClientFilters.OAuthRefreshToken(oauthCredentials, it, scopes) }
             ?: oAuthFlowFilter
 
-        filter
-            .then(backend)(Request(POST, tokenUri))
-            .takeIf { it.status.successful }
-            ?.let { response -> tokenExtractor(response).map { it.accessToken }.valueOrNull() }
-            ?.let {
-                ExpiringCredentials(
-                    credentials = it,
-                    expiry = it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
-                )
-            }
+        runBlocking {
+            filter
+                .then(backend)(Request(POST, tokenUri))
+                .takeIf { it.status.successful }
+                ?.let { response -> tokenExtractor(response).map { it.accessToken }.valueOrNull() }
+                ?.let {
+                    ExpiringCredentials(
+                        credentials = it,
+                        expiry = it.expiresIn?.let { clock.instant().plusSeconds(it) } ?: MAX
+                    )
+                }
+        }
     }
 
     return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })

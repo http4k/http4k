@@ -29,7 +29,7 @@ class InteractionStorageTest {
     }
 
     @Test
-    fun `memory storage handles contract`() {
+    fun `memory storage handles contract`() = runBlocking {
         val factory = InteractionStorage.InMemory()
         val storage = factory("foo")
 

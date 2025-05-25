@@ -16,7 +16,7 @@ class ARNTest {
     private val partition = "partition"
 
     @Test
-    fun `can get parts back from ARN - resource type and id`() {
+    fun `can get parts back from ARN - resource type and id`() = runBlocking {
         val arn = ARN.of(awsService, region, account, resourceType, resourceId, partition)
 
         assertThat(arn.toString(), equalTo("arn:partition:kms:ldn-north-1:001234567890:key:foobar"))
@@ -29,7 +29,7 @@ class ARNTest {
     }
 
     @Test
-    fun `can get parts back from ARN - resource id`() {
+    fun `can get parts back from ARN - resource id`() = runBlocking {
         val arn = ARN.of(awsService, region, account, resourceId, partition)
 
         assertThat(arn.toString(), equalTo("arn:partition:kms:ldn-north-1:001234567890:foobar"))
@@ -41,7 +41,7 @@ class ARNTest {
     }
 
     @Test
-    fun `can get parts back from ARN - resource path`() {
+    fun `can get parts back from ARN - resource path`() = runBlocking {
         val arn = ARN.of(awsService, region, account, resourcePath, partition)
 
         assertThat(arn.toString(), equalTo("arn:partition:kms:ldn-north-1:001234567890:key/foobar"))
@@ -54,7 +54,7 @@ class ARNTest {
     }
 
     @Test
-    fun `can get parts back from ARN - resource path with longer path`() {
+    fun `can get parts back from ARN - resource path with longer path`() = runBlocking {
         val arn = ARN.parse("arn:partition:kms:ldn-north-1:001234567890:key/name/${UUID(0, 0)}")
 
         assertThat(arn.toString(), equalTo("arn:partition:kms:ldn-north-1:001234567890:key/name/${UUID(0, 0)}"))

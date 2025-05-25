@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class FormTest {
 
     @Test
-    fun `can add to request and extract it`() {
+    fun `can add to request and extract it`() = runBlocking {
         val form: Form = listOf("a" to "b")
 
         val get = Request(GET, "ignored").body(form.toBody())
@@ -22,7 +22,7 @@ class FormTest {
     }
 
     @Test
-    fun `can add individual form parameters`() {
+    fun `can add individual form parameters`() = runBlocking {
         val get = Request(GET, "ignored").form("foo", "1").form("bar", "2")
 
         val actual = get.form()
@@ -32,7 +32,7 @@ class FormTest {
     }
 
     @Test
-    fun `can add multiple form parameters`() {
+    fun `can add multiple form parameters`() = runBlocking {
         val get = Request(GET, "ignored").form("foo" to "1", "bar" to "2")
 
         val actual = get.form()
@@ -42,7 +42,7 @@ class FormTest {
     }
 
     @Test
-    fun `can handle stream body`() {
+    fun `can handle stream body`() = runBlocking {
         val form: Form = listOf("a" to "b")
 
         val get = Request(GET, "ignored").body(form.toBody().stream)

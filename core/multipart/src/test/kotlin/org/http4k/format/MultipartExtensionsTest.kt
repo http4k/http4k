@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.with
 import org.http4k.lens.MultipartForm
 import org.http4k.lens.MultipartFormField
@@ -12,7 +13,7 @@ data class Foo(val bar: String)
 class MultipartExtensionsTest {
 
     @Test
-    fun `can inject into form with auto lens`() {
+    fun `can inject into form with auto lens`() = runBlocking {
         val foo = Foo("bar")
         assertThat(
             MultipartForm()
@@ -23,7 +24,7 @@ class MultipartExtensionsTest {
     }
 
     @Test
-    fun `can inject into form with json lens`() {
+    fun `can inject into form with json lens`() = runBlocking {
         val foo = Foo("bar")
         assertThat(
             MultipartForm()

@@ -23,7 +23,7 @@ class SimpleMetadataLookupTest {
         )
 
     @Test
-    fun `finds value from object`() {
+    fun `finds value from object`() = runBlocking {
         assertThat(
             "exists",
             simpleMetadataLookup(KotlinBean()),
@@ -37,7 +37,7 @@ class SimpleMetadataLookupTest {
     }
 
     @Test
-    fun `does not work with generics`() {
+    fun `does not work with generics`() = runBlocking {
         assertThat("", simpleMetadataLookup(Blowup("inside")), equalTo(FieldMetadata()))
     }
 

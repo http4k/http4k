@@ -45,7 +45,7 @@ class SSOCredentialsProviderTest {
     }
 
     @Test
-    fun `takes account of expiry date`() {
+    fun `takes account of expiry date`() = runBlocking {
         var count = 0
 
         val sso = Filter { next ->
@@ -78,7 +78,7 @@ class SSOCredentialsProviderTest {
 
 
     @Test
-    fun `use cached sso credentials when login disabled`() {
+    fun `use cached sso credentials when login disabled`() = runBlocking {
         ssoProfile.cachedTokenPath(cachedTokenDirectory).toFile().writeText(
             """
                 {
@@ -130,7 +130,7 @@ class SSOCredentialsProviderTest {
 
 
     @Test
-    fun `use oidc credentials if access token not cached`() {
+    fun `use oidc credentials if access token not cached`() = runBlocking {
         var count = 0
 
         val oidc = Filter { next ->
@@ -170,7 +170,7 @@ class SSOCredentialsProviderTest {
     }
 
     @Test
-    fun `throw error when access token not cached and login disabled`() {
+    fun `throw error when access token not cached and login disabled`() = runBlocking {
         var count = 0
 
         val oidc = Filter { next ->
@@ -198,7 +198,7 @@ class SSOCredentialsProviderTest {
     }
 
     @Test
-    fun `use previously registered client if access not cached`() {
+    fun `use previously registered client if access not cached`() = runBlocking {
         var count = 0
 
         val oidc = Filter { next ->
@@ -254,7 +254,7 @@ class SSOCredentialsProviderTest {
     }
 
     @Test
-    fun `register new client if access token and registration expired`() {
+    fun `register new client if access token and registration expired`() = runBlocking {
         var count = 0
 
         val oidc = Filter { next ->

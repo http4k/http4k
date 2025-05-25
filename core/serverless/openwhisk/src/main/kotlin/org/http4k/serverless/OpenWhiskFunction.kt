@@ -1,6 +1,7 @@
 package org.http4k.serverless
 
 import com.google.gson.JsonObject
+import kotlinx.coroutines.runBlocking
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.base64Encode
 import org.http4k.core.Body
@@ -22,13 +23,16 @@ class OpenWhiskFunction(
     private val detectBinaryBody: DetectBinaryBody = NonBinary
 ) : (JsonObject) -> JsonObject {
 
-    private val app = appLoader(System.getenv())
+    private val app = runBlocking { appLoader(System.getenv()) }
 
     override fun invoke(request: JsonObject) =
-        CatchAll()
-            .then(AddOpenWhiskRequest(request))
-            .then(app)
-            .invoke(request.asHttp4k()).toGson()
+        runBlocking {
+            CatchAll()
+                .then(AddOpenWhiskRequest(request))
+                .then(app)
+                .invoke(request.asHttp4k()).toGson()
+
+        }
 
     private fun Response.toGson() = JsonObject().apply {
         addProperty("statusCode", status.code)

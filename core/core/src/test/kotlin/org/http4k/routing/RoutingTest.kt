@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class RoutingTest {
 
     @Test
-    fun `can bind a verb to a static handler`() {
+    fun `can bind a verb to a static handler`() = runBlocking {
         val routes = routes(
             "/path1" bind GET to static(),
             "/path2" bind static(),
@@ -39,7 +39,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `not found`() {
+    fun `not found`() = runBlocking {
         val routes = routes("/a/b" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/something"))
@@ -48,7 +48,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `method not allowed`() {
+    fun `method not allowed`() = runBlocking {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched") }
         )
@@ -59,7 +59,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `mismatched path with no alternate method should be unmatched`() {
+    fun `mismatched path with no alternate method should be unmatched`() = runBlocking {
         val routes = routes(
             "/search/foo" bind POST to { Response(OK) },
             "/search/bar" bind GET to { Response(OK) }
@@ -70,7 +70,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `matches uri template and method`() {
+    fun `matches uri template and method`() = runBlocking {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched") }
         )
@@ -82,7 +82,7 @@ class RoutingTest {
 
     @Test
     @Disabled("this doesn't have a name so isn't bound...")
-    fun `matches empty uri template and method`() {
+    fun `matches empty uri template and method`() = runBlocking {
         val routes = routes(
             "/{.*}" bind GET to { Response(OK).body("matched") }
         )
@@ -93,7 +93,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `matches uri template only`() {
+    fun `matches uri template only`() = runBlocking {
         val routes = routes(
             "/a/{route}" bind { _: Request -> Response(OK).body("matched") }
         )
@@ -104,7 +104,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can mix and match Route styles`() {
+    fun `can mix and match Route styles`() = runBlocking {
         val routes = routes(
             "/a" bind GET to { Response(OK).body("matched a") },
             "/b/c" bind routes(
@@ -132,7 +132,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `matches uses first match`() {
+    fun `matches uses first match`() = runBlocking {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched a") },
             "/a/{route}" bind GET to { Response(OK).body("matched b") }
@@ -144,7 +144,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `capture pattern until the end of the path`() {
+    fun `capture pattern until the end of the path`() = runBlocking {
         val routes = routes(
             "/a/{route:.*}" bind GET to { Response(OK).body(it.path("route")!!) }
         )
@@ -154,7 +154,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `path parameters are available in request`() {
+    fun `path parameters are available in request`() = runBlocking {
         val routes = routes(
             "/{a}/{b}/{c}" bind GET to { req: Request ->
                 Response(OK).body(
@@ -173,7 +173,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `matches uri with query`() {
+    fun `matches uri with query`() = runBlocking {
         val routes = routes("/a/b" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/b?foo=bar"))
@@ -182,13 +182,13 @@ class RoutingTest {
     }
 
     @Test
-    fun `matches regex uri with query`() {
+    fun `matches regex uri with query`() = runBlocking {
         val handler = routes("/a/{b:.+}" bind GET to { Response(OK).body(it.path("b")!!) })
         assertThat(handler(Request(GET, "/a/foo?bob=rita")).bodyString(), equalTo("foo"))
     }
 
     @Test
-    fun `does not matche request with extra path parts`() {
+    fun `does not matche request with extra path parts`() = runBlocking {
         val routes = routes("/a" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/b"))
@@ -197,7 +197,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can stop matching extra parts`() {
+    fun `can stop matching extra parts`() = runBlocking {
         val routes = routes("/a{$}" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/b"))
@@ -206,7 +206,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `breaks if trying to access path parameters without header present`() {
+    fun `breaks if trying to access path parameters without header present`() = runBlocking {
         try {
             Request(GET, "/").path("abc")
             fail("Expected exception")
@@ -216,7 +216,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can put routes inside of routes`() {
+    fun `can put routes inside of routes`() = runBlocking {
         val subRoutes = routes(
             "/a/{route}" bind GET to { Response(OK).header("header", it.header("header")).body("matched") }
         )
@@ -239,7 +239,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `group router shortcuts if parent prefix does not match`() {
+    fun `group router shortcuts if parent prefix does not match`() = runBlocking {
         val app = routes(
             "/prefix" bind routes(
                 "/{.*}" bind GET to { Response(OK).body("matched") }
@@ -251,7 +251,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `route grouping prefix can contain a dynamic segment`() {
+    fun `route grouping prefix can contain a dynamic segment`() = runBlocking {
         val subRoutes = routes(
             "/a/{route}" bind GET to { Response(OK).body(it.path("name") + it.path("route")) }
         )
@@ -264,7 +264,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can add filter to router`() {
+    fun `can add filter to router`() = runBlocking {
         val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
             {
@@ -281,7 +281,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can add filter to a RoutingHttpHandler`() {
+    fun `can add filter to a RoutingHttpHandler`() = runBlocking {
         val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
             {
@@ -298,7 +298,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can apply a filter to a RoutingHttpHandler`() {
+    fun `can apply a filter to a RoutingHttpHandler`() = runBlocking {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
             .then { Response(OK).body(it.header("name")!!) }
 
@@ -309,7 +309,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `RoutingHttpHandler with filters also applies when route is not found`() {
+    fun `RoutingHttpHandler with filters also applies when route is not found`() = runBlocking {
         val filter = Filter { next -> { next(it).body("value") } }
 
         val routingHttpHandler = filter.then(
@@ -321,7 +321,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can apply a filter to a Router`() {
+    fun `can apply a filter to a Router`() = runBlocking {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
             .then(
                 routes(
@@ -332,7 +332,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can get path from routed message`() {
+    fun `can get path from routed message`() = runBlocking {
         assertThat(
             RequestWithContext(Request(GET, "/foo/bar"), UriTemplate.from("/foo/{name}")).path("name"),
             equalTo("bar")
@@ -340,7 +340,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `can get null path from routed message`() {
+    fun `can get null path from routed message`() = runBlocking {
         assertThat(
             RequestWithContext(Request(GET, "/foo/bar"), UriTemplate.from("/foo/{name}")).path("non-existing"),
             equalTo(null)
@@ -348,7 +348,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `cannot get path from non-routed message`() {
+    fun `cannot get path from non-routed message`() = runBlocking {
         try {
             Request(GET, "/foo/bar").path("name")
             fail("Expected exception")
@@ -358,7 +358,7 @@ class RoutingTest {
     }
 
     @Test
-    fun `cannot get path from routed message without uri template`() {
+    fun `cannot get path from routed message without uri template`() = runBlocking {
         try {
             RequestWithContext(Request(GET, "/foo/bar"), emptyMap()).path("name")
             fail("Expected exception")

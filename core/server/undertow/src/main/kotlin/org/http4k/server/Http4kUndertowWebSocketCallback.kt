@@ -10,6 +10,7 @@ import io.undertow.websockets.core.WebSockets.sendBinary
 import io.undertow.websockets.core.WebSockets.sendClose
 import io.undertow.websockets.core.WebSockets.sendText
 import io.undertow.websockets.spi.WebSocketHttpExchange
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.websocket.PushPullAdaptingWebSocket
@@ -32,7 +33,11 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
             override fun close(status: WsStatus) {
                 sendClose(status.code, status.description, channel, null)
             }
-        }.apply(ws(upgradeRequest))
+        }.apply {
+            runBlocking {
+                ws(upgradeRequest) // FIXME coroutine blocking
+            }
+        }
 
         channel.addCloseTask {
             socket.triggerClose(WsStatus(it.closeCode, it.closeReason ?: "unknown"))

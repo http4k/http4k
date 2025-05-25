@@ -18,7 +18,7 @@ class MessageContentGeneratorTest {
 //    }
 //
 //    @Test
-//    fun `reverse input`() {
+//    fun `reverse input`() = runBlocking {
 //        assertThat(
 //            ChatCompletionGenerator.ReverseInput(input),
 //            equalTo(
@@ -28,7 +28,7 @@ class MessageContentGeneratorTest {
 //    }
 //
 //    @Test
-//    fun `echo input`() {
+//    fun `echo input`() = runBlocking {
 //        assertThat(
 //            ChatCompletionGenerator.Echo(input),
 //            equalTo(

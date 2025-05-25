@@ -7,6 +7,7 @@ import io.opentelemetry.semconv.ErrorAttributes
 import io.opentelemetry.semconv.HttpAttributes
 import io.opentelemetry.semconv.NetworkAttributes
 import io.opentelemetry.semconv.ServerAttributes
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -38,10 +39,10 @@ class OpenTelemetry2xMetricsClientTest {
 
     private val remoteServerMock: HttpHandler = routes("/one.json" bind GET to { Response(OK) })
 
-    private val durationClient by lazy { requestDuration.then(remoteServerMock) }
+    private val durationClient by lazy { runBlocking { requestDuration.then(remoteServerMock) } }
 
     @Test
-    fun `requests generate duration metrics tagged with method and status and host`() {
+    fun `requests generate duration metrics tagged with method and status and host`() = runBlocking {
         assertThat(durationClient(Request(GET, "http://test.server.com:9999/one.json")), hasStatus(OK))
         repeat(2) {
             assertThat(durationClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))

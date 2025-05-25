@@ -39,7 +39,7 @@ interface ImportTableFromS3Contract : AwsContract {
     private val dynamo get() = DynamoDb.Http(aws.region, { aws.credentials }, http)
 
     @Test
-    fun `import table is successful`() {
+    fun `import table is successful`() = runBlocking {
         val table = TableName.sample()
         val bucket = BucketName.sample()
         initBucket(bucket, csv = "ID,AGE\n1,42")
@@ -95,7 +95,7 @@ interface ImportTableFromS3Contract : AwsContract {
     }
 
     @Test
-    fun `import table fails where the S3 bucket does not exist`() {
+    fun `import table fails where the S3 bucket does not exist`() = runBlocking {
         val importArn =
             dynamo.importTable(sourceBucket = BucketName.sample()).successValue().ImportTableDescription.ImportArn!!
         dynamo.waitForImportFinished(importArn)
@@ -108,7 +108,7 @@ interface ImportTableFromS3Contract : AwsContract {
     }
 
     @Test
-    fun `query table imports by table ARN`() {
+    fun `query table imports by table ARN`() = runBlocking {
         val import = dynamo.importTable(sourceBucket = BucketName.sample()).successValue().ImportTableDescription
 
         val importSummaries = dynamo.listImports(TableArn = import.TableArn!!).successValue().ImportSummaryList

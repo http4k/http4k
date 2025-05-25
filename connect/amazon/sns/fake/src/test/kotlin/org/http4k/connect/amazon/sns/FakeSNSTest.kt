@@ -24,7 +24,7 @@ class FakeSNSTest : SNSContract, FakeAwsContract {
     }
 
     @Test
-    fun `topic messages are parsed`() {
+    fun `topic messages are parsed`() = runBlocking {
         with(sns) {
             val topicArn = createTopic(topicName, listOf(), mapOf()).successValue().topicArn
             try {
@@ -50,7 +50,7 @@ class FakeSNSTest : SNSContract, FakeAwsContract {
     }
 
     @Test
-    fun `batch publish messages are parsed`() {
+    fun `batch publish messages are parsed`() = runBlocking {
         with(sns) {
             val topicArn = createTopic(topicName, listOf(), mapOf()).successValue().topicArn
             try {

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class OperatingSystemTest {
 
     @Test
-    fun `detect OS`() {
+    fun `detect OS`() = runBlocking {
         System.setProperty("os.name", "Mac OS foo")
         assertThat(OperatingSystem.detect(), equalTo(MacOS))
         System.setProperty("os.name", "Windows foo")

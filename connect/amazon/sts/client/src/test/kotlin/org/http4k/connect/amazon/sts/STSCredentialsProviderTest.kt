@@ -35,7 +35,7 @@ class STSCredentialsProviderTest {
     private val provider = CredentialsProvider.STS(sts, clock, Duration.ofSeconds(60), requestProvider)
 
     @Test
-    fun `gets credentials first time only`() {
+    fun `gets credentials first time only`() = runBlocking {
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
         every { sts.invoke(any<AssumeRole>()) } returns assumedRole(firstCreds)
 
@@ -47,7 +47,7 @@ class STSCredentialsProviderTest {
     }
 
     @Test
-    fun `gets credentials when expired time only`() {
+    fun `gets credentials when expired time only`() = runBlocking {
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
         every { sts.invoke(any<AssumeRole>()) } returns assumedRole(firstCreds)
 

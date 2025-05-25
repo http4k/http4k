@@ -3,6 +3,7 @@ package org.http4k.serverless
 import com.google.cloud.functions.HttpFunction
 import com.google.cloud.functions.HttpRequest
 import com.google.cloud.functions.HttpResponse
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.valueOf
@@ -18,13 +19,15 @@ val GCF_REQUEST_KEY = RequestKey.required<HttpRequest>("HTTP4K_GCF_REQUEST")
 abstract class GoogleCloudHttpFunction(appLoader: AppLoader) : HttpFunction {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val app = appLoader(System.getenv())
+    private val app = runBlocking { appLoader(System.getenv()) }
 
     override fun service(request: HttpRequest, response: HttpResponse) =
-        CatchAll()
-            .then(AddGCPRequest(request))
-            .then(app)(request.asHttp4kRequest())
-            .into(response)
+        runBlocking { // FIXME coroutine blocking
+            CatchAll()
+                .then(AddGCPRequest(request))
+                .then(app)(request.asHttp4kRequest())
+                .into(response)
+        }
 }
 
 private fun HttpRequest.asHttp4kRequest() =

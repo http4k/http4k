@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 
 class BucketNameTest {
     @Test
-    fun `can construct uri`() {
+    fun `can construct uri`() = runBlocking {
         assertThat(
             BucketName.of("foobar").toUri(Region.of("eu-west-1")),
             equalTo(Uri.of("https://foobar.s3.eu-west-1.amazonaws.com"))
@@ -16,7 +16,7 @@ class BucketNameTest {
     }
 
     @Test
-    fun `can construct uri for path style`() {
+    fun `can construct uri for path style`() = runBlocking {
         assertThat(
             BucketName.of("foo.bar").toUri(Region.of("eu-west-1")),
             equalTo(Uri.of("https://s3.eu-west-1.amazonaws.com/foo.bar"))
@@ -24,7 +24,7 @@ class BucketNameTest {
     }
 
     @Test
-    fun `can construct uri with forced path style`() {
+    fun `can construct uri with forced path style`() = runBlocking {
         assertThat(
             BucketName.of("foobar").toUri(Region.of("eu-west-1"), true),
             equalTo(Uri.of("https://s3.eu-west-1.amazonaws.com/foobar"))

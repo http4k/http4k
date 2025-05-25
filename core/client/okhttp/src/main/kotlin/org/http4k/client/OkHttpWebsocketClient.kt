@@ -29,15 +29,15 @@ object OkHttpWebsocketClient {
         timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
         client: OkHttpClient = defaultOkHttpClient()
     ) = object: WebsocketFactory {
-        override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer) =
+        override suspend fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer) =
             OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
 
-        override fun blocking(uri: Uri, headers: Headers) =
+        override suspend fun blocking(uri: Uri, headers: Headers) =
             OkHttpBlockingWebsocket(uri, headers, timeout, client).awaitConnected()
     }
 
     // backwards compatibility
-    fun nonBlocking(
+    suspend fun nonBlocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,
@@ -46,7 +46,7 @@ object OkHttpWebsocketClient {
         onConnect: WsConsumer
     ) = OkHttpWebsocketClient(timeout, client).nonBlocking(uri, headers, onError, onConnect)
 
-    fun blocking(
+    suspend fun blocking(
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.of(5, ChronoUnit.SECONDS)

@@ -17,14 +17,14 @@ import java.time.ZoneOffset
 
 class FilterExtensionsTest {
     @Test
-    fun `set base aws service url`() {
+    fun `set base aws service url`() = runBlocking {
         val app = ClientFilters.SetAwsServiceUrl("myservice", "narnia")
             .then { Response(Status.OK).body(it.uri.toString()) }
         assertThat(app(Request(Method.GET, "/bob")), hasBody("https://myservice.narnia.amazonaws.com/bob"))
     }
 
     @Test
-    fun `authorize aws request`() {
+    fun `authorize aws request`() = runBlocking {
         // given
         lateinit var capturedRequest: Request
         val app = ClientFilters.AwsAuth(

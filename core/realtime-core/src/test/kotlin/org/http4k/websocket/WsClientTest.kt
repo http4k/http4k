@@ -39,7 +39,7 @@ class WsClientTest {
     }
 
     @Test
-    fun `when match, passes a consumer with the matching request`() {
+    fun `when match, passes a consumer with the matching request`() = runBlocking {
         val consumer = TestConsumer();
         var r: Request? = null
         { req: Request ->
@@ -51,7 +51,7 @@ class WsClientTest {
     }
 
     @Test
-    fun `sends outbound messages to the websocket`() {
+    fun `sends outbound messages to the websocket`() = runBlocking {
         val consumer = TestConsumer()
         val client = { _: Request -> WsResponse(consumer) }.testWsClient(Request(GET, "/"))
 
@@ -64,7 +64,7 @@ class WsClientTest {
     }
 
     @Test
-    fun `sends inbound messages to the client`() {
+    fun `sends inbound messages to the client`() = runBlocking {
         val client = { _: Request ->
             WsResponse { ws: Websocket ->
                 ws.send(message)
@@ -78,7 +78,7 @@ class WsClientTest {
     }
 
     @Test
-    fun `closed websocket throws when read attempted`() {
+    fun `closed websocket throws when read attempted`() = runBlocking {
         val client = { _: Request ->
             WsResponse { ws: Websocket ->
                 ws.close(NEVER_CONNECTED)
@@ -89,7 +89,7 @@ class WsClientTest {
     }
 
     @Test
-    fun `throws for no match`() {
+    fun `throws for no match`() = runBlocking {
         val actual = object : WsHandler {
             override fun invoke(request: Request) = WsResponse { it.close(NEVER_CONNECTED) }
         }.testWsClient(Request(GET, "/"))
@@ -98,7 +98,7 @@ class WsClientTest {
     }
 
     @Test
-    fun `when no messages`() {
+    fun `when no messages`() = runBlocking {
         val client = { _: Request ->
             WsResponse { ws: Websocket ->
                 ws.close(NORMAL)

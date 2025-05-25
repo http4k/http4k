@@ -27,7 +27,7 @@ fun ClientFilters.DiscoveredMcpOAuth(
 ) = object : Filter {
     private var auth = Filter.NoOp
 
-    override fun invoke(next: HttpHandler): HttpHandler {
+    override suspend fun invoke(next: HttpHandler): HttpHandler {
         return {
             val response = auth.then(next)(it)
             when {

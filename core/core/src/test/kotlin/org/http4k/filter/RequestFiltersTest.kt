@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test
 
 class RequestFiltersTest {
     @Test
-    fun `proxy host - http`() {
+    fun `proxy host - http`() = runBlocking {
         val handler = RequestFilters.ProxyHost(Http).then { Response(OK).body(it.uri.toString()) }
         assertThat(
             handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")),
@@ -42,7 +42,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `proxy host - https`() {
+    fun `proxy host - https`() = runBlocking {
         val handler = RequestFilters.ProxyHost(Https).then { Response(OK).body(it.uri.toString()) }
         assertThat(
             handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")),
@@ -56,7 +56,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `proxy host - port`() {
+    fun `proxy host - port`() = runBlocking {
         val handler = RequestFilters.ProxyHost(Port).then { Response(OK).body(it.uri.toString()) }
         assertThat(
             handler(Request(GET, "http://localhost:443/loop").header("host", "bob.com")),
@@ -78,7 +78,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `tap passes request through to function`() {
+    fun `tap passes request through to function`() = runBlocking {
         val get = Request(GET, "")
         var called = false
         RequestFilters.Tap { called = true; assertThat(it, equalTo(get)) }.then(Response(OK).toHttpHandler())(get)
@@ -86,7 +86,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `gzip request and add content encoding`() {
+    fun `gzip request and add content encoding`() = runBlocking {
         val handler = RequestFilters.GZip().then {
             assertThat(
                 it,
@@ -98,7 +98,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `gzip request and add do not content encoding where request is empty`() {
+    fun `gzip request and add do not content encoding where request is empty`() = runBlocking {
         val handler = RequestFilters.GZip().then {
             assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
             Response(OK)
@@ -107,7 +107,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `gunzip request which has gzip content encoding`() {
+    fun `gunzip request which has gzip content encoding`() = runBlocking {
         fun assertSupportsUnzipping(body: String) {
             val handler = RequestFilters.GunZip().then {
                 assertThat(it, hasBody(body))
@@ -120,7 +120,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `passthrough gunzip request with no transfer encoding`() {
+    fun `passthrough gunzip request with no transfer encoding`() = runBlocking {
         val body = "foobar"
         val handler = ResponseFilters.GunZip().then {
             assertThat(it, hasBody(body))
@@ -130,19 +130,19 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `base 64 decode body`() {
+    fun `base 64 decode body`() = runBlocking {
         val handler = Base64DecodeBody().then(RequestFilters.Assert(hasBody("hello"))).then { Response(OK) }
         handler(Request(GET, "").body("hello".base64Encode()))
     }
 
     @Test
-    fun `set header`() {
+    fun `set header`() = runBlocking {
         val handler = SetHeader("foo", "bar").then(RequestFilters.Assert(hasHeader("foo", "bar"))).then { Response(OK) }
         assertThat(handler(Request(GET, "")), hasStatus(OK))
     }
 
     @Test
-    fun `modify request`() {
+    fun `modify request`() = runBlocking {
         val handler = Modify(CONTENT_TYPE of APPLICATION_PDF).then(
             RequestFilters.Assert(
                 hasHeader("content-type", "application/pdf; charset=utf-8")
@@ -152,7 +152,7 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `request headers inclusion`() {
+    fun `request headers inclusion`() = runBlocking {
         val app = RequestFilters.IncludeHeaders("foo", "bar")
             .then { request -> Response(OK).headers(request.headers) }
 
@@ -168,7 +168,7 @@ class RequestFiltersTest {
         )))
     }
     @Test
-    fun `request headers exclusion`() {
+    fun `request headers exclusion`() = runBlocking {
         val app = RequestFilters.ExcludeHeaders("foo", "bar")
             .then { request -> Response(OK).headers(request.headers) }
 

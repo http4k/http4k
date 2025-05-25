@@ -20,31 +20,31 @@ import java.time.Instant
 internal class RequestObjectExtractorTest {
 
     @Test
-    fun `if not three parts then failure`() {
+    fun `if not three parts then failure`() = runBlocking {
         assertThat(extractRequestJwtClaimsAsMap("kasdjflksadjfsjdfaksjdf"), equalTo(failure()))
         assertThat(extractRequestJwtClaimsAsMap("kasdjflksadj.fsjdfaksjdf"), equalTo(failure()))
         assertThat(extractRequestJwtClaimsAsMap("kasdjfl.ksadj.fsjdfa.ksjdf"), equalTo(failure()))
     }
 
     @Test
-    fun `if has three parts but middle part is not valid base64 encoded`() {
+    fun `if has three parts but middle part is not valid base64 encoded`() = runBlocking {
         assertThat(extractRequestJwtClaimsAsMap("kasdjfl.ksadjfsjd.faksjdf"), equalTo(failure()))
     }
 
     @Test
-    fun `if middle part is correctly base64 encoded but not json then error`() {
+    fun `if middle part is correctly base64 encoded but not json then error`() = runBlocking {
         assertThat(extractRequestJwtClaimsAsMap("kasdjfl.${Base64.encodeBase64String("something not json".toByteArray())}.faksjdf"),
             equalTo(failure()))
     }
 
     @Test
-    fun `if middle part is correctly base64 encoded json then success`() {
+    fun `if middle part is correctly base64 encoded json then success`() = runBlocking {
         assertThat(extractRequestJwtClaimsAsMap("kasdjfl.${Base64.encodeBase64String("{\"foo\":\"bar\"}".toByteArray())}.faksjdf"),
             equalTo(success(mapOf("foo" to "bar") as Map<*, *>)))
     }
 
     @Test
-    fun `parses 'full' object correctly`() {
+    fun `parses 'full' object correctly`() = runBlocking {
         val expiry = Instant.now().epochSecond
         val rawData = mapOf(
             "iss" to "s6BhdRkqt3",
@@ -104,7 +104,7 @@ internal class RequestObjectExtractorTest {
     }
 
     @Test
-    fun `if has unknown fields ignore them, and parse known ones`() {
+    fun `if has unknown fields ignore them, and parse known ones`() = runBlocking {
         val rawData = mapOf(
             "iss" to "s6BhdRkqt3",
             "foo" to "bar")
@@ -122,7 +122,7 @@ internal class RequestObjectExtractorTest {
     }
 
     @Test
-    fun `multiple audiences are supported`() {
+    fun `multiple audiences are supported`() = runBlocking {
         val rawData = mapOf(
             "aud" to listOf("https://audience1", "https://audience2", "https://audience3")
         )

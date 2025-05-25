@@ -20,7 +20,7 @@ import java.nio.ByteBuffer
 class AzureHttpClientTest {
 
     @Test
-    fun `converts formats correctly`() {
+    fun `converts formats correctly`() = runBlocking {
         val headers = listOf("foo" to "bar2", "foo" to "bar1")
         val request = Request(POST, "https://foobar/123")
             .query("foo", "bar1")

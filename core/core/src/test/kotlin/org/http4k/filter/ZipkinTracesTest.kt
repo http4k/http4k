@@ -14,7 +14,7 @@ import kotlin.random.Random
 class TraceIdTest {
 
     @Test
-    fun `creates a new random`() {
+    fun `creates a new random`() = runBlocking {
         val r = Random(1)
         assertThat(TraceId.new(r), equalTo(TraceId("1a2ac523b005b1a4")))
         assertThat(TraceId.new(r), equalTo(TraceId("6d33b6a05a4abadf")))
@@ -24,18 +24,18 @@ class TraceIdTest {
 class SamplingDecisionTest {
 
     @Test
-    fun `accepts valid values`() {
+    fun `accepts valid values`() = runBlocking {
         assertThat(SamplingDecision.from("1"), equalTo(SAMPLE))
         assertThat(SamplingDecision.from("0"), equalTo(DO_NOT_SAMPLE))
     }
 
     @Test
-    fun `defaults to sample`() {
+    fun `defaults to sample`() = runBlocking {
         assertThat(SamplingDecision.from(null), equalTo(SAMPLE))
     }
 
     @Test
-    fun `parses invalid values as sample`() {
+    fun `parses invalid values as sample`() = runBlocking {
         assertThat(SamplingDecision.from("true"), equalTo(SAMPLE))
         assertThat(SamplingDecision.from("false"), equalTo(SAMPLE))
         assertThat(SamplingDecision.from("wibble"), equalTo(SAMPLE))
@@ -60,7 +60,7 @@ class ZipkinTracesTest {
     private val expectedWithDecision = ZipkinTraces(TraceId("somevalue1"), TraceId("somevalue2"), TraceId("somevalue3"), DO_NOT_SAMPLE)
 
     @Test
-    fun `generates a new set of traces from a request`() {
+    fun `generates a new set of traces from a request`() = runBlocking {
         val actual = ZipkinTraces(Request(GET, ""))
         assertThat(actual, present())
         assertThat(actual.parentSpanId, absent())
@@ -68,23 +68,23 @@ class ZipkinTracesTest {
     }
 
     @Test
-    fun `gets a set of traces from a request without a sampling decision`() {
+    fun `gets a set of traces from a request without a sampling decision`() = runBlocking {
         assertThat(ZipkinTraces(requestWithTraces), equalTo(expectedWithTraces))
     }
 
     @Test
-    fun `gets a set of traces from a request with a sampling decision`() {
+    fun `gets a set of traces from a request with a sampling decision`() = runBlocking {
         assertThat(ZipkinTraces(requestWithDecision), equalTo(expectedWithDecision))
     }
 
     @Test
-    fun `puts expected things onto a request`() {
+    fun `puts expected things onto a request`() = runBlocking {
         val requestWithDefaultDecision = requestWithTraces.header("x-b3-sampled", "1")
         assertThat(ZipkinTraces(expectedWithTraces, Request(GET, "")), equalTo(requestWithDefaultDecision))
     }
 
     @Test
-    fun `puts expected things onto a request with a sampling decision`() {
+    fun `puts expected things onto a request with a sampling decision`() = runBlocking {
         assertThat(ZipkinTraces(expectedWithDecision, Request(GET, "")), equalTo(requestWithDecision))
     }
 }

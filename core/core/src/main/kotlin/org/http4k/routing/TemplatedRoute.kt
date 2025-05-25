@@ -11,20 +11,20 @@ import org.http4k.routing.RoutingResult.NotMatched
 /**
  * Applies the generic templating routing logic regardless of protocol
  */
-abstract class TemplatedRoute<R, F : ((Request) -> R) -> (Request) -> R, Self : RouteMatcher<R, F>>(
+abstract class TemplatedRoute<R, F : suspend (suspend (Request) -> R) -> suspend (Request) -> R, Self : RouteMatcher<R, F>>(
     protected val uriTemplate: UriTemplate,
-    protected val handler: (Request) -> R,
+    protected val handler: suspend (Request) -> R,
     protected val router: Router,
     protected val filter: F,
     private val responseFor: (Status) -> R,
-    private val addUriTemplateFilter: ((Request) -> R) -> (Request) -> R
+    private val addUriTemplateFilter: suspend (suspend (Request) -> R) -> suspend (Request) -> R
 ) : RouteMatcher<R, F> {
 
     init {
         require(handler !is RoutingHandler<*, *, *>)
     }
 
-    override fun match(request: Request) = when {
+    override suspend fun match(request: Request) = when {
         uriTemplate.matches(request.uri.path) -> when (val result = router(request)) {
             is Matched -> RoutingMatch(0, result.description, addUriTemplateFilter(filter(handler)))
             is NotMatched -> RoutingMatch(1, result.description, filter { responseFor(result.status) })

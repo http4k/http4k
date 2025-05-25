@@ -22,7 +22,7 @@ class DigestAuthTest {
     }
 
     @Test
-    fun `invalid credentials`() {
+    fun `invalid credentials`() = runBlocking {
         val handler = ServerFilters.DigestAuth(realm, passwordLookup)
             .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "hunter2")).then(handler)(Request(GET, "/"))
@@ -32,7 +32,7 @@ class DigestAuthTest {
     }
 
     @Test
-    fun `valid credentials with Auth Qop`() {
+    fun `valid credentials with Auth Qop`() = runBlocking {
         val handler =
             ServerFilters.DigestAuth(realm, passwordLookup, listOf(Auth)).then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(GET, "/"))
@@ -43,7 +43,7 @@ class DigestAuthTest {
     }
 
 //    @Test TODO not fully implemented
-//    fun `valid credentials with Auth-Int Qop`() {
+//    fun `valid credentials with Auth-Int Qop`() = runBlocking {
 //        val handler = ServerFilters.DigestAuth(realm, passwordLookup, qop = listOf(Qop.AuthInt)).then { Response(Status.OK) }
 //        val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(Method.GET, "/"))
 //
@@ -52,7 +52,7 @@ class DigestAuthTest {
 //    }
 
     @Test
-    fun `valid credentials with no qop`() {
+    fun `valid credentials with no qop`() = runBlocking {
         val handler = ServerFilters.DigestAuth(realm, passwordLookup, emptyList()).then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password"))
             .then(handler)(Request(GET, "/"))
@@ -62,7 +62,7 @@ class DigestAuthTest {
     }
 
     @Test
-    fun `valid credentials in proxy mode`() {
+    fun `valid credentials in proxy mode`() = runBlocking {
         val handler = ServerFilters.DigestAuth(realm, passwordLookup, digestMode = DigestMode.Proxy).then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password"), digestMode = DigestMode.Proxy)
             .then(handler)(Request(GET, "/"))

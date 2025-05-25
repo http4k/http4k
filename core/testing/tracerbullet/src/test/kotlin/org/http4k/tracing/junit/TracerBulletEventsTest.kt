@@ -32,7 +32,7 @@ class TracerBulletEventsTest {
     private val title = "Title (variant): toString"
 
     @Test
-    fun `write traces`() {
+    fun `write traces`() = runBlocking {
         val events = tracerBulletEvents(Auto)
 
         val eventsToSend = listOf(MyEvent, MyOtherEvent, YetAnotherEvent)
@@ -52,7 +52,7 @@ class TracerBulletEventsTest {
     }
 
     @Test
-    fun `write traces on failure`() {
+    fun `write traces on failure`() = runBlocking {
         val events = tracerBulletEvents(Auto)
 
         val eventsToSend = listOf(MyEvent, MyOtherEvent, YetAnotherEvent)
@@ -72,7 +72,7 @@ class TracerBulletEventsTest {
     }
 
     @Test
-    fun `does not write empty traces`() {
+    fun `does not write empty traces`() = runBlocking {
         val events = tracerBulletEvents(Auto)
         events.afterTestExecution(FakeEC())
 
@@ -81,7 +81,7 @@ class TracerBulletEventsTest {
     }
 
     @Test
-    fun `does not write empty traces when rendering off`() {
+    fun `does not write empty traces when rendering off`() = runBlocking {
         val events = tracerBulletEvents(Manual)
 
         val eventsToSend = listOf(MyEvent, MyOtherEvent, YetAnotherEvent)
@@ -95,7 +95,7 @@ class TracerBulletEventsTest {
     }
 
     @Test
-    fun `can enable and disable rendering`() {
+    fun `can enable and disable rendering`() = runBlocking {
         val events = tracerBulletEvents(Manual)
 
         val decoratedEvents = AddZipkinTraces().then(events)

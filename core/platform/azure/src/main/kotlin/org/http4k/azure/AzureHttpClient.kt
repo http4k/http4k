@@ -5,6 +5,7 @@ import com.azure.core.http.HttpHeader
 import com.azure.core.http.HttpHeaders
 import com.azure.core.http.HttpRequest
 import com.azure.core.http.HttpResponse
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -22,7 +23,7 @@ import java.util.concurrent.CountDownLatch
  * Pluggable Http client adapter for Azure SDK.
  */
 class AzureHttpClient(private val http: HttpHandler) : HttpClient {
-    override fun send(request: HttpRequest) = http(request.toHttp4k()).fromHttp4k(request)
+    override fun send(request: HttpRequest) = runBlocking { http(request.toHttp4k()).fromHttp4k(request) } // FIXME coroutine blocking
 }
 
 internal fun Flux<ByteBuffer>.toInputStream(): InputStream {

@@ -23,7 +23,7 @@ abstract class FakeSystemContract(private val fake: ChaoticHttpHandler) {
     protected abstract val anyValid: Request
 
     @Test
-    fun `can serve the Chaos API`() {
+    fun `can serve the Chaos API`() = runBlocking {
         val response = fake(Request(GET, "/chaos"))
         assertThat(
             response,
@@ -32,7 +32,7 @@ abstract class FakeSystemContract(private val fake: ChaoticHttpHandler) {
     }
 
     @Test
-    fun `returns error when told to misbehave`() {
+    fun `returns error when told to misbehave`() = runBlocking {
         val originalStatus = fake(anyValid).status
         fake.returnStatus(I_M_A_TEAPOT)
         assertThat(fake(anyValid), hasStatus(I_M_A_TEAPOT))
@@ -41,13 +41,13 @@ abstract class FakeSystemContract(private val fake: ChaoticHttpHandler) {
     }
 
     @Test
-    fun `default port number is suitably random`() {
+    fun `default port number is suitably random`() = runBlocking {
         assertThat(fake::class.defaultPort, greaterThan(10000))
         assertThat(fake::class.defaultPort % 100, greaterThan(0))
     }
 
     @Test
-    fun `default local uri`() {
+    fun `default local uri`() = runBlocking {
         assertThat(fake::class.defaultLocalUri, equalTo(Uri.of("http://localhost:${fake::class.defaultPort}")))
     }
 }

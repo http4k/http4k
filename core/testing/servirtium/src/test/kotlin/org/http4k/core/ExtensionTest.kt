@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class ExtensionTest {
 
     @Test
-    fun `alphabetise headers request`() {
+    fun `alphabetise headers request`() = runBlocking {
         assertThat(
             Request(GET, "")
                 .header("b", "b")
@@ -26,7 +26,7 @@ class ExtensionTest {
     }
 
     @Test
-    fun `alphabetise headers response`() {
+    fun `alphabetise headers response`() = runBlocking {
         assertThat(
             Response(OK)
                 .header("b", "b")

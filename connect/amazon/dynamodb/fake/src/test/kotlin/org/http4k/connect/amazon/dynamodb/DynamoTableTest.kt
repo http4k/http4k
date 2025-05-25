@@ -15,7 +15,7 @@ class DynamoTableTest {
     private val intS = Attribute.int().required("int")
 
     @Test
-    fun `item lifecycle`() {
+    fun `item lifecycle`() = runBlocking {
         val table = DynamoTable(TableDescription(KeySchema = listOf(attS.asKeySchema(HASH))))
 
         val stringKey = Item(attS of "hello")

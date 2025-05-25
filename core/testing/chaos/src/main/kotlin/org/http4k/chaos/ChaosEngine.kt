@@ -19,7 +19,7 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
     private var trigger = Trigger { on.get() }
     private val state = ChaosStages.Variable(initialStage)
 
-    override fun invoke(p1: HttpHandler) = Repeat { Wait.until(trigger).then(state.until(!trigger)) }.asFilter()(p1)
+    override suspend fun invoke(p1: HttpHandler) = Repeat { Wait.until(trigger).then(state.until(!trigger)) }.asFilter()(p1)
 
     /**
      * Check if the configured Chaos behaviour is currently being applied to all traffic.

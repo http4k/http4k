@@ -44,7 +44,7 @@ class ContainerCredentialsCredentialsProviderTest {
     )
 
     @Test
-    fun `gets credentials first time only`() {
+    fun `gets credentials first time only`() = runBlocking {
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
         every { containerCredentials(GetCredentials(relativePathUri)) } returns Success(firstCreds)
 
@@ -56,7 +56,7 @@ class ContainerCredentialsCredentialsProviderTest {
     }
 
     @Test
-    fun `gets credentials when expired time only`() {
+    fun `gets credentials when expired time only`() = runBlocking {
         val firstCreds = credentialsExpiringAt(now.plusSeconds(61), 1)
         every { containerCredentials(GetCredentials(relativePathUri)) } returns Success(firstCreds)
 
@@ -79,7 +79,7 @@ class ContainerCredentialsCredentialsProviderTest {
     }
 
     @Test
-    fun `credentials chain gracefully fails outside container`() {
+    fun `credentials chain gracefully fails outside container`() = runBlocking {
         val chain = CredentialsChain.ContainerCredentials(
             env = Environment.ENV,
             http = { Response(Status.INTERNAL_SERVER_ERROR) },

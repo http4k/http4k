@@ -64,7 +64,7 @@ class DynamoDbQueryDslTest {
     inner class ScanTests {
 
         @Test
-        fun `scan with equals filter`() {
+        fun `scan with equals filter`() = runBlocking {
             // when
             index.scan(PageSize = 20, ConsistentRead = true) {
                 filterExpression {
@@ -87,7 +87,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with not equals filter`() {
+        fun `scan with not equals filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -110,7 +110,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with greater than filter`() {
+        fun `scan with greater than filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -131,7 +131,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with greater or equal filter`() {
+        fun `scan with greater or equal filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -152,7 +152,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with less than filter`() {
+        fun `scan with less than filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -173,7 +173,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with less or equal filter`() {
+        fun `scan with less or equal filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -194,7 +194,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with equals attribute filter`() {
+        fun `scan with equals attribute filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -215,7 +215,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with BETWEEN filter`() {
+        fun `scan with BETWEEN filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -241,7 +241,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with IN filter`() {
+        fun `scan with IN filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -269,7 +269,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with attribute_exists filter`() {
+        fun `scan with attribute_exists filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -290,7 +290,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with attribute_not_exists filter`() {
+        fun `scan with attribute_not_exists filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -311,7 +311,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with begins_with filter`() {
+        fun `scan with begins_with filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -332,7 +332,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with contains filter`() {
+        fun `scan with contains filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -353,7 +353,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scan with logical operators in filter`() {
+        fun `scan with logical operators in filter`() = runBlocking {
             // when
             index.scan {
                 filterExpression {
@@ -389,7 +389,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `scanPage with complex filter`() {
+        fun `scanPage with complex filter`() = runBlocking {
             // when
             index.scanPage(
                 ExclusiveStartKey = Key(hashKeyAttr of uuid, sortKeyAttr of "B"),
@@ -421,7 +421,7 @@ class DynamoDbQueryDslTest {
     inner class QueryTests {
 
         @Test
-        fun `query with hash key condition`() {
+        fun `query with hash key condition`() = runBlocking {
             // when
             index.query(ScanIndexForward = false, PageSize = 10, ConsistentRead = true) {
                 keyCondition {
@@ -446,7 +446,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query on index with hash key condition`() {
+        fun `query on index with hash key condition`() = runBlocking {
             // when
             table.index(secondaryIndex).query {
                 keyCondition {
@@ -468,7 +468,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query with hash key and missing sort key condition`() {
+        fun `query with hash key and missing sort key condition`() = runBlocking {
             // when
             index.query {
                 keyCondition {
@@ -493,7 +493,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query in index with hash key and ignored sort key condition (because of missing sort key)`() {
+        fun `query in index with hash key and ignored sort key condition (because of missing sort key)`() = runBlocking {
             // when
             table.index(secondaryIndex).query {
                 keyCondition {
@@ -515,7 +515,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query with hash key and sort key operator condition`() {
+        fun `query with hash key and sort key operator condition`() = runBlocking {
             // when
             index.query {
                 keyCondition {
@@ -537,7 +537,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query with hash key and sort key between condition`() {
+        fun `query with hash key and sort key between condition`() = runBlocking {
             // when
             index.query {
                 keyCondition {
@@ -565,7 +565,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query with hash key and sort key begins_with condition`() {
+        fun `query with hash key and sort key begins_with condition`() = runBlocking {
             // when
             index.query {
                 keyCondition {
@@ -587,7 +587,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `query with key condition and filter expression`() {
+        fun `query with key condition and filter expression`() = runBlocking {
             // when
             index.query {
                 keyCondition {
@@ -625,7 +625,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `queryPage with key condition and filter expression`() {
+        fun `queryPage with key condition and filter expression`() = runBlocking {
             // when
             index.queryPage(
                 ScanIndexForward = false,
@@ -674,7 +674,7 @@ class DynamoDbQueryDslTest {
         }
 
         @Test
-        fun `count with key condition and filter expression`() {
+        fun `count with key condition and filter expression`() = runBlocking {
             // when
             index.count {
                 keyCondition {

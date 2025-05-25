@@ -16,17 +16,17 @@ class JacksonJsonPropertyAnnotatedTest {
     data class Beany(@JsonProperty("NEWNAME") val oldName: String = "hello") : Foo()
 
     @Test
-    fun `finds value from object`() {
+    fun `finds value from object`() = runBlocking {
         assertThat("nonNullable", JacksonJsonPropertyAnnotated(Beany(), "NEWNAME"), equalTo(Field("hello", false, FieldMetadata.empty)))
     }
 
     @Test
-    fun `finds value from superclass object`() {
+    fun `finds value from superclass object`() = runBlocking {
         assertThat("superValue", JacksonJsonPropertyAnnotated(Beany(), "SUPERNEWNAME"), equalTo(Field("bob", false, FieldMetadata.empty)))
     }
 
     @Test
-    fun `throws on no field found`() {
+    fun `throws on no field found`() = runBlocking {
         assertThat("non existent", { JacksonJsonPropertyAnnotated(Beany(), "non existent") }, throws<NoFieldFound>())
     }
 }

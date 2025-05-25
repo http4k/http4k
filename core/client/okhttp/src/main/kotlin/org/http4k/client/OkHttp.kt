@@ -7,6 +7,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
 import org.http4k.client.PreCannedOkHttpClients.defaultOkHttpClient
 import org.http4k.core.BodyMode
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -33,28 +34,23 @@ object OkHttp {
     operator fun invoke(
         client: OkHttpClient = defaultOkHttpClient(),
         bodyMode: BodyMode = BodyMode.Memory
-    ): DualSyncAsyncHttpHandler =
-        object : DualSyncAsyncHttpHandler {
-            override fun invoke(request: Request): Response =
-                try {
-                    client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
-                } catch (e: ConnectException) {
-                    Response(CONNECTION_REFUSED.toClientStatus(e))
-                } catch (e: UnknownHostException) {
-                    Response(UNKNOWN_HOST.toClientStatus(e))
-                } catch (e: NoRouteToHostException) {
-                    Response(UNKNOWN_HOST.toClientStatus(e))
-                } catch (e: InterruptedIOException) {
-                    when {
-                        e is SocketTimeoutException -> Response(CLIENT_TIMEOUT.toClientStatus(e))
-                        e.message == "timeout" -> Response(CLIENT_TIMEOUT.toClientStatus(e))
-                        else -> throw e
-                    }
-                }
-
-            override operator fun invoke(request: Request, fn: (Response) -> Unit) =
-                client.newCall(request.asOkHttp()).enqueue(Http4kCallback(bodyMode, fn))
+    ): HttpHandler = { request: Request ->
+        try {
+            client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
+        } catch (e: ConnectException) {
+            Response(CONNECTION_REFUSED.toClientStatus(e))
+        } catch (e: UnknownHostException) {
+            Response(UNKNOWN_HOST.toClientStatus(e))
+        } catch (e: NoRouteToHostException) {
+            Response(UNKNOWN_HOST.toClientStatus(e))
+        } catch (e: InterruptedIOException) {
+            when {
+                e is SocketTimeoutException -> Response(CLIENT_TIMEOUT.toClientStatus(e))
+                e.message == "timeout" -> Response(CLIENT_TIMEOUT.toClientStatus(e))
+                else -> throw e
+            }
         }
+    }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
         override fun onFailure(call: Call, e: IOException) = fn(

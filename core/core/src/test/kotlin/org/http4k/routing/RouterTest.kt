@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 class RouterTest {
     @Test
-    fun `orElse router catches everything`() {
+    fun `orElse router catches everything`() = runBlocking {
         val asRouter = { _: Request -> false }.asRouter()
         val app = routes(
             asRouter bind { _: Request -> Response(NOT_ACCEPTABLE) },

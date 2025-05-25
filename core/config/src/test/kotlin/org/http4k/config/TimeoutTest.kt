@@ -7,7 +7,7 @@ import java.time.Duration
 
 class TimeoutTest {
     @Test
-    fun `timeout value`() {
+    fun `timeout value`() = runBlocking {
         assertThat({ Timeout(Duration.ofMillis(-1)) }, throws<IllegalArgumentException>())
     }
 }

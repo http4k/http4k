@@ -47,7 +47,7 @@ class WsFilterTest {
     }
 
     @Test
-    fun `can manipulate value on way in and out of service`() {
+    fun `can manipulate value on way in and out of service`() = runBlocking {
         val svc = first.then(second).then(ws)
         val request = Request(GET, Uri.of("/path"))
 

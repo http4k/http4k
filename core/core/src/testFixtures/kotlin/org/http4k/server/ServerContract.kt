@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import kotlinx.coroutines.runBlocking
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -56,7 +57,7 @@ abstract class ServerContract(
 
     private val proxiedServer = { req: Request -> Response(OK).body(req.body) }.asServer(SunHttp(0))
 
-    private val routes =
+    private val routes = runBlocking {
         requiredMethods.map { m ->
             "/" + m.name bind m to { Response(OK).body(m.name) }
         } + listOf(
@@ -68,10 +69,10 @@ abstract class ServerContract(
                     {
 
                         next(it)
-                            .also { println("returning"  + it.status) }
+                            .also { println("returning" + it.status) }
                     }
                 }.then(
-                SetBaseUriFrom(Uri.of("http://localhost:${proxiedServer.port()}")).then(JavaHttpClient()).debug()
+                    SetBaseUriFrom(Uri.of("http://localhost:${proxiedServer.port()}")).then(JavaHttpClient()).debug()
                 ),
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
@@ -110,6 +111,7 @@ abstract class ServerContract(
                 Response(NO_CONTENT)
             }
         )
+    }
 
     @BeforeEach
     fun before() {
@@ -118,7 +120,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `can call an endpoint with all supported Methods`() {
+    fun `can call an endpoint with all supported Methods`() = runBlocking {
         for (method in requiredMethods) {
 
             val response = client(Request(method, baseUrl + "/" + method.name))
@@ -130,19 +132,19 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `null header`() {
+    fun `null header`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/null-header-value"))
         assertThat(response.status, equalTo(OK))
     }
 
     @Test
-    fun `http version`() {
+    fun `http version`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/version"))
         assertThat(response.bodyString(), equalTo("HTTP/1.1"))
     }
 
     @Test
-    open fun `can return a large body - GET`() {
+    open fun `can return a large body - GET`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/large").body("hello mum"))
 
         assertThat(response.status, equalTo(OK))
@@ -150,7 +152,7 @@ abstract class ServerContract(
     }
 
     @Test
-    open fun `can return a large body - POST`() {
+    open fun `can return a large body - POST`() = runBlocking {
         val response = client(Request(POST, "$baseUrl/large").body("hello mum"))
 
         assertThat(response.status, equalTo(OK))
@@ -158,7 +160,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `gets the body from the request`() {
+    fun `gets the body from the request`() = runBlocking {
         val response = client(Request(POST, "$baseUrl/echo").body("hello mum"))
 
         assertThat(response.status, equalTo(OK))
@@ -166,7 +168,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `can set multiple headers with the same name`() {
+    fun `can set multiple headers with the same name`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/multiple-headers"))
 
         assertThat(response.status, equalTo(OK))
@@ -174,7 +176,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `returns headers`() {
+    fun `returns headers`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/headers"))
         assertThat(response.status, equalTo(ACCEPTED))
         assertThat(response.headerValues("content-type").size, equalTo(1))
@@ -182,7 +184,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `can handle quotes in request headers`() {
+    fun `can handle quotes in request headers`() = runBlocking {
         val response = client(
             Request(GET, "$baseUrl/request-headers")
                 .header("foo", """"my header with quotes"""")
@@ -200,10 +202,13 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `should not manipulate request headers`() {
+    fun `should not manipulate request headers`() = runBlocking {
         val response = client(
             Request(GET, "$baseUrl/request-headers")
-                .header("foo", """Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36""")
+                .header(
+                    "foo",
+                    """Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"""
+                )
         )
         assertThat(response.status, equalTo(OK))
         assertThat(
@@ -214,7 +219,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `length is set on body if it is sent`() {
+    fun `length is set on body if it is sent`() = runBlocking {
         val response = client(
             Request(POST, "$baseUrl/length")
                 .body("12345").header("Content-Length", "5")
@@ -223,13 +228,13 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `length is ignored on body if it not well formed`() {
+    fun `length is ignored on body if it not well formed`() = runBlocking {
         val response = client(Request(POST, "$baseUrl/length").header("Content-Length", "nonsense").body("12345"))
         assertThat(response, hasStatus(OK).and(hasBody("5")))
     }
 
     @Test
-    fun `gets the uri from the request`() {
+    fun `gets the uri from the request`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/uri?bob=bill"))
 
         assertThat(response.status, equalTo(OK))
@@ -237,14 +242,14 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `endpoint that blows up results in 500`() {
+    fun `endpoint that blows up results in 500`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/boom"))
 
         assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
     }
 
     @Test
-    fun `can handle multiple request headers`() {
+    fun `can handle multiple request headers`() = runBlocking {
         val response = client(
             Request(GET, "$baseUrl/request-headers").header("foo", "one").header("foo", "two").header("foo", "three")
         )
@@ -260,7 +265,7 @@ abstract class ServerContract(
     }
 
     @Test
-    open fun `treats multiple request headers as single item comma-separated list`() {
+    open fun `treats multiple request headers as single item comma-separated list`() = runBlocking {
         val response = client(
             Request(GET, "$baseUrl/request-headers").header("foo", "one,two,three")
         )
@@ -270,7 +275,7 @@ abstract class ServerContract(
     }
 
     @Test
-    fun `deals with streaming response`() {
+    fun `deals with streaming response`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/stream"))
 
         assertThat(response.status, equalTo(OK))
@@ -278,27 +283,27 @@ abstract class ServerContract(
     }
 
     @Test
-    open fun `ok when length already set`() {
+    open fun `ok when length already set`() = runBlocking {
         val response = client(Request(GET, "$baseUrl/presetlength"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("content-length"), equalTo("0"))
     }
 
     @Test
-    open fun `can start on port zero and then get the port`() {
+    open fun `can start on port zero and then get the port`() = runBlocking {
         routes(*routes.toTypedArray()).asServer(serverConfig(0, Immediate)).start().use {
             assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
         }
     }
 
     @Test
-    fun `returns 501 on illegal request`() {
+    fun `returns 501 on illegal request`() = runBlocking {
         val actual = ClientForServerTesting.makeRequestWithInvalidMethod(baseUrl)
         assertThat(actual, equalTo(NOT_IMPLEMENTED))
     }
 
     @Test
-    fun `can resolve request source`() {
+    fun `can resolve request source`() = runBlocking {
         assertThat(
             client(Request(GET, "$baseUrl/request-source")),
             allOf(
@@ -311,7 +316,7 @@ abstract class ServerContract(
     }
 
     @Test
-    open fun `illegal url doesn't expose stacktrace`() {
+    open fun `illegal url doesn't expose stacktrace`() = runBlocking {
         assertThat(
             client(Request(GET, "$baseUrl/v1/foo//bar")).bodyString().lowercase(),
             !containsSubstring("exception")
@@ -319,12 +324,12 @@ abstract class ServerContract(
     }
 
     @Test
-    open fun `return 204 no content`() {
+    open fun `return 204 no content`() = runBlocking {
         assertThat(client(Request(GET, "$baseUrl/no-content")).status, equalTo(NO_CONTENT))
     }
 
     @Test
-    open fun `can act as a simple proxy`() {
+    open fun `can act as a simple proxy`() = runBlocking {
         val body = "hello mum"
 
         val response = client(Request(POST, "$baseUrl/proxy").body(body))

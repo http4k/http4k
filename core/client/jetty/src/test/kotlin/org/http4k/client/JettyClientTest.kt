@@ -12,7 +12,7 @@ class JettyClientTest :
     HttpClientWithMemoryModeContract {
 
     @Test
-    override fun `can send multiple headers with same name`() {
+    override fun `can send multiple headers with same name`() = runBlocking {
         val response = client(Request(Method.POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo").header("echo", "bar"))
 
         assertThat(response, hasBody("echo: foo, bar"))

@@ -18,7 +18,7 @@ class ChaoticHttpHandlerTest {
     }
 
     @Test
-    fun `handles spurious errors`() {
+    fun `handles spurious errors`() = runBlocking {
         val fake = object : ChaoticHttpHandler() {
             override val app: HttpHandler = { error("foobar") }
         }
@@ -26,7 +26,7 @@ class ChaoticHttpHandlerTest {
     }
 
     @Test
-    fun `can enable and disable behaviour`() {
+    fun `can enable and disable behaviour`() = runBlocking {
 
         assertThat(fake(Request(Method.GET, "")), hasStatus(OK))
 
@@ -38,7 +38,7 @@ class ChaoticHttpHandlerTest {
     }
 
     @Test
-    fun `can start on a default port`() {
+    fun `can start on a default port`() = runBlocking {
         fake.start().use {
             assertThat(fake(Request(Method.GET, "http://localhost:${it.port()}")), hasStatus(OK))
         }

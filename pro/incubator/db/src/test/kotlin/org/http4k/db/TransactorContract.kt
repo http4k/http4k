@@ -27,7 +27,7 @@ abstract class TransactorContract {
     }
 
     @Test
-    fun `perform regular write operation`() {
+    fun `perform regular write operation`() = runBlocking {
         val transactor = transactor()
 
         transactor.perform { repository ->
@@ -44,7 +44,7 @@ abstract class TransactorContract {
     }
 
     @Test
-    fun `rollback on exception`() {
+    fun `rollback on exception`() = runBlocking {
         val transactor = transactor()
 
         expectThrows<Exception> {
@@ -64,7 +64,7 @@ abstract class TransactorContract {
     }
 
     @Test
-    fun `throw if read operation is performed in read-only transaction`() {
+    fun `throw if read operation is performed in read-only transaction`() = runBlocking {
         val transactor = transactor()
 
         expectThrows<Exception> {
@@ -73,7 +73,7 @@ abstract class TransactorContract {
     }
 
     @Test
-    fun `throw if operation fails`() {
+    fun `throw if operation fails`() = runBlocking {
         val transactor = transactor()
         expectThrows<Exception> {
             transactor.perform { repository ->

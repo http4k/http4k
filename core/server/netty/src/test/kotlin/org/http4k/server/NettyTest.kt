@@ -16,7 +16,7 @@ val defaultStopMode = Graceful(ofMillis(1))
 class NettyTest : ServerContract({ port, _ -> Netty(port, defaultStopMode) }, ClientForServerTesting()) {
 
     @Test
-    fun `sets keep-alive for non-streaming response`() {
+    fun `sets keep-alive for non-streaming response`() = runBlocking {
         assertThat(client(Request(Method.GET, "${baseUrl}/headers")),
             allOf(
                 hasStatus(Status.ACCEPTED),

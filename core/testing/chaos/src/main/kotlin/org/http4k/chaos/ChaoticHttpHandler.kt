@@ -37,7 +37,7 @@ abstract class ChaoticHttpHandler : HttpHandler {
 
     fun returnStatus(status: Status) = misbehave(ReturnStatus(status))
 
-    override fun invoke(request: Request) = chaosEngine
+    override suspend fun invoke(request: Request) = chaosEngine
         .then(CatchAll())
         .then(attachChaosIfSupported())(request)
 

@@ -13,6 +13,7 @@ import io.opentelemetry.extension.trace.propagation.B3Propagator
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.data.SpanData
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -40,7 +41,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `server creates new span when existing trace`() {
+    fun `server creates new span when existing trace`() = runBlocking {
         val sentTraceId = "11111111111111111111111111111111"
         val parentSpanId = "2222222222222222"
 
@@ -74,7 +75,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `server creates new span when no parent`() {
+    fun `server creates new span when no parent`() = runBlocking {
         var createdContext: SpanData? = null
 
         val app = ServerFilters.OpenTelemetryTracing()
@@ -101,7 +102,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `a server span can be mutated during creation`() {
+    fun `a server span can be mutated during creation`() = runBlocking {
         val sentTraceId = "11111111111111111111111111111111"
         val parentSpanId = "2222222222222222"
         val creationValue = stringKey("test-attribute")
@@ -130,7 +131,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `a server span can be mutated before completion`() {
+    fun `a server span can be mutated before completion`() = runBlocking {
         val sentTraceId = "11111111111111111111111111111111"
         val parentSpanId = "2222222222222222"
         val postStatus = longKey("post-status")
@@ -162,7 +163,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `a client span can be mutated during creation`() {
+    fun `a client span can be mutated during creation`() = runBlocking {
         var createdContext: SpanData? = null
         val creationValue = stringKey("test-attribute")
 
@@ -182,7 +183,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `a client span can be mutated before completion`() {
+    fun `a client span can be mutated before completion`() = runBlocking {
         var createdContext: SpanData? = null
         val postStatus = longKey("post-status")
         val postUri = stringKey("post-uri")
@@ -206,7 +207,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `client creates new span when no parent`() {
+    fun `client creates new span when no parent`() = runBlocking {
         var createdContext: SpanData? = null
 
         val app = ClientFilters.OpenTelemetryTracing()
@@ -227,7 +228,7 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
-    fun `server and client propagate correctly`() {
+    fun `server and client propagate correctly`() = runBlocking {
         val sentTraceId = "11111111111111111111111111111111"
         val originalSpanId = "2222222222222222"
 

@@ -20,11 +20,11 @@ class HelidonClientTest : HttpClientContract(
     HttpClientWithMemoryModeContract {
 
     @Disabled
-    override fun `fails with no protocol`() {
+    override fun `fails with no protocol`() = runBlocking {
     }
 
     @Test
-    fun `query parameters are preserved in requests made by the Helidon client`() {
+    fun `query parameters are preserved in requests made by the Helidon client`() = runBlocking {
         val helidonQuery = WebClient.create()
             .makeHelidonRequest(Request(GET, "http://localhost?p1=foo&p2=123&p1=bar"))
             .resolvedUri()
@@ -35,14 +35,14 @@ class HelidonClientTest : HttpClientContract(
     }
 
     @Test
-    fun `helidon doesn't add another host header`() {
+    fun `helidon doesn't add another host header`() = runBlocking {
         val response = client(Request(GET, "http://localhost:$port/headers").header("Host", "localhost:$port"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("Host,User-Agent,Connection,Content-Length,Proxy-Connection"))
     }
 
     @Test
-    fun `requestModifier allows modification of all requests used by the client`() {
+    fun `requestModifier allows modification of all requests used by the client`() = runBlocking {
         val requestModifyingClient = HelidonClient(requestModifier = { it.queryParam("query", "true") })
         val response = requestModifyingClient(Request(POST, "http://localhost:$port/someUri"))
         assertThat(response.header("query"), equalTo("true"))

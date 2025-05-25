@@ -19,7 +19,7 @@ class Ec2InstanceProfileRegionProviderTest {
     private val provider = RegionProvider.Ec2InstanceProfile(service)
 
     @Test
-    fun `metadata service not available (not in EC2)`() {
+    fun `metadata service not available (not in EC2)`() = runBlocking {
         service.returnStatus(Status.CONNECTION_REFUSED)
 
         assertThat(provider.invoke(), absent())

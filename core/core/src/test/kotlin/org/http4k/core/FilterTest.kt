@@ -17,7 +17,7 @@ class FilterTest {
     private val addResponseHeader = Filter { next -> { next(it).header("goodbye", "cruel") } }
 
     @Test
-    fun `can manipulate value on way in and out of service`() {
+    fun `can manipulate value on way in and out of service`() = runBlocking {
         val svc = addRequestHeader.then(addResponseHeader).then(echoHeaders)
         val response = svc(Request(GET, of("/")))
         assertThat(response.header("hello"), equalTo("world"))
@@ -25,7 +25,7 @@ class FilterTest {
     }
 
     @Test
-    fun `applies in order of chain`() {
+    fun `applies in order of chain`() = runBlocking {
         val minus10 = Filter { next ->
             {
                 next(it.replaceHeader("hello", (it.header("hello")!!.toInt() - 10).toString()))
@@ -43,7 +43,7 @@ class FilterTest {
     }
 
     @Test
-    fun `application order equivalence`() {
+    fun `application order equivalence`() = runBlocking {
         val chained = Filter.NoOp
             .then(appendHeader("foo"))
             .then(appendHeader("bar"))
@@ -63,7 +63,7 @@ class FilterTest {
     }
 
     @Test
-    fun `initiates filter only once`() {
+    fun `initiates filter only once`() = runBlocking {
         var count = 0
         val countFilter = Filter { next ->
             count++

@@ -22,7 +22,7 @@ class LambdaRuntimeAPITest {
     private val lambdaRuntimeAPI = LambdaRuntimeAPI(fake)
 
     @Test
-    fun `get next invocation`() {
+    fun `get next invocation`() = runBlocking {
         assertThat(
             lambdaRuntimeAPI.nextInvocation(), equalTo(
                 Request(POST, "")
@@ -40,14 +40,14 @@ class LambdaRuntimeAPITest {
     }
 
     @Test
-    fun `post init error`() {
+    fun `post init error`() = runBlocking {
         val error = Exception()
         LambdaRuntimeAPI(fake).initError(error)
         assertThat(fake.errors[0], equalTo(error.toBody()))
     }
 
     @Test
-    fun `post request error`() {
+    fun `post request error`() = runBlocking {
         val error = Exception()
         LambdaRuntimeAPI(fake).error(
             Request(POST, "")
@@ -57,7 +57,7 @@ class LambdaRuntimeAPITest {
     }
 
     @Test
-    fun `post request response`() {
+    fun `post request response`() = runBlocking {
         LambdaRuntimeAPI(fake).success(
             Request(POST, "")
                 .header("Lambda-Runtime-Aws-Request-Id", "00000000-0000-0000-0000-000000000000"),

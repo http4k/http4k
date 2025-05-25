@@ -14,7 +14,7 @@ class JettyClientStreamingTest : HttpClientContract(
 ) {
 
     @Test
-    override fun `can send multiple headers with same name`() {
+    override fun `can send multiple headers with same name`() = runBlocking {
         val response = client(
             Request(Method.POST, "http://localhost:$port/multiRequestHeader").header("echo", "foo")
                 .header("echo", "bar")
@@ -24,6 +24,6 @@ class JettyClientStreamingTest : HttpClientContract(
     }
 
     @Test
-    override fun `socket timeouts are converted into 504`() {
+    override fun `socket timeouts are converted into 504`() = runBlocking {
     }
 }

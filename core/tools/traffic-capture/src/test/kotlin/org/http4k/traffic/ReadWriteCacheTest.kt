@@ -14,7 +14,7 @@ import java.nio.file.Files
 class ReadWriteCacheTest {
 
     @Test
-    fun `Disk ReadWriteCache can store and retrieve cached data`() {
+    fun `Disk ReadWriteCache can store and retrieve cached data`() = runBlocking {
         val tmp = Files.createTempDirectory(".").toFile()
         tmp.deleteOnExit()
 
@@ -22,12 +22,12 @@ class ReadWriteCacheTest {
     }
 
     @Test
-    fun `Memory ReadWriteCache can store and retrieve cached data`() {
+    fun `Memory ReadWriteCache can store and retrieve cached data`() = runBlocking {
         testCache(ReadWriteCache.Memory())
     }
 
     @Test
-    fun `asCache can transform a Storage instance into a ReadWriteCache`() {
+    fun `asCache can transform a Storage instance into a ReadWriteCache`() = runBlocking {
         val storage = object : Storage<String> {
             val values = mutableMapOf<String, String>()
             override fun get(key: String): String? = values[key]

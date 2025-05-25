@@ -3,6 +3,7 @@ package org.http4k.multipart
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.string
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -60,7 +61,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `upload multiple files and fields`() {
+    fun `upload multiple files and fields`() = runBlocking {
         val boundary = "-----1234"
         val multipartFormContentsStream = MultipartFormBuilder(boundary)
             .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream(), emptyList())
@@ -82,7 +83,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `can load complex real life safari example`() {
+    fun `can load complex real life safari example`() = runBlocking {
         val form = safariExample()
 
         val parts = MultipartFormParser(UTF_8, 1024000, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
@@ -91,7 +92,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `throws exception if form is too big`() {
+    fun `throws exception if form is too big`() = runBlocking {
         val form = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(UTF_8),
             FileInputStream("examples/safari-example.multipart"),
@@ -108,7 +109,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `saves all parts to disk`() {
+    fun `saves all parts to disk`() = runBlocking {
         val form = safariExample()
 
         val parts = MultipartFormParser(UTF_8, 100, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
@@ -121,7 +122,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `saves some parts to disk`() {
+    fun `saves some parts to disk`() = runBlocking {
         val form = safariExample()
 
         val parts = MultipartFormParser(UTF_8, 1024 * 4, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
@@ -138,7 +139,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `should keep some parts on disk`() {
+    fun `should keep some parts on disk`() = runBlocking {
         try {
             val form = safariExample()
 
@@ -159,7 +160,7 @@ class MultipartFormParserTest {
     }
 
     @Test
-    fun `throws exception if multipart malformed`() {
+    fun `throws exception if multipart malformed`() = runBlocking {
         val form = StreamingMultipartFormParts.parse(
             "---2345".toByteArray(UTF_8),
             ByteArrayInputStream(

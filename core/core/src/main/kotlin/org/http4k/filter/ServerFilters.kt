@@ -366,7 +366,7 @@ object ServerFilters {
         private val compressibleContentTypes: Set<ContentType>,
         private val compressionMode: GzipCompressionMode = Memory()
     ) : Filter {
-        override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
+        override suspend fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)
     }

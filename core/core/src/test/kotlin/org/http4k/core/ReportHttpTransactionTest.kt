@@ -17,7 +17,7 @@ class ReportHttpTransactionTest {
 
     @Test
     @Disabled
-    fun `unable to set request key before transaction logger`() {
+    fun `unable to set request key before transaction logger`() = runBlocking {
         val lens = RequestKey.optional<String>("foo")
 
         val app: HttpHandler = routes("" bind GET to { req: Request -> Response(OK) })

@@ -11,13 +11,13 @@ import java.util.UUID
 internal class AuthRequestTest {
 
     @Test
-    fun `is not open id connect auth request if scope doesn't include 'openid'`() {
+    fun `is not open id connect auth request if scope doesn't include 'openid'`() = runBlocking {
         assertThat(defaultAuthRequest.copy(scopes = emptyList()).isOIDC(), equalTo(false))
         assertThat(defaultAuthRequest.copy(scopes = listOf("contacts", "public", "oauth")).isOIDC(), equalTo(false))
     }
 
     @Test
-    fun `is open id connect auth request if scope includes 'openid'`() {
+    fun `is open id connect auth request if scope includes 'openid'`() = runBlocking {
         assertThat(defaultAuthRequest.copy(scopes = listOf("openid")).isOIDC(), equalTo(true))
         assertThat(defaultAuthRequest.copy(scopes = listOf("OPENID")).isOIDC(), equalTo(true))
         assertThat(defaultAuthRequest.copy(scopes = listOf("OpEnID")).isOIDC(), equalTo(true))

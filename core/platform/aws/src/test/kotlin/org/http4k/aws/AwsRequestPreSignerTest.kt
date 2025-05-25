@@ -16,7 +16,7 @@ import java.time.ZoneOffset
 class AwsRequestPreSignerTest {
 
     @Test
-    fun `signed GET with standard credentials`() {
+    fun `signed GET with standard credentials`() = runBlocking {
         val time = Instant.parse("2013-05-24T00:00:00Z")
         val signer = AwsRequestPreSigner(
             scope = AwsCredentialScope("us-east-1", "s3"),
@@ -44,7 +44,7 @@ class AwsRequestPreSignerTest {
     }
 
     @Test
-    fun `signed PUT with STS credentials`() {
+    fun `signed PUT with STS credentials`() = runBlocking {
         val signer = AwsRequestPreSigner(
             scope = AwsCredentialScope("us-east-1", "s3"),
             credentials = AwsCredentials(

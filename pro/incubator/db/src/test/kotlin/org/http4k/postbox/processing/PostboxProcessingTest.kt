@@ -46,7 +46,7 @@ class PostboxProcessingTest {
         backoffStrategy = { _, _ -> reprocessingDelay })
 
     @Test
-    fun `process a single pending request`() {
+    fun `process a single pending request`() = runBlocking {
         val requestId = RequestId.of("0")
 
         store(requestId, requestForSuccess)
@@ -57,7 +57,7 @@ class PostboxProcessingTest {
     }
 
     @Test
-    fun `a failed request gets scheduled to be processed later`() {
+    fun `a failed request gets scheduled to be processed later`() = runBlocking {
         val requestId = RequestId.of("0")
         val now = timeSource()
 
@@ -68,7 +68,7 @@ class PostboxProcessingTest {
     }
 
     @Test
-    fun `a failed request does not affect other requests in batch`() {
+    fun `a failed request does not affect other requests in batch`() = runBlocking {
         val now = timeSource()
         val r1 = RequestId.of("1")
         val r2 = RequestId.of("2")
@@ -86,7 +86,7 @@ class PostboxProcessingTest {
     }
 
     @Test
-    fun `a failed request gets marked as dead after maximum attempts reached`() {
+    fun `a failed request gets marked as dead after maximum attempts reached`() = runBlocking {
         val requestId = RequestId.of("0")
 
         store(requestId, requestForFailure)
@@ -96,7 +96,7 @@ class PostboxProcessingTest {
     }
 
     @Test
-    fun `default backoff strategy`() {
+    fun `default backoff strategy`() = runBlocking {
         val randomSource: RandomSource = { 7 }
         assertThat(defaultBackoffStrategy(0, randomSource), equalTo(ofSeconds(12)))
         assertThat(defaultBackoffStrategy(1, randomSource), equalTo(ofSeconds(17)))

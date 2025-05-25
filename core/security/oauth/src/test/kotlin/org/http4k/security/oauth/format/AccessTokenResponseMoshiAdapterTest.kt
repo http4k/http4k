@@ -18,7 +18,7 @@ class AccessTokenResponseMoshiAdapterTest {
     private val marshaller = OAuthMoshi
 
     @Test
-    fun `deserialize with explicit nulls`() {
+    fun `deserialize with explicit nulls`() = runBlocking {
         val json = """{
             "access_token":"my_token",
             "token_type":null,
@@ -39,7 +39,7 @@ class AccessTokenResponseMoshiAdapterTest {
     }
 
     @Test
-    fun `deserialize with implicit nulls`() {
+    fun `deserialize with implicit nulls`() = runBlocking {
         val json = """{ "access_token":"my_token"}"""
 
         assertThat(marshaller.asA(json), equalTo(AccessTokenResponse(
@@ -53,7 +53,7 @@ class AccessTokenResponseMoshiAdapterTest {
     }
 
     @Test
-    fun `deserialize with full json`() {
+    fun `deserialize with full json`() = runBlocking {
         val json = """{
             "access_token":"my_token",
             "token_type":"special",

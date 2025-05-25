@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpHeaderValues.WEBSOCKET
 import io.netty.handler.codec.http.HttpRequest
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
@@ -21,7 +22,10 @@ class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundH
             if (requiresWsUpgrade(msg)) {
                 val address = ctx.channel().remoteAddress() as InetSocketAddress
                 val upgradeRequest = msg.asRequest(address)
-                val wsConsumer = wsHandler(upgradeRequest)
+
+                val wsConsumer = runBlocking {
+                    wsHandler(upgradeRequest) // FIXME coroutine blocking
+                }
 
                 val config = WebSocketServerProtocolConfig.newBuilder()
                     .handleCloseFrames(false)

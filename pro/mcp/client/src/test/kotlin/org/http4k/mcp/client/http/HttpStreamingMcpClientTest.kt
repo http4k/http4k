@@ -104,7 +104,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             protocol, OAuthMcpSecurity(Uri.of("http://auth1")) { it == "123" })
 
     @Test
-    fun `deals with error`() {
+    fun `deals with error`() = runBlocking {
         val toolArg = Tool.Arg.string().required("name")
 
         val protocol = McpProtocol(
@@ -154,7 +154,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     }
 
     @Test
-    fun `resume a stream`() {
+    fun `resume a stream`() = runBlocking {
         val toolArg = Tool.Arg.string().required("name")
         val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
             ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
@@ -223,7 +223,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     }
 
     @Test
-    fun `can do sampling`() {
+    fun `can do sampling`() = runBlocking {
         val model = ModelName.of("my model")
 
         val samplingResponses = listOf(
@@ -274,7 +274,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     }
 
     @Test
-    fun `can do progress`() {
+    fun `can do progress`() = runBlocking {
         val tools = ServerTools(
             Tool("progress", "description") bind {
                 try {

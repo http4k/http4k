@@ -14,7 +14,7 @@ class DelegatedPropertyTest {
     private val qListReq by Query.long().multi.of().required()
 
     @Test
-    fun `extract and inject`() {
+    fun `extract and inject`() = runBlocking {
         val base = Request(GET, "")
         assertThat(qReq(base.query("qReq", "123")), equalTo(123L))
         assertThat(base.with(qReq of 123), equalTo(base.query("qReq", "123")))

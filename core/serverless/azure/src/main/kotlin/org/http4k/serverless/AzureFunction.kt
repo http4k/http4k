@@ -4,6 +4,7 @@ import com.microsoft.azure.functions.ExecutionContext
 import com.microsoft.azure.functions.HttpRequestMessage
 import com.microsoft.azure.functions.HttpResponseMessage
 import com.microsoft.azure.functions.HttpStatus
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -21,7 +22,7 @@ val AZURE_CONTEXT_KEY = RequestKey.required<ExecutionContext>("HTTP4K_AZURE_CONT
 abstract class AzureFunction(appLoader: AppLoader) {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    private val app = appLoader(System.getenv())
+    private val app = runBlocking { appLoader(System.getenv()) }
 
     abstract fun handleRequest(
         req: HttpRequestMessage<Optional<String>>,
@@ -29,10 +30,12 @@ abstract class AzureFunction(appLoader: AppLoader) {
     ): HttpResponseMessage
 
     protected fun handle(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) =
-        CatchAll()
-            .then(AddAzure(request, ctx))
-            .then(app)(request.asHttp4k())
-            .asAzure(request)
+        runBlocking {
+            CatchAll()
+                .then(AddAzure(request, ctx))
+                .then(app)(request.asHttp4k())
+                .asAzure(request)
+        }
 }
 
 private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) = Filter { next ->

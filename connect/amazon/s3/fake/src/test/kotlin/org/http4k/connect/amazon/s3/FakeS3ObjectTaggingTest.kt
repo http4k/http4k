@@ -33,7 +33,7 @@ class FakeS3ObjectTaggingTest {
         .s3BucketClient(bucket, fakeAwsEnvironment.region)
 
     @Test
-    fun `put object tagging updates last-modified`() {
+    fun `put object tagging updates last-modified`() = runBlocking {
         s3Bucket.putObject(key, "hello".byteInputStream())
 
         time += Duration.ofMinutes(1)
@@ -42,7 +42,7 @@ class FakeS3ObjectTaggingTest {
     }
 
     @Test
-    fun `delete object tagging updates last-modified`() {
+    fun `delete object tagging updates last-modified`() = runBlocking {
         s3Bucket.putObject(key, "hello".byteInputStream(), tags = listOf(Tag("hello", "there")))
 
         time += Duration.ofMinutes(1)

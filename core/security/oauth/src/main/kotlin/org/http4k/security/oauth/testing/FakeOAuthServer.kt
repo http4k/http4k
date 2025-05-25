@@ -2,6 +2,7 @@ package org.http4k.security.oauth.testing
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -60,13 +61,15 @@ fun FakeOAuthServer(
         refreshTokens = refreshTokens,
     )
 
-    return routes(
-        server.tokenRoute,
-        authPath bind GET to server.authenticationStart.then {
-            Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
-        },
-        "/autologin" bind GET to { server.authenticationComplete(it) }
-    )
+    return runBlocking {
+        routes(
+            server.tokenRoute,
+            authPath bind GET to server.authenticationStart.then {
+                Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
+            },
+            "/autologin" bind GET to { server.authenticationComplete(it) }
+        )
+    }
 }
 
 private class AlwaysOkClientValidator : ClientValidator {

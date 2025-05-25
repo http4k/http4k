@@ -17,7 +17,7 @@ class HttpMessageTest {
     private val emptyRequest = Request(GET, "")
 
     @Test
-    fun `can bind many objects to a request`() {
+    fun `can bind many objects to a request`() = runBlocking {
         val populated = emptyRequest.with(
             Body.string(TEXT_PLAIN).toLens() of "the body",
             Header.int().required("intHeader") of 123,
@@ -31,7 +31,7 @@ class HttpMessageTest {
     }
 
     @Test
-    fun `can bind many objects to a response`() {
+    fun `can bind many objects to a response`() = runBlocking {
         val populated = Response(OK).with(
             Body.string(TEXT_PLAIN).toLens() of "the body",
             Header.int().required("intHeader") of 123

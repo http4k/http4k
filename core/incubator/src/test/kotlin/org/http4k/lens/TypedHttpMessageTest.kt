@@ -43,7 +43,7 @@ class TypedHttpMessageTest {
     }
 
     @Test
-    fun `required fields`() {
+    fun `required fields`() = runBlocking {
         val out = routes("/{path}" bind GET to { input: Request ->
             val req = MyRequest(input)
             assertThat(req.path, equalTo(MyValue.of(999)))
@@ -69,7 +69,7 @@ class TypedHttpMessageTest {
     }
 
     @Test
-    fun `optional fields`() {
+    fun `optional fields`() = runBlocking {
         val req = MyRequest(Request(GET, "").query("query", "123"))
         assertThat(req.header, absent())
         req.header = "123456"
@@ -82,13 +82,13 @@ class TypedHttpMessageTest {
     }
 
     @Test
-    fun `defaulted fields`() {
+    fun `defaulted fields`() = runBlocking {
         val req = MyRequest(Request(GET, ""))
         assertThat(req.defaulted, equalTo(UUID(0, 0)))
     }
 
     @Test
-    fun `body can be read and written`() {
+    fun `body can be read and written`() = runBlocking {
         val resp = MyResponse(Response(OK))
         resp.aBody = MyType("hello")
         assertThat(resp.aBody, equalTo(MyType("hello")))

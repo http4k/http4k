@@ -12,49 +12,49 @@ import org.junit.jupiter.api.Test
 class CurlTest {
 
     @Test
-    fun `generates for simple get request`() {
+    fun `generates for simple get request`() = runBlocking {
         val curl = Request(GET, "http://httpbin.org").toCurl()
         assertThat(curl, equalTo("curl -X GET \"http://httpbin.org\""))
     }
 
     @Test
-    fun `generates for request with query`() {
+    fun `generates for request with query`() = runBlocking {
         val curl = Request(GET, "http://httpbin.org").query("a", "one two three").toCurl()
         assertThat(curl, equalTo("""curl -X GET "http://httpbin.org?a=one+two+three""""))
     }
 
     @Test
-    fun `includes headers`() {
+    fun `includes headers`() = runBlocking {
         val curl = Request(GET, "http://httpbin.org").header("foo", "my header").toCurl()
         assertThat(curl, equalTo("""curl -X GET -H "foo:my header" "http://httpbin.org""""))
     }
 
     @Test
-    fun `deals with headers with quotes`() {
+    fun `deals with headers with quotes`() = runBlocking {
         val curl = Request(GET, "http://httpbin.org").header("foo", "my \"quoted\" header").toCurl()
         assertThat(curl, equalTo("""curl -X GET -H "foo:my \"quoted\" header" "http://httpbin.org""""))
     }
 
     @Test
-    fun `includes body data`() {
+    fun `includes body data`() = runBlocking {
         val curl = Request(POST, "http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
         assertThat(curl, equalTo("""curl -X POST --data "foo=bar" "http://httpbin.org/post""""))
     }
 
     @Test
-    fun `escapes body form`() {
+    fun `escapes body form`() = runBlocking {
         val curl = Request(GET, "http://httpbin.org").body(listOf("foo" to "bar \"quoted\"").toBody()).toCurl()
         assertThat(curl, equalTo("""curl -X GET --data "foo=bar+%22quoted%22" "http://httpbin.org""""))
     }
 
     @Test
-    fun `escapes body string`() {
+    fun `escapes body string`() = runBlocking {
         val curl = Request(GET, "http://httpbin.org").body("my \"quote\"").toCurl()
         assertThat(curl, equalTo("""curl -X GET --data "my \"quote\"" "http://httpbin.org""""))
     }
 
     @Test
-    fun `does not realise stream body`() {
+    fun `does not realise stream body`() = runBlocking {
         val request = Request(POST, "http://httpbin.org").body("any stream".byteInputStream())
         val curl = request.toCurl()
         assertThat(curl, equalTo("""curl -X POST --data "<<stream>>" "http://httpbin.org""""))
@@ -62,7 +62,7 @@ class CurlTest {
     }
 
     @Test
-    fun `limits the entity if it's too large`() {
+    fun `limits the entity if it's too large`() = runBlocking {
         val largeBody = (0..500).joinToString(" ")
         val curl = Request(GET, "http://httpbin.org").body(largeBody).toCurl(256)
         val data = "data \"([^\"]+)\"".toRegex().find(curl)?.groupValues?.get(1)!!

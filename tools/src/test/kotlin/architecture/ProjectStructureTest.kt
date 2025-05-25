@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class ProjectStructureTest {
 
     @Test
-    fun `tests requiring network implement PortBasedTest`() {
+    fun `tests requiring network implement PortBasedTest`() = runBlocking {
         val portRequiredClasses = Konsist.scopeFromTest()
             .files
             .filter { file ->
@@ -35,7 +35,7 @@ class ProjectStructureTest {
     }
 
     @Test
-    fun `tests class names end with Test or Contract`() {
+    fun `tests class names end with Test or Contract`() = runBlocking {
         Konsist.scopeFromTest()
             .files
             .classes()

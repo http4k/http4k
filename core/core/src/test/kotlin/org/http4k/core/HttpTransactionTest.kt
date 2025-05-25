@@ -15,7 +15,7 @@ class HttpTransactionTest {
     private val startTime = Instant.ofEpochSecond(93)
 
     @Test
-    fun `cannot get the routing group from a standard Response`() {
+    fun `cannot get the routing group from a standard Response`() = runBlocking {
         assertThat(
             HttpTransaction(
                 request = Request(GET, Uri.of("/")),
@@ -27,7 +27,7 @@ class HttpTransactionTest {
     }
 
     @Test
-    fun `can get the routing group from a RoutedResponse`() {
+    fun `can get the routing group from a RoutedResponse`() = runBlocking {
         val response = ResponseWithContext(Response(OK), UriTemplate.from("hello"))
         assertThat(
             HttpTransaction(
@@ -40,7 +40,7 @@ class HttpTransactionTest {
     }
 
     @Test
-    fun `can create with request and response extensions`() {
+    fun `can create with request and response extensions`() = runBlocking {
         class ExtendedRequest(val delegate: RequestWithContext) : Request by delegate, RoutedMessage by delegate
 
         class ExtendedResponse(val delegate: ResponseWithContext) : Response by delegate, RoutedMessage by delegate

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Disabled
 class ClasspathResourceLoaderTest : ResourceLoaderContract(ResourceLoaders.Classpath("/")) {
 
     @Disabled
-    override fun `loads embedded index file`() {
+    override fun `loads embedded index file`() = runBlocking {
         super.`loads embedded index file`()
     }
 }

@@ -1,5 +1,6 @@
 package org.http4k.aws
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -18,7 +19,9 @@ class AwsSdkAsyncClient(private val http: HttpHandler) : SdkAsyncHttpClient {
     override fun close() {}
 
     override fun execute(request: AsyncExecuteRequest) = try {
-        val response = http(request.toHttp4k())
+        val response = runBlocking {
+            http(request.toHttp4k()) // FIXME coroutine blocking
+        }
 
         val publisher = SimplePublisher<ByteBuffer>()
         publisher.send(response.body.payload)
@@ -45,6 +48,7 @@ private fun AsyncExecuteRequest.toHttp4k() = with(request()) {
     when (this) {
         is SdkHttpFullRequest ->
             init.body(contentStreamProvider().map { Body(it.newStream()) }.orElse(Body.EMPTY))
+
         else -> init
     }
 }

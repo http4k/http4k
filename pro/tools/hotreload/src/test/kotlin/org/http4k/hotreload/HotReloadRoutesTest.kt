@@ -22,7 +22,7 @@ import java.time.Duration
 class HotReloadRoutesTest {
 
     @Test
-    fun `proxies to backend on non HTML route`() {
+    fun `proxies to backend on non HTML route`() = runBlocking {
         val app = HotReloadRoutes({ Response(OK).body("fallback") })
         assertThat(app(Request(GET, "")), hasStatus(OK).and(hasBody("fallback")))
     }
@@ -38,13 +38,13 @@ class HotReloadRoutesTest {
     }
 
     @Test
-    fun `responds to ping`() {
+    fun `responds to ping`() = runBlocking {
         val app = HotReloadRoutes({ Response(INTERNAL_SERVER_ERROR) })
         assertThat(app(Request(GET, "/http4k/ping")), hasStatus(OK).and(hasBody("pong")))
     }
 
     @Test
-    fun `responds to hot-reload after sleeping`() {
+    fun `responds to hot-reload after sleeping`() = runBlocking {
         val duration = Duration.ofMinutes(1111)
         val app = HotReloadRoutes({ Response(INTERNAL_SERVER_ERROR) }, duration, {
             assertThat(it, equalTo(duration))

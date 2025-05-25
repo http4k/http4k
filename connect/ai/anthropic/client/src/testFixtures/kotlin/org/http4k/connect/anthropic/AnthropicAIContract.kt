@@ -48,7 +48,7 @@ interface AnthropicAIContract {
     }
 
     @Test
-    fun `generate message response stream`() {
+    fun `generate message response stream`() = runBlocking {
         val responses = anthropicAi.messageCompletionStream(
             ModelName.of("claude-3-5-sonnet-20240620"),
             listOf(

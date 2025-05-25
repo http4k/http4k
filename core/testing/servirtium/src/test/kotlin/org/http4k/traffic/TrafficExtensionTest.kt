@@ -64,7 +64,7 @@ class TrafficExtensionTest {
     }
 
     @Test
-    fun `replay replays traffic from servirtium markdown format`() {
+    fun `replay replays traffic from servirtium markdown format`() = runBlocking {
         val replay = Replay.Servirtium({
             javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readBytes()
         })
@@ -86,7 +86,7 @@ class TrafficExtensionTest {
     }
 
     @Test
-    fun `replay replays binary traffic from servirtium markdown format`() {
+    fun `replay replays binary traffic from servirtium markdown format`() = runBlocking {
         val replay = Replay.Servirtium({
             javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readBytes()
         },

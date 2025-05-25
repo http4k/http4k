@@ -23,7 +23,7 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
     }
 
     @Test
-    fun `default usage`() {
+    fun `default usage`() = runBlocking {
         val client = awsClientFilter(Payload.Mode.Signed)
             .then(OkHttp())
         bucketLifecycle((client))

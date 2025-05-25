@@ -30,5 +30,5 @@ abstract class LambdaHttpClient(function: Function, region: Region) : Filter {
     private val filter = createFunctionRequest(function)
         .then(ClientFilters.SetAwsServiceUrl("lambda", region.value))
 
-    override fun invoke(handler: HttpHandler): HttpHandler = filter(handler)
+    override suspend fun invoke(handler: HttpHandler): HttpHandler = filter(handler)
 }

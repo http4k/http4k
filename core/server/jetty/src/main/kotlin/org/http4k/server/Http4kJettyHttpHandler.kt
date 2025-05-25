@@ -1,5 +1,6 @@
 package org.http4k.server
 
+import kotlinx.coroutines.runBlocking
 import org.eclipse.jetty.http.HttpHeader
 import org.eclipse.jetty.io.Content
 import org.eclipse.jetty.server.Handler.Abstract
@@ -18,7 +19,11 @@ import org.eclipse.jetty.server.Response as JettyResponse
 
 class Http4kJettyHttpHandler(private val handler: HttpHandler) : Abstract(Invocable.InvocationType.BLOCKING) {
     override fun handle(request: JettyRequest, response: JettyResponse, callback: Callback): Boolean {
-        (request.asHttp4kRequest()?.let(handler) ?: Response(Status.NOT_IMPLEMENTED)).transferTo(response)
+        (request.asHttp4kRequest()?.let {
+            runBlocking {
+                handler(it) // FIXME coroutine blocking
+            }
+        } ?: Response(Status.NOT_IMPLEMENTED)).transferTo(response)
         callback.succeeded()
         return true
     }

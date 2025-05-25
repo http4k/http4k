@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.contract.ContractRouterMatch.MatchedWithoutHandler
 import org.http4k.contract.ContractRouterMatch.MatchingHandler
 import org.http4k.contract.ContractRouterMatch.MethodNotMatched
@@ -41,12 +42,14 @@ data class ContractRouteMatcher(
 ) : RouteMatcher<Response, Filter> {
     private val contractRoot = PathSegments(rootAsString)
 
-    private val notFound = preSecurityFilter
-        .then(security?.filter ?: Filter.NoOp)
-        .then(postSecurityFilter)
-        .then { renderer.notFound() }
+    private val notFound = runBlocking {
+        preSecurityFilter
+            .then(security?.filter ?: Filter.NoOp)
+            .then(postSecurityFilter)
+            .then { renderer.notFound() }
+    }
 
-    override fun match(request: Request): RoutingMatch<Response> {
+    override suspend fun match(request: Request): RoutingMatch<Response> {
         val m = internalMatch(request)
         return RoutingMatch(
             m.priority,
@@ -62,7 +65,7 @@ data class ContractRouteMatcher(
         )
     }
 
-    private fun internalMatch(request: Request): ContractRouterMatch {
+    private suspend fun internalMatch(request: Request): ContractRouterMatch {
         val unmatched: ContractRouterMatch = Unmatched
 
         return if (request.isIn(contractRoot)) {

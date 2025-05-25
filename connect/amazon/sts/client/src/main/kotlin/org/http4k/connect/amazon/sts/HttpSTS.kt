@@ -28,7 +28,7 @@ fun STS.Companion.Http(
     private val signedHttp = signAwsRequests(region, credentialsProvider, clock, Signed, overrideEndpoint).then(http)
     private val unauthedHttp = setHostForAwsService(region, overrideEndpoint).then(http)
 
-    override fun <R> invoke(action: STSAction<R>) =
+    override suspend fun <R> invoke(action: STSAction<R>) =
         action.toResult(
             when (action) {
                 is AssumeRoleWithWebIdentity -> unauthedHttp(action.toRequest())

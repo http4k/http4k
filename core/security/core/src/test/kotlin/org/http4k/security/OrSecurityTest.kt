@@ -28,12 +28,12 @@ class OrSecurityTest {
         .or(ApiKeySecurity(Query.required("third"), { true }))
 
     @Test
-    fun `toString makes sense`() {
+    fun `toString makes sense`() = runBlocking {
         assertThat(FooBar.or(BarFoo).or(FooBar).toString(), equalTo("OrSecurity(all=[FooBar, BarFoo, FooBar])"))
     }
 
     @Test
-    fun `requires either securities to pass to succeed`() {
+    fun `requires either securities to pass to succeed`() = runBlocking {
         val handler = composite.filter(next)
         assertThat(handler(Request(GET, "")), hasStatus(UNAUTHORIZED))
         assertThat(handler(Request(GET, "?first=true")), hasStatus(OK))

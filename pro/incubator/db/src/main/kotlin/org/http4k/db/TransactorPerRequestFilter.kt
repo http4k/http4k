@@ -1,5 +1,6 @@
 package org.http4k.db
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.with
@@ -13,7 +14,9 @@ fun <Resource : Any> TransactionPerRequestFilter(transactor: Transactor<Resource
     return Filter { next ->
         { request: Request ->
             transactor.perform { resource ->
-                next(request.with(key of resource))
+                runBlocking {
+                    next(request.with(key of resource)) // FIXME coroutine blocking
+                }
             }
         }
     }

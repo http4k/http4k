@@ -18,7 +18,7 @@ class WsRoutingTest {
     val closed = AtomicReference<WsStatus>()
 
     @Test
-    fun `simple find with path matching`() {
+    fun `simple find with path matching`() = runBlocking {
         val request = AtomicReference<Request>()
 
         val ws = websockets(
@@ -53,7 +53,7 @@ class WsRoutingTest {
     }
 
     @Test
-    fun `not found connection is refused`() {
+    fun `not found connection is refused`() = runBlocking {
         val websockets = websockets(
             "/foo" bind { _ -> WsResponse { it.close(WsStatus.REFUSE) } }
         )

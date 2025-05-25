@@ -3,7 +3,7 @@ package org.http4k.serverless
 /**
  * Handler for a Serverless function invocation.
  */
-fun interface FnHandler<In, Ctx, Out> : (In, Ctx) -> Out
+fun interface FnHandler<In, Ctx, Out> : suspend (In, Ctx) -> Out
 
 fun interface FnFilter<In, Ctx, Out> : (FnHandler<In, Ctx, Out>) -> FnHandler<In, Ctx, Out> {
     companion object

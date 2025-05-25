@@ -17,7 +17,7 @@ class ResponderTest {
     private val response = Response(OK)
 
     @Test
-    fun `Responder from Source replays stored responses or falls back to Service Unavailable`() {
+    fun `Responder from Source replays stored responses or falls back to Service Unavailable`() = runBlocking {
         val cache = ReadWriteCache.Memory()
         cache[request] = response
 
@@ -27,7 +27,7 @@ class ResponderTest {
     }
 
     @Test
-    fun `Responder from Replay replays stored responses or falls back to Service Unavailable`() {
+    fun `Responder from Replay replays stored responses or falls back to Service Unavailable`() = runBlocking {
         val stream = ReadWriteStream.Memory()
         stream[request] = response
         stream[request2] = response

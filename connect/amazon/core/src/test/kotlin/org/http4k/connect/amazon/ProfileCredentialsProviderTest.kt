@@ -55,7 +55,7 @@ class ProfileCredentialsProviderTest {
     ).invoke()
 
     @Test
-    fun `default profile in custom file`() {
+    fun `default profile in custom file`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("default")),
             equalTo(AwsCredentials("key123", "secret123"))
@@ -63,7 +63,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `custom profile in custom file`() {
+    fun `custom profile in custom file`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("dev")),
             equalTo(AwsCredentials("key456", "secret456"))
@@ -71,7 +71,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `missing profile`() {
+    fun `missing profile`() = runBlocking {
         assertThat(
             getCredentials(ProfileName.of("missing")),
             absent()
@@ -79,7 +79,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `missing file`() {
+    fun `missing file`() = runBlocking {
         assertThat(
             CredentialsChain.Profile(Environment.EMPTY.with(AWS_CREDENTIAL_PROFILES_FILE of Path("foobar")))(),
             absent()
@@ -87,7 +87,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `credentials are cached`() {
+    fun `credentials are cached`() = runBlocking {
         val expected = AwsCredentials("key123", "secret123")
         val chain = CredentialsChain.Profile(
             profileName = ProfileName.of("default"),
@@ -109,7 +109,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider provides default credentials from env`() {
+    fun `CredentialsProvider provides default credentials from env`() = runBlocking {
         assertThat(
             CredentialsProvider.Profile(env).invoke(),
             equalTo(AwsCredentials("key123", "secret123"))
@@ -117,7 +117,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider provides custom credentials from env`() {
+    fun `CredentialsProvider provides custom credentials from env`() = runBlocking {
         assertThat(
             CredentialsProvider.Profile(env, profileName = ProfileName.of("dev")).invoke(),
             equalTo(AwsCredentials("key456", "secret456"))
@@ -125,7 +125,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider provides custom config credentials from env`() {
+    fun `CredentialsProvider provides custom config credentials from env`() = runBlocking {
         assertThat(
             CredentialsProvider.Profile(env, profileName = ProfileName.of("dev1")).invoke(),
             equalTo(AwsCredentials("key789", "secret789"))
@@ -133,7 +133,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider provides custom credentials from custom file`() {
+    fun `CredentialsProvider provides custom credentials from custom file`() = runBlocking {
         assertThat(
             CredentialsProvider.Profile(
                 profileName = ProfileName.of("dev"),
@@ -144,7 +144,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider provides default credentials from custom file`() {
+    fun `CredentialsProvider provides default credentials from custom file`() = runBlocking {
         assertThat(
             CredentialsProvider.Profile(credentialsPath = credentialsFile).invoke(),
             equalTo(AwsCredentials("key123", "secret123"))
@@ -152,7 +152,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider throws exception for missing profile`() {
+    fun `CredentialsProvider throws exception for missing profile`() = runBlocking {
         val ex = assertThrows<IllegalArgumentException> {
             CredentialsProvider.Profile(profileName = ProfileName.of("missing")).invoke()
         }
@@ -160,7 +160,7 @@ class ProfileCredentialsProviderTest {
     }
 
     @Test
-    fun `CredentialsProvider throws exception for missing credentials path`() {
+    fun `CredentialsProvider throws exception for missing credentials path`() = runBlocking {
         val ex = assertThrows<IllegalArgumentException> {
             CredentialsProvider.Profile(credentialsPath = Path("foobar")).invoke()
         }

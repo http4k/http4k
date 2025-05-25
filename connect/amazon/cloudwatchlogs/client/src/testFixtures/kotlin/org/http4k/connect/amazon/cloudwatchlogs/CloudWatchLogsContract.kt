@@ -25,7 +25,7 @@ interface CloudWatchLogsContract : AwsContract {
     private val logStreamName get() = LogStreamName.of(uuid().toString())
 
     @Test
-    fun `log events lifecycle`() {
+    fun `log events lifecycle`() = runBlocking {
         with(cloudWatchLogs) {
             createLogGroup(logGroupName, mapOf("1" to "2")).valueOrNull()!!
             createLogStream(logGroupName, logStreamName).valueOrNull()!!

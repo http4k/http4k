@@ -6,7 +6,7 @@ import org.http4k.connect.RemoteFailure
 
 @Http4kConnectApiClient
 interface InstanceMetadataService {
-    operator fun <R> invoke(action: Ec2MetadataAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: Ec2MetadataAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

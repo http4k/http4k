@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 class OpenWhiskFunctionTest {
 
     @Test
-    fun `full request (raw) - calls the handler and returns proper body`() {
+    fun `full request (raw) - calls the handler and returns proper body`() = runBlocking {
         assertExpectedResponseIs(
             FakeOpenWhiskRawRequest(
                 "post",
@@ -37,7 +37,7 @@ class OpenWhiskFunctionTest {
     }
 
     @Test
-    fun `full request (with queries at top level) - binary - calls the handler and returns proper body`() {
+    fun `full request (with queries at top level) - binary - calls the handler and returns proper body`() = runBlocking {
         assertExpectedResponseIs(
             FakeOpenWhiskRequestWithTopLevelQueries(
                 "post",
@@ -57,7 +57,7 @@ class OpenWhiskFunctionTest {
     }
 
     @Test
-    fun `full request (with queries at top level) - non-binary - calls the handler and returns proper body`() {
+    fun `full request (with queries at top level) - non-binary - calls the handler and returns proper body`() = runBlocking {
         assertExpectedResponseIs(
             FakeOpenWhiskRequestWithTopLevelQueries(
                 "post",
@@ -77,7 +77,7 @@ class OpenWhiskFunctionTest {
     }
 
     @Test
-    fun `minimal request - calls the handler and returns proper body`() {
+    fun `minimal request - calls the handler and returns proper body`() = runBlocking {
         assertExpectedResponseIs(
             FakeOpenWhiskRequestWithTopLevelQueries("get", null, null, null, null),
             FakeOpenWhiskResponse(200, emptyMap(), "P3F1ZXJ5PQ=="),

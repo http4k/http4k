@@ -60,7 +60,7 @@ class DynamoDbUpdateGrammarTest {
     )
 
     @Test
-    fun `remove - two actions`() {
+    fun `remove - two actions`() = runBlocking {
         val item = Item(attrS of "a", attrN of 1, attrSS of setOf("b"))
 
         assert("REMOVE $attrN $attrSS", item, Item(attrS of "a"))

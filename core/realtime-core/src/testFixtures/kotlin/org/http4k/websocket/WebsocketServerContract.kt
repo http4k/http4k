@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.base64Encode
 import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
@@ -30,7 +31,6 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.time.Duration
@@ -125,13 +125,12 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `can do standard http traffic`() {
-        if (!httpSupported) return
-        assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
+    fun `can do standard http traffic`() = runBlocking {
+        if (httpSupported) assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
     }
 
     @Test
-    fun `does not error when we do not call close`() {
+    fun `does not error when we do not call close`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${port}/noclose"))
         assertThat(
             client.received().take(1).toList(),
@@ -144,7 +143,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `can send and receive text messages from socket`() {
+    fun `can send and receive text messages from socket`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
         client.send(WsMessage("hello"))
 
@@ -162,7 +161,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `can send and receive binary messages from socket - MemoryBody`() {
+    fun `can send and receive binary messages from socket - MemoryBody`() = runBlocking {
         val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
 
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bin"))
@@ -174,7 +173,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `can send and receive binary messages from socket - StreamBody`() {
+    fun `can send and receive binary messages from socket - StreamBody`() = runBlocking {
         val content = javaClass.classLoader.getResourceAsStream("org/http4k/websocket/sample_2k.png")!!.readBytes()
 
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bin"))
@@ -186,7 +185,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `errors are propagated to the 'on error' handler`() {
+    fun `errors are propagated to the 'on error' handler`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
         assertThat(
@@ -196,7 +195,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `should propagate close on client close`() {
+    fun `should propagate close on client close`() = runBlocking {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null
 
@@ -218,7 +217,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `should propagate close on server close`() {
+    fun `should propagate close on server close`() = runBlocking {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null
 
@@ -244,7 +243,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    open fun `should propagate close on server stop`() {
+    open fun `should propagate close on server stop`() = runBlocking {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null
 
@@ -267,14 +266,14 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `should correctly set query parameters on upgrade request passed into the web socket`() {
+    fun `should correctly set query parameters on upgrade request passed into the web socket`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
         client.send(WsMessage("hello"))
         assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("foo"))))
     }
 
     @Test
-    fun `can connect with non-blocking client`() {
+    fun `can connect with non-blocking client`() = runBlocking {
         val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/hello/bob"))
         val latch = CountDownLatch(1)
         client.onMessage {
@@ -285,19 +284,21 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    fun `should fail on invalid url`() {
+    fun `should fail on invalid url`() = runBlocking {
         assertThat({
-            val client = WebsocketClient.blocking(
-                Uri.of("ws://localhost:$port/aaa"),
-                timeout = Duration.ZERO
-            )
+            runBlocking {
 
-            client.send(WsMessage("hello"))
+                val client = WebsocketClient.blocking(
+                    Uri.of("ws://localhost:$port/aaa"),
+                    timeout = Duration.ZERO
+                )
+                client.send(WsMessage("hello"))
+            }
         }, throws<WebsocketNotConnectedException>())
     }
 
     @Test
-    fun `can send and receive multi-frame messages from socket`() {
+    fun `can send and receive multi-frame messages from socket`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/echo"))
 
         val longMessage = WsMessage((1..10000).joinToString("") { "a" })
@@ -310,7 +311,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
-    open fun `can receive headers from upgrade request`() {
+    open fun `can receive headers from upgrade request`() = runBlocking {
         val client = WebsocketClient.blocking(
             Uri.of("ws://localhost:$port/headers"),
             listOf("Foo" to "bar")

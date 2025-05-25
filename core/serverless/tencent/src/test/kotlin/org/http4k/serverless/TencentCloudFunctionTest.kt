@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 class TencentCloudFunctionTest {
 
     @Test
-    fun `adapts APIGW request and response and receives context`() {
+    fun `adapts APIGW request and response and receives context`() = runBlocking {
 
         val context: Context = mock()
 

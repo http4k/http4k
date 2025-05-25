@@ -16,7 +16,7 @@ private class MyFunction : AwsLambdaEventFunction(FnLoader {
 
 class AwsLambdaEventFunctionTest {
     @Test
-    fun `can implement function and call it`() {
+    fun `can implement function and call it`() = runBlocking {
         val input = "{}"
         val output = ByteArrayOutputStream()
         MyFunction().handleRequest(input.byteInputStream(), output, mock())

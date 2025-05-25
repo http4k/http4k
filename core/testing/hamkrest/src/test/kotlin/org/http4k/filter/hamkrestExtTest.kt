@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test
 
 class ExtensionsTest {
     @Test
-    fun `request matching as a filter`() {
+    fun `request matching as a filter`() = runBlocking {
         val app = RequestFilters.Assert(hasHeader("bob")).then { Response(OK) }
 
         app(Request(GET, "").header("bob", "foo"))
@@ -21,9 +22,14 @@ class ExtensionsTest {
     }
 
     @Test
-    fun `response matching as a filter`() {
+    fun `response matching as a filter`() = runBlocking {
         ResponseFilters.Assert(!hasHeader("bob")).then { Response(OK) }(Request(GET, ""))
 
-        assertThat({ ResponseFilters.Assert(hasHeader("bob")).then { Response(OK) }(Request(GET, "")) }, throws<AssertionError>())
+        assertThat(
+            { runBlocking {
+                ResponseFilters.Assert(hasHeader("bob")).then { Response(OK) }(Request(GET, ""))
+            } },
+            throws<AssertionError>()
+        )
     }
 }

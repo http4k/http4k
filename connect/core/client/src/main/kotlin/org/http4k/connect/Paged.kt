@@ -5,6 +5,7 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.peekFailure
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Response
 import org.http4k.format.AutoMarshalling
 import org.http4k.lens.LensExtractor
@@ -31,7 +32,7 @@ interface PagedAction<Token, ItemType, Rsp : Paged<Token, ItemType>, Self : Page
  * Paginate the response of the passed action
  */
 fun <Token, ItemType, Action : PagedAction<Token, ItemType, Rsp, Action>, Rsp : Paged<Token, ItemType>> paginated(
-    fn: (Action) -> Result<Rsp, RemoteFailure>, action: Action
+    fn: suspend (Action) -> Result<Rsp, RemoteFailure>, action: Action
 ): Sequence<Result<List<ItemType>, RemoteFailure>> {
 
     var nextRequest: Action? = action
@@ -39,9 +40,11 @@ fun <Token, ItemType, Action : PagedAction<Token, ItemType, Rsp, Action>, Rsp : 
     return generateSequence {
         nextRequest
             ?.let {
-                fn(it).map { rsp ->
-                    nextRequest = rsp.token()?.let(it::next)
-                    rsp.items
+                runBlocking {
+                    fn(it).map { rsp ->
+                        nextRequest = rsp.token()?.let(it::next)
+                        rsp.items
+                    }
                 }
             }
     }.map { it.peekFailure { nextRequest = null } }

@@ -28,7 +28,7 @@ class DatastarExtensionsTest {
     }
 
     @Test
-    fun `can roundtrip events in and out of response`() {
+    fun `can roundtrip events in and out of response`() = runBlocking {
         val response = Response(OK).datastarEvents(
             listOf(
                 MergeFragments("<foo/>", "<bar/>"),

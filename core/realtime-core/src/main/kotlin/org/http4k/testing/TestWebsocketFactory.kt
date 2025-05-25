@@ -12,18 +12,18 @@ object TestWebsocketFactory {
 
     operator fun invoke(server: WsHandler) = object: WebsocketFactory {
 
-        override fun nonBlocking(
+        override suspend fun nonBlocking(
             uri: Uri,
             headers: Headers,
             onError: (Throwable) -> Unit,
             onConnect: WsConsumer
         ) = Request(GET, uri)
             .headers(headers)
-            .let(server::testWebsocket)
+            .let { server.testWebsocket(it) }
             .also(onConnect)
 
-        override fun blocking(uri: Uri, headers: Headers) = Request(GET, uri)
+        override suspend fun blocking(uri: Uri, headers: Headers) = Request(GET, uri)
             .headers(headers)
-            .let(server::testWsClient)
+            .let { server.testWsClient(it) }
     }
 }

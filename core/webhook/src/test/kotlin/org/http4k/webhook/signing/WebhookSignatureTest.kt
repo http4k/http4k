@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class WebhookSignatureTest {
 
     @Test
-    fun `can roundtrip`() {
+    fun `can roundtrip`() = runBlocking {
         val payload = SignedPayload.encode("foobar")
         val sig = WebhookSignature.of(v1, payload)
         assertThat(sig.identifier, equalTo(v1))

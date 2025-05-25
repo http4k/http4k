@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class RequestExtensionsTest {
 
     @Test
-    fun `encodes path`() {
+    fun `encodes path`() = runBlocking {
         val encodedRequest = Request(GET, "http://www.google.com/a:b:c/d e/*f/~g").encodeUri()
         assertThat(
             encodedRequest.uri.path,

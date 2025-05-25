@@ -86,7 +86,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan table`() {
+    fun `scan table`() = runBlocking {
         val result = dynamo.scan(table).successValue()
 
         assertThat(result.Count, equalTo(3))
@@ -98,7 +98,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan with filter`() {
+    fun `scan with filter`() = runBlocking {
         val result = dynamo.scan(
             TableName = table,
             FilterExpression = "$attrN = :val1",
@@ -113,7 +113,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan with limit`() {
+    fun `scan with limit`() = runBlocking {
         val result = dynamo.scan(TableName = table, Limit = 2).successValue()
 
         assertThat(result.Count, equalTo(2))
@@ -122,7 +122,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan multiple pages`() {
+    fun `scan multiple pages`() = runBlocking {
         val page1 = dynamo.scan(
             TableName = table,
             Limit = 2
@@ -143,7 +143,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan with max results for page`() {
+    fun `scan with max results for page`() = runBlocking {
         val numItems = 2_000
         val payload = (1..1_000).map { "a".repeat(1_000) }.toSet()
 
@@ -166,7 +166,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan index`() {
+    fun `scan index`() = runBlocking {
         val result = dynamo.scan(TableName = table, IndexName = binaryStringGSI).successValue()
 
         assertThat(result.Count, equalTo(2))
@@ -177,7 +177,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test // Fixes GH#327
-    fun `filter evaluated after pagination`() {
+    fun `filter evaluated after pagination`() = runBlocking {
         dynamo.batchWriteItem(
             mapOf(
                 table to listOf(
@@ -213,7 +213,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `paginate on GSI - different keys than primary index`() {
+    fun `paginate on GSI - different keys than primary index`() = runBlocking {
         val idAttr = Attribute.uuid().required("id")
         val nameAttr = Attribute.string().required("name")
         val dobAttr = Attribute.localDate().required("dob")
@@ -278,7 +278,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan on missing index`() {
+    fun `scan on missing index`() = runBlocking {
         val result = dynamo.scan(
             TableName = table,
             IndexName = IndexName.of("missing")
@@ -294,7 +294,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan with reserved word - exact case`() {
+    fun `scan with reserved word - exact case`() = runBlocking {
         dynamo.putItem(table, item1)
 
         val result = dynamo.scan(
@@ -313,7 +313,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `scan with reserved word - named`() {
+    fun `scan with reserved word - named`() = runBlocking {
         dynamo.putItem(table, item1)
 
         dynamo.scan(
@@ -329,7 +329,7 @@ abstract class DynamoDbScanContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with reserved word - ignore case`() {
+    fun `query with reserved word - ignore case`() = runBlocking {
         dynamo.putItem(table, item1)
 
         val result = dynamo.scan(

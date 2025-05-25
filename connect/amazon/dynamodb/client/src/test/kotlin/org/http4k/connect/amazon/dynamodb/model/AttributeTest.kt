@@ -24,7 +24,7 @@ import java.util.UUID
 class AttributeTest {
 
     @Test
-    fun `can create value from attributes`() {
+    fun `can create value from attributes`() = runBlocking {
         assertThat(
             Attribute.value(MyLongType).required("name").asValue(MyLongType.of(1)),
             equalTo(Num(1))
@@ -45,7 +45,7 @@ class AttributeTest {
     }
 
     @Test
-    fun `defaulted falls back to another lens`() {
+    fun `defaulted falls back to another lens`() = runBlocking {
         val fallback: Attribute<UUID> = Attribute.string().map(UUID::fromString, UUID::toString).required("fallback")
         val primary = Attribute.uuid().defaulted("primary", fallback)
 
@@ -56,7 +56,7 @@ class AttributeTest {
     }
 
     @Test
-    fun `may ignore null values in optional attributes`() {
+    fun `may ignore null values in optional attributes`() = runBlocking {
         // given
         val optionalWithNull = Attribute.string().optional("withNull")
         val optionalWithoutNull = Attribute.string().optional("withoutNull", ignoreNull = true)
@@ -77,7 +77,7 @@ class AttributeTest {
     }
 
     @Test
-    fun `convert optional Attribute to required Attribute`() {
+    fun `convert optional Attribute to required Attribute`() = runBlocking {
         // given
         val givenOptionalInt = Attribute.int().optional("intValue")
         val givenRequiredInt = Attribute.int().required("intValue")

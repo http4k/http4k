@@ -1,5 +1,6 @@
 package org.http4k.jsonrpc
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -31,16 +32,18 @@ data class JsonRpcService<NODE>(
 
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
 
-    private val handler = CatchLensFailure { _ -> Response(OK).with(jsonLens of json.renderError(ParseError)) }
-        .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
-        .then {
-            when (val responseJson = processor(jsonLens(it))) {
-                null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
-                else -> Response(OK).with(jsonLens of responseJson)
+    private val handler = runBlocking {
+        CatchLensFailure { _ -> Response(OK).with(jsonLens of json.renderError(ParseError)) }
+            .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
+            .then {
+                when (val responseJson = processor(jsonLens(it))) {
+                    null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
+                    else -> Response(OK).with(jsonLens of responseJson)
+                }
             }
-        }
+    }
 
-    override fun invoke(request: Request): Response = handler(request)
+    override suspend fun invoke(request: Request): Response = handler(request)
 }
 
 const val jsonRpcVersion: String = "2.0"

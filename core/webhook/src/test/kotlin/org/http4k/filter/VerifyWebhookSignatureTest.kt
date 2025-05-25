@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test
 class VerifyWebhookSignatureTest {
 
     @Test
-    fun `verify ok signature`() {
+    fun `verify ok signature`() = runBlocking {
         val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ ->
             true
         }, { Response(I_M_A_TEAPOT) })
@@ -46,7 +46,7 @@ class VerifyWebhookSignatureTest {
     }
 
     @Test
-    fun `don't verify bad signature`() {
+    fun `don't verify bad signature`() = runBlocking {
         val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ ->
             false
         }, { Response(I_M_A_TEAPOT) })
@@ -68,7 +68,7 @@ class VerifyWebhookSignatureTest {
     }
 
     @Test
-    fun `missing signature is bad`() {
+    fun `missing signature is bad`() = runBlocking {
         val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ -> error("") }, { Response(I_M_A_TEAPOT) })
             .then { error("") }
 

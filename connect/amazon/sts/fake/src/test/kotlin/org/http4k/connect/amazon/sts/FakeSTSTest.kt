@@ -16,7 +16,7 @@ class FakeSTSTest : STSContract, FakeAwsContract {
     override val http = FakeSTS()
 
     @Test
-    fun `assume role with web identity`() {
+    fun `assume role with web identity`() = runBlocking {
         val result = sts.assumeRoleWithWebIdentity(
             ARN.of("arn:aws:iam::169766454405:role/ROLETEST"),
             RoleSessionName.of(UUID.randomUUID().toString()),

@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.hasSize
+import kotlinx.coroutines.runBlocking
 import org.http4k.base64Encode
 import org.http4k.core.MemoryBody
 import org.http4k.core.StreamBody
@@ -23,7 +24,7 @@ abstract class NonBlockingWebsocketClientContract(
 
     @Test
     @Timeout(10, unit = TimeUnit.SECONDS)
-    fun `send and receive in text mode`() {
+    fun `send and receive in text mode`() = runBlocking {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 
@@ -46,7 +47,7 @@ abstract class NonBlockingWebsocketClientContract(
 
     @Test
     @Timeout(10, unit = TimeUnit.SECONDS)
-    fun `send and receive in binary mode - MemoryBody`() {
+    fun `send and receive in binary mode - MemoryBody`() = runBlocking {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 
@@ -72,7 +73,7 @@ abstract class NonBlockingWebsocketClientContract(
 
     @Test
     @Timeout(10, unit = TimeUnit.SECONDS)
-    fun `send and receive in binary mode - StreamBody`() {
+    fun `send and receive in binary mode - StreamBody`() = runBlocking {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 
@@ -97,7 +98,7 @@ abstract class NonBlockingWebsocketClientContract(
     }
 
     @Test
-    fun `onConnect is called when connected`() {
+    fun `onConnect is called when connected`() = runBlocking {
         val connected = CountDownLatch(1)
 
         websockets.nonBlocking(Uri.of("ws://localhost:$port/bob")) {
@@ -108,7 +109,7 @@ abstract class NonBlockingWebsocketClientContract(
     }
 
     @Test
-    fun `onError is called on connection error`() {
+    fun `onError is called on connection error`() = runBlocking {
         val error = CountDownLatch(1)
 
         websockets.nonBlocking(Uri.of("ws://does-not-exist:12345"), onError = { error.countDown() })
@@ -117,7 +118,7 @@ abstract class NonBlockingWebsocketClientContract(
     }
 
     @Test
-    fun `headers are sent to the server`() {
+    fun `headers are sent to the server`() = runBlocking {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 

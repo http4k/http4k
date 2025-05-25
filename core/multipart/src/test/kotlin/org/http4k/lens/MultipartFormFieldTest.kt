@@ -4,13 +4,14 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 class MultipartFormFieldTest {
     private val form = MultipartForm(mapOf("hello" to listOf(MultipartFormField("world"), MultipartFormField("world2"))))
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(MultipartFormField.string().optional("hello")(form), equalTo("world"))
         assertThat(MultipartFormField.string().required("hello")(form), equalTo("world"))
         assertThat(MultipartFormField.string().map { it.length }.required("hello")(form), equalTo(5))
@@ -22,7 +23,7 @@ class MultipartFormFieldTest {
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         assertThat(MultipartFormField.optional("world")(form), absent())
         val requiredFormField = MultipartFormField.required("world")
         assertThat({ requiredFormField(form) }, throws(lensFailureWith<MultipartForm>(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
@@ -33,7 +34,7 @@ class MultipartFormFieldTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = MultipartFormField.string().required("world")
         assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
 
@@ -43,7 +44,7 @@ class MultipartFormFieldTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val requiredFormField = MultipartFormField.string().map(String::toInt).required("hello")
         assertThat({ requiredFormField(form) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
 
@@ -58,14 +59,14 @@ class MultipartFormFieldTest {
     }
 
     @Test
-    fun `sets value on form`() {
+    fun `sets value on form`() = runBlocking {
         val formField = MultipartFormField.string().required("bob")
         val withFormField = formField("hello", form)
         assertThat(formField(withFormField), equalTo("hello"))
     }
 
     @Test
-    fun `can create a custom type and get and set on request`() {
+    fun `can create a custom type and get and set on request`() = runBlocking {
         val custom = MultipartFormField.string().map(::MyCustomType, MyCustomType::value).required("bob")
 
         val instance = MyCustomType("hello world!")
@@ -77,7 +78,7 @@ class MultipartFormFieldTest {
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(MultipartFormField.string().required("hello").toString(), equalTo("Required form 'hello'"))
         assertThat(MultipartFormField.string().optional("hello").toString(), equalTo("Optional form 'hello'"))
         assertThat(MultipartFormField.string().multi.required("hello").toString(), equalTo("Required form 'hello'"))

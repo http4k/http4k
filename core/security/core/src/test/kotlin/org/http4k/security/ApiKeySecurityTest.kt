@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 class ApiKeySecurityTest {
 
     @Test
-    fun `valid API key is granted access and result carried through`() {
+    fun `valid API key is granted access and result carried through`() = runBlocking {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
@@ -31,7 +31,7 @@ class ApiKeySecurityTest {
     }
 
     @Test
-    fun `OPTIONS request is granted access even with no API key if toggled off`() {
+    fun `OPTIONS request is granted access even with no API key if toggled off`() = runBlocking {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
@@ -42,7 +42,7 @@ class ApiKeySecurityTest {
     }
 
     @Test
-    fun `missing API key is unauthorized`() {
+    fun `missing API key is unauthorized`() = runBlocking {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
@@ -52,7 +52,7 @@ class ApiKeySecurityTest {
     }
 
     @Test
-    fun `bad API key is unauthorized`() {
+    fun `bad API key is unauthorized`() = runBlocking {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
@@ -62,7 +62,7 @@ class ApiKeySecurityTest {
     }
 
     @Test
-    fun `unknown API key is unauthorized`() {
+    fun `unknown API key is unauthorized`() = runBlocking {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
@@ -74,7 +74,7 @@ class ApiKeySecurityTest {
     @Nested
     inner class WithConsumer {
         @Test
-        fun `valid API key is granted access and result carried through`() {
+        fun `valid API key is granted access and result carried through`() = runBlocking {
             val param = Query.int().required("name")
             val consumer = Header.string().required("consumer-name")
             val next: HttpHandler = { Response(OK).body("hello ${consumer[it]}") }
@@ -86,7 +86,7 @@ class ApiKeySecurityTest {
         }
 
         @Test
-        fun `API key without consumer is unauthorized`() {
+        fun `API key without consumer is unauthorized`() = runBlocking {
             val param = Query.int().required("name")
             val consumer = Header.string().required("consumer-name")
             val next: HttpHandler = { Response(OK).body("hello") }
@@ -98,7 +98,7 @@ class ApiKeySecurityTest {
 
 
         @Test
-        fun `OPTIONS request is granted access even with no API key if toggled off`() {
+        fun `OPTIONS request is granted access even with no API key if toggled off`() = runBlocking {
             val param = Query.int().required("name")
             val consumer = Header.string().defaulted("consumer-name", "unknown-consumer")
             val next: HttpHandler = { Response(OK).body("hello ${consumer[it]}") }
@@ -110,7 +110,7 @@ class ApiKeySecurityTest {
         }
 
         @Test
-        fun `missing API key is unauthorized`() {
+        fun `missing API key is unauthorized`() = runBlocking {
             val param = Query.int().required("name")
             val consumer = Header.string().required("consumer-name")
             val next: HttpHandler = { Response(OK).body("hello") }
@@ -121,7 +121,7 @@ class ApiKeySecurityTest {
         }
 
         @Test
-        fun `bad API key is unauthorized`() {
+        fun `bad API key is unauthorized`() = runBlocking {
             val param = Query.int().required("name")
             val consumer = Header.string().required("consumer-name")
             val next: HttpHandler = { Response(OK).body("hello") }
@@ -132,7 +132,7 @@ class ApiKeySecurityTest {
         }
 
         @Test
-        fun `unknown API key is unauthorized`() {
+        fun `unknown API key is unauthorized`() = runBlocking {
             val param = Query.int().required("name")
             val next: HttpHandler = { Response(OK).body("hello") }
 

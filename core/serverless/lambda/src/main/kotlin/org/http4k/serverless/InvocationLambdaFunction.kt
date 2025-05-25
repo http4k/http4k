@@ -15,7 +15,7 @@ import java.io.InputStream
 class InvocationFnLoader(private val appLoader: AppLoader) : FnLoader<Context> {
     constructor(input: HttpHandler) : this(AppLoader { input })
 
-    override operator fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
+    override suspend operator fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
         val app = appLoader(env)
         return FnHandler { inputStream, ctx ->
             val request = Request(POST, "/2015-03-31/functions/${ctx.functionName}/invocations")

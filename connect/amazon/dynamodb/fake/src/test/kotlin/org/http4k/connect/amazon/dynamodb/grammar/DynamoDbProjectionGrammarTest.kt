@@ -15,7 +15,7 @@ class DynamoDbProjectionGrammarTest {
     private val attrMap = Attribute.map().required("attrMap")
 
     @Test
-    fun `attribute value`() {
+    fun `attribute value`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("attr1").eval(ItemWithSubstitutions(Item(attr1 of "123"))),
             equalTo(listOf(attr1.name to attr1.asValue("123")))
@@ -23,7 +23,7 @@ class DynamoDbProjectionGrammarTest {
     }
 
     @Test
-    fun `attribute value with expression name`() {
+    fun `attribute value with expression name`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("#att")
                 .eval(ItemWithSubstitutions(Item(attr1 of "123"), mapOf("#att" to AttributeName.of("attr1")))),
@@ -32,7 +32,7 @@ class DynamoDbProjectionGrammarTest {
     }
 
     @Test
-    fun `indexed attribute value`() {
+    fun `indexed attribute value`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("attrList[1]").eval(
                 ItemWithSubstitutions(
@@ -52,7 +52,7 @@ class DynamoDbProjectionGrammarTest {
     }
 
     @Test
-    fun `indexed attribute value with expression name`() {
+    fun `indexed attribute value with expression name`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("#theList[1]").eval(
                 ItemWithSubstitutions(
@@ -73,7 +73,7 @@ class DynamoDbProjectionGrammarTest {
     }
 
     @Test
-    fun `multiple indexed attribute value`() {
+    fun `multiple indexed attribute value`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("attrList[0][1][2]").eval(
                 ItemWithSubstitutions(
@@ -119,7 +119,7 @@ class DynamoDbProjectionGrammarTest {
     }
 
     @Test
-    fun `map attribute value`() {
+    fun `map attribute value`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("attrMap.attr1").eval(
                 ItemWithSubstitutions(Item(attrMap of Item(attr1 of "456", attrNum of 456)))
@@ -129,7 +129,7 @@ class DynamoDbProjectionGrammarTest {
     }
 
     @Test
-    fun `map attribute value with expression name`() {
+    fun `map attribute value with expression name`() = runBlocking {
         assertThat(
             DynamoDbProjectionGrammar.parse("#map.#att").eval(
                 ItemWithSubstitutions(

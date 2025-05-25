@@ -19,7 +19,7 @@ class KotlinxSerializationTest : JsonContract<JsonElement>(KotlinxSerialization)
      * which is currently not customisable.
      */
     @Test
-    override fun `serializes object to json`() {
+    override fun `serializes object to json`() = runBlocking {
         j {
             val input = obj(
                 "string" to string("value"),

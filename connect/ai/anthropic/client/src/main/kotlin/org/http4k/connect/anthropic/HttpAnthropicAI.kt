@@ -16,5 +16,5 @@ fun AnthropicAI.Companion.Http(
         .then(SetHeader("anthropic-version", apiVersion.value.toString()))
         .then(http)
 
-    override fun <R> invoke(action: AnthropicAIAction<R>) = action.toResult(routedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: AnthropicAIAction<R>) = action.toResult(routedHttp(action.toRequest()))
 }

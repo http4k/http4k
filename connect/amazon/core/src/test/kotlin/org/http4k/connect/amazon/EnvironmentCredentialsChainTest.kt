@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class EnvironmentCredentialsChainTest {
 
     @Test
-    fun `find credentials`() {
+    fun `find credentials`() = runBlocking {
         val env = Environment.EMPTY
             .with(AWS_ACCESS_KEY_ID of AccessKeyId.of("key123"))
             .with(AWS_SECRET_ACCESS_KEY of SecretAccessKey.of("secret123"))
@@ -25,7 +25,7 @@ class EnvironmentCredentialsChainTest {
     }
 
     @Test
-    fun `missing credentials`() {
+    fun `missing credentials`() = runBlocking {
         assertThat(
             CredentialsChain.Environment(Environment.EMPTY).invoke(),
             absent()

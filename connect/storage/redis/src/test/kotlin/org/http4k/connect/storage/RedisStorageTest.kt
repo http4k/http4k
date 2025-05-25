@@ -32,7 +32,7 @@ class RedisStorageTest : StorageContract() {
     }
 
     @Test
-    fun `when a custom duration function is passed, the returned value is set as the expiry`() {
+    fun `when a custom duration function is passed, the returned value is set as the expiry`() = runBlocking {
         val redisCommands = mockk<RedisCommands<String, AnEntity>>()
         val capturedArgs = mutableListOf<SetArgs>()
         every { redisCommands.set(any(), any(), capture(capturedArgs)) } returns "OK"

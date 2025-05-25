@@ -11,7 +11,7 @@ class FakeSQSTest : SQSContract, FakeAwsContract {
     override val http = FakeSQS()
 
     @Test
-    fun `multiple messages are handled correctly`() {
+    fun `multiple messages are handled correctly`() = runBlocking {
         with(sqs) {
             val created = createQueue(
                 queueName,

@@ -2,6 +2,7 @@ package org.http4k.template
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Response
@@ -17,7 +18,7 @@ abstract class ViewModelContract(private val templates: Templates) {
         Item("item2", "£3", listOf(Feature("nasty"))))
 
     @Test
-    fun `renders into Body`() {
+    fun `renders into Body`() = runBlocking {
         val renderer = templates.CachingClasspath()
 
         val view = Body.viewModel(renderer, TEXT_HTML).toLens()
@@ -30,7 +31,7 @@ abstract class ViewModelContract(private val templates: Templates) {
     }
 
     @Test
-    fun `renders into WsMessage`() {
+    fun `renders into WsMessage`() = runBlocking {
         val renderer = templates.CachingClasspath()
 
         val view = WsMessage.viewModel(renderer).toLens()

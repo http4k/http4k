@@ -2,6 +2,7 @@ package org.http4k.sse
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType
@@ -62,7 +63,7 @@ abstract class DatastarServerContract(
     }
 
     @Test
-    fun `can receive messages from sse`() {
+    fun `can receive messages from sse`() = runBlocking {
         val client = BlockingSseClient(Uri.of("http://localhost:${server.port()}/signal"))
 
         val toList = client.received().toList()
@@ -78,7 +79,7 @@ abstract class DatastarServerContract(
     }
 
     @Test
-    fun `can receive messages via http`() {
+    fun `can receive messages via http`() = runBlocking {
         val response = client(Request(GET, "http://localhost:${server.port()}/noStream"))
 
         assertThat(
@@ -96,7 +97,7 @@ data: useViewTransition false
     }
 
     @Test
-    fun `can receive messages via client`() {
+    fun `can receive messages via client`() = runBlocking {
         val response = client(
             Request(
                 GET,

@@ -56,7 +56,7 @@ class TracingFunctionalTest: PortBasedTest {
     private fun Service.port() = registry[this] ?: error("could not find server port")
 
     @Test
-    fun `single server call`() {
+    fun `single server call`() = runBlocking {
         ServiceA.start()
         val clientA = clientFor(ServiceA)
 
@@ -69,7 +69,7 @@ class TracingFunctionalTest: PortBasedTest {
     }
 
     @Test
-    fun `server to server call`() {
+    fun `server to server call`() = runBlocking {
         ServiceB.start()
         ServiceA.start(clientFor(ServiceB))
         val clientA = clientFor(ServiceA)
@@ -85,7 +85,7 @@ class TracingFunctionalTest: PortBasedTest {
     }
 
     @Test
-    fun `multiple calls`() {
+    fun `multiple calls`() = runBlocking {
         ServiceB.start()
         ServiceC.start()
         ServiceA.start(clientFor(ServiceB), clientFor(ServiceC))

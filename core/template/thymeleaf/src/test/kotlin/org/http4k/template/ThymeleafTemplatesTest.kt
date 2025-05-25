@@ -17,7 +17,7 @@ class ThymeleafTemplatesTest : TemplatesContract<ThymeleafTemplates>(ThymeleafTe
 class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
 
     @Test
-    fun `can override template name to provide format specific stuff`() {
+    fun `can override template name to provide format specific stuff`() = runBlocking {
         val renderer = ThymeleafTemplates().CachingClasspath()
 
         assertThat(renderer(CssFeature("blue")), equalTo("body {\n" +
@@ -26,7 +26,7 @@ class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
     }
 
     @Test
-    fun `can specify template fragment`() {
+    fun `can specify template fragment`() = runBlocking {
         val renderer = ThymeleafTemplates().CachingClasspath()
 
         assertThat(renderer(WithFragment), equalTo("<span>inside</span>"))

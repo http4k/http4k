@@ -25,7 +25,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     override val expectedArbitraryMap = """{"str":"val1","num":123.1,"array":[1.1,"stuff"],"map":{"foo":"bar"},"bool":true}"""
 
     @Test
-    open fun `out only string`() {
+    open fun `out only string`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = OutOnlyHolder(OutOnly("foobar"))
@@ -35,7 +35,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    open fun `in only string`() {
+    open fun `in only string`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = InOnlyHolder(InOnly("foobar"))
@@ -44,7 +44,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    open fun `prohibit strings`() {
+    open fun `prohibit strings`() = runBlocking {
         val marshaller = customMarshallerProhibitStrings()
 
         assertThat(marshaller.asFormatString(StringHolder("hello")).normaliseJson(), equalTo(expectedConvertToInputStream))
@@ -52,7 +52,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    open fun `roundtrip custom mapped number`() {
+    open fun `roundtrip custom mapped number`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
@@ -61,7 +61,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    open fun `serialises enum as a key correctly`() {
+    open fun `serialises enum as a key correctly`() = runBlocking {
         val marshaller = customMarshaller()
         val input = SpecificMapHolder(mapOf(AnEnum.woo to MyValue.of("yay")))
         val expected = """{"value":{"yay":"yay"}}"""
@@ -78,7 +78,7 @@ abstract class AutoMarshallingJsonContract(marshaller: AutoMarshalling) : AutoMa
     }
 
     @Test
-    fun `handles unit`() {
+    fun `handles unit`() = runBlocking {
         customMarshaller().asA<Unit>("{}")
     }
 

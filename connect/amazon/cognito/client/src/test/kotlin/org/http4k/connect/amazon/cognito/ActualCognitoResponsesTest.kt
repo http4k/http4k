@@ -15,7 +15,7 @@ class ActualCognitoResponsesTest {
     val factory = CognitoMoshi
 
     @Test
-    fun `deserialising a user password response with no challenges requested`() {
+    fun `deserialising a user password response with no challenges requested`() = runBlocking {
         val response = factory.asA<AuthInitiated>(
             """{"AuthenticationResult":
             {"AccessToken":"access-token",
@@ -35,7 +35,7 @@ class ActualCognitoResponsesTest {
     }
 
     @Test
-    fun `deserializing a user password response with a challenge`() {
+    fun `deserializing a user password response with a challenge`() = runBlocking {
         val response = factory.asA<AuthInitiated>(
             """
                 {

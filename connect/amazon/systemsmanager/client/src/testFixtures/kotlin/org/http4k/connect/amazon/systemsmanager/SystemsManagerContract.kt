@@ -15,7 +15,7 @@ interface SystemsManagerContract : AwsContract {
     private val sm get() = SystemsManager.Http(aws.region, { aws.credentials }, http)
 
     @Test
-    fun `parameter lifecycle`() {
+    fun `parameter lifecycle`() = runBlocking {
         val name = SSMParameterName.of(UUID.randomUUID().toString())
         assertThat(sm.getParameter(name).failureOrNull()!!.status, equalTo(BAD_REQUEST))
         assertThat(sm.putParameter(name, "value", ParameterType.String).successValue().Version, equalTo(1))

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class ProtocolVersionTest {
 
     @Test
-    fun `can compare`() {
+    fun `can compare`() = runBlocking {
         assertThat(`2025-03-26`, greaterThan(ProtocolVersion.`2024-11-05`))
     }
 }

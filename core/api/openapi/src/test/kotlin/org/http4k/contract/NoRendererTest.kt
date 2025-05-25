@@ -11,17 +11,17 @@ import org.junit.jupiter.api.Test
 
 class NoRendererTest {
     @Test
-    fun `renders not found`() {
+    fun `renders not found`() = runBlocking {
         assertThat(NoRenderer.notFound(), equalTo(Response(NOT_FOUND)))
     }
 
     @Test
-    fun `renders bad request`() {
+    fun `renders bad request`() = runBlocking {
         assertThat(NoRenderer.badRequest(LensFailure(listOf())), equalTo(Response(BAD_REQUEST)))
     }
 
     @Test
-    fun `renders description`() {
+    fun `renders description`() = runBlocking {
         assertThat(NoRenderer.description(Root, NoSecurity, listOf(), emptySet(), emptyMap()), equalTo(Response(NOT_FOUND)))
     }
 }

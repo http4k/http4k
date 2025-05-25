@@ -13,7 +13,7 @@ class PrimitivesFieldMetadataRetrievalStrategyTest {
     data class ValueHolder(val v: Any)
 
     @Test
-    fun `extract format from value type field`() {
+    fun `extract format from value type field`() = runBlocking {
         checkFormat(1, "int32")
         checkFormat(1L, "int64")
         checkFormat(1.0, "double")

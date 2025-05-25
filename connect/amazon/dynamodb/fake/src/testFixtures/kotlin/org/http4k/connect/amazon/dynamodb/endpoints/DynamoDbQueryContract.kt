@@ -98,7 +98,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query empty table`() {
+    fun `query empty table`() = runBlocking {
         val result = dynamo.query(
             TableName = table,
             KeyConditionExpression = "$attrS = :val1",
@@ -110,7 +110,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by hash`() {
+    fun `query by hash`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -133,7 +133,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by hash - reverse order`() {
+    fun `query by hash - reverse order`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -157,7 +157,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by hash and range`() {
+    fun `query by hash and range`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -182,7 +182,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by global index`() {
+    fun `query by global index`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -208,7 +208,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by global index - reverse`() {
+    fun `query by global index - reverse`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -233,7 +233,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by local index`() {
+    fun `query by local index`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -258,7 +258,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by local index - reverse`() {
+    fun `query by local index - reverse`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -283,7 +283,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with limit`() {
+    fun `query with limit`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -301,7 +301,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with ExclusiveStartKey`() {
+    fun `query with ExclusiveStartKey`() = runBlocking {
         val item1 = Item(attrS of "hash1", attrN of 1).also { dynamo.putItem(table, it) }
         val item2 = Item(attrS of "hash1", attrN of 2).also { dynamo.putItem(table, it) }
         val item3 = Item(attrS of "hash1", attrN of 3).also { dynamo.putItem(table, it) }
@@ -319,7 +319,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with ExclusiveStartKey - empty`() {
+    fun `query with ExclusiveStartKey - empty`() = runBlocking {
         Item(attrS of "hash1", attrN of 1).also { dynamo.putItem(table, it) }
         Item(attrS of "hash1", attrN of 2).also { dynamo.putItem(table, it) }
         val item3 = Item(attrS of "hash1", attrN of 3).also { dynamo.putItem(table, it) }
@@ -337,7 +337,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query by index - with limit`() {
+    fun `query by index - with limit`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
         dynamo.putItem(table, hash1Val2)
         dynamo.putItem(table, hash2Val1)
@@ -371,7 +371,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with max results for page`() {
+    fun `query with max results for page`() = runBlocking {
         val numItems = 2_000
         val payload = (1..1_000).map { "a".repeat(1_000) }.toSet()
 
@@ -396,7 +396,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test // Fixes GH#327
-    fun `filter evaluated after pagination`() {
+    fun `filter evaluated after pagination`() = runBlocking {
         dynamo.batchWriteItem(
             mapOf(
                 table to listOf(
@@ -433,7 +433,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `paginate on GSI - different keys than primary index`() {
+    fun `paginate on GSI - different keys than primary index`() = runBlocking {
         val idAttr = Attribute.uuid().required("id")
         val nameAttr = Attribute.string().required("name")
         val dobAttr = Attribute.localDate().required("dob")
@@ -502,7 +502,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query on missing index`() {
+    fun `query on missing index`() = runBlocking {
         val result = dynamo.query(
             TableName = table,
             IndexName = IndexName.of("missing"),
@@ -520,7 +520,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with reserved word - key condition`() {
+    fun `query with reserved word - key condition`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
 
         val result = dynamo.query(
@@ -539,7 +539,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with reserved word - filter`() {
+    fun `query with reserved word - filter`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
 
         val result = dynamo.query(
@@ -559,7 +559,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with named reserved word`() {
+    fun `query with named reserved word`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
 
         dynamo.query(
@@ -576,7 +576,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
     }
 
     @Test
-    fun `query with reserved word - ignore case`() {
+    fun `query with reserved word - ignore case`() = runBlocking {
         dynamo.putItem(table, hash1Val1)
 
         val result = dynamo.query(

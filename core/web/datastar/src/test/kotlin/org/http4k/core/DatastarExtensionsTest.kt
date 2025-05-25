@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class DatastarExtensionsTest {
 
     @Test
-    fun `can identify a datastar request`() {
+    fun `can identify a datastar request`() = runBlocking {
         assertThat(Request(GET, "").isDatastar, equalTo(false))
         assertThat(Request(GET, "").with(Header.DATASTAR_REQUEST of true).isDatastar, equalTo(true))
     }

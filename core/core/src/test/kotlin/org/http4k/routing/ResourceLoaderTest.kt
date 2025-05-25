@@ -11,38 +11,38 @@ import java.io.File
 class ResourceLoaderTest {
 
     @Test
-    fun `classpath loader loads existing file`() {
+    fun `classpath loader loads existing file`() = runBlocking {
         checkContents(Classpath("/"), "mybob.xml", "<xml>content</xml>")
     }
 
     @Test
-    fun `classpath loader loads existing child file`() {
+    fun `classpath loader loads existing child file`() = runBlocking {
         checkContents(Classpath("/"), "org/index.html", "hello from the io index.html")
     }
 
     @Test
-    fun `classpath loader for missing file`() {
+    fun `classpath loader for missing file`() = runBlocking {
         assertThat(Classpath("/").load("notAFile"), absent())
     }
 
     @Test
-    fun `directory loader loads existing file`() {
+    fun `directory loader loads existing file`() = runBlocking {
         checkContents(Directory("./src/test/resources"), "mybob.xml", "<xml>content</xml>")
     }
 
     @Test
-    fun `directory loader loads existing child file`() {
+    fun `directory loader loads existing child file`() = runBlocking {
         checkContents(Directory("./src/test/resources"), "org/index.html", "hello from the io index.html")
     }
 
     @Test
-    fun `directory loader should not load resources above the base directory`() {
+    fun `directory loader should not load resources above the base directory`() = runBlocking {
         assertThat(Directory("./src/test/resources").load("../../../../.python-version"), absent())
         assertThat(Directory(File("./src/test/resources").absolutePath).load("../../../../.python-version"), absent())
     }
 
     @Test
-    fun `directory loader for missing file`() {
+    fun `directory loader for missing file`() = runBlocking {
         assertThat(Directory("./src/test/resources").load("notAFile"), absent())
     }
 

@@ -37,7 +37,7 @@ class CachingFiltersTest {
     private val response = Response(OK)
 
     @Test
-    fun `Adds If-Modified-Since to Request`() {
+    fun `Adds If-Modified-Since to Request`() = runBlocking {
         val maxAge = Duration.ofSeconds(1)
         val response = AddIfModifiedSince(clock, maxAge).then {
             Response(OK).header(
@@ -57,7 +57,7 @@ class CachingFiltersTest {
         FallbackCacheControl(cacheTimings).then { response }(request)
 
     @Test
-    fun `FallbackCacheControl - adds the headers if they are not set`() {
+    fun `FallbackCacheControl - adds the headers if they are not set`() = runBlocking {
 
         val responseWithNoHeaders = Response(OK)
         val response = getResponseWith(timings, responseWithNoHeaders)
@@ -71,7 +71,7 @@ class CachingFiltersTest {
     }
 
     @Test
-    fun `FallbackCacheControl - does not overwrite the headers if they are set`() {
+    fun `FallbackCacheControl - does not overwrite the headers if they are set`() = runBlocking {
         val responseWithHeaders =
             Response(OK).header("Cache-Control", "rita").header("Expires", "sue").header("Vary", "bob")
         val response = getResponseWith(timings, responseWithHeaders)
@@ -82,7 +82,7 @@ class CachingFiltersTest {
     }
 
     @Test
-    fun `FallbackCacheControl - renders cache header correctly if some directives have an empty Duration`() {
+    fun `FallbackCacheControl - renders cache header correctly if some directives have an empty Duration`() = runBlocking {
         val responseWithHeaders = Response(OK)
         val response = getResponseWith(timingsWithZeroValues, responseWithHeaders)
 
@@ -90,39 +90,39 @@ class CachingFiltersTest {
     }
 
     @Test
-    fun `NoCache - does not cache non-GET requests`() {
+    fun `NoCache - does not cache non-GET requests`() = runBlocking {
         val response = NoCache().responseFor(Request(PUT, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
     @Test
-    fun `NoCache - adds correct headers to GET responses`() {
+    fun `NoCache - adds correct headers to GET responses`() = runBlocking {
         val response = NoCache().responseFor(Request(GET, ""))
         assertThat(response, hasHeader("Cache-Control", "private, must-revalidate"))
         assertThat(response, !hasHeader("Expires"))
     }
 
     @Test
-    fun `NoCache - does not add headers if response fails predicate`() {
+    fun `NoCache - does not add headers if response fails predicate`() = runBlocking {
         val response = NoCache { false }.responseFor(Request(GET, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
     @Test
-    fun `MaxAge - does not cache non-GET requests`() {
+    fun `MaxAge - does not cache non-GET requests`() = runBlocking {
         val response = MaxAge(Duration.ofHours(1)).responseFor(Request(PUT, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 
     @Test
-    fun `MaxAge - adds correct headers to GET responses`() {
+    fun `MaxAge - adds correct headers to GET responses`() = runBlocking {
         val response = MaxAge(Duration.ofHours(1)).responseFor(Request(GET, ""))
         assertThat(response, hasHeader("Cache-Control", "public, max-age=3600"))
         assertThat(response, !hasHeader("Expires"))
     }
 
     @Test
-    fun `MaxAge - adds correct headers to GET when illegal header value`() {
+    fun `MaxAge - adds correct headers to GET when illegal header value`() = runBlocking {
         val responseWithHeaders = Response(OK).header("Date", "foobar")
 
         val response = (MaxAge(Duration.ofHours(1)).then { responseWithHeaders })(Request(GET, ""))
@@ -131,7 +131,7 @@ class CachingFiltersTest {
     }
 
     @Test
-    fun `MaxAge - does not add headers if response fails predicate`() {
+    fun `MaxAge - does not add headers if response fails predicate`() = runBlocking {
         val response = MaxAge(Duration.ofHours(1)) { false }.responseFor(Request(GET, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }

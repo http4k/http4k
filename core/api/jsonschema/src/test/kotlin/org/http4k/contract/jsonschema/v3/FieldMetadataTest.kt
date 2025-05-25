@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class FieldMetadataTest {
 
     @Test
-    fun `can combine`() {
+    fun `can combine`() = runBlocking {
         val first = mapOf("foo" to "bar", "1" to 2)
         val second = mapOf("bar" to "foo")
         assertThat(FieldMetadata(first) + FieldMetadata(second), equalTo(FieldMetadata(first + second)))

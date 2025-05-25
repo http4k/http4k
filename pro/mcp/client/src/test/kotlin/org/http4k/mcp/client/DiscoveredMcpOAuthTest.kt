@@ -66,7 +66,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
     ).asServer(JettyLoom(0))
 
     @Test
-    fun `can discover auth token from protected resource`() {
+    fun `can discover auth token from protected resource`() = runBlocking {
         authServer.start()
 
         var count = 0

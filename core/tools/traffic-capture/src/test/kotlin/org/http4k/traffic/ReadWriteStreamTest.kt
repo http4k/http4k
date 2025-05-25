@@ -13,7 +13,7 @@ import java.nio.file.Files
 class ReadWriteStreamTest {
 
     @Test
-    fun `Disk ReadWriteStream can store and retrieve cached data in order`() {
+    fun `Disk ReadWriteStream can store and retrieve cached data in order`() = runBlocking {
         val tmp = Files.createTempDirectory(".").toFile()
         tmp.deleteOnExit()
 
@@ -21,7 +21,7 @@ class ReadWriteStreamTest {
     }
 
     @Test
-    fun `Memory ReadWriteStream can store and retrieve cached data in order`() {
+    fun `Memory ReadWriteStream can store and retrieve cached data in order`() = runBlocking {
         testStream(ReadWriteStream.Memory())
     }
 

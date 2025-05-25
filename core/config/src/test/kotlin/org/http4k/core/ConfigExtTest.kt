@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class ConfigExtTest {
 
     @Test
-    fun `uri extensions`() {
+    fun `uri extensions`() = runBlocking {
         val originalUri = Uri.of("http://bob:80")
 
         val newHost = Host("hello")

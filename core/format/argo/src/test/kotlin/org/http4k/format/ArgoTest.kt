@@ -13,7 +13,7 @@ class ArgoTest : JsonContract<JsonNode>(Argo) {
 }"""
 
     @Test
-    fun `removes duplicates`() {
+    fun `removes duplicates`() = runBlocking {
         assertThat(Argo.compact(obj("goo" to string("goo"), "goo" to string("goo"))), equalTo("""{"goo":"goo"}"""))
     }
 }

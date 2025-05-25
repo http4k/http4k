@@ -23,10 +23,10 @@ class RealGitHubModelsTest : AzureAIContract, PortBasedTest {
     )
 
     @Disabled("not in github")
-    override fun `get completion response streaming`() {
+    override fun `get completion response streaming`() = runBlocking {
     }
 
     @Disabled("not in github")
-    override fun `get completion response non-stream`() {
+    override fun `get completion response non-stream`() = runBlocking {
     }
 }

@@ -61,7 +61,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    open fun `transactional items`() {
+    open fun `transactional items`() = runBlocking {
         with(dynamo) {
             transactWriteItems(
                 listOf(
@@ -98,7 +98,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    fun `batch operations`() {
+    fun `batch operations`() = runBlocking {
         with(dynamo) {
             val write = batchWriteItem(
                 mapOf(
@@ -120,7 +120,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    open fun `partiSQL operations`() {
+    open fun `partiSQL operations`() = runBlocking {
         with(dynamo) {
             putItem(table, createItem("hello")).successValue()
 
@@ -133,7 +133,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    fun `item lifecycle`() {
+    fun `item lifecycle`() = runBlocking {
         with(dynamo) {
             putItem(table, createItem("hello")).successValue()
 
@@ -185,7 +185,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    fun `pagination of results`() {
+    fun `pagination of results`() = runBlocking {
         with(dynamo) {
             putItem(table, createItem("hello")).successValue()
             putItem(table, createItem("hello2")).successValue()
@@ -210,7 +210,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    fun `table lifecycle`() {
+    fun `table lifecycle`() = runBlocking {
         with(dynamo) {
             assertThat(listTables().successValue().TableNames, hasElement(table))
 
@@ -231,7 +231,7 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
-    fun `migrate data beetween tables`() {
+    fun `migrate data beetween tables`() = runBlocking {
         with(dynamo) {
             val destination = TableName.sample()
             try {
@@ -267,7 +267,7 @@ interface DynamoDbContract : AwsContract {
 
     @Test
     @Disabled
-    fun `delete tables`() {
+    fun `delete tables`() = runBlocking {
         dynamo.listTables()
             .successValue()
             .TableNames

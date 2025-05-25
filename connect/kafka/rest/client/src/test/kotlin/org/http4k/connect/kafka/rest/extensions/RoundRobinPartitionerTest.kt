@@ -8,7 +8,7 @@ import java.util.Random
 
 class RoundRobinPartitionerTest {
     @Test
-    fun `round robins the partitions`() {
+    fun `round robins the partitions`() = runBlocking {
         val p = RoundRobinRecordPartitioner<String, String>(
             listOf(
                 PartitionId.of(1),

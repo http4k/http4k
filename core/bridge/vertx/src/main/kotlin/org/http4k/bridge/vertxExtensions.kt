@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import java.io.ByteArrayInputStream
 
-fun Response.into(response: HttpServerResponse) =
+ fun Response.into(response: HttpServerResponse) =
     headers
         .fold(response) { acc, (k, v) -> acc.putHeader(k, v) }
         .setStatusCode(status.code).setStatusMessage(status.description)

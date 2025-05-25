@@ -10,7 +10,7 @@ import java.util.UUID
 class UriBuilderTest {
 
     @Test
-    fun `can inject typesafe args into a Uri`() {
+    fun `can inject typesafe args into a Uri`() = runBlocking {
         val time = Path.localDate().of("time")
         val id = Path.uuid().of("id")
         val sort = Query.boolean().required("sort")

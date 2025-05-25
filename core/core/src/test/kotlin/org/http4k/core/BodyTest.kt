@@ -10,12 +10,12 @@ import java.nio.ByteBuffer
 
 class BodyTest {
     @Test
-    fun `body string`() {
+    fun `body string`() = runBlocking {
         assertThat(Response(OK).body("abc").bodyString(), equalTo("abc"))
     }
 
     @Test
-    fun `body bytebuffer`() {
+    fun `body bytebuffer`() = runBlocking {
         assertThat(
             Response(OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
             equalTo("abc")
@@ -23,7 +23,7 @@ class BodyTest {
     }
 
     @Test
-    fun `body stream`() {
+    fun `body stream`() = runBlocking {
         assertThat(
             String(Response(OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
             equalTo("abc")
@@ -31,36 +31,36 @@ class BodyTest {
     }
 
     @Test
-    fun `string body can be streamed`() {
+    fun `string body can be streamed`() = runBlocking {
         assertThat(String(Body("abc").stream.readBytes()), equalTo("abc"))
     }
 
     @Test
-    fun `stream body allow for equality by consuming its stream`() {
+    fun `stream body allow for equality by consuming its stream`() = runBlocking {
         assertThat(Body("abc".byteInputStream()), equalTo(Body("abc".byteInputStream())))
     }
 
     @Test
-    fun `can consume stream body as payload more than once`() {
+    fun `can consume stream body as payload more than once`() = runBlocking {
         val body = Body("abc".byteInputStream())
         String(body.payload.array())
         assertThat(String(body.payload.array()), equalTo("abc"))
     }
 
     @Test
-    fun `can not consume stream body as stream more than once`() {
+    fun `can not consume stream body as stream more than once`() = runBlocking {
         val body = Body("abc".byteInputStream())
         assertThat(String(body.stream.readBytes()), equalTo("abc"))
         assertThat(String(body.stream.readBytes()), equalTo(""))
     }
 
     @Test
-    fun `stream body generates consistent hashing by consuming its stream`() {
+    fun `stream body generates consistent hashing by consuming its stream`() = runBlocking {
         assertThat(Body("abc".byteInputStream()).hashCode(), equalTo(Body("abc".byteInputStream()).hashCode()))
     }
 
     @Test
-    fun `can construct with array backed ByteBuffer`() {
+    fun `can construct with array backed ByteBuffer`() = runBlocking {
         val body = Body(ByteBuffer.wrap("abc".toByteArray()))
         assertThat(body.length, equalTo(3L))
         assertThat(body.toString(), equalTo("abc"))
@@ -68,7 +68,7 @@ class BodyTest {
     }
 
     @Test
-    fun `can construct with read only array backed ByteBuffer`() {
+    fun `can construct with read only array backed ByteBuffer`() = runBlocking {
         val body = Body(ByteBuffer.wrap("abc".toByteArray()).asReadOnlyBuffer())
         assertThat(body.length, equalTo(3L))
         assertThat(body.toString(), equalTo("abc"))
@@ -76,7 +76,7 @@ class BodyTest {
     }
 
     @Test
-    fun `can construct with non-array backed ByteBuffer`() {
+    fun `can construct with non-array backed ByteBuffer`() = runBlocking {
         val bytes = "abc".toByteArray()
         val buf = ByteBuffer.allocateDirect(bytes.size)
         buf.put(bytes)
@@ -89,7 +89,7 @@ class BodyTest {
     }
 
     @Test
-    fun `correct length and bytes when created from ByteBuffer`() {
+    fun `correct length and bytes when created from ByteBuffer`() = runBlocking {
         val bytes = ByteArray(16) { it.toByte() }
         val buf = ByteBuffer.wrap(bytes, 4, 8)
         val body = Body(buf)
@@ -102,7 +102,7 @@ class BodyTest {
     }
 
     @Test
-    fun `correct string contents when created from ByteBuffer`() {
+    fun `correct string contents when created from ByteBuffer`() = runBlocking {
         val bytes = "abcdefghij".toByteArray(Charsets.UTF_8)
         val body = Body(ByteBuffer.wrap(bytes, 2, 4))
 
@@ -110,7 +110,7 @@ class BodyTest {
     }
 
     @Test
-    fun `hasContentToRead returns false when empty`() {
+    fun `hasContentToRead returns false when empty`() = runBlocking {
 
         fun String.inputStreamWhichReportsZeroWhenNotRead() = object : ByteArrayInputStream(encodeToByteArray()) {
             var availableWhichIsZeroWhenNotEverRead = 0

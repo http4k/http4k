@@ -17,7 +17,7 @@ class CookieMatchersTest {
     fun value() = assertMatchAndNonMatch(Cookie("name", "bob"), haveValue("bob"), haveValue("bill"))
 
     @Test
-    fun `value with matcher`() {
+    fun `value with matcher`() = runBlocking {
         assertMatchAndNonMatch(Cookie("name", "bob"), haveValue(be<String>("bob")), haveValue(contain("bill")))
     }
 
@@ -41,7 +41,7 @@ class CookieMatchersTest {
     }
 
     @Test
-    fun `never expire`() {
+    fun `never expire`() = runBlocking {
         assertMatchAndNonMatch(Cookie("name", "value", expires = null),
             neverExpire(), neverExpire().invert())
     }

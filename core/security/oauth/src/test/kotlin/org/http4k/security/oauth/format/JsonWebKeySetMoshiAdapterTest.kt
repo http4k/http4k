@@ -16,7 +16,7 @@ class JsonWebKeySetMoshiAdapterTest {
     private val marshaller = OAuthMoshi
 
     @Test
-    fun `deserialize with minimal fields`() {
+    fun `deserialize with minimal fields`() = runBlocking {
         val json = """{
             "keys": [{
                 "kty": "RSA"
@@ -37,7 +37,7 @@ class JsonWebKeySetMoshiAdapterTest {
     }
 
     @Test
-    fun `deserialize with full fields`() {
+    fun `deserialize with full fields`() = runBlocking {
         val json = """{
             "keys": [{
                 "kty": "RSA",
@@ -74,7 +74,7 @@ class JsonWebKeySetMoshiAdapterTest {
     }
 
     @Test
-    fun `deserialize multiple keys`() {
+    fun `deserialize multiple keys`() = runBlocking {
         val json = """{
             "keys": [
                 {"kty": "RSA", "kid": "key1"},

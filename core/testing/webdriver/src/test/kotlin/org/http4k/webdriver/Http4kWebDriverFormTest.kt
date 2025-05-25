@@ -36,7 +36,7 @@ class Http4kWebDriverFormTest {
     })
 
     @Test
-    fun `POSTing a form prefixes with the original host in the URL`() {
+    fun `POSTing a form prefixes with the original host in the URL`() = runBlocking {
         val driver = Http4kWebDriver(
             routes(
                 "/submit" bind { Response(Status.OK).body(it.uri.toString()) },
@@ -59,7 +59,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POSTing a form with multiple values associated with a single name`() {
+    fun `POSTing a form with multiple values associated with a single name`() = runBlocking {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("other_checkbox1"))!!.click()
         driver.findElement(By.id("button"))!!.submit()
@@ -69,7 +69,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form`() {
+    fun `POST form`() = runBlocking {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("https://example.com/form")
@@ -78,7 +78,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form via button click`() {
+    fun `POST form via button click`() = runBlocking {
         driver.get("/bob")
         driver.findElement(By.id("resetbutton"))!!.click()
         driver.assertOnPage("/bob")
@@ -89,7 +89,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form with empty action`() {
+    fun `POST form with empty action`() = runBlocking {
         var loadCount = 0
         val driver = Http4kWebDriver({ req ->
             loadCount++
@@ -115,7 +115,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form with action set to empty string`() {
+    fun `POST form with action set to empty string`() = runBlocking {
         var loadCount = 0
         val driver = Http4kWebDriver({ req ->
             loadCount++
@@ -140,7 +140,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form with action set to fragment with no leading slash replaces last part of current base path`() {
+    fun `POST form with action set to fragment with no leading slash replaces last part of current base path`() = runBlocking {
         val driver = driverFor("test.html", action = "fragmentWithNoLeadingSlash")
 
         driver.get("http://example.com/bob/was/here/today")
@@ -150,7 +150,7 @@ class Http4kWebDriverFormTest {
 
 
     @Test
-    fun `GET form`() {
+    fun `GET form`() = runBlocking {
         val driver = driverFor("test.html", method = GET)
 
         driver.get("/bob")
@@ -162,7 +162,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form with an empty text box`() {
+    fun `POST form with an empty text box`() = runBlocking {
         driver.get("https://example.com/bob")
         driver.findElement(By.tagName("textarea"))!!.sendKeys("")
         driver.findElement(By.id("button"))!!.submit()
@@ -174,7 +174,7 @@ class Http4kWebDriverFormTest {
 
     // https://www.w3.org/TR/html401/interact/forms.html#h-17.13
     @Test
-    fun `POST form via input of type 'submit' click`() {
+    fun `POST form via input of type 'submit' click`() = runBlocking {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("input-submit"))!!.click()
         driver.assertOnPage("https://example.com/form")
@@ -183,7 +183,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form - activated submit buttons ('input' elements) are submitted with the form`() {
+    fun `POST form - activated submit buttons ('input' elements) are submitted with the form`() = runBlocking {
         driver.get("https://example.com/bob")
         driver.findElement(By.id("only-send-when-activated"))!!.submit()
         driver.assertOnPage("https://example.com/form")
@@ -194,7 +194,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form - form elements associated with the form by the 'form' attribute are still sent`() {
+    fun `POST form - form elements associated with the form by the 'form' attribute are still sent`() = runBlocking {
         val driver = driverFor("form_element_association.html")
 
         driver.get("https://example.com/bob")
@@ -206,7 +206,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form - disabled controls`() {
+    fun `POST form - disabled controls`() = runBlocking {
         val driver = driverFor("disabled-controls.html", POST)
 
         driver.get("https://example.com/bob")
@@ -218,7 +218,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form - unable to submit using a disabled button`() {
+    fun `POST form - unable to submit using a disabled button`() = runBlocking {
         val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
 
         driver.get("https://example.com/bob")
@@ -229,7 +229,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form - unable to submit using a disabled submit input`() {
+    fun `POST form - unable to submit using a disabled submit input`() = runBlocking {
         val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
 
         driver.get("https://example.com/bob")
@@ -240,7 +240,7 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
-    fun `POST form - a form that has an 'enctype' of 'multipart form-data' transmits its data as a multipart form`() {
+    fun `POST form - a form that has an 'enctype' of 'multipart form-data' transmits its data as a multipart form`() = runBlocking {
         val driver = Http4kWebDriver({ req ->
             val body = File("src/test/resources/file_upload_test.html").readText()
             if (req.method == GET) return@Http4kWebDriver Response(Status.OK).body(body)

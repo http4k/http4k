@@ -12,12 +12,12 @@ data class PolyHandler @JvmOverloads constructor(
     val sse: SseHandler? = null
 )
 
-fun Filter.then(poly: PolyHandler): PolyHandler = poly.copy(http = poly.http?.let { then(it) })
+suspend fun Filter.then(poly: PolyHandler): PolyHandler = poly.copy(http = poly.http?.let { then(it) })
 
-fun interface PolyFilter : (PolyHandler) -> PolyHandler {
+fun interface PolyFilter : suspend (PolyHandler) -> PolyHandler {
     companion object
 }
 
 fun PolyFilter.then(next: PolyFilter): PolyFilter = PolyFilter { this(next(it)) }
 
-fun PolyFilter.then(next: PolyHandler): PolyHandler = this(next)
+suspend fun PolyFilter.then(next: PolyHandler): PolyHandler = this(next)

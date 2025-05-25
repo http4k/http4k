@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class SseRoutingTest {
 
     @Test
-    fun `uses router for matching`() {
+    fun `uses router for matching`() = runBlocking {
         val app = sse(
             query("goodbye") bind sse {
                 it.send(SseMessage.Data("query"))

@@ -18,7 +18,7 @@ class QueryTest {
     private val request = Request(GET, of("/?hello=world&hello=world2"))
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(Query.optional("hello")(request), equalTo("world"))
         assertThat(Query.required("hello")(request), equalTo("world"))
         assertThat(Query.map { it.length }.required("hello")(request), equalTo(5))
@@ -30,7 +30,7 @@ class QueryTest {
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         assertThat(Query.optional("world")(request), absent())
 
         val requiredQuery = Query.required("world")
@@ -48,7 +48,7 @@ class QueryTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = Query.required("world")
         assertThat(single("value2", single("value1", request)), equalTo(request.query("world", "value2")))
 
@@ -60,7 +60,7 @@ class QueryTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val requiredQuery = Query.map(String::toInt).required("hello")
         assertThat(
             { requiredQuery(request) },
@@ -87,14 +87,14 @@ class QueryTest {
     }
 
     @Test
-    fun `sets value on request`() {
+    fun `sets value on request`() = runBlocking {
         val query = Query.required("bob")
         val withQuery = request.with(query of "hello")
         assertThat(query(withQuery), equalTo("hello"))
     }
 
     @Test
-    fun `can create a custom type and get and set on request`() {
+    fun `can create a custom type and get and set on request`() = runBlocking {
         val custom = Query.map(::MyCustomType) { it.value }.required("bob")
 
         val instance = MyCustomType("hello world!")
@@ -106,7 +106,7 @@ class QueryTest {
     }
 
     @Test
-    fun `required string lens with null value`() {
+    fun `required string lens with null value`() = runBlocking {
         val nonMapped = Query.required("bob")
 
         val request = Request(GET, "/foo")
@@ -119,7 +119,7 @@ class QueryTest {
     }
 
     @Test
-    fun `required lens with no value`() {
+    fun `required lens with no value`() = runBlocking {
         val noValue = Query.noValue().required("bob")
         val multiNoValue = Query.noValue().multi.required("bob")
 
@@ -133,7 +133,7 @@ class QueryTest {
     }
 
     @Test
-    fun `optional custom type with null value`() {
+    fun `optional custom type with null value`() = runBlocking {
         val mapped = Query.map(::MyCustomType) { it.value }.optional("bob")
         val nonMapped = Query.optional("bob")
 
@@ -164,7 +164,7 @@ class QueryTest {
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(Query.required("hello").toString(), equalTo("Required query 'hello'"))
         assertThat(Query.optional("hello").toString(), equalTo("Optional query 'hello'"))
         assertThat(Query.multi.required("hello").toString(), equalTo("Required query 'hello'"))
@@ -172,7 +172,7 @@ class QueryTest {
     }
 
     @Test
-    fun `enum`() {
+    fun `enum`() = runBlocking {
         val requiredLens = Query.enum<Method>().required("method")
         assertThat(requiredLens(Request(GET, "/?method=DELETE")), equalTo(Method.DELETE))
 
@@ -182,13 +182,13 @@ class QueryTest {
     }
 
     @Test
-    fun `mapped enum`() {
+    fun `mapped enum`() = runBlocking {
         val requiredLens = Query.enum(MappedEnum::from, MappedEnum::to).required("whatevs")
         assertThat(requiredLens(Request(GET, "/?whatevs=eulav")), equalTo(MappedEnum.value))
     }
 
     @Test
-    fun `case-insensitive enum`() {
+    fun `case-insensitive enum`() = runBlocking {
         val lens = Query.enum<Method>(caseSensitive = false).required("method")
         assertThat(lens(Request(GET, "/?method=delete")), equalTo(Method.DELETE))
     }

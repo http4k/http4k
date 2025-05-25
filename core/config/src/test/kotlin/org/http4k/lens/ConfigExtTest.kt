@@ -74,7 +74,7 @@ class ConfigExtTest {
     }
 
     @Test
-    fun `host header`() {
+    fun `host header`() = runBlocking {
         fun assertFormat(input: Authority) {
             val reqWithHeader = Request(Method.GET, "").with(Header.HOST of input)
             assertThat(reqWithHeader.header("Host"), equalTo(input.toString()))

@@ -22,7 +22,7 @@ internal class AccessTokenFetcherTest {
     private val accessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(config)
 
     @Test
-    fun `can get access token from plain text body`() {
+    fun `can get access token from plain text body`() = runBlocking {
         val api = { _: Request -> Response(OK).body("some-access-token") }
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
@@ -31,7 +31,7 @@ internal class AccessTokenFetcherTest {
     }
 
     @Test
-    fun `can get access token from json body`() {
+    fun `can get access token from json body`() = runBlocking {
         //see https://tools.ietf.org/html/rfc6749#section-4.1.4
         val token = AccessToken(
             value = "some-access-token",
@@ -57,7 +57,7 @@ internal class AccessTokenFetcherTest {
     }
 
     @Test
-    fun `can get access token from form encoded body`() {
+    fun `can get access token from form encoded body`() = runBlocking {
         val accessTokenDetails = AccessTokenDetails(
             AccessToken("some-access-token", "doo", 123, "scope", RefreshToken("bob")),
             IdToken("id")
@@ -73,7 +73,7 @@ internal class AccessTokenFetcherTest {
     }
 
     @Test
-    fun `can get access token from json body for content-type without directive`() {
+    fun `can get access token from json body for content-type without directive`() = runBlocking {
         val api = { _: Request ->
             Response(OK)
                 .header("Content-Type", "application/json")
@@ -86,7 +86,7 @@ internal class AccessTokenFetcherTest {
     }
 
     @Test
-    fun `handle non-successful response`() {
+    fun `handle non-successful response`() = runBlocking {
         val api = { _: Request -> Response(BAD_REQUEST) }
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)

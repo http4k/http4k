@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch
 
 class AsyncHttpHandlerTest: PortBasedTest {
     @Test
-    fun `can convert a synchronous HttpHandler to mimic the AsyncHttpClient API`() {
+    fun `can convert a synchronous HttpHandler to mimic the AsyncHttpClient API`() = runBlocking {
 
         val handler = { _: Request -> Response(OK) }.withAsyncApi()
 

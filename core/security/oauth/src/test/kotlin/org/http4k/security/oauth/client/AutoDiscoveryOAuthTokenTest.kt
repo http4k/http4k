@@ -69,7 +69,7 @@ class AutoDiscoveryOAuthTokenTest {
     }
 
     @Test
-    fun `uses discovered endpoints when metadata is available`() {
+    fun `uses discovered endpoints when metadata is available`() = runBlocking {
         val app = ClientFilters.AutoDiscoveryOAuthToken(
             AuthServerDiscovery.fromKnownAuthServer(Uri.of("https://example.com")),
             credentials = credentials,
@@ -95,7 +95,7 @@ class AutoDiscoveryOAuthTokenTest {
     }
 
     @Test
-    fun `uses discovered endpoints from protected resource`() {
+    fun `uses discovered endpoints from protected resource`() = runBlocking {
         val app = ClientFilters.AutoDiscoveryOAuthToken(
             AuthServerDiscovery.fromProtectedResource(baseUri.path("/resource")),
             credentials = credentials,

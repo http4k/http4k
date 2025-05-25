@@ -75,41 +75,41 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
 
     @Test
     @Disabled("not supported")
-    override fun `roundtrip arbitrary array`() {
+    override fun `roundtrip arbitrary array`() = runBlocking {
         super.`roundtrip arbitrary array`()
     }
 
     @Test
     @Disabled
-    override fun `serialises enum as a key correctly`() {
+    override fun `serialises enum as a key correctly`() = runBlocking {
     }
 
     @Test
     @Disabled("not supported")
-    override fun `roundtrip arbitrary map`() {
+    override fun `roundtrip arbitrary map`() = runBlocking {
         super.`roundtrip arbitrary map`()
     }
 
     @Test
     @Disabled("not supported")
-    override fun `roundtrip arbitrary set`() {
+    override fun `roundtrip arbitrary set`() = runBlocking {
         super.`roundtrip arbitrary set`()
     }
 
     @Test
     @Disabled("not supported")
-    override fun `prohibit strings`() {
+    override fun `prohibit strings`() = runBlocking {
         super.`prohibit strings`()
     }
 
     @Test
     @Disabled("not supported")
-    override fun `fails decoding when a extra key found`() {
+    override fun `fails decoding when a extra key found`() = runBlocking {
         super.`fails decoding when a extra key found`()
     }
 
     @Test
-    override fun `roundtrip custom value`() {
+    override fun `roundtrip custom value`() = runBlocking {
         val marshaller = customMarshaller()
 
         val wrapper = MyValueHolder(MyValue("foobar"))
@@ -119,7 +119,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `roundtrip arbitrary object to and from body`() {
+    fun `roundtrip arbitrary object to and from body`() = runBlocking {
         val body = customMarshaller().autoBody<ArbObject>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -128,7 +128,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `roundtrip arbitrary object to and from ws body`() {
+    fun `roundtrip arbitrary object to and from ws body`() = runBlocking {
         val body = customMarshaller().wsAutoBody(ArbObject::class).toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -137,7 +137,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `default content type`() {
+    fun `default content type`() = runBlocking {
         val body = customMarshaller().autoBody<ArbObject>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -146,7 +146,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `custom content type`() {
+    fun `custom content type`() = runBlocking {
         val marshaller = KondorJson(ContentType.Text("application/some-custom+json")) {
             register(JArbObject)
         }
@@ -158,7 +158,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    override fun `automarshalling failure has expected message`() {
+    override fun `automarshalling failure has expected message`() = runBlocking {
         val marshaller = KondorJson(ContentType.Text("application/some-custom+json")) {
             register(JArbObject)
         }
@@ -168,7 +168,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `roundtrip arbitrary object to and from body using converter body lens`() {
+    fun `roundtrip arbitrary object to and from body using converter body lens`() = runBlocking {
         val body = JArbObject.autoBody().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -177,7 +177,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `roundtrip arbitrary object to and from ws body using converter body lens`() {
+    fun `roundtrip arbitrary object to and from ws body using converter body lens`() = runBlocking {
         val body = JArbObject.wsAutoBody().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -186,7 +186,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
     }
 
     @Test
-    fun `roundtrip arbitrary object to and from with BiDi lens`() {
+    fun `roundtrip arbitrary object to and from with BiDi lens`() = runBlocking {
         val lens = KondorJson() { register(JArbObject) }
             .asBiDiMapping<ArbObject>()
 

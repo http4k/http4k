@@ -43,7 +43,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `logs request as page view`() {
+    fun `logs request as page view`() = runBlocking {
         val response = analytics(Request(GET, "https://www.http4k.org/some/world"))
 
         assertThat(response, hasStatus(OK))
@@ -51,7 +51,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `logs routed request as page view`() {
+    fun `logs routed request as page view`() = runBlocking {
         val response = analytics(RequestWithContext(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}")))
 
         assertThat(response, hasStatus(OK))
@@ -59,7 +59,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `logs request with host as page view`() {
+    fun `logs request with host as page view`() = runBlocking {
         val response = analytics(Request(GET, "/some/world").header("host", "www.http4k.org"))
 
         assertThat(response, hasStatus(OK))
@@ -67,7 +67,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `logs page view for informational response`() {
+    fun `logs page view for informational response`() = runBlocking {
         val response = analytics(Request(GET, "/informational"))
 
         assertThat(response, hasStatus(CONTINUE))
@@ -75,7 +75,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `logs page view for redirect response`() {
+    fun `logs page view for redirect response`() = runBlocking {
         val response = analytics(Request(GET, "/redirect"))
 
         assertThat(response, hasStatus(SEE_OTHER))
@@ -83,7 +83,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `ignore bad responses from google analytics`() {
+    fun `ignore bad responses from google analytics`() = runBlocking {
         testHttpClient.response = Response(CLIENT_TIMEOUT)
 
         val response = analytics(Request(GET, "some/world"))
@@ -93,7 +93,7 @@ class CollectPageViewTest {
     }
 
     @Test
-    fun `don't log page view on unsuccessful response`() {
+    fun `don't log page view on unsuccessful response`() = runBlocking {
         val response = analytics(Request(GET, "/fail"))
 
         assertThat(response, hasStatus(BAD_REQUEST))

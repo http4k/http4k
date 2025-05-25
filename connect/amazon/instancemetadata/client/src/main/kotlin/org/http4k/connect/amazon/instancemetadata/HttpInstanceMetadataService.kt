@@ -15,6 +15,6 @@ fun InstanceMetadataService.Companion.Http(http: HttpHandler = JavaHttpClient())
         .then(ClientFilters.SetXForwardedHost())
         .then(http)
 
-    override fun <R> invoke(action: Ec2MetadataAction<R>) =
+    override suspend fun <R> invoke(action: Ec2MetadataAction<R>) =
         action.toResult(unauthedHttp(action.toRequest()))
 }

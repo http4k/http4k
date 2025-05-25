@@ -51,7 +51,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `set value on existing item`() {
+    fun `set value on existing item`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item).successValue()
 
         dynamo.updateItem(
@@ -65,7 +65,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `set value on missing item`() {
+    fun `set value on missing item`() = runBlocking {
         dynamo.updateItem(
             TableName = table,
             Key = key,
@@ -77,7 +77,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `set element of missing list`() {
+    fun `set element of missing list`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item.without(attrL)).successValue()
 
         assertThat(
@@ -91,7 +91,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `set missing element of list`() {
+    fun `set missing element of list`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item.with(attrL of listOf(attrN.asValue(1)))).successValue()
 
         dynamo.updateItem(
@@ -105,7 +105,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `increment value on existing item`() {
+    fun `increment value on existing item`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item).successValue()
 
         dynamo.updateItem(
@@ -119,7 +119,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `remove attribute from existing item`() {
+    fun `remove attribute from existing item`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item).successValue()
 
         dynamo.updateItem(
@@ -132,7 +132,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `remove attribute from missing item`() {
+    fun `remove attribute from missing item`() = runBlocking {
         dynamo.updateItem(
             TableName = table,
             Key = key,
@@ -143,7 +143,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `remove element from list - out of bounds`() {
+    fun `remove element from list - out of bounds`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item).successValue()
 
         dynamo.updateItem(
@@ -156,7 +156,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `add element to set`() {
+    fun `add element to set`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item).successValue()
 
         dynamo.updateItem(
@@ -170,7 +170,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `add element to missing set`() {
+    fun `add element to missing set`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item.without(attrSS)).successValue()
 
         dynamo.updateItem(
@@ -184,7 +184,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `delete element from set`() {
+    fun `delete element from set`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item).successValue()
 
         dynamo.updateItem(
@@ -198,7 +198,7 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     }
 
     @Test
-    fun `delete element from missing set`() {
+    fun `delete element from missing set`() = runBlocking {
         dynamo.putItem(TableName = table, Item = item.without(attrSS)).successValue()
 
         dynamo.updateItem(

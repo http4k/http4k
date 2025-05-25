@@ -26,7 +26,7 @@ class AccessTokenFetcher(
     private val accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator,
     private val accessTokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm()
 ) {
-    fun fetch(authCode: String, pkceVerifier: String? = null): Result<AccessTokenDetails, CouldNotFetchAccessToken> =
+    suspend fun fetch(authCode: String, pkceVerifier: String? = null): Result<AccessTokenDetails, CouldNotFetchAccessToken> =
         api(
             Request(POST, providerConfig.tokenPath)
                 .with(

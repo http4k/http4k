@@ -21,7 +21,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     open val expectedNullBigDecimalJsonType = JsonType.Null
 
     @Test
-    fun `looks up types`() {
+    fun `looks up types`() = runBlocking {
         j {
             assertThat(typeOf(string("")), equalTo(JsonType.String))
             assertThat(typeOf(number(1)), equalTo(JsonType.Integer))
@@ -34,7 +34,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `converting null values to nodes`() {
+    fun `converting null values to nodes`() = runBlocking {
         j {
             assertThat(typeOf((null as String?).asJsonValue()), equalTo(JsonType.Null))
             assertThat(typeOf((null as Int?).asJsonValue()), equalTo(JsonType.Null))
@@ -47,7 +47,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    open fun `serializes object to json`() {
+    open fun `serializes object to json`() = runBlocking {
         j {
             val input = obj(
                 "string" to string("value"),
@@ -74,7 +74,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `can write and read body as json`() {
+    fun `can write and read body as json`() = runBlocking {
         j {
             val body = body().toLens()
 
@@ -91,7 +91,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get fields`() {
+    fun `get fields`() = runBlocking {
         j {
             val result = fields(obj(listOf("hello" to string("world"), "hello2" to string("world2")))).associate {
                 it.first to (typeOf(it.second) to text(it.second))
@@ -105,7 +105,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get values`() {
+    fun `get values`() = runBlocking {
         j {
             assertThat(text(string("world")), equalTo("world"))
             assertThat(integer(number(1)), equalTo(1L))
@@ -115,7 +115,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get text for all primitive types`() {
+    fun `get text for all primitive types`() = runBlocking {
         j {
             assertThat(text(string("1.0")), equalTo("1.0"))
             assertThat(text(number(1)), equalTo("1"))
@@ -129,7 +129,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get string value`() {
+    fun `get string value`() = runBlocking {
         j {
             assertThat(textValueOf(obj("value" to string("world")), "value"), equalTo("world"))
             assertThat(textValueOf(obj("value" to number(1)), "value"), equalTo("1"))
@@ -138,7 +138,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get elements`() {
+    fun `get elements`() = runBlocking {
         j {
             val fields = listOf(string("world"), string("world2"))
             val elements = elements(array(fields)).toList()
@@ -147,7 +147,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `can write and read spec as json`() {
+    fun `can write and read spec as json`() = runBlocking {
         j {
             val validValue = """{"hello":"world"}"""
             checkContract(
@@ -164,7 +164,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `invalid json blows up parse`() {
+    fun `invalid json blows up parse`() = runBlocking {
         j {
             assertThat({ parse("") }, throws(anything))
             assertThat({ parse("somevalue") }, throws(anything))
@@ -172,7 +172,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get no fields`() {
+    fun `get no fields`() = runBlocking {
         j {
             assertThat(fields(string("foo")).toList(), equalTo(emptyList()))
             assertThat(fields(boolean(true)).toList(), equalTo(emptyList()))

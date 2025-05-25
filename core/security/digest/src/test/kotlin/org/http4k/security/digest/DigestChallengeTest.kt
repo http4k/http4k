@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class DigestChallengeTest {
 
     @Test
-    fun `process basic challenge for header with extra space`() {
+    fun `process basic challenge for header with extra space`() = runBlocking {
         val challenge = DigestChallenge.parse(" Digest realm=\"server\", nonce=\"6a4363b9256176c8c225ee70d191a620\"")
         assertThat(challenge, equalTo(DigestChallenge(
             realm = "server",
@@ -20,7 +20,7 @@ class DigestChallengeTest {
     }
 
     @Test
-    fun `process auth challenge`() {
+    fun `process auth challenge`() = runBlocking {
         val challenge = DigestChallenge.parse("Digest realm=\"http4k\", nonce=\"1234abcd\", algorithm=MD5, qop=\"auth\"")
         assertThat(challenge, equalTo(DigestChallenge(
             realm = "http4k",
@@ -32,7 +32,7 @@ class DigestChallengeTest {
     }
 
     @Test
-    fun `process auth challenge with '=' in nonce`() {
+    fun `process auth challenge with '=' in nonce`() = runBlocking {
         val challenge = DigestChallenge.parse("Digest realm=\"axis\", nonce=\"1234=abcd\", algorithm=MD5, qop=\"auth\"")
         assertThat(challenge, equalTo(DigestChallenge(
             realm = "axis",

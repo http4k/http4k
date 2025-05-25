@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 class OAuthRefreshTokenTest {
 
     @Test
-    fun `auths with correct form`() {
+    fun `auths with correct form`() = runBlocking {
         val app = ClientFilters.OAuthRefreshToken(
             Credentials("hello", "world"),
             RefreshToken("goodbye"),
@@ -34,7 +34,7 @@ class OAuthRefreshTokenTest {
     }
 
     @Test
-    fun `omits scope if not provided`() {
+    fun `omits scope if not provided`() = runBlocking {
         val app = ClientFilters.OAuthRefreshToken(
             Credentials("hello", "world"),
             RefreshToken("goodbye"),

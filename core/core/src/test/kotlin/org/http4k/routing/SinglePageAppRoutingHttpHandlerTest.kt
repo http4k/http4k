@@ -24,7 +24,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     )
 
     @Test
-    override fun `with filter - applies in correct order`() {
+    override fun `with filter - applies in correct order`() = runBlocking {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
         val request = Request(GET, "/not-found")
         val criteria = isHomePage() and hasHeader("res-header", "foobar")
@@ -33,7 +33,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     }
 
     @Test
-    override fun `stacked filter application - applies when not found`() {
+    override fun `stacked filter application - applies when not found`() = runBlocking {
         val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found")
         val criteria = isHomePage() and hasHeader("res-header", "foo")
@@ -42,7 +42,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     }
 
     @Test
-    override fun `with filter - applies when not found`() {
+    override fun `with filter - applies when not found`() = runBlocking {
         val filtered = handler.withFilter(filterAppending("foo"))
         val request = Request(GET, "/not-found")
         val criteria = isHomePage() and hasHeader("res-header", "foo")
@@ -51,7 +51,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     }
 
     @Test
-    override fun `does not match a particular route`() {
+    override fun `does not match a particular route`() = runBlocking {
         val request = Request(GET, "/not-found")
         val criteria = isHomePage()
 
@@ -59,7 +59,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     }
 
     @Test
-    override fun `with base path - no longer matches original`() {
+    override fun `with base path - no longer matches original`() = runBlocking {
         val criteria = isHomePage()
         val request = Request(GET, validPath)
         val withBasePath = handler.withBasePath(prefix)
@@ -68,13 +68,13 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `does not match non-GET requests for valid path`() {
+    fun `does not match non-GET requests for valid path`() = runBlocking {
         assertThat(handler(Request(OPTIONS, validPath)), hasStatus(OK))
         assertThat(handler(Request(GET, validPath)), hasStatus(OK))
     }
 
     @Test
-    fun `does not interfere with CORs policy`() {
+    fun `does not interfere with CORs policy`() = runBlocking {
         val app = Cors(UnsafeGlobalPermissive)
             .then(
                 routes(
@@ -107,7 +107,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     }
 
     @Test
-    fun `DSL construction defaults to using public as a root path`() {
+    fun `DSL construction defaults to using public as a root path`() = runBlocking {
         val dslDefault = singlePageApp()
         val criteria = isHomePage("public")
 

@@ -57,7 +57,7 @@ class HtmxHttp4kWebDriverTest {
     }).withHtmx()
 
     @Test
-    fun `test the driver`() {
+    fun `test the driver`() = runBlocking {
         driver.navigate().to("/text?value=foo")
         assertThat(driver.pageSource, equalTo("foo"))
 
@@ -69,7 +69,7 @@ class HtmxHttp4kWebDriverTest {
     }
 
     @Test
-    fun `issues a GET request on click and swaps text content`() {
+    fun `issues a GET request on click and swaps text content`() = runBlocking {
         driver.navigate().to("/")
 
         val button = driver.findElement(By.id("hx-get-button"))!!
@@ -79,7 +79,7 @@ class HtmxHttp4kWebDriverTest {
     }
 
     @Test
-    fun `issues a GET request on click and swaps html content`() {
+    fun `issues a GET request on click and swaps html content`() = runBlocking {
         driver.navigate().to("/")
 
         val div = driver.findElement(By.id("hx-get-div"))!!
@@ -94,7 +94,7 @@ class HtmxHttp4kWebDriverTest {
     @Nested
     inner class `Htmx examples` {
         @Test
-        fun `Example 3 - Click to Load`() {
+        fun `Example 3 - Click to Load`() = runBlocking {
             driver.navigate().to("/")
 
             assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Load More Agents..."))

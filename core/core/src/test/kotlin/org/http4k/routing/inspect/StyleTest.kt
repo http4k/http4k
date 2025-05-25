@@ -10,25 +10,25 @@ import org.junit.jupiter.api.Test
 class ColouringTest {
 
     @Test
-    fun `can print with full ansi style`() {
+    fun `can print with full ansi style`() = runBlocking {
         val style = TextStyle(ForegroundColour.Red, BackgroundColour.Blue, Variation.Underline)
         assertThat("test".styled(style), equalTo(ForegroundColour.Red.ansi + BackgroundColour.Blue.ansi + Variation.Underline.ansi + "test" + reset))
     }
 
     @Test
-    fun `can print with style disabled`() {
+    fun `can print with style disabled`() = runBlocking {
         val style = TextStyle(ForegroundColour.Red, BackgroundColour.Blue, Variation.Underline)
         assertThat("test".styled(style, None), equalTo("test"))
     }
 
     @Test
-    fun `can print with limited pseudo escaping`() {
+    fun `can print with limited pseudo escaping`() = runBlocking {
         val style = TextStyle(ForegroundColour.Red, BackgroundColour.Blue, Variation.Underline)
         assertThat("test".styled(style, Pseudo), equalTo("_[red]test[red]_"))
     }
 
     @Test
-    fun `default style is ignored`() {
+    fun `default style is ignored`() = runBlocking {
         val style = TextStyle()
         assertThat("test".styled(style, None), equalTo("test"))
         assertThat("test".styled(style, Pseudo), equalTo("test"))

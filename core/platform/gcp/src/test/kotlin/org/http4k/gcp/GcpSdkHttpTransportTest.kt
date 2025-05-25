@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class GcpSdkHttpTransportTest {
 
     @Test
-    fun `converts formats correctly`() {
+    fun `converts formats correctly`() = runBlocking {
         val headers = listOf("foo" to "bar2")
         val request = Request(POST, "https://foobar/123")
             .query("foo", "bar1")

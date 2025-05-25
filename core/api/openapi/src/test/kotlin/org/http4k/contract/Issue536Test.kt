@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 class Issue536Test {
 
     @Test
-    fun `path parameters are decoded correctly`() {
+    fun `path parameters are decoded correctly`() = runBlocking {
         val app = routes(
             "/" bind contract {
                 routes += Path.of("name") bindContract GET to { name ->

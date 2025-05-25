@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -36,11 +37,11 @@ class OpenTelemetryMetricsClientTest {
 
     private val remoteServerMock: HttpHandler = routes("/one.json" bind GET to { Response(OK) })
 
-    private val timedClient by lazy { requestTimer.then(remoteServerMock) }
-    private val countedClient by lazy { requestCounter.then(remoteServerMock) }
+    private val timedClient by lazy { runBlocking { requestTimer.then(remoteServerMock) } }
+    private val countedClient by lazy { runBlocking { requestCounter.then(remoteServerMock) } }
 
     @Test
-    fun `timed requests generate timing metrics tagged with method and status and host`() {
+    fun `timed requests generate timing metrics tagged with method and status and host`() = runBlocking {
         assertThat(timedClient(Request(GET, "http://test.server.com:9999/one.json")), hasStatus(OK))
         repeat(2) {
             assertThat(timedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
@@ -103,7 +104,7 @@ class OpenTelemetryMetricsClientTest {
     }
 
     @Test
-    fun `counted requests generate count metrics tagged with method and status and host`() {
+    fun `counted requests generate count metrics tagged with method and status and host`() = runBlocking {
         assertThat(countedClient(Request(GET, "http://test.server.com:9999/one.json")), hasStatus(OK))
         repeat(2) {
             assertThat(countedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
@@ -147,12 +148,12 @@ class OpenTelemetryMetricsClientTest {
     }
 
     @Test
-    fun `request timer meter names and transaction labelling can be configured`() {
+    fun `request timer meter names and transaction labelling can be configured`() = runBlocking {
         requestTimer = ClientFilters.OpenTelemetryMetrics.RequestTimer(
             name = "timer.requests",
             description = "custom.description",
             labeler =
-            { it.copy(labels = mapOf("foo" to "bar")) },
+                { it.copy(labels = mapOf("foo" to "bar")) },
             clock = clock
         )
 
@@ -165,11 +166,12 @@ class OpenTelemetryMetricsClientTest {
     }
 
     @Test
-    fun `request counter meter names and transaction labelling can be configured`() {
-        requestCounter = ClientFilters.OpenTelemetryMetrics.RequestCounter(name = "counter.requests",
+    fun `request counter meter names and transaction labelling can be configured`() = runBlocking {
+        requestCounter = ClientFilters.OpenTelemetryMetrics.RequestCounter(
+            name = "counter.requests",
             description = "custom.description",
             labeler =
-            { it.copy(labels = mapOf("foo" to "bar")) }
+                { it.copy(labels = mapOf("foo" to "bar")) }
         )
 
         assertThat(countedClient(Request(GET, "http://test.server.com:9999/one.json")), hasStatus(OK))

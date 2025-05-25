@@ -18,9 +18,9 @@ interface Websocket {
 
 typealias WsConsumer = (Websocket) -> Unit
 
-typealias WsHandler = (Request) -> WsResponse
+typealias WsHandler = suspend (Request) -> WsResponse
 
-fun interface WsFilter : (WsHandler) -> WsHandler {
+fun interface WsFilter : suspend (WsHandler) -> WsHandler {
     companion object
 }
 

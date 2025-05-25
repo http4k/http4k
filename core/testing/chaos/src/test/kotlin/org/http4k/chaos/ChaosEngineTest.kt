@@ -36,7 +36,7 @@ class ChaosEngineTest {
     private val customChaos = """{"chaos":"Always ReturnStatus (418)"}"""
 
     @Test
-    fun `can convert a normal app to be chaotic`() {
+    fun `can convert a normal app to be chaotic`() = runBlocking {
         val app = routes("/" bind GET to { Response(OK) })
 
         val engine = ChaosEngine(ReturnStatus(NOT_FOUND))
@@ -59,7 +59,7 @@ class ChaosEngineTest {
     }
 
     @Test
-    fun `can convert a normal app to support the set of remote Chaos endpoints`() {
+    fun `can convert a normal app to support the set of remote Chaos endpoints`() = runBlocking {
         val app = routes("/" bind GET to { Response(OK) })
 
         val engine = ChaosEngine(ReturnStatus(UNAUTHORIZED))
@@ -102,7 +102,7 @@ class ChaosEngineTest {
     }
 
     @Test
-    fun `can configure chaos controls`() {
+    fun `can configure chaos controls`() = runBlocking {
         val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosApi(
@@ -115,7 +115,7 @@ class ChaosEngineTest {
     }
 
     @Test
-    fun `combines with other route blocks`() {
+    fun `combines with other route blocks`() = runBlocking {
         val app =
             routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
@@ -129,7 +129,7 @@ class ChaosEngineTest {
     }
 
     @Test
-    fun `combines with a standard handler route blocks`() {
+    fun `combines with a standard handler route blocks`() = runBlocking {
         val app = { _: Request -> Response(I_M_A_TEAPOT) }
 
         val appWithChaos = app.withChaosApi(controlsPath = "/context")

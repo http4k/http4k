@@ -27,12 +27,12 @@ class HttpEventTest {
     )
     
     @Test
-    fun `outgoing equals`() {
+    fun `outgoing equals`() = runBlocking {
         assertThat(Outgoing(tx), equalTo(Outgoing(tx)))
     }
 
     @Test
-    fun `outgoing uses template if available`() {
+    fun `outgoing uses template if available`() = runBlocking {
         assertThat(Outgoing(HttpTransaction(
             request = Request(GET, "/bob"),
             response = Response(OK),
@@ -50,7 +50,7 @@ class HttpEventTest {
     }
 
     @Test
-    fun `incoming uses template if available`() {
+    fun `incoming uses template if available`() = runBlocking {
         assertThat(Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
         assertThat(
             Incoming(
@@ -65,12 +65,12 @@ class HttpEventTest {
     }
 
     @Test
-    fun `incoming equals`() {
+    fun `incoming equals`() = runBlocking {
         assertThat(Incoming(tx), equalTo(Incoming(tx)))
     }
 
     @Test
-    fun `toString is working as expected`() {
+    fun `toString is working as expected`() = runBlocking {
         assertThat(Incoming(tx).toString(), equalTo("Incoming(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
         assertThat(Outgoing(tx).toString(), equalTo("Outgoing(uri=, method=GET, status=200 OK, latency=0, xUriTemplate=, protocol=http)"))
     }

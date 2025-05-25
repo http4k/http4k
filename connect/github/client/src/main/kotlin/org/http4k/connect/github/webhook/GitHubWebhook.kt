@@ -7,7 +7,7 @@ import org.http4k.connect.github.api.GitHubWebhookAction
 
 @Http4kConnectApiClient
 fun interface GitHubWebhook {
-    operator fun invoke(action: GitHubWebhookAction): Result<Unit, RemoteFailure>
+    suspend operator fun invoke(action: GitHubWebhookAction): Result<Unit, RemoteFailure>
 
     companion object
 }

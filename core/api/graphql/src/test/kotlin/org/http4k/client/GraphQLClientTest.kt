@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 class GraphQLClientTest: InMemoryTest {
 
     @Test
-    fun `convert a standard HttpHandler into a GraphQL client`() {
+    fun `convert a standard HttpHandler into a GraphQL client`() = runBlocking {
         val uri = "/foo"
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))

@@ -22,13 +22,13 @@ class RequestKeyTest {
     private val request = RequestWithContext(Request(GET, ""), mapOf("hello" to "world"))
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(RequestKey.required<String>("hello")(request), equalTo("world"))
         assertThat(RequestKey.optional<String>("hello")(request), equalTo("world"))
     }
 
     @Test
-    fun `required value missing`() {
+    fun `required value missing`() = runBlocking {
         val requiredRequestKey = RequestKey.required<String>("world")
         assertThat(
             { requiredRequestKey(request) },
@@ -37,13 +37,13 @@ class RequestKeyTest {
     }
 
     @Test
-    fun `optional value missing`() {
+    fun `optional value missing`() = runBlocking {
         val optionalRequestKey = RequestKey.optional<String>("world")
         assertThat(optionalRequestKey(request), absent())
     }
 
     @Test
-    fun `sets value on request`() {
+    fun `sets value on request`() = runBlocking {
         val requiredKey = RequestKey.required<String>("bob")
         assertThat(requiredKey(request.with(requiredKey of "hello")), equalTo("hello"))
 
@@ -52,7 +52,7 @@ class RequestKeyTest {
     }
 
     @Test
-    fun `required context value makes it through routing`() {
+    fun `required context value makes it through routing`() = runBlocking {
         val app: HttpHandler =
             routes("" bind GET to { req: Request -> Response(Status.OK).body(RequestKey.required<String>("foo")(req)) })
         val resp = Filter { next ->
@@ -64,7 +64,7 @@ class RequestKeyTest {
     }
 
     @Test
-    fun `optional context value makes it through routing`() {
+    fun `optional context value makes it through routing`() = runBlocking {
         val app: HttpHandler =
             routes("" bind GET to { req: Request -> Response(Status.OK).body(RequestKey.optional<String>("foo")(req)!!) })
         val resp = Filter { next ->

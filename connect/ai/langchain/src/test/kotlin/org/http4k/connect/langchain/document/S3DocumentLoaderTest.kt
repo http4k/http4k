@@ -49,7 +49,7 @@ class S3DocumentLoaderTest {
     private val parser = DocumentParser { DefaultDocument(it.reader().readText()) }
 
     @Test
-    fun `can load document`() {
+    fun `can load document`() = runBlocking {
         assertThat(
             s3DocumentLoader(bucket, parser), equalTo(
                 Success(

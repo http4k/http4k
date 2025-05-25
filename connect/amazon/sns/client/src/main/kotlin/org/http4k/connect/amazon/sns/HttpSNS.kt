@@ -24,7 +24,7 @@ fun SNS.Companion.Http(
 ) = object : SNS {
     private val signedHttp = signAwsRequests(region, credentialsProvider, clock, Signed, overrideEndpoint).then(http)
 
-    override fun <R> invoke(action: SNSAction<R>) = action.toResult(signedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: SNSAction<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
 /**

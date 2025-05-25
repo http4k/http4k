@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 
 class FakeOAuthServerTest {
     @Test
-    fun `auto logs in`() {
+    fun `auto logs in`() = runBlocking {
         val authPath = "/auth"
         val tokenPath = "/token"
         val callbackPath = "/cb"

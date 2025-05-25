@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.POST
 import org.http4k.lens.Header
@@ -15,7 +16,7 @@ import java.io.InputStream
 class MultipartFormBodyTest {
 
     @Test
-    fun `retrieving files and fields`() {
+    fun `retrieving files and fields`() = runBlocking {
         val file1 = MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())
         val file2 = MultipartFormFile("foo2.txt", TEXT_PLAIN, "content2".byteInputStream())
         val form = MultipartFormBody("bob") +
@@ -51,7 +52,7 @@ class MultipartFormBodyTest {
     }
 
     @Test
-    fun `can handle when body is already pulled into memory`() {
+    fun `can handle when body is already pulled into memory`() = runBlocking {
         val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
             ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
@@ -68,7 +69,7 @@ class MultipartFormBodyTest {
     }
 
     @Test
-    fun `closing streams - manually created multipart`() {
+    fun `closing streams - manually created multipart`() = runBlocking {
         val streams = (1..3).map { "content $it" }.map { TestInputStream(it) }
 
         val body = streams.toMultipartForm()
@@ -81,7 +82,7 @@ class MultipartFormBodyTest {
     }
 
     @Test
-    fun `closing streams - manually created multipart can be closed via its stream`() {
+    fun `closing streams - manually created multipart can be closed via its stream`() = runBlocking {
         val streams = (1..3).map { "content $it" }.map { TestInputStream(it) }
 
         val body = streams.toMultipartForm()
@@ -94,7 +95,7 @@ class MultipartFormBodyTest {
     }
 
     @Test
-    fun `closing streams - parsed from existing message`() {
+    fun `closing streams - parsed from existing message`() = runBlocking {
         val streams = (1..3).map { "content $it" }.map { TestInputStream(it) }
 
         val original = streams.toMultipartForm()
@@ -108,7 +109,7 @@ class MultipartFormBodyTest {
     }
 
     @Test
-    fun `gets boundary successfully from content type`() {
+    fun `gets boundary successfully from content type`() = runBlocking {
         val boundary = "boundary"
 
         val withCharset = Request(POST, "")

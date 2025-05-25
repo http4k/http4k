@@ -25,7 +25,7 @@ class HelidonWebsocketClient(
     private val timeout: Duration = Duration.ofSeconds(5)
 ): WebsocketFactory {
 
-    override fun nonBlocking(
+    override suspend fun nonBlocking(
         uri: Uri,
         headers: Headers,
         onError: (Throwable) -> Unit,
@@ -47,7 +47,7 @@ class HelidonWebsocketClient(
         return ws
     }
 
-    override fun blocking(uri: Uri, headers: Headers): Http4kWsClient {
+    override suspend fun blocking(uri: Uri, headers: Headers): Http4kWsClient {
         val latch = CountDownLatch(1)
 
         val ws = nonBlocking(

@@ -26,33 +26,33 @@ import java.util.UUID
 class PathTest {
 
     @Test
-    fun `fixed value cannot contain slash characters`() {
+    fun `fixed value cannot contain slash characters`() = runBlocking {
         assertThat({ Path.fixed("hel/lo") }, throws<IllegalArgumentException>())
     }
 
     @Test
-    fun `fixed value present`() {
+    fun `fixed value present`() = runBlocking {
         assertThat(Path.fixed("hello")("hello"), equalTo("hello"))
     }
 
     @Test
-    fun `fixed value mismatch`() {
+    fun `fixed value mismatch`() = runBlocking {
         assertThat({ (Path.fixed("hello"))("world") }, throws(lensFailureWith<String>(overallType = Failure.Type.Invalid)))
     }
 
     @Test
-    fun `fixed toString`() {
+    fun `fixed toString`() = runBlocking {
         assertThat(Path.fixed("hello").toString(), equalTo("hello"))
     }
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(Path.of("hello")("world"), equalTo("world"))
         assertThat(Path.map { it.length }.of("hello")("world"), equalTo(5))
     }
 
     @Test
-    fun `value present in request when it has been pre-parsed`() {
+    fun `value present in request when it has been pre-parsed`() = runBlocking {
         val target = RequestWithContext(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}"))
 
         assertThat(Path.of("hello")(target), equalTo("world"))
@@ -61,19 +61,19 @@ class PathTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val path = Path.map(String::toInt).of("hello")
         assertThat({ path("world") }, throws(lensFailureWith<String>(Invalid(path.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
-    fun `can create a custom type and get it`() {
+    fun `can create a custom type and get it`() = runBlocking {
         val path = Path.map(::MyCustomType).of("bob")
         assertThat(path("hello world!"), equalTo(MyCustomType("hello world!")))
     }
 
     @Test
-    fun `can inject into path with simple path`() {
+    fun `can inject into path with simple path`() = runBlocking {
         val path = Path.of("bob")
         val injected = Request(GET, "/{bob}").with(path of "hello")
 
@@ -81,13 +81,13 @@ class PathTest {
     }
 
     @Test
-    fun `can inject into path with regex path`() {
+    fun `can inject into path with regex path`() = runBlocking {
         val injected = Request(GET, "/{bob:.*}").with(Path.of("bob") of "hello")
         assertThat(injected.uri.path, equalTo("/hello"))
     }
 
     @Test
-    fun `sets value on request uri with proper encoding`() {
+    fun `sets value on request uri with proper encoding`() = runBlocking {
         fun checkEncodeDecode(unencoded: String, encoded: String) {
             val pathParam = Path.of("bob")
             val updated = RequestWithContext(Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of unencoded), UriTemplate.from("/first/{bob}/second"))
@@ -115,7 +115,7 @@ class PathTest {
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(Path.of("hello").toString(), equalTo("{hello}"))
     }
 
@@ -192,13 +192,13 @@ class PathTest {
     fun `enum`() = checkContract(Path.enum(), "DELETE", DELETE)
 
     @Test
-    fun `case-insensitive enum`() {
+    fun `case-insensitive enum`() = runBlocking {
         val lens = Path.enum<Method>(caseSensitive = false).of("method")
         assertThat(lens("delete"), equalTo(DELETE))
     }
 
     @Test
-    fun `mapped enum`() {
+    fun `mapped enum`() = runBlocking {
         val requiredLens = Path.enum(MappedEnum::from, MappedEnum::to).of("whatevs")
         assertThat(requiredLens("eulav"), equalTo(MappedEnum.value))
     }

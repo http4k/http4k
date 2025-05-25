@@ -11,7 +11,7 @@ interface CloudFrontContract : AwsContract {
     private val distribution get() = DistributionId.of("E1HHLORGLBAQYP")
 
     @Test
-    fun `invalidate cache`() {
+    fun `invalidate cache`() = runBlocking {
         cloudFront.createInvalidation(distribution, "/foobar").successValue()
     }
 }

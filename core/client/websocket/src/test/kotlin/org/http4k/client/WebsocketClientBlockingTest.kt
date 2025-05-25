@@ -23,12 +23,12 @@ class WebsocketClientBlockingTest : BlockingWebsocketClientContract(
     override fun <T : Throwable> connectionClosedErrorMatcher(): Matcher<T> = isA<WebsocketNotConnectedException>()
 
     @Disabled
-    override fun `exception is thrown on connection error`() {
+    override fun `exception is thrown on connection error`() = runBlocking {
         super.`exception is thrown on connection error`()
     }
 
     @Test
-    fun `blocking with auto-reconnection (closed by server)`() {
+    fun `blocking with auto-reconnection (closed by server)`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"), autoReconnection = true)
         client.send(WsMessage("hello"))
 
@@ -41,7 +41,7 @@ class WebsocketClientBlockingTest : BlockingWebsocketClientContract(
     }
 
     @Test
-    fun `blocking with auto-reconnection (closed by client)`() {
+    fun `blocking with auto-reconnection (closed by client)`() = runBlocking {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/long-living/bob"), autoReconnection = true)
 
         client.send(WsMessage("hello"))

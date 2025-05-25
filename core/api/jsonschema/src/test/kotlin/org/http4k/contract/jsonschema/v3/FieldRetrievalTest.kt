@@ -16,12 +16,12 @@ class FieldRetrievalTest {
     data class Beany(val nonNullable: String = "hello", val aNullable: String? = "aNullable")
 
     @Test
-    fun `bombs if can't find field anywhere`() {
+    fun `bombs if can't find field anywhere`() = runBlocking {
         assertThat({ FieldRetrieval.compose(blowUp, blowUp)(Beany(), "foo") }, throws<NoFieldFound>())
     }
 
     @Test
-    fun `field retrieval falls back if none found`() {
+    fun `field retrieval falls back if none found`() = runBlocking {
         assertThat(FieldRetrieval.compose(blowUp, findIt)(Beany(), "foo"), equalTo(Field("hello", true, FieldMetadata.empty)))
     }
 }

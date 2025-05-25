@@ -1,5 +1,6 @@
 package org.http4k.server
 
+import kotlinx.coroutines.runBlocking
 import org.apache.http.Header
 import org.apache.http.HttpEntityEnclosingRequest
 import org.apache.http.HttpInetConnection
@@ -26,10 +27,14 @@ import org.http4k.filter.ServerFilters
  */
 class Http4kApache4RequestHandler(handler: HttpHandler) : HttpRequestHandler {
 
-    private val safeHandler = ServerFilters.CatchAll().then(handler)
+    private val safeHandler = runBlocking { ServerFilters.CatchAll().then(handler) }
 
     override fun handle(request: HttpRequest, response: HttpResponse, context: HttpContext) =
-        (request.asHttp4kRequest(context)?.let(safeHandler) ?: Response(Status.NOT_IMPLEMENTED)).into(response)
+        (request.asHttp4kRequest(context)?.let {
+            runBlocking {
+                safeHandler(it) // FIXME coroutine blocking
+            }
+        } ?: Response(Status.NOT_IMPLEMENTED)).into(response)
 
     private fun HttpRequest.asHttp4kRequest(context: HttpContext): Request? {
         val connection = context.getAttribute(HttpCoreContext.HTTP_CONNECTION) as HttpInetConnection

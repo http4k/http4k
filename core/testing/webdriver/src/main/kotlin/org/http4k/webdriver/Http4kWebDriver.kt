@@ -1,5 +1,6 @@
 package org.http4k.webdriver
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -37,12 +38,13 @@ interface Http4KNavigation : Navigation {
 }
 
 class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDefaultZone()) : WebDriver {
-    val handler =
+    val handler = runBlocking {
         Filter { next -> { request -> next(request.header("host", latestHost)) } }
             .then(ClientFilters.FollowRedirects())
             .then(ClientFilters.Cookies(clock, cookieStorage()))
             .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
             .then(initialHandler)
+    }
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
@@ -51,19 +53,21 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
     private var latestHost: String? = null
 
     private fun navigateTo(request: Request) {
-        val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
-        val host = request.uri.host + (request.uri.port?.let { ":$it" } ?: "")
-        if (host.isNotEmpty()) latestHost = host
-        val response = handler(normalizedPath)
-        current = Page(
-            response.status,
-            this::navigateTo,
-            { currentUrl },
-            UUID.randomUUID(),
-            normalized(latestUri),
-            response.bodyString(),
-            current
-        )
+        runBlocking {
+            val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
+            val host = request.uri.host + (request.uri.port?.let { ":$it" } ?: "")
+            if (host.isNotEmpty()) latestHost = host
+            val response = handler(normalizedPath)
+            current = Page(
+                response.status,
+                { navigateTo(it) },
+                { currentUrl },
+                UUID.randomUUID(),
+                normalized(latestUri),
+                response.bodyString(),
+                current
+            )
+        }
     }
 
     private fun normalized(path: String) = when {

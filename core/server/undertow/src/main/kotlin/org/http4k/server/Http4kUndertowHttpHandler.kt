@@ -2,6 +2,7 @@ package org.http4k.server
 
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -18,7 +19,7 @@ import org.http4k.filter.ServerFilters.CatchAll
  * Exposed to allow for insertion into a customised Undertow server instance
  */
 class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpHandler {
-    private val safeHandler = CatchAll().then(handler)
+    private val safeHandler = runBlocking { CatchAll().then(handler) }
 
     private fun Response.into(exchange: HttpServerExchange) {
         exchange.statusCode = status.code
@@ -38,5 +39,7 @@ class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpH
         }
 
     override fun handleRequest(exchange: HttpServerExchange) =
-        (exchange.asRequest()?.let { safeHandler(it) } ?: Response(NOT_IMPLEMENTED)).into(exchange)
+        (exchange.asRequest()?.let { runBlocking {
+            safeHandler(it) // FIXME coroutine blocking
+        } } ?: Response(NOT_IMPLEMENTED)).into(exchange)
 }

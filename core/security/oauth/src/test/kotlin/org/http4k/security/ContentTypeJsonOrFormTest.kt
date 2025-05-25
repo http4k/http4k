@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class ContentTypeJsonOrFormTest {
 
     @Test
-    fun `should extract default access token`() {
+    fun `should extract default access token`() = runBlocking {
         val discordTokenResponse = """
         {
           "token_type": "Bearer",
@@ -29,7 +29,7 @@ class ContentTypeJsonOrFormTest {
     }
 
     @Test
-    fun `should extract custom access token`() {
+    fun `should extract custom access token`() = runBlocking {
         val discordTokenResponse = """
         {
           "token_type": "Bearer",

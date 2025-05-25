@@ -8,14 +8,14 @@ import org.junit.jupiter.api.Test
 class AuthorityTest {
 
     @Test
-    fun `can parse from string`() {
+    fun `can parse from string`() = runBlocking {
         assertThat(Authority("localhost:80"), equalTo(Authority(Host.localhost, Port(80))))
         assertThat(Authority("localhost"), equalTo(Authority(Host.localhost, null)))
         assertThat({ Authority("") }, throws<IllegalArgumentException>())
     }
 
     @Test
-    fun `check toString`() {
+    fun `check toString`() = runBlocking {
         assertThat(Authority(Host.localhost, Port(80)).toString(), equalTo("localhost:80"))
         assertThat(Authority(Host.localhost).toString(), equalTo("localhost"))
     }

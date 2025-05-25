@@ -93,7 +93,7 @@ object ResponseFilters {
             .map { it.value }
             .map { it.split(";").first() }
 
-        override fun invoke(next: HttpHandler): HttpHandler = { request ->
+        override suspend fun invoke(next: HttpHandler): HttpHandler = { request ->
             next(request).let {
                 if (requestAcceptsGzip(request) && isCompressible(it)) {
                     compressionMode.compress(it.body).apply(it)
@@ -155,7 +155,7 @@ object ResponseFilters {
             MessageDigest.getInstance("MD5")
         }
 
-        override fun invoke(next: HttpHandler): HttpHandler = { request ->
+        override suspend fun invoke(next: HttpHandler): HttpHandler = { request ->
             next(request).let { response ->
                 if (request.method == Method.GET && response.status == Status.OK) {
                     checkEtag(request, response)

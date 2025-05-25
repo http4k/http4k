@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test
 class LoadMetaResouceTest {
 
     @Test
-    fun `can load file from meta-dir`() {
+    fun `can load file from meta-dir`() = runBlocking {
         assertThat(loadMetaResource<MimeTypes>("mime.types"), present())
     }
 
     @Test
-    fun `throws on missing`() {
+    fun `throws on missing`() = runBlocking {
         assertThat(
             { loadMetaResource<MimeTypes>("myfile.txt") },
             throws(has(java.lang.IllegalStateException::message, equalTo("" +

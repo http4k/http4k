@@ -23,7 +23,7 @@ class AwsSdkV2CompatibilityTest {
         .build()
 
     @Test
-    fun `round trip`() {
+    fun `round trip`() = runBlocking {
         val url = client.createQueue {
             it.queueName("foo")
         }.queueUrl()

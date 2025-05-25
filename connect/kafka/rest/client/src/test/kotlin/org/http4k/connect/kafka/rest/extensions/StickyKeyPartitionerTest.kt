@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class StickyKeyPartitionerTest {
     @Test
-    fun `uses the key hash for getting the partition`() {
+    fun `uses the key hash for getting the partition`() = runBlocking {
         val p = StickyKeyRecordPartitioner<String, String>(
             listOf(
                 PartitionId.of(1),

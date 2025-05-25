@@ -17,7 +17,7 @@ class NettyStreamingTest : StreamingContract() {
         ClientForServerTesting(bodyMode = Stream)
 
     @Test
-    override fun `can stream request`() {
+    override fun `can stream request`() = runBlocking {
         // request streaming is not currently supported in the Netty integration
     }
 }

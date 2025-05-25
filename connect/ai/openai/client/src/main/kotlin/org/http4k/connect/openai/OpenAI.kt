@@ -9,7 +9,7 @@ import org.http4k.connect.RemoteFailure
  */
 @Http4kConnectApiClient
 interface OpenAI {
-    operator fun <R> invoke(action: OpenAIAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: OpenAIAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

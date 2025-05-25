@@ -15,7 +15,7 @@ class DigestEncoderTest {
     private val encoder = DigestEncoder(MessageDigest.getInstance("MD5"), Charsets.ISO_8859_1)
 
     @Test
-    fun `calculate Auth response 1`() {
+    fun `calculate Auth response 1`() = runBlocking {
         val response = encoder(
             realm = "super-secure IOT device",
             qop = Auth,
@@ -32,7 +32,7 @@ class DigestEncoderTest {
     }
 
     @Test
-    fun `calculate Auth response 2`() {
+    fun `calculate Auth response 2`() = runBlocking {
         val response = encoder(
             realm = "a random server",
             qop = Auth,
@@ -49,7 +49,7 @@ class DigestEncoderTest {
     }
 
     @Test
-    fun `calculate no-qop response`() {
+    fun `calculate no-qop response`() = runBlocking {
         val response = encoder(
             realm = "insecure-server",
             qop = null,

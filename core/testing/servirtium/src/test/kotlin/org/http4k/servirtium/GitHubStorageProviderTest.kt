@@ -22,7 +22,7 @@ class GitHubStorageProviderTest {
     }
 
     @Test
-    fun `wrong credentials fails`() {
+    fun `wrong credentials fails`() = runBlocking {
         val storage = gitHubFor(Credentials("notuser", "noway"))
         assertThat({ storage("gitHubFile").get() }, throws<Unauthorized>())
     }

@@ -19,7 +19,7 @@ fun GoogleAnalytics.Companion.Http(
     object : GoogleAnalytics {
         private val http = SetBaseUriFrom(GOOGLE_ANALYTICS_URL).then(rawHttp)
 
-        override fun <R> invoke(action: GoogleAnalyticsAction<R>) = action.toResult(
+        override suspend fun <R> invoke(action: GoogleAnalyticsAction<R>) = action.toResult(
             http(
                 action.toRequest()
                     .with(measurementIdQuery of measurementId)

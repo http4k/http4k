@@ -27,13 +27,13 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     data class OrderedContainer(val second: List<String>, val first: String)
 
     @Test
-    override fun `can set field order`() {
+    override fun `can set field order`() = runBlocking {
         assertThat(JacksonXml.asFormatString(OrderedContainer(listOf("2.1", "2.2"), "1.0")),
             equalTo("<OrderedContainer><first>1.0</first><second>2.1</second><second>2.2</second></OrderedContainer>"))
     }
 
     @Test
-    override fun `can roundtrip an HTTP request body`() {
+    override fun `can roundtrip an HTTP request body`() = runBlocking {
         val lens = Body.auto<UriContainer>().toLens()
         val item = UriContainer(Uri.of("foo.bar"))
         val r = Response(OK).with(lens of item)
@@ -42,7 +42,7 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     }
 
     @Test
-    fun `can roundtrip an HTTP request body with custom content-type`() {
+    fun `can roundtrip an HTTP request body with custom content-type`() = runBlocking {
         val customContentType = Text("application/custom+xml")
         val lens = JacksonXml.autoBody<UriContainer>(contentType = customContentType).toLens()
         val item = UriContainer(Uri.of("foo.bar"))
@@ -52,7 +52,7 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     }
 
     @Test
-    override fun `can roundtrip an WsMessage`() {
+    override fun `can roundtrip an WsMessage`() = runBlocking {
         val lens = WsMessage.auto<UriContainer>().toLens()
         val item = UriContainer(Uri.of("foo.bar"))
         val msg = lens(item)
@@ -61,12 +61,12 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     }
 
     @Test
-    fun `nullable fields are supported - jackson bug`() {
+    fun `nullable fields are supported - jackson bug`() = runBlocking {
         assertThat(JacksonXml.asA("<NullableListContainerBug/>"), equalTo(NullableListContainerBug(null)))
     }
 
     @Test
-    fun `can roundtrip an HTTP request body with custom marshaller`() {
+    fun `can roundtrip an HTTP request body with custom marshaller`() = runBlocking {
         val customContentType = Text("application/snake-xml")
         val marshaller = ConfigurableJacksonXml(
             mapper = KotlinModule.Builder().build()
@@ -84,7 +84,7 @@ class JacksonXmlTest : AutoMarshalingXmlContract(JacksonXml) {
     }
 
     @Test
-    fun `can roundtrip an with BiDi lens`() {
+    fun `can roundtrip an with BiDi lens`() = runBlocking {
         val lens = JacksonXml.asBiDiMapping<UriContainer>()
         val item = UriContainer(Uri.of("foo.bar"))
         assertThat(lens(lens(item)), equalTo(item))

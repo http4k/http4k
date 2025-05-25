@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
 
     @Test
-    fun `default usage`() {
+    fun `default usage`() = runBlocking {
         val client = awsClientFilter(Payload.Mode.Signed)
             .then(ApacheClient(requestBodyMode = BodyMode.Memory))
         bucketLifecycle((client))

@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test
 
 class ResponseTest {
     @Test
-    fun `differences in header order do not invalidate equality`() {
+    fun `differences in header order do not invalidate equality`() = runBlocking {
         val responseOne = Response(OK).header("foo", "bar").header("fizz", "buzz")
         val responseTwo = Response(OK).header("fizz", "buzz").header("foo", "bar")
         assertThat(responseOne, equalTo(responseTwo))
     }
 
     @Test
-    fun `if multiple headers with the same key exist in two headers, they must be in the same order for the headers to be equal`() {
+    fun `if multiple headers with the same key exist in two headers, they must be in the same order for the headers to be equal`() = runBlocking {
         val responseOne = Response(OK)
             .header("foo", "bar")
             .header("foo", "buzz")

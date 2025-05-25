@@ -118,7 +118,7 @@ abstract class DataContainerContract<C : ChildFields<G>, G : GrandchildFields, C
     abstract fun grandchildContainer(input: Map<String, Any?>): G
 
     @Test
-    fun `can read primitives values`() {
+    fun `can read primitives values`() = runBlocking {
         val input = container(
             mapOf(
                 "string" to "string",
@@ -205,7 +205,7 @@ abstract class DataContainerContract<C : ChildFields<G>, G : GrandchildFields, C
     }
 
     @Test
-    fun `read object values`() {
+    fun `read object values`() = runBlocking {
         val input = container(
             mapOf(
                 "subClass" to mapOf(
@@ -272,7 +272,7 @@ abstract class DataContainerContract<C : ChildFields<G>, G : GrandchildFields, C
     }
 
     @Test
-    fun `read list values`() {
+    fun `read list values`() = runBlocking {
         val input = container(
             mapOf(
                 "list" to listOf("string1", "string2"),
@@ -321,7 +321,7 @@ abstract class DataContainerContract<C : ChildFields<G>, G : GrandchildFields, C
     }
 
     @Test
-    fun `get meta data from the container`() {
+    fun `get meta data from the container`() = runBlocking {
         val input = container(emptyMap()) as DataContainer<*>
 
         val propertyMetaData = input.propertyMetadata().find { it.name == "string" }

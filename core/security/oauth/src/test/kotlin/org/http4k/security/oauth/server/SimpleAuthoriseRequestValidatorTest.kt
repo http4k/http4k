@@ -29,7 +29,7 @@ class SimpleAuthoriseRequestValidatorTest {
         )
 
     @Test
-    fun `return auth request when client is valid`() {
+    fun `return auth request when client is valid`() = runBlocking {
         val validAuthRequest = AuthRequest(
             responseType = ResponseType.Code,
             client = validClientId,
@@ -44,7 +44,7 @@ class SimpleAuthoriseRequestValidatorTest {
     }
 
     @Test
-    fun `validates client_id value`() {
+    fun `validates client_id value`() = runBlocking {
         val authRequest = AuthRequest(
             responseType = ResponseType.Code,
             client = ClientId("invalid-client"),
@@ -56,7 +56,7 @@ class SimpleAuthoriseRequestValidatorTest {
     }
 
     @Test
-    fun `validates redirect_uri value`() {
+    fun `validates redirect_uri value`() = runBlocking {
         val authRequest = AuthRequest(
             responseType = ResponseType.Code,
             client = validClientId,
@@ -68,7 +68,7 @@ class SimpleAuthoriseRequestValidatorTest {
     }
 
     @Test
-    fun `validates scopes`() {
+    fun `validates scopes`() = runBlocking {
         val authRequest = AuthRequest(
             responseType = ResponseType.Code,
             client = validClientId,

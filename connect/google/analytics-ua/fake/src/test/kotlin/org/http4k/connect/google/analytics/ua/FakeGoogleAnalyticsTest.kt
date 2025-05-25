@@ -15,7 +15,7 @@ class FakeGoogleAnalyticsTest {
     private val analytics = GoogleAnalytics.Http(TrackingId.of("SOME_TRACKING_ID"), FakeGoogleAnalytics())
 
     @Test
-    fun `can log page view`() {
+    fun `can log page view`() = runBlocking {
         assertThat(
             analytics.collect(
                 PageView(
@@ -31,7 +31,7 @@ class FakeGoogleAnalyticsTest {
     }
 
     @Test
-    fun `can log event`() {
+    fun `can log event`() = runBlocking {
         assertThat(
             analytics.collect(
                 Event(

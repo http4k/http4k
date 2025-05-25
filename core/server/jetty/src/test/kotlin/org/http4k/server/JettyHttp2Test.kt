@@ -10,7 +10,7 @@ import java.io.File
 class JettyHttp2Test: PortBasedTest {
 
     @Test
-    fun `can configure http2`() {
+    fun `can configure http2`() = runBlocking {
         val server = { _: Request -> Response(Status.OK) }.asServer(
             Jetty(
                 0,

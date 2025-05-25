@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 class NoOpPartitionerTest {
     @Test
-    fun `round robins the partitions`() {
+    fun `round robins the partitions`() = runBlocking {
         val p = NoOpPartitioner<String, String>(listOf())
 
         assertThat(p("hello", "world"), equalTo(null))

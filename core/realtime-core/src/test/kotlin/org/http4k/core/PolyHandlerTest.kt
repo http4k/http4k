@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 class PolyHandlerTest {
 
     @Test
-    fun `can add filter to polyhandler`() {
+    fun `can add filter to polyhandler`() = runBlocking {
         val p = poly(
             "http" bindHttp { req: Request -> Response(OK) },
             "sse" bindSse { req: Request -> SseResponse {} },

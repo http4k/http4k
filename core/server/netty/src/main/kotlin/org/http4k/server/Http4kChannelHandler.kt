@@ -14,6 +14,7 @@ import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
 import io.netty.handler.codec.http.LastHttpContent.EMPTY_LAST_CONTENT
 import io.netty.handler.stream.ChunkedStream
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryBody
@@ -33,11 +34,15 @@ import java.net.InetSocketAddress
  * Exposed to allow for insertion into a customised Netty server instance
  */
 class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<FullHttpRequest>() {
-    private val safeHandler = ServerFilters.CatchAll().then(handler)
+    private val safeHandler = runBlocking { ServerFilters.CatchAll().then(handler) }
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
         val address = ctx.channel().remoteAddress() as? InetSocketAddress
-        val response = request.asRequest(address)?.let(safeHandler) ?: Response(Status.NOT_IMPLEMENTED)
+        val response = request.asRequest(address)?.let {
+            runBlocking {
+                safeHandler(it) // FIXME coroutine blocking
+            }
+        } ?: Response(Status.NOT_IMPLEMENTED)
 
         when (response.body) {
             is MemoryBody -> {

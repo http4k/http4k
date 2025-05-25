@@ -9,7 +9,7 @@ import org.http4k.connect.RemoteFailure
  */
 @Http4kConnectApiClient
 interface AzureAI {
-    operator fun <R> invoke(action: AzureAIAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: AzureAIAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

@@ -19,14 +19,14 @@ class ResponseMatchersTest {
     fun `set cookie`() = assertMatchAndNonMatch(Response(OK).cookie(Cookie("name", "bob")), haveSetCookie(Cookie("name", "bob")), haveSetCookie(Cookie("name", "bill")))
 
     @Test
-    fun `should haveSetCookie(Cookie), cookie does not exist`() {
+    fun `should haveSetCookie(Cookie), cookie does not exist`() = runBlocking {
         assertThrows<AssertionError> {
             Response(OK).cookie(Cookie("name", "bob")) should haveSetCookie(Cookie("planet", "Earth"))
         }
     }
 
     @Test
-    fun `shouldNot haveSetCookie(Cookie), cookie does not exist`() {
+    fun `shouldNot haveSetCookie(Cookie), cookie does not exist`() = runBlocking {
         assertDoesNotThrow {
             Response(OK).cookie(Cookie("name", "bob")) shouldNot haveSetCookie(Cookie("planet", "Earth"))
         }

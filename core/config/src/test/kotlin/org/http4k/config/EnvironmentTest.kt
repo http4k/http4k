@@ -11,7 +11,7 @@ import java.io.FileNotFoundException
 class EnvironmentTest {
 
     @Test
-    fun `load from resource`() {
+    fun `load from resource`() = runBlocking {
         val finalEnv = Environment.fromResource("local.properties") overrides Environment.from("FIRST" to "bill")
 
         assertThat(finalEnv["first"], equalTo("bob"))
@@ -20,7 +20,7 @@ class EnvironmentTest {
     }
 
     @Test
-    fun `load from file`() {
+    fun `load from file`() = runBlocking {
         val file = File("src/test/resources/local.properties")
         val finalEnv = Environment.from(file) overrides Environment.from("FOO" to "bill")
 
@@ -37,7 +37,7 @@ class EnvironmentTest {
     }
 
     @Test
-    fun `overriding overrides separator`() {
+    fun `overriding overrides separator`() = runBlocking {
         val finalEnv = MapEnvironment.from(
             listOf("FOO" to "foo;bar").toMap().toProperties(),
             separator = ";"
@@ -47,7 +47,7 @@ class EnvironmentTest {
     }
 
     @Test
-    fun `add to overriding environment`() {
+    fun `add to overriding environment`() = runBlocking {
         val finalEnv = Environment.from("FOO" to "bob") overrides Environment.from("BAR" to "bill")
         val extendedEnv = finalEnv.set("BAZ", "bud")
 
@@ -66,7 +66,7 @@ class EnvironmentTest {
     }
 
     @Test
-    fun `defaults secret`() {
+    fun `defaults secret`() = runBlocking {
         val secret = EnvironmentKey.secret().required("PASSWORD")
         val env = Environment.defaults(secret of Secret("hunter2"))
 
@@ -76,7 +76,7 @@ class EnvironmentTest {
     }
 
     @Test
-    fun `convert keys`() {
+    fun `convert keys`() = runBlocking {
         infix fun String.shouldConvertTo(expected: String) = assertThat(this, convertFromKey(), equalTo(expected))
 
         "" shouldConvertTo ""

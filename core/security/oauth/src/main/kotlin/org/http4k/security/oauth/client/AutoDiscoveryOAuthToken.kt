@@ -1,6 +1,7 @@
 package org.http4k.security.oauth.client
 
 import dev.forkhandles.result4k.onFailure
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -18,7 +19,7 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     scopes: List<String> = emptyList(),
     oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(credentials, scopes),
     gracePeriod: Duration = Duration.ofSeconds(10),
-): Filter {
+): Filter = runBlocking {
     val (authServerUri, metadata) = authServerDiscovery(backend)
         .onFailure { throw it.reason }
     val config = OAuthProviderConfig(
@@ -28,7 +29,7 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
         credentials = credentials
     )
 
-    return ClientFilters.RefreshingOAuthToken(
+    ClientFilters.RefreshingOAuthToken(
         config = config,
         backend = backend,
         oAuthFlowFilter = oAuthFlowFilter,

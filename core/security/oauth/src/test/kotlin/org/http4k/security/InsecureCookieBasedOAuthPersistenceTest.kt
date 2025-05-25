@@ -26,45 +26,45 @@ class InsecureCookieBasedOAuthPersistenceTest {
     private val expectedCookieExpiry = clock.instant().plus(cookieValidity)
 
     @Test
-    fun `failed response has correct cookies`() {
+    fun `failed response has correct cookies`() = runBlocking {
         assertThat(persistence.authFailureResponse(OAuthCallbackError.AuthorizationCodeMissing(Uri.of("foo"))), equalTo(
             Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce").invalidateCookie("prefixOriginalUri")
         ))
     }
 
     @Test
-    fun `token retrieval based on cookie`() {
+    fun `token retrieval based on cookie`() = runBlocking {
         assertThat(persistence.retrieveToken(Request(GET, "")), absent())
         assertThat(persistence.retrieveToken(Request(GET, "").cookie(Cookie("prefixAccessToken", "tokenValue"))), equalTo(AccessToken("tokenValue")))
     }
 
     @Test
-    fun `csrf retrieval based on cookie`() {
+    fun `csrf retrieval based on cookie`() = runBlocking {
         assertThat(persistence.retrieveCsrf(Request(GET, "")), absent())
         assertThat(persistence.retrieveCsrf(Request(GET, "").cookie(Cookie("prefixCsrf", "csrfValue"))), equalTo(CrossSiteRequestForgeryToken("csrfValue")))
     }
 
     @Test
-    fun `nonce retrieval based on cookie`() {
+    fun `nonce retrieval based on cookie`() = runBlocking {
         assertThat(persistence.retrieveNonce(Request(GET, "")), absent())
         assertThat(persistence.retrieveNonce(Request(GET, "").cookie(Cookie("prefixNonce", "nonceValue"))),
             equalTo(Nonce("nonceValue")))
     }
 
     @Test
-    fun `original uri retrieval based on cookie`() {
+    fun `original uri retrieval based on cookie`() = runBlocking {
         assertThat(persistence.retrieveOriginalUri(Request(GET, "")), absent())
         assertThat(persistence.retrieveOriginalUri(Request(GET, "").cookie(Cookie("prefixOriginalUri", "https://foo.com"))), equalTo(Uri.of("https://foo.com")))
     }
 
     @Test
-    fun `adds csrf as a cookie to the auth redirect`() {
+    fun `adds csrf as a cookie to the auth redirect`() = runBlocking {
         assertThat(persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")),
             equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue", expires = expectedCookieExpiry, path = "/"))))
     }
 
     @Test
-    fun `adds csrf as a cookie to the token redirect`() {
+    fun `adds csrf as a cookie to the token redirect`() = runBlocking {
         assertThat(persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")),
             equalTo(Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue", expires = expectedCookieExpiry, path = "/"))
                 .invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce").invalidateCookie("prefixOriginalUri")
@@ -72,7 +72,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
     }
 
     @Test
-    fun `adds nonce as a cookie to the auth redirect`() {
+    fun `adds nonce as a cookie to the auth redirect`() = runBlocking {
         assertThat(persistence.assignNonce(Response(TEMPORARY_REDIRECT), Nonce("nonceValue")), equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixNonce", "nonceValue",
                 expires = expectedCookieExpiry, path = "/"))

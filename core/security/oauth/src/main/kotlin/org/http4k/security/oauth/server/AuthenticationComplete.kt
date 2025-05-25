@@ -16,7 +16,7 @@ class AuthenticationComplete(
     private val documentationUri: String? = null
 ) : HttpHandler {
 
-    override fun invoke(request: Request): Response {
+    override suspend fun invoke(request: Request): Response {
         val authorizationRequest = requestTracking.resolveAuthRequest(request)
             ?: error("Authorization request could not be found.")
 

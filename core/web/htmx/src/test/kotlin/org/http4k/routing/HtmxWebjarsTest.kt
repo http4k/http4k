@@ -1,6 +1,7 @@
 package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
@@ -13,13 +14,13 @@ class HtmxWebjarsTest {
     private val app = FollowRedirects().then(htmxWebjars())
 
     @Test
-    fun `can serve htmx`() {
+    fun `can serve htmx`() = runBlocking {
         assertThat(app(Request(GET, "htmx.js")), hasStatus(OK))
         assertThat(app(Request(GET, "htmx.min.js")), hasStatus(OK))
     }
 
     @Test
-    fun `can serve hyperscript (with redirects)`() {
+    fun `can serve hyperscript (with redirects)`() = runBlocking {
         assertThat(app(Request(GET, "hyperscript.js")), hasStatus(OK))
         assertThat(app(Request(GET, "hyperscript.min.js")), hasStatus(OK))
 

@@ -26,7 +26,7 @@ class HelpersKtTest {
     )
 
     @Test
-    fun `condition an item`() {
+    fun `condition an item`() = runBlocking {
         assertThat(item.condition(null, emptyMap(), emptyMap()), equalTo(item))
 
         assertThat(
@@ -47,7 +47,7 @@ class HelpersKtTest {
     }
 
     @Test
-    fun `project from an item`() {
+    fun `project from an item`() = runBlocking {
         assertThat(
             item.project(
                 "#alias, attrList[0], attrMap.attrStr, attrList[1][1], attrMap.attrBool",

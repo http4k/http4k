@@ -329,7 +329,7 @@ class BiDiLensSpecTest {
     )
 
     @Test
-    fun `can composite object from several sources and decompose it again`() {
+    fun `can composite object from several sources and decompose it again`() = runBlocking {
         data class CompositeObject(val number: Int, val string: String?)
 
         val lens = spec.composite(

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class DefaultReadinessCheckResultRendererTest {
 
     @Test
-    fun `calls toString() on result`() {
+    fun `calls toString() on result`() = runBlocking {
         assertThat(
             DefaultReadinessCheckResultRenderer(
                 Failed("first", "failed")

@@ -11,7 +11,7 @@ data class Foo(val name: String)
 
 class AlibabaCloudEventFunctionTest {
     @Test
-    fun `calls the handler and returns proper body`() {
+    fun `calls the handler and returns proper body`() = runBlocking {
 
         val response = ByteArrayOutputStream()
 

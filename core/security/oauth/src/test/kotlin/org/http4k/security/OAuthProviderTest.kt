@@ -68,13 +68,13 @@ class OAuthProviderTest {
     )
 
     @Test
-    fun `filter - when accessToken value is present, request is let through`() {
+    fun `filter - when accessToken value is present, request is let through`() = runBlocking {
         oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessToken("randomToken"))
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")), hasStatus(OK).and(hasBody("i am witorious!")))
     }
 
     @Test
-    fun `filter - when no accessToken value present, request is redirected to expected location`() {
+    fun `filter - when no accessToken value present, request is redirected to expected location`() = runBlocking {
         val expectedHeader = "http://authHost/base/auth?" +
             "client_id=user&response_type=code&scope=scope1+scope2&" +
             "redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&" +
@@ -84,7 +84,7 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `filter - accepts custom request JWT container`() {
+    fun `filter - accepts custom request JWT container`() = runBlocking {
         val expectedHeader = "http://authHost/base/auth?" +
             "client_id=user&response_type=code&scope=scope1+scope2&" +
             "redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=randomCsrf&" +
@@ -95,7 +95,7 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `filter - request redirection may use other response_type`() {
+    fun `filter - request redirection may use other response_type`() = runBlocking {
         assertThat(oAuth(oAuthPersistence, OK, CodeIdToken)
             .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
     }
@@ -107,7 +107,7 @@ class OAuthProviderTest {
     private val withCodeAndValidState = withCode.query("state", "randomCsrf")
 
     @Test
-    fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
+    fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() = runBlocking {
         assertThat(oAuth(oAuthPersistence).callback(base), hasStatus(FORBIDDEN) and hasStatusDescription("Authorization code missing"))
 
         assertThat(oAuth(oAuthPersistence).callback(withCookie), hasStatus(FORBIDDEN) and hasStatusDescription("Authorization code missing"))
@@ -116,13 +116,13 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `when api returns bad status`() {
+    fun `when api returns bad status`() = runBlocking {
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
         assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidState), hasStatus(FORBIDDEN) and hasStatusDescription("Failed to fetch access token (status: 500 Internal Server Error)"))
     }
 
     @Test
-    fun `callback - when valid inputs passed, defaults value stored in oauth persistence`() {
+    fun `callback - when valid inputs passed, defaults value stored in oauth persistence`() = runBlocking {
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
         oAuthPersistence.assignOriginalUri(Response(OK), Uri.of("/defaulted"))
 
@@ -134,7 +134,7 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `callback - when valid inputs passed, defaults to root if no uri is stored in oauth persistence`() {
+    fun `callback - when valid inputs passed, defaults to root if no uri is stored in oauth persistence`() = runBlocking {
         oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
 
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
@@ -145,21 +145,21 @@ class OAuthProviderTest {
     }
 
     @Test
-    fun `api - uses base api uri`() {
+    fun `api - uses base api uri`() = runBlocking {
         val response = oAuth(oAuthPersistence).api(Request(GET, "/some-resource"))
 
         assertThat(response, hasHeader("request-uri", equalTo("http://apiHost/api/some-resource")))
     }
 
     @Test
-    fun `id token - can fail from id_token from callback request`() {
+    fun `id token - can fail from id_token from callback request`() = runBlocking {
         val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAuth = Failure(InvalidIdToken("some reason")))
 
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }
 
     @Test
-    fun `id token - can fail from id_token from access token response`() {
+    fun `id token - can fail from id_token from access token response`() = runBlocking {
         val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(InvalidIdToken("some reason")))
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
     }

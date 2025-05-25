@@ -9,7 +9,7 @@ import org.http4k.connect.RemoteFailure
  */
 @Http4kConnectApiClient
 interface AnthropicAI {
-    operator fun <R> invoke(action: AnthropicAIAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: AnthropicAIAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

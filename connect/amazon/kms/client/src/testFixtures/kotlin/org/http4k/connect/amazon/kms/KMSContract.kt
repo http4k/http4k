@@ -31,7 +31,7 @@ interface KMSContract : AwsContract {
     private val kms get() = KMS.Http(aws.region, { aws.credentials }, http)
 
     @Test
-    fun `encrypt-decrypt key lifecycle`() {
+    fun `encrypt-decrypt key lifecycle`() = runBlocking {
         val plaintextString = Base64Blob.encode("hello there")
         val plaintextBinary = Base64Blob.of("GiD3+7WHA+0nJYnGIB3E25tm5rJqwlYi2IpLzEDRqE0ymw==")
 
@@ -69,7 +69,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `RSA sign-verify key lifecycle`() {
+    fun `RSA sign-verify key lifecycle`() = runBlocking {
         val message1 = Base64Blob.encode("hello there")
         val message2 = Base64Blob.encode("goodbye there")
 
@@ -97,7 +97,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `ECDSA sign-verify key lifecycle`() {
+    fun `ECDSA sign-verify key lifecycle`() = runBlocking {
         val message1 = Base64Blob.encode("hello there")
         val message2 = Base64Blob.encode("General Kenobi!")
 
@@ -125,7 +125,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `retrieve RSA key for signing`() {
+    fun `retrieve RSA key for signing`() = runBlocking {
         val message1 = Base64Blob.encode("hello there")
 
         val creation = kms.createKey(RSA_2048, SIGN_VERIFY).successValue()
@@ -155,7 +155,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `retrieve ECDSA key for signing`() {
+    fun `retrieve ECDSA key for signing`() = runBlocking {
         val message1 = Base64Blob.encode("hello there")
 
         val creation = kms.createKey(ECC_NIST_P521, SIGN_VERIFY).successValue()
@@ -186,7 +186,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `verify with missing key`() {
+    fun `verify with missing key`() = runBlocking {
         val keyId = kms.createKey(RSA_2048, SIGN_VERIFY).successValue().KeyMetadata.KeyId
 
         try {
@@ -203,7 +203,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `key cannot verify signature of another key`() {
+    fun `key cannot verify signature of another key`() = runBlocking {
         val key1 = kms.createKey(RSA_2048, SIGN_VERIFY).successValue().KeyMetadata.KeyId
         val key2 = kms.createKey(RSA_2048, SIGN_VERIFY).successValue().KeyMetadata.KeyId
 
@@ -222,7 +222,7 @@ interface KMSContract : AwsContract {
     }
 
     @Test
-    fun `create key with new KeySpec property`() {
+    fun `create key with new KeySpec property`() = runBlocking {
         val keyId = kms.createKey(KeyUsage = SIGN_VERIFY, KeySpec = RSA_3072).successValue().KeyMetadata.KeyId
 
         try {

@@ -7,6 +7,7 @@ import io.helidon.webserver.http.Handler
 import io.helidon.webserver.http.ServerRequest
 import io.helidon.webserver.http.ServerResponse
 import io.helidon.webserver.sse.SseSink.TYPE
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -31,16 +32,18 @@ fun HelidonToHttp4kHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req
     val httpToUse = http ?: { Response(NOT_FOUND) }
     req.toHttp4k()
         ?.let {
-            when {
-                sse != null && it.isEventStream() -> {
-                    val http4kResponse = sse(it)
-                    when {
-                        http4kResponse.handled -> http4kResponse.writeInto(it, res)
-                        else -> res.from(httpToUse(it))
+            runBlocking { // FIXME coroutine blocking
+                when {
+                    sse != null && it.isEventStream() -> {
+                        val http4kResponse = sse(it)
+                        when {
+                            http4kResponse.handled -> http4kResponse.writeInto(it, res)
+                            else -> res.from(httpToUse(it))
+                        }
                     }
-                }
 
-                else -> res.from(httpToUse(it))
+                    else -> res.from(httpToUse(it))
+                }
             }
         }
         ?: res.from(Response(NOT_IMPLEMENTED))

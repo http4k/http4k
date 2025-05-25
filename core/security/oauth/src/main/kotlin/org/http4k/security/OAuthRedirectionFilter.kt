@@ -29,7 +29,7 @@ class OAuthRedirectionFilter(
     private val responseMode: ResponseMode? = null,
 ) : Filter {
 
-    override fun invoke(next: HttpHandler): HttpHandler = { request ->
+    override suspend fun invoke(next: HttpHandler): HttpHandler = { request ->
         if (oAuthPersistence.retrieveToken(request) != null) next(request)
         else {
             val csrf = generateCrsf(request)

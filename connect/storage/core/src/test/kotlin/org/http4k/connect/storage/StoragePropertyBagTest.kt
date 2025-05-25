@@ -27,7 +27,7 @@ class StoragePropertyBagTest {
     }
 
     @Test
-    fun `set and get object values`() {
+    fun `set and get object values`() = runBlocking {
         val storage = Storage.InMemory<String>()
         val parent = Parent(storage)
 

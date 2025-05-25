@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 class VertxToHttp4kHandlerTest : PortBasedTest {
 
     @Test
-    fun `passes requests through and adapts`() {
+    fun `passes requests through and adapts`() = runBlocking {
         val vertx = Vertx.builder().build()
 
         val router = Router.router(vertx)

@@ -13,7 +13,7 @@ class LocalKafkaRestTest : KafkaRestV2Contract, PortBasedTest {
     }
 
     @Disabled("no schema registry available in compose")
-    override fun `can send AVRO messages and get them back`() {
+    override fun `can send AVRO messages and get them back`() = runBlocking {
         super.`can send AVRO messages and get them back`()
     }
 

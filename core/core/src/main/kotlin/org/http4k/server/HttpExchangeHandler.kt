@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import com.sun.net.httpserver.HttpExchange
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -36,7 +37,11 @@ class HttpExchangeHandler(private val handler: HttpHandler) : com.sun.net.httpse
     override fun handle(exchange: HttpExchange) {
         with(exchange) {
             try {
-                populate(toRequest()?.let(handler) ?: Response(NOT_IMPLEMENTED))
+                populate(toRequest()?.let {
+                    runBlocking {
+                        handler(it) // FIXME coroutine blocking
+                    }
+                } ?: Response(NOT_IMPLEMENTED))
             } catch (e: Exception) {
                 sendResponseHeaders(500, -1)
             } finally {

@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class UriTest {
     @Test
-    fun `parsing a full uri`() {
+    fun `parsing a full uri`() = runBlocking {
         val value = "http://user:pass@host:1234/some/path?q1=v1&q2=v2#abc"
         val uri = Uri.of(value)
         assertThat(uri.scheme, equalTo("http"))
@@ -24,7 +24,7 @@ class UriTest {
     }
 
     @Test
-    fun `creating a full uri by hand`() {
+    fun `creating a full uri by hand`() = runBlocking {
         val uri = Uri.of("")
             .scheme("https")
             .userInfo("user:pass")
@@ -38,7 +38,7 @@ class UriTest {
     }
 
     @Test
-    fun `handles no prefixed slash in a path`() {
+    fun `handles no prefixed slash in a path`() = runBlocking {
         val uri = Uri.of("")
             .scheme("https")
             .host("example.com")
@@ -49,7 +49,7 @@ class UriTest {
     }
 
     @Test
-    fun `equality for round tripping`() {
+    fun `equality for round tripping`() = runBlocking {
         assertThat(Uri.of("path"), equalTo(Uri.of(Uri.of("path").toString())))
     }
 
@@ -117,14 +117,14 @@ class UriTest {
     }
 
     @Test
-    fun `can encode a path segment correctly`() {
+    fun `can encode a path segment correctly`() = runBlocking {
         val original = "123 / 456"
         val encoded = "123%20%2F%20456"
         assertThat(original.toPathSegmentEncoded(), equalTo(encoded))
     }
 
     @Test
-    fun `can extend existing uri path`() {
+    fun `can extend existing uri path`() = runBlocking {
         assertThat(Uri.of("http://ignore").extend(Uri.of("/")), equalTo(Uri.of("http://ignore/")))
         assertThat(Uri.of("http://ignore/a").extend(Uri.of("")), equalTo(Uri.of("http://ignore/a")))
         assertThat(Uri.of("http://ignore/a").extend(Uri.of("/b")), equalTo(Uri.of("http://ignore/a/b")))
@@ -133,7 +133,7 @@ class UriTest {
     }
 
     @Test
-    fun `can extend existing uri`() {
+    fun `can extend existing uri`() = runBlocking {
         assertThat(
             Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz#bob")),
             equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz#bob"))
@@ -145,7 +145,7 @@ class UriTest {
     }
 
     @Test
-    fun `can encode query param values`() {
+    fun `can encode query param values`() = runBlocking {
         val unEncodedUri = Uri.of("http://ignore/?q1=encode me pls&q2=encode me 2")
         val encodedUri = "http://ignore/?q1=encode+me+pls&q2=encode+me+2"
         val queryParametersEncodedUri = unEncodedUri.queryParametersEncoded()

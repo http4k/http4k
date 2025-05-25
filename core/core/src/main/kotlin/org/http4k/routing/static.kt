@@ -47,7 +47,7 @@ data class StaticRouteMatcher(
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
-    override fun match(request: Request) = when (val result = router(request)) {
+    override suspend fun match(request: Request) = when (val result = router(request)) {
         is Matched -> handler(request).let {
             when {
                 it.status != NOT_FOUND -> RoutingMatch(0, result.description, filter.then { _: Request -> it })
@@ -72,7 +72,7 @@ internal class ResourceLoadingHandler(
 ) : HttpHandler {
     private val extMap = MimeTypes(extraFileExtensionToContentTypes)
 
-    override fun invoke(p1: Request): Response = if (isStartingWithPathSegment(p1) && p1.method == GET) {
+    override suspend fun invoke(p1: Request): Response = if (isStartingWithPathSegment(p1) && p1.method == GET) {
         load(convertPath(p1.uri.path))
     } else Response(NOT_FOUND)
 

@@ -43,7 +43,7 @@ import kotlin.concurrent.thread
 class ResilienceFiltersTest {
 
     @Test
-    fun `circuit break filter`() {
+    fun `circuit break filter`() = runBlocking {
         val minimumOpenStateApparently = Duration.ofSeconds(1)
         val config = CircuitBreakerConfig.custom()
             .slidingWindow(2, 2, COUNT_BASED, SYNCHRONIZED)
@@ -76,7 +76,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `retrying stops when successful result returned`() {
+    fun `retrying stops when successful result returned`() = runBlocking {
 
         val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
@@ -94,7 +94,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `retrying eventually runs out and returns the last result`() {
+    fun `retrying eventually runs out and returns the last result`() = runBlocking {
 
         val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
@@ -112,7 +112,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `rate limit filter`() {
+    fun `rate limit filter`() = runBlocking {
         val config = RateLimiterConfig.custom()
             .limitRefreshPeriod(Duration.ofSeconds(1))
             .limitForPeriod(1)
@@ -125,7 +125,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `bulkhead filter`() {
+    fun `bulkhead filter`() = runBlocking {
         val config = BulkheadConfig.custom()
             .maxConcurrentCalls(1)
             .maxWaitDuration(Duration.ZERO)
@@ -147,7 +147,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `TimeLimit filter returns error response if time limit is exceeded`() {
+    fun `TimeLimit filter returns error response if time limit is exceeded`() = runBlocking {
         val timeoutService = ResilienceFilters.TimeLimit(TimeLimiter.of(Duration.ofMillis(50)))
             .then {
                 Thread.sleep(100)
@@ -158,7 +158,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `TimeLimit filter returns success if time limit is not exceeded`() {
+    fun `TimeLimit filter returns success if time limit is not exceeded`() = runBlocking {
         val timeoutService = ResilienceFilters.TimeLimit(TimeLimiter.of(Duration.ofMillis(100)))
             .then {
                 Thread.sleep(50)
@@ -169,7 +169,7 @@ class ResilienceFiltersTest {
     }
 
     @Test
-    fun `TimeLimit filter can use a different future supplier if supplied`() {
+    fun `TimeLimit filter can use a different future supplier if supplied`() = runBlocking {
         val executorService = Executors.newSingleThreadExecutor {
             Thread(it, "My thread")
         }

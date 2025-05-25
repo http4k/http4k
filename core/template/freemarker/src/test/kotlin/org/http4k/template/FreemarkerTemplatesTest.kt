@@ -15,7 +15,7 @@ class FreemarkerTemplatesTest : TemplatesContract<FreemarkerTemplates>(Freemarke
 class FreemarkerViewModelTest : ViewModelContract(FreemarkerTemplates(Configuration(VERSION_2_3_34))) {
 
     @Test
-    fun `can override template name to provide format specific stuff`() {
+    fun `can override template name to provide format specific stuff`() = runBlocking {
         val renderer = FreemarkerTemplates(Configuration(VERSION_2_3_34)).CachingClasspath()
 
         assertThat(renderer(HtmlFeature("pretty")), equalTo("<html><span>pretty</span></html>"))

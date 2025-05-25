@@ -1,5 +1,6 @@
 package org.http4k.client
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.then
@@ -22,7 +23,7 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int, Server
         get() = server.port()
 
     @BeforeEach
-    fun before() {
+    fun before() = runBlocking {
         server = Filter.NoOp
             .then(PrintRequestAndResponse().inIntelliJOnly())
             .then(ServerForClientContract)

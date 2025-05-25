@@ -5,5 +5,5 @@ import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 
 object TestServerlessFunction : AppLoader {
-    override fun invoke(env: Map<String, String>) = PrintRequestAndResponse().then(ServerForClientContract)
+    override suspend fun invoke(env: Map<String, String>) = PrintRequestAndResponse().then(ServerForClientContract)
 }

@@ -13,15 +13,15 @@ import org.http4k.core.Request
 abstract class RoutingHandler<R, F, Self : RouteMatcher<R, F>>(
     val routes: List<RouteMatcher<R, F>>,
     private val copy: (List<RouteMatcher<R, F>>) -> Self
-) : (Request) -> R, RouteMatcher<R, F> {
+) : suspend (Request) -> R, RouteMatcher<R, F> {
 
     init {
         require(routes.isNotEmpty(), { "No routes added!" })
     }
 
-    override fun invoke(request: Request) = match(request)(request)
+    override suspend fun invoke(request: Request) = match(request)(request)
 
-    override fun match(request: Request) = routes.minOf { it.match(request) }
+    override suspend fun match(request: Request) = routes.minOf { it.match(request) }
 
     override fun withBasePath(prefix: String) = copy(routes.map { it.withBasePath(prefix) })
 

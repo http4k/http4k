@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test
 class OpenIdServerTest {
 
     @Test
-    fun `can follow authorization code id_token flow`() {
+    fun `can follow authorization code id_token flow`() = runBlocking {
         val clientOauthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer()
@@ -70,7 +70,7 @@ class OpenIdServerTest {
     }
 
     @Test
-    fun `reject oidc flow if nonces do not match`() {
+    fun `reject oidc flow if nonces do not match`() = runBlocking {
         val clientOauthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer(expectedNonce = Nonce("some invalid nonce"))

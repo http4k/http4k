@@ -23,14 +23,14 @@ interface AzureAIContract {
     val azureAi: AzureAI
 
     @Test
-    fun `get info`() {
+    fun `get info`() = runBlocking {
         val modelName = ModelName.of("Meta-Llama-3-8B-Instruct")
         val model = azureAi.getInfo(modelName).successValue()
         assertThat(model.model_name, equalTo(modelName))
     }
 
     @Test
-    fun `get chat completion response non-stream`() {
+    fun `get chat completion response non-stream`() = runBlocking {
         val responses = azureAi.chatCompletion(
             ModelName.of("Meta-Llama-3-8B-Instruct"),
             listOf(
@@ -46,7 +46,7 @@ interface AzureAIContract {
     }
 
     @Test
-    fun `get completion response non-stream`() {
+    fun `get completion response non-stream`() = runBlocking {
         val responses = azureAi(Completion(
             Prompt.of("foobar"),
             stream = false,
@@ -58,7 +58,7 @@ interface AzureAIContract {
     }
 
     @Test
-    fun `get chat completion response streaming`() {
+    fun `get chat completion response streaming`() = runBlocking {
         val responses = azureAi.chatCompletion(
             ModelName.of("Meta-Llama-3-8B-Instruct"),
             listOf(
@@ -74,7 +74,7 @@ interface AzureAIContract {
     }
 
     @Test
-    fun `get completion response streaming`() {
+    fun `get completion response streaming`() = runBlocking {
         val responses = azureAi(
             Completion(
                 Prompt.of("what is the best type of cat?"),
@@ -88,7 +88,7 @@ interface AzureAIContract {
     }
 
     @Test
-    fun `get embeddings`() {
+    fun `get embeddings`() = runBlocking {
         assertThat(
             azureAi.createEmbeddings(
                 ModelName.of("text-embedding-3-small"),

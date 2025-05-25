@@ -6,7 +6,7 @@ import org.http4k.connect.RemoteFailure
 
 @Http4kConnectApiClient
 interface Example {
-    operator fun <R> invoke(action: ExampleAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: ExampleAction<R>): Result<R, RemoteFailure>
 
     companion object
 }

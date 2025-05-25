@@ -7,7 +7,7 @@ import org.http4k.connect.amazon.AwsServiceCompanion
 
 @Http4kConnectApiClient
 interface ContainerCredentials {
-    operator fun <R> invoke(action: ContainerCredentialsAction<R>): Result<R, RemoteFailure>
+    suspend operator fun <R> invoke(action: ContainerCredentialsAction<R>): Result<R, RemoteFailure>
 
     companion object : AwsServiceCompanion("containercredentials")
 }

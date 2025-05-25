@@ -2,6 +2,7 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -13,7 +14,7 @@ interface HttpClientWithMemoryModeContract : PortBasedTest {
     val port: Int
 
     @Test
-    fun `honors the memory body mode when a request body is an input stream`() {
+    fun `honors the memory body mode when a request body is an input stream`() = runBlocking {
         val expectedBody = "hello world"
 
         val request = Request(POST, "http://localhost:$port/echo").body(expectedBody.byteInputStream())

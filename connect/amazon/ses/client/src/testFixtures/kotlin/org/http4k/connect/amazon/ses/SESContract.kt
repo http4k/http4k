@@ -29,7 +29,7 @@ interface SESContract : AwsContract {
     val to get() = EmailAddress.of("destination@example.com")
 
     @Test
-    fun `send simple email`() {
+    fun `send simple email`() = runBlocking {
         val response = ses.sendEmail(
             fromEmailAddress = from,
             destination = Destination(
@@ -52,7 +52,7 @@ interface SESContract : AwsContract {
     }
 
     @Test
-    fun `send raw email`() {
+    fun `send raw email`() = runBlocking {
         val response = ses.sendEmail(
             fromEmailAddress = from,
             destination = Destination(
@@ -71,7 +71,7 @@ interface SESContract : AwsContract {
     }
 
     @Test
-    fun `send email - without destination`() {
+    fun `send email - without destination`() = runBlocking {
         val response = ses.sendEmail(
             fromEmailAddress = from,
             content = EmailContent(
@@ -93,7 +93,7 @@ interface SESContract : AwsContract {
     }
 
     @Test
-    fun `send email - without from address`() {
+    fun `send email - without from address`() = runBlocking {
         val response = ses.sendEmail(
             destination = Destination(
                 toAddresses = setOf(to)

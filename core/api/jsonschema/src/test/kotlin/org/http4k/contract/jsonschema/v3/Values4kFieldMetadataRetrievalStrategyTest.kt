@@ -22,7 +22,7 @@ class Values4kFieldMetadataRetrievalStrategyTest {
     data class ValueHolder(val v: Value<*>)
 
     @Test
-    fun `extract format from value type field`() {
+    fun `extract format from value type field`() = runBlocking {
         checkFormat(object : IntValue(1) {}, "int32")
         checkFormat(object : LongValue(1L) {}, "int64")
         checkFormat(object : DoubleValue(1.0) {}, "double")

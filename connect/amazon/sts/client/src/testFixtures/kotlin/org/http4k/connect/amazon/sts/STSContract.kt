@@ -19,7 +19,7 @@ interface STSContract : AwsContract {
         STS.Http(aws.region, { aws.credentials }, http, clock)
 
     @Test
-    fun `assume role`() {
+    fun `assume role`() = runBlocking {
         val result = sts.assumeRole(
             ARN.of("arn:aws:iam::169766454405:role/ROLETEST"),
             RoleSessionName.of(UUID.randomUUID().toString()),

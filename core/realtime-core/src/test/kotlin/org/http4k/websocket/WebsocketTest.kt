@@ -28,7 +28,7 @@ class WebsocketTest {
     }
 
     @Test
-    fun `when match, passes a consumer with the matching request`() {
+    fun `when match, passes a consumer with the matching request`() = runBlocking {
         val consumer = TestConsumer();
 
         var r: Request? = null
@@ -41,7 +41,7 @@ class WebsocketTest {
     }
 
     @Test
-    fun `sends outbound messages to the websocket`() {
+    fun `sends outbound messages to the websocket`() = runBlocking {
         val consumer = TestConsumer()
         val client = { _: Request -> WsResponse(consumer) }.testWebsocket(Request(Method.GET, "/"))
         client.onMessage {
@@ -55,7 +55,7 @@ class WebsocketTest {
     }
 
     @Test
-    fun `sends inbound messages to the client`() {
+    fun `sends inbound messages to the client`() = runBlocking {
         val consumer = TestConsumer()
         val client = { _: Request -> WsResponse(consumer) }.testWebsocket(Request(Method.GET, "/"))
         consumer.websocket.onMessage {
@@ -72,7 +72,7 @@ class WebsocketTest {
     }
 
     @Test
-    fun `server-side close triggers all close handlers`() {
+    fun `server-side close triggers all close handlers`() = runBlocking {
         val consumer = TestConsumer()
         val client = { _: Request -> WsResponse(consumer) }.testWebsocket(Request(Method.GET, "/"))
 
@@ -86,7 +86,7 @@ class WebsocketTest {
     }
 
     @Test
-    fun `client-side close triggers all close handlers`() {
+    fun `client-side close triggers all close handlers`() = runBlocking {
         val consumer = TestConsumer()
         val client = { _: Request -> WsResponse(consumer) }.testWebsocket(Request(Method.GET, "/"))
 

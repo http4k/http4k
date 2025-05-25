@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test
 class ContractRouteTest {
 
     @Test
-    fun `can build a request from a route`() {
+    fun `can build a request from a route`() = runBlocking {
         val path1: BiDiPathLens<Int> = Path.int().of("sue")
         val path2 = Path.string().of("bob")
         val pair = path1 / path2 meta {
@@ -51,7 +51,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `can build a request from a string`() {
+    fun `can build a request from a string`() = runBlocking {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
         val pair = "/bob" bindContract GET
@@ -61,7 +61,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `can build a request from a routespec`() {
+    fun `can build a request from a routespec`() = runBlocking {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
         val request = (path1 / path2 meta {
@@ -75,7 +75,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `can build a request from a routespec - no base`() {
+    fun `can build a request from a routespec - no base`() = runBlocking {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
         val request = (path1 / path2 meta {
@@ -86,7 +86,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `0 parts - matches route`() {
+    fun `0 parts - matches route`() = runBlocking {
         val handler: (Request) -> Response = { Response(OK) }
         val route = "/" bindContract GET to handler
         "/" bindContract GET to { -> handler }
@@ -100,7 +100,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `new requests`() {
+    fun `new requests`() = runBlocking {
         fun assertRequest(contractRoute: ContractRoute, expected: String) {
             assertThat(contractRoute.newRequest(Uri.of("http://foo.com")), equalTo(Request(GET, expected)))
         }
@@ -140,7 +140,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `route as HttpHandler matches as expected`() {
+    fun `route as HttpHandler matches as expected`() = runBlocking {
         val route = Path.int().of("value") meta {} bindContract GET to { { Response(OK) } }
 
         assertThat(route(Request(GET, "/1")), hasStatus(OK))
@@ -149,7 +149,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `route as HttpHandler validates security of route`() {
+    fun `route as HttpHandler validates security of route`() = runBlocking {
         val route = Path.int().of("value") meta {
             security = ApiKeySecurity(Query.required("foo"), { true })
         } bindContract GET to { { Response(OK) } }
@@ -158,7 +158,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `route as HttpHandler performs pre-extraction of route`() {
+    fun `route as HttpHandler performs pre-extraction of route`() = runBlocking {
         val route = Path.int().of("value") meta {
             queries += Query.required("foo")
         } bindContract GET to { { Response(OK) } }
@@ -167,14 +167,14 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `1 part - matches route`() {
+    fun `1 part - matches route`() = runBlocking {
         fun matched(value: String) = { _: Request -> Response(OK).body(value) }
 
         checkMatching(Path.of("value") bindContract GET to ::matched, "/value", "value")
     }
 
     @Test
-    fun `2 parts - matches route`() {
+    fun `2 parts - matches route`() = runBlocking {
         fun matched(value1: String, value2: String) = { _: Request -> Response(OK).body(value1 + value2) }
 
         checkMatching(Path.of("value") / "value2" meta {} bindContract GET to ::matched,
@@ -183,7 +183,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `3 parts - matches route`() {
+    fun `3 parts - matches route`() = runBlocking {
         fun matched(value1: String, value2: String, value3: String) =
             { _: Request -> Response(OK).body(value1 + value2 + value3) }
 
@@ -193,7 +193,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `4 parts - matches route`() {
+    fun `4 parts - matches route`() = runBlocking {
         fun matched(value1: String, value2: String, value3: String, value4: String) =
             { _: Request -> Response(OK).body(value1 + value2 + value3 + value4) }
 
@@ -202,7 +202,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `5 parts - matches route`() {
+    fun `5 parts - matches route`() = runBlocking {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String) =
             { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 + value5) }
 
@@ -211,7 +211,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `6 parts - matches route`() {
+    fun `6 parts - matches route`() = runBlocking {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String) =
             { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 + value5 + value6) }
 
@@ -222,7 +222,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `7 parts - matches route`() {
+    fun `7 parts - matches route`() = runBlocking {
         fun matched(
             value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
             value7: String
@@ -237,7 +237,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `8 parts - matches route`() {
+    fun `8 parts - matches route`() = runBlocking {
         fun matched(
             value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
             value7: String, value8: String
@@ -252,7 +252,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `9 parts - matches route`() {
+    fun `9 parts - matches route`() = runBlocking {
         fun matched(
             value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
             value7: String, value8: String, value9: String
@@ -268,7 +268,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `10 parts - matches route`() {
+    fun `10 parts - matches route`() = runBlocking {
         fun matched(
             value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
             value7: String, value8: String, value9: String, value10: String
@@ -286,7 +286,7 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `11 parts - unsupported`() {
+    fun `11 parts - unsupported`() = runBlocking {
         assertThat({
             Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
                 Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
@@ -295,14 +295,14 @@ class ContractRouteTest {
     }
 
     @Test
-    fun `param starting with prefix is not changed`() {
+    fun `param starting with prefix is not changed`() = runBlocking {
         val route = "somePrefix" / Path.of("value") bindContract GET to { value -> { Response(OK).body(value) } }
 
         assertThat(route(Request(GET, "/somePrefix/somePrefixInValue")).bodyString(), equalTo("somePrefixInValue"))
     }
 
     @Test
-    fun `can receive negotiated body with PreFlightExtraction`() {
+    fun `can receive negotiated body with PreFlightExtraction`() = runBlocking {
         val v1Lens = Body.string(ContentType("custom/v1"))
             .map({ require("v1-" in it); it.replace("v1-", "") }, { "v1-$it" })
             .toLens()

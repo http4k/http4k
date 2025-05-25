@@ -7,7 +7,7 @@ import java.io.File
 
 class ExtensionsTest {
     @Test
-    fun `can read yaml into properties`() {
+    fun `can read yaml into properties`() = runBlocking {
         val env = Environment.fromYaml(File("src/test/resources/local.yaml"))
 
         assertThat(env["string"], equalTo("hello"))
@@ -20,7 +20,7 @@ class ExtensionsTest {
     }
 
     @Test
-    fun `can read yaml resources into properties`() {
+    fun `can read yaml resources into properties`() = runBlocking {
         val env = Environment.fromYaml("/local.yaml")
 
         assertThat(env["string"], equalTo("hello"))
@@ -33,7 +33,7 @@ class ExtensionsTest {
     }
 
     @Test
-    fun `can read config into properties`() {
+    fun `can read config into properties`() = runBlocking {
         val env = Environment.fromConfigFile(File("src/test/resources/local.config"))
 
         assertThat(env["default.region"], equalTo("eu-west1"))

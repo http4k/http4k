@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class GraphQLResponseTest {
 
     @Test
-    fun `convert from execution result`() {
+    fun `convert from execution result`() = runBlocking {
         val error = GraphqlErrorBuilder.newError()
             .message("oh no!")
             .build()

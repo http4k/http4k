@@ -1,5 +1,6 @@
 package org.http4k.security
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -37,7 +38,7 @@ class OAuthProvider(
 ) {
 
     // pre-configured API client for this provider
-    val api = SetBaseUriFrom(providerConfig.apiBase).then(client)
+    val api = runBlocking { SetBaseUriFrom(providerConfig.apiBase).then(client) }
 
     // use this filter to protect endpoints
     val authFilter = OAuthRedirectionFilter(

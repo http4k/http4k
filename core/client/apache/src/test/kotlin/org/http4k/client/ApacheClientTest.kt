@@ -30,7 +30,7 @@ class ApacheClientTest : HttpClientContract(::ApacheServer, ApacheClient(),
     HttpClientWithMemoryModeContract {
 
     @Test
-    fun `connect timeout is handled`() {
+    fun `connect timeout is handled`() = runBlocking {
         assertThat(ApacheClient(object : CloseableHttpClient() {
             override fun doExecute(target: HttpHost?, request: ClassicHttpRequest?, context: HttpContext?): CloseableHttpResponse {
                 throw ConnectTimeoutException("test timeout")

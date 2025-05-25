@@ -9,6 +9,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.Retry.ofDefaults
 import io.github.resilience4j.timelimiter.TimeLimiter
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
@@ -63,8 +64,11 @@ object ResilienceFilters {
             {
                 try {
                     retry.executeCallable {
-                        next(it).apply {
-                            if (isError(this)) throw RetryError(this)
+                        runBlocking {
+                            next(it).apply {
+                                if (isError(this)) throw RetryError(this) // FIXME coroutine blocking
+                                else this
+                            }
                         }
                     }
                 } catch (e: RetryError) {
@@ -85,7 +89,11 @@ object ResilienceFilters {
         ) = Filter { next ->
             {
                 try {
-                    rateLimit.executeCallable { next(it) }
+                    rateLimit.executeCallable {
+                        runBlocking {
+                            next(it) // FIXME coroutine blocking
+                        }
+                    }
                 } catch (_: RequestNotPermitted) {
                     onError()
                 }
@@ -104,7 +112,11 @@ object ResilienceFilters {
         ) = Filter { next ->
             {
                 try {
-                    bulkhead.executeCallable { next(it) }
+                    bulkhead.executeCallable {
+                        runBlocking {
+                            next(it) // FIXME coroutine blocking
+                        }
+                    }
                 } catch (_: BulkheadFullException) {
                     onError()
                 }
@@ -126,7 +138,9 @@ object ResilienceFilters {
                 try {
                     timeLimiter.executeFutureSupplier {
                         futureSupplier {
-                            next(it)
+                            runBlocking {
+                                next(it) // FIXME coroutine blocking
+                            }
                         }
                     }
                 } catch (_: TimeoutException) {

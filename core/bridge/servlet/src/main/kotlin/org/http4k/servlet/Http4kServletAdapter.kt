@@ -1,5 +1,6 @@
 package org.http4k.servlet
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Parameters
@@ -16,7 +17,9 @@ import javax.servlet.http.HttpServletResponse
  * Adapts between the Servlet and http4k APIs
  */
 class Http4kServletAdapter(private val handler: HttpHandler) {
-    fun handle(req: HttpServletRequest, resp: HttpServletResponse) = handler(req.asHttp4kRequest()).transferTo(resp)
+    fun handle(req: HttpServletRequest, resp: HttpServletResponse) = runBlocking {
+        handler(req.asHttp4kRequest()).transferTo(resp) // FIXME coroutine blocking
+    }
 }
 
 @Suppress("DEPRECATION")

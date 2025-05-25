@@ -1,5 +1,6 @@
 package org.http4k.aws
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpHandler
@@ -20,7 +21,7 @@ class AwsSdkClient(private val http: HttpHandler) : SdkHttpClient {
     }
 
     override fun prepareRequest(request: HttpExecuteRequest) = object : ExecutableHttpRequest {
-        override fun call() = http(request.fromAws()).asAws()
+        override fun call() = runBlocking { http(request.fromAws()).asAws() } // FIXME coroutine blocking
         override fun abort() {}
     }
 }

@@ -17,7 +17,7 @@ class CookiesTest {
         .cookie("hello", "world2")
 
     @Test
-    fun `value present`() {
+    fun `value present`() = runBlocking {
         assertThat(Cookies.optional("hello")(request), equalTo(Cookie("hello", "world")))
         assertThat(Cookies.required("hello")(request), equalTo(Cookie("hello", "world")))
         assertThat(Cookies.map { it.value.length }.required("hello")(request), equalTo(5))
@@ -29,7 +29,7 @@ class CookiesTest {
     }
 
     @Test
-    fun `value missing`() {
+    fun `value missing`() = runBlocking {
         assertThat(Cookies.optional("world")(request), absent())
         val required = Cookies.required("world")
         assertThat({ required(request) }, throws(lensFailureWith<Request>(Missing(required.meta), overallType = Failure.Type.Missing)))
@@ -40,7 +40,7 @@ class CookiesTest {
     }
 
     @Test
-    fun `value replaced`() {
+    fun `value replaced`() = runBlocking {
         val single = Cookies.required("world")
         val target = single(Cookie("world", "value1"), request)
         val actual = single(Cookie("world", "value2"), target)
@@ -52,7 +52,7 @@ class CookiesTest {
     }
 
     @Test
-    fun `invalid value`() {
+    fun `invalid value`() = runBlocking {
         val asInt = Cookies.map { it.value.toInt() }
 
         val required = asInt.required("hello")
@@ -69,7 +69,7 @@ class CookiesTest {
     }
 
     @Test
-    fun `sets value on request`() {
+    fun `sets value on request`() = runBlocking {
         val cookie = Cookies.required("bob")
         val cookieInstance = Cookie("bob", "hello")
         val withCookies = cookie(cookieInstance, request)
@@ -77,7 +77,7 @@ class CookiesTest {
     }
 
     @Test
-    fun `can create a custom type and get and set on request`() {
+    fun `can create a custom type and get and set on request`() = runBlocking {
         val custom = Cookies.map({ MyCustomType(it.value) }, { Cookie("bob", it.value) }).required("bob")
 
         val instance = MyCustomType("hello world!")
@@ -89,7 +89,7 @@ class CookiesTest {
     }
 
     @Test
-    fun `toString is ok`() {
+    fun `toString is ok`() = runBlocking {
         assertThat(Cookies.optional("hello").toString(), equalTo("Optional cookie 'hello'"))
     }
 }

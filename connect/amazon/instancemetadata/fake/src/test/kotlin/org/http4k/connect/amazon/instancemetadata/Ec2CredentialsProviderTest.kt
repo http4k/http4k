@@ -20,14 +20,14 @@ class Ec2CredentialsProviderTest {
     private val chain = CredentialsChain.Ec2InstanceProfile(service, clock = clock)
 
     @Test
-    fun `metadata service not available (not in EC2)`() {
+    fun `metadata service not available (not in EC2)`() = runBlocking {
         service.returnStatus(CONNECTION_REFUSED)
 
         assertThat(chain.invoke(), absent())
     }
 
     @Test
-    fun `no instance profile available`() {
+    fun `no instance profile available`() = runBlocking {
         val metadata = InstanceMetadata(clock.instant()).copy(profiles = emptySet())
         val service = FakeInstanceMetadataService(clock, metadata)
         val chain = CredentialsChain.Ec2InstanceProfile(service, clock = clock)
@@ -36,7 +36,7 @@ class Ec2CredentialsProviderTest {
     }
 
     @Test
-    fun `load credentials from profile`() {
+    fun `load credentials from profile`() = runBlocking {
         val credentials = chain.invoke()
         assertThat(credentials, present())
 
@@ -45,7 +45,7 @@ class Ec2CredentialsProviderTest {
     }
 
     @Test
-    fun `load cached credentials from profile`() {
+    fun `load cached credentials from profile`() = runBlocking {
         val credentials = chain.invoke()
         assertThat(credentials, present())
 

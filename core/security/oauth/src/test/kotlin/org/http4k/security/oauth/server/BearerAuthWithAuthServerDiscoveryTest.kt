@@ -23,7 +23,7 @@ class BearerAuthWithAuthServerDiscoveryTest {
     private val successHandler = { _: Request -> Response(OK).body("success") }
 
     @Test
-    fun `passes request through when valid token is provided`() {
+    fun `passes request through when valid token is provided`() = runBlocking {
         val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
             authServerUri
         ) { token -> token == validToken }
@@ -37,7 +37,7 @@ class BearerAuthWithAuthServerDiscoveryTest {
     }
 
     @Test
-    fun `returns 401 when no token is provided`() {
+    fun `returns 401 when no token is provided`() = runBlocking {
         val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
             authServerUri
         ) { true }
@@ -57,7 +57,7 @@ class BearerAuthWithAuthServerDiscoveryTest {
     }
 
     @Test
-    fun `returns 401 when invalid token is provided`() {
+    fun `returns 401 when invalid token is provided`() = runBlocking {
         val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
             authServerUri
         ) { token -> token == validToken }
@@ -78,7 +78,7 @@ class BearerAuthWithAuthServerDiscoveryTest {
     }
 
     @Test
-    fun `includes additional content in WWW-Authenticate header`() {
+    fun `includes additional content in WWW-Authenticate header`() = runBlocking {
         val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(
             authServerUri,
             "realm" to "test-realm",
@@ -100,7 +100,7 @@ class BearerAuthWithAuthServerDiscoveryTest {
     }
 
     @Test
-    fun `works with the simplified string check constructor`() {
+    fun `works with the simplified string check constructor`() = runBlocking {
         val filter = ServerFilters.BearerAuthWithAuthServerDiscovery(authServerUri) { it == validToken }
 
         val validResponse = filter.then(successHandler)(

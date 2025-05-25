@@ -1,5 +1,6 @@
 package org.http4k.client
 
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.BodyMode.Stream
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Disabled
@@ -13,7 +14,7 @@ class FuelStreamingTest : HttpClientContract(
 ) {
     @Test
     @Disabled
-    override fun `can send multiple headers with same name`() {
+    override fun `can send multiple headers with same name`() = runBlocking {
         super.`can send multiple headers with same name`()
     }
 }

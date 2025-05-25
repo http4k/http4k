@@ -38,7 +38,7 @@ fun CloudFront.Companion.Http(
         )
         .then(http)
 
-    override fun <R> invoke(action: CloudFrontAction<R>) = action.toResult(signedHttp(action.toRequest()))
+    override suspend fun <R> invoke(action: CloudFrontAction<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
 /**

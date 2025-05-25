@@ -10,7 +10,7 @@ class FileSystemApprovalSourceTest {
     private val fs = FileSystemApprovalSource(File("src/test/resources"))
 
     @Test
-    fun `filenames are as expected`() {
+    fun `filenames are as expected`() = runBlocking {
         assertThat(fs.approvedFor("hello").toString(), endsWith("/hello.approved"))
         assertThat(fs.actualFor("hello").toString(), endsWith("/hello.actual"))
     }

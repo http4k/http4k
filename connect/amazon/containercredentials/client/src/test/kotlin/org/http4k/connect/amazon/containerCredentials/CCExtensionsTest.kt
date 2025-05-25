@@ -14,7 +14,7 @@ import org.junit.jupiter.api.assertThrows
 class CCExtensionsTest {
 
     @Test
-    fun `uses full uri if present`() {
+    fun `uses full uri if present`() = runBlocking {
         val env = Environment.defaults(
             AWS_CONTAINER_CREDENTIALS_FULL_URI of Uri.of("http://foobar/fullpath"),
             AWS_CONTAINER_CREDENTIALS_RELATIVE_URI of Uri.of("randompath")
@@ -26,7 +26,7 @@ class CCExtensionsTest {
     }
 
     @Test
-    fun `constructs uri if only relative present`() {
+    fun `constructs uri if only relative present`() = runBlocking {
         val env = Environment.defaults(
             AWS_CONTAINER_CREDENTIALS_RELATIVE_URI of Uri.of("/randompath")
         )
@@ -38,7 +38,7 @@ class CCExtensionsTest {
     }
 
     @Test
-    fun `blows up if neither present`() {
+    fun `blows up if neither present`() = runBlocking {
         val env = EMPTY
 
         assertThrows<LensFailure> {

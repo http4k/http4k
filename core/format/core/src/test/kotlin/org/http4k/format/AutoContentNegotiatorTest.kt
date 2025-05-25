@@ -39,7 +39,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `response body - without accept header`() {
+    fun `response body - without accept header`() = runBlocking {
         val response = Request(GET, "/")
             .let(returnJohn)
 
@@ -47,7 +47,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `response body - with v1 accept header`() {
+    fun `response body - with v1 accept header`() = runBlocking {
         val response = Request(GET, "/")
             .header("accept", v1Lens.contentType.toHeaderValue())
             .let(returnJohn)
@@ -56,7 +56,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `response body - with v2 accept header`() {
+    fun `response body - with v2 accept header`() = runBlocking {
         val response = Request(GET, "/")
             .header("accept", v2Lens.contentType.toHeaderValue())
             .let(returnJohn)
@@ -65,7 +65,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `request body - v1 body without content-type header`() {
+    fun `request body - v1 body without content-type header`() = runBlocking {
         val response = Request(GET, "/")
             .body("v1-john")
             .let(receiveJohn)
@@ -74,7 +74,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `request body - v2 body without content-type header`() {
+    fun `request body - v2 body without content-type header`() = runBlocking {
         val response = Request(GET, "/")
             .body("v2-john")
             .let(receiveJohn)
@@ -83,7 +83,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `request body - v1 body`() {
+    fun `request body - v1 body`() = runBlocking {
         val response = Request(GET, "/")
             .with(v1Lens of "john")
             .with(Header.CONTENT_TYPE of v1Lens.contentType)
@@ -93,7 +93,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `request body - v2 body`() {
+    fun `request body - v2 body`() = runBlocking {
         val response = Request(GET, "/")
             .with(v2Lens of "john")
             .let(receiveJohn)
@@ -102,7 +102,7 @@ class AutoContentNegotiatorTest {
     }
 
     @Test
-    fun `request body - v1 body with v2 content-type header`() {
+    fun `request body - v1 body with v2 content-type header`() = runBlocking {
         val response = Request(GET, "/")
             .with(v1Lens of "john")
             .with(Header.CONTENT_TYPE of v2Lens.contentType)

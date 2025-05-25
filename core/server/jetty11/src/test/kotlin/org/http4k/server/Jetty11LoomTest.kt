@@ -12,7 +12,7 @@ class Jetty11LoomTest :
     override fun requestScheme() = equalTo("http")
 
     @Test
-    fun `returns status with pre-defined standardized description`() {
+    fun `returns status with pre-defined standardized description`() = runBlocking {
         val response = client(Request(GET, "${baseUrl}/status-with-foobar-description"))
 
         assertThat(response.status.code, equalTo(201))

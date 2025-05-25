@@ -55,7 +55,7 @@ private fun AzureAI(
     private val extra = Header.enum<ExtraParameters>().optional("extra-parameters")
     private val modelDeployment = Header.value(Deployment).optional("azureml-model-deployment")
 
-    override fun <R> invoke(action: AzureAIAction<R>) = action.toResult(
+    override suspend fun <R> invoke(action: AzureAIAction<R>) = action.toResult(
         routedHttp(
             action.toRequest().with(modelDeployment of deployment, extra of extraParameters)
         )

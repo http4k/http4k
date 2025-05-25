@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class CVE_2024_55875Test : PortBasedTest {
 
     @Test
-    fun `does not expand external entity`() {
+    fun `does not expand external entity`() = runBlocking {
         val websiteAccessed = AtomicBoolean(false)
 
         val maliciousWebsite = { _: Request ->
@@ -53,7 +53,7 @@ class CVE_2024_55875Test : PortBasedTest {
     }
 
     @Test
-    fun `external schema is not loaded`() {
+    fun `external schema is not loaded`() = runBlocking {
         val websiteAccessed = AtomicBoolean(false)
 
         val maliciousWebsite = { _: Request ->
@@ -87,7 +87,7 @@ class CVE_2024_55875Test : PortBasedTest {
     }
 
     @Test
-    fun `external dtd is not loaded`() {
+    fun `external dtd is not loaded`() = runBlocking {
         val websiteAccessed = AtomicBoolean(false)
 
         val maliciousWebsite = { _: Request ->

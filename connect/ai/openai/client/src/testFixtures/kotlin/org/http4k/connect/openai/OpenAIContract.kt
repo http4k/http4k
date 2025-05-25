@@ -25,7 +25,7 @@ interface OpenAIContract {
     val openAi: OpenAI
 
     @Test
-    fun `get models`() {
+    fun `get models`() = runBlocking {
         assertThat(
             openAi.getModels().successValue().data
                 .first { it.id == ObjectId.of("gpt-4") }.owned_by,
@@ -34,7 +34,7 @@ interface OpenAIContract {
     }
 
     @Test
-    fun `get chat response non-stream`() {
+    fun `get chat response non-stream`() = runBlocking {
         val responses = openAi.chatCompletion(
             ModelName.GPT3_5,
             listOf(
@@ -50,7 +50,7 @@ interface OpenAIContract {
     }
 
     @Test
-    fun `get chat response streaming`() {
+    fun `get chat response streaming`() = runBlocking {
         val responses = openAi.chatCompletion(
             ModelName.GPT3_5,
             listOf(
@@ -66,7 +66,7 @@ interface OpenAIContract {
     }
 
     @Test
-    fun `get embeddings`() {
+    fun `get embeddings`() = runBlocking {
         assertThat(
             openAi.createEmbeddings(
                 ModelName.TEXT_EMBEDDING_ADA_002,

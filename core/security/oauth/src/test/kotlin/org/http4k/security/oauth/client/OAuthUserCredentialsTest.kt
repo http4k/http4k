@@ -17,7 +17,7 @@ class OAuthUserCredentialsTest {
     private val config = OAuthProviderConfig(Uri.of("http://auth"), "/authorize", "/", Credentials("hello", "world"))
 
     @Test
-    fun `auths with correct form`() {
+    fun `auths with correct form`() = runBlocking {
         val app = ClientFilters.OAuthUserCredentials(
             config,
             Credentials("user", "password"),
@@ -37,7 +37,7 @@ class OAuthUserCredentialsTest {
     }
 
     @Test
-    fun `omits scope if not provided`() {
+    fun `omits scope if not provided`() = runBlocking {
         val app = ClientFilters.OAuthUserCredentials(
             config,
             Credentials("user", "password"),
