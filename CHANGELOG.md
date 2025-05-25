@@ -3,8 +3,8 @@ CHAN<h2 class="github">Changelog</h2>
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.10.0.0 (uncut)
-- **http4k-***: Upgrade some dependency versions, including LangChain4k to V1..
+### v6.10.0.0
+- **http4k-***: Upgrade some dependency versions, including LangChain4k to V1.
 - **http4k-connect-ai-langchain**: Implement HTTP Client adapter so that http4k clients and fakes slot effortlessly into the new LangChain4J v1 APIs.
 - **http4k-connect-ai-langchain**: [Breaking] Replacement of `ChatLanguageModel` implementations with `ChatModel`. These will eventually go away once all LangChain models support HTTP client injection (see above).
 - **http4k-testing-webdriver**: [Possible break]: Upgrade of JSoup dependency may cause issues with parsing of HTML content. [GitHub](https://github.com/jhy/jsoup/issues/2330)
