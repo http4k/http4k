@@ -4,7 +4,6 @@ import dev.forkhandles.result4k.map
 import dev.langchain4j.agent.tool.ToolExecutionRequest
 import dev.langchain4j.agent.tool.ToolSpecification
 import dev.langchain4j.data.message.AiMessage
-import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.ImageContent
 import dev.langchain4j.data.message.ImageContent.DetailLevel.AUTO
 import dev.langchain4j.data.message.ImageContent.DetailLevel.HIGH
@@ -12,9 +11,10 @@ import dev.langchain4j.data.message.ImageContent.DetailLevel.LOW
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.TextContent
 import dev.langchain4j.data.message.UserMessage
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.chat.request.ChatRequest
+import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.output.FinishReason
-import dev.langchain4j.model.output.Response
 import dev.langchain4j.model.output.TokenUsage
 import org.http4k.connect.lmstudio.LmStudio
 import org.http4k.connect.lmstudio.TokenId
@@ -61,100 +61,107 @@ data class LmStudioChatModelOptions(
     val parallelToolCalls: Boolean? = null,
 )
 
-fun LmStudioChatLanguageModel(
-    lmStudio: LmStudio,
-    options: LmStudioChatModelOptions
-) =
-    object : ChatLanguageModel {
-        override fun generate(p0: List<ChatMessage>) = generate(p0, emptyList())
-
-        override fun generate(messages: List<ChatMessage>, toolSpecifications: List<ToolSpecification>?)
-            : Response<AiMessage> = with(options) {
-            lmStudio.chatCompletion(
-                model,
-                messages.map {
-                    when (it) {
-                        is UserMessage -> it.toHttp4k()
-                        is SystemMessage -> it.toHttp4k()
-                        is AiMessage -> it.toHttp4k()
-                        else -> error("unknown message type")
-                    }
-                },
-                maxTokens,
-                temperature,
-                top_p,
-                n,
-                stop,
-                presencePenalty,
-                frequencyPenalty,
-                logitBias,
-                user,
-                false,
-                responseFormat,
-                toolSpecifications?.takeIf { it.isNotEmpty() }?.map { it.toHttp4k() },
-                toolChoice,
-                parallelToolCalls
-            )
-        }
-            .map {
-                it.map {
-                    Response(
-                        AiMessage(it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""),
-                        it.usage?.let { TokenUsage(it.prompt_tokens, it.completion_tokens, it.total_tokens) },
-                        when (it.choices?.last()?.finish_reason) {
-                            StopReason.stop -> FinishReason.STOP
-                            StopReason.length -> FinishReason.LENGTH
-                            StopReason.content_filter -> FinishReason.CONTENT_FILTER
-                            StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
-                            else -> FinishReason.OTHER
+fun LmStudioChatLanguageModel(lmStudio: LmStudio, options: LmStudioChatModelOptions) =
+    object : ChatModel {
+        override fun doChat(request: ChatRequest) = with(request) {
+            with(options) {
+                lmStudio.chatCompletion(
+                    ModelName.of(modelName()),
+                    messages().map {
+                        when (it) {
+                            is UserMessage -> it.toHttp4k()
+                            is SystemMessage -> it.toHttp4k()
+                            is AiMessage -> it.toHttp4k()
+                            else -> error("unknown message type")
                         }
-                    )
-                }.toList()
-            }.orThrow().first()
-    }
-
-private fun UserMessage.toHttp4k() = Message(
-    Role.User,
-    contents().map {
-        when (it) {
-            is TextContent -> it.toHttp4k()
-            is ImageContent -> it.toHttp4k()
-            else -> error("unknown content type")
-        }
-    }, name()?.let { User.of(it) },
-    null
-)
-
-private fun SystemMessage.toHttp4k() = Message(
-    Role.System,
-    listOf(MessageContent(ContentType.text, text()))
-)
-
-private fun AiMessage.toHttp4k(): Message {
-    val toolCalls = toolExecutionRequests()?.map { it.toHttp4k() }?.takeIf { it.isNotEmpty() }
-    return Message(Role.Assistant, listOf(MessageContent(ContentType.text, text())), tool_calls = toolCalls)
-}
-
-private fun ToolExecutionRequest.toHttp4k() = ToolCall(id(), "function", FunctionCall(name(), arguments()))
-
-private fun TextContent.toHttp4k() = MessageContent(ContentType.text, this@toHttp4k.text())
-
-private fun ImageContent.toHttp4k() =
-    MessageContent(
-        ContentType.image_url, null, ImageUrl(
-            Uri.of(this@toHttp4k.image().url().toString()),
-            when (this@toHttp4k.detailLevel()) {
-                LOW -> low
-                HIGH -> high
-                AUTO -> auto
+                    },
+                    MaxTokens.of(1),
+                    temperature,
+                    top_p,
+                    n,
+                    stop,
+                    presencePenalty,
+                    frequencyPenalty,
+                    logitBias,
+                    user,
+                    stream ?: false,
+                    responseFormat,
+                    toolSpecifications()?.takeIf { it.isNotEmpty() }?.map { it.toHttp4k() },
+                    options.toolChoice,
+                    options.parallelToolCalls ?: false
+                ).map {
+                    it.map {
+                        ChatResponse.builder()
+                            .aiMessage(
+                                AiMessage(
+                                    it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""
+                                )
+                            )
+                            .tokenUsage(it.usage?.let {
+                                TokenUsage(
+                                    it.prompt_tokens,
+                                    it.completion_tokens,
+                                    it.total_tokens
+                                )
+                            })
+                            .finishReason(
+                                when (it.choices.last().finish_reason) {
+                                    StopReason.stop -> FinishReason.STOP
+                                    StopReason.length -> FinishReason.LENGTH
+                                    StopReason.content_filter -> FinishReason.CONTENT_FILTER
+                                    StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
+                                    else -> FinishReason.OTHER
+                                }
+                            )
+                            .build()
+                    }.toList()
+                }.orThrow().first()
             }
-        )
-    )
+        }
 
-private fun ToolSpecification.toHttp4k() = Tool(
-    FunctionSpec(
-        this@toHttp4k.name(),
-        this@toHttp4k.parameters(),
-        this@toHttp4k.description()
-    )
-)
+        private fun UserMessage.toHttp4k() = Message(
+            Role.User,
+            contents().map {
+                when (it) {
+                    is TextContent -> it.toHttp4k()
+                    is ImageContent -> it.toHttp4k()
+                    else -> error("unknown content type")
+                }
+            }, name()?.let { User.of(it) },
+            null
+        )
+
+        private fun SystemMessage.toHttp4k() = Message(
+            Role.System,
+            listOf(MessageContent(ContentType.text, text()))
+        )
+
+        private fun AiMessage.toHttp4k(): Message {
+            val toolCalls = toolExecutionRequests()?.map { it.toHttp4k() }?.takeIf { it.isNotEmpty() }
+            return Message(Role.Assistant, listOf(MessageContent(ContentType.text, text())), tool_calls = toolCalls)
+        }
+
+        private fun ToolExecutionRequest.toHttp4k() = ToolCall(id(), "function", FunctionCall(name(), arguments()))
+
+        private fun TextContent.toHttp4k() = MessageContent(ContentType.text, this@toHttp4k.text())
+
+        private fun ImageContent.toHttp4k() =
+            MessageContent(
+                ContentType.image_url, null, ImageUrl(
+                    Uri.of(this@toHttp4k.image().url().toString()),
+                    when (this@toHttp4k.detailLevel()) {
+                        LOW -> low
+                        HIGH -> high
+                        AUTO -> auto
+                    }
+                )
+            )
+
+        private fun ToolSpecification.toHttp4k() = Tool(
+            FunctionSpec(
+                this@toHttp4k.name(),
+                this@toHttp4k.parameters(),
+                this@toHttp4k.description()
+            )
+        )
+    }

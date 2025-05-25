@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
+import dev.langchain4j.data.document.DefaultDocument
 import dev.langchain4j.data.document.Document
 import dev.langchain4j.data.document.DocumentParser
 import dev.langchain4j.data.document.Metadata
@@ -45,7 +46,7 @@ class S3DocumentLoaderTest {
     }
 
     private val s3DocumentLoader = S3DocumentLoader(env, http = s3)
-    private val parser = DocumentParser { Document(it.reader().readText()) }
+    private val parser = DocumentParser { DefaultDocument(it.reader().readText()) }
 
     @Test
     fun `can load document`() {
@@ -53,8 +54,8 @@ class S3DocumentLoaderTest {
             s3DocumentLoader(bucket, parser), equalTo(
                 Success(
                     listOf(
-                        Document("1", Metadata(mapOf("source" to "s3://hello/1"))),
-                        Document("2", Metadata(mapOf("source" to "s3://hello/2"))),
+                        DefaultDocument("1", Metadata(mapOf("source" to "s3://hello/1"))),
+                        DefaultDocument("2", Metadata(mapOf("source" to "s3://hello/2"))),
                     )
                 )
             )

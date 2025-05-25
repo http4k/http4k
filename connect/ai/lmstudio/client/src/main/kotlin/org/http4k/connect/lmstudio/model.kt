@@ -34,6 +34,7 @@ class ResponseFormatType private constructor(value: String) : StringValue(value)
     companion object : NonBlankStringValueFactory<ResponseFormatType>(::ResponseFormatType) {
         val JsonObject = ResponseFormatType.of("json_object")
         val url = ResponseFormatType.of("url")
+        val text = ResponseFormatType.of("text")
     }
 }
 

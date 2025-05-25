@@ -4,7 +4,6 @@ import dev.forkhandles.result4k.map
 import dev.langchain4j.agent.tool.ToolExecutionRequest
 import dev.langchain4j.agent.tool.ToolSpecification
 import dev.langchain4j.data.message.AiMessage
-import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.ImageContent
 import dev.langchain4j.data.message.ImageContent.DetailLevel.AUTO
 import dev.langchain4j.data.message.ImageContent.DetailLevel.HIGH
@@ -12,9 +11,10 @@ import dev.langchain4j.data.message.ImageContent.DetailLevel.LOW
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.TextContent
 import dev.langchain4j.data.message.UserMessage
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.chat.request.ChatRequest
+import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.output.FinishReason
-import dev.langchain4j.model.output.Response
 import dev.langchain4j.model.output.TokenUsage
 import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.ModelName
@@ -66,15 +66,12 @@ data class OpenAiChatModelOptions(
 fun OpenAiChatLanguageModel(
     openAi: OpenAI,
     options: OpenAiChatModelOptions = OpenAiChatModelOptions()
-) =
-    object : ChatLanguageModel {
-        override fun generate(p0: List<ChatMessage>) = generate(p0, emptyList())
-
-        override fun generate(messages: List<ChatMessage>, toolSpecifications: List<ToolSpecification>?)
-            : Response<AiMessage> = with(options) {
+) = object : ChatModel {
+    override fun doChat(request: ChatRequest) = with(request) {
+        with(options) {
             openAi.chatCompletion(
-                model,
-                messages.map {
+                options.model,
+                messages().map {
                     when (it) {
                         is UserMessage -> it.toHttp4k()
                         is SystemMessage -> it.toHttp4k()
@@ -91,29 +88,41 @@ fun OpenAiChatLanguageModel(
                 frequencyPenalty,
                 logitBias,
                 user,
-                false,
+                stream ?: false,
                 responseFormat,
-                toolSpecifications?.takeIf { it.isNotEmpty() }?.map { it.toHttp4k() },
-                toolChoice,
-                parallelToolCalls
-            )
-        }
-            .map {
+                toolSpecifications()?.takeIf { it.isNotEmpty() }?.map { it.toHttp4k() },
+                options.toolChoice,
+                options.parallelToolCalls ?: false
+            ).map {
                 it.map {
-                    Response(
-                        AiMessage(it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""),
-                        it.usage?.let { TokenUsage(it.prompt_tokens, it.completion_tokens, it.total_tokens) },
-                        when (it.choices?.last()?.finish_reason) {
-                            StopReason.stop -> FinishReason.STOP
-                            StopReason.length -> FinishReason.LENGTH
-                            StopReason.content_filter -> FinishReason.CONTENT_FILTER
-                            StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
-                            else -> FinishReason.OTHER
-                        }
-                    )
+                    ChatResponse.builder()
+                        .aiMessage(
+                            AiMessage(
+                                it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""
+                            )
+                        )
+                        .tokenUsage(it.usage?.let {
+                            TokenUsage(
+                                it.prompt_tokens,
+                                it.completion_tokens,
+                                it.total_tokens
+                            )
+                        })
+                        .finishReason(
+                            when (it.choices.last().finish_reason) {
+                                StopReason.stop -> FinishReason.STOP
+                                StopReason.length -> FinishReason.LENGTH
+                                StopReason.content_filter -> FinishReason.CONTENT_FILTER
+                                StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
+                                else -> FinishReason.OTHER
+                            }
+                        )
+                        .build()
                 }.toList()
             }.orThrow().first()
+        }
     }
+}
 
 private fun UserMessage.toHttp4k() = Message(
     Role.User,
