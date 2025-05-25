@@ -10,6 +10,7 @@ import org.http4k.connect.withAiMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
+import org.http4k.format.MoshiNodeAdapter
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
@@ -18,6 +19,7 @@ import se.ansman.kotshi.KotshiJsonAdapterFactory
 object OpenAIMoshi : ConfigurableMoshi(
     Moshi.Builder()
         .add(OpenAIJsonAdapterFactory)
+        .add(MoshiNodeAdapter)
         .add(ListAdapter)
         .add(MapAdapter)
         .asConfigurable()

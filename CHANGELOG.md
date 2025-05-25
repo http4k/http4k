@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.10.0.0 (uncut)
 - **http4k-***: Upgrade some dependency versions.
+- **http4k-connect-ai-langchain**: Implement HTTP Client adapter so that http4k can be used as a LangChain HTTP client base.
 - **http4k-testing-webdriver**: [Possible break]: Upgrade of JSoup dependency may cause issues with parsing of HTML content. [GitHub](https://github.com/jhy/jsoup/issues/2330)
 - **http4k-testing-approval**: [Possible break]: Upgrade of JSoup dependency may cause issues with parsing of HTML content. [GitHub](https://github.com/jhy/jsoup/issues/2330)
 - **http4k-mcp-sdk***: Add cancellation capability.

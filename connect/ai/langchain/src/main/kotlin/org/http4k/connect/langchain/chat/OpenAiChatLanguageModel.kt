@@ -66,65 +66,63 @@ data class OpenAiChatModelOptions(
 fun OpenAiChatLanguageModel(
     openAi: OpenAI,
     options: OpenAiChatModelOptions = OpenAiChatModelOptions()
-) =
-    object : ChatModel {
-
-        override fun doChat(request: ChatRequest) = with(request) {
-            with(options) {
-                openAi.chatCompletion(
-                    ModelName.of(modelName()),
-                    messages().map {
-                        when (it) {
-                            is UserMessage -> it.toHttp4k()
-                            is SystemMessage -> it.toHttp4k()
-                            is AiMessage -> it.toHttp4k()
-                            else -> error("unknown message type")
-                        }
-                    },
-                    MaxTokens.of(1),
-                    temperature,
-                    top_p,
-                    n,
-                    stop,
-                    presencePenalty,
-                    frequencyPenalty,
-                    logitBias,
-                    user,
-                    stream ?: false,
-                    responseFormat,
-                    toolSpecifications()?.takeIf { it.isNotEmpty() }?.map { it.toHttp4k() },
-                    options.toolChoice,
-                    options.parallelToolCalls ?: false
-                ).map {
-                    it.map {
-                        ChatResponse.builder()
-                            .aiMessage(
-                                AiMessage(
-                                    it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""
-                                )
+) = object : ChatModel {
+    override fun doChat(request: ChatRequest) = with(request) {
+        with(options) {
+            openAi.chatCompletion(
+                options.model,
+                messages().map {
+                    when (it) {
+                        is UserMessage -> it.toHttp4k()
+                        is SystemMessage -> it.toHttp4k()
+                        is AiMessage -> it.toHttp4k()
+                        else -> error("unknown message type")
+                    }
+                },
+                MaxTokens.of(1),
+                temperature,
+                top_p,
+                n,
+                stop,
+                presencePenalty,
+                frequencyPenalty,
+                logitBias,
+                user,
+                stream ?: false,
+                responseFormat,
+                toolSpecifications()?.takeIf { it.isNotEmpty() }?.map { it.toHttp4k() },
+                options.toolChoice,
+                options.parallelToolCalls ?: false
+            ).map {
+                it.map {
+                    ChatResponse.builder()
+                        .aiMessage(
+                            AiMessage(
+                                it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""
                             )
-                            .tokenUsage(it.usage?.let {
-                                TokenUsage(
-                                    it.prompt_tokens,
-                                    it.completion_tokens,
-                                    it.total_tokens
-                                )
-                            })
-                            .finishReason(
-                                when (it.choices.last().finish_reason) {
-                                    StopReason.stop -> FinishReason.STOP
-                                    StopReason.length -> FinishReason.LENGTH
-                                    StopReason.content_filter -> FinishReason.CONTENT_FILTER
-                                    StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
-                                    else -> FinishReason.OTHER
-                                }
+                        )
+                        .tokenUsage(it.usage?.let {
+                            TokenUsage(
+                                it.prompt_tokens,
+                                it.completion_tokens,
+                                it.total_tokens
                             )
-                            .build()
-                    }.toList()
-                }.orThrow().first()
-            }
+                        })
+                        .finishReason(
+                            when (it.choices.last().finish_reason) {
+                                StopReason.stop -> FinishReason.STOP
+                                StopReason.length -> FinishReason.LENGTH
+                                StopReason.content_filter -> FinishReason.CONTENT_FILTER
+                                StopReason.tool_calls -> FinishReason.TOOL_EXECUTION
+                                else -> FinishReason.OTHER
+                            }
+                        )
+                        .build()
+                }.toList()
+            }.orThrow().first()
         }
     }
+}
 
 private fun UserMessage.toHttp4k() = Message(
     Role.User,

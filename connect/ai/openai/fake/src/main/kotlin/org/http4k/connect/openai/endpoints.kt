@@ -32,6 +32,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.core.with
+import org.http4k.format.MoshiArray
+import org.http4k.format.MoshiObject
+import org.http4k.format.MoshiString
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.bind
@@ -89,7 +92,7 @@ fun createEmbeddings(models: Storage<Model>) = "/v1/embeddings" bind POST to
 fun chatCompletion(clock: Clock, completionGenerators: Map<ModelName, ChatCompletionGenerator>) =
     "/v1/chat/completions" bind POST to
         { request ->
-            val chatRequest = autoBody<ChatCompletion>().toLens()(request)
+            val chatRequest = autoBody<ChatCompletion>().toLens()(request.convertSimpleMessageToArrayOfMessages())
             val choices = (completionGenerators[chatRequest.model] ?: ChatCompletionGenerator.LoremIpsum())(chatRequest)
 
             when {
@@ -126,6 +129,36 @@ fun chatCompletion(clock: Clock, completionGenerators: Map<ModelName, ChatComple
                 )
             }
         }
+
+private fun Request.convertSimpleMessageToArrayOfMessages(): Request {
+    val node = OpenAIMoshi.parse(bodyString()) as MoshiObject
+    val messages = node["messages"] as MoshiArray
+
+    val firstMessage = messages[0] as MoshiObject
+    val content = firstMessage["content"]
+    return when {
+        content is MoshiString -> {
+            node.attributes["messages"] = MoshiArray(
+                listOf(
+                    MoshiObject(
+                        mutableMapOf(
+                            "role" to MoshiString("user"),
+                            "content" to MoshiArray(
+                                MoshiObject(
+                                    "type" to MoshiString("text"),
+                                    "text" to content
+                                )
+                            )
+                        )
+                    )
+                ) + messages.elements.drop(1)
+            )
+            body(OpenAIMoshi.asFormatString(node))
+        }
+
+        else -> this
+    }
+}
 
 private fun completionResponse(
     request: Request,

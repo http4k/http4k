@@ -16,7 +16,7 @@ dependencies {
     api("dev.langchain4j:langchain4j-core:_")
     api("dev.langchain4j:langchain4j-http-client:1.0.1")
 
-    testFixturesApi("dev.langchain4j:langchain4j-anthropic:1.0.1-beta6")
+    testFixturesApi("dev.langchain4j:langchain4j-open-ai:1.0.1")
 
     testFixturesApi("dev.langchain4j:langchain4j:_")
     testFixturesApi(project(":http4k-connect-ai-openai-fake"))

@@ -1,7 +1,6 @@
 package org.http4k.connect.langchain.chat
 
 import dev.forkhandles.result4k.map
-import dev.langchain4j.agent.tool.ToolSpecification
 import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.ContentType
@@ -12,7 +11,6 @@ import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.response.ChatResponse
-import dev.langchain4j.model.output.Response
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Role.Companion.Assistant
@@ -33,17 +31,14 @@ fun OllamaChatLanguageModel(
     keep_alive: String? = null,
     options: ModelOptions? = null,
 ) = object : ChatModel {
-    override fun doChat(chatRequest: ChatRequest): ChatResponse {
-        with(chatRequest) {
-            ollama.chatCompletion(model, messages().map { it.toHttp4k() }, stream, format, keep_alive, options)
-                .map {
-                    ChatResponse.builder()
-                        .aiMessage(AiMessage(it.mapNotNull { it.message?.content }.joinToString("")))
-                        .build()
-                }
-                .orThrow()
-        }
-        return super.doChat(chatRequest)
+    override fun doChat(chatRequest: ChatRequest) = with(chatRequest) {
+        ollama.chatCompletion(model, messages().map { it.toHttp4k() }, stream, format, keep_alive, options)
+            .map {
+                ChatResponse.builder()
+                    .aiMessage(AiMessage(it.mapNotNull { it.message?.content }.joinToString("")))
+                    .build()
+            }
+            .orThrow()
     }
 }
 
