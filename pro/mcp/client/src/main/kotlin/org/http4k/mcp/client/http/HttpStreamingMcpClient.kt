@@ -27,6 +27,8 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.ElicitationHandler
+import org.http4k.mcp.ElicitationRequest
 import org.http4k.mcp.McpError
 import org.http4k.mcp.McpError.Http
 import org.http4k.mcp.McpResult
@@ -60,6 +62,7 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.ClientMessage
 import org.http4k.mcp.protocol.messages.McpCompletion
+import org.http4k.mcp.protocol.messages.McpElicitations
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpPrompt
@@ -214,6 +217,24 @@ class HttpStreamingMcpClient(
             .map { PromptResponse(it.messages, it.description) }
     }
 
+    override fun elicitations() = object : McpClient.Elicitations {
+        override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
+            callbacks.getOrPut(McpElicitations.Method) { mutableListOf() }.add(
+                McpCallback(McpElicitations.Request::class) { request, requestId ->
+                    if (requestId == null) return@McpCallback
+
+                    with(with(request) { fn(ElicitationRequest(message, requestedSchema, _meta.progress)) }) {
+                        http.send(
+                            McpElicitations,
+                            McpElicitations.Response(action, content, _meta),
+                            requestId
+                        )
+                    }
+                }
+            )
+        }
+    }
+
     override fun sampling() = object : McpClient.Sampling {
         override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
             callbacks.getOrPut(McpSampling.Method) { mutableListOf() }.add(
@@ -231,7 +252,8 @@ class HttpStreamingMcpClient(
                                     temperature,
                                     stopSequences,
                                     modelPreferences,
-                                    metadata
+                                    metadata,
+                                    _meta.progress
                                 )
                             )
                         }

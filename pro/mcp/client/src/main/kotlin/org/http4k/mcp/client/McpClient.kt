@@ -4,6 +4,7 @@ import org.http4k.connect.model.ToolName
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse
+import org.http4k.mcp.ElicitationHandler
 import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
@@ -33,6 +34,7 @@ interface McpClient : AutoCloseable {
     fun sampling(): Sampling
     fun resources(): Resources
     fun completions(): Completions
+    fun elicitations(): Elicitations
 
     /**
      * List and interact with Tools provided by this MCP server
@@ -68,13 +70,23 @@ interface McpClient : AutoCloseable {
     }
 
     /**
-     * Perform Model Sampling on a model provided by this MCP client. Works during a tool call.
+     * Perform Model Sampling on a model provided by this MCP client. Works during a incoming calls.
      */
     interface Sampling {
         /**
          * Note that the timeout defined here is applied between each message received by the model
          */
         fun onSampled(overrideDefaultTimeout: Duration? = null, fn: SamplingHandler)
+    }
+
+    /**
+     * Perform User Elicitations to the MCP client.  Works during a incoming calls.
+     */
+    interface Elicitations {
+        /**
+         * Note that the timeout defined here is applied between each message received by the model
+         */
+        fun onElicitation(overrideDefaultTimeout: Duration? = null, fn: ElicitationHandler)
     }
 
     /**

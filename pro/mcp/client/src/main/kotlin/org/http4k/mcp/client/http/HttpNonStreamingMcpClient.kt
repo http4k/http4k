@@ -18,7 +18,6 @@ import org.http4k.mcp.PromptRequest
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceRequest
 import org.http4k.mcp.ResourceResponse
-import org.http4k.mcp.SamplingHandler
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse.Error
 import org.http4k.mcp.ToolResponse.Ok
@@ -104,10 +103,9 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
             .map { PromptResponse(it.messages, it.description) }
     }
 
-    override fun sampling() = object : McpClient.Sampling {
-        override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) =
-            throw UnsupportedOperationException()
-    }
+    override fun sampling() = throw UnsupportedOperationException()
+
+    override fun elicitations(): McpClient.Elicitations = throw UnsupportedOperationException()
 
     override fun resources() = object : McpClient.Resources {
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()

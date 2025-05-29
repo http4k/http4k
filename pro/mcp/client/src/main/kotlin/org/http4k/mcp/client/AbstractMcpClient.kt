@@ -13,6 +13,7 @@ import org.http4k.mcp.McpError
 import org.http4k.mcp.McpError.Timeout
 import org.http4k.mcp.McpResult
 import org.http4k.mcp.client.internal.ClientCompletions
+import org.http4k.mcp.client.internal.ClientElicitations
 import org.http4k.mcp.client.internal.ClientPrompts
 import org.http4k.mcp.client.internal.ClientRequestProgress
 import org.http4k.mcp.client.internal.ClientResources
@@ -143,6 +144,11 @@ abstract class AbstractMcpClient(
 
     override fun sampling(): McpClient.Sampling =
         ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+        }
+
+    override fun elicitations(): McpClient.Elicitations =
+        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 

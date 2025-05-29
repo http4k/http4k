@@ -25,8 +25,9 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         messages, maxTokens,
                         systemPrompt, includeContext,
                         temperature, stopSequences,
-                        modelPreferences, metadata
-                    )
+                        modelPreferences, metadata,
+                        _meta.progress,
+                        )
                 }.valueOrNull()!!
             onSampling.forEach { handler ->
                 handler(req).forEach { response ->

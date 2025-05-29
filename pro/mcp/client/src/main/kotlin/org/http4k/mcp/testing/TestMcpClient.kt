@@ -4,8 +4,8 @@ import dev.forkhandles.result4k.map
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
-import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.McpResult
+import org.http4k.mcp.client.McpClient
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.protocol.ClientCapabilities
 import org.http4k.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
@@ -14,6 +14,7 @@ import org.http4k.mcp.protocol.Version
 import org.http4k.mcp.protocol.VersionedMcpEntity
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.testing.capabilities.TestingCompletions
+import org.http4k.mcp.testing.capabilities.TestingElicitations
 import org.http4k.mcp.testing.capabilities.TestingPrompts
 import org.http4k.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.mcp.testing.capabilities.TestingResources
@@ -32,6 +33,7 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
     private val prompts = TestingPrompts(sender)
     private val progress = TestingRequestProgress(sender)
     private val sampling = TestingSampling(sender)
+    private val elicitations = TestingElicitations(sender)
     private val resources = TestingResources(sender)
     private val completions = TestingCompletions(sender)
 
@@ -58,6 +60,8 @@ class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
     override fun progress() = progress
 
     override fun sampling() = sampling
+
+    override fun elicitations() = elicitations
 
     override fun resources() = resources
 

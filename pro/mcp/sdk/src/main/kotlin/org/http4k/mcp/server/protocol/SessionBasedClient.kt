@@ -2,14 +2,21 @@ package org.http4k.mcp.server.protocol
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.mcp.Client
-import org.http4k.mcp.McpError
+import org.http4k.mcp.ElicitationRequest
+import org.http4k.mcp.ElicitationResponse
+import org.http4k.mcp.McpError.Protocol
+import org.http4k.mcp.McpError.Timeout
 import org.http4k.mcp.McpResult
 import org.http4k.mcp.SamplingRequest
 import org.http4k.mcp.SamplingResponse
+import org.http4k.mcp.model.CompletionStatus.Finished
+import org.http4k.mcp.model.CompletionStatus.InProgress
 import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.ProgressToken
+import org.http4k.mcp.protocol.messages.McpElicitations
 import org.http4k.mcp.protocol.messages.McpProgress
 import org.http4k.mcp.protocol.messages.McpSampling
 import org.http4k.mcp.protocol.messages.fromJsonRpc
@@ -17,7 +24,8 @@ import org.http4k.mcp.protocol.messages.toJsonRpc
 import org.http4k.mcp.util.McpJson
 import java.time.Duration
 import java.util.concurrent.LinkedBlockingDeque
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 class SessionBasedClient<Transport>(
@@ -27,6 +35,40 @@ class SessionBasedClient<Transport>(
     private val random: Random,
     private val clientTracking: () -> ClientTracking?
 ) : Client {
+
+    override fun elicit(request: ElicitationRequest, fetchNextTimeout: Duration?): McpResult<ElicitationResponse> {
+        val id = McpMessageId.random(random)
+        val queue = LinkedBlockingDeque<ElicitationResponse>()
+        val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
+
+        return when {
+            tracking.supportsElicitations -> {
+                tracking.trackRequest(id) {
+                    with(it.fromJsonRpc<McpElicitations.Response>()) {
+                        queue.put(ElicitationResponse(action, content))
+                        Finished
+                    }
+                }
+
+                with(request) {
+                    sessions.request(
+                        context, McpElicitations.Request(
+                            message, requestedSchema, Meta(progressToken)
+                        ).toJsonRpc(McpElicitations, McpJson.asJsonObject(id))
+                    )
+                }
+
+                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                    null -> Failure(Timeout)
+                    else -> Success(nextMessage)
+                }
+            }
+
+            else -> Failure(Protocol(InvalidRequest))
+        }
+
+    }
+
     override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
         val id = McpMessageId.random(random)
         val queue = LinkedBlockingDeque<SamplingResponse>()
@@ -38,8 +80,8 @@ class SessionBasedClient<Transport>(
                     with(it.fromJsonRpc<McpSampling.Response>()) {
                         queue.put(SamplingResponse(model, role, content, stopReason))
                         when {
-                            stopReason == null -> org.http4k.mcp.model.CompletionStatus.InProgress
-                            else -> org.http4k.mcp.model.CompletionStatus.Finished
+                            stopReason == null -> InProgress
+                            else -> Finished
                         }
                     }
                 }
@@ -62,11 +104,11 @@ class SessionBasedClient<Transport>(
                 sequence {
                     while (true) {
                         when (val nextMessage = queue.poll(
-                            fetchNextTimeout?.toMillis() ?: Long.MAX_VALUE,
-                            TimeUnit.MILLISECONDS
+                            fetchNextTimeout?.toMillis() ?: MAX_VALUE,
+                            MILLISECONDS
                         )) {
                             null -> {
-                                yield(Failure(McpError.Timeout))
+                                yield(Failure(Timeout))
                                 break
                             }
 

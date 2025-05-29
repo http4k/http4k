@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 class ClientTracking(initialize: McpInitialize.Request) {
     val supportsSampling = initialize.capabilities.sampling != null
     val supportsRoots = initialize.capabilities.roots?.listChanged == true
+    val supportsElicitations = initialize.capabilities.elicitation != null
 
     private val calls = ConcurrentHashMap<McpMessageId, (JsonRpcResult<McpNodeType>) -> CompletionStatus>()
 

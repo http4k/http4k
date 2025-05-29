@@ -20,8 +20,8 @@ import org.http4k.mcp.model.McpMessageId
 import org.http4k.mcp.protocol.McpException
 import org.http4k.mcp.protocol.McpRpcMethod
 import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.messages.McpCancelled
 import org.http4k.mcp.protocol.messages.ClientMessage
+import org.http4k.mcp.protocol.messages.McpCancelled
 import org.http4k.mcp.protocol.messages.McpCompletion
 import org.http4k.mcp.protocol.messages.McpInitialize
 import org.http4k.mcp.protocol.messages.McpLogging
@@ -90,16 +90,14 @@ class McpProtocol<Transport>(
         val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return error() }
 
         return when (rawPayload) {
-            is MoshiArray -> {
-                Success(
-                    MoshiArray(
-                        rawPayload.elements
-                            .filterIsInstance<MoshiObject>()
-                            .map { processMessage(it, transport, session, httpReq) }
-                            .map { it.get() }
-                    )
+            is MoshiArray -> Success(
+                MoshiArray(
+                    rawPayload.elements
+                        .filterIsInstance<MoshiObject>()
+                        .map { processMessage(it, transport, session, httpReq) }
+                        .map { it.get() }
                 )
-            }
+            )
 
             is MoshiObject -> processMessage(rawPayload, transport, session, httpReq)
             else -> error()
@@ -187,15 +185,13 @@ class McpProtocol<Transport>(
                         ok()
                     }
 
-                    McpResource.Unsubscribe.Method -> {
-                        when (resources) {
-                            is ObservableResources -> {
-                                resources.unsubscribe(session, jsonReq.fromJsonRpc())
-                                ok()
-                            }
-
-                            else -> ok()
+                    McpResource.Unsubscribe.Method -> when (resources) {
+                        is ObservableResources -> {
+                            resources.unsubscribe(session, jsonReq.fromJsonRpc())
+                            ok()
                         }
+
+                        else -> ok()
                     }
 
                     McpInitialize.Initialized.Method -> ok()

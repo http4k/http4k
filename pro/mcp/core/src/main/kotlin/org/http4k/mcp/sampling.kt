@@ -38,7 +38,8 @@ data class SamplingRequest(
     val temperature: Temperature? = null,
     val stopSequences: List<String>? = null,
     val modelPreferences: ModelPreferences? = null,
-    val metadata: Map<String, Any> = emptyMap()
+    val metadata: Map<String, Any> = emptyMap(),
+    val progressToken: ProgressToken? = null
 )
 
 data class SamplingResponse(
