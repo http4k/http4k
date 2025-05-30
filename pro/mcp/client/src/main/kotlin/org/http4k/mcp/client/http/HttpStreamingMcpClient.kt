@@ -73,6 +73,7 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asA
 import org.http4k.mcp.util.McpJson.compact
+import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
@@ -188,7 +189,7 @@ class HttpStreamingMcpClient(
 
                         else -> Ok(
                             it.content,
-                            it.structuredContent?.let { McpJson.convert(it) },
+                            it.structuredContent?.let(McpJson::convert),
                             it._meta
                         )
                     }

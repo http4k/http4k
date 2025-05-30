@@ -59,14 +59,14 @@ internal class ClientTools(
                     true -> Error(
                         ErrorMessage(
                             -1, it.content?.joinToString()
-                                ?: it.structuredContent?.let { McpJson.asFormatString(it) }
+                                ?: it.structuredContent?.let(McpJson::asFormatString)
                                 ?: "<no message"
                         )
                     )
 
                     else -> Ok(
                         it.content,
-                        it.structuredContent?.let { McpJson.convert(it) },
+                        it.structuredContent?.let(McpJson::convert),
                         it._meta
                     )
                 }

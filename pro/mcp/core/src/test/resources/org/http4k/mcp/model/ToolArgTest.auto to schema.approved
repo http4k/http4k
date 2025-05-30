@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "foo": {
+      "example": "foo",
+      "type": "string",
+      "nullable": false
+    },
+    "bar": {
+      "example": 0,
+      "format": "int32",
+      "type": "integer",
+      "nullable": false
+    }
+  },
+  "example": {
+    "foo": "foo",
+    "bar": 0
+  },
+  "type": "object",
+  "required": [
+    "bar",
+    "foo"
+  ]
+}

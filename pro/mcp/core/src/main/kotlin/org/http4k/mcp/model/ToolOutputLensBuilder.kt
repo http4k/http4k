@@ -13,13 +13,13 @@ import org.http4k.mcp.util.McpNodeType
 
 class ToolOutputLensBuilder<OUT : Any>(
     internal val get: LensGet<Ok, OUT>,
-    private val toSchema: ToolLens<Ok, *>.() -> McpNodeType
+    private val toSchema: McpCapabilityLens<Ok, *>.() -> McpNodeType
 ) {
     fun toLens(
         description: String? = null,
         protocolCapability: ProtocolVersion = `2025-03-26`,
         metadata: Map<String, Any> = emptyMap()
-    ) = ToolLens(
+    ) = McpCapabilityLens(
         Meta(true, "toolResponse", ObjectParam, "response", description, metadata),
         { get("response")(it).first() },
         { value, target ->

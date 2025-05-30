@@ -3,6 +3,7 @@ package org.http4k.mcp.model
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
 import org.http4k.connect.model.ToolName
+import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.BooleanParam
@@ -17,6 +18,9 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
 import org.http4k.mcp.util.McpNodeType
+import java.security.DrbgParameters.Instantiation
+import java.time.Instant
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -31,8 +35,8 @@ import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 class Tool private constructor(
     val name: ToolName,
     val description: String,
-    val args: List<ToolLens<ToolRequest, *>>,
-    val output: ToolLens<ToolResponse.Ok, *>? = null,
+    val args: List<McpCapabilityLens<ToolRequest, *>>,
+    val output: McpCapabilityLens<ToolResponse.Ok, *>? = null,
     val annotations: ToolAnnotations? = null,
 ) : CapabilitySpec {
     val outputSchema: McpNodeType? = null
@@ -40,8 +44,8 @@ class Tool private constructor(
     constructor(
         name: String,
         description: String,
-        vararg arguments: ToolLens<ToolRequest, *>,
-        output: ToolLens<ToolResponse.Ok, *>? = null,
+        vararg arguments: McpCapabilityLens<ToolRequest, *>,
+        output: McpCapabilityLens<ToolResponse.Ok, *>? = null,
         annotations: ToolAnnotations? = null
     ) : this(ToolName.of(name), description, arguments.toList(), output, annotations)
 
@@ -107,16 +111,19 @@ inline fun <reified T : Enum<T>> Tool.Arg.enum() =
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified VALUE : Value<T>, reified T : Any> Tool.Arg.value(vf: ValueFactory<VALUE, T>) =
-    mapWithNewMeta(
-        { vf.of(it as T) }, { it.value }, when (T::class) {
-            String::class -> StringParam
-            Int::class -> IntegerParam
-            Long::class -> IntegerParam
-            Boolean::class -> BooleanParam
-            Double::class -> NumberParam
-            Float::class -> NumberParam
-            else -> ObjectParam
-        }
-    )
+    mapWithNewMeta({ vf.of(it as T) }, { it.value }, paramMeta<T>())
 
 fun <NEXT, OUT> ToolArgLensSpec<OUT>.map(mapping: BiDiMapping<OUT, NEXT>) = map(mapping::invoke, mapping::invoke)
+
+inline fun <reified T : Any> paramMeta() = when (T::class) {
+    String::class -> StringParam
+    Int::class -> IntegerParam
+    Long::class -> IntegerParam
+    Boolean::class -> BooleanParam
+    Double::class -> NumberParam
+    Float::class -> NumberParam
+    LocalDate::class -> StringParam
+    Instant::class -> StringParam
+    Uri::class -> StringParam
+    else -> ObjectParam
+}

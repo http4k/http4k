@@ -89,7 +89,7 @@ abstract class ConfigurableMcpJson(
     }
 
     /**
-     * Auto-marshalled lens for a tool argument. You will need Kotlin reflection on the classpath for this to work.
+     * Auto-marshalled lens for a tool output. You will need Kotlin reflection on the classpath for this to work.
      */
     inline fun <reified T : Any> Tool.Output.auto(example: T): ToolOutputLensBuilder<T> {
         val autoJsonToJsonSchema = AutoJsonToJsonSchema(this@ConfigurableMcpJson)

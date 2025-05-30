@@ -7,6 +7,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.with
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.util.McpJson
+import org.http4k.mcp.util.McpJson.auto
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
@@ -60,6 +61,14 @@ class ToolArgTest {
     @Test
     fun `enum to schema`(approver: Approver) {
         approver.check(Tool.Arg.enum<TestEnum>(), TestEnum.BAR, TestEnum.BAR)
+    }
+
+    data class FooBar(val foo: String = "foo", val bar: Int = 0)
+
+    @Test
+    fun `auto to schema`(approver: Approver) {
+        val spec = Tool.Arg.auto(FooBar()).required("foo")
+        approver.assertApproved(McpJson.asFormatString(spec.toSchema()), APPLICATION_JSON)
     }
 
     private fun <T : Any> Approver.check(spec: ToolArgLensSpec<T>, value: T, mapValue: Any) {

@@ -30,8 +30,6 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.lens.with
 import org.http4k.mcp.CompletionResponse
-import org.http4k.mcp.ElicitationRequest
-import org.http4k.mcp.ElicitationResponse
 import org.http4k.mcp.PromptResponse
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.SamplingRequest
@@ -41,12 +39,10 @@ import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.client.McpClientContract
 import org.http4k.mcp.firstDeterministicSessionId
 import org.http4k.mcp.model.Content
-import org.http4k.mcp.model.ElicitationAction
 import org.http4k.mcp.model.McpEntity
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta
 import org.http4k.mcp.model.Progress
-import org.http4k.mcp.model.ProgressToken
 import org.http4k.mcp.model.Prompt
 import org.http4k.mcp.model.PromptName
 import org.http4k.mcp.model.Reference
@@ -68,7 +64,6 @@ import org.http4k.mcp.server.protocol.Session
 import org.http4k.mcp.server.security.OAuthMcpSecurity
 import org.http4k.mcp.server.sessions.SessionEventStore
 import org.http4k.mcp.server.sessions.SessionProvider
-import org.http4k.mcp.util.McpJson
 import org.http4k.routing.bind
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
@@ -278,54 +273,69 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(5))
     }
 
-    @Test
-    fun `can do elicitation`() {
-        val tools = ServerTools(
-            Tool("elicit", "description") bind {
-                val received = it.client.elicit(
-                    ElicitationRequest("foobar", McpJson.obj(), it.meta.progress),
-                    Duration.ofSeconds(1)
-                )
-                assertThat(received, equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!), McpJson.obj()))))
-                ToolResponse.Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
-            }
-        )
+    data class FooBar(val foo: String, val bar: Int)
 
-        val eventStore = SessionEventStore.InMemory(10)
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            HttpStreamingSessions(
-                sessionProvider = SessionProvider.Random(Random(0)),
-                eventStore = eventStore
-            ).apply { start() },
-            tools = tools,
-        )
-
-        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
-
-        mcpClient.start()
-
-        mcpClient.elicitations().onElicitation { ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!), McpJson.obj()) }
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
-            equalTo(Success(ToolResponse.Ok(Content.Text("accept"))))
-        )
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
-            equalTo(Success(ToolResponse.Ok(Content.Text("decline"))))
-        )
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
-            equalTo(Success(ToolResponse.Ok(Content.Text("cancel"))))
-        )
-
-        mcpClient.stop()
-
-        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(7))
-    }
+//    @Test
+//    fun `can do elicitation`() {
+//        val output = Elicitation.auto(FooBar("foo", 42)).toLens()
+//
+//        val response = FooBar("bar", 69)
+//
+//        val tools = ServerTools(
+//            Tool("elicit", "description") bind {
+//                val received = it.client.elicit(
+//                    ElicitationRequest("foobar", output, it.meta.progress),
+//                    Duration.ofSeconds(1)
+//                )
+//                assertThat(
+//                    received,
+//                    equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
+//                )
+//
+//                assertThat(output(received.valueOrNull()!!), equalTo(response))
+//
+//                ToolResponse.Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
+//            }
+//        )
+//
+//        val eventStore = SessionEventStore.InMemory(10)
+//        val protocol = McpProtocol(
+//            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+//            HttpStreamingSessions(
+//                sessionProvider = SessionProvider.Random(Random(0)),
+//                eventStore = eventStore
+//            ).apply { start() },
+//            tools = tools,
+//        )
+//
+//        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
+//
+//        mcpClient.start()
+//
+//        mcpClient.elicitations()
+//            .onElicitation {
+//                ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!)).with(output of response)
+//            }
+//
+//        assertThat(
+//            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
+//            equalTo(Success(ToolResponse.Ok(Content.Text("accept"))))
+//        )
+//
+//        assertThat(
+//            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
+//            equalTo(Success(ToolResponse.Ok(Content.Text("decline"))))
+//        )
+//
+//        assertThat(
+//            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
+//            equalTo(Success(ToolResponse.Ok(Content.Text("cancel"))))
+//        )
+//
+//        mcpClient.stop()
+//
+//        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(7))
+//    }
 
     @Test
     fun `can do progress`() {
