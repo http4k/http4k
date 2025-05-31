@@ -2,14 +2,12 @@ package org.http4k.mcp.model
 
 import dev.forkhandles.values.LocalDateValue
 import dev.forkhandles.values.LocalDateValueFactory
-import dev.forkhandles.values.NonBlankStringValueFactory
-import dev.forkhandles.values.StringValue
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.mcp.ElicitationResponse
 import org.http4k.mcp.model.Elicitation.Metadata.EnumNames
 import org.http4k.mcp.model.Elicitation.Metadata.boolean.Default
-import org.http4k.mcp.model.Elicitation.Metadata.integer.Maximum
-import org.http4k.mcp.model.Elicitation.Metadata.integer.Minimum
+import org.http4k.mcp.model.Elicitation.Metadata.integer.Max
+import org.http4k.mcp.model.Elicitation.Metadata.integer.Min
 import org.http4k.mcp.model.Elicitation.Metadata.string.Format.Date
 import org.http4k.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.mcp.model.Elicitation.Metadata.string.MinLength
@@ -45,8 +43,8 @@ class ElicitationTest {
         approver.approve(
             Elicitation.int().required(
                 "name", "title", "description",
-                Minimum(1),
-                Maximum(100),
+                Min(1),
+                Max(100),
             )
         )
     }

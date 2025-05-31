@@ -2,8 +2,8 @@ package org.http4k.mcp
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.mcp.model.Elicitation
-import org.http4k.mcp.model.Elicitation.Metadata.integer.Maximum
-import org.http4k.mcp.model.Elicitation.Metadata.integer.Minimum
+import org.http4k.mcp.model.Elicitation.Metadata.integer.Max
+import org.http4k.mcp.model.Elicitation.Metadata.integer.Min
 import org.http4k.mcp.model.Elicitation.Metadata.string.Format.Date
 import org.http4k.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.mcp.model.Elicitation.Metadata.string.MinLength
@@ -36,8 +36,8 @@ class ElicitationRequestTest {
             ),
             Elicitation.int().optional(
                 "optInt", "title", "description",
-                Minimum(1),
-                Maximum(100)
+                Min(1),
+                Max(100)
             ),
             Elicitation.boolean().defaulted(
                 "defBool",

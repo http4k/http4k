@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
+val a= Elicitation.Metadata.string.Format.DateTime
 object Elicitation {
 
     /**
@@ -61,13 +62,13 @@ object Elicitation {
         }
 
         abstract class number<T : Any>(name: String) : Metadata<Number, T>(name) {
-            data class Minimum(override val value: Number) : number<Number>("minimum")
-            data class Maximum(override val value: Number) : number<Number>("maximum")
+            data class Min(override val value: Number) : number<Number>("minimum")
+            data class Max(override val value: Number) : number<Number>("maximum")
         }
 
         abstract class integer<T : Any>(name: String) : Metadata<Long, T>(name) {
-            data class Minimum(override val value: Int) : integer<Int>("minimum")
-            data class Maximum(override val value: Int) : integer<Int>("maximum")
+            data class Min(override val value: Int) : integer<Int>("minimum")
+            data class Max(override val value: Int) : integer<Int>("maximum")
         }
 
         abstract class boolean<T : Any>(name: String) : Metadata<Boolean, T>(name) {
