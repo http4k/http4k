@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Disabled
 
 class RealGitHubModelsTest : AzureAIContract, PortBasedTest {
-    val token = EnvironmentKey.value(GitHubToken).optional("GITHUB_TOKEN")
+    val token = EnvironmentKey.value(GitHubToken).optional("GITHUB_TOKEN_MODELS")
 
     init {
         Assumptions.assumeTrue(token(ENV) != null, "No API Key set - skipping")
