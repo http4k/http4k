@@ -1,9 +1,16 @@
 package org.http4k.a2a.protocol.model
 
-import org.http4k.connect.model.Role
+import org.http4k.a2a.protocol.messages.Metadata
+import se.ansman.kotshi.JsonSerializable
 
+@JsonSerializable
 data class Message(
-    val role: Role,
+    val messageId: String,
+    val role: MessageRole,
     val parts: List<Part>,
-    val metadata: Metadata? = null
+    val contextId: ContextId? = null,
+    val taskId: TaskId? = null,
+    val referenceTaskIds: List<TaskId>? = null,
+    val metadata: Metadata = emptyMap()
 )
+

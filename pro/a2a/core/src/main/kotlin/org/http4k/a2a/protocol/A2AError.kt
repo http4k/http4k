@@ -3,6 +3,7 @@ package org.http4k.a2a.protocol
 import org.http4k.core.Response
 import org.http4k.jsonrpc.ErrorMessage
 
+
 /**
  * Sealed type encapsulating the known failure modes of A2A clients
  */
@@ -29,7 +30,9 @@ sealed interface A2AError {
     data class Internal(val cause: Exception) : A2AError
 }
 
-val ErrorMessage.Companion.NotFound get() = ErrorMessage(-32001, "Task not found")
-val ErrorMessage.Companion.NotCancelable get() = ErrorMessage(-32002, "Task not found")
-val ErrorMessage.Companion.PushNotificationsNotSupported get() = ErrorMessage(-32003, "Push notifications unsupported")
-val ErrorMessage.Companion.UnsupportedOperation get() = ErrorMessage(-32004, "Unsupported Operation")
+val TASK_NOT_FOUND = ErrorMessage(-32001, "Task not found")
+val TASK_NOT_CANCELABLE = ErrorMessage(-32002, "Task not cancelable")
+val PUSH_NOTIFICATION_NOT_SUPPORTED = ErrorMessage(-32003, "Push Notification is not supported")
+val UNSUPPORTED_OPERATION = ErrorMessage(-32004, "Unsupported operation")
+val CONTENT_TYPE_UNSUPPORTED = ErrorMessage(-32005, "Incompatible content types")
+val INVALID_AGENT_RESPONSE = ErrorMessage(-32006, "Invalid agent response")

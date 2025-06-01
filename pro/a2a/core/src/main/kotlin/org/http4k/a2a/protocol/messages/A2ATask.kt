@@ -1,114 +1,89 @@
 package org.http4k.a2a.protocol.messages
 
-import org.http4k.a2a.protocol.A2ARpcMethod
-import org.http4k.a2a.protocol.model.Artifact
-import org.http4k.a2a.protocol.model.Message
-import org.http4k.a2a.protocol.model.PushNotificationConfig
-import org.http4k.a2a.protocol.model.SessionId
+import org.http4k.a2a.protocol.A2ARpcMethod.Companion.of
+import org.http4k.a2a.protocol.model.Task
 import org.http4k.a2a.protocol.model.TaskId
-import org.http4k.a2a.protocol.model.TaskStatus
+import org.http4k.a2a.protocol.model.TaskPushNotificationConfig
+import se.ansman.kotshi.JsonSerializable
 
+/**
+ * Task-related operations for A2A protocol
+ */
 object A2ATask {
-    object Send : A2ARpc {
-        override val Method = A2ARpcMethod.of("tasks/send")
-
-        data class Request(
-            val id: TaskId,
-            val sessionId: SessionId? = null,
-            val message: Message,
-            val pushNotification: PushNotificationConfig? = null,
-            val historyLength: Int? = null,
-            override val metadata: Metadata? = null
-        ) : ClientMessage.Request
-
-        data class Response(
-            val id: TaskId,
-            val sessionId: SessionId? = null,
-            val status: TaskStatus,
-            val artifacts: List<Artifact>? = null,
-            val metadata: Metadata? = null
-        ) : ClientMessage.Response
-    }
 
     object Get : A2ARpc {
-        override val Method = A2ARpcMethod.of("tasks/send")
+        override val Method = of("tasks/get")
 
-        data class Request(val id: TaskId, val historyLength: Int? = null, override val metadata: Metadata? = null) :
-            ClientMessage.Request
-
-        data class Response(
+        @JsonSerializable
+        data class Request(
             val id: TaskId,
-            val sessionId: SessionId? = null,
-            val status: TaskStatus,
-            val artifacts: List<Artifact>? = null,
-            val metadata: Metadata? = null
-        ) : ClientMessage.Response
+            val historyLength: Int? = null,
+            override val metadata: Metadata = emptyMap()
+        ) : ClientMessage.Request, HasMeta
+
+        @JsonSerializable
+        data class Response(
+            val task: Task
+        ) : ServerMessage.Response
     }
 
     object Cancel : A2ARpc {
-        override val Method = A2ARpcMethod.of("tasks/cancel")
+        override val Method = of("tasks/cancel")
 
-        data class Request(val id: TaskId, val historyLength: Int? = null, override val metadata: Metadata? = null) :
-            ClientMessage.Request
-
-        data class Response(
+        @JsonSerializable
+        data class Request(
             val id: TaskId,
-            val sessionId: SessionId? = null,
-            val status: TaskStatus,
-            val artifacts: List<Artifact>? = null,
-            val metadata: Metadata? = null
-        ) : ClientMessage.Response
+            override val metadata: Metadata = emptyMap()
+        ) : ClientMessage.Request, HasMeta
+
+        @JsonSerializable
+        data class Response(
+            val task: Task
+        ) : ServerMessage.Response
     }
 
-    object PushNotifications {
+    object PushNotificationConfig {
+
         object Set : A2ARpc {
-            override val Method = A2ARpcMethod.of("tasks/push_notifications/set")
+            override val Method = of("tasks/pushNotificationConfig/set")
 
-            data class Request(val id: TaskId, val pushNotificationConfig: PushNotificationConfig) :
-                ClientMessage.Request
+            @JsonSerializable
+            data class Request(
+                val taskId: TaskId,
+                val pushNotificationConfig: org.http4k.a2a.protocol.model.PushNotificationConfig
+            ) : ClientMessage.Request
 
-            data class Response(val id: TaskId, val pushNotificationConfig: PushNotificationConfig) :
-                ClientMessage.Response
+            @JsonSerializable
+            data class Response(
+                val taskPushNotificationConfig: TaskPushNotificationConfig
+            ) : ServerMessage.Response
         }
 
         object Get : A2ARpc {
-            override val Method = A2ARpcMethod.of("tasks/push_notifications/get")
+            override val Method = of("tasks/pushNotificationConfig/get")
 
-            data class Request(val id: TaskId, override val metadata: Metadata? = null) : ClientMessage.Request
+            @JsonSerializable
+            data class Request(
+                val id: TaskId,
+                override val metadata: Metadata = emptyMap()
+            ) : ClientMessage.Request, HasMeta
 
-            data class Response(val id: TaskId, val pushNotificationConfig: PushNotificationConfig) :
-                ClientMessage.Response
+            @JsonSerializable
+            data class Response(
+                val taskPushNotificationConfig: TaskPushNotificationConfig
+            ) : ServerMessage.Response
         }
     }
 
     object Resubscribe : A2ARpc {
-        override val Method = A2ARpcMethod.of("tasks/resubscribe")
+        override val Method = of("tasks/resubscribe")
 
-        data class Request(val id: TaskId, val historyLength: Int? = null, override val metadata: Metadata? = null) :
-            ClientMessage.Request
-    }
-
-    object Subscribe : A2ARpc {
-        override val Method = A2ARpcMethod.of("tasks/sendSubscribe")
-
+        @JsonSerializable
         data class Request(
             val id: TaskId,
-            val sessionId: SessionId? = null,
-            val message: Message,
-            val pushNotification: PushNotificationConfig? = null,
-            val historyLength: Int? = null,
-            override val metadata: Metadata? = null
-        ) : ClientMessage.Request
-    }
+            override val metadata: Metadata = emptyMap()
+        ) : ClientMessage.Request, HasMeta
 
-    object History : A2ARpc {
-        override val Method = A2ARpcMethod.of("tasks/getHistory")
-
-        data class Request(val id: TaskId, val historyLength: Int? = null, override val metadata: Metadata? = null) :
-            ClientMessage.Request
-
-        data class Response(val messageHistory: List<Message> = emptyList()) : ClientMessage.Response
+        // Note: Response is the same as Stream response - returns streaming events
     }
 }
-
-

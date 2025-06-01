@@ -7,5 +7,7 @@ enum class TaskState {
     completed,
     canceled,
     failed,
+    rejected,
+    `auth-required`,
     unknown
 }
