@@ -39,7 +39,7 @@ jobs:
         uses: buildnote/action@main
         if: always()
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v5.5.1
+        uses: mikepenz/action-junit-report@v5.6.0
         if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
