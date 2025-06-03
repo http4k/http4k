@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.11.0.0
+- **http4k-connect***: [Deprecation] Repackaging of core types into `org.http4k.ai` package. Change the offending package names to fix.
+- **http4k-mcp-***: [Deprecation] Repackaging of core types into `org.http4k.ai` package. Change the offending package names to fix.
+
 ### v6.10.2.0
 - **http4k-***: Upgrade some dependency versions.
 - **http4k-mcp-sdk**: Add typesafe lens access to Elicitations.
