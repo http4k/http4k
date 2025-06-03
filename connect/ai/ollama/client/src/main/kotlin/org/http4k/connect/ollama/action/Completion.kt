@@ -2,7 +2,6 @@ package org.http4k.connect.ollama.action
 
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Prompt
-import org.http4k.ai.model.SystemMessage
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.ollama.OllamaAction
@@ -25,7 +24,7 @@ data class Completion(
     val prompt: Prompt,
     val images: List<Base64Blob>? = null,
     val stream: Boolean? = false,
-    val system: SystemMessage? = null,
+    val system: Prompt? = null,
     val format: ResponseFormat? = null,
     val template: Template? = null,
     val raw: Boolean? = null,

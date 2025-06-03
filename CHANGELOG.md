@@ -4,8 +4,10 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.11.0.0
+- **http4k-ai-core**: [New module!] Core module for common AI types
+- **http4k-connect-ai-core**: [Breaking] This module has been renamed to `http4k-ai-core`.
 - **http4k-connect***: [Deprecation] Repackaging of core types into `org.http4k.ai` package. Change the offending package names to fix.
-- **http4k-mcp-***: [Deprecation] Repackaging of core types into `org.http4k.ai` package. Change the offending package names to fix.
+- **http4k-mcp-***: [Deprecation] Repackaging of core types into `org.http4k.ai` package. Change the offending package names to fix. `SystemMessage` is now `Prompt`
 
 ### v6.10.2.0
 - **http4k-***: Upgrade some dependency versions.

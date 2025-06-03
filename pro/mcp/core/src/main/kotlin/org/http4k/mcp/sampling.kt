@@ -2,9 +2,9 @@ package org.http4k.mcp
 
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Prompt
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
-import org.http4k.ai.model.SystemMessage
 import org.http4k.ai.model.Temperature
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
@@ -31,7 +31,7 @@ fun SamplingFilter.then(next: SamplingHandler): SamplingHandler = this(next)
 data class SamplingRequest(
     val messages: List<Message>,
     val maxTokens: MaxTokens,
-    val systemPrompt: SystemMessage? = null,
+    val systemPrompt: Prompt? = null,
     val includeContext: SamplingIncludeContext? = null,
     val temperature: Temperature? = null,
     val stopSequences: List<String>? = null,

@@ -8,7 +8,6 @@ import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ResponseId
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
-import org.http4k.ai.model.SystemMessage
 import org.http4k.ai.model.Temperature
 import org.http4k.ai.model.ToolName
 import org.http4k.connect.model.Base64Blob
@@ -30,7 +29,6 @@ fun <T> AutoMappingConfiguration<T>.withAiMappings() = apply {
     value(ResponseId)
     value(Role)
     value(StopReason)
-    value(SystemMessage)
     value(Temperature)
     value(ToolName)
     value(MaxTokens)
