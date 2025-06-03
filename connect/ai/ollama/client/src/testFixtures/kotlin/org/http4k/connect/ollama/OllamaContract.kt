@@ -4,8 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.present
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.Assistant
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.connect.ollama.action.ModelOptions
 import org.http4k.connect.successValue
 import org.http4k.testing.ApprovalTest

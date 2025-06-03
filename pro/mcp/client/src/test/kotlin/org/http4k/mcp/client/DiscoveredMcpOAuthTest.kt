@@ -3,9 +3,9 @@ package org.http4k.mcp.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
+import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode.Disconnect
-import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials

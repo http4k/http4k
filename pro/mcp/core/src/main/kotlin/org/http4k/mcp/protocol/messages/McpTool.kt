@@ -1,6 +1,6 @@
 package org.http4k.mcp.protocol.messages
 
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.ToolName
 import org.http4k.format.MoshiNode
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Cursor

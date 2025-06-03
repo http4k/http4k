@@ -3,8 +3,8 @@ package org.http4k.mcp.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
-import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.ToolName
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.lens.with

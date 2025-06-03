@@ -4,7 +4,6 @@ import org.http4k.connect.model.MimeType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
-import org.http4k.lens.int
 import org.http4k.mcp.ResourceResponse
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse

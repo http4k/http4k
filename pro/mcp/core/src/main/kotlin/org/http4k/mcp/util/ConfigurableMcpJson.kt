@@ -7,7 +7,7 @@ import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.withAiMappings
+import org.http4k.ai.util.withAiMappings
 import org.http4k.contract.jsonschema.JsonSchemaCollapser
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.Body

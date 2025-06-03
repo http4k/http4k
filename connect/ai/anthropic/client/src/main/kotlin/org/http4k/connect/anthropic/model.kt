@@ -5,9 +5,9 @@ import dev.forkhandles.values.LocalDateValueFactory
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.Value
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.ToolName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -23,10 +23,6 @@ class UserId private constructor(value: String) : StringValue(value) {
 
 class ModelType private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ModelType>(::ModelType)
-}
-
-class Prompt private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<Prompt>(::Prompt)
 }
 
 class ToolUseId private constructor(value: String) : StringValue(value) {
@@ -55,10 +51,6 @@ sealed class ToolChoice {
 
 enum class SourceType {
     base64
-}
-
-class ResponseId private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<ResponseId>(::ResponseId)
 }
 
 val StopReason.Companion.end_turn get() = StopReason.of("end_turn")

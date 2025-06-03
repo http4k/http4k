@@ -1,5 +1,5 @@
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.openai.GPT3_5
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI

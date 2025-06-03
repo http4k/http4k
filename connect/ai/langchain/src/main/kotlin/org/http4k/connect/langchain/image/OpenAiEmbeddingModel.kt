@@ -4,7 +4,7 @@ import dev.forkhandles.result4k.map
 import dev.langchain4j.data.image.Image
 import dev.langchain4j.model.image.ImageModel
 import dev.langchain4j.model.output.Response
-import org.http4k.connect.model.ModelName
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.openai.DALL_E_2
 import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.Quality

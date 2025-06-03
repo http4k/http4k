@@ -2,13 +2,13 @@ package org.http4k.mcp.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.model.MaxTokens
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.ToolName
+import org.http4k.connect.model.MimeType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
@@ -391,7 +391,8 @@ class McpProtocolTest {
         val unstructuredTool = Tool("unstructured", "description", stringArg, intArg)
         val structuredTool = Tool("structured", "description", output = output)
 
-        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+        val content =
+            Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val tools = ServerTools(
             listOf(

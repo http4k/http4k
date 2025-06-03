@@ -2,7 +2,7 @@ package org.http4k.mcp.model
 
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.ToolName
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ParamMeta
@@ -18,7 +18,6 @@ import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse
 import org.http4k.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
 import org.http4k.mcp.util.McpNodeType
-import java.security.DrbgParameters.Instantiation
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

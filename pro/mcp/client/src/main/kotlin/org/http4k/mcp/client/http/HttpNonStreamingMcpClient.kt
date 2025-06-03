@@ -3,8 +3,8 @@ package org.http4k.mcp.client.http
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
+import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
-import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri

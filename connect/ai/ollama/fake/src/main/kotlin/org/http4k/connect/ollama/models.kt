@@ -1,6 +1,6 @@
 package org.http4k.connect.ollama
 
-import org.http4k.connect.model.ModelName
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.ollama.action.Details
 import org.http4k.connect.ollama.action.Model
 import org.http4k.connect.storage.InMemory

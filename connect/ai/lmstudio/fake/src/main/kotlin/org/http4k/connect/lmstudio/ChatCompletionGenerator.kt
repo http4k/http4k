@@ -1,11 +1,11 @@
 package org.http4k.connect.lmstudio
 
+import org.http4k.ai.model.Role.Companion.System
+import org.http4k.ai.model.Role.Companion.User
+import org.http4k.ai.model.StopReason
 import org.http4k.connect.lmstudio.action.ChatCompletion
 import org.http4k.connect.lmstudio.action.Choice
 import org.http4k.connect.lmstudio.action.ChoiceDetail
-import org.http4k.connect.model.Role.Companion.System
-import org.http4k.connect.model.Role.Companion.User
-import org.http4k.connect.model.StopReason
 import java.util.Random
 
 /**
@@ -22,7 +22,12 @@ val ChatCompletionGenerator.Companion.ReverseInput
     get() = ChatCompletionGenerator { req ->
         req.messages.flatMap { m ->
             m.content?.mapIndexed { i, content ->
-                Choice(i, ChoiceDetail(System, content.text?.reversed() ?: "", null), null, StopReason.stop)
+                Choice(
+                    i,
+                    ChoiceDetail(System, content.text?.reversed() ?: "", null),
+                    null,
+                    StopReason.stop
+                )
             } ?: emptyList()
         }
     }

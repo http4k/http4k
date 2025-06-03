@@ -6,12 +6,12 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.startsWith
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.azure.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.azure.ObjectType.Companion.ChatCompletionChunk
 import org.http4k.connect.azure.action.Completion
 import org.http4k.connect.azure.action.Message
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.successValue
 import org.http4k.testing.ApprovalTest
 import org.junit.jupiter.api.Test

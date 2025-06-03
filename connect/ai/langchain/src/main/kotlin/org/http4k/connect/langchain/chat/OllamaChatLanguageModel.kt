@@ -11,11 +11,11 @@ import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.response.ChatResponse
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.Role.Companion.System
+import org.http4k.ai.model.Role.Companion.User
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.Role.Companion.System
-import org.http4k.connect.model.Role.Companion.User
 import org.http4k.connect.ollama.Message
 import org.http4k.connect.ollama.Ollama
 import org.http4k.connect.ollama.ResponseFormat

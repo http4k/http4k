@@ -6,12 +6,12 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
+import org.http4k.ai.model.ToolName
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode
 import org.http4k.client.ReconnectionMode.Immediate
 import org.http4k.client.chunkedSseSequence
-import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -73,7 +73,6 @@ import org.http4k.mcp.protocol.messages.McpTool
 import org.http4k.mcp.util.McpJson
 import org.http4k.mcp.util.McpJson.asA
 import org.http4k.mcp.util.McpJson.compact
-import org.http4k.mcp.util.McpNodeType
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference

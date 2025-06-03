@@ -1,8 +1,8 @@
 package org.http4k.connect.azure
 
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.model.ModelName
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.BearerAuth
 import org.http4k.routing.routes

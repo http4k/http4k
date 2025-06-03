@@ -1,12 +1,12 @@
 package org.http4k.connect.anthropic.action
 
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.ToolName
 import org.http4k.connect.anthropic.SourceType
 import org.http4k.connect.anthropic.ToolUseId
 import org.http4k.connect.anthropic.UserId
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.ToolName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel

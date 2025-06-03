@@ -2,9 +2,7 @@ package org.http4k.connect.azure
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.Timestamp
-import org.http4k.connect.withAiMappings
+import org.http4k.ai.util.withAiMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -21,14 +19,10 @@ object AzureAIMoshi : ConfigurableMoshi(
         .asConfigurable()
         .withStandardMappings()
         .withAiMappings()
-        .value(Base64Blob)
-        .value(CompletionId)
         .value(ModelProvider)
         .value(ModelType)
         .value(ObjectType)
         .value(ObjectId)
-        .value(Prompt)
-        .value(Timestamp)
         .value(TokenId)
         .value(User)
         .done()

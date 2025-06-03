@@ -4,13 +4,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.ToolName
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.MaxTokens
 import org.http4k.connect.model.MimeType
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.ToolName
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
@@ -243,7 +243,8 @@ class TestMcpClientTest {
 
         val tool = Tool("name", "description", stringArg, intArg)
 
-        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
+        val content =
+            Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val serverTools = ServerTools(listOf(tool bind {
             it.meta.progress?.let { p ->

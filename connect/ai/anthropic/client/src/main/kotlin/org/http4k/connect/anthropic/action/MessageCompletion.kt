@@ -2,18 +2,18 @@ package org.http4k.connect.anthropic.action
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Prompt
+import org.http4k.ai.model.ResponseId
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.Temperature
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.anthropic.AnthropicAIAction
 import org.http4k.connect.anthropic.AnthropicAIMoshi
-import org.http4k.connect.anthropic.Prompt
-import org.http4k.connect.anthropic.ResponseId
 import org.http4k.connect.anthropic.ToolChoice
 import org.http4k.connect.asRemoteFailure
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

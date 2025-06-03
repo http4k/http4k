@@ -1,7 +1,7 @@
 package org.http4k.mcp.testing.capabilities
 
 import dev.forkhandles.result4k.map
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.mcp.ToolRequest
 import org.http4k.mcp.ToolResponse

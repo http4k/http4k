@@ -1,5 +1,6 @@
 package org.http4k.connect.lmstudio
 
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.lmstudio.LmStudioMoshi.asFormatString
 import org.http4k.connect.lmstudio.LmStudioMoshi.autoBody
 import org.http4k.connect.lmstudio.ObjectType.Companion.ChatCompletion
@@ -13,7 +14,6 @@ import org.http4k.connect.lmstudio.action.Embeddings
 import org.http4k.connect.lmstudio.action.Model
 import org.http4k.connect.lmstudio.action.Models
 import org.http4k.connect.lmstudio.action.Usage
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM

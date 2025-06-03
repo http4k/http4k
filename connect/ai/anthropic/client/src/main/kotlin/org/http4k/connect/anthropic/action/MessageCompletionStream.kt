@@ -1,18 +1,18 @@
 package org.http4k.connect.anthropic.action
 
 import dev.forkhandles.result4k.map
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Prompt
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.Temperature
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.anthropic.AnthropicAIAction
 import org.http4k.connect.anthropic.AnthropicAIMoshi
-import org.http4k.connect.anthropic.Prompt
 import org.http4k.connect.anthropic.ToolChoice
 import org.http4k.connect.anthropic.action.MessageGenerationEvent.Ping
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
-import org.http4k.connect.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -52,7 +52,11 @@ data class MessageCompletionStream internal constructor(
         top_p: Double? = 0.0,
     ) : this(
         model,
-        listOf(Message(Role.User, listOf(Content.Text(prompt.value)))),
+        listOf(
+            Message(
+                Role.User, listOf(Content.Text(prompt.value))
+            )
+        ),
         max_tokens,
         metadata,
         stop_sequences,

@@ -1,7 +1,7 @@
 package org.http4k.connect.openai
 
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletionChunk

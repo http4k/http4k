@@ -1,11 +1,11 @@
 package org.http4k.mcp.protocol.messages
 
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.SystemMessage
-import org.http4k.connect.model.Temperature
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.SystemMessage
+import org.http4k.ai.model.Temperature
 import org.http4k.mcp.model.Content
 import org.http4k.mcp.model.Message
 import org.http4k.mcp.model.Meta

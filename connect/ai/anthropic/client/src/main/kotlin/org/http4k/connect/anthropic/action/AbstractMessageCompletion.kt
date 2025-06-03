@@ -1,10 +1,10 @@
 package org.http4k.connect.anthropic.action
 
-import org.http4k.connect.anthropic.Prompt
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Prompt
+import org.http4k.ai.model.Temperature
 import org.http4k.connect.anthropic.ToolChoice
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Temperature
 
 sealed interface AbstractMessageCompletion {
     val model: ModelName

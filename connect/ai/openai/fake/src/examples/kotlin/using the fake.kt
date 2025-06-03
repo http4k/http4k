@@ -1,8 +1,8 @@
 import dev.forkhandles.result4k.onFailure
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.start
 import org.http4k.client.JavaHttpClient
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.GPT3_5
 import org.http4k.connect.openai.Http

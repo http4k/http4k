@@ -2,11 +2,7 @@ package org.http4k.connect.openai
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.Timestamp
-import org.http4k.connect.withAiMappings
+import org.http4k.ai.util.withAiMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -25,14 +21,9 @@ object OpenAIMoshi : ConfigurableMoshi(
         .asConfigurable()
         .withStandardMappings()
         .withAiMappings()
-        .value(Base64Blob)
-        .value(CompletionId)
-        .value(ModelName)
         .value(OpenAIOrg)
         .value(ObjectType)
         .value(ObjectId)
-        .value(Role)
-        .value(Timestamp)
         .value(TokenId)
         .value(User)
         .done()

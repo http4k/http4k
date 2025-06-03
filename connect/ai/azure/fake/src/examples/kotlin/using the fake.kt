@@ -1,4 +1,5 @@
 import dev.forkhandles.result4k.onFailure
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.start
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.azure.AzureAI
@@ -9,7 +10,6 @@ import org.http4k.connect.azure.Http
 import org.http4k.connect.azure.Region
 import org.http4k.connect.azure.action.Message
 import org.http4k.connect.azure.chatCompletion
-import org.http4k.connect.model.ModelName
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom

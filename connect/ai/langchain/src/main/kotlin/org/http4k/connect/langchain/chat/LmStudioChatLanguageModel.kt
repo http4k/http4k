@@ -16,6 +16,11 @@ import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.output.FinishReason
 import dev.langchain4j.model.output.TokenUsage
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.Temperature
 import org.http4k.connect.lmstudio.LmStudio
 import org.http4k.connect.lmstudio.TokenId
 import org.http4k.connect.lmstudio.User
@@ -32,15 +37,7 @@ import org.http4k.connect.lmstudio.action.ResponseFormat
 import org.http4k.connect.lmstudio.action.Tool
 import org.http4k.connect.lmstudio.action.ToolCall
 import org.http4k.connect.lmstudio.chatCompletion
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
-import org.http4k.connect.openai.content_filter
-import org.http4k.connect.openai.length
-import org.http4k.connect.openai.stop
-import org.http4k.connect.openai.tool_calls
+import org.http4k.connect.openai.*
 import org.http4k.connect.orThrow
 import org.http4k.core.Uri
 

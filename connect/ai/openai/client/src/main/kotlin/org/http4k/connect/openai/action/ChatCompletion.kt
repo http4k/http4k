@@ -3,15 +3,15 @@
 package org.http4k.connect.openai.action
 
 import dev.forkhandles.result4k.Result
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ResponseId
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.Temperature
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
-import org.http4k.connect.openai.CompletionId
 import org.http4k.connect.openai.ObjectType
 import org.http4k.connect.openai.OpenAIAction
 import org.http4k.connect.openai.OpenAIMoshi
@@ -19,7 +19,7 @@ import org.http4k.connect.openai.OpenAIMoshi.autoBody
 import org.http4k.connect.openai.TokenId
 import org.http4k.connect.openai.User
 import org.http4k.connect.openai.action.Detail.auto
-import org.http4k.connect.util.toCompletionSequence
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -220,7 +220,7 @@ data class FunctionCall(
 
 @JsonSerializable
 data class CompletionResponse(
-    val id: CompletionId,
+    val id: ResponseId,
     val created: Timestamp,
     val model: ModelName,
     val choices: List<Choice>,

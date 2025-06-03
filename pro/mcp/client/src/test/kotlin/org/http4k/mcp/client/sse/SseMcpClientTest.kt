@@ -3,8 +3,8 @@ package org.http4k.mcp.client.sse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.failureOrNull
+import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
-import org.http4k.connect.model.ToolName
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET

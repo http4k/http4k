@@ -1,4 +1,6 @@
 import dev.forkhandles.result4k.onFailure
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.start
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.lmstudio.CHAT_MODEL
@@ -7,8 +9,6 @@ import org.http4k.connect.lmstudio.Http
 import org.http4k.connect.lmstudio.LmStudio
 import org.http4k.connect.lmstudio.action.Message
 import org.http4k.connect.lmstudio.chatCompletion
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom

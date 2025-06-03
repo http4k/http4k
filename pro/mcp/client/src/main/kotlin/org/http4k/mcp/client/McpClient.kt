@@ -1,6 +1,6 @@
 package org.http4k.mcp.client
 
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.ToolName
 import org.http4k.core.Uri
 import org.http4k.mcp.CompletionRequest
 import org.http4k.mcp.CompletionResponse

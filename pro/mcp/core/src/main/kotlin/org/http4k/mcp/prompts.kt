@@ -1,6 +1,6 @@
 package org.http4k.mcp
 
-import org.http4k.connect.model.Role
+import org.http4k.ai.model.Role
 import org.http4k.core.Request
 import org.http4k.lens.McpLensTarget
 import org.http4k.mcp.model.Content.Text
