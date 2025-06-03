@@ -9,10 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-core"))
-    api(project(":http4k-format-core"))
+    api(project(":http4k-ai-core"))
 
-    api(project(":http4k-format-moshi")) {
-        exclude("org.jetbrains.kotlin", "kotlin-reflect")
-    }
+    api("se.ansman.kotshi:api:_")
 }

@@ -1,6 +1,5 @@
 package org.http4k.ai.util
 
-import com.squareup.moshi.JsonAdapter
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.RequestId
@@ -16,7 +15,6 @@ import org.http4k.connect.model.MimeType
 import org.http4k.connect.model.Timestamp
 import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.value
-import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 fun <T> AutoMappingConfiguration<T>.withAiMappings() = apply {
     value(Base64Blob)
@@ -35,6 +33,3 @@ fun <T> AutoMappingConfiguration<T>.withAiMappings() = apply {
     value(ToolName)
     value(MaxTokens)
 }
-
-@KotshiJsonAdapterFactory
-object Http4kAiCoreJsonAdapterFactory : JsonAdapter.Factory by KotshiHttp4kAiCoreJsonAdapterFactory
