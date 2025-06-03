@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.startsWith
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.UserPrompt
 import org.http4k.connect.azure.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.azure.ObjectType.Companion.ChatCompletionChunk
 import org.http4k.connect.azure.action.Completion
@@ -48,7 +49,7 @@ interface AzureAIContract {
     @Test
     fun `get completion response non-stream`() {
         val responses = azureAi(Completion(
-            Prompt.of("foobar"),
+            UserPrompt.of("foobar"),
             stream = false,
             max_tokens = MaxTokens.of(1000),
         )).successValue().toList()
@@ -77,7 +78,7 @@ interface AzureAIContract {
     fun `get completion response streaming`() {
         val responses = azureAi(
             Completion(
-                Prompt.of("what is the best type of cat?"),
+                UserPrompt.of("what is the best type of cat?"),
                 MaxTokens.of(1000),
                 stream = true
             )

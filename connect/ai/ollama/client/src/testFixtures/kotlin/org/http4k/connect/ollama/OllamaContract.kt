@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.present
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.UserPrompt
 import org.http4k.connect.ollama.action.ModelOptions
 import org.http4k.connect.successValue
 import org.http4k.testing.ApprovalTest
@@ -37,7 +38,7 @@ interface OllamaContract {
     fun `get completion response non-stream`() {
         val responses = ollama.completion(
             modelName,
-            Prompt.of("count to five"),
+            UserPrompt.of("count to five"),
             null,
             false,
             null,
@@ -55,7 +56,7 @@ interface OllamaContract {
     fun `get completion response stream`() {
         val responses = ollama.completion(
             modelName,
-            Prompt.of("count to five"),
+            UserPrompt.of("count to five"),
             null,
             true,
             null,
@@ -102,7 +103,7 @@ interface OllamaContract {
         assertThat(
             ollama.createEmbeddings(
                 modelName,
-                Prompt.of("count to five"),
+                UserPrompt.of("count to five"),
                 null, ModelOptions(temperature = 0.0)
             ).successValue().embedding.size,
             greaterThan(0)

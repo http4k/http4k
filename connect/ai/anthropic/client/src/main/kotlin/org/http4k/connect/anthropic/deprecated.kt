@@ -4,4 +4,4 @@ package org.http4k.connect.anthropic
 typealias ResponseId = org.http4k.ai.model.ResponseId
 
 @Deprecated("use common prompt")
-typealias Prompt = org.http4k.ai.model.Prompt
+typealias Prompt = org.http4k.ai.model.UserPrompt

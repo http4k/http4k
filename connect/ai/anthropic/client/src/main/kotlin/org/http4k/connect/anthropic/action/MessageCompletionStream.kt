@@ -3,9 +3,10 @@ package org.http4k.connect.anthropic.action
 import dev.forkhandles.result4k.map
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.Prompt
+import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.SystemPrompt
 import org.http4k.ai.model.Temperature
 import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.Http4kConnectAction
@@ -30,7 +31,7 @@ data class MessageCompletionStream internal constructor(
     override val max_tokens: MaxTokens,
     override val metadata: Metadata? = null,
     override val stop_sequences: List<String> = emptyList(),
-    override val system: Prompt? = null,
+    override val system: SystemPrompt? = null,
     override val temperature: Temperature? = Temperature.ZERO,
     override val tool_choice: ToolChoice? = null,
     override val tools: List<Tool> = emptyList(),
@@ -40,11 +41,11 @@ data class MessageCompletionStream internal constructor(
 ) : AbstractMessageCompletion, AnthropicAIAction<Sequence<MessageGenerationEvent>> {
     constructor(
         model: ModelName,
-        prompt: Prompt,
+        prompt: UserPrompt,
         max_tokens: MaxTokens,
         metadata: Metadata? = null,
         stop_sequences: List<String> = emptyList(),
-        system: Prompt? = null,
+        system: SystemPrompt? = null,
         temperature: Temperature? = Temperature.ZERO,
         tool_choice: ToolChoice? = null,
         tools: List<Tool> = emptyList(),
@@ -75,7 +76,7 @@ data class MessageCompletionStream internal constructor(
         max_tokens: MaxTokens,
         metadata: Metadata? = null,
         stop_sequences: List<String> = emptyList(),
-        system: Prompt? = null,
+        system: SystemPrompt? = null,
         temperature: Temperature? = Temperature.ZERO,
         tool_choice: ToolChoice? = null,
         tools: List<Tool> = emptyList(),

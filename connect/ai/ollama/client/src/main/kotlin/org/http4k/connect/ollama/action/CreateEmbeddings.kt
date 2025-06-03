@@ -1,7 +1,7 @@
 package org.http4k.connect.ollama.action
 
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.Prompt
+import org.http4k.ai.model.UserPrompt
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.ollama.OllamaMoshi.autoBody
 import org.http4k.core.Method.POST
@@ -14,7 +14,7 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class CreateEmbeddings(
     val model: ModelName,
-    val prompt: Prompt,
+    val prompt: UserPrompt,
     val keep_alive: String? = null,
     val options: ModelOptions? = null
 ) : NonNullOllamaAction<EmbeddingsResponse>(EmbeddingsResponse::class) {

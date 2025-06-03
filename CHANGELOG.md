@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.11.1.0 
+- **http4k-ai-core**: [Rename] Disambiguate System and User Prompt
+- **http4k-connect***: [Rename] Disambiguate System and User Prompt 
+
 ### v6.11.0.0
 - **http4k-ai-core**: [New module!] Core module for common AI types
 - **http4k-connect-ai-core**: [Breaking] This module has been renamed to `http4k-ai-core`.
