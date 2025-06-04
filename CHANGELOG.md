@@ -3,6 +3,16 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.12.0.0
+- **http4k-***: Repackaging modules into new http4k ecosystem `http4k-ai`
+- **http4k-ai-llm**: [New module!] Core abstractions for a unified LLM API, providing a functional interface for working with LLMs in true http4k style. :)
+- **http4k-mcp-core**: [Breaking] Package migration `org.http4k.mcp` to `org.http4k.ai.mcp`. Fix: Simple replacement will fix imports.
+- **http4k-mcp-core**: [Deprecation] Replaced with `http4k-ai-mcp-core`
+- **http4k-mcp-client**: [Breaking] Package migration `org.http4k.mcp` to `org.http4k.ai.mcp`. Fix: Simple replacement will fix imports.
+- **http4k-mcp-client**: [Deprecation] Replaced with `http4k-ai-mcp-client`
+- **http4k-mcp-sdk**: [Breaking] Package migration `org.http4k.mcp` to `org.http4k.ai.mcp`. Fix: Simple replacement will fix imports.
+- **http4k-mcp-sdk**: [Deprecation] Replaced with `http4k-ai-mcp-sdk`
+
 ### v6.11.1.0 
 - **http4k-ai-core**: [Rename] Disambiguate System and User Prompt
 - **http4k-connect***: [Rename] Disambiguate System and User Prompt 

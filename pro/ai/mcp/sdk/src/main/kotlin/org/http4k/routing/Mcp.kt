@@ -4,40 +4,40 @@ import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.mcp.CompletionHandler
-import org.http4k.mcp.PromptHandler
-import org.http4k.mcp.ResourceHandler
-import org.http4k.mcp.ToolHandler
-import org.http4k.mcp.model.Prompt
-import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.Resource
-import org.http4k.mcp.model.Tool
-import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.capability.CapabilityPack
-import org.http4k.mcp.server.capability.CompletionCapability
-import org.http4k.mcp.server.capability.PromptCapability
-import org.http4k.mcp.server.capability.ResourceCapability
-import org.http4k.mcp.server.capability.ServerCapability
-import org.http4k.mcp.server.capability.ServerCompletions
-import org.http4k.mcp.server.capability.ServerPrompts
-import org.http4k.mcp.server.capability.ServerResources
-import org.http4k.mcp.server.capability.ServerTools
-import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.http.HttpNonStreamingMcp
-import org.http4k.mcp.server.http.HttpStreamingMcp
-import org.http4k.mcp.server.http.HttpStreamingSessions
-import org.http4k.mcp.server.jsonrpc.JsonRpcMcp
-import org.http4k.mcp.server.jsonrpc.JsonRpcSessions
-import org.http4k.mcp.server.protocol.McpProtocol
-import org.http4k.mcp.server.protocol.Session
-import org.http4k.mcp.server.security.McpSecurity
-import org.http4k.mcp.server.security.NoMcpSecurity
-import org.http4k.mcp.server.sse.SseMcp
-import org.http4k.mcp.server.sse.SseSessions
-import org.http4k.mcp.server.stdio.StdIoMcpSessions
-import org.http4k.mcp.server.websocket.WebsocketMcp
-import org.http4k.mcp.server.websocket.WebsocketSessions
+import org.http4k.ai.mcp.CompletionHandler
+import org.http4k.ai.mcp.PromptHandler
+import org.http4k.ai.mcp.ResourceHandler
+import org.http4k.ai.mcp.ToolHandler
+import org.http4k.ai.mcp.model.Prompt
+import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.server.capability.CapabilityPack
+import org.http4k.ai.mcp.server.capability.CompletionCapability
+import org.http4k.ai.mcp.server.capability.PromptCapability
+import org.http4k.ai.mcp.server.capability.ResourceCapability
+import org.http4k.ai.mcp.server.capability.ServerCapability
+import org.http4k.ai.mcp.server.capability.ServerCompletions
+import org.http4k.ai.mcp.server.capability.ServerPrompts
+import org.http4k.ai.mcp.server.capability.ServerResources
+import org.http4k.ai.mcp.server.capability.ServerTools
+import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.ai.mcp.server.http.HttpNonStreamingMcp
+import org.http4k.ai.mcp.server.http.HttpStreamingMcp
+import org.http4k.ai.mcp.server.http.HttpStreamingSessions
+import org.http4k.ai.mcp.server.jsonrpc.JsonRpcMcp
+import org.http4k.ai.mcp.server.jsonrpc.JsonRpcSessions
+import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.server.security.McpSecurity
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.ai.mcp.server.sse.SseMcp
+import org.http4k.ai.mcp.server.sse.SseSessions
+import org.http4k.ai.mcp.server.stdio.StdIoMcpSessions
+import org.http4k.ai.mcp.server.websocket.WebsocketMcp
+import org.http4k.ai.mcp.server.websocket.WebsocketSessions
 import java.io.Reader
 import java.io.Writer
 import java.time.Duration.ZERO
@@ -105,7 +105,7 @@ fun mcpStdIo(
     executor: SimpleScheduler = SimpleSchedulerService(1)
 ) = McpProtocol(
     metadata,
-    StdIoMcpSessions(writer),
+    org.http4k.ai.mcp.server.stdio.StdIoMcpSessions(writer),
     ServerTools(capabilities.filterIsInstance<ToolCapability>()),
     ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
     ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),

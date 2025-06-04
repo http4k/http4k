@@ -11,11 +11,11 @@ import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.debug
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.security.NoMcpSecurity
-import org.http4k.mcp.server.security.OAuthMcpSecurity
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer

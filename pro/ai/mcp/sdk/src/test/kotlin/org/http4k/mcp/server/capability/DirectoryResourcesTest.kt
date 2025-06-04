@@ -1,4 +1,4 @@
-package org.http4k.mcp.server.capability
+package org.http4k.ai.mcp.server.capability
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -9,14 +9,14 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.mcp.Client.Companion.NoOp
-import org.http4k.mcp.model.Resource
-import org.http4k.mcp.model.ResourceName
-import org.http4k.mcp.model.ResourceUriTemplate
-import org.http4k.mcp.protocol.McpException
-import org.http4k.mcp.protocol.messages.McpResource
-import org.http4k.mcp.server.capability.RecursionMode.Flat
-import org.http4k.mcp.server.capability.RecursionMode.Recursive
+import org.http4k.ai.mcp.Client.Companion.NoOp
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.model.ResourceUriTemplate
+import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.server.capability.RecursionMode.Flat
+import org.http4k.ai.mcp.server.capability.RecursionMode.Recursive
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File

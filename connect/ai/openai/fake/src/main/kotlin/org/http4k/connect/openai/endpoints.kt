@@ -1,6 +1,7 @@
 package org.http4k.connect.openai
 
 import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ResponseId
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletion
@@ -169,7 +170,7 @@ private fun completionResponse(
     now: Instant,
     choices: List<Choice>
 ): CompletionResponse = CompletionResponse(
-    CompletionId.of(
+    ResponseId.of(
         UUID.nameUUIDFromBytes((request.bodyString() + "$it").toByteArray()).toString()
     ),
     Timestamp.of(now),

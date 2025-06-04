@@ -1,9 +1,9 @@
-package org.http4k.mcp.server.sessions
+package org.http4k.ai.mcp.server.sessions
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.mcp.protocol.SessionId
-import org.http4k.mcp.server.protocol.Session
+import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test

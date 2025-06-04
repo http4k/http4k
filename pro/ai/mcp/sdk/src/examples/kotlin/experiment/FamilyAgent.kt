@@ -1,16 +1,16 @@
 package experiment
 
-import org.http4k.mcp.CompletionRequest
-import org.http4k.mcp.CompletionResponse
-import org.http4k.mcp.ToolResponse
-import org.http4k.mcp.model.Content.Text
-import org.http4k.mcp.model.Reference
-import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.string
-import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.server.capability.CompletionCapability
-import org.http4k.mcp.server.capability.ToolCapability
-import org.http4k.mcp.server.security.NoMcpSecurity
+import org.http4k.ai.mcp.CompletionRequest
+import org.http4k.ai.mcp.CompletionResponse
+import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.Content.Text
+import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.string
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.server.capability.CompletionCapability
+import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
 import org.http4k.routing.mcpSse
 import org.http4k.server.JettyLoom

@@ -9,10 +9,10 @@ import org.http4k.events.AutoMarshallingEvents
 import org.http4k.events.EventFilters
 import org.http4k.events.then
 import org.http4k.format.Moshi
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.security.OAuthMcpSecurity
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.routing.mcpHttpStreaming
 import java.time.Clock
 import java.util.Random

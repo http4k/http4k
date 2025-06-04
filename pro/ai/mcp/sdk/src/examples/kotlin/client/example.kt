@@ -5,17 +5,17 @@ import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Uri
-import org.http4k.mcp.CompletionRequest
-import org.http4k.mcp.PromptRequest
-import org.http4k.mcp.ResourceRequest
-import org.http4k.mcp.ToolRequest
-import org.http4k.mcp.client.http.HttpStreamingMcpClient
-import org.http4k.mcp.model.CompletionArgument
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.model.PromptName
-import org.http4k.mcp.model.Reference
-import org.http4k.mcp.protocol.ClientCapabilities
-import org.http4k.mcp.protocol.Version
+import org.http4k.ai.mcp.CompletionRequest
+import org.http4k.ai.mcp.PromptRequest
+import org.http4k.ai.mcp.ResourceRequest
+import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
+import org.http4k.ai.mcp.model.CompletionArgument
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.model.PromptName
+import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.protocol.ClientCapabilities
+import org.http4k.ai.mcp.protocol.Version
 
 fun main() {
     val mcpClient = HttpStreamingMcpClient(

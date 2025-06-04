@@ -1,10 +1,10 @@
 package server.sse
 
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.ServerProtocolCapability
-import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.security.NoMcpSecurity
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.ServerProtocolCapability
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.mcpSse
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer

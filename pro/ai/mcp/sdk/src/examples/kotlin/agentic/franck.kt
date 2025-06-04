@@ -2,10 +2,10 @@ package agentic
 
 import agentic.tools.person.PersonToolPack
 import org.http4k.core.PolyHandler
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.ServerMetaData
-import org.http4k.mcp.protocol.Version
-import org.http4k.mcp.server.security.NoMcpSecurity
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.mcpHttpStreaming
 import java.time.DayOfWeek
 import java.time.LocalDate

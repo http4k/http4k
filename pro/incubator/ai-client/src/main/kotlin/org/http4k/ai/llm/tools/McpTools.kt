@@ -8,12 +8,12 @@ import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.llm.LLMError
 import org.http4k.ai.llm.LLMResult
 import org.http4k.ai.llm.model.Message.ToolResult
-import org.http4k.mcp.McpError.Internal
-import org.http4k.mcp.McpError.Protocol
-import org.http4k.mcp.ToolResponse.Error
-import org.http4k.mcp.ToolResponse.Ok
-import org.http4k.mcp.client.McpClient
-import org.http4k.mcp.model.Content
+import org.http4k.ai.mcp.McpError.Internal
+import org.http4k.ai.mcp.McpError.Protocol
+import org.http4k.ai.mcp.ToolResponse.Error
+import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.model.Content
 
 /**
  * Tools implementation for the MCP protocol.
@@ -24,7 +24,7 @@ class McpTools(private val client: McpClient) : Tools {
         .mapFailure { LLMError.Internal(java.lang.Exception(it.toString())) }
 
     override fun invoke(request: ToolRequest): LLMResult<ToolResponse> =
-        client.tools().call(request.name, org.http4k.mcp.ToolRequest(request.arguments))
+        client.tools().call(request.name, org.http4k.ai.mcp.ToolRequest(request.arguments))
             .flatMap {
                 when (it) {
                     is Ok -> when {

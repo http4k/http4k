@@ -17,9 +17,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.ai.llm.chat.ChatJson.auto
-import org.http4k.mcp.client.http.HttpStreamingMcpClient
-import org.http4k.mcp.model.McpEntity
-import org.http4k.mcp.protocol.Version
+import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind

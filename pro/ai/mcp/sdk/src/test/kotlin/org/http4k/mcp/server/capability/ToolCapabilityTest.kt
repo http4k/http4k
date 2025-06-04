@@ -1,11 +1,11 @@
-package org.http4k.mcp.server.capability
+package org.http4k.ai.mcp.server.capability
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.mcp.model.Tool
-import org.http4k.mcp.model.enum
-import org.http4k.mcp.model.int
-import org.http4k.mcp.model.string
-import org.http4k.mcp.util.McpJson.asFormatString
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.enum
+import org.http4k.ai.mcp.model.int
+import org.http4k.ai.mcp.model.string
+import org.http4k.ai.mcp.util.McpJson.asFormatString
 import org.http4k.security.ResponseType
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
