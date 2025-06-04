@@ -11,7 +11,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-ai-llm"))
-    api(project(":http4k-mcp-sdk"))
+    api(project(":http4k-ai-mcp-sdk"))
     api(project(":http4k-server-jetty"))
     api("se.ansman.kotshi:api:_")
 

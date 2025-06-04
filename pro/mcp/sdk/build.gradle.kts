@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Http4kCommercial
 
-description = "http4k MCP server SDK"
+description = "Deprecated: use http4k-ai-mcp-sdk instead"
 
 val license by project.extra { Http4kCommercial }
 
@@ -9,19 +9,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-mcp-core"))
-    api(project(":http4k-mcp-client"))
-    api(project(":http4k-security-oauth"))
-
-    testImplementation(project(":http4k-serverless-lambda"))
-    testImplementation(project(":http4k-client-websocket"))
-
-    testImplementation("org.jsoup:jsoup:_")
-    testImplementation("dev.forkhandles:fs4k")
-
-    testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation(project(":http4k-server-jetty"))
-    testImplementation(project(":http4k-config"))
-    testImplementation(project(":http4k-security-oauth"))
-    testImplementation(project(":http4k-testing-approval"))
+    api(project(":http4k-ai-mcp-sdk"))
 }
