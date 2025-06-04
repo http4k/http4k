@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Http4kCommercial
 
-description = "http4k MCP Client support"
+description = "http4k AI MCP Client support"
 
 val license by project.extra { Http4kCommercial }
 
