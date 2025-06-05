@@ -6,14 +6,14 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import org.http4k.ai.llm.LLMError
 import org.http4k.ai.llm.tools.ToolRequest
-import org.http4k.ai.llm.tools.Tools
+import org.http4k.ai.llm.tools.LLMTools
 
 /**
- * A composite of multiple [Tools] instances, which allows for invoking tools across multiple collections.
+ * A composite of multiple [LLMTools] instances, which allows for invoking tools across multiple collections.
  *
- * @property toolCollections The iterable of [Tools] instances to be composed.
+ * @property toolCollections The iterable of [LLMTools] instances to be composed.
  */
-class CompositeTools(private val toolCollections: Iterable<Tools>) : Tools {
+class CompositeLLMTools(private val toolCollections: Iterable<LLMTools>) : LLMTools {
     override fun list() = toolCollections.map { it.list() }.allValues().map { it.flatten() }
 
     override fun invoke(request: ToolRequest) = toolCollections

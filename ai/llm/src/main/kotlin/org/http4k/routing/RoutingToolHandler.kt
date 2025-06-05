@@ -6,9 +6,9 @@ import org.http4k.ai.llm.LLMError
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.tools.ToolHandler
 import org.http4k.ai.llm.tools.ToolRequest
-import org.http4k.ai.llm.tools.Tools
+import org.http4k.ai.llm.tools.LLMTools
 
-class RoutingToolHandler(private val tools: List<Pair<LLMTool, ToolHandler>>) : Tools,
+class RoutingToolHandler(private val tools: List<Pair<LLMTool, ToolHandler>>) : LLMTools,
     Iterable<Pair<LLMTool, ToolHandler>> by tools {
     private val byName = tools.map { it.first.name to it.second }.toMap()
 

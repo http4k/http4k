@@ -1,9 +1,6 @@
 package org.http4k.ai.mcp.testing
 
 import dev.forkhandles.result4k.map
-import org.http4k.core.Method.POST
-import org.http4k.core.PolyHandler
-import org.http4k.core.Request
 import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpEntity
@@ -19,13 +16,15 @@ import org.http4k.ai.mcp.testing.capabilities.TestingPrompts
 import org.http4k.ai.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.ai.mcp.testing.capabilities.TestingResources
 import org.http4k.ai.mcp.testing.capabilities.TestingSampling
-import org.http4k.ai.mcp.testing.capabilities.TestingTools
+import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
+import org.http4k.core.Request
 
 /**
  * Create an in-memory MCP test client - HTTP Streaming only. For Non-HTTP Streaming, use HttpNonStreamingMcpClient
  */
 fun PolyHandler.testMcpClient(connectRequest: Request = Request(POST, "/mcp")) =
-    org.http4k.ai.mcp.testing.TestMcpClient(this, connectRequest)
+    TestMcpClient(this, connectRequest)
 
 class TestMcpClient(poly: PolyHandler, connectRequest: Request) : McpClient {
 

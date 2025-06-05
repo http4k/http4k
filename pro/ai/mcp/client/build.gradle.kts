@@ -11,8 +11,12 @@ plugins {
 dependencies {
     api(project(":http4k-ai-mcp-core"))
     api(project(":http4k-security-oauth"))
-    
+
+    implementation(project(":http4k-ai-llm"))
+
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-ai-llm")))
+
     testImplementation(project(":http4k-ai-mcp-sdk"))
     testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-security-core"))

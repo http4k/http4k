@@ -16,5 +16,6 @@ dependencies {
     api("se.ansman.kotshi:api:_")
     ksp("se.ansman.kotshi:compiler:_")
 
+    testFixturesApi(project(":http4k-api-jsonrpc"))
     testFixturesApi(project(":http4k-connect-storage-core"))
 }

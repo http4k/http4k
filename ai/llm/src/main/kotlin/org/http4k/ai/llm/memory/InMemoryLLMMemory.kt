@@ -2,8 +2,6 @@ package org.http4k.ai.llm.memory
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.ai.llm.LLMError
-import org.http4k.ai.llm.LLMError.Internal
 import org.http4k.ai.llm.LLMError.NotFound
 import org.http4k.ai.llm.LLMResult
 import org.http4k.ai.llm.model.Message

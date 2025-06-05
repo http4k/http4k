@@ -10,4 +10,6 @@ sealed interface LLMError {
     data object NotFound : LLMError
 
     data class Internal(val cause: Exception) : LLMError
+
+    data class Custom<T>(val error: T) : LLMError
 }
