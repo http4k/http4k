@@ -20,13 +20,13 @@ import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.ModelParams
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.tools.ToolResponse
-import org.http4k.ai.llm.tools.Tools
+import org.http4k.ai.llm.tools.LLMTools
 import org.http4k.ai.model.ToolName
 
 class ChatSessionStateMachine(
     private val llm: Chat,
     private val memory: LLMMemory,
-    private val tools: Tools,
+    private val tools: LLMTools,
     private val chatParams: (List<LLMTool>) -> ModelParams
 ) {
     private var state: ChatSessionState = WaitingForInput

@@ -8,7 +8,7 @@ import org.http4k.ai.llm.chat.ChatSessionStateMachine
 import org.http4k.ai.llm.memory.InMemory
 import org.http4k.ai.llm.memory.LLMMemory
 import org.http4k.ai.llm.model.ModelParams
-import org.http4k.ai.llm.tools.McpTools
+import org.http4k.ai.llm.tools.McpLLMTools
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -40,7 +40,7 @@ fun Chatzilla(url: Uri): RoutingHttpHandler {
     val stateMachine = ChatSessionStateMachine(
         AChatLLM(),
         LLMMemory.InMemory(),
-        McpTools(client)
+        McpLLMTools(client)
     ) { ModelParams(tools = it) }.start()
     val handler = ChatSessionHandler(stateMachine)
 
