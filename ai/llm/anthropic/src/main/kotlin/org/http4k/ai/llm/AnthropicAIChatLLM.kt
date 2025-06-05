@@ -17,6 +17,7 @@ import org.http4k.connect.anthropic.AnthropicIApiKey
 import org.http4k.connect.anthropic.ApiVersion
 import org.http4k.connect.anthropic.Http
 import org.http4k.connect.anthropic.ToolChoice
+import org.http4k.connect.anthropic.action.Content
 import org.http4k.connect.anthropic.action.Metadata
 import org.http4k.connect.anthropic.action.Tool
 import org.http4k.connect.anthropic.messageCompletion
@@ -32,23 +33,36 @@ fun AnthropicAIChatLLM(
     systemPrompt: SystemPrompt? = null,
 ) = object : Chat {
     private val client = AnthropicAI.Http(apiKey, apiVersion, http)
-    override fun invoke(request: ChatRequest) = client.messageCompletion(
-        request.params.modelName,
-        UserPrompt.of(""),
-        request.params.maxOutputTokens ?: MaxTokens.of(MAX_VALUE),
-        metadata,
-        request.params.stopSequences,
-        systemPrompt,
-        request.params.temperature,
-        request.params.toolSelection?.toLLM(),
-        request.params.tools.map { it.toAnthropic() },
-        request.params.topK,
-        request.params.topP
-    )
-        .map {
-            TODO()
+    override fun invoke(request: ChatRequest) =
+        with(request) {
+            request.messages
+            client.messageCompletion(
+                params.modelName,
+                UserPrompt.of(""),
+                params.maxOutputTokens ?: MaxTokens.of(MAX_VALUE),
+                metadata,
+                params.stopSequences,
+                systemPrompt,
+                params.temperature,
+                params.toolSelection?.toLLM(),
+                params.tools.map { it.toAnthropic() },
+                params.topK,
+                params.topP
+            )
+                .map {
+                    it.content.map {
+                        it.toLLM()
+                    }
+                    TODO()
+                }
+                .mapFailure { Http(Response(it.status).body(it.message ?: "")) }
+
         }
-        .mapFailure { Http(Response(it.status).body(it.message ?: "")) }
+}
+
+private fun Content.toLLM(): org.http4k.ai.llm.model.Message {
+    org.http4k.ai.llm.model.Message.Assistant()
+    TODO("Not yet implemented")
 }
 
 private fun ToolSelection.toLLM() = when (this) {
