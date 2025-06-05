@@ -7,6 +7,7 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.failureOrNull
 import org.http4k.ai.llm.LLMError.NotFound
 import org.http4k.ai.llm.LLMError
+import org.http4k.ai.llm.LLMError
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ToolName
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
