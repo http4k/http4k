@@ -14,13 +14,13 @@ import org.http4k.ai.mcp.McpError.Protocol
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content
-import org.http4k.ai.mcp.ToolResponse.Error
 
 fun McpError.toLLM(): LLMError = when (this) {
     is McpError.Http -> Http(response)
     is McpError.Internal -> Internal(cause)
     is Protocol -> Custom(error)
     is McpError.Protocol -> Custom(error)
+    is Protocol -> Custom(error)
     McpError.Timeout -> Timeout
 }
 
@@ -28,6 +28,8 @@ fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
     is Ok -> Success(
         ToolResponse(
     is Ok -> Success(ToolResponse(
+    is Ok -> Success(
+        ToolResponse(
         (content ?: emptyList())
         .filterIsInstance<Content.Text>()
         .map { ToolResult(request.id, request.name, it.text) }
@@ -36,4 +38,6 @@ fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
 
     is Error -> Failure(Protocol(error).toLLM())
     is Error -> Failure(McpError.Protocol(error).toLLM())
+
+    is Error -> Failure(Protocol(error).toLLM())
 }
