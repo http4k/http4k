@@ -6,7 +6,7 @@ import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Temperature
 
 data class ModelParams(
-    val modelName: ModelName? = null,
+    val modelName: ModelName,
     val temperature: Temperature? = null,
     val stopSequences: List<String> = emptyList(),
     val maxOutputTokens: MaxTokens? = null,
