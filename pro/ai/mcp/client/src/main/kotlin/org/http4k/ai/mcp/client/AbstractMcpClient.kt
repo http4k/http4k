@@ -47,7 +47,7 @@ import kotlin.random.Random
 abstract class AbstractMcpClient(
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
-    private val protocolVersion: ProtocolVersion = LATEST_VERSION,
+    protected val protocolVersion: ProtocolVersion = LATEST_VERSION,
     private val defaultTimeout: Duration,
     private val random: Random
 ) : McpClient {

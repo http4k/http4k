@@ -7,19 +7,14 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
-import org.http4k.core.Request
-import org.http4k.core.with
-import org.http4k.format.renderRequest
-import org.http4k.format.renderResult
-import org.http4k.ai.mcp.client.AbstractMcpClient
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Internal
 import org.http4k.ai.mcp.McpError.Timeout
+import org.http4k.ai.mcp.client.AbstractMcpClient
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
-import org.http4k.ai.mcp.protocol.MCP_PROTOCOL_VERSION
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.Version
@@ -28,6 +23,12 @@ import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
+import org.http4k.core.with
+import org.http4k.format.renderRequest
+import org.http4k.format.renderResult
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.WebsocketFactory
@@ -57,7 +58,7 @@ class WebsocketMcpClient(
     private val wsClient by lazy {
         websocketFactory.blocking(
             wsRequest.uri,
-            wsRequest.with(MCP_PROTOCOL_VERSION of protocolVersion).headers
+            wsRequest.with(Header.MCP_PROTOCOL_VERSION of protocolVersion).headers
         )
     }
 

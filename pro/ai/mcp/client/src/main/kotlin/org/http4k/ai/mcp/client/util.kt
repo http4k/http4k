@@ -17,10 +17,14 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.lens.contentType
 import org.http4k.ai.mcp.McpError.Protocol
 import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.sse.SseMessage.Event
 
 internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, Protocol> = with(McpJson) {
@@ -38,9 +42,10 @@ internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, 
     }
 }
 
-internal fun ClientMessage.toHttpRequest(endpoint: Uri, rpc: McpRpc, messageId: McpMessageId? = null) =
+internal fun ClientMessage.toHttpRequest(protocolVersion: ProtocolVersion, endpoint: Uri, rpc: McpRpc, messageId: McpMessageId? = null) =
     Request(POST, endpoint)
         .contentType(APPLICATION_JSON)
+        .with(Header.MCP_PROTOCOL_VERSION of protocolVersion)
         .body(with(McpJson) {
             val params = asJsonObject(this@toHttpRequest)
             val id = messageId?.let { asJsonObject(it) } ?: nullNode()

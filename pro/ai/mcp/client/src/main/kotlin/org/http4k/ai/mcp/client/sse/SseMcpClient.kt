@@ -4,6 +4,22 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.resultFrom
 import dev.forkhandles.result4k.valueOrNull
+import org.http4k.ai.mcp.McpError.Http
+import org.http4k.ai.mcp.McpError.Timeout
+import org.http4k.ai.mcp.McpResult
+import org.http4k.ai.mcp.client.AbstractMcpClient
+import org.http4k.ai.mcp.client.toHttpRequest
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.protocol.ClientCapabilities
+import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
+import org.http4k.ai.mcp.protocol.ProtocolVersion
+import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.messages.ClientMessage
+import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
@@ -13,23 +29,8 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters.SetHostFrom
-import org.http4k.ai.mcp.client.AbstractMcpClient
-import org.http4k.ai.mcp.McpError.Http
-import org.http4k.ai.mcp.McpError.Timeout
-import org.http4k.ai.mcp.McpResult
-import org.http4k.ai.mcp.client.toHttpRequest
-import org.http4k.ai.mcp.model.McpEntity
-import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.ClientCapabilities
-import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
-import org.http4k.ai.mcp.protocol.MCP_PROTOCOL_VERSION
-import org.http4k.ai.mcp.protocol.ProtocolVersion
-import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
-import org.http4k.ai.mcp.protocol.messages.McpRpc
-import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -56,7 +57,7 @@ class SseMcpClient(
 
     private val endpoint = AtomicReference<String>()
 
-    private val sseClient = Http4kSseClient(sseRequest.with(MCP_PROTOCOL_VERSION of protocolVersion), http)
+    private val sseClient = Http4kSseClient(sseRequest.with(Header.MCP_PROTOCOL_VERSION of protocolVersion), http)
 
     override fun received() = sseClient.received()
 
@@ -65,7 +66,7 @@ class SseMcpClient(
     }
 
     override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit> {
-        val response = http(mcp.toHttpRequest(Uri.of(endpoint.get()), rpc))
+        val response = http(mcp.toHttpRequest(protocolVersion, Uri.of(endpoint.get()), rpc))
         return when {
             response.status.successful -> Success(Unit)
             else -> Failure(Http(response))
@@ -85,7 +86,7 @@ class SseMcpClient(
 
         if (messageQueues[messageId] == null) messageQueues[messageId] = LinkedBlockingQueue()
 
-        val response = http(message.toHttpRequest(Uri.of(endpoint.get()), rpc, messageId))
+        val response = http(message.toHttpRequest(protocolVersion, Uri.of(endpoint.get()), rpc, messageId))
         return when {
             response.status.successful -> resultFrom {
                 if (!latch.await(timeout.toMillis(), MILLISECONDS)) error("Timeout waiting for init")

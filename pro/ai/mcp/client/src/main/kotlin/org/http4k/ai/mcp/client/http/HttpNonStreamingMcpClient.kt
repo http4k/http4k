@@ -3,13 +3,6 @@ package org.http4k.ai.mcp.client.http
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
-import org.http4k.ai.model.ToolName
-import org.http4k.client.JavaHttpClient
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.HttpHandler
-import org.http4k.core.Uri
-import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.lens.accept
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.McpError.Http
@@ -27,6 +20,8 @@ import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.protocol.ProtocolVersion
+import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
@@ -38,13 +33,24 @@ import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asFormatString
 import org.http4k.ai.mcp.util.McpJson.convert
+import org.http4k.ai.model.ToolName
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpHandler
+import org.http4k.core.Uri
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.accept
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 
 /**
  * JSON Rpc connection MCP client.
  */
-class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: HttpHandler = JavaHttpClient()) :
+class HttpNonStreamingMcpClient(
+    private val baseUri: Uri,
+    private val http: HttpHandler = JavaHttpClient(),
+    private val protocolVersion: ProtocolVersion = LATEST_VERSION,
+) :
     McpClient {
 
     override fun start() = Success(ServerCapabilities())
@@ -141,7 +147,7 @@ class HttpNonStreamingMcpClient(private val baseUri: Uri, private val http: Http
     override fun close() {}
 
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
-        val response = this(message.toHttpRequest(baseUri, rpc).accept(APPLICATION_JSON))
+        val response = this(message.toHttpRequest(protocolVersion, baseUri, rpc).accept(APPLICATION_JSON))
 
         return when {
             response.status.successful -> Event("message", response.bodyString()).asAOrFailure<T>()

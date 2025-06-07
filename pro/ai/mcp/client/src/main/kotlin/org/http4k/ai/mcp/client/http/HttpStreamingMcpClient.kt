@@ -6,25 +6,6 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
-import org.http4k.ai.model.ToolName
-import org.http4k.client.Http4kSseClient
-import org.http4k.client.JavaHttpClient
-import org.http4k.client.ReconnectionMode
-import org.http4k.client.ReconnectionMode.Immediate
-import org.http4k.client.chunkedSseSequence
-import org.http4k.core.BodyMode.Stream
-import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Uri
-import org.http4k.core.with
-import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.lens.Header
-import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.lens.accept
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationHandler
@@ -73,6 +54,26 @@ import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asA
 import org.http4k.ai.mcp.util.McpJson.compact
+import org.http4k.ai.model.ToolName
+import org.http4k.client.Http4kSseClient
+import org.http4k.client.JavaHttpClient
+import org.http4k.client.ReconnectionMode
+import org.http4k.client.ReconnectionMode.Immediate
+import org.http4k.client.chunkedSseSequence
+import org.http4k.core.BodyMode.Stream
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.format.MoshiObject
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_PROTOCOL_VERSION
+import org.http4k.lens.MCP_SESSION_ID
+import org.http4k.lens.accept
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
@@ -107,7 +108,8 @@ class HttpStreamingMcpClient(
             thread(isDaemon = true) {
                 Http4kSseClient(
                     Request(GET, baseUri)
-                        .with(Header.MCP_SESSION_ID of sessionId.get()),
+                        .with(Header.MCP_SESSION_ID of sessionId.get())
+                        .with(Header.MCP_PROTOCOL_VERSION of protocolVersion),
                     http, notificationSseReconnectionMode, System.err::println
                 )
                     .received()
@@ -323,7 +325,7 @@ class HttpStreamingMcpClient(
         messageId: McpMessageId? = null
     ): McpResult<Sequence<Event>> {
         val response = this(
-            message.toHttpRequest(baseUri, rpc, messageId)
+            message.toHttpRequest(protocolVersion, baseUri, rpc, messageId)
                 .accept(TEXT_EVENT_STREAM)
                 .with(Header.MCP_SESSION_ID of sessionId.get())
         )
