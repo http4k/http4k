@@ -24,7 +24,7 @@ class AChatLLM : Chat {
                 ChatResponse(
                     Assistant(
                         null, listOf(
-                            ToolRequest(RequestId.of("1"), request.params!!.tools[0].name, mapOf("name" to "Bob"))
+                            ToolRequest(RequestId.of("tool-1"), request.params!!.tools[0].name, mapOf("name" to "Bob"))
                         )
                     ),
                     Metadata(ResponseId.of("1"), ModelName.of("foo"))
@@ -38,8 +38,8 @@ class AChatLLM : Chat {
                             Assistant(
                                 null, listOf(
                                     ToolRequest(
-                                        RequestId.of("2"),
-                                        request.params!!.tools[1].name,
+                                        RequestId.of("tool-2"),
+                                        request.params.tools[1].name,
                                         mapOf("name" to lastMessage.text)
                                     )
                                 )

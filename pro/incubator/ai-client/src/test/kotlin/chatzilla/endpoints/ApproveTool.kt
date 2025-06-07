@@ -4,6 +4,8 @@ import chatzilla.ChatHistory
 import org.http4k.ai.llm.chat.ChatJson.datastarModel
 import org.http4k.ai.llm.chat.ChatSessionHandler
 import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
+import org.http4k.ai.llm.chat.ChatSessionState.Processing
+import org.http4k.ai.llm.chat.ChatSessionState.Responding
 import org.http4k.ai.model.RequestId
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
@@ -19,6 +21,7 @@ data class ToolApproval(val id: RequestId)
 fun ApproveTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handler: ChatSessionHandler) =
     "/approve" bind POST to {
         val approval = it.datastarModel<ToolApproval>()
+        println(approval)
         val response = Response(OK).datastarFragments(
             renderer(history.addToolApproved(approval.id)),
             selector = Selector.of("#" + approval.id)
@@ -27,6 +30,18 @@ fun ApproveTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handle
         when (val newState = handler.onToolApprove()) {
             is AwaitingApproval -> response.datastarFragments(
                 renderer(history.addToolConsent(newState.pendingTools.first())),
+                append,
+                Selector.of("#chat-container")
+            )
+
+            is Processing -> response.datastarFragments(
+                renderer(history.addAi(newState.message)),
+                append,
+                Selector.of("#chat-container")
+            )
+
+            is Responding -> response.datastarFragments(
+                renderer(history.addAi(newState.response.message.text ?: "")),
                 append,
                 Selector.of("#chat-container")
             )
