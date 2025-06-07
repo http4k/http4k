@@ -10,12 +10,24 @@ class ChatSessionHandler(private val stateMachine: ChatSessionStateMachine) {
     fun onUserMessage(message: String) = stateMachine(UserInput(message))
 
     fun onToolApprove(toolName: ToolName) = when (val currentState = stateMachine.currentState()) {
-        is AwaitingApproval -> stateMachine(ToolApproved(currentState.pendingTools.first { it.name == toolName }))
+        is AwaitingApproval -> {
+            val toolRequest = currentState.pendingTools.find { it.name == toolName }
+            when(toolRequest) {
+                null -> currentState
+                else -> stateMachine(ToolApproved(toolRequest))
+            }
+        }
         else -> currentState
     }
 
     fun onToolReject(toolName: ToolName) = when (val currentState = stateMachine.currentState()) {
-        is AwaitingApproval -> stateMachine(ToolRejected(currentState.pendingTools.first { it.name == toolName }))
+        is AwaitingApproval ->  {
+            val toolRequest = currentState.pendingTools.find { it.name == toolName }
+            when(toolRequest) {
+                null -> currentState
+                else -> stateMachine(ToolRejected(toolRequest))
+            }
+        }
         else -> currentState
     }
 }
