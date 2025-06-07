@@ -20,6 +20,7 @@ data class ToolApproval(val id: RequestId)
 
 fun ApproveTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handler: ChatSessionHandler) =
     "/approve" bind POST to {
+        println("Approve tool request")
         val approval = it.datastarModel<ToolApproval>()
         println(approval)
         val response = Response(OK).datastarFragments(
@@ -28,24 +29,32 @@ fun ApproveTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handle
         )
 
         when (val newState = handler.onToolApprove()) {
-            is AwaitingApproval -> response.datastarFragments(
-                renderer(history.addToolConsent(newState.pendingTools.first())),
-                append,
-                Selector.of("#chat-container")
-            )
+            is AwaitingApproval -> {
+                response.datastarFragments(
+                    renderer(history.addToolConsent(newState.pendingTools.first())),
+                    append,
+                    Selector.of("#chat-container")
+                )
+            }
 
-            is Processing -> response.datastarFragments(
-                renderer(history.addAi(newState.message)),
-                append,
-                Selector.of("#chat-container")
-            )
+            is Processing -> {
+                response.datastarFragments(
+                    renderer(history.addAi(newState.message)),
+                    append,
+                    Selector.of("#chat-container")
+                )
+            }
 
-            is Responding -> response.datastarFragments(
-                renderer(history.addAi(newState.response.message.text ?: "")),
-                append,
-                Selector.of("#chat-container")
-            )
+            is Responding -> {
+                response.datastarFragments(
+                    renderer(history.addAi(newState.response.message.text ?: "")),
+                    append,
+                    Selector.of("#chat-container")
+                )
+            }
 
-            else -> response
+            else -> {
+                response
+            }
         }
     }

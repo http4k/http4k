@@ -1,4 +1,5 @@
-<div id="{{request.id}}" class="tool-approval">
+<div id="{{request.id}}" class="tool-approval"
+     data-signals="{id: '{{request.id}}', toolName: '{{request.name}}'}">
     <span>Approve tool for use? <b>{{request.name}}</b></span>
     <pre>{{request.arguments}}</pre>
     <input type="hidden" value="{{request.id}}" data-bind="id"/>
