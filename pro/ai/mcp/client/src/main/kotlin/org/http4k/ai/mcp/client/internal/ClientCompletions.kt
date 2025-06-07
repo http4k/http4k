@@ -16,12 +16,12 @@ internal class ClientCompletions(
     private val queueFor: (McpMessageId) -> Iterable<McpNodeType>,
     private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
-    private val sender: org.http4k.ai.mcp.client.internal.McpRpcSender,
+    private val sender: McpRpcSender,
     private val random: Random
 ) : McpClient.Completions {
     override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
         sender(
-            McpCompletion, McpCompletion.Request(ref, request.argument, request.meta),
+            McpCompletion, McpCompletion.Request(ref, request.argument, request.context, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
             McpMessageId.random(random)
         )

@@ -2,6 +2,7 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Completion
 import org.http4k.ai.mcp.model.CompletionArgument
+import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.McpRpcMethod
@@ -14,6 +15,7 @@ object McpCompletion : McpRpc {
     data class Request(
         val ref: Reference,
         val argument: CompletionArgument,
+        val context: CompletionContext = CompletionContext(),
         override val _meta: Meta = Meta.default
     ) : ClientMessage.Request, HasMeta
 

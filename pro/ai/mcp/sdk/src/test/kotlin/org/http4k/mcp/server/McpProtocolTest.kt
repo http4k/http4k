@@ -2,32 +2,6 @@ package org.http4k.ai.mcp.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.model.MaxTokens
-import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
-import org.http4k.ai.model.Role
-import org.http4k.ai.model.Role.Companion.Assistant
-import org.http4k.ai.model.ToolName
-import org.http4k.connect.model.MimeType
-import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
-import org.http4k.core.PolyHandler
-import org.http4k.core.Request
-import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.format.MoshiInteger
-import org.http4k.format.MoshiString
-import org.http4k.format.renderError
-import org.http4k.format.renderRequest
-import org.http4k.format.renderResult
-import org.http4k.hamkrest.hasStatus
-import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
-import org.http4k.lens.int
-import org.http4k.lens.with
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceResponse
@@ -35,6 +9,7 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Annotations
 import org.http4k.ai.mcp.model.Completion
 import org.http4k.ai.mcp.model.CompletionArgument
+import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.McpEntity
@@ -93,6 +68,32 @@ import org.http4k.ai.mcp.server.sse.SseSessions
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.auto
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.ToolName
+import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MimeType
+import org.http4k.connect.model.MimeType.Companion.IMAGE_GIF
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
+import org.http4k.format.MoshiInteger
+import org.http4k.format.MoshiString
+import org.http4k.format.renderError
+import org.http4k.format.renderRequest
+import org.http4k.format.renderResult
+import org.http4k.hamkrest.hasStatus
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.lens.int
+import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
 import org.http4k.sse.SseEventId
@@ -556,7 +557,11 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpCompletion,
-                McpCompletion.Request(ref, CompletionArgument("arg", "value"), Meta(progressToken))
+                McpCompletion.Request(
+                    ref, CompletionArgument("arg", "value"),
+                    CompletionContext(mapOf("foo" to "bar")),
+                    Meta(progressToken)
+                )
             )
 
             assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
