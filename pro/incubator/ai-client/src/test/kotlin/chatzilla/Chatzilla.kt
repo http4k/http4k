@@ -20,6 +20,7 @@ import org.http4k.ai.llm.chat.ChatJson.auto
 import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.model.ModelName
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
@@ -41,7 +42,7 @@ fun Chatzilla(url: Uri): RoutingHttpHandler {
         AChatLLM(),
         LLMMemory.InMemory(),
         McpLLMTools(client)
-    ) { ModelParams(tools = it) }.start()
+    ) { ModelParams(ModelName.of("hello"), tools = it) }.start()
     val handler = ChatSessionHandler(stateMachine)
 
     return routes(
