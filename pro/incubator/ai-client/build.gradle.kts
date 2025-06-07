@@ -13,6 +13,10 @@ dependencies {
     api(project(":http4k-ai-llm"))
     api(project(":http4k-ai-mcp-sdk"))
     api(project(":http4k-server-jetty"))
+    api(project(":http4k-web-datastar"))
+    api(project(":http4k-template-handlebars"))
+    api("org.jetbrains.kotlin:kotlin-reflect:_")
+
     api("se.ansman.kotshi:api:_")
 
     ksp("se.ansman.kotshi:compiler:_")

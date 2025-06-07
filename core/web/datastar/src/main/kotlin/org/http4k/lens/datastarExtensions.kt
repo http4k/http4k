@@ -4,6 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.Companion.from
@@ -100,9 +101,10 @@ fun Response.datastarFragments(
 )
 
 /**
- * Inject a Datastar Event into a response
+ * Inject a Datastar Event into a response. Appends the event to the existing body of the response
  */
-fun Response.datastarFragments(event: MergeFragments) = with(Body.datastarEvents().toLens() of listOf(event))
+fun Response.datastarFragments(event: MergeFragments) =
+    body(bodyString() + Response(OK).with(Body.datastarEvents().toLens() of listOf(event)).bodyString())
 
 /**
  * Inject a Datastar MergeFragments event into a Response as a Datastar event

@@ -1,0 +1,6 @@
+<div id="message-form">
+    <label for="message"></label>
+    <input id="message" class="message-input" type="text" value="" data-bind="message" ,
+           placeholder="Type your message here..."/>
+    <button id="send" data-on-click="@post('/message')">Send</button>
+</div>
