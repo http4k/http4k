@@ -1,6 +1,6 @@
-<div id="message-form">
+<div id="message-form" data-signals="{}">
     <label for="message"></label>
-    <input id="message" class="message-input" type="text" value="" data-bind="message" ,
+    <input id="message" class="message-input" type="text" value="" data-bind="message"
            placeholder="Type your message here..."/>
-    <button id="send" data-on-click="@post('/message')">Send</button>
+    <button id="send" data-on-click="@post('/message')" data-indicator-fetching>Send</button>
 </div>

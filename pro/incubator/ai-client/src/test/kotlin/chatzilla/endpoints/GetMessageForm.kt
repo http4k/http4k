@@ -12,3 +12,5 @@ fun GetMessageForm(renderer: DatastarFragmentRenderer) =
     "/message" bind GET to { Response(OK).datastarFragments(renderer(MessageForm)) }
 
 data object MessageForm : ViewModel
+
+data object DisabledMessageForm : ViewModel
