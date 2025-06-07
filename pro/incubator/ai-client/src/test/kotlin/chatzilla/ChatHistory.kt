@@ -10,7 +10,7 @@ import org.http4k.ai.model.RequestId
 import org.http4k.template.ViewModel
 
 class ChatHistory(welcomeMessage: String) {
-    private val _content = mutableListOf<HistoryContent>(Ai("-1", welcomeMessage))
+    private val _content = mutableListOf<HistoryContent>(Ai("0", welcomeMessage))
 
     fun addUser(message: String) = User(_content.size.toString(), message).also(_content::add)
     fun addAi(message: String) = Ai(_content.size.toString(), message).also(_content::add)
