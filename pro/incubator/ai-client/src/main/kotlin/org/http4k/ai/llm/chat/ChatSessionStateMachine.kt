@@ -3,24 +3,19 @@ package org.http4k.ai.llm.chat
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
-import org.http4k.ai.llm.chat.ChatSessionEvent.End
-import org.http4k.ai.llm.chat.ChatSessionEvent.ProcessResponse
 import org.http4k.ai.llm.chat.ChatSessionEvent.ToolApproved
 import org.http4k.ai.llm.chat.ChatSessionEvent.ToolRejected
 import org.http4k.ai.llm.chat.ChatSessionEvent.UserInput
 import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
-import org.http4k.ai.llm.chat.ChatSessionState.Finished
-import org.http4k.ai.llm.chat.ChatSessionState.Processing
 import org.http4k.ai.llm.chat.ChatSessionState.Responding
-import org.http4k.ai.llm.chat.ChatSessionState.ToolInvocation
 import org.http4k.ai.llm.chat.ChatSessionState.WaitingForInput
 import org.http4k.ai.llm.memory.LLMMemory
 import org.http4k.ai.llm.memory.LLMMemoryId
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.ModelParams
 import org.http4k.ai.llm.tools.LLMTool
-import org.http4k.ai.llm.tools.ToolResponse
 import org.http4k.ai.llm.tools.LLMTools
+import org.http4k.ai.llm.tools.ToolResponse
 import org.http4k.ai.model.ToolName
 
 class ChatSessionStateMachine(
@@ -53,11 +48,6 @@ class ChatSessionStateMachine(
                 else -> currentState
             }
 
-            is Processing -> when (event) {
-                is ProcessResponse -> event.response.process()
-                else -> currentState
-            }
-
             is AwaitingApproval -> when (event) {
                 is ToolApproved -> {
                     val remaining = currentState.pendingTools.filter { it != event.toolRequest }
@@ -85,19 +75,14 @@ class ChatSessionStateMachine(
                 else -> currentState
             }
 
-            is ToolInvocation -> currentState
-
             is Responding -> when (event) {
                 is UserInput -> {
                     memory.add(memoryId, listOf(Message.User(event.message)))
                     processLLMResponse()
                 }
 
-                is End -> Finished
                 else -> WaitingForInput
             }
-
-            is Finished -> currentState
         }
 
         return state

@@ -6,6 +6,4 @@ sealed class ChatSessionEvent {
     data class UserInput(val message: String) : ChatSessionEvent()
     data class ToolApproved(val toolRequest: ToolRequest) : ChatSessionEvent()
     data class ToolRejected(val toolRequest: ToolRequest) : ChatSessionEvent()
-    data class ProcessResponse(val response: ChatResponse) : ChatSessionEvent()
-    data object End : ChatSessionEvent()
 }

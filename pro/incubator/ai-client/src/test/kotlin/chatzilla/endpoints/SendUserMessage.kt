@@ -5,7 +5,6 @@ import org.http4k.ai.llm.chat.ChatJson
 import org.http4k.ai.llm.chat.ChatJson.datastarModel
 import org.http4k.ai.llm.chat.ChatSessionHandler
 import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
-import org.http4k.ai.llm.chat.ChatSessionState.Processing
 import org.http4k.ai.llm.chat.ChatSessionState.Responding
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -29,12 +28,6 @@ fun SendUserMessage(history: ChatHistory, renderer: DatastarFragmentRenderer, ha
         when (val newState = handler.onUserMessage(message)) {
             is AwaitingApproval -> response.datastarFragments(
                 renderer(history.addToolConsent(newState.pendingTools.first())),
-                append,
-                Selector.of("#chat-container")
-            )
-
-            is Processing -> response.datastarFragments(
-                renderer(history.addAi(newState.message)),
                 append,
                 Selector.of("#chat-container")
             )

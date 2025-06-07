@@ -15,22 +15,10 @@ sealed class ChatSessionState {
     data object WaitingForInput : ChatSessionState()
 
     @JsonSerializable
-    @PolymorphicLabel("processing")
-    data class Processing(val message: String) : ChatSessionState()
-
-    @JsonSerializable
     @PolymorphicLabel("awaitingApproval")
     data class AwaitingApproval(val pendingTools: List<ToolRequest>) : ChatSessionState()
 
     @JsonSerializable
-    @PolymorphicLabel("toolInvocation")
-    data class ToolInvocation(val toolRequest: ToolRequest, val remainingTools: List<ToolRequest>) : ChatSessionState()
-
-    @JsonSerializable
     @PolymorphicLabel("responding")
     data class Responding(val response: ChatResponse) : ChatSessionState()
-
-    @JsonSerializable
-    @PolymorphicLabel("finished")
-    data object Finished : ChatSessionState()
 }
