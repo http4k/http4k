@@ -24,9 +24,6 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
-import org.http4k.core.Method.POST
-import org.http4k.core.PolyHandler
-import org.http4k.core.Request
 
 /**
  * Create an in-memory MCP test client - HTTP Streaming only. For Non-HTTP Streaming, use HttpNonStreamingMcpClient

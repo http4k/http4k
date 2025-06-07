@@ -4,9 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.failureOrNull
-import org.http4k.ai.llm.LLMError.NotFound
-import org.http4k.ai.llm.LLMError
 import org.http4k.ai.llm.LLMError
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ToolName
