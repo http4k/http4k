@@ -177,7 +177,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+            ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(listOf("1", "2"))
             })
         )

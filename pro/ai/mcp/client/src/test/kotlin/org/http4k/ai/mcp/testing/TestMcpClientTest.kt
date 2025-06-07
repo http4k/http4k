@@ -317,7 +317,7 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with completions`() {
-        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val serverCompletions = ServerCompletions(
             listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )
@@ -341,7 +341,7 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with progress`() {
-        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
 
         val progress = Progress("hello", 1, 1.0)
         val serverCompletions = ServerCompletions(

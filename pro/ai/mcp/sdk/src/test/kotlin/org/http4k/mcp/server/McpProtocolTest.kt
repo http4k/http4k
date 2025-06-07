@@ -528,7 +528,7 @@ class McpProtocolTest {
 
     @Test
     fun `deal with completions`() {
-        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind {
                 it.meta.progress?.let { _ ->
@@ -568,7 +568,7 @@ class McpProtocolTest {
 
     @Test
     fun `can handle batched messages`() {
-        val ref = Reference.Resource(Uri.of("https://www.http4k.org"))
+        val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
         )

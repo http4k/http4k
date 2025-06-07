@@ -35,7 +35,6 @@ import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.util.McpJson.auto
 import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
@@ -95,7 +94,7 @@ interface McpClientContract<T> : PortBasedTest {
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.Resource(Uri.of("https://http4k.org")) bind {
+            ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
                 CompletionResponse(listOf("1", "2"))
             }),
         )
@@ -140,7 +139,7 @@ interface McpClientContract<T> : PortBasedTest {
         assertThat(
             mcpClient.completions()
                 .complete(
-                    Reference.Resource(Uri.of("https://http4k.org")),
+                    Reference.ResourceTemplate(Uri.of("https://http4k.org")),
                     CompletionRequest(CompletionArgument("foo", "bar"))
                 ).valueOrNull()!!,
             equalTo(CompletionResponse(listOf("1", "2")))

@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.13.0.0
+- **http4k-mcp-core**: [Breaking] Rename Reference.Resource to Reference.ResourceTemplate.
+
 ### v6.12.0.0
 - **http4k-***: Repackaging modules into new http4k ecosystem `http4k-ai`
 - **http4k-ai-llm**: [New module!] Core abstractions for a unified LLM API, providing a functional interface for working with LLMs in true http4k style. :)
