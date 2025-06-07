@@ -12,13 +12,10 @@ import org.http4k.ai.llm.memory.InMemory
 import org.http4k.ai.llm.memory.LLMMemory
 import org.http4k.ai.llm.model.ModelParams
 import org.http4k.ai.llm.tools.McpLLMTools
-import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.RequestId
-import org.http4k.ai.model.ToolName
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -49,8 +46,8 @@ fun Chatzilla2(mcp: Uri): HttpHandler {
         routes(
             GetMessageForm(datastarRenderer),
             SendUserMessage(history, datastarRenderer, handler),
-            ApproveTool(history, datastarRenderer),
-            DenyTool(history, datastarRenderer),
+            ApproveTool(history, datastarRenderer, handler),
+            DenyTool(history, datastarRenderer, handler),
             GetHistory(history, renderer),
             Index(renderer),
             static(Classpath("public")),

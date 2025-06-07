@@ -7,7 +7,6 @@ import org.http4k.ai.llm.chat.ChatSessionHandler
 import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
 import org.http4k.ai.llm.chat.ChatSessionState.Processing
 import org.http4k.ai.llm.chat.ChatSessionState.Responding
-import org.http4k.ai.llm.chat.ChatSessionState.ToolInvocation
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -46,7 +45,6 @@ fun SendUserMessage(history: ChatHistory, renderer: DatastarFragmentRenderer, ha
                 Selector.of("#chat-container")
             )
 
-            is ToolInvocation -> response
             else -> response
         }
     }
