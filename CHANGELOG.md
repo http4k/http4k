@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.13.0.0
+- **http4k-***: Upgrade some dependency versions
 - **http4k-mcp-core**: [Breaking] Rename Reference.Resource to Reference.ResourceTemplate.
 
 ### v6.12.0.0
