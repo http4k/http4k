@@ -1,6 +1,6 @@
 package org.http4k.ai.llm.model
 
-import org.http4k.ai.llm.model.Content.Image.DetailLevel.LOW
+import org.http4k.ai.llm.model.Content.Image.DetailLevel.Low
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -15,8 +15,8 @@ sealed class Content {
 
     @JsonSerializable
     @PolymorphicLabel("image")
-    data class Image(val image: Resource, val detail: DetailLevel = LOW) : Content() {
-        enum class DetailLevel { LOW, HIGH, AUTO }
+    data class Image(val image: Resource, val detail: DetailLevel = Low) : Content() {
+        enum class DetailLevel { Low, High, Auto }
     }
 
     @JsonSerializable

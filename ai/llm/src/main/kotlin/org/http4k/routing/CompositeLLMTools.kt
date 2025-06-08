@@ -22,3 +22,5 @@ class CompositeLLMTools(private val toolCollections: Iterable<LLMTools>) : LLMTo
         .map { it.flatten().toMap()[request.name] }
         .flatMap { if (it == null) Failure(LLMError.NotFound) else it(request) }
 }
+
+operator fun LLMTools.plus(that: LLMTools): LLMTools = CompositeLLMTools(listOf(this, that))

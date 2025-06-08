@@ -17,11 +17,14 @@ sealed class Message {
 
     @JsonSerializable
     @PolymorphicLabel("user")
-    data class User(val name: String? = null, val contents: List<Content> = emptyList()) : Message()
+    data class User(val contents: List<Content> = emptyList()) : Message() {
+        constructor(message: String) : this(listOf(Content.Text(message)))
+    }
 
     @JsonSerializable
     @PolymorphicLabel("assistant")
-    data class Assistant(val text: String? = null, val toolRequests: List<ToolRequest> = emptyList()) : Message()
+    data class Assistant(val contents: List<Content> = emptyList(), val toolRequests: List<ToolRequest> = emptyList()) :
+        Message()
 
     @JsonSerializable
     @PolymorphicLabel("tool")

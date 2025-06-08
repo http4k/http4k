@@ -7,6 +7,7 @@ import org.http4k.ai.llm.LLMError
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.toLLM
 import org.http4k.ai.mcp.toLLM
@@ -20,7 +21,7 @@ class McpLLMTools(private val client: McpClient) : LLMTools {
         .mapFailure { LLMError.Internal(java.lang.Exception(it.toString())) }
 
     override fun invoke(request: ToolRequest) =
-        client.tools().call(request.name, org.http4k.ai.mcp.ToolRequest(request.arguments))
+        client.tools().call(request.name, org.http4k.ai.mcp.ToolRequest(request.arguments, meta = Meta(request.id.value)))
             .mapFailure { it.toLLM() }
             .flatMap {
                 when (it) {

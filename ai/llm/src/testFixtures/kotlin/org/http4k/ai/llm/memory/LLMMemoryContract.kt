@@ -19,9 +19,9 @@ interface LLMMemoryContract {
 
     @Test
     fun `lifecycle of memory`() {
-        val user = Message.User("bob", listOf(Content.Text("hello")))
+        val user = Message.User(listOf(Content.Text("hello")))
         val assistant = Message.Assistant(
-            "assistant",
+            listOf(Content.Text("assistant")),
             listOf(ToolRequest(RequestId.of("1"), ToolName.of("tool"), mapOf("arg" to "value")))
         )
 

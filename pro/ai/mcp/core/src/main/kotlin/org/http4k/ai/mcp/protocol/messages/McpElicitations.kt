@@ -14,12 +14,12 @@ object McpElicitations : McpRpc {
         val message: String,
         val requestedSchema: McpNodeType,
         override val _meta: Meta = Meta.default
-    ) : ServerMessage.Request, ClientMessage.Request, HasMeta
+    ) : ServerMessage.Request, HasMeta
 
     @JsonSerializable
     data class Response(
         val action: ElicitationAction,
         val content: McpNodeType,
         override val _meta: Meta = Meta.default
-    ) : ServerMessage.Response, ClientMessage.Response, HasMeta
+    ) : ClientMessage.Response, HasMeta
 }

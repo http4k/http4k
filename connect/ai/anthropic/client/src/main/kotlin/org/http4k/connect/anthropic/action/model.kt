@@ -31,7 +31,7 @@ sealed class Content {
 
     @JsonSerializable
     @PolymorphicLabel("tool_use")
-    data class ToolUse(val name: ToolName, val id: ToolUseId, val input: Any) : Content()
+    data class ToolUse(val name: ToolName, val id: ToolUseId, val input: Map<String, Any>) : Content()
 
     @JsonSerializable
     @PolymorphicLabel("tool_result")

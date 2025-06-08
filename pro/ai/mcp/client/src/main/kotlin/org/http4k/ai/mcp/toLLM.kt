@@ -25,10 +25,10 @@ fun McpError.toLLM(): LLMError = when (this) {
 fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
     is Ok -> Success(
         ToolResponse(
-        (content ?: emptyList())
-        .filterIsInstance<Content.Text>()
-        .map { ToolResult(request.id, request.name, it.text) }
-        .first())
+            (content ?: emptyList())
+                .filterIsInstance<Content.Text>()
+                .map { ToolResult(request.id, request.name, it.text) }
+                .first())
     )
 
     is Error -> Failure(Protocol(error).toLLM())

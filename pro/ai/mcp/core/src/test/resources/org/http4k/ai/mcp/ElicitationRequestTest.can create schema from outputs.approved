@@ -27,9 +27,25 @@
       "type": "number",
       "title": "title",
       "description": "description"
+    },
+    "enum": {
+      "enum": [
+        "Bar",
+        "Baz",
+        "Foo"
+      ],
+      "enumNames": [
+        "bar",
+        "baz",
+        "foo"
+      ],
+      "type": "string",
+      "title": "title",
+      "description": "description"
     }
   },
   "required": [
-    "reqStr"
+    "reqStr",
+    "enum"
   ]
 }

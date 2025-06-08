@@ -6,7 +6,5 @@ import org.http4k.ai.llm.model.ModelParams
 
 data class ChatRequest(val messages: List<Message>, val params: ModelParams) {
     constructor(message: Message.User, params: ModelParams) : this(listOf(message), params)
-    constructor(message: String, params: ModelParams) : this(
-        Message.User(null, listOf(Text(message))), params
-    )
+    constructor(message: String, params: ModelParams) : this(Message.User(listOf(Text(message))), params)
 }

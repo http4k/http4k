@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp
 
+import org.http4k.ai.mcp.Option.*
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.Elicitation.Metadata.integer.Max
@@ -9,6 +10,7 @@ import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MinLength
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.Pattern
 import org.http4k.ai.mcp.model.boolean
+import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.number
 import org.http4k.ai.mcp.model.string
@@ -44,8 +46,18 @@ class ElicitationRequestTest {
                 true,  "title", "description",
                 Elicitation.Metadata.boolean.Default(true)
             ),
-            Elicitation.number().optional("optNum", "title", "description")
+            Elicitation.number().optional("optNum", "title", "description"),
+            Elicitation.enum<Option>().required("enum", "title", "description",
+                Elicitation.Metadata.EnumNames(mapOf(
+                    Foo to "foo",
+                    Bar to "bar",
+                    Baz to "baz"
+                )))
         )
         approver.assertApproved(pretty(request.requestedSchema), APPLICATION_JSON)
     }
+}
+
+enum class Option {
+    Foo, Bar, Baz
 }
