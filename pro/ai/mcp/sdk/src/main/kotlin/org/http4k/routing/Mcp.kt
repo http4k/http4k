@@ -2,8 +2,6 @@ package org.http4k.routing
 
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
-import org.http4k.core.Method.POST
-import org.http4k.core.Request
 import org.http4k.ai.mcp.CompletionHandler
 import org.http4k.ai.mcp.PromptHandler
 import org.http4k.ai.mcp.ResourceHandler
@@ -32,12 +30,13 @@ import org.http4k.ai.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.security.McpSecurity
-import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sse.SseMcp
 import org.http4k.ai.mcp.server.sse.SseSessions
 import org.http4k.ai.mcp.server.stdio.StdIoMcpSessions
 import org.http4k.ai.mcp.server.websocket.WebsocketMcp
 import org.http4k.ai.mcp.server.websocket.WebsocketSessions
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
 import java.io.Reader
 import java.io.Writer
 import java.time.Duration.ZERO
@@ -105,19 +104,20 @@ fun mcpStdIo(
     executor: SimpleScheduler = SimpleSchedulerService(1)
 ) = McpProtocol(
     metadata,
-    org.http4k.ai.mcp.server.stdio.StdIoMcpSessions(writer),
+    StdIoMcpSessions(writer),
     ServerTools(capabilities.filterIsInstance<ToolCapability>()),
     ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
     ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),
     ServerCompletions(capabilities.filterIsInstance<CompletionCapability>()),
 ).apply {
-    executor.schedule({ reader.buffered().lineSequence().forEach { it: String ->
-        try {
-            receive(Unit, Session(SessionId.of(UUID(0, 0).toString())), Request(POST, "").body(it))
-        } catch (e: Exception) {
-            e.printStackTrace(System.err)
+    executor.schedule({
+        reader.buffered().lineSequence().forEach { it: String ->
+            try {
+                receive(Unit, Session(SessionId.of(UUID(0, 0).toString())), Request(POST, "").body(it))
+            } catch (e: Exception) {
+                e.printStackTrace(System.err)
+            }
         }
-    }
     }, ZERO)
 }
 
