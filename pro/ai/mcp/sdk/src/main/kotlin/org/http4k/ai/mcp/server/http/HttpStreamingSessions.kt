@@ -30,7 +30,7 @@ class HttpStreamingSessions(
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2)
-) : org.http4k.ai.mcp.server.protocol.Sessions<Sse> {
+) : Sessions<Sse> {
 
     private val clientConnections = ConcurrentHashMap<ClientRequestContext, Sse>()
 

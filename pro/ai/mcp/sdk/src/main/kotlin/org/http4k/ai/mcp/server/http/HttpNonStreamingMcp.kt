@@ -16,7 +16,7 @@ fun HttpNonStreamingMcp(mcpProtocol: McpProtocol<Sse>, security: McpSecurity, pa
     CatchAll()
         .then(CatchLensFailure())
         .then(routes(security.routes + HttpFilter(security).then(
-            org.http4k.ai.mcp.server.http.HttpNonStreamingMcpConnection(
+            HttpNonStreamingMcpConnection(
                 mcpProtocol,
                 path
             )

@@ -24,7 +24,7 @@ import kotlin.random.Random
 class WebsocketSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : org.http4k.ai.mcp.server.protocol.Sessions<Websocket> {
+) : Sessions<Websocket> {
 
     private val sessions = ConcurrentHashMap<Session, Websocket>()
 

@@ -60,7 +60,7 @@ import kotlin.random.Random
  */
 class McpProtocol<Transport>(
     internal val metaData: ServerMetaData,
-    private val sessions: org.http4k.ai.mcp.server.protocol.Sessions<Transport>,
+    private val sessions: Sessions<Transport>,
     private val tools: Tools = ServerTools(),
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = ServerPrompts(),
@@ -73,7 +73,7 @@ class McpProtocol<Transport>(
 ) {
     constructor(
         metaData: ServerMetaData,
-        sessions: org.http4k.ai.mcp.server.protocol.Sessions<Transport>,
+        sessions: Sessions<Transport>,
         vararg capabilities: ServerCapability
     ) : this(
         metaData,
@@ -264,7 +264,7 @@ class McpProtocol<Transport>(
                     sessions.assign(context, this, httpReq)
                     try {
                         fn(it,
-                            org.http4k.ai.mcp.server.protocol.SessionBasedClient(
+                            SessionBasedClient(
                                 progress,
                                 context,
                                 sessions,

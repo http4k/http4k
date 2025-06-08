@@ -9,15 +9,15 @@ import org.http4k.ai.mcp.util.McpNodeType
  * transport to session, and the sending of messages to the client.
  */
 interface Sessions<Transport> {
-    fun retrieveSession(connectRequest: Request): org.http4k.ai.mcp.server.protocol.SessionState
+    fun retrieveSession(connectRequest: Request): SessionState
 
-    fun respond(transport: Transport, session: org.http4k.ai.mcp.server.protocol.Session, message: McpNodeType): Result4k<McpNodeType, McpNodeType>
-    fun transportFor(context: org.http4k.ai.mcp.server.protocol.ClientRequestContext): Transport
-    fun onClose(context: org.http4k.ai.mcp.server.protocol.ClientRequestContext, fn: () -> Unit)
+    fun respond(transport: Transport, session: Session, message: McpNodeType): Result4k<McpNodeType, McpNodeType>
+    fun transportFor(context: ClientRequestContext): Transport
+    fun onClose(context: ClientRequestContext, fn: () -> Unit)
 
-    fun request(context: org.http4k.ai.mcp.server.protocol.ClientRequestContext, message: McpNodeType)
+    fun request(context: ClientRequestContext, message: McpNodeType)
 
-    fun assign(context: org.http4k.ai.mcp.server.protocol.ClientRequestContext, transport: Transport, connectRequest: Request)
-    fun end(context: org.http4k.ai.mcp.server.protocol.ClientRequestContext)
+    fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request)
+    fun end(context: ClientRequestContext)
 }
 

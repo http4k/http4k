@@ -25,7 +25,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
         POST to { req ->
             with(protocol) {
                 when (val session = retrieveSession(req)) {
-                    is Session -> receive(org.http4k.ai.mcp.server.http.FakeSse(req), session, req).asHttp()
+                    is Session -> receive(FakeSse(req), session, req).asHttp()
                     is InvalidSession -> Response(NOT_FOUND)
                 }
             }

@@ -23,7 +23,7 @@ class SseSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
-) : org.http4k.ai.mcp.server.protocol.Sessions<Sse> {
+) : Sessions<Sse> {
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
 

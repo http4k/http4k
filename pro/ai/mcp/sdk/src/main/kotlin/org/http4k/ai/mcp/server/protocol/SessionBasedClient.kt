@@ -30,10 +30,10 @@ import kotlin.random.Random
 
 class SessionBasedClient<Transport>(
     private val progressToken: ProgressToken,
-    private val context: org.http4k.ai.mcp.server.protocol.ClientRequestContext,
-    private val sessions: org.http4k.ai.mcp.server.protocol.Sessions<Transport>,
+    private val context: ClientRequestContext,
+    private val sessions: Sessions<Transport>,
     private val random: Random,
-    private val clientTracking: () -> org.http4k.ai.mcp.server.protocol.ClientTracking?
+    private val clientTracking: () -> ClientTracking?
 ) : Client {
 
     override fun elicit(request: ElicitationRequest, fetchNextTimeout: Duration?): McpResult<ElicitationResponse> {
