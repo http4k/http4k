@@ -1,5 +1,9 @@
 package chatzilla
 
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.result4k.valueOrNull
+import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Tool
@@ -20,6 +24,14 @@ val greetingTool = Tool("greeting", "greet a person by name", name)
 fun mcpServer(port: Int = 0) = mcpHttpStreaming(
     ServerMetaData(McpEntity.of("123"), Version.of("123")),
     NoMcpSecurity,
-    getFullNameTool bind { Ok("${name(it)} Smith") },
+    getFullNameTool bind {
+        val firstName = name(it)
+        System.err.println("SENDING ELICITATION FOR $it")
+        it.client.elicit(ElicitationRequest(it.meta.progress!!))
+            .map {
+                System.err.println("RESPONSE ELICITATION WAS $it")
+                Ok("$firstName '${it.action}' Smith")
+            }.valueOrNull()!!
+    },
     greetingTool bind { Ok("hello ${name(it)}") }
 ).asServer(JettyLoom(port))

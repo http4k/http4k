@@ -1,4 +1,4 @@
-package chatzilla.endpoints
+package chatzilla.endpoints.tools
 
 import chatzilla.ChatHistory
 import dev.forkhandles.result4k.map

@@ -1,0 +1,6 @@
+<div id="elicitation-form" data-signals="{}">
+    <span>{{message}}</span>
+    <button id="accept" data-on-click="@post('/elicitations/accept/{{id}}')" data-indicator-fetching>Accept</button>
+    <button id="decline" data-on-click="@post('/elicitations/decline/{{id}}')" data-indicator-fetching>Decline</button>
+    <button id="cancel" data-on-click="@post('/elicitations/cancel/{{id}}')" data-indicator-fetching>Cancel</button>
+</div>

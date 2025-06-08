@@ -3,12 +3,14 @@ package chatzilla
 import chatzilla.Settings.ANTHROPIC_API_KEY
 import chatzilla.Settings.MCP_URL
 import chatzilla.Settings.MODEL
-import chatzilla.endpoints.ApproveTool
-import chatzilla.endpoints.DenyTool
 import chatzilla.endpoints.GetHistory
 import chatzilla.endpoints.GetMessageForm
 import chatzilla.endpoints.Index
 import chatzilla.endpoints.SendUserMessage
+import chatzilla.endpoints.elicitations.GetElicitations
+import chatzilla.endpoints.elicitations.RespondToElicitation
+import chatzilla.endpoints.tools.ApproveTool
+import chatzilla.endpoints.tools.DenyTool
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.llm.chat.AnthropicAI
 import org.http4k.ai.llm.chat.Chat
@@ -55,6 +57,8 @@ fun Chatzilla(env: Environment): PolyHandler {
     val handler = ChatSessionHandler(stateMachine)
 
     return poly(
+        GetElicitations(history, datastarRenderer, client),
+        RespondToElicitation(datastarRenderer),
         SendUserMessage(history, datastarRenderer, handler),
         ApproveTool(history, datastarRenderer, handler),
         DenyTool(history, datastarRenderer, handler),
