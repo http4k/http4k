@@ -32,7 +32,7 @@ class ObjectId private constructor(value: String) : StringValue(value) {
 }
 
 enum class Quality {
-    standard, hd
+    auto, standard, hd, high, medium, low
 }
 
 enum class Style {

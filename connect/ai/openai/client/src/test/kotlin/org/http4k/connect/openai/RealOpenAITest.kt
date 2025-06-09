@@ -9,6 +9,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
 class RealOpenAITest : OpenAIContract, PortBasedTest {
+
     val apiKey = EnvironmentKey.value(OpenAIToken).optional("OPEN_AI_TOKEN")
 
     init {

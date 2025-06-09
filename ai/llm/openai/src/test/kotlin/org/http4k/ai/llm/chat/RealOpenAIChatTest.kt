@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 
 class RealOpenAIChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
-    val apiKey = EnvironmentKey.value(OpenAIApi.ApiKey).optional("OPENAI_API_KEY2")
+    val apiKey = EnvironmentKey.value(OpenAIApi.ApiKey).optional("OPENAI_API_KEY")
 
     init {
         assumeTrue(apiKey(ENV) != null, "No API Key set - skipping")
@@ -23,3 +23,4 @@ class RealOpenAIChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     override val model = GPT3_5
 }
+

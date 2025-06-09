@@ -11,6 +11,7 @@ import org.http4k.connect.openai.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletionChunk
 import org.http4k.connect.openai.OpenAIModels.GPT3_5
 import org.http4k.connect.openai.OpenAIOrg.Companion.OPENAI
+import org.http4k.connect.openai.action.ImageResponseFormat
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.action.Size
 import org.http4k.connect.successValue
@@ -78,6 +79,11 @@ interface OpenAIContract {
 
     @Test
     fun `can generate image`(approver: Approver) {
-        openAi.generateImage("An excellent library", Size.`256x256`).successValue()
+        openAi.generateImage("An excellent library",
+            Size.`256x256`,
+            ImageResponseFormat.url,
+            1,
+            null,
+            null).successValue()
     }
 }

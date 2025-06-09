@@ -20,7 +20,7 @@ fun OpenAIImageModel(openAi: OpenAI, options: ImageModelOptions = ImageModelOpti
     override fun generate(p0: String) = Response(generate(p0, 1).content().first())
 
     override fun generate(it: String, n: Int) = with(options) {
-        openAi.generateImage(it, size, imageResponseFormat, n, quality, style, user)
+        openAi.generateImage(it, size, imageResponseFormat, n, user)
             .map { Response(it.data.map { it.toHttp4k() }) }
             .orThrow()
     }
@@ -36,7 +36,5 @@ data class ImageModelOptions(
     val size: Size = Size.`1024x1024`,
     val model: ModelName = DALL_E_2,
     val imageResponseFormat: ImageResponseFormat = ImageResponseFormat.b64_json,
-    val quality: Quality = Quality.standard,
-    val style: Style = Style.vivid,
     val user: User? = null
 )
