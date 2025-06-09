@@ -9,6 +9,7 @@ import org.http4k.ai.model.ResponseId
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.Temperature
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.model.Timestamp
@@ -19,7 +20,6 @@ import org.http4k.connect.openai.OpenAIMoshi.autoBody
 import org.http4k.connect.openai.TokenId
 import org.http4k.connect.openai.User
 import org.http4k.connect.openai.action.Detail.auto
-import org.http4k.ai.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -84,10 +84,6 @@ data class ChatCompletion(
         stream = stream
     )
 
-    init {
-        require(tools == null || tools.isNotEmpty()) { "Tools cannot be empty" }
-    }
-
     override fun toRequest() = Request(POST, "/v1/chat/completions")
         .with(autoBody<ChatCompletion>().toLens() of this)
 
@@ -120,6 +116,7 @@ data class Message(
     val content: List<MessageContent>? = null,
     val name: User? = null,
     val refusal: String? = null,
+    val tool_call_id: String? = null,
     val tool_calls: List<ToolCall>? = null
 ) {
     companion object {
@@ -137,9 +134,10 @@ data class Message(
         fun Assistant(content: List<MessageContent>, name: User? = null, refusal: String? = null) =
             Message(Role.Assistant, content, name, refusal)
 
-        @JvmName("AssistantToolCalls")
-        fun Assistant(tool_calls: List<ToolCall>, name: User? = null, refusal: String? = null) =
-            Message(Role.Assistant, null, name, refusal, tool_calls)
+        fun ToolCalls(tool_calls: List<ToolCall>) = Message(Role.Assistant, null, null, null, null, tool_calls)
+
+        fun ToolCallResult(tool_call_id: String, content: String) =
+            Message(Role.Tool, listOf(MessageContent(ContentType.text, content)), tool_call_id = tool_call_id)
     }
 }
 
@@ -177,7 +175,7 @@ data class Choice(
     internal val delta: ChoiceDetail?,
     val finish_reason: StopReason?
 ) {
-    val message get() = msg ?: delta
+    val message get() = msg ?: delta ?: ChoiceDetail(Role.Assistant, "", emptyList())
 }
 
 @JsonSerializable
@@ -199,17 +197,15 @@ data class ToolCall(
 )
 
 @JsonSerializable
-data class Tool(val function: FunctionSpec) {
-    val type = "function"
-}
+data class Tool(val function: FunctionSpec, val type: String = "function")
 
 @JsonSerializable
 data class FunctionSpec(
     val name: String,
-    val parameters: Any? = null, // JSON schema format
+    val parameters: Map<String, Any>,
     val description: String? = null,
 ) {
-    val type = "function"
+    val type: String = "function"
 }
 
 @JsonSerializable
@@ -230,3 +226,4 @@ data class CompletionResponse(
     val system_fingerprint: String? = null,
     val service_tier: String? = null
 )
+

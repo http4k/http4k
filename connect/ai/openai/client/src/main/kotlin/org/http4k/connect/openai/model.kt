@@ -39,10 +39,28 @@ enum class Style {
     vivid, natural
 }
 
+
+object OpenAIModels {
+    val GPT4 = ModelName.of("gpt-4")
+    val DALL_E_2 = ModelName.of("dall-e-2")
+    val GPT4_TURBO_PREVIEW = ModelName.of("gpt-4-turbo-preview")
+    val GPT3_5 = ModelName.of("gpt-3.5-turbo")
+    val TEXT_EMBEDDING_ADA_002 = ModelName.of("text-embedding-ada-002")
+}
+
+@Deprecated("Use OpenAiModels")
 val ModelName.Companion.GPT4 get() = ModelName.of("gpt-4")
+
+@Deprecated("Use OpenAiModels")
 val ModelName.Companion.DALL_E_2 get() = ModelName.of("dall-e-2")
+
+@Deprecated("Use OpenAiModels")
 val ModelName.Companion.GPT4_TURBO_PREVIEW get() = ModelName.of("gpt-4-turbo-preview")
+
+@Deprecated("Use OpenAiModels")
 val ModelName.Companion.GPT3_5 get() = ModelName.of("gpt-3.5-turbo")
+
+@Deprecated("Use OpenAiModels")
 val ModelName.Companion.TEXT_EMBEDDING_ADA_002 get() = ModelName.of("text-embedding-ada-002")
 
 class TokenId private constructor(value: String) : StringValue(value) {

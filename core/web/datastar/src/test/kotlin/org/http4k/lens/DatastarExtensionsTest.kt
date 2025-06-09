@@ -36,8 +36,6 @@ class DatastarExtensionsTest {
             )
         )
 
-        println(response)
-
         assertThat(
             response.datastarEvents(), equalTo(
                 listOf(

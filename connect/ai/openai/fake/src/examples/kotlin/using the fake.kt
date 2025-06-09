@@ -7,6 +7,7 @@ import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.GPT3_5
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
+import org.http4k.connect.openai.OpenAIModels.GPT3_5
 import org.http4k.connect.openai.OpenAIToken
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.action.Size
@@ -30,7 +31,7 @@ fun main() {
 
     // get a chat completion
     openai
-        .chatCompletion(ModelName.GPT3_5, listOf(Message.User("good afternoon")), MaxTokens.of(1000), true)
+        .chatCompletion(GPT3_5, listOf(Message.User("good afternoon")), MaxTokens.of(1000), true)
         .onFailure { error(it) }
         .toList()
         .first()

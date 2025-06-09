@@ -5,8 +5,8 @@ import dev.langchain4j.data.image.Image
 import dev.langchain4j.model.image.ImageModel
 import dev.langchain4j.model.output.Response
 import org.http4k.ai.model.ModelName
-import org.http4k.connect.openai.DALL_E_2
 import org.http4k.connect.openai.OpenAI
+import org.http4k.connect.openai.OpenAIModels.DALL_E_2
 import org.http4k.connect.openai.Quality
 import org.http4k.connect.openai.Style
 import org.http4k.connect.openai.User
@@ -34,7 +34,7 @@ private fun ImageData.toHttp4k() = Image.builder().apply {
 
 data class ImageModelOptions(
     val size: Size = Size.`1024x1024`,
-    val model: ModelName = ModelName.DALL_E_2,
+    val model: ModelName = DALL_E_2,
     val imageResponseFormat: ImageResponseFormat = ImageResponseFormat.b64_json,
     val quality: Quality = Quality.standard,
     val style: Style = Style.vivid,

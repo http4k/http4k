@@ -10,6 +10,7 @@ import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletionChunk
+import org.http4k.connect.openai.OpenAIModels.GPT3_5
 import org.http4k.connect.openai.OpenAIOrg.Companion.OPENAI
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.action.Size
@@ -36,7 +37,7 @@ interface OpenAIContract {
     @Test
     fun `get chat response non-stream`() {
         val responses = openAi.chatCompletion(
-            ModelName.GPT3_5,
+            GPT3_5,
             listOf(
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
@@ -52,7 +53,7 @@ interface OpenAIContract {
     @Test
     fun `get chat response streaming`() {
         val responses = openAi.chatCompletion(
-            ModelName.GPT3_5,
+            GPT3_5,
             listOf(
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")

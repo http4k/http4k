@@ -12,8 +12,6 @@ import org.http4k.filter.debug
 import org.http4k.lens.value
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
 
 class RealAnthropicAIChatTest : ChatContract, PortBasedTest {
 
@@ -25,10 +23,4 @@ class RealAnthropicAIChatTest : ChatContract, PortBasedTest {
 
     override val chat = Chat.AnthropicAI(token(ENV)!!, JavaHttpClient().debug(), _2023_06_01)
     override val model = AnthropicModels.Claude_Sonnet_3_7
-
-    @Disabled
-    @Test
-    override fun `can generate a tool request - text input`() {
-        super.`can generate a tool request - text input`()
-    }
 }
