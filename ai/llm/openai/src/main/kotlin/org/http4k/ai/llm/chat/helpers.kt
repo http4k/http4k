@@ -11,7 +11,9 @@ import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.llm.util.LLMJson
 import org.http4k.ai.model.RequestId
+import org.http4k.ai.model.Temperature
 import org.http4k.ai.model.ToolName
+import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.CompletionResponse
 import org.http4k.connect.openai.action.ContentType
 import org.http4k.connect.openai.action.ContentType.image_url
@@ -79,3 +81,21 @@ fun Content.toOpenAI() = when (this) {
     is Content.Text -> MessageContent(ContentType.text, text)
     else -> error("Unsupported content type $this")
 }
+
+fun ChatRequest.asOpenAI(stream: Boolean) =
+    ChatCompletion(
+        params.modelName,
+        messages.map { it.toOpenAI() },
+        params.maxOutputTokens,
+        params.temperature ?: Temperature.ONE,
+        params.topP ?: 1.0,
+        1,
+        params.stopSequences,
+        params.presencePenalty ?: 0.0,
+        params.frequencyPenalty ?: 0.0,
+        null,
+        null,
+        stream,
+        params.responseFormat?.toOpenAI(),
+        params.tools.map { it.toOpenAI() }
+    )
