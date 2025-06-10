@@ -10,7 +10,7 @@ import chatzilla.endpoints.GetMessageForm
 import chatzilla.endpoints.Index
 import chatzilla.endpoints.SendUserMessage
 import dev.forkhandles.result4k.valueOrNull
-import org.http4k.ai.llm.AnthropicAI
+import org.http4k.ai.llm.chat.AnthropicAI
 import org.http4k.ai.llm.chat.Chat
 import org.http4k.ai.llm.chat.ChatSessionHandler
 import org.http4k.ai.llm.chat.ChatSessionStateMachine
