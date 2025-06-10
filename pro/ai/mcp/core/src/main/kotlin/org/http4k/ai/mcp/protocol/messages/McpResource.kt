@@ -14,6 +14,7 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
+@ExposedCopyVisibility
 data class McpResource internal constructor(
     val uri: Uri?,
     val uriTemplate: ResourceUriTemplate?,

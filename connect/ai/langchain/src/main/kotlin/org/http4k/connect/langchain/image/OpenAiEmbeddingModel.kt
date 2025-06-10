@@ -16,7 +16,7 @@ import org.http4k.connect.openai.action.Size
 import org.http4k.connect.openai.generateImage
 import org.http4k.connect.orThrow
 
-fun OpenAiImageModel(openAi: OpenAI, options: ImageModelOptions = ImageModelOptions()) = object : ImageModel {
+fun OpenAIImageModel(openAi: OpenAI, options: ImageModelOptions = ImageModelOptions()) = object : ImageModel {
     override fun generate(p0: String) = Response(generate(p0, 1).content().first())
 
     override fun generate(it: String, n: Int) = with(options) {

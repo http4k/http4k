@@ -7,7 +7,6 @@ import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.startsWith
 import org.http4k.ai.model.MaxTokens
-import org.http4k.ai.model.ModelName
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletionChunk
 import org.http4k.connect.openai.OpenAIModels.GPT3_5
@@ -70,7 +69,7 @@ interface OpenAIContract {
     fun `get embeddings`() {
         assertThat(
             openAi.createEmbeddings(
-                ModelName.TEXT_EMBEDDING_ADA_002,
+                OpenAIModels.TEXT_EMBEDDING_ADA_002,
                 listOf("What is your favourite colour?")
             ).successValue().model.value,
             startsWith("text-embedding-ada-002")
