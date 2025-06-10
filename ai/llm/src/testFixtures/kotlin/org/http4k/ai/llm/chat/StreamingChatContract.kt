@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.model.ModelParams
-import org.http4k.ai.llm.model.ResponseFormat.Text
+import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Temperature.Companion.ZERO
 import org.junit.jupiter.api.Test

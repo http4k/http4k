@@ -2,9 +2,8 @@ package org.http4k.ai.llm.chat
 
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.Resource
-import org.http4k.ai.llm.model.ToolSelection
-import org.http4k.ai.llm.model.ToolSelection.Auto
-import org.http4k.ai.llm.model.ToolSelection.Required
+import org.http4k.ai.llm.chat.ToolSelection.Auto
+import org.http4k.ai.llm.chat.ToolSelection.Required
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.model.RequestId

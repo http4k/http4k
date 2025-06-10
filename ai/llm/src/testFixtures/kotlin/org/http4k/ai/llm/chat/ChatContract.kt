@@ -9,7 +9,7 @@ import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.ModelParams
-import org.http4k.ai.llm.model.ResponseFormat.Text
+import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.util.LLMJson
 import org.http4k.ai.llm.util.LLMJson.convert

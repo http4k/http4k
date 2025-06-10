@@ -4,9 +4,8 @@ import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.Message.Assistant
 import org.http4k.ai.llm.model.Resource
-import org.http4k.ai.llm.model.ResponseFormat
-import org.http4k.ai.llm.model.ResponseFormat.Json
-import org.http4k.ai.llm.model.ResponseFormat.Text
+import org.http4k.ai.llm.chat.ChatResponseFormat.Json
+import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.llm.util.LLMJson
@@ -32,7 +31,7 @@ import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
 import org.http4k.connect.openai.action.Tool
 import org.http4k.connect.openai.action.ToolCall
 
-fun ResponseFormat.toOpenAI() = when (this) {
+fun ChatResponseFormat.toOpenAI() = when (this) {
     is Json -> JsonSchema(true, LLMJson.convert(schema))
     Text -> null
 }
