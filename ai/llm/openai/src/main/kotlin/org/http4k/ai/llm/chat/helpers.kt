@@ -12,8 +12,10 @@ import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.llm.util.LLMJson
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.Temperature
+import org.http4k.ai.model.TokenUsage
 import org.http4k.ai.model.ToolName
 import org.http4k.connect.openai.action.ChatCompletion
+import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.CompletionResponse
 import org.http4k.connect.openai.action.ContentType
 import org.http4k.connect.openai.action.ContentType.image_url
@@ -35,16 +37,22 @@ fun ResponseFormat.toOpenAI() = when (this) {
     Text -> null
 }
 
+fun CompletionResponse.toHttp4k() = ChatResponse(
+    choices.toHttp4k(),
+    ChatResponse.Metadata(
+        id, model, usage
+            ?.let { TokenUsage(it.prompt_tokens, it.completion_tokens) })
+)
 
-fun CompletionResponse.toLLM(): Assistant {
-    val (contents, tools) = choices.partition { (it.message.tool_calls?.size ?: 0) == 0 }
+fun List<Choice>.toHttp4k(): Assistant {
+    val (contents, tools) = partition { (it.message.tool_calls?.size ?: 0) == 0 }
     return Assistant(
         contents.map { Content.Text(it.message.content ?: "") },
-        tools.flatMap { it.message.tool_calls?.map { it.toLLM() } ?: emptyList() }
+        tools.flatMap { it.message.tool_calls?.map { it.toHttp4k() } ?: emptyList() }
     )
 }
 
-fun ToolCall.toLLM() =
+fun ToolCall.toHttp4k() =
     ToolRequest(RequestId.of(id), ToolName.of(function.name), LLMJson.convert(LLMJson.parse(function.arguments)))
 
 fun LLMTool.toOpenAI() = Tool(FunctionSpec(name.value, inputSchema, description))
@@ -82,7 +90,7 @@ fun Content.toOpenAI() = when (this) {
     else -> error("Unsupported content type $this")
 }
 
-fun ChatRequest.asOpenAI(stream: Boolean) =
+fun ChatRequest.toOpenAI(stream: Boolean) =
     ChatCompletion(
         params.modelName,
         messages.map { it.toOpenAI() },

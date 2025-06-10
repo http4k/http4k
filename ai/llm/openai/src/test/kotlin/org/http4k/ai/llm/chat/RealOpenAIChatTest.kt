@@ -10,7 +10,7 @@ import org.http4k.lens.value
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-class RealOpenAIChatTest : ChatContract, PortBasedTest {
+class RealOpenAIChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     val apiKey = EnvironmentKey.value(OpenAIApi.ApiKey).optional("OPENAI_API_KEY2")
 
@@ -19,6 +19,7 @@ class RealOpenAIChatTest : ChatContract, PortBasedTest {
     }
 
     override val chat = Chat.OpenAI(apiKey(ENV)!!, JavaHttpClient().debug())
+    override val streamingChat = StreamingChat.OpenAI(apiKey(ENV)!!, JavaHttpClient().debug())
 
     override val model = GPT3_5
 }

@@ -11,18 +11,16 @@ import org.http4k.core.Response
 /**
  * OpenAI Chat interface for using with the real OpenAI API endpoints
  */
-fun Chat.Companion.OpenAI(apiKey: OpenAIApi.ApiKey, http: HttpHandler, org: OpenAIApi.Org? = null) =
+fun StreamingChat.Companion.OpenAI(apiKey: OpenAIApi.ApiKey, http: HttpHandler, org: OpenAIApi.Org? = null) =
     OpenAI(OpenAIApi(apiKey, http, org))
 
 /**
  * Chat interface for any OpenAI-compatible client
  */
-fun Chat.Companion.OpenAI(openAICompatibleClient: OpenAICompatibleClient) = object : Chat {
+fun StreamingChat.Companion.OpenAI(openAICompatibleClient: OpenAICompatibleClient) = object : StreamingChat {
     private val client = openAICompatibleClient()
 
-    override fun invoke(request: ChatRequest) =
-        client(request.toOpenAI(false))
-            .map { it.first() }
-            .map { it.toHttp4k() }
-            .mapFailure { Http(Response(it.status).body(it.message ?: "")) }
+    override fun invoke(request: ChatRequest) = client(request.toOpenAI(true))
+        .map { it.map { it.toHttp4k() } }
+        .mapFailure { Http(Response(it.status).body(it.message ?: "")) }
 }
