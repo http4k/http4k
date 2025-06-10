@@ -1,6 +1,5 @@
-package org.http4k.ai.llm
+package org.http4k.ai.llm.chat
 
-import org.http4k.ai.llm.chat.ChatResponse
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.Resource
 import org.http4k.ai.llm.model.ToolSelection

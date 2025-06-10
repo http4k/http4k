@@ -1,7 +1,5 @@
-package org.http4k.ai.llm
+package org.http4k.ai.llm.chat
 
-import org.http4k.ai.llm.chat.Chat
-import org.http4k.ai.llm.chat.ChatContract
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey

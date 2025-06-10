@@ -1,11 +1,8 @@
-package org.http4k.ai.llm
+package org.http4k.ai.llm.chat
 
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.llm.LLMError.Http
-import org.http4k.ai.llm.chat.Chat
-import org.http4k.ai.llm.chat.ChatRequest
-import org.http4k.ai.llm.chat.ChatResponse
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.SystemPrompt
 import org.http4k.connect.anthropic.AnthropicAI
