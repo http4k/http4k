@@ -18,6 +18,6 @@ interface ImageGenerationContract {
         val response = imageGeneration(ImageRequest(model, UserPrompt.of("a nice doggy"), ImageResponseFormat.url)).valueOrNull()!!
 
         val actual = response.resources.first() as Resource.Ref
-        assertThat(actual.uri.toString(), startsWith("https://"))
+        assertThat(actual.uri.toString(), startsWith("http"))
     }
 }

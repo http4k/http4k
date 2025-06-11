@@ -1,5 +1,6 @@
 package org.http4k.connect.anthropic
 
+import org.http4k.connect.anthropic.action.Content
 import org.http4k.connect.anthropic.action.Content.Image
 import org.http4k.connect.anthropic.action.Content.Text
 import org.http4k.connect.anthropic.action.Content.ToolResult
@@ -10,7 +11,7 @@ import java.util.Random
 /**
  * Helps to control the generation of responses in a particular format for a model.
  */
-fun interface MessageContentGenerator : (List<Message>) -> List<Text> {
+fun interface MessageContentGenerator : (List<Message>) -> List<Content> {
     companion object
 }
 
