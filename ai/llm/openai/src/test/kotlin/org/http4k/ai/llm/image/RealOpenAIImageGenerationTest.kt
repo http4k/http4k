@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 
 class RealOpenAIImageGenerationTest : ImageGenerationContract, PortBasedTest {
 
-    val apiKey = EnvironmentKey.value(OpenAIApi.ApiKey).optional("OPENAI_API_KEY2")
+    val apiKey = EnvironmentKey.value(OpenAIApi.ApiKey).optional("OPENAI_API_KEY")
 
     init {
         assumeTrue(apiKey(Environment.ENV) != null, "No API Key set - skipping")

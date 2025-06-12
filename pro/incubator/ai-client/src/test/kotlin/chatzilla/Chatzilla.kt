@@ -23,6 +23,7 @@ import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.PolyHandler
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
@@ -35,7 +36,7 @@ import org.http4k.template.DatastarFragmentRenderer
 import org.http4k.template.HandlebarsTemplates
 
 fun Chatzilla(env: Environment): PolyHandler {
-    val http = JavaHttpClient().debug()
+    val http = JavaHttpClient(responseBodyMode = Stream).debug()
 
     val renderer = HandlebarsTemplates().CachingClasspath()
     val datastarRenderer = DatastarFragmentRenderer(renderer)
