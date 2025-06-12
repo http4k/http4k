@@ -56,7 +56,7 @@ class RatpackStopTest : ServerStopContract(Ratpack, JettyClient(), {
 
 class HelidonStopTest : ServerStopContract(Helidon, JettyClient(), {
     enableImmediateStop()
-//    enableGracefulStop()
+    enableGracefulStop()
 })
 
 class SunHttpStopTest : ServerStopContract(SunHttp, JettyClient(), {
