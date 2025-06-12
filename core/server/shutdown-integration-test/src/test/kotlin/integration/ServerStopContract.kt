@@ -13,6 +13,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.Http4kServer
@@ -121,7 +122,7 @@ abstract class ServerStopContract(
 
         val response = client(request)
 
-        assertThat(response, hasStatus(Status.CONNECTION_REFUSED))
+        assertThat(response, hasStatus(CONNECTION_REFUSED))
     }
 
     @Test
@@ -197,7 +198,7 @@ abstract class ServerStopContract(
                 try {
                     responses.add(client(Request(POST, "$baseUrl/slow-echo").body("Hello")).also { it.bodyString() })
                 } catch (e: Exception) {
-                    responses.add(Response(Status.CONNECTION_REFUSED.toClientStatus(e)))
+                    responses.add(Response(CONNECTION_REFUSED.toClientStatus(e)))
                 }
             }
         }
