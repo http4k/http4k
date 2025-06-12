@@ -5,13 +5,14 @@ import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.llm.LLMError.Http
 import org.http4k.ai.llm.OpenAIApi
 import org.http4k.ai.llm.OpenAICompatibleClient
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 
 /**
  * OpenAI Chat interface for using with the real OpenAI API endpoints
  */
-fun StreamingChat.Companion.OpenAI(apiKey: OpenAIApi.ApiKey, http: HttpHandler, org: OpenAIApi.Org? = null) =
+fun StreamingChat.Companion.OpenAI(apiKey: OpenAIApi.ApiKey, http: HttpHandler = JavaHttpClient(), org: OpenAIApi.Org? = null) =
     OpenAI(OpenAIApi(apiKey, http, org))
 
 /**

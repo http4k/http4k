@@ -5,6 +5,7 @@ import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.llm.LLMError.Http
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.SystemPrompt
+import org.http4k.client.JavaHttpClient
 import org.http4k.connect.anthropic.AnthropicAI
 import org.http4k.connect.anthropic.AnthropicIApiKey
 import org.http4k.connect.anthropic.ApiVersion
@@ -17,7 +18,7 @@ import org.http4k.core.Response
 
 fun Chat.Companion.AnthropicAI(
     apiKey: AnthropicIApiKey,
-    http: HttpHandler,
+    http: HttpHandler = JavaHttpClient(),
     apiVersion: ApiVersion = _2023_06_01,
     metadata: Metadata? = null,
     systemPrompt: SystemPrompt? = null,
