@@ -20,23 +20,23 @@ import org.http4k.filter.ServerFilters.CatchAll
 class Http4kUndertowHttpHandler(handler: HttpHandler) : io.undertow.server.HttpHandler {
     private val safeHandler = CatchAll().then(handler)
 
-    private fun Response.into(exchange: HttpServerExchange) {
-        exchange.statusCode = status.code
-        headers.toParametersMap().forEach { (name, values) ->
-            exchange.responseHeaders.putAll(HttpString(name), values.toList())
-        }
-        body.stream.use { it.copyTo(exchange.outputStream) }
-    }
-
-    private fun HttpServerExchange.asRequest() =
-        Method.supportedOrNull(requestMethod.toString())?.let {
-            Request(it, Uri.of("$relativePath?$queryString"), protocol.toString())
-                .headers(requestHeaders
-                    .flatMap { header -> header.map { header.headerName.toString() to it } })
-                .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
-                .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
-        }
-
     override fun handleRequest(exchange: HttpServerExchange) =
         (exchange.asRequest()?.let { safeHandler(it) } ?: Response(NOT_IMPLEMENTED)).into(exchange)
 }
+
+fun Response.into(exchange: HttpServerExchange) {
+    exchange.statusCode = status.code
+    headers.toParametersMap().forEach { (name, values) ->
+        exchange.responseHeaders.putAll(HttpString(name), values.toList())
+    }
+    body.stream.use { it.copyTo(exchange.outputStream) }
+}
+
+internal fun HttpServerExchange.asRequest() =
+    Method.supportedOrNull(requestMethod.toString())?.let {
+        Request(it, Uri.of("$relativePath?$queryString"), protocol.toString())
+            .headers(requestHeaders
+                .flatMap { header -> header.map { header.headerName.toString() to it } })
+            .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
+            .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
+    }

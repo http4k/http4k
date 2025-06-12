@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.13.0.0
 - **http4k-***: Upgrade some dependency versions
+- **http4k-server-undertow**: [Fix #1365] Gracefully handle unrecognized/invalid HTTP verbs
 - **http4k-mcp-core**: [Breaking] Rename Reference.Resource to Reference.ResourceTemplate.
 - **http4k-connect-ai-langchain**: [Breaking] Rename some classes for consistency. Easy fix :)
 
