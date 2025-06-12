@@ -1,11 +1,12 @@
-import org.http4k.internal.ModuleLicense.Http4kCommercial
+//import org.http4k.internal.ModuleLicense.Http4kCommercial
 
-description = "http4k chat client"
-
-val license by project.extra { Http4kCommercial }
+//description = "http4k chat client"
+//
+//val license by project.extra { Http4kCommercial }
 
 plugins {
-    id("org.http4k.pro")
+    id("org.http4k.conventions")
+//    id("org.http4k.pro")
     id("com.google.devtools.ksp")
 }
 
