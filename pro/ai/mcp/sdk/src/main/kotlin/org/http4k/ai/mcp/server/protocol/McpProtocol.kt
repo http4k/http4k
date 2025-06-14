@@ -4,15 +4,6 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
-import org.http4k.core.Request
-import org.http4k.format.MoshiArray
-import org.http4k.format.MoshiNode
-import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
-import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.LogLevel.error
@@ -52,6 +43,15 @@ import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.mcp.util.McpJson.nullNode
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
+import org.http4k.format.MoshiArray
+import org.http4k.format.MoshiNode
+import org.http4k.format.MoshiObject
+import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
+import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -263,7 +263,8 @@ class McpProtocol<Transport>(
                     val context = ClientCall(progress, session)
                     sessions.assign(context, this, httpReq)
                     try {
-                        fn(it,
+                        fn(
+                            it,
                             SessionBasedClient(
                                 progress,
                                 context,
@@ -337,7 +338,8 @@ class McpProtocol<Transport>(
             metaData.entity, metaData.capabilities, when {
                 metaData.protocolVersions.contains(request.protocolVersion) -> request.protocolVersion
                 else -> metaData.protocolVersions.max()
-            }
+            },
+            metaData.instructions
         )
     }
 

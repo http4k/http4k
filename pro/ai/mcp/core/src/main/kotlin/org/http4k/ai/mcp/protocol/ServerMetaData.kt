@@ -14,20 +14,23 @@ data class ServerMetaData internal constructor(
     val entity: VersionedMcpEntity,
     val protocolVersions: Set<ProtocolVersion> = setOf(`2025-03-26`, `2024-11-05`),
     val capabilities: ServerCapabilities = ServerCapabilities(),
+    val instructions: String? = null,
 ) {
     constructor(
         entity: McpEntity,
         version: Version,
         vararg capabilities: ServerProtocolCapability,
         title: String? = null,
+        instructions: String? = null,
         protocolVersions: Set<ProtocolVersion> = setOf(`2025-03-26`, `2024-11-05`),
-    ) : this(VersionedMcpEntity(entity, version, title), protocolVersions, ServerCapabilities(*capabilities))
+    ) : this(VersionedMcpEntity(entity, version, title), protocolVersions, ServerCapabilities(*capabilities), instructions)
 
     constructor(
         entity: String,
         version: String,
         vararg capabilities: ServerProtocolCapability,
         title: String? = null,
+        instructions: String? = null,
         protocolVersions: Set<ProtocolVersion> = setOf(`2025-03-26`, `2024-11-05`),
-    ) : this(VersionedMcpEntity(entity, version, title), protocolVersions, ServerCapabilities(*capabilities))
+    ) : this(VersionedMcpEntity(entity, version, title), protocolVersions, ServerCapabilities(*capabilities), instructions)
 }

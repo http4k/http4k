@@ -113,7 +113,8 @@ class McpProtocolTest {
     private val serverName = McpEntity.of("server")
     private val clientName = McpEntity.of("server")
 
-    private val metadata = ServerMetaData(serverName, Version.of("1"))
+    private val metadata = ServerMetaData(serverName, Version.of("1"),
+        title = "title", instructions = "instructions")
 
     private val random = Random(0)
 
@@ -724,7 +725,7 @@ class McpProtocolTest {
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, `2024-11-05`)
+            McpInitialize.Response(metadata.entity, metadata.capabilities, `2024-11-05`, metadata.instructions)
         )
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
