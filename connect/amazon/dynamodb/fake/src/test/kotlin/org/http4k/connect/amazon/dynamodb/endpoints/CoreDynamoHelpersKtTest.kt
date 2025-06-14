@@ -8,7 +8,7 @@ import org.http4k.connect.amazon.dynamodb.model.AttributeName
 import org.http4k.connect.amazon.dynamodb.model.Item
 import org.junit.jupiter.api.Test
 
-class HelpersKtTest {
+class CoreDynamoHelpersKtTest {
     private val attrNum = Attribute.int().required("attrNum")
     private val attrStr = Attribute.string().required("attrStr")
     private val attrBoolean = Attribute.boolean().required("attrBool")
