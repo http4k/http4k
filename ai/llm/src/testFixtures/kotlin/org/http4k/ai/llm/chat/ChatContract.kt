@@ -88,9 +88,3 @@ interface ChatContract {
     }
 }
 
-private fun List<Content>.consolidate() = map {
-    when (it) {
-        is Content.Text -> Content.Text(it.text.filter { it.isLetterOrDigit() }.lowercase())
-        else -> it
-    }
-}

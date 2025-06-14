@@ -19,14 +19,14 @@ interface StreamingChatContract {
     fun `can ask a simple question text streaming`() {
         val stream = streamingChat(
             ChatRequest(
-                "what is 2+2? do not explain, do not use tools, just give the answer",
+                "what is 2+2? do not explain, do not use tools, just give the answer. do not add whitespace to the answer",
                 ModelParams(model, ZERO, responseFormat = Text)
             )
         ).valueOrNull()!!
 
         val message = stream
-            .map { it.message.contents.map { it as Content.Text }.joinToString("") { it.text } }
-               .joinToString("")
-        assertThat(message, equalTo("4"))
+            .flatMap { it.message.contents.consolidate() }
+            .toList()
+        assertThat(message, equalTo(listOf(Content.Text("4"))))
     }
 }

@@ -9,7 +9,7 @@ import org.http4k.lens.value
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
-class RealGeminiChatTest : ChatContract, PortBasedTest {
+class RealGeminiChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     val apiKey = EnvironmentKey.value(Gemini.ApiKey).optional("GEMINI_API_KEY")
 
@@ -18,6 +18,7 @@ class RealGeminiChatTest : ChatContract, PortBasedTest {
     }
 
     override val chat = Chat.OpenAI(Gemini(apiKey(ENV)!!, JavaHttpClient().debug()))
+    override val streamingChat = StreamingChat.OpenAI(Gemini(apiKey(ENV)!!, JavaHttpClient().debug()))
 
     override val model = Gemini.Models.Gemini1_5
 }
