@@ -58,8 +58,12 @@ class RatpackStopTest : ServerStopContract(Ratpack, JettyClient(), {
 
 class HelidonStopTest : ServerStopContract(Helidon, JettyClient(), {
     enableImmediateStop()
-    enableGracefulStop()
-}, ServerConfig.StopMode.Graceful(Duration.ofSeconds(20)))
+}) {
+    @Disabled("Helidon is in a half-broken state with respect to stop modes. Graceful stop is supported, but does not work in docker as expected.")
+    override fun `server config throws when invoked with unsupported stop mode`() {
+        super.`server config throws when invoked with unsupported stop mode`()
+    }
+}
 
 class SunHttpStopTest : ServerStopContract(SunHttp, JettyClient(), {
     enableImmediateStop()

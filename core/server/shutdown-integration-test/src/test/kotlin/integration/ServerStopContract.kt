@@ -39,9 +39,9 @@ abstract class ServerStopContract(
     private val backend: ServerBackend,
     protected val client: HttpHandler,
     enableStopModes: ConfigureServerStopContract.() -> Unit,
-    private val defaultGracefulStopMode: Graceful = Graceful(ofSeconds(10)),
 ) : PortBasedTest {
 
+    private val defaultGracefulStopMode: Graceful = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
     private val supportedStopModes = ConfigureServerStopContract()
         .also(enableStopModes)
@@ -161,12 +161,12 @@ abstract class ServerStopContract(
     }
 
     @Test
-    open fun `graceful stop mode is waiting for inflight requests to succeed`() {
+    fun `graceful stop mode is waiting for inflight requests to succeed`() {
         startServerOrSkip(defaultGracefulStopMode).testInflightRequestsCompleteDuringServerStop()
     }
 
     @Test
-    fun `server config throws when invoked with unsupported stop mode`() {
+    open fun `server config throws when invoked with unsupported stop mode`() {
         val illegalConfigurationAttempts: Array<() -> Unit> =
             listOf(Immediate, defaultGracefulStopMode)
                 .subtract(supportedStopModes)
