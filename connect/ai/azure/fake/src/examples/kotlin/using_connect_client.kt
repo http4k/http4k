@@ -1,9 +1,9 @@
 import dev.forkhandles.result4k.Result
+import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.azure.AzureAI
-import org.http4k.connect.azure.AzureAIApiKey
 import org.http4k.connect.azure.AzureHost
 import org.http4k.connect.azure.FakeAzureAI
 import org.http4k.connect.azure.Http
@@ -22,9 +22,11 @@ fun main() {
     val http: HttpHandler = if (USE_REAL_CLIENT) JavaHttpClient() else FakeAzureAI()
 
     // create a client
-    val client = AzureAI.Http(AzureAIApiKey.of("foobar"),
+    val client = AzureAI.Http(
+        ApiKey.of("foobar"),
         AzureHost.of("foobar"), Region.of("foobar"),
-        http.debug())
+        http.debug()
+    )
 
     // all operations return a Result monad of the API type
     val result: Result<Sequence<CompletionResponse>, RemoteFailure> = client

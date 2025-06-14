@@ -6,6 +6,7 @@ import org.http4k.ai.llm.LLMError.Http
 import org.http4k.ai.llm.OpenAIApi
 import org.http4k.ai.llm.OpenAICompatibleClient
 import org.http4k.ai.llm.model.Resource
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.openai.action.Size
 import org.http4k.connect.openai.generateImage
@@ -15,7 +16,7 @@ import org.http4k.core.Response
 /**
  * OpenAI ImageGeneration interface for using with the real OpenAI API endpoints
  */
-fun ImageGeneration.Companion.OpenAI(apiKey: OpenAIApi.ApiKey, http: HttpHandler = JavaHttpClient(), org: OpenAIApi.Org? = null) =
+fun ImageGeneration.Companion.OpenAI(apiKey: ApiKey, http: HttpHandler = JavaHttpClient(), org: OpenAIApi.Org? = null) =
     OpenAI(OpenAIApi(apiKey, http, org))
 
 /**

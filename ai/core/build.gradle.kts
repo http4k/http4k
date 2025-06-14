@@ -1,6 +1,6 @@
 import org.http4k.internal.ModuleLicense.Apache2
 
-description = "http4k AI Core types"
+description = "http4k AI core types"
 
 val license by project.extra { Apache2 }
 

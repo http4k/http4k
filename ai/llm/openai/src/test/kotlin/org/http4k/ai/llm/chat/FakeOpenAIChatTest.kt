@@ -1,9 +1,9 @@
 package org.http4k.ai.llm.chat
 
-import org.http4k.ai.llm.OpenAIApi
 import org.http4k.ai.llm.image.ImageGeneration
 import org.http4k.ai.llm.image.ImageGenerationContract
 import org.http4k.ai.llm.image.OpenAI
+import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.Role
 import org.http4k.connect.openai.ChatCompletionGenerator
 import org.http4k.connect.openai.FakeOpenAI
@@ -31,9 +31,12 @@ class FakeOpenAIChatTest : ChatContract, StreamingChatContract, ImageGenerationC
                 Choice(
                     0, ChoiceDetail(
                         Role.Assistant, null, listOf(
-                            ToolCall("1", "function", FunctionCall("calculator",
-                                """{"first-arg":2.0, "second-arg":2.0}"""
-                            ))
+                            ToolCall(
+                                "1", "function", FunctionCall(
+                                    "calculator",
+                                    """{"first-arg":2.0, "second-arg":2.0}"""
+                                )
+                            )
                         )
                     ), null, null
                 )
@@ -52,9 +55,9 @@ class FakeOpenAIChatTest : ChatContract, StreamingChatContract, ImageGenerationC
         }
     }))
 
-    override val chat = Chat.OpenAI(OpenAIApi.ApiKey.of("asd"), http)
-    override val streamingChat = StreamingChat.OpenAI(OpenAIApi.ApiKey.of("asd"), http)
-    override val imageGeneration = ImageGeneration.OpenAI(OpenAIApi.ApiKey.of("asd"), http)
+    override val chat = Chat.OpenAI(ApiKey.of("asd"), http)
+    override val streamingChat = StreamingChat.OpenAI(ApiKey.of("asd"), http)
+    override val imageGeneration = ImageGeneration.OpenAI(ApiKey.of("asd"), http)
 
     override val model = OpenAIModels.GPT3_5
 }

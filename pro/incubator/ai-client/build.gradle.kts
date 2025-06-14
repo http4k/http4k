@@ -11,7 +11,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-ai-llm"))
+    api(project(":http4k-ai-llm-core"))
     api(project(":http4k-ai-mcp-sdk"))
     api(project(":http4k-server-jetty"))
     api(project(":http4k-web-datastar"))

@@ -1,0 +1,10 @@
+package org.http4k.ai.langchain4j.embedding
+
+import org.http4k.connect.openai.FakeOpenAI
+import org.http4k.connect.openai.Http
+import org.http4k.connect.openai.OpenAI
+import org.http4k.connect.openai.OpenAIToken
+
+class OpenAiEmbeddingModelTest : EmbeddingModelContract {
+    override val model = OpenAIEmbeddingModel(OpenAI.Http(OpenAIToken.of("hello"), FakeOpenAI()))
+}

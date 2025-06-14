@@ -9,9 +9,9 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-ai-llm"))
+    api(project(":http4k-ai-llm-core"))
     api(project(":http4k-connect-ai-anthropic"))
     testApi(project(":http4k-connect-ai-anthropic-fake"))
     testFixturesApi(testFixtures(project(":http4k-core")))
-    testFixturesApi(testFixtures(project(":http4k-ai-llm")))
+    testFixturesApi(testFixtures(project(":http4k-ai-llm-core")))
 }

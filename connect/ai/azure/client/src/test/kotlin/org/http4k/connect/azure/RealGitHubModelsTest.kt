@@ -1,5 +1,6 @@
 package org.http4k.connect.azure
 
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment
 import org.http4k.config.Environment.Companion.ENV
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Disabled
 
 class RealGitHubModelsTest : AzureAIContract, PortBasedTest {
-    val token = EnvironmentKey.value(GitHubToken).optional("GITHUB_TOKEN_MODELS")
+    val token = EnvironmentKey.value(ApiKey).optional("GITHUB_TOKEN_MODELS")
 
     init {
         Assumptions.assumeTrue(token(ENV) != null, "No API Key set - skipping")

@@ -2,12 +2,11 @@ package org.http4k.connect.openai
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.StopReason
 
-class OpenAIToken private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<OpenAIToken>(::OpenAIToken)
-}
+typealias OpenAIToken = ApiKey
 
 class OpenAIOrg private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<OpenAIOrg>(::OpenAIOrg) {

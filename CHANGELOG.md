@@ -3,19 +3,25 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.13.1.0
+### v6.14.0.0
 - **http4k-***: Upgrade some dependency versions
-- **http4k-mcp-core**: Add new draft spec features to model
+- **http4k-connect-langchain**: [Breaking!] This is now `http4k-ai-langchain4j`. The packages have been moved to `org.http4k.ai.langchain4j` - you can search and replace the imports to fix the breaks.
+- **http4k-ai-mcp-sdk**: Add new draft spec features to model.
+- **http4k-ai-llm-anthropic**: [New module!] Universal LLM support for OpenAI.
+- **http4k-ai-llm-azure**: [New module!] Universal LLM support for Azure and Azure GitHubModels.
+- **http4k-ai-llm-gemini**: [New module!] Universal LLM support for Google Gemini models.
+- **http4k-ai-llm-github**: [New module!] Universal LLM support for GitHubModels through the GitHub API.
+- **http4k-ai-llm-openai**: [New module!] Universal LLM support for OpenAI and compatible LLM APis, including Gemini, Azure, GitHubModels
 
 ### v6.13.0.0
 - **http4k-***: Upgrade some dependency versions
 - **http4k-server-undertow**: [Fix #1365] Gracefully handle unrecognized/invalid HTTP verbs
-- **http4k-mcp-core**: [Breaking] Rename Reference.Resource to Reference.ResourceTemplate.
+- **http4k-ai-mcp-sdk**: [Breaking] Rename Reference.Resource to Reference.ResourceTemplate.
 - **http4k-connect-ai-langchain**: [Breaking] Rename some classes for consistency. Easy fix :)
 
 ### v6.12.0.0
 - **http4k-***: Repackaging modules into new http4k ecosystem `http4k-ai`
-- **http4k-ai-llm**: [New module!] Core abstractions for a unified LLM API, providing a functional interface for working with LLMs in true http4k style. :)
+- **http4k-ai-llm-core**: [New module!] Core abstractions for a unified LLM API, providing a functional interface for working with LLMs in true http4k style. :)
 - **http4k-mcp-core**: [Breaking] Package migration `org.http4k.mcp` to `org.http4k.ai.mcp`. Fix: Simple replacement will fix imports.
 - **http4k-mcp-core**: [Deprecation] Replaced with `http4k-ai-mcp-core`
 - **http4k-mcp-client**: [Breaking] Package migration `org.http4k.mcp` to `org.http4k.ai.mcp`. Fix: Simple replacement will fix imports.

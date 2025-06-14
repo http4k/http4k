@@ -1,6 +1,6 @@
 package org.http4k.ai.llm.chat
 
-import org.http4k.ai.llm.OpenAIApi
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 
 class RealOpenAIChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
-    val apiKey = EnvironmentKey.value(OpenAIApi.ApiKey).optional("OPENAI_API_KEY")
+    val apiKey = EnvironmentKey.value(ApiKey).optional("OPENAI_API_KEY")
 
     init {
         assumeTrue(apiKey(ENV) != null, "No API Key set - skipping")

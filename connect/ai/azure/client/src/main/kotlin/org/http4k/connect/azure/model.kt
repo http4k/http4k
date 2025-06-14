@@ -2,6 +2,7 @@ package org.http4k.connect.azure
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.StopReason
 
 class Region private constructor(value: String) : StringValue(value) {
@@ -18,13 +19,11 @@ class AzureHost private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<AzureHost>(::AzureHost)
 }
 
-class AzureAIApiKey private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<AzureAIApiKey>(::AzureAIApiKey)
-}
+@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
+typealias AzureAIApiKey = ApiKey
 
-class GitHubToken private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<GitHubToken>(::GitHubToken)
-}
+@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
+typealias GitHubToken = ApiKey
 
 class AzureResource private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<AzureResource>(::AzureResource)
