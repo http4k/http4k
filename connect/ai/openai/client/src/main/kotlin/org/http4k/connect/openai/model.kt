@@ -6,6 +6,7 @@ import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.StopReason
 
+@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
 typealias OpenAIToken = ApiKey
 
 class OpenAIOrg private constructor(value: String) : StringValue(value) {

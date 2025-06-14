@@ -7,7 +7,6 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.OpenAIOrg
-import org.http4k.connect.openai.OpenAIToken
 import org.http4k.core.HttpHandler
 
 
@@ -19,7 +18,7 @@ class OpenAIApi(
     private val http: HttpHandler = JavaHttpClient(),
     private val org: Org? = null
 ) : OpenAICompatibleClient {
-    override fun invoke() = OpenAI.Http(OpenAIToken.of(apiKey.value), http, org?.let { OpenAIOrg.of(it.value) })
+    override fun invoke() = OpenAI.Http(ApiKey.of(apiKey.value), http, org?.let { OpenAIOrg.of(it.value) })
 
     class Org private constructor(value: String) : StringValue(value) {
         companion object : NonBlankStringValueFactory<Org>(::Org)

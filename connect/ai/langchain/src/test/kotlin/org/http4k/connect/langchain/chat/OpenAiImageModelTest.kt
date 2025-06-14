@@ -1,11 +1,11 @@
 package org.http4k.connect.langchain.chat
 
+import org.http4k.ai.model.ApiKey
 import org.http4k.connect.langchain.image.OpenAIImageModel
 import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
-import org.http4k.connect.openai.OpenAIToken
 
 class OpenAiImageModelTest : ImageModelContract {
-    override val model = OpenAIImageModel(OpenAI.Http(OpenAIToken.of("hello"), FakeOpenAI()))
+    override val model = OpenAIImageModel(OpenAI.Http(ApiKey.of("hello"), FakeOpenAI()))
 }

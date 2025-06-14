@@ -1,5 +1,6 @@
 package org.http4k.connect.anthropic
 
+import org.http4k.ai.model.ApiKey
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -7,7 +8,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.RequestFilters.SetHeader
 
 fun AnthropicAI.Companion.Http(
-    apiKey: AnthropicIApiKey,
+    apiKey: ApiKey,
     apiVersion: ApiVersion,
     http: HttpHandler,
 ) = object : AnthropicAI {
