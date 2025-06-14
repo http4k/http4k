@@ -7,6 +7,8 @@ import org.http4k.ai.llm.OpenAIApi
 import org.http4k.ai.llm.OpenAICompatibleClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 
 /**

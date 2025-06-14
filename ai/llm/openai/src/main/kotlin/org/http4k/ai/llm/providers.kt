@@ -38,7 +38,7 @@ class OpenAIApi(
 /**
  * GitHubModels via Azure integration
  */
-class GitHubModels(private val apiKey: ApiKey, private val http: HttpHandler = JavaHttpClient()) :
+class AzureGitHubModels(private val apiKey: ApiKey, private val http: HttpHandler = JavaHttpClient()) :
     OpenAICompatibleClient {
     override fun invoke() = object : OpenAI {
         private val routedHttp = SetBaseUriFrom(Uri.of("https://models.inference.ai.azure.com"))
@@ -108,5 +108,36 @@ class Gemini(private val apiKey: ApiKey, private val http: HttpHandler = JavaHtt
         val Gemini1_5Pro = ModelName.of("gemini-1.5-pro")
         val Gemini1_5Ultra = ModelName.of("gemini-1.5-ultra")
         val Gemini2_0 = ModelName.of("gemini-2.0-flash")
+    }
+}
+
+/**
+ * GitHubModels integration
+ */
+class GitHubModels(
+    private val apiKey: ApiKey,
+    private val http: HttpHandler = JavaHttpClient(),
+    private val githubOrg: String? = null
+) : OpenAICompatibleClient {
+    override fun invoke() = object : OpenAI {
+
+        val orgPath = githubOrg?.let { "orgs/$it/" } ?: ""
+        private val routedHttp = BearerAuth(apiKey.value).then(http)
+
+        override fun <R> invoke(action: OpenAIAction<R>) = action.toResult(
+            routedHttp(
+                action.toRequest()
+                    .uri(Uri.of("https://models.github.ai/${orgPath}inference/chat/completions"))
+            )
+        )
+    }
+
+    class ApiKey private constructor(value: String) : StringValue(value) {
+        companion object : NonBlankStringValueFactory<ApiKey>(::ApiKey)
+    }
+
+    object Models {
+        val OpenAI_GPT4 = ModelName.of("openai/gpt-4.1")
+        val OpenAI_O1 = ModelName.of("openai/o1")
     }
 }
