@@ -28,7 +28,6 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.assertTimeout
 import org.opentest4j.TestAbortedException
-import java.time.Duration
 import java.time.Duration.ofMillis
 import java.time.Duration.ofSeconds
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -41,17 +40,13 @@ abstract class ServerStopContract(
     protected val client: HttpHandler,
     enableStopModes: ConfigureServerStopContract.() -> Unit,
     private val defaultGracefulStopMode: Graceful = Graceful(ofSeconds(10)),
-): PortBasedTest {
+) : PortBasedTest {
 
     private val timeoutTolerance = ofMillis(1000)
-    private val supportedStopModes: Set<StopMode>
+    private val supportedStopModes = ConfigureServerStopContract()
+        .also(enableStopModes)
+        .enabledModes
     private val dockerHost = System.getenv("SERVER_HOST") ?: "127.0.0.1"
-
-    init {
-        supportedStopModes = ConfigureServerStopContract()
-            .also(enableStopModes)
-            .enabledModes
-    }
 
     inner class ConfigureServerStopContract(val enabledModes: MutableSet<StopMode> = mutableSetOf()) {
         fun enableImmediateStop() {
