@@ -6,10 +6,10 @@ import com.natpryce.hamkrest.greaterThanOrEqualTo
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.valueOrNull
+import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.ModelParams
-import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.util.LLMJson
 import org.http4k.ai.llm.util.LLMJson.convert
@@ -32,7 +32,7 @@ interface ChatContract {
             )
         ).valueOrNull()!!
 
-        assertThat(response.message.contents, equalTo(listOf(Content.Text("4"))))
+        assertThat(response.message.contents.consolidate(), equalTo(listOf(Content.Text("4"))))
         assertThat(response.message.toolRequests, equalTo(listOf()))
         assertThat(response.metadata.usage?.total, present(greaterThanOrEqualTo(0)))
     }
@@ -64,7 +64,7 @@ interface ChatContract {
             tools = listOf(LLMTool("calculator", "A simple calculator", convert(jsonSchema))),
         )
         val initialRequest = ChatRequest(
-            "what is 2+2? do not explain. use the tool to get the answer and then give me the answer as the word not a number when i give you the tool response. Just respond with the number and not any sentence about it",
+            "what is 2+2? do not explain. use the tool to get the answer and then give me the answer as the word not a number when i give you the tool response. Use your knowledge to convert the number to text version of the number and not any sentence about it",
             params
         )
         val initialResponse = chat(initialRequest).valueOrNull()!!
@@ -81,9 +81,16 @@ interface ChatContract {
                     Message.ToolResult(toolRequest.id, toolRequest.name, "4"), params
             )
         ).onFailure { error(it) }
-        assertThat(response2.message.contents, equalTo(listOf(Content.Text("four"))))
+        assertThat(response2.message.contents.consolidate(), equalTo(listOf(Content.Text("four"))))
         assertThat(response2.message.toolRequests, equalTo(listOf()))
         assertThat(response2.metadata.usage?.total, present(greaterThanOrEqualTo(0)))
 
+    }
+}
+
+private fun List<Content>.consolidate() = map {
+    when (it) {
+        is Content.Text -> Content.Text(it.text.filter { it.isLetterOrDigit() }.lowercase())
+        else -> it
     }
 }

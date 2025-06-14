@@ -10,7 +10,7 @@ import org.http4k.ai.model.Temperature
 data class ModelParams(
     val modelName: ModelName,
     val temperature: Temperature? = null,
-    val stopSequences: List<String> = emptyList(),
+    val stopSequences: List<String>? = null,
     val maxOutputTokens: MaxTokens? = null,
     val responseFormat: ChatResponseFormat? = null,
     val tools: List<LLMTool> = emptyList(),

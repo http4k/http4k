@@ -32,7 +32,7 @@ fun Chat.Companion.AnthropicAI(
                 request.messages.map { it.toAnthropic() },
                 request.params.maxOutputTokens ?: MaxTokens.of(64000),
                 metadata,
-                request.params.stopSequences,
+                request.params.stopSequences ?: emptyList(),
                 systemPrompt,
                 request.params.temperature,
                 request.params.toolSelection?.toLLM(),

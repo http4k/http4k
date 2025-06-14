@@ -2,6 +2,7 @@ package org.http4k.ai.llm
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import org.http4k.ai.model.ModelName
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
@@ -79,5 +80,33 @@ class Azure(
 
     class Resource private constructor(value: String) : StringValue(value) {
         companion object : NonBlankStringValueFactory<Resource>(::Resource)
+    }
+}
+
+/**
+ * Gemini integration
+ */
+class Gemini(private val apiKey: ApiKey, private val http: HttpHandler = JavaHttpClient()) : OpenAICompatibleClient {
+    override fun invoke() = object : OpenAI {
+
+        private val routedHttp = BearerAuth(apiKey.value).then(http)
+
+        override fun <R> invoke(action: OpenAIAction<R>) = action.toResult(
+            routedHttp(
+                action.toRequest()
+                    .uri(Uri.of("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"))
+            )
+        )
+    }
+
+    class ApiKey private constructor(value: String) : StringValue(value) {
+        companion object : NonBlankStringValueFactory<ApiKey>(::ApiKey)
+    }
+
+    object Models {
+        val Gemini1_5 = ModelName.of("gemini-1.5-flash")
+        val Gemini1_5Pro = ModelName.of("gemini-1.5-pro")
+        val Gemini1_5Ultra = ModelName.of("gemini-1.5-ultra")
+        val Gemini2_0 = ModelName.of("gemini-2.0-flash")
     }
 }

@@ -1,11 +1,11 @@
 package org.http4k.ai.llm.chat
 
+import org.http4k.ai.llm.chat.ChatResponseFormat.Json
+import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.model.Message
 import org.http4k.ai.llm.model.Message.Assistant
 import org.http4k.ai.llm.model.Resource
-import org.http4k.ai.llm.chat.ChatResponseFormat.Json
-import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.llm.util.LLMJson
@@ -30,6 +30,7 @@ import org.http4k.connect.openai.action.MessageContent
 import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
 import org.http4k.connect.openai.action.Tool
 import org.http4k.connect.openai.action.ToolCall
+import java.util.UUID
 
 fun ChatResponseFormat.toOpenAI() = when (this) {
     is Json -> JsonSchema(true, LLMJson.convert(schema))
@@ -52,7 +53,11 @@ fun List<Choice>.toHttp4k(): Assistant {
 }
 
 fun ToolCall.toHttp4k() =
-    ToolRequest(RequestId.of(id), ToolName.of(function.name), LLMJson.convert(LLMJson.parse(function.arguments)))
+    ToolRequest(
+        if (id.isBlank()) RequestId.of(UUID.randomUUID().toString()) else RequestId.of(id),
+        ToolName.of(function.name),
+        LLMJson.convert(LLMJson.parse(function.arguments))
+    )
 
 fun LLMTool.toOpenAI() = Tool(FunctionSpec(name.value, inputSchema, description))
 
@@ -95,11 +100,11 @@ fun ChatRequest.toOpenAI(stream: Boolean) =
         messages.map { it.toOpenAI() },
         params.maxOutputTokens,
         params.temperature ?: Temperature.ONE,
-        params.topP ?: 1.0,
+        params.topP,
         1,
         params.stopSequences,
-        params.presencePenalty ?: 0.0,
-        params.frequencyPenalty ?: 0.0,
+        params.presencePenalty,
+        params.frequencyPenalty,
         null,
         null,
         stream,
