@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 class RealGeminiChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     val apiKey =
-        EnvironmentKey.value(ApiKey).defaulted("GEMINI_API_KEY2", ApiKey.of("AIzaSyAwRGjqzyxQmDgP-NvppASZqSsjZdJ8MSw"))
+        EnvironmentKey.value(ApiKey).optional("GEMINI_API_KEY")
 
     init {
         assumeTrue(apiKey(ENV) != null, "No API Key set - skipping")
