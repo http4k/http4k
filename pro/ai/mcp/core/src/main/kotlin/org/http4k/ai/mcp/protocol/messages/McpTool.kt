@@ -14,9 +14,10 @@ import se.ansman.kotshi.JsonSerializable
 data class McpTool(
     val name: ToolName,
     val description: String,
-    val inputSchema: Map<String, Any> = emptyMap(),
-    val outputSchema: Map<String, Any>? = null,
-    val annotations: ToolAnnotations? = null,
+    val title: String?,
+    val inputSchema: Map<String, Any>,
+    val outputSchema: Map<String, Any>?,
+    val annotations: ToolAnnotations?,
 ) {
     object List : McpRpc {
         override val Method = of("tools/list")

@@ -52,9 +52,10 @@ class WebsocketMcpClient(
     private val websocketFactory: WebsocketFactory,
     capabilities: ClientCapabilities = All,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
+    title: String? = null,
     defaultTimeout: Duration = Duration.ofSeconds(1),
     random: Random = Random
-) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout, random) {
+) : AbstractMcpClient(VersionedMcpEntity(name, version, title), capabilities, protocolVersion, defaultTimeout, random) {
     private val wsClient by lazy {
         websocketFactory.blocking(
             wsRequest.uri,

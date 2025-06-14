@@ -18,8 +18,8 @@ interface PromptCapability : ServerCapability, PromptHandler {
 }
 
 fun PromptCapability(prompt: Prompt, handler: PromptHandler) = object : PromptCapability {
-    override fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.args.map {
-        McpPrompt.Argument(it.meta.name, it.meta.description, it.meta.required)
+    override fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.title, prompt.args.map {
+        McpPrompt.Argument(it.meta.name, it.meta.description, it.meta.metadata["title"] as String?, it.meta.required)
     })
 
     override fun get(mcp: McpPrompt.Get.Request, client: Client, http: Request) = try {

@@ -8,9 +8,12 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class McpPrompt(val name: PromptName, val description: String?, val arguments: kotlin.collections.List<Argument>) {
+data class McpPrompt(val name: PromptName,
+                     val description: String?,
+                     val title: String?,
+                     val arguments: kotlin.collections.List<Argument>) {
     @JsonSerializable
-    data class Argument(val name: String, val description: String? = null, val required: Boolean? = null)
+    data class Argument(val name: String, val description: String? = null, val title: String? = null, val required: Boolean? = null)
 
     object Get : McpRpc {
         override val Method = of("prompts/get")

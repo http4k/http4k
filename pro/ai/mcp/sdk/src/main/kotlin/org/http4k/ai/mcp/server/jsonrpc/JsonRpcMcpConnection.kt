@@ -21,7 +21,7 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: R
         is Session -> {
             with(protocol) {
                 handleInitialize(
-                    McpInitialize.Request(VersionedMcpEntity(metaData.entity.name, metaData.entity.version), All),
+                    McpInitialize.Request(metaData.entity, All),
                     session
                 )
                 receive(Unit, session, req).asHttp()

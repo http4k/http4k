@@ -36,6 +36,7 @@ interface ToolCapability : ServerCapability, ToolHandler {
 fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     override fun toTool() = McpTool(
         tool.name, tool.description,
+        tool.title,
         McpJson.convert(tool.toSchema()),
         tool.outputSchema?.let { McpJson.convert(it) },
         tool.annotations

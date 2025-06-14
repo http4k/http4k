@@ -13,12 +13,13 @@ import org.http4k.ai.mcp.PromptRequest
 class Prompt private constructor(
     val name: PromptName,
     val description: String?,
-    val args: List<BiDiLens<PromptRequest, *>>
+    val args: List<BiDiLens<PromptRequest, *>>,
+    val title: String? = null
 ) : CapabilitySpec {
-    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>) :
-        this(name, description, args.toList())
-    constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>) :
-        this(PromptName.of(name), description, args.toList())
+    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>,  title: String? = null) :
+        this(name, description, args.toList(), title)
+    constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null) :
+        this(PromptName.of(name), description, args.toList(), title)
 
     object Arg : BiDiLensSpec<PromptRequest, String>(
         "promptRequest", StringParam,

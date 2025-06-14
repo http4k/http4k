@@ -1,7 +1,5 @@
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.connect.model.MimeType
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.model.Annotations
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Meta
@@ -11,6 +9,8 @@ import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
+import org.http4k.connect.model.MimeType
+import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -19,10 +19,11 @@ data class McpResource internal constructor(
     val uri: Uri?,
     val uriTemplate: ResourceUriTemplate?,
     val name: ResourceName,
-    val description: String? = null,
-    val mimeType: MimeType? = null,
-    val size: Size? = null,
-    val annotations: Annotations? = null
+    val description: String?,
+    val title: String?,
+    val mimeType: MimeType?,
+    val size: Size?,
+    val annotations: Annotations?
 ) {
     constructor(
         uri: Uri,
@@ -30,8 +31,9 @@ data class McpResource internal constructor(
         description: String? = null,
         mimeType: MimeType? = null,
         size: Size? = null,
-        annotations: Annotations? = null
-    ) : this(uri, null, name, description, mimeType, size, annotations)
+        annotations: Annotations? = null,
+        title: String? = null
+    ) : this(uri, null, name, description, title, mimeType, size, annotations)
 
     constructor(
         uriTemplate: ResourceUriTemplate,
@@ -39,8 +41,9 @@ data class McpResource internal constructor(
         description: String? = null,
         mimeType: MimeType? = null,
         size: Size? = null,
-        annotations: Annotations? = null
-    ) : this(null, uriTemplate, name, description, mimeType, size, annotations)
+        annotations: Annotations? = null,
+        title: String? = null,
+    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations)
 
     object Read : McpRpc {
         override val Method = of("resources/read")

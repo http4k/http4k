@@ -36,6 +36,7 @@ class Tool private constructor(
     val description: String,
     val args: List<McpCapabilityLens<ToolRequest, *>>,
     val output: McpCapabilityLens<ToolResponse.Ok, *>? = null,
+    val title: String? = null,
     val annotations: ToolAnnotations? = null,
 ) : CapabilitySpec {
     val outputSchema: McpNodeType? = null
@@ -45,8 +46,9 @@ class Tool private constructor(
         description: String,
         vararg arguments: McpCapabilityLens<ToolRequest, *>,
         output: McpCapabilityLens<ToolResponse.Ok, *>? = null,
+        title: String? = null,
         annotations: ToolAnnotations? = null
-    ) : this(ToolName.of(name), description, arguments.toList(), output, annotations)
+    ) : this(ToolName.of(name), description, arguments.toList(), output, title, annotations)
 
     /**
      * A typesafe tool argument lens. Use the extension functions below to create a lens for a specific type.

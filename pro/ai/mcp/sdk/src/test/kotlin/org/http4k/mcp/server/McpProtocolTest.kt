@@ -198,8 +198,8 @@ class McpProtocolTest {
 
     @Test
     fun `deal with prompts`() {
-        val intArg = Prompt.Arg.int().required("name", "description")
-        val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
+        val intArg = Prompt.Arg.int().required("name", "description", mapOf("title" to "title"))
+        val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title")
 
         val mcp = SseMcp(
             McpProtocol(
@@ -228,8 +228,8 @@ class McpProtocolTest {
                 McpPrompt.List.Response(
                     listOf(
                         McpPrompt(
-                            PromptName.of("prompt"), "description",
-                            listOf(McpPrompt.Argument("name", "description", true))
+                            PromptName.of("prompt"), "description", "title",
+                            listOf(McpPrompt.Argument("name", "description", "title", true))
                         )
                     )
                 )
@@ -389,8 +389,8 @@ class McpProtocolTest {
         val intArg = Tool.Arg.int().optional("bar", "description2")
         val output = Tool.Output.auto(FooBar("bar")).toLens()
 
-        val unstructuredTool = Tool("unstructured", "description", stringArg, intArg)
-        val structuredTool = Tool("structured", "description", output = output)
+        val unstructuredTool = Tool("unstructured", "description", stringArg, intArg, title = "title")
+        val structuredTool = Tool("structured", "description", output = output, title = "title")
 
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -430,7 +430,7 @@ class McpProtocolTest {
                 McpTool.List.Response(
                     listOf(
                         McpTool(
-                            ToolName.of("unstructured"), "description",
+                            ToolName.of("unstructured"), "description", "title",
                             mapOf(
                                 "type" to "object",
                                 "required" to listOf("foo"),
@@ -438,15 +438,19 @@ class McpProtocolTest {
                                     "foo" to mapOf("type" to "string", "description" to "description1"),
                                     "bar" to mapOf("type" to "integer", "description" to "description2")
                                 )
-                            )
+                            ),
+                            null,
+                            null
                         ),
                         McpTool(
-                            ToolName.of("structured"), "description",
+                            ToolName.of("structured"), "description", "title",
                             mapOf(
                                 "type" to "object",
                                 "required" to listOf<String>(),
                                 "properties" to emptyMap<String, Any>()
-                            )
+                            ),
+                            null,
+                            null
                         )
                     )
                 )

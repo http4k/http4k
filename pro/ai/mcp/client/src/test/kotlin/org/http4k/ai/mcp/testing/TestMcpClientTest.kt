@@ -95,8 +95,8 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with prompts`() {
-        val intArg = Prompt.Arg.int().required("name", "description")
-        val prompt = Prompt(PromptName.of("prompt"), "description", intArg)
+        val intArg = Prompt.Arg.int().required("name", "description", mapOf("title" to "title"))
+        val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title")
 
         val serverPrompts = ServerPrompts(
             listOf(
@@ -124,8 +124,8 @@ class TestMcpClientTest {
                     Success(
                         listOf(
                             McpPrompt(
-                                PromptName.of("prompt"), "description",
-                                listOf(McpPrompt.Argument("name", "description", true))
+                                PromptName.of("prompt"), "description", "title",
+                                listOf(McpPrompt.Argument("name", "description", "title", true))
                             )
                         )
                     )
@@ -241,7 +241,7 @@ class TestMcpClientTest {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
 
-        val tool = Tool("name", "description", stringArg, intArg)
+        val tool = Tool("name", "description", stringArg, intArg, title = "title")
 
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -271,7 +271,7 @@ class TestMcpClientTest {
                     Success(
                         listOf(
                             McpTool(
-                                ToolName.of("name"), "description",
+                                ToolName.of("name"), "description", "title",
                                 mapOf(
                                     "type" to "object",
                                     "required" to listOf("foo"),
@@ -279,7 +279,9 @@ class TestMcpClientTest {
                                         "foo" to mapOf("type" to "string", "description" to "description1"),
                                         "bar" to mapOf("type" to "integer", "description" to "description2")
                                     )
-                                )
+                                ),
+                                null,
+                                null
                             )
                         )
                     )

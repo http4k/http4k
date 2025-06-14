@@ -1,9 +1,9 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.util.Rfc6570UriTemplateMatcher.matches
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
-import org.http4k.ai.mcp.util.Rfc6570UriTemplateMatcher.matches
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -15,6 +15,7 @@ sealed class Resource : CapabilitySpec {
     abstract val size: Size?
     abstract val description: String?
     abstract val mimeType: MimeType?
+    abstract val title: String?
     abstract val annotations: Annotations?
 
     data class Static(
@@ -24,13 +25,13 @@ sealed class Resource : CapabilitySpec {
         override val mimeType: MimeType? = null,
         override val size: Size? = null,
         override val annotations: Annotations? = null,
+        override val title: String? = null,
     ) : Resource() {
         constructor(
             uri: String, name: String, description: String? = null,
             mimeType: MimeType? = null, size: Size? = null,
-
-            annotations: Annotations? = null,
-        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations)
+            annotations: Annotations? = null, title: String? = null
+        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations, title)
 
         override fun matches(uri: Uri) = this.uri == uri
     }
@@ -42,14 +43,21 @@ sealed class Resource : CapabilitySpec {
         override val mimeType: MimeType? = null,
         override val size: Size? = null,
         override val annotations: Annotations? = null,
-        internal val matchFn: ResourceUriTemplate.(Uri) -> Boolean = { matches(it) }
+        override val title: String? = null,
+        internal val matchFn: ResourceUriTemplate.(Uri) -> Boolean = { matches(it) },
     ) : Resource() {
         constructor(
-            uriTemplate: String, name: String, description: String? = null,
+            uriTemplate: String,
+            name: String,
+            description: String? = null,
             mimeType: MimeType? = null,
             size: Size? = null,
             annotations: Annotations? = null,
-        ) : this(ResourceUriTemplate.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations)
+            title: String? = null,
+        ) : this(
+            ResourceUriTemplate.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations,
+            title
+        )
 
         override fun matches(uri: Uri) = matchFn(uriTemplate, uri)
     }
