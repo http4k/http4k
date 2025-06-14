@@ -28,6 +28,7 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.assertTimeout
 import org.opentest4j.TestAbortedException
+import java.time.Duration
 import java.time.Duration.ofMillis
 import java.time.Duration.ofSeconds
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -38,10 +39,10 @@ import kotlin.concurrent.thread
 abstract class ServerStopContract(
     private val backend: ServerBackend,
     protected val client: HttpHandler,
-    enableStopModes: ConfigureServerStopContract.() -> Unit
+    enableStopModes: ConfigureServerStopContract.() -> Unit,
+    private val defaultGracefulStopMode: Graceful = Graceful(ofSeconds(10)),
 ): PortBasedTest {
 
-    private val defaultGracefulStopMode = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
     private val supportedStopModes: Set<StopMode>
     private val dockerHost = System.getenv("SERVER_HOST") ?: "127.0.0.1"
@@ -165,7 +166,7 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `graceful stop mode is waiting for inflight requests to succeed`() {
+    open fun `graceful stop mode is waiting for inflight requests to succeed`() {
         startServerOrSkip(defaultGracefulStopMode).testInflightRequestsCompleteDuringServerStop()
     }
 
