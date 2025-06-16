@@ -17,6 +17,8 @@ Copyright (c) 2025-present http4k Ltd, a company registered in England and Wales
 
 "Derivative Works" means any software that incorporates, extends, or modifies the Software.
 
+"Annual Recurring Revenue" or "ARR" means the total gross revenue received by an organization and its Affiliates from all sources during a twelve-month period, including but not limited to sales of products or services, licensing fees, subscriptions, consulting revenue, and any other commercial income, calculated on a rolling twelve-month basis.
+
 ## 2. License Grant and Restrictions
 
 2.1 License Types and Conditions
@@ -31,6 +33,13 @@ a) Commercial Usage:
 b) Non-Commercial Usage:
 - Use is strictly for non-commercial purposes (including personal projects, academic research, education, and non-profit organizations)
 - Attribution is provided to http4k Ltd in any resulting work or publication
+
+c) Startup Exception:
+- Organizations with Annual Recurring Revenue of less than $1,000,000 USD may use the Software without a paid subscription
+- Must provide annual self-certification of revenue status upon request
+- Must obtain a commercial subscription within 60 days of exceeding the $1,000,000 ARR threshold
+- Attribution is required in any resulting work or publication
+- This exception applies only to for-profit organizations; non-profit organizations continue to qualify under Non-Commercial Usage
 
 Subject to the foregoing conditions, you are permitted to:
 - Use the Software's development tools and tooling modules
@@ -84,56 +93,66 @@ The above restrictions do not apply to http4k components released under the Apac
 - You may not redistribute protected source code or binaries except as explicitly permitted
 - You must maintain the confidentiality of protected source code and repository access credentials
 
-## 3. Term and Termination
+## 3. Revenue Reporting and Compliance
 
-3.1. This license is effective until terminated.
+3.1 Organizations using the Startup Exception must:
+- Maintain accurate records of their Annual Recurring Revenue
+- Provide annual self-certification of revenue status within 30 days of http4k Ltd's written request
+- Notify http4k Ltd within 30 days of exceeding the $1,000,000 ARR threshold
+- Obtain a commercial subscription within 60 days of exceeding the threshold
 
-3.2. Your rights under this license will terminate automatically if you fail to comply with its terms.
+3.2 Failure to comply with revenue reporting requirements or obtain required licenses constitutes a material breach of this license.
 
-3.3. Upon termination:
+## 4. Term and Termination
+
+4.1. This license is effective until terminated.
+
+4.2. Your rights under this license will terminate automatically if you fail to comply with its terms.
+
+4.3. Upon termination:
 - All rights granted under this license cease immediately
 - You must cease all use of the Software
 - You must destroy all copies of the Software in your possession
 
-## 4. Support and Updates
+## 5. Support and Updates
 
 Support and updates are provided according to your Subscription Tier as specified in the Commercial Terms.
 
-## 5. Compliance and Auditing
+## 6. Compliance and Auditing
 
-5.1. You agree to maintain accurate records regarding your use of the Software.
+6.1. You agree to maintain accurate records regarding your use of the Software and, if applicable, your Annual Recurring Revenue.
 
-5.2. http4k Ltd reserves the right to audit your use of the Software upon reasonable notice.
+6.2. http4k Ltd reserves the right to audit your use of the Software and revenue compliance upon reasonable notice.
 
-5.3. You agree to cooperate with http4k Ltd in such audits and provide reasonable access to records relating to Software use.
+6.3. You agree to cooperate with http4k Ltd in such audits and provide reasonable access to records relating to Software use and revenue calculations.
 
-## 6. Payment Terms
+## 7. Payment Terms
 
-6.1. License fees shall be paid in accordance with the Commercial Terms.
+7.1. License fees shall be paid in accordance with the Commercial Terms.
 
-6.2. Failure to pay required fees constitutes grounds for license termination.
+7.2. Failure to pay required fees constitutes grounds for license termination.
 
-## 7. Export Compliance
+## 8. Export Compliance
 
 Use and distribution of the Software may be subject to export and import laws. You agree to comply with all applicable export and import laws and regulations.
 
-## 8. Apache License Exclusion
+## 9. Apache License Exclusion
 
 This Commercial License applies only to the part of this Software that is not distributed under the Apache2 license.
 
-## 9. Warranty Disclaimer
+## 10. Warranty Disclaimer
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## 10. Third Party Components
+## 11. Third Party Components
 
 For all third party components incorporated into the http4k Software, those components are licensed under the original license provided by the owner of the applicable component.
 
-## 11. Assignment
+## 12. Assignment
 
 You may not assign or transfer your rights and obligations under this License without prior written consent from http4k Ltd. http4k Ltd may assign its rights to any successor in interest to the Software.
 
-## 12. Severability
+## 13. Severability
 
 If any provision of this License is held to be unenforceable or invalid, that provision will be enforced to the maximum extent possible and the other provisions will remain in full force and effect.
 
