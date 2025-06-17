@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.14.1.0
+- **http4k-connect-amazon-cloudwatch***: [New module!] with a server fake. H/T @PaulWMR for the contribution.
+
 ### v6.14.0.0
 - **http4k-***: Upgrade some dependency versions
 - **http4k-connect-langchain**: [Breaking!] This is now `http4k-ai-langchain4j`. The packages have been moved to `org.http4k.ai.langchain4j` - you can search and replace the imports to fix the breaks.
