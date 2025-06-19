@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.14.1.0
 - **http4k-connect-amazon-cloudwatch***: [New module!] with a server fake. H/T @PaulWMR for the contribution.
+- **http4k-connect-amazon-instancemetadata**: [Unlikely Break] Support IMDSv2
 
 ### v6.14.0.0
 - **http4k-***: Upgrade some dependency versions
