@@ -1,11 +1,9 @@
 {
   "node": {
-    "example": null,
     "additionalProperties": {
       "properties": {
         "key": {
           "example": "value",
-          "format": null,
           "type": "string",
           "nullable": true
         },
@@ -16,13 +14,10 @@
           "nullable": true
         },
         "key3": {
-          "example": null,
           "additionalProperties": {
             "properties": {
               "inner": {
-                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
-                "example": null,
-                "format": null
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               }
             },
             "example": {
@@ -30,17 +25,12 @@
                 "uri": "foobar"
               }
             },
-            "format": null,
-            "type": "object",
-            "required": null
+            "type": "object"
           },
-          "format": null,
           "type": "object"
         },
         "key4": {
-          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
-          "example": null,
-          "format": null
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
         },
         "key5": {
           "items": {
@@ -101,7 +91,6 @@
               "enumVal": "value2"
             }
           ],
-          "format": null,
           "type": "array",
           "nullable": true
         },
@@ -114,14 +103,11 @@
             1,
             2
           ],
-          "format": null,
           "type": "array",
           "nullable": true
         },
         "key7": {
-          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder",
-          "example": null,
-          "format": null
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
         }
       },
       "example": {
@@ -238,150 +224,38 @@
           ]
         }
       },
-      "format": null,
-      "type": "object",
-      "required": null
+      "type": "object"
     },
-    "format": null,
     "type": "object"
   },
-  "definitions": [
-    {
-      "first": "org.http4k.contract.jsonschema.v3.ArbObject2",
-      "second": {
-        "properties": {
-          "uri": {
-            "example": "foobar",
-            "format": "uri",
-            "type": "string",
-            "nullable": false
-          }
-        },
-        "example": {
-          "uri": "foobar"
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "uri"
-        ]
-      }
+  "definitions": {
+    "org.http4k.contract.jsonschema.v3.ArbObject2": {
+      "properties": {
+        "uri": {
+          "example": "foobar",
+          "format": "uri",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "example": {
+        "uri": "foobar"
+      },
+      "type": "object",
+      "required": [
+        "uri"
+      ]
     },
-    {
-      "first": "org.http4k.contract.jsonschema.v3.ArbObject",
-      "second": {
-        "properties": {
-          "child": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
-            "example": null,
-            "format": null
-          },
-          "list": {
-            "items": {
-              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
-            },
-            "example": [
-              {
-                "uri": "foobar"
-              },
-              {
-                "uri": "foobar"
-              }
-            ],
-            "format": null,
-            "type": "array",
-            "nullable": false
-          },
-          "nestedList": {
-            "items": {
-              "items": {
-                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
-              },
-              "format": null,
-              "type": "array"
-            },
-            "example": [
-              [
-                {
-                  "uri": "foobar"
-                },
-                {
-                  "uri": "foobar"
-                }
-              ]
-            ],
-            "format": null,
-            "type": "array",
-            "nullable": false
-          },
-          "nullableChild": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2",
-            "example": null,
-            "format": null
-          },
-          "stringList": {
-            "items": {
-              "format": null,
-              "type": "string"
-            },
-            "example": [
-              "hello",
-              "goodbye"
-            ],
-            "format": null,
-            "type": "array",
-            "nullable": false
-          },
-          "anyList": {
-            "items": {
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
-                  },
-                  "format": null,
-                  "type": "array"
-                },
-                {
-                  "format": null,
-                  "type": "string"
-                },
-                {
-                  "format": null,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
-                }
-              ]
-            },
-            "example": [
-              "123",
-              {
-                "uri": "foobar"
-              },
-              true,
-              [
-                {
-                  "uri": "foobar"
-                }
-              ]
-            ],
-            "format": null,
-            "type": "array",
-            "nullable": false
-          },
-          "enumVal": {
-            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo",
-            "example": null,
-            "format": null
-          }
+    "org.http4k.contract.jsonschema.v3.ArbObject": {
+      "properties": {
+        "child": {
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
         },
-        "example": {
-          "child": {
-            "uri": "foobar"
+        "list": {
+          "items": {
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
           },
-          "list": [
+          "example": [
             {
               "uri": "foobar"
             },
@@ -389,7 +263,17 @@
               "uri": "foobar"
             }
           ],
-          "nestedList": [
+          "type": "array",
+          "nullable": false
+        },
+        "nestedList": {
+          "items": {
+            "items": {
+              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+            },
+            "type": "array"
+          },
+          "example": [
             [
               {
                 "uri": "foobar"
@@ -399,14 +283,44 @@
               }
             ]
           ],
-          "nullableChild": {
-            "uri": "foobar"
+          "type": "array",
+          "nullable": false
+        },
+        "nullableChild": {
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+        },
+        "stringList": {
+          "items": {
+            "type": "string"
           },
-          "stringList": [
+          "example": [
             "hello",
             "goodbye"
           ],
-          "anyList": [
+          "type": "array",
+          "nullable": false
+        },
+        "anyList": {
+          "items": {
+            "oneOf": [
+              {
+                "items": {
+                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
+              }
+            ]
+          },
+          "example": [
             "123",
             {
               "uri": "foobar"
@@ -418,102 +332,88 @@
               }
             ]
           ],
-          "enumVal": "value2"
+          "type": "array",
+          "nullable": false
         },
-        "format": null,
-        "type": "object",
-        "required": [
-          "anyList",
-          "child",
-          "list",
-          "nestedList",
-          "stringList"
-        ]
-      }
-    },
-    {
-      "first": "org.http4k.contract.jsonschema.v3.Foo",
-      "second": {
-        "example": "value2",
-        "enum": [
-          "value1",
-          "value2"
+        "enumVal": {
+          "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
+        }
+      },
+      "example": {
+        "child": {
+          "uri": "foobar"
+        },
+        "list": [
+          {
+            "uri": "foobar"
+          },
+          {
+            "uri": "foobar"
+          }
         ],
-        "format": null,
-        "type": "string",
-        "nullable": true
-      }
-    },
-    {
-      "first": "org.http4k.contract.jsonschema.v3.GenericListHolder",
-      "second": {
-        "properties": {
-          "value": {
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
-                },
-                {
-                  "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
-                }
-              ]
+        "nestedList": [
+          [
+            {
+              "uri": "foobar"
             },
-            "example": [
+            {
+              "uri": "foobar"
+            }
+          ]
+        ],
+        "nullableChild": {
+          "uri": "foobar"
+        },
+        "stringList": [
+          "hello",
+          "goodbye"
+        ],
+        "anyList": [
+          "123",
+          {
+            "uri": "foobar"
+          },
+          true,
+          [
+            {
+              "uri": "foobar"
+            }
+          ]
+        ],
+        "enumVal": "value2"
+      },
+      "type": "object",
+      "required": [
+        "anyList",
+        "child",
+        "list",
+        "nestedList",
+        "stringList"
+      ]
+    },
+    "org.http4k.contract.jsonschema.v3.Foo": {
+      "example": "value2",
+      "enum": [
+        "value1",
+        "value2"
+      ],
+      "type": "string",
+      "nullable": true
+    },
+    "org.http4k.contract.jsonschema.v3.GenericListHolder": {
+      "properties": {
+        "value": {
+          "items": {
+            "oneOf": [
               {
-                "uri": "foobar"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
               },
               {
-                "child": {
-                  "uri": "foobar"
-                },
-                "list": [
-                  {
-                    "uri": "foobar"
-                  },
-                  {
-                    "uri": "foobar"
-                  }
-                ],
-                "nestedList": [
-                  [
-                    {
-                      "uri": "foobar"
-                    },
-                    {
-                      "uri": "foobar"
-                    }
-                  ]
-                ],
-                "nullableChild": {
-                  "uri": "foobar"
-                },
-                "stringList": [
-                  "hello",
-                  "goodbye"
-                ],
-                "anyList": [
-                  "123",
-                  {
-                    "uri": "foobar"
-                  },
-                  true,
-                  [
-                    {
-                      "uri": "foobar"
-                    }
-                  ]
-                ],
-                "enumVal": "value2"
+                "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject"
               }
-            ],
-            "format": null,
-            "type": "array",
-            "nullable": false
-          }
-        },
-        "example": {
-          "value": [
+            ]
+          },
+          "example": [
             {
               "uri": "foobar"
             },
@@ -560,14 +460,65 @@
               ],
               "enumVal": "value2"
             }
-          ]
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "value"
+          ],
+          "type": "array",
+          "nullable": false
+        }
+      },
+      "example": {
+        "value": [
+          {
+            "uri": "foobar"
+          },
+          {
+            "child": {
+              "uri": "foobar"
+            },
+            "list": [
+              {
+                "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
+              }
+            ],
+            "nestedList": [
+              [
+                {
+                  "uri": "foobar"
+                },
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "nullableChild": {
+              "uri": "foobar"
+            },
+            "stringList": [
+              "hello",
+              "goodbye"
+            ],
+            "anyList": [
+              "123",
+              {
+                "uri": "foobar"
+              },
+              true,
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "enumVal": "value2"
+          }
         ]
-      }
+      },
+      "type": "object",
+      "required": [
+        "value"
+      ]
     }
-  ]
+  }
 }

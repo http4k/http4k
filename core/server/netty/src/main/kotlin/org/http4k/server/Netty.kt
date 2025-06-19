@@ -4,7 +4,8 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
-import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.channel.MultiThreadIoEventLoopGroup
+import io.netty.channel.nio.NioIoHandler
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpObjectAggregator
@@ -45,8 +46,9 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
             if (sse != null) throw UnsupportedOperationException("Netty does not support sse")
         }
 
-        private val masterGroup = NioEventLoopGroup()
-        private val workerGroup = NioEventLoopGroup()
+        private val masterGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
+        private val workerGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
+
         private var closeFuture: ChannelFuture? = null
         private lateinit var address: InetSocketAddress
 

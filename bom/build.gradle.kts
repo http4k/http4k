@@ -8,14 +8,14 @@ plugins {
     id("org.http4k.community")
 }
 
+val excluded = setOf("http4k-tools", "http4k-incubator-ai-client", "http4k-incubator-db")
 dependencies {
     constraints {
         rootProject.subprojects
             .asSequence()
             .filter { it.name != project.name }
             .filter { shouldBePublished(it) }
-            .filterNot { it.name.contains("http4k-mcp") }
-            .filterNot { it.name == "http4k-tools" }
+            .filterNot { excluded.contains(it.name) }
             .sortedBy { it.name }
             .toList()
             .forEach { api(it) }

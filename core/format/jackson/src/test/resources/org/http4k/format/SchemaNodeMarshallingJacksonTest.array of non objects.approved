@@ -1,0 +1,13 @@
+{
+  "items": {
+    "format": "format",
+    "type": "string"
+  },
+  "example": [
+    "asd"
+  ],
+  "format": null,
+  "type": "array",
+  "foo": "bar",
+  "nullable": false
+}

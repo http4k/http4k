@@ -2,6 +2,7 @@ package org.http4k.testing
 
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.sse.SseClient
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsHandler
@@ -60,3 +61,9 @@ class TestWsClient internal constructor(wsResponse: WsResponse) : WsClient {
 
 fun WsHandler.testWsClient(request: Request): TestWsClient = TestWsClient(invoke(request))
 fun PolyHandler.testWsClient(request: Request): TestWsClient = ws?.testWsClient(request) ?: error("No WS handler set.")
+
+
+fun WsClient.useClient(fn: WsClient.() -> Unit) {
+    fn(this)
+    close()
+}

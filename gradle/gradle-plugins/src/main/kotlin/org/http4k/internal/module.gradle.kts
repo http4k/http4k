@@ -7,7 +7,7 @@ plugins {
     id("org.http4k.internal.code-coverage")
 }
 
-tasks.create("dependencyList") {
+tasks.register("dependencyList") {
     doLast {
         configurations.runtimeClasspath.get().resolvedConfiguration.lenientConfiguration.allModuleDependencies.forEach { resolved ->
             println("${project.name} -> ${resolved.module.id}")

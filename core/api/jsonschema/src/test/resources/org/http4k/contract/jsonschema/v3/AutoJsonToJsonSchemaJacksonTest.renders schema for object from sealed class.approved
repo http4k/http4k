@@ -1,30 +1,23 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.SealedChild",
-    "example": null,
-    "format": null
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.SealedChild"
   },
-  "definitions": [
-    {
-      "first": "org.http4k.contract.jsonschema.v3.SealedChild",
-      "second": {
-        "properties": {
-          "string": {
-            "example": "child",
-            "format": null,
-            "type": "string",
-            "nullable": false
-          }
-        },
-        "example": {
-          "string": "child"
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "string"
-        ]
-      }
+  "definitions": {
+    "org.http4k.contract.jsonschema.v3.SealedChild": {
+      "properties": {
+        "string": {
+          "example": "child",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "example": {
+        "string": "child"
+      },
+      "type": "object",
+      "required": [
+        "string"
+      ]
     }
-  ]
+  }
 }

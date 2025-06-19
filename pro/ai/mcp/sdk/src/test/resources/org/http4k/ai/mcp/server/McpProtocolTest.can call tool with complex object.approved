@@ -1,0 +1,15 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"complexValue\":{\"foo\":123,\"bar\":{\"name\":\"hello\"},\"baz\":true},\"listArg\":[{\"name\":\"123\"}]}"
+      }
+    ],
+    "isError": false,
+    "_meta": {
+    }
+  },
+  "id": 1
+}

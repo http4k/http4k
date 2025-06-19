@@ -15,9 +15,18 @@ class GraphQLResponseTest {
             .message("oh no!")
             .build()
 
-        assertThat(GraphQLResponse.from(
-            ExecutionResultImpl("hello world", listOf(error))
-        ), equalTo(
-            GraphQLResponse("hello world", listOf(Jackson.asA(Jackson.asFormatString(error))))))
+        val extensions: Map<Any, Any> = mapOf("foo" to mapOf("bar" to "baz"))
+
+        assertThat(
+            GraphQLResponse.from(ExecutionResultImpl("hello world", listOf(error), extensions)
+            ),
+            equalTo(
+                GraphQLResponse(
+                    "hello world",
+                    listOf(Jackson.asA(Jackson.asFormatString(error))),
+                    Jackson.asA(Jackson.asFormatString(extensions))
+                )
+            ),
+        )
     }
 }

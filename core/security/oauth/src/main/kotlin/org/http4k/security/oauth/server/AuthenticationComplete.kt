@@ -46,6 +46,8 @@ class AuthenticationComplete(
                                 it
                             ).value
                         )
+
+                    else -> throw UnsupportedOperationException(authorizationRequest.responseType.queryParameterValue)
                 }
             }
                 .mapFailure {

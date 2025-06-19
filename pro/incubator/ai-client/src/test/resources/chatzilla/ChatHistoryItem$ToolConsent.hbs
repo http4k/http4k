@@ -1,0 +1,10 @@
+<div id="{{request.id}}" class="tool-approval"
+     data-signals="{id: '{{request.id}}', toolName: '{{request.name}}'}">
+    <span>Approve tool for use? <b>{{request.name}}</b></span>
+    <pre>{{request.arguments}}</pre>
+    <input type="hidden" value="{{request.id}}" data-bind="id"/>
+    <input type="hidden" value="{{request.name}}" data-bind="toolName"/>
+    <button class="tool-buttons" id="approve" data-on-click="@post('/approve')" data-indicator-fetching>Approve</button>
+    <button class="tool-buttons" id="deny" data-on-click="@post('/deny')" data-indicator-fetching>Deny</button>
+</div>
+

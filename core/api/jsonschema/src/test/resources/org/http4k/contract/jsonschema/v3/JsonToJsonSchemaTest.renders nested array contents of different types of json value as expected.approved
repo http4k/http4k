@@ -8,20 +8,17 @@
       }
     }
   },
-  "definitions": [
-    {
-      "first": "bob",
-      "second": {
-        "type": "object",
-        "required": [
-        ],
-        "properties": {
-          "anotherString": {
-            "type": "string",
-            "example": "yetAnotherString"
-          }
+  "definitions": {
+    "bob": {
+      "type": "object",
+      "required": [
+      ],
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "yetAnotherString"
         }
       }
     }
-  ]
+  }
 }

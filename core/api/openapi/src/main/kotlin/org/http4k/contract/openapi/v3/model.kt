@@ -108,7 +108,7 @@ sealed class BodyContent {
     class SchemaContent<NODE : Any>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(),
         HasSchema<NODE> {
         val schema = jsonSchema?.node
-        override fun definitions() = jsonSchema?.definitions.orEmpty()
+        override fun definitions() = jsonSchema?.definitions.orEmpty().toList()
     }
 
     class OneOfSchemaContent<NODE : Any>(private val schemas: List<BodyContent>) : BodyContent(), HasSchema<NODE> {
@@ -176,7 +176,7 @@ sealed class RequestParameter<NODE>(
     class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) :
         RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
         val schema: NODE? = jsonSchema?.node
-        override fun definitions() = jsonSchema?.definitions.orEmpty()
+        override fun definitions() = jsonSchema?.definitions.orEmpty().toList()
     }
 
     class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) :

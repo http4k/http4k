@@ -1,8 +1,9 @@
 package org.http4k.connect.azure
 
+import org.http4k.ai.model.ApiKey
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
-import org.http4k.connect.model.ModelName
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.BearerAuth
 import org.http4k.routing.routes
@@ -30,7 +31,7 @@ class FakeAzureAI(
     /**
      * Convenience function to get AzureAI client
      */
-    fun client() = AzureAI.Http(AzureAIApiKey.of("azureai-key"), AzureHost.of("localhost"), Region.of("foo"), this)
+    fun client() = AzureAI.Http(ApiKey.of("azureai-key"), AzureHost.of("localhost"), Region.of("foo"), this)
 }
 
 fun main() {

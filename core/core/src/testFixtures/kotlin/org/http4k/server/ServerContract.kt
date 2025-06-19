@@ -42,6 +42,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse.BodyHandlers
 
 abstract class ServerContract(
     private val serverConfig: (Int, StopMode) -> ServerConfig, protected val client: HttpHandler,
@@ -68,10 +72,10 @@ abstract class ServerContract(
                     {
 
                         next(it)
-                            .also { println("returning"  + it.status) }
+                            .also { println("returning" + it.status) }
                     }
                 }.then(
-                SetBaseUriFrom(Uri.of("http://localhost:${proxiedServer.port()}")).then(JavaHttpClient()).debug()
+                    SetBaseUriFrom(Uri.of("http://localhost:${proxiedServer.port()}")).then(JavaHttpClient()).debug()
                 ),
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
@@ -127,6 +131,18 @@ abstract class ServerContract(
             if (method == Method.HEAD) assertThat(response.body, equalTo(Body.EMPTY))
             else assertThat(response.bodyString(), equalTo(method.name))
         }
+    }
+
+    @Test
+    fun `illegal method gives a 501`() {
+        val response = HttpClient.newHttpClient().send(
+            HttpRequest.newBuilder()
+                .method("FOOBAR", HttpRequest.BodyPublishers.noBody())
+                .uri(URI(baseUrl))
+                .build(), BodyHandlers.ofByteArray()
+        )
+
+        assertThat(response.statusCode(), equalTo(NOT_IMPLEMENTED.code))
     }
 
     @Test
@@ -203,7 +219,10 @@ abstract class ServerContract(
     fun `should not manipulate request headers`() {
         val response = client(
             Request(GET, "$baseUrl/request-headers")
-                .header("foo", """Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36""")
+                .header(
+                    "foo",
+                    """Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"""
+                )
         )
         assertThat(response.status, equalTo(OK))
         assertThat(

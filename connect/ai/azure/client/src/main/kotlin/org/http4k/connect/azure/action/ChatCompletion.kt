@@ -2,16 +2,16 @@
 
 package org.http4k.connect.azure.action
 
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ResponseId
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.Temperature
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.azure.AzureAIMoshi.autoBody
-import org.http4k.connect.azure.CompletionId
 import org.http4k.connect.azure.ObjectType
 import org.http4k.connect.azure.User
 import org.http4k.connect.azure.action.Detail.auto
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -192,7 +192,7 @@ data class FunctionCall(
 
 @JsonSerializable
 data class CompletionResponse(
-    val id: CompletionId,
+    val id: ResponseId,
     val created: Timestamp,
     val model: ModelName,
     val choices: List<Choice>,

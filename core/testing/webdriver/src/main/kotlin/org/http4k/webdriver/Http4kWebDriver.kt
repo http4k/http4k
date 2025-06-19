@@ -189,9 +189,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         }
 
         override fun refresh() {
-            current?.let {
-                current = it.copy(contents = handler(Request(GET, it.url)).bodyString())
-            }
+            current?.let { get(it.url) }
         }
 
         override fun back() {

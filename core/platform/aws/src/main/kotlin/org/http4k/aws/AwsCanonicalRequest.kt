@@ -40,13 +40,12 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .sorted()
                 .joinToString("&")
 
-        private fun Uri.normalisedPath() = if (path.isBlank()) "/" else path.split("/")
-            .joinToString("/") {
-                it.urlEncoded().replace("+", "%20").replace("*", "%2A").replace("%7E", "~")
-            }
-            .let { if (it.startsWith("/")) it else "/$it" }
+        private fun Uri.normalisedPath() =
+            path.let { if (it.startsWith("/")) it else "/$it" }
     }
 }
 
+
 internal fun Request.signedHeaders(): String =
     headers.map { it.first.lowercase(getDefault()) }.toSet().sorted().joinToString(";")
+

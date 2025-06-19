@@ -25,15 +25,21 @@ class RedirectTest {
 
     private var cookiesSentToFinalDestination = listOf<HCookie>()
 
+    private var redirect = true
+
     private val redirectingHandler = routes(
         finalUrl bind Method.GET to { req: Request ->
             cookiesSentToFinalDestination = req.cookies()
             Response(OK).body("You made it!")
         },
         startingUrl bind Method.GET to {
-            Response(SEE_OTHER)
-                .header("Location", finalUrl)
-                .cookie(org.http4k.core.cookie.Cookie(cookieKey, cookieValue))
+            if (redirect) {
+                Response(SEE_OTHER)
+                    .header("Location", finalUrl)
+                    .cookie(org.http4k.core.cookie.Cookie(cookieKey, cookieValue))
+            } else {
+                Response(OK).body("not yet")
+            }
         }
     )
 
@@ -56,6 +62,15 @@ class RedirectTest {
             expectedCookiesInLastRequest,
             equalTo(setOf(redirectAddedCookie, someOtherCookie))
         )
+    }
+
+    @Test
+    fun `follows redirects on a refresh`() {
+        redirect = false
+        driver.get(startingUrl)
+        redirect = true
+        driver.navigate().refresh()
+        assertThat(driver.currentUrl, equalTo(finalUrl))
     }
 
     private fun HCookie.toSeleniumCookie() = Cookie(name, value, path ?: "")

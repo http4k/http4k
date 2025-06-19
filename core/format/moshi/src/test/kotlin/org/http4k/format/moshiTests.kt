@@ -14,9 +14,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Moshi.auto
+import org.http4k.format.Moshi.json
+import org.http4k.format.Moshi.obj
 import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.BiDiMapping
+import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -265,6 +268,11 @@ class MoshiJsonTest : JsonContract<MoshiNode>(Moshi) {
                 """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.2,"bigInt":12344,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
             assertThat(compact(input), equalTo(expected))
         }
+    }
+
+    @Test
+    fun `websocket message message json`() {
+        assertThat(WsMessage().json(obj()), equalTo(WsMessage("""{}""")))
     }
 }
 

@@ -2,13 +2,13 @@ package org.http4k.connect.azure
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role.Companion.System
+import org.http4k.ai.model.StopReason
 import org.http4k.connect.azure.action.ChatCompletion
 import org.http4k.connect.azure.action.Choice
 import org.http4k.connect.azure.action.ChoiceDetail
 import org.http4k.connect.azure.action.Message
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.System
-import org.http4k.connect.model.StopReason
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved

@@ -21,7 +21,7 @@ class FakeOpenAITest : OpenAIContract {
     fun `can generate and serve image from url`(approver: Approver) {
         val generated = openAi.generateImage(
             "An excellent library", Size.`1024x1024`,
-            url, 1, Quality.standard, Style.vivid, null
+            url, 1, null
         ).successValue()
 
         val uri = generated.data.first().url!!
@@ -33,7 +33,7 @@ class FakeOpenAITest : OpenAIContract {
     fun `can generate and serve image as data url`(approver: Approver) {
         val generated = openAi.generateImage(
             "An excellent library", Size.`1024x1024`,
-            b64_json, 1, Quality.standard, Style.vivid, null
+            b64_json, 1, null
         ).successValue()
 
         approver.assertApproved(generated.data.first().b64_json!!.value)

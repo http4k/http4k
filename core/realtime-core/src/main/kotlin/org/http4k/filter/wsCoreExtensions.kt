@@ -78,7 +78,7 @@ fun WsHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false)
 fun RoutingWsHandler.debug(out: PrintStream = System.out, debugStream: Boolean = false) =
     DebuggingFilters.PrintWsRequestAndResponse(out, debugStream).then(this)
 
-fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream: Boolean = false) =
+fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream: Boolean = false, shouldReport: (WsMessage) -> Boolean = { true }) =
     WsFilter { next ->
         { req ->
             try {
@@ -88,15 +88,17 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
                         response.consumer(object : Websocket by ws {
                             override fun send(message: WsMessage) {
                                 ws.send(message)
-                                out.println(
-                                    "***** WS SEND ${req.method}: ${req.uri} -> " + when (message.mode) {
-                                        Text -> "Text: ${message.bodyString()}"
-                                        Binary -> "Binary: ${
-                                            if (debugStream) message.body.payload.array().contentToString()
-                                            else "<<stream>>"
-                                        }"
-                                    }
-                                )
+                                if(shouldReport(message)) {
+                                    out.println(
+                                        "***** WS SEND ${req.method}: ${req.uri} -> " + when (message.mode) {
+                                            Text -> "Text: ${message.bodyString()}"
+                                            Binary -> "Binary: ${
+                                                if (debugStream) message.body.payload.array().contentToString()
+                                                else "<<stream>>"
+                                            }"
+                                        }
+                                    )
+                                }
                             }
 
                             override fun close(status: WsStatus) {

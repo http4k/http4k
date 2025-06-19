@@ -4,16 +4,19 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.Companion.from
 import org.http4k.datastar.DatastarEvent.MergeFragments
+import org.http4k.datastar.DatastarEvent.MergeSignals
 import org.http4k.datastar.Fragment
 import org.http4k.datastar.MergeMode
 import org.http4k.datastar.MergeMode.morph
 import org.http4k.datastar.Selector
 import org.http4k.datastar.SettleDuration
 import org.http4k.datastar.SettleDuration.Companion.DEFAULT
+import org.http4k.datastar.Signal
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
@@ -100,9 +103,32 @@ fun Response.datastarFragments(
 )
 
 /**
- * Inject a Datastar Event into a response
+ * Inject a Datastar Event into a response. Appends the event to the existing body of the response
  */
-fun Response.datastarFragments(event: MergeFragments) = with(Body.datastarEvents().toLens() of listOf(event))
+fun Response.datastarFragments(event: MergeFragments) =
+    contentType(TEXT_EVENT_STREAM).
+    body(bodyString() + Response(OK).with(Body.datastarEvents().toLens() of listOf(event)).bodyString())
+
+/**
+ * Put datastar event into response as a datastar-merge-fragments event
+ */
+@JvmName("datastarFragments")
+fun Response.datastarSignals(vararg signals: Signal, onlyIfMissing: Boolean = false, id: SseEventId? = null) =
+    datastarSignals(signals.toList(), onlyIfMissing, id)
+
+/**
+ * Put datastar event into response as a datastar-merge-fragments event
+ */
+@JvmName("datastarSignals")
+fun Response.datastarSignals(signals: List<Signal>, onlyIfMissing: Boolean = false, id: SseEventId? = null) =
+    datastarSignals(MergeSignals(signals, onlyIfMissing, id))
+
+/**
+ * Inject a Datastar Event into a response. Appends the event to the existing body of the response
+ */
+fun Response.datastarSignals(event: MergeSignals) =
+    contentType(TEXT_EVENT_STREAM).
+    body(bodyString() + Response(OK).datastarEvents(listOf(event)).bodyString())
 
 /**
  * Inject a Datastar MergeFragments event into a Response as a Datastar event

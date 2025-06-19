@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-connect-ai-core"))
+    api(project(":http4k-ai-core"))
     api("se.ansman.kotshi:api:_")
 
     testApi(project(":http4k-format-moshi"))

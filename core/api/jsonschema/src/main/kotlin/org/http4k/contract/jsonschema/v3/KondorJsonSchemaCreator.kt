@@ -24,7 +24,7 @@ class KondorJsonSchemaCreator(
                 obj("\$ref" to string("#/$refLocationPrefix/$reference"))
             }
 
-            return JsonSchema(schemaRef, setOf(reference to schema))
+            return JsonSchema(schemaRef, mapOf(reference to schema))
         } catch (e: Exception) {
             return delegate.toSchema(json.obj(), overrideDefinitionId, refModelNamePrefix)
         }
@@ -44,7 +44,7 @@ class KondorJsonSchemaCreator(
             (refModelNamePrefix.orEmpty()) + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         return JsonSchema(
             json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) },
-            setOf(definitionId to newDefinition)
+            mapOf(definitionId to newDefinition)
         )
     }
 }

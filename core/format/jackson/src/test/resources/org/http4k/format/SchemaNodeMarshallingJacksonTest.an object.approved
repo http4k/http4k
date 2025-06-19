@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "node1": {
+      "example": 123,
+      "format": null,
+      "type": "string",
+      "foo": "bar",
+      "nullable": false
+    }
+  },
+  "example": {
+  },
+  "format": null,
+  "type": "object",
+  "required": [
+    "node1"
+  ],
+  "foo": "bar"
+}

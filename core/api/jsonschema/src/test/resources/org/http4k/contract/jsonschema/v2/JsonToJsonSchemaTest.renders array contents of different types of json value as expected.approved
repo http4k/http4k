@@ -5,18 +5,15 @@
       "$ref": "#/definitions/bob"
     }
   },
-  "definitions": [
-    {
-      "first": "bob",
-      "second": {
-        "type": "object",
-        "properties": {
-          "anotherString": {
-            "type": "string",
-            "example": "yetAnotherString"
-          }
+  "definitions": {
+    "bob": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "yetAnotherString"
         }
       }
     }
-  ]
+  }
 }

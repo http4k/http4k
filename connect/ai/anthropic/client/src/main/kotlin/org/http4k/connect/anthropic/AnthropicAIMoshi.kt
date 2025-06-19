@@ -2,10 +2,8 @@ package org.http4k.connect.anthropic
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.Role
 import org.http4k.connect.model.Timestamp
-import org.http4k.connect.withAiMappings
+import org.http4k.ai.util.withAiMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -23,13 +21,9 @@ object AnthropicAIMoshi : ConfigurableMoshi(
         .withStandardMappings()
         .withAiMappings()
         .value(ModelType)
-        .value(Prompt)
-        .value(Role)
         .value(ToolUseId)
         .value(Timestamp)
         .value(UserId)
-        .value(ResponseId)
-        .value(Base64Blob)
         .done()
 )
 

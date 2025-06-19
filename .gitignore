@@ -13,3 +13,4 @@ intellij-settings/
 **/*.actual
 **/generated/**
 jte-classes
+**/CLAUDE.md

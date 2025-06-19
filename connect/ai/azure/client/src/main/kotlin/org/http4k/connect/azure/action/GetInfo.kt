@@ -1,5 +1,6 @@
 package org.http4k.connect.azure.action
 
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.NonNullAutoMarshalledAction
 import org.http4k.connect.azure.AzureAIAction
@@ -7,7 +8,6 @@ import org.http4k.connect.azure.AzureAIMoshi
 import org.http4k.connect.azure.ModelProvider
 import org.http4k.connect.azure.ModelType
 import org.http4k.connect.kClass
-import org.http4k.connect.model.ModelName
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with

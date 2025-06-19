@@ -4,8 +4,13 @@ sealed interface MoshiNode {
     companion object
 }
 
-data class MoshiArray(val elements: List<MoshiNode>) : MoshiNode
+data class MoshiArray(val elements: List<MoshiNode>) : MoshiNode {
+    constructor(vararg elements: MoshiNode) : this(listOf(*elements))
+
+    operator fun get(index: Int) = elements[index]
+}
 data class MoshiObject(val attributes: MutableMap<String, MoshiNode>) : MoshiNode {
+    constructor(vararg attributes: Pair<String, MoshiNode>) : this(attributes.toMap().toMutableMap())
     operator fun get(name: String) = attributes[name]
 }
 

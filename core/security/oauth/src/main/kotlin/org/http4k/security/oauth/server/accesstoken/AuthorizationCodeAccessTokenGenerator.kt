@@ -26,7 +26,7 @@ class AuthorizationCodeAccessTokenGenerator(
     private val authorizationCodes: AuthorizationCodes,
     private val accessTokens: AccessTokens,
     private val clock: Clock,
-    private val idTokens: IdTokens
+    private val idTokens: IdTokens = IdTokens.Unsupported
 ) : AccessTokenGenerator {
     override fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest) =
         extract(clientId, tokenRequest).flatMap { generate(it) }

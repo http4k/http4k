@@ -15,9 +15,7 @@ import java.time.Duration
 
 class WebsocketClientBlockingTest : BlockingWebsocketClientContract(
     serverConfig = Jetty(0),
-    websocketFactory = { uri, headers, timeout ->
-        WebsocketClient.blocking(uri, headers, timeout)
-    },
+    websocketFactory = { WebsocketClient(timeout = it) },
     connectionErrorTimeout = Duration.ofMillis(10)
 ) {
     override fun <T : Throwable> connectErrorMatcher(): Matcher<T> = isA<WebsocketNotConnectedException>()

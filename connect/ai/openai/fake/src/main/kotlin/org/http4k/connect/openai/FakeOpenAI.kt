@@ -1,9 +1,9 @@
 package org.http4k.connect.openai
 
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.defaultLocalUri
 import org.http4k.chaos.start
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.openai.action.Model
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Uri

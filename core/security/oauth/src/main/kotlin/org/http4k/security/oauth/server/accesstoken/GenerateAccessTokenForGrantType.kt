@@ -28,8 +28,8 @@ class GenerateAccessTokenForGrantType(
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
     clock: Clock,
-    idTokens: IdTokens,
-    refreshTokens: RefreshTokens,
+    idTokens: IdTokens = IdTokens.Unsupported,
+    refreshTokens: RefreshTokens = RefreshTokens.Unsupported,
     private val grantTypes: GrantTypesConfiguration
 ) {
     private val authorizationCode =

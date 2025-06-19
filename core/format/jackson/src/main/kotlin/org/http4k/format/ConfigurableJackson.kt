@@ -74,7 +74,7 @@ open class ConfigurableJackson(
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
         mapper.createObjectNode().also { it.setAll<JsonNode>(toList().toMap()) }
 
-    override fun fields(node: JsonNode) = node.fields().asSequence().map { (key, value) -> key to value }.toList()
+    override fun fields(node: JsonNode) = node.properties().asSequence().map { (key, value) -> key to value }.toList()
 
     override fun elements(value: JsonNode) = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()

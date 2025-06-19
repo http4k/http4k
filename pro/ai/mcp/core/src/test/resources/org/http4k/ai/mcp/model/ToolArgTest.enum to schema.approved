@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "enum": [
+    "FOO",
+    "BAR"
+  ],
+  "description": "bar",
+  "int": 1,
+  "string": "test",
+  "bool": true
+}

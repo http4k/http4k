@@ -1,7 +1,7 @@
 package org.http4k.connect.ollama.action
 
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.Http4kConnectAction
-import org.http4k.connect.model.ModelName
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import se.ansman.kotshi.JsonSerializable

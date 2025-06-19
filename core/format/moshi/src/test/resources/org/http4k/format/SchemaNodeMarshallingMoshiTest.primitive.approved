@@ -1,0 +1,6 @@
+{
+  "example": 123,
+  "type": "string",
+  "foo": "bar",
+  "nullable": false
+}

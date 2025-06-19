@@ -3,6 +3,8 @@ package org.http4k.security.oauth.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
+import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -15,6 +17,7 @@ import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
+import org.http4k.lens.contentType
 import org.http4k.lens.webForm
 import org.http4k.security.OAuthWebForms.clientId
 import org.http4k.security.OAuthWebForms.clientSecret
@@ -28,13 +31,20 @@ class AutoDiscoveryOAuthTokenTest {
     private val requests = mutableListOf<Request>()
     private val scopes = listOf("read", "write")
 
-    @Test
-    fun `uses discovered endpoints when metadata is available`() {
-        val backend = { request: Request ->
-            requests.add(request)
-            when (request.uri.path) {
-                "/.well-known/oauth-authorization-server" -> Response(OK).body(
-                    """
+    private val backend = { request: Request ->
+        requests.add(request)
+        when (request.uri.path) {
+            "/.well-known/oauth-protected-resource" -> Response(OK)
+                .contentType(APPLICATION_JSON)
+                .body(
+                """
+                { resource="/resource", "authorization_servers": ["https://example.com"] }""".trimIndent()
+            )
+
+            "/.well-known/oauth-authorization-server" -> Response(OK)
+                .contentType(APPLICATION_JSON)
+                .body(
+                """
                     {
                         "issuer": "https://example.com",
                         "authorization_endpoint": "https://example.com/custom/auth",
@@ -42,24 +52,26 @@ class AutoDiscoveryOAuthTokenTest {
                         "token_endpoint_auth_methods_supported": ["client_secret_basic"]
                     }
                     """.trimIndent()
-                )
+            )
 
-                "/custom/token" -> Response(OK).body(
-                    """
+            "/custom/token" -> Response(OK).body(
+                """
                     {
                         "access_token": "test-token",
                         "token_type": "bearer",
                         "expires_in": 3600
                     }
                     """.trimIndent()
-                )
+            )
 
-                else -> Response(NOT_FOUND)
-            }
+            else -> Response(NOT_FOUND)
         }
+    }
 
+    @Test
+    fun `uses discovered endpoints when metadata is available`() {
         val app = ClientFilters.AutoDiscoveryOAuthToken(
-            serverUri = baseUri,
+            AuthServerDiscovery.fromKnownAuthServer(Uri.of("https://example.com")),
             credentials = credentials,
             backend = backend,
             scopes = scopes
@@ -67,10 +79,8 @@ class AutoDiscoveryOAuthTokenTest {
 
         app(Request(GET, "https://api.example.com/test"))
 
-        assertThat(
-            requests[1].uri.path,
-            equalTo("/custom/token")
-        )
+        assertThat(requests[0].uri.path, equalTo("/.well-known/oauth-authorization-server"))
+        assertThat(requests[1].uri.path, equalTo("/custom/token"))
 
         assertThat(
             Body.webForm(Validator.Ignore).toLens().extract(requests[1]),
@@ -85,27 +95,9 @@ class AutoDiscoveryOAuthTokenTest {
     }
 
     @Test
-    fun `uses default endpoints when metadata discovery fails`() {
-        val backend = { request: Request ->
-            requests.add(request)
-            when (request.uri.path) {
-                "/.well-known/oauth-authorization-server" -> Response(NOT_FOUND)
-                "/token" -> Response(OK).body(
-                    """
-                    {
-                        "access_token": "test-token",
-                        "token_type": "bearer",
-                        "expires_in": 3600
-                    }
-                    """.trimIndent()
-                )
-
-                else -> Response(NOT_FOUND)
-            }
-        }
-
+    fun `uses discovered endpoints from protected resource`() {
         val app = ClientFilters.AutoDiscoveryOAuthToken(
-            serverUri = baseUri,
+            AuthServerDiscovery.fromProtectedResource(baseUri.path("/resource")),
             credentials = credentials,
             backend = backend,
             scopes = scopes
@@ -113,13 +105,12 @@ class AutoDiscoveryOAuthTokenTest {
 
         app(Request(GET, "https://api.example.com/test"))
 
-        assertThat(
-            requests[1].uri.path,
-            equalTo("/token")
-        )
+        assertThat(requests[0].uri.path, equalTo("/.well-known/oauth-protected-resource"))
+        assertThat(requests[1].uri.path, equalTo("/.well-known/oauth-authorization-server"))
+        assertThat(requests[2].uri.path, equalTo("/custom/token"))
 
         assertThat(
-            Body.webForm(Validator.Ignore).toLens().extract(requests[1]),
+            Body.webForm(Validator.Ignore).toLens().extract(requests[2]),
             equalTo(
                 WebForm()
                     .with(grantType of "client_credentials")

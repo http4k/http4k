@@ -1,6 +1,7 @@
 package org.http4k.connect.azure
 
 import dev.forkhandles.values.StringValue
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.azure.ApiVersion.Companion.PREVIEW
 import org.http4k.core.HttpHandler
@@ -15,7 +16,7 @@ import org.http4k.lens.enum
 import org.http4k.lens.value
 
 fun AzureAI.Companion.Http(
-    token: AzureAIApiKey,
+    token: ApiKey,
     host: AzureHost,
     region: Region,
     http: HttpHandler = JavaHttpClient(),
@@ -32,13 +33,13 @@ fun AzureAI.Companion.Http(
 /**
  * Use this API with GitHubModels
  */
-fun AzureAI.Companion.Http(token: GitHubToken, http: HttpHandler = JavaHttpClient()) =
+fun AzureAI.Companion.Http(token: ApiKey, http: HttpHandler = JavaHttpClient()) =
     AzureAI(Uri.of("https://models.inference.ai.azure.com"), token, http)
 
 /**
  * Use this API with Azure resources
  */
-fun AzureAI.Companion.Http(resource: AzureResource, region: Region, token: AzureAIApiKey, http: HttpHandler = JavaHttpClient()) =
+fun AzureAI.Companion.Http(resource: AzureResource, region: Region, token: ApiKey, http: HttpHandler = JavaHttpClient()) =
     AzureAI(Uri.of("https://$resource.$region.models.ai.azure.com"), token, http)
 
 private fun AzureAI(

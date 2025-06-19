@@ -4,11 +4,8 @@ import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
 import org.http4k.core.ContentType
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.RequestSource
-import org.http4k.core.Uri
-import org.http4k.core.safeLong
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.toParametersMap
 import org.http4k.sse.SseHandler
 
@@ -17,32 +14,25 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
     override fun handleRequest(exchange: HttpServerExchange) {
         when {
             exchange.hasEventStreamContentType() -> {
-                val request = exchange.asRequest() ?: error("Cannot create request from exchange")
-                with(sse(request)) {
-                    if (handled) {
-                        exchange.setStatusCode(status.code)
-                        headers.toParametersMap().forEach { (name, values) ->
-                            exchange.responseHeaders.putAll(HttpString(name), values.toList())
+                exchange.asRequest()?.let { request ->
+                    with(sse(request)) {
+                        when {
+                            handled -> {
+                                exchange.setStatusCode(status.code)
+                                headers.toParametersMap().forEach { (name, values) ->
+                                    exchange.responseHeaders.putAll(HttpString(name), values.toList())
+                                }
+                                Http4kUndertowSseHandler(request, consumer).handleRequest(exchange)
+                            }
+                            else -> fallback.handleRequest(exchange)
                         }
-                        Http4kUndertowSseHandler(request, consumer).handleRequest(exchange)
-                    } else {
-                        fallback.handleRequest(exchange)
                     }
-                }
+                } ?: Response(NOT_IMPLEMENTED).into(exchange)
             }
 
             else -> fallback.handleRequest(exchange)
         }
     }
-
-    private fun HttpServerExchange.asRequest() =
-        Method.supportedOrNull(requestMethod.toString())?.let {
-            Request(it, Uri.of("$relativePath?$queryString"))
-                .headers(requestHeaders
-                    .flatMap { header -> header.map { header.headerName.toString() to it } })
-                .source(RequestSource(sourceAddress.hostString, sourceAddress.port, requestScheme))
-                .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
-        }
 }
 
 private fun HttpServerExchange.hasEventStreamContentType() =

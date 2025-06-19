@@ -7,7 +7,6 @@ import org.http4k.connect.amazon.s3.restoreReady
 import org.http4k.connect.amazon.s3.storageClass
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
@@ -63,5 +62,3 @@ private fun bucketGetTagging(
 
     return Response(OK).body(bodyFor(obj.tags))
 }
-
-private fun keyFor(request: Request) = request.path("bucketKey")!!

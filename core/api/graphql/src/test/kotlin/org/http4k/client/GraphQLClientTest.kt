@@ -19,7 +19,7 @@ class GraphQLClientTest: InMemoryTest {
         val uri = "/foo"
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
-        val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")))
+        val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar"), mapOf("baz" to "qux")))
 
         val client = { req: Request ->
             assertThat(req, equalTo(Request(POST, uri).with(GraphQLRequest.requestLens of graphQLRequest)))

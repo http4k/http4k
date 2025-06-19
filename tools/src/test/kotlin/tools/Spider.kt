@@ -13,6 +13,8 @@ sealed class SpiderReport
 data class Ok(val original: String, val sublinks: List<SpiderReport>) : SpiderReport()
 data class Unreachable(val original: String) : SpiderReport()
 
+@Suppress("DEPRECATION")
+
 fun main() {
     val handler = ClientFilters.SetHostFrom(Uri.of("https://www.http4k.org"))
         .then(RequestFilters.Tap { println(it.uri) })
@@ -27,7 +29,9 @@ fun main() {
         val nowVisited = visited.plus(actualUrl)
 
         val sublinks = driver.findElements(By.tagName("a"))
-            .mapNotNull { it.getAttribute("href") }
+            .mapNotNull {
+                it.getAttribute("href")
+            }
             .filter {
                 it != "." &&
                     !it.startsWith("#") &&

@@ -1,39 +1,29 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.MapHolder",
-    "example": null,
-    "format": null
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.MapHolder"
   },
-  "definitions": [
-    {
-      "first": "org.http4k.contract.jsonschema.v3.MapHolder",
-      "second": {
-        "properties": {
-          "value": {
-            "example": null,
-            "additionalProperties": {
-              "properties": {
-              },
-              "example": {
-              },
-              "format": null,
-              "type": "object",
-              "required": null
+  "definitions": {
+    "org.http4k.contract.jsonschema.v3.MapHolder": {
+      "properties": {
+        "value": {
+          "additionalProperties": {
+            "properties": {
             },
-            "format": null,
+            "example": {
+            },
             "type": "object"
-          }
-        },
-        "example": {
-          "value": {
-          }
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "value"
-        ]
-      }
+          },
+          "type": "object"
+        }
+      },
+      "example": {
+        "value": {
+        }
+      },
+      "type": "object",
+      "required": [
+        "value"
+      ]
     }
-  ]
+  }
 }

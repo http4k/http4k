@@ -8,6 +8,7 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
+import org.http4k.websocket.WsStatus.Companion.NORMAL
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
@@ -26,7 +27,7 @@ abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerC
                     ws.onMessage {
                         val content = it.body.stream.readBytes()
                         ws.send(WsMessage(content))
-                        ws.close(WsStatus.NORMAL)
+                        ws.close(NORMAL)
                     }
                 }
             },
@@ -37,7 +38,7 @@ abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerC
                         req.headers.filter { it.first.startsWith("test") }.forEach { header ->
                             ws.send(WsMessage("${header.first}=${header.second}"))
                         }
-                        ws.close(WsStatus.NORMAL)
+                        ws.close(NORMAL)
                     }
                 }
             },
@@ -48,7 +49,7 @@ abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerC
                     ws.send(WsMessage(name))
                     ws.onMessage {
                         ws.send(it)
-                        ws.close(WsStatus.NORMAL)
+                        ws.close(NORMAL)
                     }
                 }
             },

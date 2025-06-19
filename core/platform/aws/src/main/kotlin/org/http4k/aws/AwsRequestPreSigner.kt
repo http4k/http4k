@@ -23,6 +23,7 @@ fun AwsRequestPreSigner(
     val credentials = credentialsProvider()
 
     val fullRequest = request
+        .encodeUri()
         .replaceHeader("Host", "${request.uri.host}${request.uri.port?.let { port -> ":$port" } ?: ""}")
         .let { it.query("X-Amz-SignedHeaders", it.signedHeaders()) }
         .query("X-Amz-Algorithm", "AWS4-HMAC-SHA256")
@@ -42,7 +43,7 @@ fun AwsRequestPreSigner(
 
     AwsPreSignedRequest(
         method = fullRequest.method,
-        uri = fullRequest.query("X-Amz-Signature", signature).encodePlusCharInPath().uri,
+        uri = fullRequest.query("X-Amz-Signature", signature).uri,
         signedHeaders = fullRequest.headers,
         expires = clock.instant() + expires
     )

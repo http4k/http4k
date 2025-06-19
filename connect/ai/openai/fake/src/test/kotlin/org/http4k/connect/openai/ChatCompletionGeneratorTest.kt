@@ -2,9 +2,12 @@ package org.http4k.connect.openai
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.System
-import org.http4k.connect.model.StopReason
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.Role.Companion.System
+import org.http4k.ai.model.StopReason
+import org.http4k.connect.openai.*
+import org.http4k.connect.openai.OpenAIModels.GPT3_5
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.ChoiceDetail
@@ -19,7 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class ChatCompletionGeneratorTest {
 
     private val input = ChatCompletion(
-        ModelName.GPT3_5, listOf(Message.User( "foobar"))
+        GPT3_5, listOf(Message.User( "foobar"))
     )
 
     @Test

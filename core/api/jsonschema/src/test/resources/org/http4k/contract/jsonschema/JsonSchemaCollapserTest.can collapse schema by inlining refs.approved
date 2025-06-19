@@ -1,0 +1,252 @@
+{
+  "properties": {
+    "child": {
+      "properties": {
+        "uri": {
+          "example": "foobar",
+          "format": "uri",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "example": {
+        "uri": "foobar"
+      },
+      "format": null,
+      "type": "object",
+      "required": [
+        "uri"
+      ]
+    },
+    "list": {
+      "items": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "format": "uri",
+            "type": "string",
+            "nullable": false
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "format": null,
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      },
+      "example": [
+        {
+          "uri": "foobar"
+        },
+        {
+          "uri": "foobar"
+        }
+      ],
+      "format": null,
+      "type": "array",
+      "nullable": false
+    },
+    "nestedList": {
+      "items": {
+        "items": {
+          "properties": {
+            "uri": {
+              "example": "foobar",
+              "format": "uri",
+              "type": "string",
+              "nullable": false
+            }
+          },
+          "example": {
+            "uri": "foobar"
+          },
+          "format": null,
+          "type": "object",
+          "required": [
+            "uri"
+          ]
+        },
+        "format": null,
+        "type": "array"
+      },
+      "example": [
+        [
+          {
+            "uri": "foobar"
+          },
+          {
+            "uri": "foobar"
+          }
+        ]
+      ],
+      "format": null,
+      "type": "array",
+      "nullable": false
+    },
+    "nullableChild": {
+      "properties": {
+        "uri": {
+          "example": "foobar",
+          "format": "uri",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "example": {
+        "uri": "foobar"
+      },
+      "format": null,
+      "type": "object",
+      "required": [
+        "uri"
+      ]
+    },
+    "stringList": {
+      "items": {
+        "format": null,
+        "type": "string"
+      },
+      "example": [
+        "hello",
+        "goodbye"
+      ],
+      "format": null,
+      "type": "array",
+      "nullable": false
+    },
+    "anyList": {
+      "items": {
+        "oneOf": [
+          {
+            "items": {
+              "properties": {
+                "uri": {
+                  "example": "foobar",
+                  "format": "uri",
+                  "type": "string",
+                  "nullable": false
+                }
+              },
+              "example": {
+                "uri": "foobar"
+              },
+              "format": null,
+              "type": "object",
+              "required": [
+                "uri"
+              ]
+            },
+            "format": null,
+            "type": "array"
+          },
+          {
+            "format": null,
+            "type": "string"
+          },
+          {
+            "format": null,
+            "type": "boolean"
+          },
+          {
+            "properties": {
+              "uri": {
+                "example": "foobar",
+                "format": "uri",
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "example": {
+              "uri": "foobar"
+            },
+            "format": null,
+            "type": "object",
+            "required": [
+              "uri"
+            ]
+          }
+        ]
+      },
+      "example": [
+        "123",
+        {
+          "uri": "foobar"
+        },
+        true,
+        [
+          {
+            "uri": "foobar"
+          }
+        ]
+      ],
+      "format": null,
+      "type": "array",
+      "nullable": false
+    },
+    "enumVal": {
+      "example": "value2",
+      "enum": [
+        "value1",
+        "value2"
+      ],
+      "format": null,
+      "type": "string",
+      "nullable": true
+    }
+  },
+  "example": {
+    "child": {
+      "uri": "foobar"
+    },
+    "list": [
+      {
+        "uri": "foobar"
+      },
+      {
+        "uri": "foobar"
+      }
+    ],
+    "nestedList": [
+      [
+        {
+          "uri": "foobar"
+        },
+        {
+          "uri": "foobar"
+        }
+      ]
+    ],
+    "nullableChild": {
+      "uri": "foobar"
+    },
+    "stringList": [
+      "hello",
+      "goodbye"
+    ],
+    "anyList": [
+      "123",
+      {
+        "uri": "foobar"
+      },
+      true,
+      [
+        {
+          "uri": "foobar"
+        }
+      ]
+    ],
+    "enumVal": "value2"
+  },
+  "format": null,
+  "type": "object",
+  "required": [
+    "anyList",
+    "child",
+    "list",
+    "nestedList",
+    "stringList"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "enum": [
+    "BAR",
+    "FOO"
+  ],
+  "enumNames": [
+    "Bar description",
+    "Foo description"
+  ],
+  "type": "string",
+  "title": "title",
+  "description": "description"
+}
