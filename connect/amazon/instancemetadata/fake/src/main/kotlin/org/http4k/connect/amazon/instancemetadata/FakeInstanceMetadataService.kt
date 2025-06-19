@@ -12,6 +12,7 @@ import org.http4k.connect.amazon.instancemetadata.endpoints.getLocalIpV4
 import org.http4k.connect.amazon.instancemetadata.endpoints.getPublicHostName
 import org.http4k.connect.amazon.instancemetadata.endpoints.getPublicIpV4
 import org.http4k.connect.amazon.instancemetadata.endpoints.getSecurityCredentials
+import org.http4k.connect.amazon.instancemetadata.endpoints.getToken
 import org.http4k.connect.amazon.instancemetadata.endpoints.listSecurityCredentials
 import org.http4k.routing.routes
 import java.time.Clock
@@ -32,7 +33,8 @@ class FakeInstanceMetadataService(
         getIdentityDocument(metadata),
         getAmiId(metadata),
         getInstanceId(metadata),
-        getInstanceType(metadata)
+        getInstanceType(metadata),
+        getToken()
     )
 
     fun client() = InstanceMetadataService.Http(this)
