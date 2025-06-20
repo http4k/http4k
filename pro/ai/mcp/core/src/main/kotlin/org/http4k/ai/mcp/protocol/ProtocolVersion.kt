@@ -8,8 +8,12 @@ class ProtocolVersion private constructor(value: String) : StringValue(value), C
     companion object : NonBlankStringValueFactory<ProtocolVersion>(::ProtocolVersion) {
         val `2024-11-05` = ProtocolVersion.of("2024-11-05")
         val `2025-03-26` = ProtocolVersion.of("2025-03-26")
+        val `2025-06-18` = ProtocolVersion.of("2025-06-18")
+
+        val PUBLISHED = setOf(`2024-11-05`, `2025-03-26`, `2025-06-18`)
+
         val DRAFT = ProtocolVersion.of("DRAFT")
 
-        val LATEST_VERSION = `2025-03-26`
+        val LATEST_VERSION = PUBLISHED.max()
     }
 }

@@ -31,7 +31,7 @@ import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.model.value
 import org.http4k.ai.mcp.protocol.ClientCapabilities
-import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.`2024-11-05`
+import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
@@ -720,12 +720,12 @@ class McpProtocolTest {
         mcp.sendToMcp(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(clientName, Version.of("1")),
-                ClientCapabilities(), `2024-11-05`
+                ClientCapabilities(), LATEST_VERSION
             )
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, `2024-11-05`, metadata.instructions)
+            McpInitialize.Response(metadata.entity, metadata.capabilities, LATEST_VERSION, metadata.instructions)
         )
 
         mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
