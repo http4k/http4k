@@ -216,14 +216,20 @@ data class FunctionCall(
 
 @JsonSerializable
 data class CompletionResponse(
-    val id: ResponseId,
+    @JsonProperty(name = "id")
+    internal val blankId: String,
     val created: Timestamp,
-    val model: ModelName,
+    @JsonProperty(name = "model")
+    internal val blankModel: String,
     val choices: List<Choice>,
     @JsonProperty(name = "object")
-    val objectType: ObjectType,
+    internal val blankObjectType: String,
     val usage: Usage? = null,
     val system_fingerprint: String? = null,
     val service_tier: String? = null
-)
+) {
+    val id get() = ResponseId.of(blankId.takeIf { it.isNotBlank() } ?: "-")
+    val model get() = ModelName.of(blankModel.takeIf { it.isNotBlank() } ?: "-")
+    val objectType get() = ObjectType.of(blankObjectType.takeIf { it.isNotBlank() } ?: "-")
+}
 
