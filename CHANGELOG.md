@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.14.1.0
+### v6.15.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk**: [Breaking] Support for `2025-06-18` spec. Changes to require OAuth resource indicators now require the MCP server URL to be used (to prevent token attack) so if you are using OAuth then you will need to specify it at creation time
 - **http4k-connect-amazon-cloudwatch***: [New module!] with a server fake. H/T @PaulWMR for the contribution.
