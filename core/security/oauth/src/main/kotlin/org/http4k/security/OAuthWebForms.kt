@@ -20,7 +20,7 @@ object OAuthWebForms {
     val code = FormField.optional("code")
     val codeVerifier = FormField.optional("code_verifier")
     val redirectUri = FormField.uri().optional("redirect_uri")
-    val resourceUri = FormField.uri().optional("resourceUri")
+    val resource = FormField.uri().optional("resource")
     val accessToken = FormField.optional("access_token")
     val username = FormField.optional("username")
     val password = FormField.optional("password")
@@ -37,7 +37,7 @@ object OAuthWebForms {
         accessToken,
         username,
         password,
-        resourceUri,
+        resource,
     ).toLens()
 
     val tokenType = FormField.defaulted("token_type", "Bearer")

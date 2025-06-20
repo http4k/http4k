@@ -125,7 +125,7 @@ class OAuthServer(
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopesQueryParameter = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val redirectUriQueryParameter = Query.uri().optional("redirect_uri")
-        val resourceUriQueryParameter = Query.uri().optional("resource_uri")
+        val resourceQueryParameter = Query.uri().optional("resource")
         val state = Query.map(::State, State::value).optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue)
             .required("response_type")
@@ -138,7 +138,7 @@ class OAuthServer(
         val clientSecret = FormField.optional("client_secret")
         val code = FormField.optional("code")
         val redirectUriForm = FormField.uri().optional("redirect_uri")
-        val resourceUriForm = FormField.uri().optional("resource_uri")
+        val resourceForm = FormField.uri().optional("resource")
         val scopesForm = FormField.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val clientAssertionType = FormField.uri().optional("client_assertion_type")
         val clientAssertion = FormField.optional("client_assertion")
@@ -153,7 +153,7 @@ class OAuthServer(
             clientAssertionType,
             clientAssertion,
             refreshToken,
-            resourceUriForm
+            resourceForm
         ).toLens()
     }
 }
@@ -172,7 +172,7 @@ fun Request.authorizationRequest() =
         OAuthServer.nonce(this),
         OAuthServer.responseMode(this),
         OAuthServer.request(this),
-        resourceUri = OAuthServer.resourceUriQueryParameter(this)
+        resourceUri = OAuthServer.resourceQueryParameter(this)
     )
 
 internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
@@ -187,6 +187,6 @@ internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
         OAuthServer.clientAssertionType(tokenRequestWebForm),
         OAuthServer.clientAssertion(tokenRequestWebForm),
         OAuthServer.refreshToken(tokenRequestWebForm)?.let { RefreshToken(it) },
-        OAuthServer.resourceUriForm(tokenRequestWebForm),
+        OAuthServer.resourceForm(tokenRequestWebForm),
     )
 }

@@ -19,13 +19,13 @@ import org.http4k.security.ContentTypeJsonOrForm
 import org.http4k.security.CredentialsProvider
 import org.http4k.security.ExpiringCredentials
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.OAuthWebForms
 import org.http4k.security.OAuthWebForms.clientId
 import org.http4k.security.OAuthWebForms.clientSecret
 import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.password
 import org.http4k.security.OAuthWebForms.refreshToken
 import org.http4k.security.OAuthWebForms.requestForm
-import org.http4k.security.OAuthWebForms.resourceUri
 import org.http4k.security.OAuthWebForms.scope
 import org.http4k.security.OAuthWebForms.username
 import org.http4k.security.Refreshing
@@ -111,7 +111,7 @@ fun ClientFilters.OAuthUserCredentials(
                         clientSecret of clientCredentials.password,
                         username of userCredentials.user,
                         password of userCredentials.password,
-                        resourceUri of resource,
+                        OAuthWebForms.resource of resource,
                         scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
                     )
             )
@@ -137,7 +137,7 @@ fun ClientFilters.OAuthClientCredentials(
                     grantType of "client_credentials",
                     clientId of clientCredentials.user,
                     clientSecret of clientCredentials.password,
-                    resourceUri of resource,
+                    OAuthWebForms.resource of resource,
                     scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
                 )
             )
@@ -166,7 +166,7 @@ fun ClientFilters.OAuthRefreshToken(
                     clientId of clientCredentials.user,
                     clientSecret of clientCredentials.password,
                     refreshToken of token,
-                    resourceUri of resource,
+                    OAuthWebForms.resource of resource,
                     scopes.takeIf { scopes -> scopes.isNotEmpty() }
                         .let { scopes -> scope of scopes?.joinToString(separator = " ") }
                 )

@@ -28,7 +28,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.routing.routes
 import org.http4k.security.OAuthWebForms.requestForm
-import org.http4k.security.OAuthWebForms.resourceUri
+import org.http4k.security.OAuthWebForms.resource
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.metadata.AuthMethod.client_secret_basic
 import org.http4k.security.oauth.metadata.ServerMetadata
@@ -43,7 +43,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
     private val protectedResourceUri = Uri.of("http://localhost:32323/mcp")
     private val authServer = routes(
         "/token" bind {
-            assertThat(resourceUri(requestForm(it)), equalTo(protectedResourceUri))
+            assertThat(resource(requestForm(it)), equalTo(protectedResourceUri))
             Response(OK)
                 .contentType(APPLICATION_JSON)
                 .body(
