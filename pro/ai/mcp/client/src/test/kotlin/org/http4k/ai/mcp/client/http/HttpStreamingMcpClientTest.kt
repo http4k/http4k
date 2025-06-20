@@ -101,7 +101,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
         HttpStreamingMcp(
-            protocol, OAuthMcpSecurity(Uri.of("http://auth1")) { it == "123" })
+            protocol, OAuthMcpSecurity(Uri.of("http://auth1"), Uri.of("http://mcp/mcp")) { it == "123" })
 
     @Test
     fun `deals with error`() {

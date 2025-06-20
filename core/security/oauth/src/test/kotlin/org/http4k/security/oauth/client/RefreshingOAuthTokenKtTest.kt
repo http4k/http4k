@@ -45,6 +45,7 @@ class RefreshingOAuthTokenTest {
             Duration.ofSeconds(10),
             clock,
             scopes = emptyList(),
+            resourceUri = null,
             { next -> { next(it.body("auth")) } },
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
@@ -85,6 +86,7 @@ class RefreshingOAuthTokenTest {
             Duration.ofSeconds(10),
             clock,
             listOf("someactivity.read", "someactivity.write"),
+            resourceUri = null,
             { next -> { next(it.body("auth")) } },
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
@@ -130,6 +132,7 @@ class RefreshingOAuthTokenTest {
             Duration.ofSeconds(10),
             clock,
             scopes = emptyList(),
+            resourceUri = null,
             { next -> { next(it.body("auth")) } },
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 

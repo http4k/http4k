@@ -1,4 +1,5 @@
 import dev.forkhandles.result4k.onFailure
+import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.MaxTokens
 import org.http4k.chaos.start
 import org.http4k.client.JavaHttpClient
@@ -6,7 +7,6 @@ import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.OpenAIModels.GPT3_5
-import org.http4k.connect.openai.OpenAIToken
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.action.Size
 import org.http4k.connect.openai.chatCompletion
@@ -16,7 +16,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 
 fun main() {
-    val openAiToken = OpenAIToken.of("your-token-here")
+    val openAiToken = ApiKey.of("your-token-here")
 
     // start the fake on the default port
     val port = FakeOpenAI().start().port()

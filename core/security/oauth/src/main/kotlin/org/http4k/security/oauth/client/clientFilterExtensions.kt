@@ -25,6 +25,7 @@ import org.http4k.security.OAuthWebForms.grantType
 import org.http4k.security.OAuthWebForms.password
 import org.http4k.security.OAuthWebForms.refreshToken
 import org.http4k.security.OAuthWebForms.requestForm
+import org.http4k.security.OAuthWebForms.resourceUri
 import org.http4k.security.OAuthWebForms.scope
 import org.http4k.security.OAuthWebForms.username
 import org.http4k.security.Refreshing
@@ -39,7 +40,8 @@ fun ClientFilters.RefreshingOAuthToken(
     gracePeriod: Duration = Duration.ofSeconds(10),
     clock: Clock = Clock.systemUTC(),
     scopes: List<String> = emptyList(),
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials, scopes),
+    resourceUri: Uri? = null,
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(config.credentials, scopes, resourceUri),
 ) = ClientFilters.RefreshingOAuthToken(
     oauthCredentials = config.credentials,
     tokenUri = config.tokenUri,
@@ -48,6 +50,7 @@ fun ClientFilters.RefreshingOAuthToken(
     gracePeriod = gracePeriod,
     clock = clock,
     scopes = scopes,
+    resourceUri = resourceUri
 )
 
 /**
@@ -62,11 +65,12 @@ fun ClientFilters.RefreshingOAuthToken(
     clock: Clock = Clock.systemUTC(),
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
     scopes: List<String> = emptyList(),
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes = scopes),
+    resourceUri: Uri? = null,
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(oauthCredentials, scopes, resourceUri),
 ): Filter {
     val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) { token ->
         val filter = token?.refreshToken
-            ?.let { ClientFilters.OAuthRefreshToken(oauthCredentials, it, scopes) }
+            ?.let { ClientFilters.OAuthRefreshToken(oauthCredentials, it, scopes, resourceUri) }
             ?: oAuthFlowFilter
 
         filter
@@ -87,13 +91,15 @@ fun ClientFilters.RefreshingOAuthToken(
 fun ClientFilters.OAuthUserCredentials(
     config: OAuthProviderConfig,
     userCredentials: Credentials,
-    scopes: List<String>
-) = OAuthUserCredentials(config.credentials, userCredentials, scopes)
+    scopes: List<String>,
+    resourceUri: Uri? = null,
+) = OAuthUserCredentials(config.credentials, userCredentials, scopes, resourceUri)
 
 fun ClientFilters.OAuthUserCredentials(
     clientCredentials: Credentials,
     userCredentials: Credentials,
-    scopes: List<String>
+    scopes: List<String>,
+    resource: Uri? = null
 ) = Filter { next ->
     {
         next(
@@ -105,6 +111,7 @@ fun ClientFilters.OAuthUserCredentials(
                         clientSecret of clientCredentials.password,
                         username of userCredentials.user,
                         password of userCredentials.password,
+                        resourceUri of resource,
                         scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
                     )
             )
@@ -114,12 +121,14 @@ fun ClientFilters.OAuthUserCredentials(
 
 fun ClientFilters.OAuthClientCredentials(
     config: OAuthProviderConfig,
-    scopes: List<String> = emptyList()
-) = OAuthClientCredentials(config.credentials, scopes)
+    scopes: List<String> = emptyList(),
+    resourceUri: Uri? = null,
+) = OAuthClientCredentials(config.credentials, scopes, resourceUri)
 
 fun ClientFilters.OAuthClientCredentials(
     clientCredentials: Credentials,
-    scopes: List<String> = emptyList()
+    scopes: List<String> = emptyList(),
+    resource: Uri? = null,
 ) = Filter { next ->
     {
         next(
@@ -128,6 +137,7 @@ fun ClientFilters.OAuthClientCredentials(
                     grantType of "client_credentials",
                     clientId of clientCredentials.user,
                     clientSecret of clientCredentials.password,
+                    resourceUri of resource,
                     scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
                 )
             )
@@ -139,12 +149,14 @@ fun ClientFilters.OAuthRefreshToken(
     config: OAuthProviderConfig,
     token: RefreshToken,
     scopes: List<String> = emptyList(),
-) = OAuthRefreshToken(config.credentials, token, scopes)
+    resource: Uri? = null,
+) = OAuthRefreshToken(config.credentials, token, scopes, resource)
 
 fun ClientFilters.OAuthRefreshToken(
     clientCredentials: Credentials,
     token: RefreshToken,
     scopes: List<String> = emptyList(),
+    resource: Uri? = null,
 ) = Filter { next ->
     {
         next(
@@ -154,6 +166,7 @@ fun ClientFilters.OAuthRefreshToken(
                     clientId of clientCredentials.user,
                     clientSecret of clientCredentials.password,
                     refreshToken of token,
+                    resourceUri of resource,
                     scopes.takeIf { scopes -> scopes.isNotEmpty() }
                         .let { scopes -> scope of scopes?.joinToString(separator = " ") }
                 )
