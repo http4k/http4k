@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### uncut
+- **http4k-connect-amazon-instancemetadata**: [Fix] Http InstanceMetadataService will now refresh tokens properly. H/T @oharaandrew314
+
 ### v6.15.0.1
 - **http4k-ai-mcp-sdk**: [Fix] `resource` parameter in OAuth corrected (was "resourceUri")
 
