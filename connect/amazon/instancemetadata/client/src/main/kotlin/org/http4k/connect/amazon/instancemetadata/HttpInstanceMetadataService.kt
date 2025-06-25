@@ -17,7 +17,9 @@ fun InstanceMetadataService.Companion.Http(
 ) = object : InstanceMetadataService {
     private val authorizedHttp = SetBaseUriFrom(Uri.of("http://169.254.169.254"))
         .then(ClientFilters.SetXForwardedHost())
-        .then(RequestFilters.SetHeader("X-aws-ec2-metadata-token", tokenProvider().value))
+        .then(RequestFilters.Modify(
+            { it.header("X-aws-ec2-metadata-token", tokenProvider().value) }
+        ))
         .then(http)
 
     override fun <R> invoke(action: Ec2MetadataAction<R>) =
