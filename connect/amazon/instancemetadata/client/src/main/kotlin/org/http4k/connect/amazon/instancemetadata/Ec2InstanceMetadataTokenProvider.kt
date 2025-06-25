@@ -4,6 +4,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.result4k.peek
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.instancemetadata.model.Token
@@ -15,7 +16,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
 
-typealias Ec2InstanceMetadataTokenProvider = () -> Token
+typealias Ec2InstanceMetadataTokenProvider = () -> Result4k<Token, RemoteFailure>
 
 fun refreshingEc2InstanceMetadataTokenProvider(
     clock: Clock = Clock.systemUTC(),
@@ -25,15 +26,12 @@ fun refreshingEc2InstanceMetadataTokenProvider(
 ): Ec2InstanceMetadataTokenProvider {
     val token = AtomicReference<TokenContainer>(null)
 
-    fun refresh(): Token = synchronized(token) {
+    fun refresh(): Result4k<Token, RemoteFailure> = synchronized(token) {
         val current = token.get()
         when {
-            current != null && !current.expiresWithin(clock, gracePeriod) -> current.token
-            else -> when (val refresh = getToken(tokenTtl, http)) {
-                is Success<Token> -> refresh.value.also {
-                    token.set(TokenContainer(it, clock.instant().plus(tokenTtl)))
-                }
-                is Failure<RemoteFailure> -> refresh.reason.throwIt()
+            current != null && !current.expiresWithin(clock, gracePeriod) -> Success(current.token)
+            else -> getToken(tokenTtl, http).peek { newToken ->
+                token.set(TokenContainer(newToken, clock.instant().plus(tokenTtl)))
             }
         }
     }
@@ -41,7 +39,7 @@ fun refreshingEc2InstanceMetadataTokenProvider(
     return {
         token.get()
             ?.takeIf { !it.expiresWithin(clock, gracePeriod) }
-            ?.token
+            ?.let { Success(it.token) }
             ?: refresh()
     }
 }
@@ -51,7 +49,7 @@ fun staticEc2InstanceMetadataTokenProvider(
     http: HttpHandler = JavaHttpClient()
 ): Ec2InstanceMetadataTokenProvider {
     val token = getToken(tokenTtl, http).onFailure { it.reason.throwIt() }
-    return { token }
+    return { Success(token) }
 }
 
 private fun getToken(ttl: Duration, http: HttpHandler): Result4k<Token, RemoteFailure> {

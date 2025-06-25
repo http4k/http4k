@@ -3,6 +3,7 @@ package org.http4k.connect.amazon.instancemetadata
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.amazon.instancemetadata.model.Token
+import org.http4k.connect.successValue
 import org.http4k.core.Method.PUT
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -22,8 +23,8 @@ class Ec2InstanceMetadataTokenProviderTest {
     fun `static token provider caches token`() {
         val provider = staticEc2InstanceMetadataTokenProvider(http = fakeImds)
 
-        assertThat(provider(), equalTo(Token.parse("token1")))
-        assertThat(provider(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
         assertThat(nextToken, equalTo(2))
     }
 
@@ -31,8 +32,8 @@ class Ec2InstanceMetadataTokenProviderTest {
     fun `refreshing token provider caches token`() {
         val provider = refreshingEc2InstanceMetadataTokenProvider(http = fakeImds)
 
-        assertThat(provider(), equalTo(Token.parse("token1")))
-        assertThat(provider(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
         assertThat(nextToken, equalTo(2))
     }
 
@@ -45,12 +46,12 @@ class Ec2InstanceMetadataTokenProviderTest {
             http = fakeImds
         )
 
-        assertThat(provider(), equalTo(Token.parse("token1")))
-        assertThat(provider(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
 
         clock.tick(Duration.ofMinutes(6))
-        assertThat(provider(), equalTo(Token.parse("token2")))
-        assertThat(provider(), equalTo(Token.parse("token2")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token2")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token2")))
     }
 
     @Test
@@ -63,11 +64,11 @@ class Ec2InstanceMetadataTokenProviderTest {
             http = fakeImds
         )
 
-        assertThat(provider(), equalTo(Token.parse("token1")))
-        assertThat(provider(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token1")))
 
         clock.tick(Duration.ofMinutes(9))
-        assertThat(provider(), equalTo(Token.parse("token2")))
-        assertThat(provider(), equalTo(Token.parse("token2")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token2")))
+        assertThat(provider().successValue(), equalTo(Token.parse("token2")))
     }
 }

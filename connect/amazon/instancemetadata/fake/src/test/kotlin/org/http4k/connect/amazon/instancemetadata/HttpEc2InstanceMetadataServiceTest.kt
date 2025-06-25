@@ -37,7 +37,7 @@ class HttpEc2InstanceMetadataServiceTest {
 
     private val client = InstanceMetadataService.Http(
         http = fake,
-        tokenProvider = { Token.parse(expectedToken) }
+        tokenProvider = { Success(Token.parse(expectedToken)) }
     )
 
     @Test
