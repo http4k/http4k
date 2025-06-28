@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### uncut
+### v6.15.1.0
+- **http4k-***: Upgrade versions
 - **http4k-connect-amazon-instancemetadata**: [Fix] Http InstanceMetadataService will now refresh tokens properly. H/T @oharaandrew314
 
 ### v6.15.0.1
