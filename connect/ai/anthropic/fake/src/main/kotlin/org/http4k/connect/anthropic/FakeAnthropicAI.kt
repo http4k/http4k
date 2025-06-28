@@ -1,5 +1,6 @@
 package org.http4k.connect.anthropic
 
+import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
@@ -20,7 +21,7 @@ class FakeAnthropicAI(
      * Convenience function to get AnthropicAI client
      */
     fun client() = AnthropicAI.Http(
-        AnthropicIApiKey.of("key"),
+        ApiKey.of("key"),
         ApiVersion._2023_06_01,
         this
     )
