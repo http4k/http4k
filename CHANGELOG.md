@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.16.0.0 (uncut)
+- **http4k-format-dataframe**: [Breaking] Upgrade to v1 beta build has resulted in API changes to the CSV and JSON objects. There are entirely new signatures so these will need to be migrated by hand.
+
 ### v6.15.1.0
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-instancemetadata**: [Fix] Http InstanceMetadataService will now refresh tokens properly. H/T @oharaandrew314
