@@ -15,9 +15,11 @@ import org.http4k.format.AutoMarshalling
 import org.http4k.lens.Header.CONTENT_TYPE
 import kotlin.reflect.KClass
 import dev.forkhandles.result4k.Success
+import org.http4k.connect.Http4kConnectAction
 
 private val amazonJson = ContentType("application/x-amz-json-1.0")
 
+@Http4kConnectAction
 abstract class SQSAction<ResultOut: Any, ResponseBody: Any>(
     private val action: String,
     private val clazz: KClass<ResponseBody>,
