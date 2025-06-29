@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.with
 
 @Http4kConnectAction
-data class WebhookPostMessage(val request: SlackMessage) : SlackWebhookAction<Unit> {
+data class WebhookPostMessage(val request: SlackMessage) : SlackWebhookAction<Unit>() {
     override fun toRequest() = Request(POST, "").with(lens of request)
 
     override fun toResult(response: Response) = with(response) {
