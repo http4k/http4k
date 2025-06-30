@@ -61,8 +61,8 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
         val parts = userInfo.split(":")
         if (parts.size != 2) return null
         return Credentials(
-            user = URLDecoder.decode(parts[0], charset.toString()),
-            password = URLDecoder.decode(parts[1], charset.toString())
+            user = URLDecoder.decode(parts[0], charset),
+            password = URLDecoder.decode(parts[1], charset)
         )
     }
 
