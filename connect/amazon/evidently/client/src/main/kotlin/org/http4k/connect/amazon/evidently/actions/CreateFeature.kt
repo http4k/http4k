@@ -1,6 +1,9 @@
 package org.http4k.connect.amazon.evidently.actions
 
+import dev.forkhandles.result4k.Result
+import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.evidently.EvidentlyAction
 import org.http4k.connect.amazon.evidently.model.EntityId
 import org.http4k.connect.amazon.evidently.model.EvaluationStrategy
@@ -23,7 +26,8 @@ data class CreateFeature(
     val name: FeatureName,
     val tags: Map<String, String>?,
     val variations: Map<VariationName, VariableValue>
-) : EvidentlyAction<FeatureResponse>(FeatureResponse::class) {
+) : EvidentlyAction<FeatureResponse>(FeatureResponse::class),
+    Action<Result<FeatureResponse, RemoteFailure>> {
 
     override fun uri() = Uri.of("/projects/$project/features")
 

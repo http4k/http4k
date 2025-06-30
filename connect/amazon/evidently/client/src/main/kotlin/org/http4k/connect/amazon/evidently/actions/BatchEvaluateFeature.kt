@@ -1,6 +1,9 @@
 package org.http4k.connect.amazon.evidently.actions
 
+import dev.forkhandles.result4k.Result
+import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.evidently.EvidentlyAction
 import org.http4k.connect.amazon.evidently.model.EntityId
@@ -15,7 +18,8 @@ import se.ansman.kotshi.JsonSerializable
 data class BatchEvaluateFeature(
     val project: ProjectName,
     val requests: List<BatchEvaluationRequest>
-) : EvidentlyAction<BatchEvaluationResultWrapper>(BatchEvaluationResultWrapper::class, dataPlane = true) {
+) : EvidentlyAction<BatchEvaluationResultWrapper>(BatchEvaluationResultWrapper::class, dataPlane = true),
+    Action<Result<BatchEvaluationResultWrapper, RemoteFailure>> {
     override fun uri() = Uri.of("/projects/$project/evaluations")
 
     override fun requestBody() = BatchEvaluateFeatureRequestWrapper(requests)
