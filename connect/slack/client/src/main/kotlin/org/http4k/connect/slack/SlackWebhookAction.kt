@@ -4,4 +4,4 @@ import dev.forkhandles.result4k.Result
 import org.http4k.connect.Action
 import org.http4k.connect.RemoteFailure
 
-interface SlackWebhookAction<R> : Action<Result<R, RemoteFailure>>
+abstract class SlackWebhookAction<R: Any> : Action<Result<R, RemoteFailure>>

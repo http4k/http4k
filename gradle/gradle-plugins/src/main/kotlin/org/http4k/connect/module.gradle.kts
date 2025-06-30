@@ -57,7 +57,6 @@ the<SourceSetContainer>().apply {
     named<SourceSet>("testFixtures") {
         extensions.getByName<SourceDirectorySet>("kotlin").apply {
             srcDir("build/generated/ksp/testFixtures/kotlin")
-            srcDir("build/generated-testFixtures-avro-java")
         }
     }
 }
