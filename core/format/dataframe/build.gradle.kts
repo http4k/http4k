@@ -6,7 +6,6 @@ val license by project.extra { Apache2 }
 
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.kotlinx.dataframe")
     id("org.http4k.community")
 }
 
@@ -17,9 +16,4 @@ dependencies {
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:_")
-}
-
-dataframes {
-    sourceSet = "test"
-    packageName = "org.http4k.format.dataframe"
 }
