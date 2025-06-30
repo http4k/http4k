@@ -4,6 +4,9 @@ import org.http4k.appendIfNotBlank
 import org.http4k.appendIfPresent
 import org.http4k.urlDecoded
 import org.http4k.urlEncoded
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.Charset
 
 data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) : Comparable<Uri> {
 
@@ -46,6 +49,21 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
     fun authority(authority: String): Uri = parseAuthority(authority).let { (userInfo, host, port) ->
         copy(userInfo = userInfo, host = host, port = port)
+    }
+
+    fun credentials(credentials: Credentials, charset: Charset = Charsets.UTF_8): Uri {
+        val encodedUsername = URLEncoder.encode(credentials.user, charset)
+        val encodedPassword = URLEncoder.encode(credentials.password, charset)
+        return userInfo("$encodedUsername:$encodedPassword")
+    }
+
+    fun credentials(charset: Charset = Charsets.UTF_8): Credentials? {
+        val parts = userInfo.split(":")
+        if (parts.size != 2) return null
+        return Credentials(
+            user = URLDecoder.decode(parts[0], charset.toString()),
+            password = URLDecoder.decode(parts[1], charset.toString())
+        )
     }
 
     override fun compareTo(other: Uri) = toString().compareTo(other.toString())
