@@ -18,8 +18,8 @@ class OAuthMcpSecurity(
     /**
      * Bare bones MCP Security implementation that uses the OAuth protected resource metadata endpoint
      */
-    constructor(authorizationServerUri: Uri, mcpPath: String = "/mcp", checkToken: (String) -> Boolean) :
-        this(ResourceMetadata(Uri.of(mcpPath), listOf(authorizationServerUri)), checkToken = checkToken)
+    constructor(authorizationServerUri: Uri, mcpUri: Uri, checkToken: (String) -> Boolean) :
+        this(ResourceMetadata(mcpUri, listOf(authorizationServerUri)), checkToken = checkToken)
 
     override val filter = ServerFilters.BearerAuthWithResourceMetadata(
         Uri.of(".well-known/oauth-protected-resource"),

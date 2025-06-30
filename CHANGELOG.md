@@ -3,6 +3,22 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.16.0.0 (uncut)
+- **http4k-format-dataframe**: [Breaking] Upgrade to v1 beta build has resulted in API changes to the CSV and JSON objects. There are entirely new signatures so these will need to be migrated by hand.
+
+### v6.15.1.0
+- **http4k-***: Upgrade versions
+- **http4k-connect-amazon-instancemetadata**: [Fix] Http InstanceMetadataService will now refresh tokens properly. H/T @oharaandrew314
+
+### v6.15.0.1
+- **http4k-ai-mcp-sdk**: [Fix] `resource` parameter in OAuth corrected (was "resourceUri")
+
+### v6.15.0.0
+- **http4k-***: Upgrade versions
+- **http4k-ai-mcp-sdk**: [Breaking] Support for `2025-06-18` spec. Changes to require OAuth resource indicators now require the MCP server URL to be used (to prevent token attack) so if you are using OAuth then you will need to specify it at creation time
+- **http4k-connect-amazon-cloudwatch***: [New module!] with a server fake. H/T @PaulWMR for the contribution.
+- **http4k-connect-amazon-instancemetadata**: [Unlikely Break] Support IMDSv2. H/T @oharaandrew314
+
 ### v6.14.0.0
 - **http4k-***: Upgrade some dependency versions
 - **http4k-connect-langchain**: [Breaking!] This is now `http4k-ai-langchain4j`. The packages have been moved to `org.http4k.ai.langchain4j` - you can search and replace the imports to fix the breaks.

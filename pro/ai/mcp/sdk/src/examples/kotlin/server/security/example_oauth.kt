@@ -19,7 +19,7 @@ import org.http4k.server.asServer
 fun main() {
     val secureMcpServer = mcpHttpStreaming(
         ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
-        OAuthMcpSecurity(Uri.of("http://oauth-server")) { it == "123" }
+        OAuthMcpSecurity(Uri.of("http://oauth-server"), Uri.of("http://mcp-server")) { it == "123" }
     )
 
     secureMcpServer

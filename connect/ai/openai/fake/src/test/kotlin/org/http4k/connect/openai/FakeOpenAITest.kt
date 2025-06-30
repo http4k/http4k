@@ -2,6 +2,7 @@ package org.http4k.connect.openai
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.model.ApiKey
 import org.http4k.connect.openai.action.ImageResponseFormat.b64_json
 import org.http4k.connect.openai.action.ImageResponseFormat.url
 import org.http4k.connect.openai.action.Size
@@ -15,7 +16,7 @@ import org.junit.jupiter.api.Test
 
 class FakeOpenAITest : OpenAIContract {
     private val fakeOpenAI = FakeOpenAI()
-    override val openAi = OpenAI.Http(OpenAIToken.of("hello"), fakeOpenAI)
+    override val openAi = OpenAI.Http(ApiKey.of("hello"), fakeOpenAI)
 
     @Test
     fun `can generate and serve image from url`(approver: Approver) {

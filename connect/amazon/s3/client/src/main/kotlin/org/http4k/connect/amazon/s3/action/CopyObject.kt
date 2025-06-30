@@ -23,7 +23,7 @@ data class CopyObject(
     val storageClass: StorageClass? = null,
     val tags: List<Tag>? = null,
     val taggingDirective: TaggingDirective? = null,
-    val headers: Headers = emptyList()
+    val headers: List<Pair<String, String?>> = emptyList()
 ) :
     S3BucketAction<Unit> {
     override fun toRequest() = Request(PUT, uri())

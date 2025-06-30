@@ -13,5 +13,6 @@ data class TokenRequest(
     val scopes: List<String>,
     val clientAssertionType: Uri?,
     val clientAssertion: String?,
-    val refreshToken: RefreshToken?
+    val refreshToken: RefreshToken?,
+    val resourceUri: Uri?
 )

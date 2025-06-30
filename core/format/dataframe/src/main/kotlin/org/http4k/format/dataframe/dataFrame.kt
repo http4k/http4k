@@ -24,9 +24,9 @@ fun HttpMessage.dataFrame(options: DataFrameFormat) =
 /**
  * Read a DataFrame from the body of the message as CSV and auto-cast it to the known schema
  */
-fun <T> HttpMessage.dataFrameCsv() = dataFrame(CSV()).cast<T>()
+fun <T> HttpMessage.dataFrameCsv(frame: CSV = CSV()) = dataFrame(frame).cast<T>()
 
 /**
  * Read a DataFrame from the body of the message as JSON and auto-cast it to the known schema
  */
-fun <T> HttpMessage.dataFrameJson() = dataFrame(JSON()).cast<T>()
+fun <T> HttpMessage.dataFrameJson(frame: JSON = JSON()) = dataFrame(frame).cast<T>()

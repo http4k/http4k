@@ -10,5 +10,5 @@ fun SlackWebhook.Companion.Http(webhookUrl: Uri, http: HttpHandler = JavaHttpCli
     object : SlackWebhook {
         private val http = SetBaseUriFrom(webhookUrl).then(http)
 
-        override fun <R> invoke(action: SlackWebhookAction<R>) = action.toResult(this.http(action.toRequest()))
+        override fun <R: Any> invoke(action: SlackWebhookAction<R>) = action.toResult(this.http(action.toRequest()))
     }

@@ -65,17 +65,18 @@ fun ClientFilters.DiscoveredMcpOAuth(
     private fun authFromProtectedResource(
         wwwAuthenticate: WwwAuthenticate,
         next: HttpHandler,
-        originalUri: Uri,
+        resourceUri: Uri,
     ): Filter {
-        val resourceUri = Uri.of(wwwAuthenticate["resource_metadata"]!!)
-        val uriToUse = if (resourceUri.scheme == "") originalUri.path(resourceUri.path) else resourceUri
+        val resourceMetadataUri = Uri.of(wwwAuthenticate["resource_metadata"]!!)
+        val resourceMetadataUriWithSchema = if (resourceMetadataUri.scheme == "") resourceUri.path(resourceMetadataUri.path) else resourceMetadataUri
 
         return ClientFilters.AutoDiscoveryOAuthToken(
-            fromProtectedResource(uriToUse),
+            fromProtectedResource(resourceMetadataUriWithSchema),
             clientCredentials,
             next,
             clock,
-            scopes
+            scopes,
+            resourceUri
         )
     }
 }

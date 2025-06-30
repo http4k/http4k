@@ -22,6 +22,7 @@ data class AuthRequest(
     val requestObject: RequestObject? = null,
     val additionalProperties: Map<String, Any> = emptyMap(),
     val codeChallenge: String? = null,
+    val resourceUri: Uri? = null,
 ) {
 
     fun isOIDC() = scopes.map { it.lowercase(Locale.getDefault()) }.contains(OIDC_SCOPE)

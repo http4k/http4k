@@ -1,15 +1,15 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.lens.LensGet
-import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.protocol.ProtocolVersion
-import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.`2025-03-26`
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.DRAFT
+import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.util.McpJson.asFormatString
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.lens.LensGet
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta.ObjectParam
 
 class ToolOutputLensBuilder<OUT : Any>(
     internal val get: LensGet<Ok, OUT>,
@@ -17,7 +17,7 @@ class ToolOutputLensBuilder<OUT : Any>(
 ) {
     fun toLens(
         description: String? = null,
-        protocolCapability: ProtocolVersion = `2025-03-26`,
+        protocolCapability: ProtocolVersion = LATEST_VERSION,
         metadata: Map<String, Any> = emptyMap()
     ) = McpCapabilityLens(
         Meta(true, "toolResponse", ObjectParam, "response", description, metadata),

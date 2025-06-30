@@ -4,6 +4,7 @@ import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Uri
 import org.http4k.filter.ClientFilters
 import org.http4k.security.OAuthProviderConfig
 import java.time.Clock
@@ -16,7 +17,8 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     backend: HttpHandler,
     clock: Clock = Clock.systemUTC(),
     scopes: List<String> = emptyList(),
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(credentials, scopes),
+    resourceUri: Uri? = null,
+    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(credentials, scopes, resourceUri),
     gracePeriod: Duration = Duration.ofSeconds(10),
 ): Filter {
     val (authServerUri, metadata) = authServerDiscovery(backend)
@@ -34,7 +36,8 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
         oAuthFlowFilter = oAuthFlowFilter,
         gracePeriod = gracePeriod,
         clock = clock,
-        scopes = scopes
+        scopes = scopes,
+        resourceUri = resourceUri
     )
 }
 
