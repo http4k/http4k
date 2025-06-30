@@ -7,7 +7,6 @@ package org.http4k.format.dataframe
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import jdk.jfr.internal.Repository
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.jetbrains.kotlinx.dataframe.annotations.ImportDataSchema
