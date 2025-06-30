@@ -1,13 +1,9 @@
 package org.http4k.connect.amazon.sqs.action
 
 import com.squareup.moshi.Json
-import dev.forkhandles.result4k.Result4k
-import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
-import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.sqs.SQSAction
 import org.http4k.connect.amazon.sqs.model.SQSMessage
-import org.http4k.connect.amazon.sqs.model.SQSMessageId
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 import java.time.ZonedDateTime
@@ -23,8 +19,7 @@ data class ReceiveMessage(
     @Json(name = "MessageAttributeNames") val messageAttributes: List<String>? = null,
     @Json(name = "EeceiveRequestAttemptId") val receiveRequestAttemptId: String? = null,
     @Json(name = "AttributeNames") val attributeNames: List<String>? = null,
-) : SQSAction<List<SQSMessage>, ReceiveMessageResponse>("ReceiveMessage", ReceiveMessageResponse::class, { it.Messages.orEmpty() }),
-    Action<Result4k<List<SQSMessage>, RemoteFailure>>
+) : SQSAction<List<SQSMessage>, ReceiveMessageResponse>("ReceiveMessage", ReceiveMessageResponse::class, { it.Messages.orEmpty() })
 
 @JsonSerializable
 data class ReceiveMessageResponse(

@@ -8,17 +8,13 @@ import org.http4k.connect.amazon.sqs.model.SQSMessageId
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 import com.squareup.moshi.Json
-import dev.forkhandles.result4k.Result4k
-import org.http4k.connect.Action
-import org.http4k.connect.RemoteFailure
 
 @Http4kConnectAction
 @JsonSerializable
 data class DeleteMessageBatch(
     @Json(name = "QueueUrl") val queueUrl: Uri,
     @Json(name = "Entries") val entries: List<DeleteMessageBatchEntry>,
-) : SQSAction<List<SQSMessageId>, DeleteMessageBatchResponse>("DeleteMessageBatch", DeleteMessageBatchResponse::class, { it.Successful.map { it.Id } }) ,
-    Action<Result4k<List<SQSMessageId>, RemoteFailure>> {
+) : SQSAction<List<SQSMessageId>, DeleteMessageBatchResponse>("DeleteMessageBatch", DeleteMessageBatchResponse::class, { it.Successful.map { it.Id } }) {
 
     constructor(
         queueUrl: Uri,

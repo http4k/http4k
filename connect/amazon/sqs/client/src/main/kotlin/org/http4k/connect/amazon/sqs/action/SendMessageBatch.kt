@@ -1,10 +1,7 @@
 package org.http4k.connect.amazon.sqs.action
 
 import com.squareup.moshi.Json
-import dev.forkhandles.result4k.Result4k
-import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
-import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.core.model.MessageFieldsDto
 import org.http4k.connect.amazon.sqs.SQSAction
 import org.http4k.connect.amazon.sqs.model.BatchResultErrorEntry
@@ -19,8 +16,7 @@ import se.ansman.kotshi.JsonSerializable
 data class SendMessageBatch(
     @Json(name = "QueueUrl") val queueUrl: Uri,
     @Json(name = "Entries") val entries: List<SendMessageBatchEntry>,
-) : SQSAction<List<SendMessageBatchResultEntry>, SendMessageBatchResponse>("SendMessageBatch", SendMessageBatchResponse::class, { it.Successful }),
-    Action<Result4k<List<SendMessageBatchResultEntry>, RemoteFailure>>
+) : SQSAction<List<SendMessageBatchResultEntry>, SendMessageBatchResponse>("SendMessageBatch", SendMessageBatchResponse::class, { it.Successful })
 
 @JsonSerializable
 data class SendMessageBatchEntry(
