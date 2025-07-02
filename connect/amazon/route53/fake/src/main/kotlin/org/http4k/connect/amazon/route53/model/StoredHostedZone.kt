@@ -6,10 +6,10 @@ data class StoredHostedZone(
     val id: HostedZoneId,
     val name: String,
     val callerReference: String,
-    val config: HostedZoneConfig?
+    val config: Config?
 )
 
-fun StoredHostedZone.toHostedZone(resources: Storage<StoredResource>) = HostedZone(
+fun StoredHostedZone.toHostedZone(resources: Storage<ResourceRecordSet>) = HostedZone(
     id = id,
     name = name,
     callerReference = callerReference,

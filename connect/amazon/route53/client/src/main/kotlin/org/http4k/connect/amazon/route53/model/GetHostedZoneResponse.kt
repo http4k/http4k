@@ -7,17 +7,20 @@ import org.w3c.dom.Document
 data class GetHostedZoneResponse(
     val delegationSet: DelegationSet?,
     val hostedZone: HostedZone,
-    val vpcs: List<VpcConfig>
+    val vpcs: List<VPC>
 ) {
     companion object {
         fun parse(document: Document) = document
-            .getElementsByTagName("HostedZoneResponse")
+            .getElementsByTagName("GetHostedZoneResponse")
             .item(0)
             .let { node ->
                 GetHostedZoneResponse(
                     hostedZone = HostedZone.parse(node.firstChild("HostedZone")!!),
                     delegationSet = node.firstChild("DelegationSet")?.let(DelegationSet::parse),
-                    vpcs = node.firstChild("VPCs")!!.childNodes.sequenceOfNodes().map(VpcConfig::parse).toList()
+                    vpcs = node.firstChild("VPCs")
+                        ?.childNodes?.sequenceOfNodes().orEmpty()
+                        .map(VPC::parse)
+                        .toList()
                 )
             }
     }

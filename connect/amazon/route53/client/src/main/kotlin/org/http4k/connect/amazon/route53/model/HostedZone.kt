@@ -8,7 +8,7 @@ data class HostedZone(
     val callerReference: String,
     val id: HostedZoneId,
     val name: String,
-    val config: HostedZoneConfig?,
+    val config: Config?,
 //    val linkedService:
     val resourceRecordSetCount: Long?
 ) {
@@ -18,7 +18,7 @@ data class HostedZone(
             id = HostedZoneId.parse(node.firstChildText("Id")!!),
             callerReference = node.firstChildText("CallerReference")!!,
             config = node.firstChild("Config")?.let { config ->
-                HostedZoneConfig(
+                Config(
                     comment = config.firstChildText("Comment"),
                     privateZone = config.firstChildText("PrivateZone")?.toBoolean()
                 )

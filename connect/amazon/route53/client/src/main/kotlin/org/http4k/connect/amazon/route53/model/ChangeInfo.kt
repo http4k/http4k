@@ -12,10 +12,10 @@ data class ChangeInfo(
 ) {
     companion object {
         fun parse(node: Node) = ChangeInfo(
-            comment = node.firstChild("Comment")?.textContent!!,
-            id = node.firstChild("Id")?.textContent!!,
-            status = Status.valueOf(node.firstChild("Status")?.textContent!!),
-            submittedAt = Instant.parse(node.firstChild("SubmittedAt")?.textContent!!)
+            comment = node.firstChild("Comment")?.textContent,
+            id = node.firstChild("Id")!!.textContent,
+            status = Status.valueOf(node.firstChild("Status")!!.textContent),
+            submittedAt = Instant.parse(node.firstChild("SubmittedAt")!!.textContent)
         )
     }
 

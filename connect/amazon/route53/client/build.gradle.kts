@@ -10,6 +10,5 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    testFixturesApi(testFixtures(project(":http4k-connect-core")))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

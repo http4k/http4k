@@ -1,10 +1,11 @@
 package org.http4k.connect.amazon.route53.endpoints
 
+import dev.forkhandles.result4k.asFailure
+import dev.forkhandles.result4k.asSuccess
 import org.http4k.connect.amazon.core.children
 import org.http4k.connect.amazon.core.firstChild
 import org.http4k.connect.amazon.core.firstChildText
 import org.http4k.connect.amazon.core.sequenceOfNodes
-import org.http4k.connect.amazon.core.xmlDoc
 import org.http4k.connect.amazon.route53.hostedZoneIdLens
 import org.http4k.connect.amazon.route53.model.AliasTarget
 import org.http4k.connect.amazon.route53.model.Change
@@ -13,60 +14,49 @@ import org.http4k.connect.amazon.route53.model.HostedZoneId
 import org.http4k.connect.amazon.route53.model.ResourceRecord
 import org.http4k.connect.amazon.route53.model.ResourceRecordSet
 import org.http4k.connect.amazon.route53.model.StoredHostedZone
-import org.http4k.connect.amazon.route53.model.StoredResource
+import org.http4k.connect.amazon.route53.model.forDomain
 import org.http4k.connect.amazon.route53.model.toXml
-import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
-import org.http4k.core.Body
-import org.http4k.core.ContentType
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.lens.contentType
+import org.w3c.dom.Document
 import java.time.Clock
 import java.util.UUID
 
-fun changeResourceRecordSets(hostedZones: Storage<StoredHostedZone>, records: Storage<StoredResource>, clock: Clock) = { request: Request ->
-    val hostedZoneId = hostedZoneIdLens(request)
-    val changes = request.body.parse()
-
-    // TODO verify hostedzone exists
-    // TODO verify fully qualified DNS names match hostedZoneId
+fun changeResourceRecordSets(
+    hostedZones: Storage<StoredHostedZone>,
+    resources: Storage<ResourceRecordSet>,
+    clock: Clock
+) = route53FakeAction(
+    requestBodyFn = Document::fromXml,
+    successFn = { "<ChangeResourceRecordSetsResponse>${it.toXml()}</ChangeResourceRecordSetsResponse>" }
+) fn@{ changes ->
+    val hostedZoneId = hostedZoneIdLens(this)
+    val hostedZone = hostedZones[hostedZoneId.value] ?: return@fn noSuchHostedZone().asFailure()
 
     for (change in changes) {
         when(change.action) {
-            Change.Action.CREATE, Change.Action.UPSERT -> { // TODO handle create/upsert differences
-                records[change.resourceRecordSet.name] = StoredResource(
-                    type = change.resourceRecordSet.type,
-                    evaluateTargetHealth = change.resourceRecordSet.aliasTarget?.evaluateTargetHealth,
-                    dnsName = change.resourceRecordSet.name,
-                    ttl = change.resourceRecordSet.ttl,
-                    values = change.resourceRecordSet.resourceRecords?.map { it.value }
-                )
+            // TODO verify fully qualified DNS names match hostedZoneId
+            //  TODO handle create/upsert differences
+            Change.Action.CREATE, Change.Action.UPSERT -> {
+                resources[change.resourceRecordSet.name] = change.resourceRecordSet
             }
-            Change.Action.DELETE -> { // TODO see if the resource must exist
-                records.remove(change.resourceRecordSet.name)
+            Change.Action.DELETE -> {
+                if (change.resourceRecordSet !in resources.forDomain(hostedZone.name)) {
+                    return@fn invalidChangeBatch().asFailure()
+                }
+                resources.remove(change.resourceRecordSet.name)
             }
         }
     }
 
-    val result = ChangeInfo(
+    ChangeInfo(
         id = UUID.randomUUID().toString(),
         status = ChangeInfo.Status.INSYNC,
         submittedAt = clock.instant(),
         comment = null
-    )
-
-    Response(Status.OK)
-        .contentType(ContentType.APPLICATION_XML)
-        .body("""<?xml version="1.0" encoding="UTF-8"?>
-<ChangeResourceRecordSetsResponse>
-    ${result.toXml()}
-</ChangeResourceRecordSetsResponse>
-""")
+    ).asSuccess()
 }
 
-private fun Body.parse(): Sequence<Change> = xmlDoc()
+private fun Document.fromXml(): List<Change> = this
     .getElementsByTagName("Change")
     .sequenceOfNodes()
     .map { node ->
@@ -82,14 +72,14 @@ private fun Body.parse(): Sequence<Change> = xmlDoc()
                             evaluateTargetHealth = target.firstChildText("EvaluateTargetHealth")!!.toBoolean(),
                         )
                     },
-                    resourceRecords = set.children("ResourceRecord").map { record ->
-                        ResourceRecord(
-                            value = record.firstChildText("Value")!!
-                        )
-                    }.toList(),
-                    ttl = Timestamp.parse(set.firstChildText("TTL")!!),
+                    resourceRecords = set.firstChild("ResourceRecords")
+                        ?.children("ResourceRecord")
+                        ?.map { ResourceRecord(value = it.firstChildText("Value")!!) }
+                        ?.toList().orEmpty(),
+                    ttl = set.firstChildText("TTL")?.toInt(),
                     type = ResourceRecordSet.Type.valueOf(set.firstChildText("Type")!!),
                 )
             }
         )
     }
+    .toList()

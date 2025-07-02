@@ -8,7 +8,7 @@ import org.http4k.connect.amazon.route53.action.Route53Action
 
 @Http4kConnectApiClient
 interface Route53 {
-    operator fun <R> invoke(action: Route53Action<R>): Result<R, RemoteFailure>
+    operator fun <R: Any> invoke(action: Route53Action<R>): Result<R, RemoteFailure>
 
     companion object : AwsServiceCompanion("route53")
 }

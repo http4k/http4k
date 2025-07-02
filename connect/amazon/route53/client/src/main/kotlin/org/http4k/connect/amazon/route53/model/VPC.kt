@@ -5,14 +5,14 @@ import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.core.model.VpcId
 import org.w3c.dom.Node
 
-data class VpcConfig(
+data class VPC(
     val vpcId: VpcId,
     val vpcRegion: Region
 ) {
-    fun toXml() = "<VpcConfig><VPCId>$vpcId</VPCId><VPCRegion>$vpcRegion</VPCRegion></VpcConfig>"
+    fun toXml() = "<VPC><VPCId>$vpcId</VPCId><VPCRegion>$vpcRegion</VPCRegion></VPC>"
 
     companion object {
-        fun parse(node: Node) = VpcConfig(
+        fun parse(node: Node) = VPC(
             vpcId = VpcId.parse(node.firstChildText("VPCId")!!),
             vpcRegion = Region.parse(node.firstChildText("VPCRegion")!!)
         )

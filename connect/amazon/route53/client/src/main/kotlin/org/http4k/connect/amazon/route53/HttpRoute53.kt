@@ -35,7 +35,7 @@ fun Route53.Companion.Http(
         )
         .then(http)
 
-    override fun <R> invoke(action: Route53Action<R>) = action.toResult(signedHttp(action.toRequest()))
+    override fun <R: Any> invoke(action: Route53Action<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
 /**
