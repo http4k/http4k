@@ -5,10 +5,10 @@ import org.w3c.dom.Node
 import java.time.Instant
 
 data class ChangeInfo(
-    val comment: String?,
     val id: String,
     val status: Status,
-    val submittedAt: Instant
+    val submittedAt: Instant,
+    val comment: String?,
 ) {
     companion object {
         fun parse(node: Node) = ChangeInfo(

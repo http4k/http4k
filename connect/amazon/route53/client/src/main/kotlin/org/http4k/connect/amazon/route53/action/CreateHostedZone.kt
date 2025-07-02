@@ -19,7 +19,7 @@ import java.util.UUID
 @Http4kConnectAction
 class CreateHostedZone(
     val name: String,
-    val delegationSetId: String?,
+//    val delegationSetId: String?,
     val hostedZoneConfig: HostedZoneConfig?,
     val vpc: VpcConfig?,
     val callerReference: String = UUID.randomUUID().toString(),
@@ -29,7 +29,7 @@ class CreateHostedZone(
         append("""<?xml version="1.0" encoding="UTF-8"?>""")
         append("""<CreateHostedZoneRequest xmlns="https://route53.amazonaws.com/doc/2013-04-01/">""")
         append("<CallerReference>$callerReference</CallerReference>")
-        append("<DelegationSetId>$delegationSetId</DelegationSetId>")
+//        append("<DelegationSetId>$delegationSetId</DelegationSetId>")
         append("<Name>$name</Name>")
         if (hostedZoneConfig != null) {
             append("<HostedZoneConfig><Comment>string</Comment><PrivateZone>boolean</PrivateZone></HostedZoneConfig>")
@@ -43,34 +43,7 @@ class CreateHostedZone(
 
 private fun parse(document: Document) = CreateHostedZoneResponse(
     changeInfo = document.firstChild("ChangeId")!!.let(ChangeInfo::parse),
-    delegationSet = document.firstChild("DelegationSet")!!.let { set ->
-        DelegationSet(
-            nameServers = document.children("NameServers")
-                .map { it.firstChildText("NameServer")!! }
-                .toList()
-            ,
-            callerReference = set.firstChildText("CallerReference")!!,
-            id = set.firstChildText("Id")!!
-        )
-    },
-    hostedZone = document.firstChild("HostedZone")?.let {
-        HostedZone(
-            name = it.firstChildText("Name")!!,
-            id = it.firstChildText("Id")!!,
-            callerReference = it.firstChildText("CallerReference")!!,
-            config = it.firstChild("Config")?.let { config ->
-                HostedZoneConfig(
-                    comment = config.firstChildText("Comment"),
-                    privateZone = config.firstChildText("PrivateZone")?.toBoolean()
-                )
-            },
-            resourceRecordSetCount = it.firstChildText("ResourceRecordSetCount")?.toLong()
-        )
-    },
-    vpc = document.firstChild("Vpc")?.let {
-        VpcConfig(
-            vpcId = VpcId.parse(it.firstChildText("VPCId")!!),
-            vpcRegion = Region.parse(it.firstChildText("VPCRegion")!!)
-        )
-    }
+    delegationSet = document.firstChild("DelegationSet")?.let(DelegationSet::parse),
+    hostedZone = document.firstChild("HostedZone")?.let(HostedZone::parse),
+    vpc = document.firstChild("Vpc")?.let(VpcConfig::parse)
 )

@@ -5,6 +5,7 @@ import org.http4k.connect.amazon.core.firstChild
 import org.http4k.connect.amazon.core.firstChildText
 import org.http4k.connect.amazon.core.sequenceOfNodes
 import org.http4k.connect.amazon.core.xmlDoc
+import org.http4k.connect.amazon.route53.hostedZoneIdLens
 import org.http4k.connect.amazon.route53.model.AliasTarget
 import org.http4k.connect.amazon.route53.model.Change
 import org.http4k.connect.amazon.route53.model.ChangeInfo
@@ -13,6 +14,7 @@ import org.http4k.connect.amazon.route53.model.ResourceRecord
 import org.http4k.connect.amazon.route53.model.ResourceRecordSet
 import org.http4k.connect.amazon.route53.model.StoredHostedZone
 import org.http4k.connect.amazon.route53.model.StoredResource
+import org.http4k.connect.amazon.route53.model.toXml
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Body
@@ -21,12 +23,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.contentType
-import org.http4k.routing.path
 import java.time.Clock
 import java.util.UUID
 
 fun changeResourceRecordSets(hostedZones: Storage<StoredHostedZone>, records: Storage<StoredResource>, clock: Clock) = { request: Request ->
-    val hostedZoneId = request.path("hostedZoneId")!!
+    val hostedZoneId = hostedZoneIdLens(request)
     val changes = request.body.parse()
 
     // TODO verify hostedzone exists
@@ -49,16 +50,18 @@ fun changeResourceRecordSets(hostedZones: Storage<StoredHostedZone>, records: St
         }
     }
 
+    val result = ChangeInfo(
+        id = UUID.randomUUID().toString(),
+        status = ChangeInfo.Status.INSYNC,
+        submittedAt = clock.instant(),
+        comment = null
+    )
+
     Response(Status.OK)
         .contentType(ContentType.APPLICATION_XML)
-        .body("""
-<?xml version="1.0" encoding="UTF-8"?><
-ChangeResourceRecordSetsResponse>
-    <ChangeInfo>
-        <Id>${UUID.randomUUID()}</Id>
-        <Status>${ChangeInfo.Status.INSYNC}</Status>
-        <SubmittedAt>${clock.instant()}</SubmittedAt>
-    </ChangeInfo>
+        .body("""<?xml version="1.0" encoding="UTF-8"?>
+<ChangeResourceRecordSetsResponse>
+    ${result.toXml()}
 </ChangeResourceRecordSetsResponse>
 """)
 }
