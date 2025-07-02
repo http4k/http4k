@@ -62,6 +62,7 @@ tasks {
     withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JVM_21)
+            freeCompilerArgs.add("-Xannotation-default-target=param-property")
         }
     }
 
@@ -84,6 +85,7 @@ tasks {
             compilerOptions {
                 jvmTarget.set(JVM_21)
                 freeCompilerArgs.add("-Xjvm-default=all")
+                freeCompilerArgs.add("-Xannotation-default-target=param-property")
             }
         }
     }

@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-java@v4.7.1
         with:
-          distribution: temurin
+          distribution: adopt
           java-version: 21
 
       - name: Generate and save dependency graph

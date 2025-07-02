@@ -153,6 +153,32 @@ class UriTest {
         assertThat(queryParametersEncodedUri.queries(), equalTo(listOf("q1" to "encode me pls", "q2" to "encode me 2")))
     }
 
+    @Test
+    fun `get credentials - not encoded`() {
+        val uri = Uri.of("http://user:password@foo")
+        assertThat(uri.credentials(), equalTo(Credentials("user", "password")))
+        assertThat(uri.host, equalTo("foo"))
+    }
+
+    @Test
+    fun `get credentials - encoded`() {
+        val uri = Uri.of("http://user%40host.com:password123%21@foo")
+        assertThat(uri.credentials(), equalTo(Credentials("user@host.com", "password123!")))
+        assertThat(uri.host, equalTo("foo"))
+    }
+
+    @Test
+    fun `set credentials - not encoded`() {
+        val uri = Uri.of("http://foo").credentials(Credentials("user", "password"))
+        assertThat(uri.userInfo, equalTo("user:password"))
+    }
+
+    @Test
+    fun `set credentials - encoded`() {
+        val uri = Uri.of("http://foo").credentials(Credentials("user@host.com", "password123!"))
+        assertThat(uri.userInfo, equalTo("user%40host.com:password123%21"))
+    }
+
     // Test cases adapted from [reference resolution examples of RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986#section-5.4)
     @ParameterizedTest(name = "base {0}, relative path {1}, maps to {2} ")
     @MethodSource("relativeUriTestData")

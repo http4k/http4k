@@ -1,6 +1,9 @@
 package org.http4k.connect.amazon.evidently.actions
 
+import dev.forkhandles.result4k.Result
+import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.evidently.EvidentlyAction
 import org.http4k.connect.amazon.evidently.model.ProjectName
@@ -13,7 +16,8 @@ data class CreateProject(
     val name: ProjectName,
     val description: String?,
     val tags: Map<String, String>?
-) : EvidentlyAction<CreateProjectResponse>(CreateProjectResponse::class) {
+) : EvidentlyAction<CreateProjectResponse>(CreateProjectResponse::class),
+    Action<Result<CreateProjectResponse, RemoteFailure>> {
     override fun uri() = Uri.of("/projects")
 
     override fun requestBody() = CreateProjectData(
