@@ -40,7 +40,7 @@ class S3DocumentLoader(
         prefix: String?,
         parser: DocumentParser
     ) = s3Client(bucket)
-        .listobj(prefix = prefix)
+        .listObjectsV2Paginated(prefix = prefix)
         .map {
             it.map {
                 it.map { item ->
