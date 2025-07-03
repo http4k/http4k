@@ -40,7 +40,7 @@ fun interface ReverseProxyHostMatcher {
     operator fun invoke(host: String, extracted: String): Boolean
 
     companion object {
-        val Contains = ReverseProxyHostMatcher { host, extracted -> extracted.contains(host) }
+        val Contains = ReverseProxyHostMatcher { host, extracted -> host.contains(extracted) }
         val Exact = ReverseProxyHostMatcher { host, extracted -> extracted == host }
     }
 }
