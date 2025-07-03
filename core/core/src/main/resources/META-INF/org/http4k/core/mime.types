@@ -35,6 +35,7 @@ application/lost+xml				lostxml
 application/mac-binhex40			hqx
 application/mac-compactpro			cpt
 application/mads+xml				mads
+application/manifest+json				webmanifest
 application/marc				mrc
 application/marcxml+xml				mrcx
 application/mathematica				ma nb mb
