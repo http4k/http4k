@@ -4,7 +4,7 @@ import org.http4k.connect.storage.Storage
 
 data class StoredHostedZone(
     val id: HostedZoneId,
-    val name: String,
+    val name: HostedZoneName,
     val callerReference: String,
     val config: Config?
 )

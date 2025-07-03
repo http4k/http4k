@@ -9,6 +9,6 @@ fun Storage<VPC>.forZone(hostedZoneId: HostedZoneId) = this
     .keySet(hostedZoneId.value)
     .mapNotNull { get(it) }
 
-fun Storage<ResourceRecordSet>.forDomain(domain: String) = keySet()
-    .filter { it.endsWith(".$domain") }
+fun Storage<ResourceRecordSet>.forDomain(domain: HostedZoneName) = keySet()
+    .filter { it.endsWith(domain.value) }
     .mapNotNull { get(it) }

@@ -15,8 +15,8 @@ data class DelegationSet(
                 .map { it.firstChildText("NameServer")!! }
                 .toList()
             ,
-            callerReference = node.firstChildText("CallerReference")!!,
-            id = node.firstChildText("Id")!!
+            callerReference = node.firstChildText("CallerReference"),
+            id = node.firstChildText("Id")
         )
     }
 }

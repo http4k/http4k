@@ -23,7 +23,9 @@ class ChangeResourceRecordSets(
         append("""<?xml version="1.0" encoding="UTF-8"?>""")
         append("""<ChangeResourceRecordSetsRequest xmlns="https://route53.amazonaws.com/doc/2013-04-01/">""")
         append("<ChangeBatch>")
+        append("<Changes>")
         changes.forEach { append(it.toXml()) }
+        append("</Changes>")
         append("</ChangeBatch>")
         append("</ChangeResourceRecordSetsRequest>")
     }

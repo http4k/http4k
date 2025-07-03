@@ -36,7 +36,7 @@ class FakeRoute53(
         "hostedzone" bind routes(
             "" bind Method.POST to createHostedZone(random, hostedZones, resources, vpcAssociations, clock),
             "$hostedZoneIdLens" bind routes(
-                "" bind Method.DELETE to deleteHostedZone(hostedZones, clock),
+                "" bind Method.DELETE to deleteHostedZone(hostedZones, resources, clock),
                 "" bind Method.GET to getHostedZone(hostedZones, resources, vpcAssociations),
                 "rrset" bind Method.POST to changeResourceRecordSets(hostedZones, resources, clock),
                 "rrset" bind Method.GET to listResourceRecordSets(hostedZones, resources)

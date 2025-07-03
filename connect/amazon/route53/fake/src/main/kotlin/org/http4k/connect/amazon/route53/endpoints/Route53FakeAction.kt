@@ -4,6 +4,7 @@ import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.recover
 import org.http4k.connect.amazon.core.xmlDoc
+import org.http4k.connect.amazon.route53.model.FakeRoute53Error
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -14,10 +15,9 @@ import org.w3c.dom.Document
 
 fun <RequestBody: Any, ResponseBody: Any> route53FakeAction(
     requestBodyFn: ((Document) -> RequestBody),
-    successFn: (ResponseBody) -> String,
-    errorFn: (Route53Error) -> Response = { Response(it.status).body(it.message) },
+    responseBodyFn: (ResponseBody) -> String,
     successCode: Status = Status.OK,
-    fn: Request.(RequestBody) -> Result4k<ResponseBody, Route53Error>
+    fn: Request.(RequestBody) -> Result4k<ResponseBody, FakeRoute53Error>
 ): HttpHandler = { request ->
     request.body.xmlDoc()
         .let(requestBodyFn)
@@ -25,22 +25,21 @@ fun <RequestBody: Any, ResponseBody: Any> route53FakeAction(
         .map {
             Response(successCode)
                 .contentType(ContentType.APPLICATION_XML)
-                .body("""<?xml version="1.0" encoding="UTF-8"?>${successFn(it)}""")
+                .body("""<?xml version="1.0" encoding="UTF-8"?>${responseBodyFn(it)}""")
         }
-        .recover(errorFn)
+        .recover { it.toResponse() }
 }
 
 fun <ResponseBody: Any> route53FakeAction(
-    successFn: (ResponseBody) -> String,
-    errorFn: (Route53Error) -> Response = { Response(it.status).body(it.message) },
+    responseBodyFn: (ResponseBody) -> String,
     successCode: Status = Status.OK,
-    fn: Request.() -> Result4k<ResponseBody, Route53Error>
+    fn: Request.() -> Result4k<ResponseBody, FakeRoute53Error>
 ): HttpHandler = { request ->
     fn(request)
         .map {
             Response(successCode)
                 .contentType(ContentType.APPLICATION_XML)
-                .body("""<?xml version="1.0" encoding="UTF-8"?>${successFn(it)}""")
+                .body("""<?xml version="1.0" encoding="UTF-8"?>${responseBodyFn(it)}""")
         }
-        .recover(errorFn)
+        .recover { it.toResponse() }
 }

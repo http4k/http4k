@@ -10,13 +10,14 @@ import org.http4k.connect.amazon.route53.model.CreateHostedZoneResponse
 import org.http4k.connect.amazon.route53.model.DelegationSet
 import org.http4k.connect.amazon.route53.model.HostedZone
 import org.http4k.connect.amazon.route53.model.HostedZoneConfig
+import org.http4k.connect.amazon.route53.model.HostedZoneName
 import org.http4k.connect.amazon.route53.model.VPC
 import org.http4k.core.Method
 import org.w3c.dom.Document
 
 @Http4kConnectAction
 class CreateHostedZone(
-    val name: String,
+    val name: HostedZoneName,
     val callerReference: String,
     val delegationSetId: String?,
     val hostedZoneConfig: HostedZoneConfig?,
@@ -29,7 +30,7 @@ class CreateHostedZone(
         append("""<?xml version="1.0" encoding="UTF-8"?>""")
         append("""<CreateHostedZoneRequest xmlns="https://route53.amazonaws.com/doc/2013-04-01/">""")
         append("<CallerReference>$callerReference</CallerReference>")
-        append("<DelegationSetId>$delegationSetId</DelegationSetId>")
+        if (delegationSetId != null) append("<DelegationSetId>$delegationSetId</DelegationSetId>")
         append("<Name>$name</Name>")
         if (hostedZoneConfig != null) append(hostedZoneConfig.toXml())
         if (vpc != null) append(vpc.toXml())

@@ -11,9 +11,11 @@ import org.http4k.connect.amazon.route53.model.Config
 import org.http4k.connect.amazon.route53.model.CreateHostedZoneResponse
 import org.http4k.connect.amazon.route53.model.HostedZoneConfig
 import org.http4k.connect.amazon.route53.model.HostedZoneId
+import org.http4k.connect.amazon.route53.model.HostedZoneName
 import org.http4k.connect.amazon.route53.model.ResourceRecordSet
 import org.http4k.connect.amazon.route53.model.StoredHostedZone
 import org.http4k.connect.amazon.route53.model.VPC
+import org.http4k.connect.amazon.route53.model.invalidInput
 import org.http4k.connect.amazon.route53.model.random
 import org.http4k.connect.amazon.route53.model.save
 import org.http4k.connect.amazon.route53.model.toHostedZone
@@ -31,6 +33,10 @@ fun createHostedZone(
     vpcAssociations: Storage<VPC>,
     clock: Clock
 ) = route53FakeAction(::fromXml, ::toXml) fn@{ data ->
+    if (data.hostedZoneConfig?.privateZone == true && data.vpc == null) {
+        return@fn invalidInput("When you're creating a private hosted zone (when you specify true for PrivateZone), you must also specify values for VPCId and VPCRegion.")
+    }
+
     val hostedZone = StoredHostedZone(
         id = HostedZoneId.random(random),
         name = data.name,
@@ -47,6 +53,22 @@ fun createHostedZone(
     data.vpc?.let {
         vpcAssociations.save(hostedZone.id, it)
     }
+
+    // create required resources
+    resources["NS:${hostedZone.name}"] = ResourceRecordSet(
+        name = hostedZone.name.value,
+        type = ResourceRecordSet.Type.NS,
+        aliasTarget = null,
+        ttl = 172800,
+        resourceRecords = listOf("ns-0000.fakedns.com")
+    )
+    resources["SOA:${hostedZone.name}"] = ResourceRecordSet(
+        name = hostedZone.name.value,
+        type = ResourceRecordSet.Type.SOA,
+        aliasTarget = null,
+        ttl = 900,
+        resourceRecords = listOf("ns-0000.fakedns.com")
+    )
 
     CreateHostedZoneResponse(
         changeInfo = ChangeInfo(
@@ -73,7 +95,7 @@ private fun fromXml(document: Document) = document
     .getElementsByTagName("CreateHostedZoneRequest")
     .item(0).let {
         CreateHostedZone(
-            name = it.firstChildText("Name")!!,
+            name = HostedZoneName.parse(it.firstChildText("Name")!!),
             callerReference = it.firstChildText("CallerReference")!!,
             delegationSetId = it.firstChild("DelegationSet")?.firstChildText("Id"),
             hostedZoneConfig = it.firstChild("HostedZoneConfig")?.let { config ->

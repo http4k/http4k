@@ -9,6 +9,6 @@ plugins {
 }
 
 dependencies {
-    testFixturesApi(project(path = ":http4k-connect-amazon-route53-fake"))
+    testFixturesApi(project(":http4k-connect-amazon-route53-fake"))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

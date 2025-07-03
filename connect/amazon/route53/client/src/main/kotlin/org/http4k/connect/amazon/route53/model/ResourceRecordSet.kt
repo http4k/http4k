@@ -9,7 +9,7 @@ data class ResourceRecordSet(
     val name: String,
     val type: Type,
     val aliasTarget: AliasTarget?,
-    val resourceRecords: List<ResourceRecord>?,
+    val resourceRecords: List<String>?,
     val ttl: Int?
 ) {
     enum class Type { SOA, A, TXT, NS, CNAME, MX, NAPTR, PTR, SRV, SPF, AAAA, CAA, DS, TLSA, SSHFP, SVCB, HTTPS }
@@ -21,7 +21,7 @@ data class ResourceRecordSet(
         aliasTarget?.let { append(it.toXml()) }
         if (resourceRecords != null && resourceRecords.isNotEmpty()) {
             append("<ResourceRecords>")
-            resourceRecords.forEach { append(it.toXml()) }
+            resourceRecords.forEach { append("<ResourceRecord><Value>$it</Value></ResourceRecord>") }
             append("</ResourceRecords>")
         }
         if (ttl != null) {
@@ -44,7 +44,7 @@ data class ResourceRecordSet(
             ttl = node.firstChildText("TTL")?.toInt(),
             resourceRecords = node.firstChild("ResourceRecords")
                 ?.children("ResourceRecord")
-                ?.map { ResourceRecord(it.firstChildText("Value")!!) }
+                ?.map { it.firstChildText("Value")!! }
                 ?.toList()
         )
     }
@@ -63,10 +63,3 @@ data class AliasTarget(
         append("</AliasTarget>")
     }
 }
-
-data class ResourceRecord(
-    val value: String
-) {
-    internal fun toXml() = "<ResourceRecord><Value>${value}</Value></ResourceRecord>"
-}
-

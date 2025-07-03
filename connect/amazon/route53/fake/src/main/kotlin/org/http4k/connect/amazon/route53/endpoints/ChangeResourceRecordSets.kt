@@ -1,6 +1,5 @@
 package org.http4k.connect.amazon.route53.endpoints
 
-import dev.forkhandles.result4k.asFailure
 import dev.forkhandles.result4k.asSuccess
 import org.http4k.connect.amazon.core.children
 import org.http4k.connect.amazon.core.firstChild
@@ -11,10 +10,10 @@ import org.http4k.connect.amazon.route53.model.AliasTarget
 import org.http4k.connect.amazon.route53.model.Change
 import org.http4k.connect.amazon.route53.model.ChangeInfo
 import org.http4k.connect.amazon.route53.model.HostedZoneId
-import org.http4k.connect.amazon.route53.model.ResourceRecord
 import org.http4k.connect.amazon.route53.model.ResourceRecordSet
 import org.http4k.connect.amazon.route53.model.StoredHostedZone
-import org.http4k.connect.amazon.route53.model.forDomain
+import org.http4k.connect.amazon.route53.model.invalidChangeBatch
+import org.http4k.connect.amazon.route53.model.noSuchHostedZone
 import org.http4k.connect.amazon.route53.model.toXml
 import org.http4k.connect.storage.Storage
 import org.w3c.dom.Document
@@ -25,25 +24,34 @@ fun changeResourceRecordSets(
     hostedZones: Storage<StoredHostedZone>,
     resources: Storage<ResourceRecordSet>,
     clock: Clock
-) = route53FakeAction(
-    requestBodyFn = Document::fromXml,
-    successFn = { "<ChangeResourceRecordSetsResponse>${it.toXml()}</ChangeResourceRecordSetsResponse>" }
-) fn@{ changes ->
+) = route53FakeAction(::parseRequest, ::serializeResponse) fn@{ changes ->
     val hostedZoneId = hostedZoneIdLens(this)
-    val hostedZone = hostedZones[hostedZoneId.value] ?: return@fn noSuchHostedZone().asFailure()
+    val hostedZone = hostedZones[hostedZoneId.value] ?: return@fn noSuchHostedZone(hostedZoneId)
+
+    // TODO validate data BEFORE, so that partial results aren't saved
 
     for (change in changes) {
+        val record = change.resourceRecordSet.copy(
+            name = change.resourceRecordSet.name.trimEnd('.').plus('.')
+        )
+        val key = "${record.type}:${record.name}"
+        val exists = key in resources.keySet()
+        val matches = record.name.endsWith(hostedZone.name.value)
+
         when(change.action) {
-            // TODO verify fully qualified DNS names match hostedZoneId
-            //  TODO handle create/upsert differences
-            Change.Action.CREATE, Change.Action.UPSERT -> {
-                resources[change.resourceRecordSet.name] = change.resourceRecordSet
+            // TODO handle particulars of what makes a valid CNAME, A, alias, etc.
+            Change.Action.CREATE -> {
+                if (!matches) return@fn invalidChangeBatch("[RRSet with DNS name ${record.name} is not permitted in zone ${hostedZone.name}]")
+                if (exists) return@fn invalidChangeBatch("[Tried to create resource record set [name='${record.name}', type='${record.type}'] but it already exists]")
+                resources[key] = record
+            }
+            Change.Action.UPSERT -> {
+                if (!matches) return@fn invalidChangeBatch("[RRSet with DNS name ${record.name} is not permitted in zone ${hostedZone.name}]")
+                resources[key] = record
             }
             Change.Action.DELETE -> {
-                if (change.resourceRecordSet !in resources.forDomain(hostedZone.name)) {
-                    return@fn invalidChangeBatch().asFailure()
-                }
-                resources.remove(change.resourceRecordSet.name)
+                if (!exists) return@fn invalidChangeBatch("[Tried to delete resource record set [name='${record.name}', type='${record.type}'] but it was not found]")
+                resources -= key
             }
         }
     }
@@ -56,7 +64,10 @@ fun changeResourceRecordSets(
     ).asSuccess()
 }
 
-private fun Document.fromXml(): List<Change> = this
+private fun serializeResponse(change: ChangeInfo) =
+    "<ChangeResourceRecordSetsResponse>${change.toXml()}</ChangeResourceRecordSetsResponse>"
+
+private fun parseRequest(document: Document): List<Change> = document
     .getElementsByTagName("Change")
     .sequenceOfNodes()
     .map { node ->
@@ -74,7 +85,7 @@ private fun Document.fromXml(): List<Change> = this
                     },
                     resourceRecords = set.firstChild("ResourceRecords")
                         ?.children("ResourceRecord")
-                        ?.map { ResourceRecord(value = it.firstChildText("Value")!!) }
+                        ?.map { it.firstChildText("Value")!! }
                         ?.toList().orEmpty(),
                     ttl = set.firstChildText("TTL")?.toInt(),
                     type = ResourceRecordSet.Type.valueOf(set.firstChildText("Type")!!),
