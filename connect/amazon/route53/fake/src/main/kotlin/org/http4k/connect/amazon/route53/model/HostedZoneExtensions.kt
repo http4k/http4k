@@ -2,7 +2,7 @@ package org.http4k.connect.amazon.route53.model
 
 import kotlin.random.Random
 
-fun HostedZone.toXml() = """<HostedZone>
+internal fun HostedZone.toXml() = """<HostedZone>
   <CallerReference>$callerReference</CallerReference>
   <Id>$id</Id>
   <Name>$name</Name>

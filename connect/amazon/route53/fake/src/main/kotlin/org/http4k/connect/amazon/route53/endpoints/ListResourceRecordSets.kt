@@ -12,7 +12,7 @@ import org.http4k.connect.storage.Storage
 fun listResourceRecordSets(
     hostedZones: Storage<StoredHostedZone>,
     resources: Storage<ResourceRecordSet>
-) = route53FakeAction(ListResourceRecordSetsResponse::toXml) fn@{
+) = route53FakeAction(::serializeResponse) fn@{
     val hostedZoneId = hostedZoneIdLens(this)
     val hostedZone = hostedZones[hostedZoneId.value] ?: return@fn noSuchHostedZone(hostedZoneId)
 
@@ -34,15 +34,15 @@ fun listResourceRecordSets(
     ).asSuccess()
 }
 
-private fun ListResourceRecordSetsResponse.toXml() = buildString {
+private fun serializeResponse(result: ListResourceRecordSetsResponse) = buildString {
     append("""<ListResourceRecordSetsResponse xmlns="https://route53.amazonaws.com/doc/2013-04-01/">""")
-    append("<IsTruncated>${isTruncated}</IsTruncated>")
-    append("<MaxItems>${maxItems}</MaxItems>")
-    if (nextRecordIdentifier != null) append("<NextRecordIdentifier>${nextRecordIdentifier}</NextRecordIdentifier>")
-    if (nextRecordName != null) append("<NextRecordName>${nextRecordName}</NextRecordName>")
-    if (nextRecordType != null) append("<NextRecordType>${nextRecordType}</NextRecordType>")
+    append("<IsTruncated>${result.isTruncated}</IsTruncated>")
+    append("<MaxItems>${result.maxItems}</MaxItems>")
+    if (result.nextRecordIdentifier != null) append("<NextRecordIdentifier>${result.nextRecordIdentifier}</NextRecordIdentifier>")
+    if (result.nextRecordName != null) append("<NextRecordName>${result.nextRecordName}</NextRecordName>")
+    if (result.nextRecordType != null) append("<NextRecordType>${result.nextRecordType}</NextRecordType>")
     append("<ResourceRecordSets>")
-    resourceRecordSets.forEach { append(it.toXml()) }
+    result.resourceRecordSets.forEach { append(it.toXml()) }
     append("</ResourceRecordSets>")
     append("</ListResourceRecordSetsResponse>")
 }
