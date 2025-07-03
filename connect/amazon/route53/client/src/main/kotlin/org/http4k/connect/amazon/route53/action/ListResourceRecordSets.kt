@@ -2,6 +2,7 @@ package org.http4k.connect.amazon.route53.action
 
 import dev.forkhandles.result4k.Result4k
 import org.http4k.connect.Action
+import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.route53.model.HostedZoneId
 import org.http4k.connect.amazon.route53.model.ListResourceRecordSetsResponse
@@ -11,6 +12,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.query
 
+@Http4kConnectAction
 class ListResourceRecordSets(
     val hostedZoneId: HostedZoneId,
     val startRecordIdentifier: String?,
