@@ -1,0 +1,11 @@
+{
+  "items": {
+    "$ref": "reffed"
+  },
+  "example": [
+    "foo"
+  ],
+  "type": "array",
+  "foo": "bar",
+  "nullable": false
+}

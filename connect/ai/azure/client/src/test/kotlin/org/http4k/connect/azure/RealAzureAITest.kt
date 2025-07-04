@@ -1,5 +1,6 @@
 package org.http4k.connect.azure
 
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey
@@ -9,7 +10,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 
 class RealAzureAITest : AzureAIContract, PortBasedTest {
-    val apiKey = EnvironmentKey.value(AzureAIApiKey).optional("AZURE_AI_API_KEY")
+    val apiKey = EnvironmentKey.value(ApiKey).optional("AZURE_AI_API_KEY")
     val resource = EnvironmentKey.value(AzureResource).required("AZURE_AI_RESOURCE")
     val region = EnvironmentKey.value(Region).required("AZURE_AI_REGION")
 

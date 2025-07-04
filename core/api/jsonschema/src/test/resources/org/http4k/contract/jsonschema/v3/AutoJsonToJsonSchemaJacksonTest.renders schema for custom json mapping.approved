@@ -4,35 +4,32 @@
     "example": null,
     "format": null
   },
-  "definitions": [
-    {
-      "first": "ArbObjectHolder",
-      "second": {
-        "properties": {
-          "inner": {
-            "items": {
-              "format": null,
-              "type": "string"
-            },
-            "example": [
-              "foobar"
-            ],
+  "definitions": {
+    "ArbObjectHolder": {
+      "properties": {
+        "inner": {
+          "items": {
             "format": null,
-            "type": "array",
-            "nullable": false
-          }
-        },
-        "example": {
-          "inner": [
+            "type": "string"
+          },
+          "example": [
             "foobar"
-          ]
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "inner"
+          ],
+          "format": null,
+          "type": "array",
+          "nullable": false
+        }
+      },
+      "example": {
+        "inner": [
+          "foobar"
         ]
-      }
+      },
+      "format": null,
+      "type": "object",
+      "required": [
+        "inner"
+      ]
     }
-  ]
+  }
 }

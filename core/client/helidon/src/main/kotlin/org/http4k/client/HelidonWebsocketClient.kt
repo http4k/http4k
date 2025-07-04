@@ -12,11 +12,14 @@ import org.http4k.websocket.WebsocketFactory
 import org.http4k.websocket.WsClient as Http4kWsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsMessage.Mode.Binary
+import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.toWsClient
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class HelidonWebsocketClient(
     private val timeout: Duration = Duration.ofSeconds(5)
@@ -53,7 +56,7 @@ class HelidonWebsocketClient(
             onConnect = { latch.countDown() }
         )
 
-        if (!latch.await(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
+        if (!latch.await(timeout.toMillis(), MILLISECONDS)) {
             error("Websocket failed to connect to $uri in $timeout")
         }
 
@@ -68,8 +71,8 @@ private fun createWebsocket(onOpen: WsConsumer): Pair<WsListener, PushPullAdapti
     val ws = object: PushPullAdaptingWebSocket() {
         override fun send(message: WsMessage) {
             when(message.mode) {
-                WsMessage.Mode.Text -> connection.send(message.bodyString(), true)
-                WsMessage.Mode.Binary -> connection.send(BufferData.create(message.body.payload.array()), true)
+                Text -> connection.send(message.bodyString(), true)
+                Binary -> connection.send(BufferData.create(message.body.payload.array()), true)
             }
         }
 
@@ -89,6 +92,7 @@ private fun createWebsocket(onOpen: WsConsumer): Pair<WsListener, PushPullAdapti
         }
 
         override fun onMessage(session: WsSession, text: String, last: Boolean) {
+            System.err.println("SENDING $text")
             ws.triggerMessage(WsMessage(text))
         }
 

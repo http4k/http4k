@@ -22,6 +22,7 @@ import java.nio.ByteBuffer
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class JavaWebSocket(
     private val port: Int = 8000,
@@ -48,7 +49,8 @@ class JavaWebSocket(
             override fun port() = server.port
             override fun start() = also {
                 server.start()
-                startLatch.await(startupTimeout.toMillis(), TimeUnit.MILLISECONDS)
+                if (!startLatch.await(startupTimeout.toMillis(), MILLISECONDS))
+                    error("Timeout waiting for server to start")
             }
 
             override fun stop() = also {

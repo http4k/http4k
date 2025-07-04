@@ -1,71 +1,52 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
-    "example": null,
-    "format": null
+    "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses"
   },
-  "definitions": [
-    {
-      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses",
-      "second": {
-        "properties": {
-          "inner": {
-            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
-            "example": null,
-            "format": null
-          },
-          "enum": {
-            "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
-            "example": null,
-            "format": null
-          }
+  "definitions": {
+    "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses": {
+      "properties": {
+        "inner": {
+          "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner"
         },
-        "example": {
-          "inner": {
-            "name": "name"
-          },
-          "enum": "bar"
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "enum",
-          "inner"
-        ]
-      }
-    },
-    {
-      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner",
-      "second": {
-        "properties": {
-          "name": {
-            "example": "name",
-            "format": null,
-            "type": "string",
-            "nullable": false
-          }
-        },
-        "example": {
+        "enum": {
+          "$ref": "#/locationPrefix/prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum"
+        }
+      },
+      "example": {
+        "inner": {
           "name": "name"
         },
-        "format": null,
-        "type": "object",
-        "required": [
-          "name"
-        ]
-      }
+        "enum": "bar"
+      },
+      "type": "object",
+      "required": [
+        "enum",
+        "inner"
+      ]
     },
-    {
-      "first": "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum",
-      "second": {
-        "example": "bar",
-        "enum": [
-          "bar"
-        ],
-        "format": null,
-        "type": "string",
-        "nullable": false
-      }
+    "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.Inner": {
+      "properties": {
+        "name": {
+          "example": "name",
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "example": {
+        "name": "name"
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "prefixorg.http4k.contract.jsonschema.v3.ArbObjectWithInnerClasses.FooEnum": {
+      "example": "bar",
+      "enum": [
+        "bar"
+      ],
+      "type": "string",
+      "nullable": false
     }
-  ]
+  }
 }

@@ -1,12 +1,12 @@
 package org.http4k.connect.anthropic.action
 
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.ToolName
 import org.http4k.connect.anthropic.SourceType
 import org.http4k.connect.anthropic.ToolUseId
 import org.http4k.connect.anthropic.UserId
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.ToolName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -31,7 +31,7 @@ sealed class Content {
 
     @JsonSerializable
     @PolymorphicLabel("tool_use")
-    data class ToolUse(val name: ToolName, val id: ToolUseId, val input: Any) : Content()
+    data class ToolUse(val name: ToolName, val id: ToolUseId, val input: Map<String, Any>) : Content()
 
     @JsonSerializable
     @PolymorphicLabel("tool_result")

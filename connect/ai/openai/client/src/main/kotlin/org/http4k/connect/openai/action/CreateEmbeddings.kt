@@ -2,10 +2,10 @@
 
 package org.http4k.connect.openai.action
 
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.NonNullAutoMarshalledAction
 import org.http4k.connect.kClass
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.openai.ObjectType
 import org.http4k.connect.openai.ObjectType.Companion.Embedding
 import org.http4k.connect.openai.ObjectType.Companion.List

@@ -1,6 +1,9 @@
 package org.http4k.connect.amazon.evidently.actions
 
+import dev.forkhandles.result4k.Result
+import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.evidently.EvidentlyAction
 import org.http4k.connect.amazon.evidently.model.EntityId
 import org.http4k.connect.amazon.evidently.model.EvaluationContext
@@ -16,7 +19,7 @@ data class EvaluateFeature(
     val feature: FeatureName,
     val entityId: EntityId,
     val evaluationContext: EvaluationContext?
-) : EvidentlyAction<EvaluatedFeature>(EvaluatedFeature::class, dataPlane = true) {
+) : EvidentlyAction<EvaluatedFeature>(EvaluatedFeature::class, dataPlane = true), Action<Result<EvaluatedFeature, RemoteFailure>> {
     override fun uri() = Uri.of("/projects/$project/evaluations/$feature")
     override fun requestBody() = EvaluateFeatureRequest(entityId, evaluationContext)
 }

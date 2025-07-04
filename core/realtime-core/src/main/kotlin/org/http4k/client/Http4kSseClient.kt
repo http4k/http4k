@@ -8,10 +8,11 @@ import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.accept
+import org.http4k.sse.SseClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
-import org.http4k.sse.SseClient
 import java.io.InputStream
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -20,18 +21,21 @@ import kotlin.concurrent.thread
 /**
  * Simple SSE client leveraging standard HttpHandlers. Tracks a single connection only and sends reconnection
  * requests including the last event id.
+ *
+ *  Note that the representation uses an unbounded blocking queue, so clients are required to consume messages
+ *  using received().
  */
 class Http4kSseClient(
     private val sseRequest: Request,
     private val http: HttpHandler,
     private var reconnectionMode: ReconnectionMode = Disconnect,
-    private val reportError: (Exception) -> Unit = {}
+    private val reportError: (Exception) -> Unit = {},
 ) : SseClient {
-
     private val running = AtomicBoolean(true)
-    private val messageQueue = LinkedBlockingQueue<SseMessage>()
 
     private val lastEventId = AtomicReference<SseEventId>()
+
+    private val messageQueue: BlockingQueue<SseMessage> = LinkedBlockingQueue()
 
     override fun received(): Sequence<SseMessage> = sequence {
         thread {
@@ -58,7 +62,7 @@ class Http4kSseClient(
         while (running.get()) {
             val value = messageQueue.take()
             yield(value)
-            if (value is SseMessage.Event) lastEventId.set(value.id)
+            if (value is SseMessage.Event && value.id != null) lastEventId.set(value.id)
         }
     }
 

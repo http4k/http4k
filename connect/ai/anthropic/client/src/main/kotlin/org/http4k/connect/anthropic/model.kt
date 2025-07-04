@@ -5,17 +5,17 @@ import dev.forkhandles.values.LocalDateValueFactory
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.Value
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.ToolName
+import org.http4k.ai.model.ApiKey
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.ToolName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 import java.time.LocalDate
 
-class AnthropicIApiKey private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<AnthropicIApiKey>(::AnthropicIApiKey)
-}
+@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
+typealias AnthropicIApiKey = ApiKey
 
 class UserId private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<UserId>(::UserId)
@@ -23,10 +23,6 @@ class UserId private constructor(value: String) : StringValue(value) {
 
 class ModelType private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ModelType>(::ModelType)
-}
-
-class Prompt private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<Prompt>(::Prompt)
 }
 
 class ToolUseId private constructor(value: String) : StringValue(value) {
@@ -57,10 +53,6 @@ enum class SourceType {
     base64
 }
 
-class ResponseId private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<ResponseId>(::ResponseId)
-}
-
 val StopReason.Companion.end_turn get() = StopReason.of("end_turn")
 val StopReason.Companion.max_tokens get() = StopReason.of("max_tokens")
 val StopReason.Companion.stop_sequence get() = StopReason.of("stop_sequence")
@@ -72,6 +64,16 @@ class ApiVersion private constructor(value: LocalDate) : LocalDateValue(value), 
     }
 }
 
+@Deprecated("Use Models instead")
 val ModelName.Companion.CLAUDE_3_7_SONNET get() = ModelName.of("claude-3-7-sonnet-20250219")
 
+@Deprecated("Use Models instead")
 val ModelName.Companion.CLAUDE_3_5_SONNET get() = ModelName.of("claude-3-5-sonnet-20240620")
+
+object AnthropicModels {
+    val Claude_Opus_4_0 = ModelName.of("claude-opus-4-0")
+    val Claude_Sonnet_4_0 = ModelName.of("claude-sonnet-4-0")
+    val Claude_Sonnet_3_7 = ModelName.of("claude-3-7-sonnet-latest")
+    val Claude_Sonnet_3_5 = ModelName.of("claude-3-5-sonnet-latest")
+    val Claude_Haiku_3_5 = ModelName.of("claude-3-5-haiku-latest")
+}

@@ -71,7 +71,7 @@ open class OpenApi2<out NODE>(
                         "tags" to array(routes.renderTags(tags)),
                         "paths" to obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOfNotNull(security) + routes.mapNotNull { it.meta.security }).combine(),
-                        "definitions" to obj(definitions),
+                        "definitions" to obj(definitions.toList()),
                         baseUri?.let { "host" to string(it.authority) },
                         baseUri?.let { "schemes" to array(string(it.scheme)) }
                     ))
@@ -173,11 +173,12 @@ open class OpenApi2<out NODE>(
                     "security" to array(security)
                 ) + (route.meta.description?.let { listOf("description" to string(it)) }.orEmpty())
 
+            val flatMap: Map<String, NODE> = route.meta.requests.flatMap {
+                it.asSchema()?.definitions?.toList() ?: emptyList()
+            }.toMap()
             FieldAndDefinitions(
                 route.method.toString().lowercase(getDefault()) to obj(fields),
-                ((route.meta.requests.flatMap {
-                    it.asSchema()?.definitions ?: emptyList()
-                }) + responseDefinitions).toSet()
+                (flatMap + responseDefinitions.toMap())
             )
         }
     }
@@ -187,7 +188,7 @@ open class OpenApi2<out NODE>(
         else -> try {
             schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId, null)
         } catch (e: Exception) {
-            JsonSchema(json.obj(), emptySet())
+            JsonSchema(json.obj(), emptyMap())
         }
     }
 
@@ -212,7 +213,7 @@ open class OpenApi2<out NODE>(
                         else if (schema.node == nullNode()) emptyList()
                         else listOf("schema" to schema.node)
                 ),
-                definitions = schema?.definitions ?: emptySet()
+                definitions = schema?.definitions ?: emptyMap()
             )
         }
     }
@@ -242,7 +243,7 @@ open class OpenApi2<out NODE>(
 
 private data class FieldsAndDefinitions<NODE>(
     val fields: List<Pair<String, NODE>> = emptyList(),
-    val definitions: Set<Pair<String, NODE>> = emptySet()
+    val definitions: Map<String, NODE> = emptyMap()
 ) {
     operator fun plus(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(
         fields + fieldAndDefinitions.field,
@@ -252,7 +253,7 @@ private data class FieldsAndDefinitions<NODE>(
 
 private data class FieldAndDefinitions<out NODE>(
     val field: Pair<String, NODE>,
-    val definitions: Set<Pair<String, NODE>>
+    val definitions: Map<String, NODE>
 )
 
 private fun <T> T?.asList() = this?.let(::listOf).orEmpty()

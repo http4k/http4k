@@ -19,7 +19,9 @@ dependencies {
 
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-format-jackson"))
+    testImplementation(project(":http4k-format-moshi"))
     testImplementation(testFixtures(project(":http4k-format-core")))
-    testImplementation(project(":http4k-testing-approval"))
+
+    testFixturesApi(project(":http4k-testing-approval"))
 }
 

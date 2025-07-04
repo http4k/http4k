@@ -1,0 +1,11 @@
+{
+  "example": "A",
+  "enum": [
+    "A",
+    "B"
+  ],
+  "format": null,
+  "type": "string",
+  "foo": "bar",
+  "nullable": false
+}

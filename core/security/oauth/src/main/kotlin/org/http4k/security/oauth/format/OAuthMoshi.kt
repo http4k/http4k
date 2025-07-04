@@ -22,6 +22,8 @@ object OAuthMoshi : ConfigurableMoshi(
         .addTyped(ServerMetadataMoshiAdapter)
         .addTyped(ErrorResponseMoshiAdapter)
         .addTyped(JsonWebKeySetMoshiAdapter)
+        .addTyped(ResourceMetadataMoshiAdapter)
+        .addTyped(OpenIdConfigurationMoshiAdapter)
         .addLast(MapAdapter)
         .addLast(ListAdapter)
         .addLast(EventAdapter)

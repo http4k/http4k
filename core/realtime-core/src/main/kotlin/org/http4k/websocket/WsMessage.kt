@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 
 data class WsMessage(val body: Body, val mode: Mode) {
-    constructor(value: String, mode: Mode = Mode.Text) : this(Body(value), mode)
+    constructor(value: String = "", mode: Mode = Mode.Text) : this(Body(value), mode)
     constructor(value: ByteBuffer, mode: Mode = Mode.Binary) : this(Body(value), mode)
     constructor(value: ByteArray, mode: Mode = Mode.Binary) : this(MemoryBody(value), mode)
     constructor(value: InputStream, mode: Mode = Mode.Binary) : this(Body(value), mode)

@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.routing.ReverseProxyHostMatcher.Companion.Exact
 import org.junit.jupiter.api.Test
 
 class ReverseProxyHandlerTest {
@@ -52,6 +53,12 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         assertThat(otherHandler(requestWithHost("host2", "/foo")), hasBody("host2host2"))
         assertThat(otherHandler(Request(GET, "http://host2/foo")), hasBody("host2null"))
         assertThat(otherHandler(Request(GET, "")), hasStatus(NOT_FOUND))
+    }
+
+    @Test
+    fun `uses matcher`() {
+        val otherHandler1 = reverseProxyRouting(hostFor("host1"), hostFor("host2"), matcher = Exact)
+        assertThat(otherHandler1(requestWithHost("host", "http://host/foo")), hasStatus(NOT_FOUND))
     }
 
     @Test

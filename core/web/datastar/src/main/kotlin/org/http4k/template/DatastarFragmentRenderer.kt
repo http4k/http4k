@@ -8,5 +8,5 @@ import org.http4k.datastar.Fragment
 class DatastarFragmentRenderer(private val renderer: TemplateRenderer) {
     operator fun invoke(vararg views: ViewModel) = views.map { Fragment.of(renderer(it).stripNewLines()) }
 
-    private fun String.stripNewLines() = replace("\n", "")
+    private fun String.stripNewLines() = replace("\r\n", "").replace("\n", "")
 }

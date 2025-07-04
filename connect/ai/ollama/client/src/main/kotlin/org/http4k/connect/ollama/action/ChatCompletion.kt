@@ -1,13 +1,13 @@
 package org.http4k.connect.ollama.action
 
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.Http4kConnectAction
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.ollama.Message
 import org.http4k.connect.ollama.OllamaAction
 import org.http4k.connect.ollama.OllamaMoshi
 import org.http4k.connect.ollama.OllamaMoshi.autoBody
 import org.http4k.connect.ollama.ResponseFormat
-import org.http4k.connect.util.toCompletionSequence
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

@@ -20,6 +20,7 @@ object OAuthWebForms {
     val code = FormField.optional("code")
     val codeVerifier = FormField.optional("code_verifier")
     val redirectUri = FormField.uri().optional("redirect_uri")
+    val resource = FormField.uri().optional("resource")
     val accessToken = FormField.optional("access_token")
     val username = FormField.optional("username")
     val password = FormField.optional("password")
@@ -35,7 +36,8 @@ object OAuthWebForms {
         redirectUri,
         accessToken,
         username,
-        password
+        password,
+        resource,
     ).toLens()
 
     val tokenType = FormField.defaulted("token_type", "Bearer")
@@ -45,17 +47,18 @@ object OAuthWebForms {
 
     val responseForm =
         Body.webForm(Validator.Strict, accessTokenResp, tokenType, expiresIn, idToken, scope, refreshToken)
-            .map({
-                AccessTokenDetails(
-                    AccessToken(
-                        accessTokenResp(it),
-                        tokenType(it),
-                        expiresIn(it),
-                        scope(it),
-                        refreshToken(it)
-                    ), idToken(it)
-                )
-            },
+            .map(
+                {
+                    AccessTokenDetails(
+                        AccessToken(
+                            accessTokenResp(it),
+                            tokenType(it),
+                            expiresIn(it),
+                            scope(it),
+                            refreshToken(it)
+                        ), idToken(it)
+                    )
+                },
                 {
                     WebForm().with(
                         accessToken of it.accessToken.value,

@@ -2,7 +2,8 @@ package org.http4k.connect.azure
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
-import org.http4k.connect.model.StopReason
+import org.http4k.ai.model.ApiKey
+import org.http4k.ai.model.StopReason
 
 class Region private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Region>(::Region)
@@ -18,13 +19,11 @@ class AzureHost private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<AzureHost>(::AzureHost)
 }
 
-class AzureAIApiKey private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<AzureAIApiKey>(::AzureAIApiKey)
-}
+@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
+typealias AzureAIApiKey = ApiKey
 
-class GitHubToken private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<GitHubToken>(::GitHubToken)
-}
+@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
+typealias GitHubToken = ApiKey
 
 class AzureResource private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<AzureResource>(::AzureResource)
@@ -59,20 +58,12 @@ class User private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<User>(::User)
 }
 
-class CompletionId private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<CompletionId>(::CompletionId)
-}
-
 class ModelProvider private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ModelProvider>(::ModelProvider)
 }
 
 class ModelType private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ModelType>(::ModelType)
-}
-
-class Prompt private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<Prompt>(::Prompt)
 }
 
 val StopReason.Companion.stop get() = StopReason.of("stop")

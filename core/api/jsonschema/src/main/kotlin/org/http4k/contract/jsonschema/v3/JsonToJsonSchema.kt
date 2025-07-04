@@ -12,7 +12,7 @@ class JsonToJsonSchema<NODE>(
     private val refLocationPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<NODE, NODE> {
     override fun toSchema(obj: NODE, overrideDefinitionId: String?, refModelNamePrefix: String?) =
-        JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId, refModelNamePrefix.orEmpty())
+        JsonSchema(obj, emptyMap()).toSchema(overrideDefinitionId, refModelNamePrefix.orEmpty())
 
     private fun JsonSchema<NODE>.toSchema(
         overrideDefinitionId: String? = null,
@@ -26,7 +26,6 @@ class JsonToJsonSchema<NODE>(
             JsonType.Number -> numberSchema()
             JsonType.Boolean -> JsonSchema(ParamMeta.BooleanParam.schema(json.boolean(json.bool(node))), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-            else -> throw IllegalSchemaException("unknown type")
         }
 
     private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> {

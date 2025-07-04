@@ -2,9 +2,9 @@ package org.http4k.connect.ollama.action
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.ai.model.ModelName
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.asRemoteFailure
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.ollama.OllamaAction
 import org.http4k.connect.ollama.OllamaMoshi
 import org.http4k.connect.ollama.OllamaMoshi.autoBody

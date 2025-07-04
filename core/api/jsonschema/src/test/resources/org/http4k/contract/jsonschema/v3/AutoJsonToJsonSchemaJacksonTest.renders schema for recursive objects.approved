@@ -1,43 +1,36 @@
 {
   "node": {
-    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject",
-    "example": null,
-    "format": null
+    "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
   },
-  "definitions": [
-    {
-      "first": "org.http4k.contract.jsonschema.v3.RecursiveObject",
-      "second": {
-        "properties": {
-          "children": {
-            "items": {
-              "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
-            },
-            "example": [
-              {
-                "children": [
-                ]
-              }
-            ],
-            "format": null,
-            "type": "array",
-            "nullable": false
-          }
-        },
-        "example": {
-          "children": [
+  "definitions": {
+    "org.http4k.contract.jsonschema.v3.RecursiveObject": {
+      "properties": {
+        "children": {
+          "items": {
+            "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.RecursiveObject"
+          },
+          "example": [
             {
               "children": [
               ]
             }
-          ]
-        },
-        "format": null,
-        "type": "object",
-        "required": [
-          "children"
+          ],
+          "type": "array",
+          "nullable": false
+        }
+      },
+      "example": {
+        "children": [
+          {
+            "children": [
+            ]
+          }
         ]
-      }
+      },
+      "type": "object",
+      "required": [
+        "children"
+      ]
     }
-  ]
+  }
 }

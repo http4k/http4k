@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import io.helidon.webclient.api.WebClient
 import org.http4k.client.HelidonClient.makeHelidonRequest
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.server.ApacheServer
@@ -38,5 +39,12 @@ class HelidonClientTest : HttpClientContract(
         val response = client(Request(GET, "http://localhost:$port/headers").header("Host", "localhost:$port"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("Host,User-Agent,Connection,Content-Length,Proxy-Connection"))
+    }
+
+    @Test
+    fun `requestModifier allows modification of all requests used by the client`() {
+        val requestModifyingClient = HelidonClient(requestModifier = { it.queryParam("query", "true") })
+        val response = requestModifyingClient(Request(POST, "http://localhost:$port/someUri"))
+        assertThat(response.header("query"), equalTo("true"))
     }
 }

@@ -2,7 +2,9 @@ package org.http4k.security
 
 enum class ResponseType(val queryParameterValue: String) {
     Code("code"),
-    CodeIdToken("code id_token");
+    Token("token"),
+    CodeIdToken("code id_token"),
+    CodeToken("code token");
 
     companion object {
         fun fromQueryParameterValue(value: String): ResponseType =

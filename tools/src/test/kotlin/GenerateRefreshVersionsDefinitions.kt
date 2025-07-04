@@ -32,7 +32,7 @@ http4k-connect-ai-anthropic
 http4k-connect-ai-anthropic-fake
 http4k-connect-ai-azure
 http4k-connect-ai-azure-fake
-http4k-connect-ai-core
+http4k-ai-core
 http4k-connect-ai-langchain
 http4k-connect-ai-lmstudio
 http4k-connect-ai-lmstudio-fake

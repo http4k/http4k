@@ -48,9 +48,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
     
-    - uses: actions/setup-java@v4.7.0
+    - uses: actions/setup-java@v4.7.1
       with:
-        distribution: temurin
+        distribution: adopt
         java-version: 21
         cache: gradle
 

@@ -1,7 +1,18 @@
 package org.http4k.aws
 
 import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.urlEncoded
 
-// AWS fail to match the signature if it contains a '+' character in the path
-// See https://jamesd3142.wordpress.com/2018/02/28/amazon-s3-and-the-plus-symbol/
-internal fun Request.encodePlusCharInPath() = uri(uri.path(uri.path.replace("+", "%2B")))
+
+internal fun Request.encodeUri() =
+    uri(uri.encodePathAndFragment())
+
+private fun Uri.encodePathAndFragment() = if (fragment.isBlank())
+    path(path.urlEncodedPath())
+else
+    path("${path}#${fragment}".urlEncodedPath()).fragment("")
+
+private fun String.urlEncodedPath() =
+    split("/").joinToString("/") { it.urlEncoded().replace("+", "%20").replace("*", "%2A").replace("%7E", "~") }
+

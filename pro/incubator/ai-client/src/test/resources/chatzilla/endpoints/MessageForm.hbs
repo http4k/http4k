@@ -1,0 +1,8 @@
+<div id="message-form" data-signals="{}">
+    <label for="message"></label>
+    <input id="message" class="message-input" type="text" value="" data-bind="message"
+           placeholder="Type your message here..."/>
+    <button id="send"
+            data-attr-disabled="!$message.trim()"
+            data-on-click="@post('/message')" data-indicator-fetching>Send</button>
+</div>

@@ -26,6 +26,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 emptyList(),
                 null,
                 null,
+                null,
                 null
             )).get()
             as? AuthorizationCodeAccessTokenRequest ?: org.junit.jupiter.api.fail("returned wrong type")
@@ -52,6 +53,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 emptyList(),
                 null,
                 null,
+                null,
                 null
             )).get()
             as? AccessTokenError ?: org.junit.jupiter.api.fail("returned wrong type")
@@ -70,6 +72,7 @@ internal class AuthorizationCodeAccessTokenGeneratorTest {
                 null,
                 Uri.of("http://some-uri"),
                 emptyList(),
+                null,
                 null,
                 null,
                 null

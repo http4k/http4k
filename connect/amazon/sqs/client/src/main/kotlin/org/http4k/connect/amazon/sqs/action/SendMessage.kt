@@ -9,6 +9,9 @@ import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 import java.time.ZonedDateTime
 import com.squareup.moshi.Json
+import dev.forkhandles.result4k.Result4k
+import org.http4k.connect.Action
+import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.core.model.MessageFieldsDto
 
 @Http4kConnectAction
@@ -17,11 +20,12 @@ data class SendMessage(
     @Json(name = "QueueUrl") val queueUrl: Uri,
     @Json(name = "MessageBody") val messageBody: String,
     @Json(name = "DelaySeconds") val delaySeconds: Int? = null,
-    @Json(name = "MessageDeDuplicationId") val messageDeduplicationId: String? = null,
+    @Json(name = "MessageDeduplicationId") val messageDeduplicationId: String? = null,
     @Json(name = "MessageGroupId") val messageGroupId: String? = null,
     @Json(name = "MessageAttributes") val messageAttributes: Map<String, MessageFieldsDto>? = null,
     @Json(name = "MessageSystemAttributes") val messageSystemAttributes: Map<String, MessageFieldsDto>? = null
-) : SQSAction<SentMessage, SentMessage>("SendMessage", SentMessage::class, { it} ) {
+) : SQSAction<SentMessage, SentMessage>("SendMessage", SentMessage::class, { it} ),
+    Action<Result4k<SentMessage, RemoteFailure>> {
     constructor(
         queueUrl: Uri,
         payload: String,

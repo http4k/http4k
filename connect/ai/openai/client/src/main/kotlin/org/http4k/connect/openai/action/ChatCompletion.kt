@@ -3,15 +3,16 @@
 package org.http4k.connect.openai.action
 
 import dev.forkhandles.result4k.Result
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ResponseId
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.Temperature
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
-import org.http4k.connect.model.Temperature
 import org.http4k.connect.model.Timestamp
-import org.http4k.connect.openai.CompletionId
 import org.http4k.connect.openai.ObjectType
 import org.http4k.connect.openai.OpenAIAction
 import org.http4k.connect.openai.OpenAIMoshi
@@ -19,7 +20,6 @@ import org.http4k.connect.openai.OpenAIMoshi.autoBody
 import org.http4k.connect.openai.TokenId
 import org.http4k.connect.openai.User
 import org.http4k.connect.openai.action.Detail.auto
-import org.http4k.connect.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -38,11 +38,11 @@ data class ChatCompletion(
     val messages: List<Message>,
     val max_tokens: MaxTokens? = null,
     val temperature: Temperature = Temperature.ONE,
-    val top_p: Double = 1.0,
+    val top_p: Double? = null,
     val n: Int = 1,
     val stop: List<String>? = null,
-    val presence_penalty: Double = 0.0,
-    val frequency_penalty: Double = 0.0,
+    val presence_penalty: Double? = null,
+    val frequency_penalty: Double? = null,
     val logit_bias: Map<TokenId, Double>? = null,
     val user: User? = null,
     val stream: Boolean = false,
@@ -84,10 +84,6 @@ data class ChatCompletion(
         stream = stream
     )
 
-    init {
-        require(tools == null || tools.isNotEmpty()) { "Tools cannot be empty" }
-    }
-
     override fun toRequest() = Request(POST, "/v1/chat/completions")
         .with(autoBody<ChatCompletion>().toLens() of this)
 
@@ -120,6 +116,7 @@ data class Message(
     val content: List<MessageContent>? = null,
     val name: User? = null,
     val refusal: String? = null,
+    val tool_call_id: String? = null,
     val tool_calls: List<ToolCall>? = null
 ) {
     companion object {
@@ -137,9 +134,10 @@ data class Message(
         fun Assistant(content: List<MessageContent>, name: User? = null, refusal: String? = null) =
             Message(Role.Assistant, content, name, refusal)
 
-        @JvmName("AssistantToolCalls")
-        fun Assistant(tool_calls: List<ToolCall>, name: User? = null, refusal: String? = null) =
-            Message(Role.Assistant, null, name, refusal, tool_calls)
+        fun ToolCalls(tool_calls: List<ToolCall>) = Message(Role.Assistant, null, null, null, null, tool_calls)
+
+        fun ToolCallResult(tool_call_id: String, content: String) =
+            Message(Role.Tool, listOf(MessageContent(ContentType.text, content)), tool_call_id = tool_call_id)
     }
 }
 
@@ -177,7 +175,7 @@ data class Choice(
     internal val delta: ChoiceDetail?,
     val finish_reason: StopReason?
 ) {
-    val message get() = msg ?: delta
+    val message get() = msg ?: delta ?: ChoiceDetail(Role.Assistant, "", emptyList())
 }
 
 @JsonSerializable
@@ -199,17 +197,15 @@ data class ToolCall(
 )
 
 @JsonSerializable
-data class Tool(val function: FunctionSpec) {
-    val type = "function"
-}
+data class Tool(val function: FunctionSpec, val type: String = "function")
 
 @JsonSerializable
 data class FunctionSpec(
     val name: String,
-    val parameters: Any? = null, // JSON schema format
+    val parameters: Map<String, Any>,
     val description: String? = null,
 ) {
-    val type = "function"
+    val type: String = "function"
 }
 
 @JsonSerializable
@@ -220,13 +216,20 @@ data class FunctionCall(
 
 @JsonSerializable
 data class CompletionResponse(
-    val id: CompletionId,
+    @JsonProperty(name = "id")
+    internal val blankId: String,
     val created: Timestamp,
-    val model: ModelName,
+    @JsonProperty(name = "model")
+    internal val blankModel: String,
     val choices: List<Choice>,
     @JsonProperty(name = "object")
-    val objectType: ObjectType,
+    internal val blankObjectType: String,
     val usage: Usage? = null,
     val system_fingerprint: String? = null,
     val service_tier: String? = null
-)
+) {
+    val id get() = ResponseId.of(blankId.takeIf { it.isNotBlank() } ?: "-")
+    val model get() = ModelName.of(blankModel.takeIf { it.isNotBlank() } ?: "-")
+    val objectType get() = ObjectType.of(blankObjectType.takeIf { it.isNotBlank() } ?: "-")
+}
+

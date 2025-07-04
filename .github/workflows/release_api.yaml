@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-java@v4.7.0
+      - uses: actions/setup-java@v4.7.1
         with:
-          distribution: temurin
+          distribution: adopt
           java-version: 21
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.3.0
+        uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew -i dokkaHtmlMultiModule -PreleaseVersion="${{ github.event.client_payload.version }}" -Porg.gradle.parallel=false
       - uses: actions/checkout@v4.2.2
         with:

@@ -1,10 +1,10 @@
 import dev.forkhandles.result4k.Result
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.openai.FakeOpenAI
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
-import org.http4k.connect.openai.OpenAIToken
 import org.http4k.connect.openai.action.Models
 import org.http4k.connect.openai.getModels
 import org.http4k.core.HttpHandler
@@ -17,7 +17,7 @@ fun main() {
     val http: HttpHandler = if (USE_REAL_CLIENT) JavaHttpClient() else FakeOpenAI()
 
     // create a client
-    val client = OpenAI.Http(OpenAIToken.of("foobar"), http.debug())
+    val client = OpenAI.Http(ApiKey.of("foobar"), http.debug())
 
     // all operations return a Result monad of the API type
     val result: Result<Models, RemoteFailure> = client

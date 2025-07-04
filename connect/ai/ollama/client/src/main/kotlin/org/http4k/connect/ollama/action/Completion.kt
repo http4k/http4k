@@ -1,16 +1,16 @@
 package org.http4k.connect.ollama.action
 
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.SystemPrompt
+import org.http4k.ai.model.UserPrompt
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.ollama.OllamaAction
 import org.http4k.connect.ollama.OllamaMoshi
 import org.http4k.connect.ollama.OllamaMoshi.autoBody
-import org.http4k.connect.ollama.Prompt
 import org.http4k.connect.ollama.ResponseFormat
-import org.http4k.connect.ollama.SystemMessage
 import org.http4k.connect.ollama.Template
-import org.http4k.connect.util.toCompletionSequence
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -22,10 +22,10 @@ import java.time.Instant
 @JsonSerializable
 data class Completion(
     val model: ModelName,
-    val prompt: Prompt,
+    val prompt: UserPrompt,
     val images: List<Base64Blob>? = null,
     val stream: Boolean? = false,
-    val system: SystemMessage? = null,
+    val system: SystemPrompt? = null,
     val format: ResponseFormat? = null,
     val template: Template? = null,
     val raw: Boolean? = null,

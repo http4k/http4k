@@ -30,7 +30,8 @@ fun configAwsEnvironment(): AwsEnvironment {
             EnvironmentKey.composite {
                 AwsCredentials(
                     EnvironmentKey.required("http4k-development-aws-access-key-id")(it),
-                    EnvironmentKey.required("http4k-development-aws-secret-access-key")(it)
+                    EnvironmentKey.required("http4k-development-aws-secret-access-key")(it),
+                    EnvironmentKey.optional("http4k-development-aws-session-token")(it)
                 )
             }(env),
             Region.of(region)

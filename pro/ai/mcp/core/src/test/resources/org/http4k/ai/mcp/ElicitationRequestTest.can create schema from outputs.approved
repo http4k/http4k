@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "properties": {
+    "reqStr": {
+      "format": "date",
+      "minLength": 1,
+      "maxLength": 10,
+      "pattern": ".*",
+      "type": "string",
+      "title": "title",
+      "description": "description"
+    },
+    "optInt": {
+      "minimum": 1,
+      "maximum": 100,
+      "type": "integer",
+      "title": "title",
+      "description": "description"
+    },
+    "defBool": {
+      "default": true,
+      "type": "boolean",
+      "title": "title",
+      "description": "description"
+    },
+    "optNum": {
+      "type": "number",
+      "title": "title",
+      "description": "description"
+    },
+    "enum": {
+      "enum": [
+        "Bar",
+        "Baz",
+        "Foo"
+      ],
+      "enumNames": [
+        "bar",
+        "baz",
+        "foo"
+      ],
+      "type": "string",
+      "title": "title",
+      "description": "description"
+    }
+  },
+  "required": [
+    "reqStr",
+    "enum"
+  ]
+}

@@ -2,7 +2,6 @@ package org.http4k.contract.jsonschema.v3
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.data.MapDataContainer
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
@@ -11,17 +10,13 @@ import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.exclusiveMinimum
 import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.format
 import org.http4k.contract.jsonschema.v3.Data4kJsonSchemaMeta.maxLength
 import org.http4k.contract.jsonschema.v3.Foo.value2
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
-import org.http4k.format.ConfigurableJackson
-import org.http4k.format.Jackson
-import org.http4k.format.asConfigurable
-import org.http4k.lens.BiDiMapping
-import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -120,7 +115,7 @@ data class MetaDataValueHolder(val i: MyInt, val j: JacksonFieldWithMetadata)
 @ExtendWith(JsonApprovalTest::class)
 abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
 
-    abstract val json: AutoMarshallingJson<NODE>
+    abstract fun autoJson(): AutoMarshallingJson<NODE>
 
     @Test
     fun `can override definition id`(approver: Approver) {
@@ -137,7 +132,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         approver.assertApproved(
             ArbObjectWithInnerClasses(),
             prefix = "prefix",
-            creator = autoJsonToJsonSchema(json, SchemaModelNamer.Canonical)
+            creator = autoJsonToJsonSchema(autoJson(), SchemaModelNamer.Canonical)
         )
     }
 
@@ -162,7 +157,7 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
     @Test
     fun `can write extra properties to map`(approver: Approver) {
         val creator = AutoJsonToJsonSchema(
-            json,
+            autoJson(),
             { _, name ->
                 if (name == "str") {
                     Field(
@@ -196,16 +191,16 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         )
 
         approver.assertApproved(
-            Response(Status.OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-                .body(Jackson.asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(autoJson().asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
         )
     }
 
     @Test
     fun `can add extra properties to a root component`(approver: Approver) {
         val creator = AutoJsonToJsonSchema(
-            json,
+            autoJson(),
             metadataRetrieval = { obj ->
                 if (obj is ArbObject3) {
                     FieldMetadata(
@@ -224,9 +219,9 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         )
 
         approver.assertApproved(
-            Response(Status.OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-                .body(Jackson.asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(autoJson().asFormatString(creator.toSchema(ArbObject3(), refModelNamePrefix = null)))
         )
     }
 
@@ -347,39 +342,6 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
     }
 
     @Test
-    fun `renders schema for when cannot find entry`(approver: Approver) {
-        approver.assertApproved(JacksonFieldAnnotated())
-    }
-
-    @Test
-    fun `renders schema for custom json mapping`(approver: Approver) {
-        val json = ConfigurableJackson(
-            KotlinModule.Builder().build()
-                .asConfigurable()
-                .text(BiDiMapping({ i: String -> ArbObject2(Uri.of(i)) }, { i: ArbObject2 -> i.uri.toString() }))
-                .done()
-        )
-
-        approver.assertApproved(
-            Response(Status.OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-                .body(
-                    Jackson.asFormatString(
-                        AutoJsonToJsonSchema(json).toSchema(
-                            ArbObjectHolder(),
-                            refModelNamePrefix = null
-                        )
-                    )
-                )
-        )
-    }
-
-    @Test
-    fun `renders schema for field with description`(approver: Approver) {
-        approver.assertApproved(JacksonFieldWithMetadata())
-    }
-
-    @Test
     fun `renders schema for object from sealed class`(approver: Approver) {
         approver.assertApproved(SealedChild)
     }
@@ -388,29 +350,37 @@ abstract class AutoJsonToJsonSchemaContract<NODE : Any> {
         obj: Any,
         name: String? = null,
         prefix: String? = null,
-        creator: AutoJsonToJsonSchema<NODE> = autoJsonToJsonSchema(json)
+        creator: AutoJsonToJsonSchema<NODE> = autoJsonToJsonSchema(autoJson())
     ) {
+        val input = creator.toSchema(obj, name, prefix)
         assertApproved(
-            Response(Status.OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-                .body(Jackson.asFormatString(creator.toSchema(obj, name, prefix)))
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(autoJson().asFormatString(input))
         )
     }
 
-    protected fun autoJsonToJsonSchema(
+    protected abstract fun autoJsonToJsonSchema(
         json: AutoMarshallingJson<NODE>,
         schemaModelNamer: SchemaModelNamer = SchemaModelNamer.Full,
         strategy: FieldMetadataRetrievalStrategy = PrimitivesFieldMetadataRetrievalStrategy
             .then(Values4kFieldMetadataRetrievalStrategy)
             .then(JacksonFieldMetadataRetrievalStrategy)
-    ) = AutoJsonToJsonSchema(
-        json,
-        FieldRetrieval.compose(
-            SimpleLookup(metadataRetrievalStrategy = strategy),
-            JacksonJsonPropertyAnnotated,
-            JacksonJsonNamingAnnotated(Jackson)
-        ),
-        schemaModelNamer,
-        "locationPrefix"
-    )
+    ): AutoJsonToJsonSchema<NODE>
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun `renders schema for a data4k container with metadata`(approver: Approver) {
+        approver.assertApproved(
+            Data4kContainer().apply {
+                anInt = MyInt.of(123)
+                anString = "helloworld"
+            },
+            creator = autoJsonToJsonSchema(
+                autoJson(), strategy = PrimitivesFieldMetadataRetrievalStrategy
+                    .then(Values4kFieldMetadataRetrievalStrategy)
+                    .then(Data4kFieldMetadataRetrievalStrategy)
+            )
+        )
+    }
 }

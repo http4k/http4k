@@ -1,5 +1,7 @@
 package org.http4k.connect.azure
 
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ResponseId
 import org.http4k.connect.azure.AzureAIMoshi.asFormatString
 import org.http4k.connect.azure.AzureAIMoshi.autoBody
 import org.http4k.connect.azure.ObjectType.Companion.ChatCompletion
@@ -13,7 +15,6 @@ import org.http4k.connect.azure.action.Embedding
 import org.http4k.connect.azure.action.Embeddings
 import org.http4k.connect.azure.action.ModelInfo
 import org.http4k.connect.azure.action.Usage
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.model.Timestamp
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
@@ -125,7 +126,7 @@ private fun completionResponse(
     now: Instant,
     choices: List<Choice>
 ): CompletionResponse = CompletionResponse(
-    CompletionId.of(
+    ResponseId.of(
         UUID.nameUUIDFromBytes((request.bodyString() + "$it").toByteArray()).toString()
     ),
     Timestamp.of(now),

@@ -1,7 +1,7 @@
 package org.http4k.connect.langchain.chat
 
+import org.http4k.ai.model.ModelName
 import org.http4k.client.JavaHttpClient
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.ollama.Http
 import org.http4k.connect.ollama.Ollama
 import org.http4k.connect.ollama.action.ModelOptions

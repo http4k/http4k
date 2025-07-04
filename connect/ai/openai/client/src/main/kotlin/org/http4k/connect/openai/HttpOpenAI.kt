@@ -1,5 +1,6 @@
 package org.http4k.connect.openai
 
+import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -13,7 +14,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.value
 
 fun OpenAI.Companion.Http(
-    token: OpenAIToken,
+    token: ApiKey,
     http: HttpHandler = JavaHttpClient(),
     org: OpenAIOrg? = null
 ) = object : OpenAI {

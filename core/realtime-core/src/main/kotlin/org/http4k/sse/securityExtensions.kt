@@ -10,7 +10,7 @@ fun SseFilter(security: Security) = SseFilter { next ->
         val authResponse = security.filter.then { Response(OK) }(it)
         when {
             authResponse.status.successful -> next(it)
-            else -> SseResponse(authResponse.status, authResponse.headers, true) {}
+            else -> SseResponse(authResponse.status, authResponse.headers, true) { it.close() }
         }
     }
 }

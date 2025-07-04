@@ -21,7 +21,7 @@ class GraphQLRoutingTest {
         val uri = Uri.of("/bob")
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
-        val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")))
+        val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar"), mapOf("baz" to "qux")))
 
         val app = routes("/bob" bind graphQL({
             assertThat(it, equalTo(graphQLRequest))
@@ -39,7 +39,7 @@ class GraphQLRoutingTest {
         val path = "/bob"
 
         val graphQLRequest = GraphQLRequest("query", "operation", mapOf("a" to "b"))
-        val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")))
+        val graphQLResponse = GraphQLResponse("hello", listOf(mapOf("foo" to "bar")), mapOf("baz" to "qux"))
 
         val contextValue = "context"
         val app = routes(path bind graphQL({ req, context ->

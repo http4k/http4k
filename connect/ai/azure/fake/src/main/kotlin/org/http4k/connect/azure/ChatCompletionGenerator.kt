@@ -1,11 +1,11 @@
 package org.http4k.connect.azure
 
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.Role.Companion.User
+import org.http4k.ai.model.StopReason
 import org.http4k.connect.azure.action.Choice
 import org.http4k.connect.azure.action.ChoiceDetail
 import org.http4k.connect.azure.action.ModelCompletion
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.Role.Companion.User
-import org.http4k.connect.model.StopReason
 import java.util.Random
 
 /**

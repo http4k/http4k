@@ -245,8 +245,7 @@ class HtmxJsoupWebElementTest {
                 equalTo(
                     """
                         |<body>
-                        |<div hx-target="this">responded</div>
-                        |</body>
+                        |<div hx-target="this">responded</div></body>
                     """.trimMargin()
                 )
             )
@@ -464,8 +463,7 @@ class HtmxJsoupWebElementTest {
                     |hx-request: true
                     |hx-target: tgt
                     |hx-trigger: a
-                    |hx-trigger-name: adiv
-                    |</body>
+                    |hx-trigger-name: adiv</body>
                     """.trimMargin()
                 )
             )

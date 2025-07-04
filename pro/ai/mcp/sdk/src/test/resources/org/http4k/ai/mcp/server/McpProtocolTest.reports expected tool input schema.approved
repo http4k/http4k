@@ -1,0 +1,131 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "tools": [
+      {
+        "name": "name",
+        "description": "description",
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "aString",
+            "anArray",
+            "anEnum"
+          ],
+          "properties": {
+            "aString": {
+              "type": "string",
+              "description": "description1"
+            },
+            "anInt": {
+              "type": "integer",
+              "description": "description2"
+            },
+            "anArray": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "description3"
+            },
+            "anEnum": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Code",
+                  "Token",
+                  "CodeIdToken",
+                  "CodeToken"
+                ]
+              },
+              "description": "description4"
+            },
+            "anInstant": {
+              "type": "string",
+              "description": "description5"
+            },
+            "aStringValue": {
+              "type": "string",
+              "description": "description6"
+            },
+            "aIntValue": {
+              "type": "integer",
+              "description": "description7"
+            },
+            "complexValue": {
+              "properties": {
+                "foo": {
+                  "example": 123,
+                  "format": "int32",
+                  "type": "integer",
+                  "nullable": true
+                },
+                "bar": {
+                  "properties": {
+                    "name": {
+                      "example": "hello",
+                      "type": "string",
+                      "nullable": false
+                    }
+                  },
+                  "example": {
+                    "name": "hello"
+                  },
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ]
+                },
+                "baz": {
+                  "example": true,
+                  "type": "boolean",
+                  "nullable": true
+                }
+              },
+              "example": {
+                "foo": 123,
+                "bar": {
+                  "name": "hello"
+                },
+                "baz": true
+              },
+              "type": "object",
+              "required": [
+                "bar"
+              ]
+            },
+            "listArg": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "example": "hello",
+                    "type": "string",
+                    "nullable": false
+                  }
+                },
+                "example": {
+                  "name": "hello"
+                },
+                "type": "object",
+                "required": [
+                  "name"
+                ]
+              },
+              "example": [
+                {
+                  "name": "hello"
+                }
+              ],
+              "type": "array",
+              "nullable": false
+            }
+          }
+        }
+      }
+    ],
+    "_meta": {
+    }
+  },
+  "id": 1
+}

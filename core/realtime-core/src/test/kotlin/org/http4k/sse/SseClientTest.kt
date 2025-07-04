@@ -45,7 +45,7 @@ class SseClientTest {
         }.testSseClient(Request(GET, "/"))
 
         assertThat(client.status, equalTo(OK))
-        assertThat(client.headers, equalTo(listOf("foo" to "bar")))
+        assertThat(client.response.headers, equalTo(listOf("foo" to "bar")))
     }
 
     @Test

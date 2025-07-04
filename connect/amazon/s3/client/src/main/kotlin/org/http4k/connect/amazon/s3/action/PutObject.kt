@@ -19,7 +19,7 @@ import java.io.InputStream
 data class PutObject(
     val key: BucketKey,
     val content: InputStream,
-    val headers: Headers = emptyList(),
+    val headers: List<Pair<String, String?>> = emptyList(),
     val tags: List<Tag> = emptyList(),
     val storageClass: StorageClass? = null,
 ) : S3BucketAction<Unit> {

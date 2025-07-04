@@ -17,7 +17,7 @@ import org.http4k.sse.then
 fun sse(sse: SseConsumer): SseHandler = { SseResponse(sse) }
 
 fun sse(vararg methods: Pair<Method, SseHandler>): SseHandler = {
-    methods.toMap()[it.method]?.invoke(it) ?: SseResponse { it.close() }
+    methods.toMap()[it.method]?.invoke(it) ?: SseResponse(handled = false) { it.close() }
 }
 
 fun sse(vararg list: RoutingSseHandler): RoutingSseHandler = sse(list.toList())

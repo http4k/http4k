@@ -1,9 +1,9 @@
 package org.http4k.connect.ollama
 
 
-import org.http4k.connect.model.ModelName
-import org.http4k.connect.model.Role.Companion.Assistant
-import org.http4k.connect.model.Role.Companion.User
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.Role.Companion.User
 import org.http4k.connect.ollama.OllamaMoshi.asFormatString
 import org.http4k.connect.ollama.OllamaMoshi.autoBody
 import org.http4k.connect.ollama.action.ChatCompletion

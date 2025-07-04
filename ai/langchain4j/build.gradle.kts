@@ -1,0 +1,27 @@
+import org.http4k.internal.ModuleLicense.Apache2
+
+val license by project.extra { Apache2 }
+
+description = "http4k AI http4k to LangChain4j integrations"
+
+plugins {
+    id("org.http4k.community")
+}
+
+dependencies {
+    api(project(":http4k-connect-amazon-s3"))
+    api(project(":http4k-connect-ai-openai"))
+    api(project(":http4k-connect-ai-ollama"))
+    api(project(":http4k-connect-ai-lmstudio"))
+    api("dev.langchain4j:langchain4j-core:_")
+    api("dev.langchain4j:langchain4j-http-client:_")
+
+    testFixturesApi("dev.langchain4j:langchain4j-open-ai:_")
+
+    testFixturesApi("dev.langchain4j:langchain4j:_")
+    testFixturesApi(project(":http4k-connect-ai-openai-fake"))
+    testFixturesApi(project(":http4k-connect-ai-ollama-fake"))
+    testFixturesApi(project(":http4k-connect-ai-lmstudio-fake"))
+    testFixturesApi(project(":http4k-connect-amazon-s3-fake"))
+    testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
+}

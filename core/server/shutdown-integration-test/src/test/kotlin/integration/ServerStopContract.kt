@@ -38,19 +38,15 @@ import kotlin.concurrent.thread
 abstract class ServerStopContract(
     private val backend: ServerBackend,
     protected val client: HttpHandler,
-    enableStopModes: ConfigureServerStopContract.() -> Unit
-): PortBasedTest {
+    enableStopModes: ConfigureServerStopContract.() -> Unit,
+) : PortBasedTest {
 
-    private val defaultGracefulStopMode = Graceful(ofSeconds(10))
+    private val defaultGracefulStopMode: Graceful = Graceful(ofSeconds(10))
     private val timeoutTolerance = ofMillis(1000)
-    private val supportedStopModes: Set<StopMode>
+    private val supportedStopModes = ConfigureServerStopContract()
+        .also(enableStopModes)
+        .enabledModes
     private val dockerHost = System.getenv("SERVER_HOST") ?: "127.0.0.1"
-
-    init {
-        supportedStopModes = ConfigureServerStopContract()
-            .also(enableStopModes)
-            .enabledModes
-    }
 
     inner class ConfigureServerStopContract(val enabledModes: MutableSet<StopMode> = mutableSetOf()) {
         fun enableImmediateStop() {
@@ -170,7 +166,7 @@ abstract class ServerStopContract(
     }
 
     @Test
-    fun `server config throws when invoked with unsupported stop mode`() {
+    open fun `server config throws when invoked with unsupported stop mode`() {
         val illegalConfigurationAttempts: Array<() -> Unit> =
             listOf(Immediate, defaultGracefulStopMode)
                 .subtract(supportedStopModes)

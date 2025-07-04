@@ -216,7 +216,7 @@ class OpenApi3<NODE : Any>(
                                 itemType.clz.java.enumConstants[0],
                                 meta.name,
                                 null
-                            ).definitions.first().second
+                            ).definitions.entries.first().value
 
                             else -> obj("type" to string(itemType.value))
                         }
@@ -342,7 +342,7 @@ class OpenApi3<NODE : Any>(
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
         ?.let { apiRenderer.toSchema(it, definitionId, null) }
-        ?: JsonSchema(json.obj(), emptySet())
+        ?: JsonSchema(json.obj(), emptyMap())
 
     private fun List<Security>.combineFull(): Render<NODE> = {
         obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) })

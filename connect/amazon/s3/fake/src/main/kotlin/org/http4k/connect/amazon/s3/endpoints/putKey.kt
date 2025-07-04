@@ -21,7 +21,7 @@ internal fun bucketPutKey(buckets: Storage<Unit>, bucketContent: Storage<BucketK
         queryPresent("tagging") bind {
             putObjectTagging(
                 it.subdomain(buckets),
-                it.path("bucketKey")!!,
+                keyFor(it),
                 buckets,
                 bucketContent,
                 clock,
@@ -32,7 +32,7 @@ internal fun bucketPutKey(buckets: Storage<Unit>, bucketContent: Storage<BucketK
         otherwise bind {
             putObject(
                 it.subdomain(buckets),
-                it.path("bucketKey")!!,
+                keyFor(it),
                 it.body.payload.array(),
                 buckets,
                 bucketContent,
@@ -48,7 +48,7 @@ internal fun pathBasedBucketPutKey(buckets: Storage<Unit>, bucketContent: Storag
         queryPresent("tagging") bind {
             putObjectTagging(
                 it.path("bucketName")!!,
-                it.path("bucketKey")!!,
+                keyFor(it),
                 buckets,
                 bucketContent,
                 clock,
@@ -59,7 +59,7 @@ internal fun pathBasedBucketPutKey(buckets: Storage<Unit>, bucketContent: Storag
         otherwise bind {
             putObject(
                 it.path("bucketName")!!,
-                it.path("bucketKey")!!,
+                keyFor(it),
                 it.body.payload.array(),
                 buckets,
                 bucketContent,

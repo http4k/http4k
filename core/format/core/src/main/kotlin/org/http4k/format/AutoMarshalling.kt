@@ -1,10 +1,14 @@
 package org.http4k.format
 
+import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.routing.body
+import org.http4k.sse.SseMessage
+import org.http4k.websocket.WsMessage
 import java.io.InputStream
 import kotlin.reflect.KClass
 
@@ -40,6 +44,9 @@ abstract class AutoMarshalling {
     @JvmName("autoRequest")
     inline fun <reified OUT : Any> BiDiLensSpec<Request, String>.auto() = autoLens<Request, OUT>(this)
     inline fun <reified OUT : Any> BiDiLensSpec<HttpMessage, String>.auto() = autoLens<HttpMessage, OUT>(this)
+
+    inline fun <reified T : Any> WsMessage.json(t: T) = body(Body(asFormatString(t)))
+    inline fun <reified T : Any> SseMessage.Event.json(t: T) = copy(data = asFormatString(t))
 
     inline fun <reified IN : Any, reified OUT : Any> autoLens(lens: BiDiLensSpec<IN, String>) =
         lens.mapWithNewMeta({ asA<OUT>(it) }, { asFormatString(it) }, ObjectParam)

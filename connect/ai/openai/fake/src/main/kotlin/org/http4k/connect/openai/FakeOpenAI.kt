@@ -1,9 +1,10 @@
 package org.http4k.connect.openai
 
+import org.http4k.ai.model.ApiKey
+import org.http4k.ai.model.ModelName
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.defaultLocalUri
 import org.http4k.chaos.start
-import org.http4k.connect.model.ModelName
 import org.http4k.connect.openai.action.Model
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Uri
@@ -39,7 +40,7 @@ class FakeOpenAI(
     /**
      * Convenience function to get OpenAI client
      */
-    fun client() = OpenAI.Http(OpenAIToken.of("openai-key"), this)
+    fun client() = OpenAI.Http(ApiKey.of("openai-key"), this)
 }
 
 fun main() {

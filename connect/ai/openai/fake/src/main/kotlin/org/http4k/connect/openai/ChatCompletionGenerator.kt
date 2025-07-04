@@ -1,7 +1,7 @@
 package org.http4k.connect.openai
 
-import org.http4k.connect.model.Role
-import org.http4k.connect.model.StopReason
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.ChoiceDetail

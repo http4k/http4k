@@ -6,11 +6,12 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.startsWith
-import org.http4k.connect.model.MaxTokens
-import org.http4k.connect.model.ModelName
+import org.http4k.ai.model.MaxTokens
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletion
 import org.http4k.connect.openai.ObjectType.Companion.ChatCompletionChunk
+import org.http4k.connect.openai.OpenAIModels.GPT3_5
 import org.http4k.connect.openai.OpenAIOrg.Companion.OPENAI
+import org.http4k.connect.openai.action.ImageResponseFormat
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.action.Size
 import org.http4k.connect.successValue
@@ -36,7 +37,7 @@ interface OpenAIContract {
     @Test
     fun `get chat response non-stream`() {
         val responses = openAi.chatCompletion(
-            ModelName.GPT3_5,
+            GPT3_5,
             listOf(
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
@@ -52,7 +53,7 @@ interface OpenAIContract {
     @Test
     fun `get chat response streaming`() {
         val responses = openAi.chatCompletion(
-            ModelName.GPT3_5,
+            GPT3_5,
             listOf(
                 Message.System("You are Leonardo Da Vinci"),
                 Message.User("What is your favourite colour?")
@@ -69,7 +70,7 @@ interface OpenAIContract {
     fun `get embeddings`() {
         assertThat(
             openAi.createEmbeddings(
-                ModelName.TEXT_EMBEDDING_ADA_002,
+                OpenAIModels.TEXT_EMBEDDING_ADA_002,
                 listOf("What is your favourite colour?")
             ).successValue().model.value,
             startsWith("text-embedding-ada-002")
@@ -78,6 +79,11 @@ interface OpenAIContract {
 
     @Test
     fun `can generate image`(approver: Approver) {
-        openAi.generateImage("An excellent library", Size.`256x256`).successValue()
+        openAi.generateImage("An excellent library",
+            Size.`256x256`,
+            ImageResponseFormat.url,
+            1,
+            null,
+            null).successValue()
     }
 }

@@ -69,7 +69,6 @@ open class ConfigurableKotlinxSerialization(
         }
         is JsonArray -> JsonType.Array
         is JsonObject -> JsonType.Object
-        else -> throw IllegalArgumentException("Don't know how to translate $value")
     }
 
     override fun JsonElement.asPrettyJsonString() = prettyJson.encodeToString(JsonElement.serializer(), this)

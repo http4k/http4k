@@ -7,3 +7,5 @@ fun poly(vararg routes: RoutingHandler<*, *, *>) = PolyHandler(
     routes.filterIsInstance<RoutingWsHandler>().flatMap { it.routes }.takeIf { it.isNotEmpty() }?.let { RoutingWsHandler(it) },
     routes.filterIsInstance<RoutingSseHandler>().flatMap { it.routes }.takeIf { it.isNotEmpty() }?.let { RoutingSseHandler(it) },
 )
+
+fun poly( routes: List<RoutingHandler<*, *, *>>) = poly(*routes.toTypedArray())
