@@ -9,6 +9,7 @@ changes with their rationale when appropriate:
 - **http4k-format-dataframe**: [Breaking] Upgrade to v1 beta build has resulted in API changes to the CSV and JSON objects. There are entirely new signatures so these will need to be migrated by hand.
 - **http4k-core**: Add `Uri.credentials` methods to get and set url-encoded credentials. H/T @oharaandrew314
 - **http4k-connect-amazon-route53** [New Module!] for basic hosted zone and record set management. H/T @oharaandrew314
+- **http4k-realtime-core** : Add `WsFilter.Tap`. H/T @oharaandrew314
 
 ### v6.15.1.0
 - **http4k-***: Upgrade versions
@@ -198,7 +199,7 @@ changes with their rationale when appropriate:
 - **http4k-connect-ai-anthropic-*** : [Fix] Correct name of input_schema field in Tool.
 - **http4k-client-helidon** : Add Helidon Websocket client. H/T @oharaandrew314
 - **http4k-server-helidon** : [Fix] Support headers for websocket upgrade request. H/T @oharaandrew314
-- **http4k-connect-storage-redis** : Changes to allow Storage instance to act as a ReadWriteCache H/T @ollieabbey
+- **http4k-connect-storage-redis** : Changes to allow Storage instance to act as a ReadWriteCache H/T @ollieabbey 
 
 ### v6.1.0.1
 
