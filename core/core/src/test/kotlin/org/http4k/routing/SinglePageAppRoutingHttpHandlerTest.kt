@@ -111,7 +111,6 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val dslDefault = singlePageApp()
         val criteria = isHomePage("public")
 
-        println(dslDefault(Request(GET, validPath)))
         assertThat(dslDefault(Request(GET, validPath)), criteria)
     }
 
