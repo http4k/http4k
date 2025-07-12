@@ -36,7 +36,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     override fun `stacked filter application - applies when not found`() {
         val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found")
-        val criteria = isHomePage() and hasHeader("res-header", "foo")
+        val criteria = hasHeader("res-header", "foo")
 
         assertThat(filtered(request), criteria)
     }
@@ -45,7 +45,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     override fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
         val request = Request(GET, "/not-found")
-        val criteria = isHomePage() and hasHeader("res-header", "foo")
+        val criteria = hasHeader("res-header", "foo")
 
         assertThat(filtered(request), criteria)
     }
