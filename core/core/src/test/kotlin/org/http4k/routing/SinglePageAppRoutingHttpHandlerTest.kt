@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
@@ -69,7 +70,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
 
     @Test
     fun `does not match non-GET requests for valid path`() {
-        assertThat(handler(Request(OPTIONS, validPath)), hasStatus(OK))
+        assertThat(handler(Request(OPTIONS, validPath)), hasStatus(NOT_FOUND))
         assertThat(handler(Request(GET, validPath)), hasStatus(OK))
     }
 
