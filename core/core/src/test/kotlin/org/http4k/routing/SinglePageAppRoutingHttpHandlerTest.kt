@@ -60,10 +60,11 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     @Test
     override fun `with base path - no longer matches original`() {
         val criteria = isHomePage()
-        val request = Request(GET, validPath)
         val withBasePath = handler.withBasePath(prefix)
 
-        assertThat(withBasePath(request), criteria)
+        assertThat(withBasePath(Request(GET, validPath)), hasStatus(NOT_FOUND))
+        assertThat(withBasePath(Request(GET, prefix + validPath)), criteria)
+
     }
 
     @Test
