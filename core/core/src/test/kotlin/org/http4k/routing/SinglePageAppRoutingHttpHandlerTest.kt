@@ -26,7 +26,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     @Test
     override fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-        val request = Request(GET, "/not-found")
+        val request = Request(GET, validPath)
         val criteria = isHomePage() and hasHeader("res-header", "foobar")
 
         assertThat(filtered(request), criteria)
