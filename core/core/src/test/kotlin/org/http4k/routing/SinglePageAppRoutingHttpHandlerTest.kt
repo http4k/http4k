@@ -54,9 +54,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     @Test
     override fun `does not match a particular route`() {
         val request = Request(GET, "/not-found")
-        val criteria = isHomePage()
-
-        assertThat(handler(request), criteria)
+        assertThat(handler(request), hasStatus(NOT_FOUND))
     }
 
     @Test
@@ -87,7 +85,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val optionsResponse = hasStatus(OK).and(hasBody(""))
 
         assertThat(
-            app(Request(GET, "/index").header("Origin", "foo")),
+            app(Request(GET, "/").header("Origin", "foo")),
             isHomePage("public")
         )
 
