@@ -2,7 +2,6 @@ package org.http4k.routing
 
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
-import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -38,12 +37,7 @@ internal data class SinglePageAppRouteMatcher(
             handler(request).let {
                 when {
                     it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
-                    else -> handler(Request(GET, pathSegments)).let {
-                        when {
-                            it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
-                            else -> RoutingMatch(2, m.description,  filter.then { _: Request -> Response(NOT_FOUND) })
-                        }
-                    }
+                    else -> RoutingMatch(2, m.description, filter.then { _: Request -> Response(NOT_FOUND) })
                 }
             }
         }
@@ -51,7 +45,9 @@ internal data class SinglePageAppRouteMatcher(
         is NotMatched -> RoutingMatch(2, m.description, filter.then { _: Request -> Response(NOT_FOUND) })
     }
 
-    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> = copy(pathSegments = prefix + pathSegments)
+    override fun withBasePath(prefix: String): RouteMatcher<Response, Filter> =
+        copy(pathSegments = prefix + pathSegments)
+
     override fun withFilter(new: Filter): RouteMatcher<Response, Filter> = copy(filter = new.then(filter))
     override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
