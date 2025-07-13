@@ -313,6 +313,13 @@ abstract class HttpClientContract(
     }
 
     @Test
+    open fun `keeps the csv header value as it is`() {
+        val response = client(Request(PUT, "http://localhost:$port/csvHeader"))
+        val values = response.headerValues("foo")
+        assertThat(values, equalTo(listOf("bar=baz,toll=troll")))
+    }
+
+    @Test
     @Disabled
     fun `sanitises uri`() {
         val response = client(Request(GET, "http://localhost:$port/encoded-uri/foo, bar & baz!"))

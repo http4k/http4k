@@ -122,7 +122,7 @@ object JettyClient {
                 Response(Status(status, reason)).headers(headers.toHttp4kHeaders())
 
             private fun HttpFields.toHttp4kHeaders(): Headers =
-                flatMap { it.values.map { hValue -> it.name to hValue } }
+                map { it.name to it.value }
 
             private fun Throwable.asHttp4kResponse(): Response = Response(
                 when (this) {
