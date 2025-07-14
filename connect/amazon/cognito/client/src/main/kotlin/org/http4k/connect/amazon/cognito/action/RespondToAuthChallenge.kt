@@ -14,7 +14,7 @@ import se.ansman.kotshi.JsonSerializable
 data class RespondToAuthChallenge(
     val ClientId: ClientId,
     val ChallengeName: ChallengeName,
-    val ChallengeResponses: Map<ChallengeName, String>? = null,
+    val ChallengeResponses: Map<String, String>? = null,
     val Session: Session? = null,
     val ClientMetadata: Map<String, String>? = null,
     val UserContextData: UserContextData? = null,
