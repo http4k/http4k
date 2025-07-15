@@ -63,6 +63,9 @@ object ServerForClientContract : HttpHandler {
             Response(OK).body(request.headers.joinToString(",") { "${it.first}=${it.second}" })
         },
         "/hostheaders" bind { request: Request -> Response(OK).body(request.headerValues("host").joinToString(",")) },
+        "/csvHeader" bind {
+            Response(OK).header("foo", "bar=baz,toll=troll")
+        },
         "/check-image" bind POST to { request: Request ->
             if (testImageBytes().contentEquals(request.body.payload.array()))
                 Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
