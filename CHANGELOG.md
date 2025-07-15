@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v6.16.0.0 (uncut)
 - **http4k-***: Upgrade versions, including Kotlin to 2.2.0
-- **http4k-core**: Fix #1377 Add optional host matching for reverse proxy routing
+- **http4k-client-okhttp**: [Possible break] Upgrade to v5 of the client, which may involve API changes
+- **http4k-core**: [Fix #1377] Add optional host matching for reverse proxy routing
 - **http4k-format-dataframe**: [Breaking] Upgrade to v1 beta build has resulted in API changes to the CSV and JSON objects. There are entirely new signatures so these will need to be migrated by hand.
 - **http4k-core**: Add `Uri.credentials` methods to get and set url-encoded credentials. H/T @oharaandrew314
 - **http4k-connect-amazon-route53** [New Module!] for basic hosted zone and record set management. H/T @oharaandrew314
