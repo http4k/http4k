@@ -10,6 +10,7 @@ changes with their rationale when appropriate:
 - **http4k-core**: Add `Uri.credentials` methods to get and set url-encoded credentials. H/T @oharaandrew314
 - **http4k-connect-amazon-route53** [New Module!] for basic hosted zone and record set management. H/T @oharaandrew314
 - **http4k-realtime-core** : Add `WsFilter.Tap`. H/T @oharaandrew314
+- **http4k-client-jetty**: [Fix #1315: Unlikely Break] JettyClient to convert header value as it is, even for csv header value
 
 ### v6.15.1.0
 - **http4k-***: Upgrade versions
