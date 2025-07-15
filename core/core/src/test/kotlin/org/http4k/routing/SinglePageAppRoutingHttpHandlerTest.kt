@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
@@ -26,7 +27,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     @Test
     override fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-        val request = Request(GET, "/not-found")
+        val request = Request(GET, validPath)
         val criteria = isHomePage() and hasHeader("res-header", "foobar")
 
         assertThat(filtered(request), criteria)
@@ -36,7 +37,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     override fun `stacked filter application - applies when not found`() {
         val filtered = filterAppending("foo").then(routes(handler))
         val request = Request(GET, "/not-found")
-        val criteria = isHomePage() and hasHeader("res-header", "foo")
+        val criteria = hasHeader("res-header", "foo")
 
         assertThat(filtered(request), criteria)
     }
@@ -45,7 +46,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     override fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
         val request = Request(GET, "/not-found")
-        val criteria = isHomePage() and hasHeader("res-header", "foo")
+        val criteria = hasHeader("res-header", "foo")
 
         assertThat(filtered(request), criteria)
     }
@@ -53,23 +54,22 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     @Test
     override fun `does not match a particular route`() {
         val request = Request(GET, "/not-found")
-        val criteria = isHomePage()
-
-        assertThat(handler(request), criteria)
+        assertThat(handler(request), hasStatus(NOT_FOUND))
     }
 
     @Test
     override fun `with base path - no longer matches original`() {
         val criteria = isHomePage()
-        val request = Request(GET, validPath)
         val withBasePath = handler.withBasePath(prefix)
 
-        assertThat(withBasePath(request), criteria)
+        assertThat(withBasePath(Request(GET, validPath)), hasStatus(NOT_FOUND))
+        assertThat(withBasePath(Request(GET, prefix + validPath)), criteria)
+
     }
 
     @Test
     fun `does not match non-GET requests for valid path`() {
-        assertThat(handler(Request(OPTIONS, validPath)), hasStatus(OK))
+        assertThat(handler(Request(OPTIONS, validPath)), hasStatus(NOT_FOUND))
         assertThat(handler(Request(GET, validPath)), hasStatus(OK))
     }
 
@@ -86,7 +86,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val optionsResponse = hasStatus(OK).and(hasBody(""))
 
         assertThat(
-            app(Request(GET, "/index").header("Origin", "foo")),
+            app(Request(GET, "/").header("Origin", "foo")),
             isHomePage("public")
         )
 
@@ -111,8 +111,7 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
         val dslDefault = singlePageApp()
         val criteria = isHomePage("public")
 
-        println(dslDefault(Request(GET, validPath)))
-        assertThat(dslDefault(Request(GET, validPath)), criteria)
+        assertThat(dslDefault(Request(GET, "/")), criteria)
     }
 
     private fun isHomePage(name: String = "root"): Matcher<Response> = hasStatus(OK)
