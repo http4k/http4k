@@ -214,7 +214,8 @@ interface CognitoContract : AwsContract {
 
             respondToAuthChallenge(
                 client.ClientId, NEW_PASSWORD_REQUIRED, mapOf(
-                    NEW_PASSWORD_REQUIRED to "",
+                    "NEW_PASSWORD" to "some-new-password",
+                    "USERNAME" to username.value
                 )
             ).successValue()
 

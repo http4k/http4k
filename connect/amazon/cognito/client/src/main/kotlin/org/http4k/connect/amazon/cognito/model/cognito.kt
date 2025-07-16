@@ -91,7 +91,7 @@ enum class VerifyStatus {
 }
 
 enum class ChallengeName {
-    SMS_MFA, SOFTWARE_TOKEN_MFA, SELECT_MFA_TYPE, MFA_SETUP, PASSWORD_VERIFIER, CUSTOM_CHALLENGE, DEVICE_SRP_AUTH, DEVICE_PASSWORD_VERIFIER, ADMIN_NO_SRP_AUTH, NEW_PASSWORD_REQUIRED
+    SMS_MFA , EMAIL_OTP , SOFTWARE_TOKEN_MFA , SELECT_MFA_TYPE , MFA_SETUP , PASSWORD_VERIFIER , CUSTOM_CHALLENGE , SELECT_CHALLENGE , DEVICE_SRP_AUTH , DEVICE_PASSWORD_VERIFIER , ADMIN_NO_SRP_AUTH , NEW_PASSWORD_REQUIRED , SMS_OTP , PASSWORD , WEB_AUTHN , PASSWORD_SRP
 }
 
 enum class AdvancedSecurityMode {
@@ -181,7 +181,8 @@ data class AnalyticsMetadata(
 
 @JsonSerializable
 data class UserContextData(
-    val EncodedData: String? = null
+    val EncodedData: String? = null,
+    val IpAddress: IpAddress? = null
 )
 
 @JsonSerializable
