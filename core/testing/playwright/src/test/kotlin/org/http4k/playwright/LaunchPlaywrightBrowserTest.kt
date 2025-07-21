@@ -21,7 +21,7 @@ class LaunchPlaywrightBrowserTest {
 
     private val app = routes(
         "/foo" bind GET to { _: Request -> Response(OK).body("foo") },
-        "/redirect" bind GET to { _: Request -> Response(FOUND).with(Header.LOCATION of Uri.of("https://example.com")) },
+        "/redirect" bind GET to { _: Request -> Response(FOUND).with(Header.LOCATION of Uri.of("https://http4k.org")) },
         "/" bind GET to { _: Request -> Response(OK).body("helloworld") }
     )
 
@@ -33,7 +33,7 @@ class LaunchPlaywrightBrowserTest {
         with(browser.newPage()) {
             assertThat(String(navigateHome().body()), equalTo("helloworld"))
             assertThat(String(navigate("/foo").body()), equalTo("foo"))
-            assertThat(String(navigate("/redirect").body()), containsSubstring("Example Domain"))
+            assertThat(String(navigate("/redirect").body()), containsSubstring("http4k"))
             assertThat(String(navigate("http://google.com").body()), containsSubstring("google"))
         }
     }
@@ -42,7 +42,7 @@ class LaunchPlaywrightBrowserTest {
     fun `provides browser`(browser: Browser) {
         with(browser.newPage()) {
             assertThat(String(navigate("/foo").body()), equalTo("foo"))
-            assertThat(String(navigate("/redirect").body()), containsSubstring("Example Domain"))
+            assertThat(String(navigate("/redirect").body()), containsSubstring("http4k"))
             assertThat(String(navigate("http://google.com").body()), containsSubstring("google"))
         }
     }
