@@ -161,7 +161,7 @@ private fun Request.convertSimpleMessageToArrayOfMessages(): Request {
                     )
                 ) + messages.elements.drop(1)
             )
-            body(OpenAIMoshi.asFormatString(node))
+            body(asFormatString(node))
         }
 
         else -> this
