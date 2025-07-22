@@ -10,6 +10,7 @@ import org.http4k.connect.storage.Storage
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.BearerAuth
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Clock
 import java.time.Clock.systemUTC
@@ -27,10 +28,8 @@ class FakeOpenAI(
                 BearerAuth { true }
                     .then(
                         routes(
-                            getModels(models),
-                            chatCompletion(clock, completionGenerators),
-                            createEmbeddings(models),
-                            generateImage(clock, baseUri),
+                            "/v1" bind openAIEndpoints(clock, baseUri, models, completionGenerators),
+                            "/v1beta" bind openAIEndpoints(clock, baseUri, models, completionGenerators)
                         )
                     ),
                 serveGeneratedContent(),
