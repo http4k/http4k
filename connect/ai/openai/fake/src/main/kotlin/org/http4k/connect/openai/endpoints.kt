@@ -38,13 +38,21 @@ import org.http4k.format.MoshiString
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.http4k.routing.static
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 import kotlin.math.absoluteValue
 
-fun generateImage(clock: Clock, baseUri: Uri) = "/v1/images/generations" bind POST to
+fun openAIEndpoints(clock: Clock, baseUri: Uri, models: Storage<Model>, completionGenerators: Map<ModelName, ChatCompletionGenerator>) = routes(
+    getModels(models),
+    chatCompletion(clock, completionGenerators),
+    createEmbeddings(models),
+    generateImage(clock, baseUri),
+)
+
+fun generateImage(clock: Clock, baseUri: Uri) = "/images/generations" bind POST to
     {
         val request = autoBody<GenerateImage>().toLens()(it)
 
@@ -63,7 +71,7 @@ fun generateImage(clock: Clock, baseUri: Uri) = "/v1/images/generations" bind PO
         )
     }
 
-fun getModels(models: Storage<Model>) = "/v1/models" bind GET to
+fun getModels(models: Storage<Model>) = "/models" bind GET to
     {
         Response(OK).with(
             autoBody<Models>().toLens() of
@@ -71,7 +79,7 @@ fun getModels(models: Storage<Model>) = "/v1/models" bind GET to
         )
     }
 
-fun createEmbeddings(models: Storage<Model>) = "/v1/embeddings" bind POST to
+fun createEmbeddings(models: Storage<Model>) = "/embeddings" bind POST to
     {
         val request = autoBody<CreateEmbeddings>().toLens()(it)
 
@@ -90,7 +98,7 @@ fun createEmbeddings(models: Storage<Model>) = "/v1/embeddings" bind POST to
     }
 
 fun chatCompletion(clock: Clock, completionGenerators: Map<ModelName, ChatCompletionGenerator>) =
-    "/v1/chat/completions" bind POST to
+    "/chat/completions" bind POST to
         { request ->
             val chatRequest = autoBody<ChatCompletion>().toLens()(request.convertSimpleMessageToArrayOfMessages())
             val choices = (completionGenerators[chatRequest.model] ?: ChatCompletionGenerator.LoremIpsum())(chatRequest)
@@ -153,7 +161,7 @@ private fun Request.convertSimpleMessageToArrayOfMessages(): Request {
                     )
                 ) + messages.elements.drop(1)
             )
-            body(OpenAIMoshi.asFormatString(node))
+            body(asFormatString(node))
         }
 
         else -> this
