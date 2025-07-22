@@ -29,7 +29,7 @@ class FakeOpenAI(
                     .then(
                         routes(
                             "/v1" bind openAIEndpoints(clock, baseUri, models, completionGenerators),
-                            "/v1beta" bind openAIEndpoints(clock, baseUri, models, completionGenerators)
+                            "/v1beta/openai" bind openAIEndpoints(clock, baseUri, models, completionGenerators)
                         )
                     ),
                 serveGeneratedContent(),
