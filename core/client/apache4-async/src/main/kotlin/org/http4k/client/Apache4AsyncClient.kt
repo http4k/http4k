@@ -2,6 +2,7 @@ package org.http4k.client
 
 import org.apache.http.Header
 import org.apache.http.HttpResponse
+import org.apache.http.NoHttpResponseException
 import org.apache.http.StatusLine
 import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
 import org.apache.http.client.config.RequestConfig
@@ -48,6 +49,7 @@ object Apache4AsyncClient {
                     override fun failed(e: Exception) = fn(Response(when (e) {
                         is ConnectTimeoutException -> CLIENT_TIMEOUT
                         is SocketTimeoutException -> CLIENT_TIMEOUT
+                        is NoHttpResponseException -> SERVICE_UNAVAILABLE
                         else -> SERVICE_UNAVAILABLE
                     }.toClientStatus(e)))
                 })
