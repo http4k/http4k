@@ -9,6 +9,7 @@ changes with their rationale when appropriate:
 - **http4k-core**: [Fix #1377] Add optional host matching for reverse proxy routing
 - **http4k-format-dataframe**: [Breaking] Upgrade to v1 beta build has resulted in API changes to the CSV and JSON objects. There are entirely new signatures so these will need to be migrated by hand.
   **http4k-core**: [Fix #1376: Unlikely Break] Fix SPA routing when it's mounted to a non-root path
+  **http4k-client-apache**: [Fix #1387] Handle NoHttpResponseException by returning SERVICE_UNAVAILABLE status 
 - **http4k-client-jetty**: [Fix #1315: Unlikely Break] JettyClient to convert header value as it is, even for csv header value
 - **http4k-client-okhttp**: [Possible break] Upgrade to v5 of the client, which may involve API changes
 - **http4k-core**: Add `Uri.credentials` methods to get and set url-encoded credentials. H/T @oharaandrew314
