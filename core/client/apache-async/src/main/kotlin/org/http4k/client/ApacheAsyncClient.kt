@@ -11,6 +11,7 @@ import org.apache.hc.core5.concurrent.FutureCallback
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpResponse
+import org.apache.hc.core5.http.NoHttpResponseException
 import org.apache.hc.core5.reactor.IOReactorStatus.INACTIVE
 import org.http4k.core.Body
 import org.http4k.core.Headers
@@ -40,6 +41,7 @@ object ApacheAsyncClient {
                     override fun failed(e: Exception) = fn(Response(when (e) {
                         is ConnectTimeoutException -> CLIENT_TIMEOUT
                         is SocketTimeoutException -> CLIENT_TIMEOUT
+                        is NoHttpResponseException -> SERVICE_UNAVAILABLE
                         else -> SERVICE_UNAVAILABLE
                     }.toClientStatus(e)))
                 })

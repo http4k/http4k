@@ -15,6 +15,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.HttpResponse
+import org.apache.hc.core5.http.NoHttpResponseException
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity
 import org.apache.hc.core5.http.io.entity.InputStreamEntity
 import org.http4k.core.BodyMode
@@ -66,6 +67,8 @@ object ApacheClient {
         } catch (e: UnknownHostException) {
             Response(UNKNOWN_HOST.toClientStatus(e))
         } catch (e: SocketException) {
+            Response(SERVICE_UNAVAILABLE.toClientStatus(e))
+        } catch (e: NoHttpResponseException) {
             Response(SERVICE_UNAVAILABLE.toClientStatus(e))
         }
     }
