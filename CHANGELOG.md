@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.16.0.0 (uncut)
+### v6.16.0.0
 - **http4k-***: Upgrade versions, including Kotlin to 2.2.0
 - **http4k-connect-amazon-route53** [New Module!] for basic hosted zone and record set management. H/T @oharaandrew314
 - **http4k-core**: [Fix #1377] Add optional host matching for reverse proxy routing
