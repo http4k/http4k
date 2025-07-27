@@ -24,17 +24,21 @@ jobs:
           java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Upload to Sonatype
+      - name: Publish
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
         run: |
-          ./gradlew publish publishToSonatype closeAndReleaseSonatypeStagingRepository \
+          ./gradlew publish --no-configuration-cache --info \
           -Psign=true \
           -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
-          -PsigningKey="${{ secrets.SIGNING_KEY }}" \
-          -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}" \
           -PltsPublishingUser="${{ secrets.LTS_PUBLISHING_USER }}" \
           -PltsPublishingPassword="${{ secrets.LTS_PUBLISHING_PASSWORD }}" \
-          -PnexusUsername="${{ secrets.NEXUS_USERNAME }}" \
-          -PnexusPassword="${{ secrets.NEXUS_PASSWORD }}"
+          -PsigningKey="${{ secrets.SIGNING_KEY }}" \
+          -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}"
+        shell: bash
       - run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}
         env:
           LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
