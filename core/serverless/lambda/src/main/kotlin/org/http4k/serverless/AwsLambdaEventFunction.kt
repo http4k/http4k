@@ -8,8 +8,14 @@ import java.io.OutputStream
 /**
  * Adapts between http4k and AWS Lambda APIs..
  */
-abstract class AwsLambdaEventFunction(loader: FnLoader<Context>) : RequestStreamHandler {
-    private val function = loader(System.getenv())
+abstract class AwsLambdaEventFunction(
+    envMap: Map<String, String> = System.getenv(),
+    loader: FnLoader<Context>
+) : RequestStreamHandler {
+    // for backwards-compatibility
+    constructor(loader: FnLoader<Context>): this(System.getenv(), loader)
+
+    private val function = loader(envMap)
 
     override fun handleRequest(input: InputStream, output: OutputStream, context: Context) {
         function(input, context).copyTo(output)

@@ -22,4 +22,18 @@ class AwsLambdaEventFunctionTest {
         MyFunction().handleRequest(input.byteInputStream(), output, mock())
         assertThat(output.toString(), equalTo("hello"))
     }
+
+    @Test
+    fun `can override env`() {
+        val function = object: AwsLambdaEventFunction(mapOf("prop" to "world"), FnLoader { env ->
+            FnHandler { _: ScheduledEvent, _: Context ->
+                env["prop"] ?: "unknown"
+            }
+        }) {}
+
+        val input = "{}"
+        val output = ByteArrayOutputStream()
+        function.handleRequest(input.byteInputStream(), output, mock())
+        assertThat(output.toString(), equalTo("world"))
+    }
 }
