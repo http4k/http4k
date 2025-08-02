@@ -1,6 +1,5 @@
 package org.http4k.ai.mcp
 
-import org.http4k.lens.McpLensTarget
 import org.http4k.ai.mcp.model.ElicitationAction
 import org.http4k.ai.mcp.model.McpCapabilityLens
 import org.http4k.ai.mcp.model.Meta
@@ -10,6 +9,7 @@ import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.lens.McpLensTarget
 
 /**
  *  Processes a elicitation request from an MCP server to a client

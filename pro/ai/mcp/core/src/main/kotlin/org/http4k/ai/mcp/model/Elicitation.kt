@@ -106,6 +106,7 @@ fun Elicitation.number() = mapWithNewMeta(
 )
 
 fun Elicitation.boolean() = mapWithNewMeta({ bool(it) }, { MoshiBoolean(it) }, BooleanParam)
+
 inline fun <reified T : Enum<T>> Elicitation.enum() =
     mapWithNewMeta(
         { enumValueOf<T>(it.toString()) },

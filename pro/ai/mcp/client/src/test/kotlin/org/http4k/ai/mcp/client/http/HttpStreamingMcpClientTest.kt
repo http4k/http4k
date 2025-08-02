@@ -64,8 +64,8 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.debug
 import org.http4k.filter.debugMcp
+import org.http4k.format.auto
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
@@ -278,11 +278,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(5))
     }
 
+    data class FooBar(val foo: String, val bar: String)
+
     @Test
     fun `can do elicitation`() {
-        val output = Elicitation.string().required("foo", "foo", "foo")
+        val output = Elicitation.auto(FooBar("123", "324")).toLens("foo", "foo")
 
-        val response = "bar"
+        val response = FooBar("123", "324")
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
