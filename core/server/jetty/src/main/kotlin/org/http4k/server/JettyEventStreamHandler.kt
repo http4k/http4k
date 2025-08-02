@@ -75,7 +75,8 @@ class JettyEventStreamHandler(
         }
 
     companion object {
-        private fun JettyRequest.isEventStream() = headers[HttpHeader.ACCEPT].contains(TEXT_EVENT_STREAM.value, true)
+        private fun JettyRequest.isEventStream() =
+            headers[HttpHeader.ACCEPT]?.contains(TEXT_EVENT_STREAM.value, true) ?: false
 
         private fun JettyResponse.writeEventStreamResponse(
             newStatus: Status,

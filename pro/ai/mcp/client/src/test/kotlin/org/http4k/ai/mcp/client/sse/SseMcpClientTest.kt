@@ -3,19 +3,6 @@ package org.http4k.ai.mcp.client.sse
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.failureOrNull
-import org.http4k.ai.model.ToolName
-import org.http4k.client.JavaHttpClient
-import org.http4k.core.BodyMode.Stream
-import org.http4k.core.Filter
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
-import org.http4k.core.Uri
-import org.http4k.core.then
-import org.http4k.filter.ClientFilters
-import org.http4k.lens.Header
-import org.http4k.lens.with
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClientContract
@@ -30,6 +17,19 @@ import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.ApiKeyMcpSecurity
 import org.http4k.ai.mcp.server.sse.SseMcp
 import org.http4k.ai.mcp.server.sse.SseSessions
+import org.http4k.ai.model.ToolName
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
+import org.http4k.core.Filter
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
+import org.http4k.lens.Header
+import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
@@ -40,7 +40,7 @@ class SseMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = true
 
-    override fun clientFor(port: Int) = org.http4k.ai.mcp.client.sse.SseMcpClient(
+    override fun clientFor(port: Int) = SseMcpClient(
         clientName, Version.of("1.0.0"),
         Request(GET, Uri.of("http://localhost:${port}/sse")),
         ClientFilters.ApiKeyAuth(Header.required("KEY") of "123").then(JavaHttpClient(responseBodyMode = Stream)),
