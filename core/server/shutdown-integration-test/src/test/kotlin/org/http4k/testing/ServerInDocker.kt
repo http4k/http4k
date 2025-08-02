@@ -137,7 +137,7 @@ class ServerInDocker(private val events: Events = PrintEventsIfDebugFlagOn()) {
 
         Files.copy(
             serverPackage.toPath(),
-            dockerWorkspace("http4k-server-shutdown-integration-test-LOCAL.zip").toPath()
+            dockerWorkspace("http4k-server-shutdown-integration-test.zip").toPath()
         )
 
         val imageId = dockerClient.buildImageCmd(dockerWorkspace("Dockerfile"))
