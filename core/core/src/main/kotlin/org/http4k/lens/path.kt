@@ -83,13 +83,15 @@ open class BiDiPathLensSpec<OUT>(
         val setLens = set(name)
 
         val meta = Meta(true, "path", paramMeta, name, description, metadata)
-        return BiDiPathLens(meta,
+        return BiDiPathLens(
+            meta,
             { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 }
 
-object Path : BiDiPathLensSpec<String>(StringParam,
+object Path : BiDiPathLensSpec<String>(
+    StringParam,
     LensGet { _, target -> listOf(target) },
     LensSet { name, values, target ->
         target.uri(
@@ -107,7 +109,8 @@ object Path : BiDiPathLensSpec<String>(StringParam,
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
         val meta = Meta(true, "path", StringParam, name, null, emptyMap())
-        return object : PathLens<String>(meta,
+        return object : PathLens<String>(
+            meta,
             { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
             override fun toString(): String = name
 
@@ -157,8 +160,3 @@ internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>)
 
 fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) =
     mapWithNewMeta(mapping::invoke, mapping::invoke, paramMeta)
-
-fun main() {
-    val name = "bob"
-    "/first/{$name}/second".replaceFirst(Regex("""\{$name(:[^}]*)?}"""), "!\$&'()*+,;=")
-}
