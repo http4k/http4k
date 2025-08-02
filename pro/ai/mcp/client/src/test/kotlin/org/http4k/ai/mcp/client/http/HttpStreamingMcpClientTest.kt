@@ -196,8 +196,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             latch.countDown()
         }
 
-        Thread.sleep(1000) // TODO RACE CONDITION
-
         tools.items = emptyList()
 
         require(latch.await(2, SECONDS))
