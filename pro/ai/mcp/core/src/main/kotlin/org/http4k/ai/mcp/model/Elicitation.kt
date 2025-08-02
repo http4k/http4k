@@ -2,6 +2,13 @@ package org.http4k.ai.mcp.model
 
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
+import org.http4k.ai.mcp.model.ElicitationLensSpec.Companion.mapWithNewMeta
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpJson.bool
+import org.http4k.ai.mcp.util.McpJson.decimal
+import org.http4k.ai.mcp.util.McpJson.integer
+import org.http4k.ai.mcp.util.McpJson.string
+import org.http4k.ai.mcp.util.McpJson.text
 import org.http4k.core.Uri
 import org.http4k.format.MoshiBoolean
 import org.http4k.format.MoshiDecimal
@@ -17,13 +24,6 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.nonBlank
 import org.http4k.lens.StringBiDiMappings.nonEmpty
-import org.http4k.ai.mcp.model.ElicitationLensSpec.Companion.mapWithNewMeta
-import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.bool
-import org.http4k.ai.mcp.util.McpJson.decimal
-import org.http4k.ai.mcp.util.McpJson.integer
-import org.http4k.ai.mcp.util.McpJson.string
-import org.http4k.ai.mcp.util.McpJson.text
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

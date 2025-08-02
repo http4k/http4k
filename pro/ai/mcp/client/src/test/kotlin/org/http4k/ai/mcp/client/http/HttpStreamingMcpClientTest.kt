@@ -8,15 +8,20 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionResponse
+import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClientContract
 import org.http4k.ai.mcp.firstDeterministicSessionId
 import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.model.Elicitation
+import org.http4k.ai.mcp.model.ElicitationAction
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
@@ -59,6 +64,8 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.debug
+import org.http4k.filter.debugMcp
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
@@ -157,7 +164,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     fun `resume a stream`() {
         val toolArg = Tool.Arg.string().required("name")
         val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
-            ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
+            Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
         val protocol = McpProtocol(
@@ -236,7 +243,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                     Duration.ofSeconds(1)
                 ).toList()
                 assertThat(received, equalTo(samplingResponses.map { Success(it) }))
-                ToolResponse.Ok(listOf(Content.Text(received.size.toString())))
+                Ok(listOf(Content.Text(received.size.toString())))
             }
         )
 
@@ -258,12 +265,12 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         assertThat(
             mcpClient.tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
-            equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
+            equalTo(Success(Ok(Content.Text("2"))))
         )
 
         assertThat(
             mcpClient.tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
-            equalTo(Success(ToolResponse.Ok(Content.Text("2"))))
+            equalTo(Success(Ok(Content.Text("2"))))
         )
 
         mcpClient.stop()
@@ -271,69 +278,68 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(5))
     }
 
-    data class FooBar(val foo: String, val bar: Int)
+    @Test
+    fun `can do elicitation`() {
+        val output = Elicitation.string().required("foo", "foo", "foo")
 
-//    @Test
-//    fun `can do elicitation`() {
-//        val output = Elicitation.auto(FooBar("foo", 42)).toLens()
-//
-//        val response = FooBar("bar", 69)
-//
-//        val tools = ServerTools(
-//            Tool("elicit", "description") bind {
-//                val received = it.client.elicit(
-//                    ElicitationRequest("foobar", output, it.meta.progress),
-//                    Duration.ofSeconds(1)
-//                )
-//                assertThat(
-//                    received,
-//                    equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
-//                )
-//
-//                assertThat(output(received.valueOrNull()!!), equalTo(response))
-//
-//                ToolResponse.Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
-//            }
-//        )
-//
-//        val eventStore = SessionEventStore.InMemory(10)
-//        val protocol = McpProtocol(
-//            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-//            HttpStreamingSessions(
-//                sessionProvider = SessionProvider.Random(Random(0)),
-//                eventStore = eventStore
-//            ).apply { start() },
-//            tools = tools,
-//        )
-//
-//        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
-//
-//        mcpClient.start(Duration.ofSeconds(1))
-//
-//        mcpClient.elicitations()
-//            .onElicitation {
-//                ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!)).with(output of response)
-//            }
-//
-//        assertThat(
-//            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
-//            equalTo(Success(ToolResponse.Ok(Content.Text("accept"))))
-//        )
-//
-//        assertThat(
-//            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
-//            equalTo(Success(ToolResponse.Ok(Content.Text("decline"))))
-//        )
-//
-//        assertThat(
-//            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
-//            equalTo(Success(ToolResponse.Ok(Content.Text("cancel"))))
-//        )
-//
-//        mcpClient.stop()
-//
-//        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(7))
-//    }
+        val response = "bar"
+
+        val tools = ServerTools(
+            Tool("elicit", "description") bind {
+                val request = ElicitationRequest("foobar", output, progressToken = it.meta.progress)
+                val received = it.client.elicit(
+                    request,
+                    Duration.ofSeconds(1)
+                )
+                assertThat(
+                    received,
+                    equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
+                )
+
+                assertThat(output(received.valueOrNull()!!), equalTo(response))
+
+                Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
+            }
+        )
+
+        val eventStore = SessionEventStore.InMemory(10)
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            HttpStreamingSessions(
+                sessionProvider = SessionProvider.Random(Random(0)),
+                eventStore = eventStore
+            ).apply { start() },
+            tools = tools,
+        )
+
+        val mcpClient = clientFor(toPolyHandler(protocol).debugMcp().asServer(JettyLoom(0)).start().port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.elicitations()
+            .onElicitation {
+                ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!)).with(output of response)
+            }
+
+        assertThat(
+            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
+            equalTo(Success(Ok(Content.Text("accept"))))
+        )
+
+        assertThat(
+            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
+            equalTo(Success(Ok(Content.Text("decline"))))
+        )
+
+        assertThat(
+            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
+            equalTo(Success(Ok(Content.Text("cancel"))))
+        )
+
+        mcpClient.stop()
+
+        assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(7))
+    }
 
     @Test
     fun `can do progress`() {
@@ -341,7 +347,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             Tool("progress", "description") bind {
                 try {
                     it.client.progress(1, 2.0)
-                    ToolResponse.Ok(listOf(Content.Text("")))
+                    Ok(listOf(Content.Text("")))
                 } catch (e: Exception) {
                     throw e
                 }
@@ -367,7 +373,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         assertThat(
             mcpClient.tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
-            equalTo(Success(ToolResponse.Ok(Content.Text(""))))
+            equalTo(Success(Ok(Content.Text(""))))
         )
 
         assertThat(prog.get(), equalTo(Progress("progress", 1, 2.0)))
