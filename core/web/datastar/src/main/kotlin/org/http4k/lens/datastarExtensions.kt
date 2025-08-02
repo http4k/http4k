@@ -8,14 +8,13 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.Companion.from
-import org.http4k.datastar.DatastarEvent.MergeFragments
-import org.http4k.datastar.DatastarEvent.MergeSignals
-import org.http4k.datastar.Fragment
-import org.http4k.datastar.MergeMode
-import org.http4k.datastar.MergeMode.morph
+import org.http4k.datastar.DatastarEvent.PatchElements
+import org.http4k.datastar.DatastarEvent.PatchSignals
+import org.http4k.datastar.Element
+import org.http4k.datastar.MorphMode
+import org.http4k.datastar.MorphMode.outer
+import org.http4k.datastar.MorphMode.outer
 import org.http4k.datastar.Selector
-import org.http4k.datastar.SettleDuration
-import org.http4k.datastar.SettleDuration.Companion.DEFAULT
 import org.http4k.datastar.Signal
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
@@ -34,70 +33,64 @@ val Header.DATASTAR_CONTENT_TYPE
 val Query.DATASTAR_MODEL get() = Query.map(String::urlDecoded, String::urlEncoded).optional("datastar")
 
 /**
- * Put datastar event into response as a datastar-merge-fragments event
+ * Put datastar event into response as a datastar-patch-elements event
  */
-fun Response.datastarFragments(
-    vararg fragments: String,
-    mergeMode: MergeMode = morph,
+fun Response.datastarElements(
+    vararg elements: String,
+    morphMode: MorphMode = outer,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
-    settleDuration: SettleDuration? = DEFAULT,
     id: SseEventId? = null,
-): Response = datastarFragments(fragments.toList(), mergeMode, selector, useViewTransition, settleDuration, id)
+): Response = datastarElements(elements.toList(), morphMode, selector, useViewTransition, id)
 
 /**
- * Put datastar event into response as a datastar-merge-fragments event
+ * Put datastar event into response as a datastar-patch-elements event
  */
-@JvmName("datastarFragmentsStrings")
-fun Response.datastarFragments(
-    fragments: List<String>,
-    mergeMode: MergeMode = morph,
+@JvmName("datastarElementsStrings")
+fun Response.datastarElements(
+    elements: List<String>,
+    morphMode: MorphMode = outer,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
-    settleDuration: SettleDuration? = DEFAULT,
     id: SseEventId? = null,
 ): Response =
-    datastarFragments(fragments.map { Fragment.of(it) }, mergeMode, selector, useViewTransition, settleDuration, id)
+    datastarElements(elements.map { Element.of(it) }, morphMode, selector, useViewTransition, id)
 
 /**
- * Put datastar event into response as a datastar-merge-fragments event
+ * Put datastar event into response as a datastar-patch-elements event
  */
-fun Response.datastarFragments(
-    vararg fragments: Fragment,
-    mergeMode: MergeMode = morph,
+fun Response.datastarElements(
+    vararg elements: Element,
+    morphMode: MorphMode = outer,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
-    settleDuration: SettleDuration? = DEFAULT,
     id: SseEventId? = null,
-): Response = datastarFragments(
-    MergeFragments(
-        fragments.toList(),
-        mergeMode,
+): Response = datastarElements(
+    PatchElements(
+        elements.toList(),
+        morphMode,
         selector,
         useViewTransition,
-        settleDuration,
         id
     )
 )
 
 /**
- * Put datastar event into response as a datastar-merge-fragments event
+ * Put datastar event into response as a datastar-patch-elements event
  */
-@JvmName("datastarFragments")
-fun Response.datastarFragments(
-    fragments: List<Fragment>,
-    mergeMode: MergeMode = morph,
+@JvmName("datastarElements")
+fun Response.datastarElements(
+    elements: List<Element>,
+    morphMode: MorphMode = MorphMode.outer,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
-    settleDuration: SettleDuration? = DEFAULT,
     id: SseEventId? = null,
-): Response = datastarFragments(
-    MergeFragments(
-        fragments.toList(),
-        mergeMode,
+): Response = datastarElements(
+    PatchElements(
+        elements.toList(),
+        morphMode,
         selector,
         useViewTransition,
-        settleDuration,
         id
     )
 )
@@ -105,35 +98,34 @@ fun Response.datastarFragments(
 /**
  * Inject a Datastar Event into a response. Appends the event to the existing body of the response
  */
-fun Response.datastarFragments(event: MergeFragments) =
+fun Response.datastarElements(event: PatchElements) =
     contentType(TEXT_EVENT_STREAM).
     body(bodyString() + Response(OK).with(Body.datastarEvents().toLens() of listOf(event)).bodyString())
 
 /**
- * Put datastar event into response as a datastar-merge-fragments event
+ * Put datastar event into response as a datastar-patch-elements event
  */
-@JvmName("datastarFragments")
 fun Response.datastarSignals(vararg signals: Signal, onlyIfMissing: Boolean = false, id: SseEventId? = null) =
     datastarSignals(signals.toList(), onlyIfMissing, id)
 
 /**
- * Put datastar event into response as a datastar-merge-fragments event
+ * Put datastar event into response as a datastar-patch-elements event
  */
 @JvmName("datastarSignals")
 fun Response.datastarSignals(signals: List<Signal>, onlyIfMissing: Boolean = false, id: SseEventId? = null) =
-    datastarSignals(MergeSignals(signals, onlyIfMissing, id))
+    datastarSignals(PatchSignals(signals, onlyIfMissing, id))
 
 /**
  * Inject a Datastar Event into a response. Appends the event to the existing body of the response
  */
-fun Response.datastarSignals(event: MergeSignals) =
+fun Response.datastarSignals(event: PatchSignals) =
     contentType(TEXT_EVENT_STREAM).
     body(bodyString() + Response(OK).datastarEvents(listOf(event)).bodyString())
 
 /**
- * Inject a Datastar MergeFragments event into a Response as a Datastar event
+ * Inject a Datastar PatchElements event into a Response as a Datastar event
  */
-fun Response.html(vararg events: MergeFragments) = html(events.flatMap { it.fragments }.joinToString("\n") { it.value })
+fun Response.html(vararg events: PatchElements) = html(events.flatMap { it.elements }.joinToString("\n") { it.value })
 
 /**
  * Roundtrip datastar events
@@ -141,8 +133,8 @@ fun Response.html(vararg events: MergeFragments) = html(events.flatMap { it.frag
 fun Body.Companion.datastarEvents() = string(TEXT_EVENT_STREAM)
     .map({ it.toDatastarEvents() }, { it.joinToString("") { it.toSseEvent().toMessage() } })
 
-fun Body.Companion.datastarFragments(): BiDiBodyLensSpec<List<MergeFragments>> =
-    datastarEvents().map({ it.filterIsInstance<MergeFragments>() }, { it })
+fun Body.Companion.datastarElements(): BiDiBodyLensSpec<List<PatchElements>> =
+    datastarEvents().map({ it.filterIsInstance<PatchElements>() }, { it })
 
 fun Response.datastarEvents(events: List<DatastarEvent>) =
     contentType(TEXT_EVENT_STREAM).body(events.joinToString("") { it.toSseEvent().toMessage() })

@@ -32,14 +32,14 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.static
-import org.http4k.template.DatastarFragmentRenderer
+import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.HandlebarsTemplates
 
 fun Chatzilla(env: Environment): PolyHandler {
     val http = JavaHttpClient(responseBodyMode = Stream).debug()
 
     val renderer = HandlebarsTemplates().CachingClasspath()
-    val datastarRenderer = DatastarFragmentRenderer(renderer)
+    val datastarRenderer = DatastarElementRenderer(renderer)
 
     val history = ChatHistory.InMemory()
 

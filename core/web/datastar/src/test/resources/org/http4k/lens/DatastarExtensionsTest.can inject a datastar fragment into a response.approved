@@ -1,6 +1,0 @@
-event: datastar-merge-fragments
-data: fragments foo
-data: fragments bar
-data: settleDuration 300
-data: mergeMode morph
-data: useViewTransition false

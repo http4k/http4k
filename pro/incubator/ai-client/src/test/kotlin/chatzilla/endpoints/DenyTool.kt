@@ -9,19 +9,19 @@ import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
 import org.http4k.ai.llm.chat.ChatSessionState.Responding
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ToolName
-import org.http4k.datastar.MergeMode.append
+import org.http4k.datastar.MorphMode.append
 import org.http4k.datastar.Selector
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
-import org.http4k.sse.sendMergeFragments
-import org.http4k.template.DatastarFragmentRenderer
+import org.http4k.sse.sendPatchElements
+import org.http4k.template.DatastarElementRenderer
 
 data class ToolDenial(val id: RequestId, val toolName: ToolName)
 
-fun DenyTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handler: ChatSessionHandler) =
+fun DenyTool(history: ChatHistory, renderer: DatastarElementRenderer, handler: ChatSessionHandler) =
     "/deny" bind sse { sse ->
         val denial = sse.datastarModel<ToolDenial>()
-        sse.sendMergeFragments(
+        sse.sendPatchElements(
             renderer(history.addToolDenied(denial.id)),
             selector = Selector.of("#" + denial.id)
         )
@@ -29,7 +29,7 @@ fun DenyTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handler: 
         handler.onToolReject(denial.toolName)
             .map { newState ->
                 when (newState) {
-                    is AwaitingApproval -> sse.sendMergeFragments(
+                    is AwaitingApproval -> sse.sendPatchElements(
                         renderer(
                             history.addAi(newState.contents),
                             history.addToolConsent(newState.pendingTools.first())
@@ -38,7 +38,7 @@ fun DenyTool(history: ChatHistory, renderer: DatastarFragmentRenderer, handler: 
                         Selector.of("#chat-container")
                     ).close()
 
-                    is Responding -> sse.sendMergeFragments(
+                    is Responding -> sse.sendPatchElements(
                         renderer(history.addAi(newState.contents)),
                         append,
                         Selector.of("#chat-container")

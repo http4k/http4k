@@ -11,11 +11,11 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.datastar.DatastarEvent
-import org.http4k.datastar.DatastarEvent.MergeSignals
+import org.http4k.datastar.DatastarEvent.PatchSignals
 import org.http4k.datastar.Signal
 import org.http4k.filter.debug
 import org.http4k.lens.accept
-import org.http4k.lens.datastarFragments
+import org.http4k.lens.datastarElements
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse
@@ -40,8 +40,8 @@ abstract class DatastarServerContract(
 
     private val sse = sse(
         "/signal" bind sse(GET to sse {
-            it.send(MergeSignals(Signal.of("oh signal1")).toSseEvent())
-            it.send(MergeSignals(Signal.of("oh signal2")).toSseEvent())
+            it.send(PatchSignals(Signal.of("oh signal1")).toSseEvent())
+            it.send(PatchSignals(Signal.of("oh signal2")).toSseEvent())
             it.close()
         })
     ).debug()
@@ -50,7 +50,7 @@ abstract class DatastarServerContract(
     fun before() {
         server = poly(
             routes("/noStream" hbind {
-                Response(OK).datastarFragments(DatastarEvent.MergeFragments("hello"))
+                Response(OK).datastarElements(DatastarEvent.PatchElements("hello"))
             }),
             sse
         ).asServer(serverConfig(0)).start()
@@ -70,8 +70,8 @@ abstract class DatastarServerContract(
             toList,
             equalTo(
                 listOf(
-                    Event("datastar-merge-signals", "signals oh signal1\nonlyIfMissing false"),
-                    Event("datastar-merge-signals", "signals oh signal2\nonlyIfMissing false")
+                    Event("datastar-patch-signals", "signals oh signal1\nonlyIfMissing false"),
+                    Event("datastar-patch-signals", "signals oh signal2\nonlyIfMissing false")
                 )
             )
         )
@@ -84,10 +84,9 @@ abstract class DatastarServerContract(
         assertThat(
             response.bodyString(),
             equalTo(
-                """event: datastar-merge-fragments
-data: fragments hello
-data: settleDuration 300
-data: mergeMode morph
+                """event: datastar-patch-elements
+data: elements hello
+data: mode outer
 data: useViewTransition false
 
 """
@@ -105,11 +104,11 @@ data: useViewTransition false
         )
 
         val actual = response.bodyString()
-        val expected = """event:datastar-merge-signals
+        val expected = """event:datastar-patch-signals
 data:signals oh signal1
 data:onlyIfMissing false
 
-event:datastar-merge-signals
+event:datastar-patch-signals
 data:signals oh signal2
 data:onlyIfMissing false
 
