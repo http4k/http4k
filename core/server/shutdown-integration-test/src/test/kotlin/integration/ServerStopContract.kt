@@ -13,6 +13,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.Http4kServer
@@ -21,6 +22,7 @@ import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import org.http4k.server.ServerConfig.UnsupportedStopMode
 import org.http4k.testing.ServerBackend
+import org.http4k.testing.ServerBackend.Companion.PORT
 import org.http4k.testing.ServerInDocker
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
@@ -65,7 +67,7 @@ abstract class ServerStopContract(
         val startTime = System.currentTimeMillis()
         while (true) {
             try {
-                assertThat(client(Request(GET, "${this.baseUrl}/health")), hasStatus(Status.OK))
+                assertThat(client(Request(GET, "${baseUrl}/health")), hasStatus(OK).and(hasBody(baseUrl)))
                 break;
             } catch (e: AssertionError) {
                 if (System.currentTimeMillis() - startTime >= 2000) {
@@ -78,7 +80,6 @@ abstract class ServerStopContract(
 
     private fun serverInDocker(stopMode: StopMode) = object : Http4kServer {
         val serverInDocker = ServerInDocker()
-        val port = 8000
         override fun start(): Http4kServer {
             val containerId = serverInDocker.start(backend, stopMode)
             return object : Http4kServer {
@@ -88,11 +89,11 @@ abstract class ServerStopContract(
                     return object : Http4kServer {
                         override fun start(): Http4kServer = error("already stopped")
                         override fun stop(): Http4kServer = error("already stopped")
-                        override fun port(): Int = port
+                        override fun port(): Int = PORT
                     }
                 }
 
-                override fun port(): Int = port
+                override fun port(): Int = PORT
             }
         }
 
@@ -205,6 +206,6 @@ abstract class ServerStopContract(
         inflightRequestThreads.forEach { it.join() }
 
         assertThat(responses, hasSize(equalTo(numberOfInflightRequests)))
-        assertThat(responses, allElements(hasStatus(Status.OK).and(hasBody("Hello"))))
+        assertThat(responses, allElements(hasStatus(OK).and(hasBody("Hello"))))
     }
 }

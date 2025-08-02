@@ -17,39 +17,43 @@ import org.http4k.server.Undertow
 
 enum class ServerBackend : (StopMode) -> ServerConfig {
     Apache {
-        override fun invoke(mode: StopMode) = ApacheServer(8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = ApacheServer(PORT, stopMode = mode)
     },
     Apache4 {
-        override fun invoke(mode: StopMode) = Apache4Server(8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = Apache4Server(PORT, stopMode = mode)
     },
     Jetty {
-        override fun invoke(mode: StopMode) = Jetty(port = 8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = Jetty(port = PORT, stopMode = mode)
     },
     JettyLoom {
-        override fun invoke(mode: StopMode) = JettyLoom(port = 8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = JettyLoom(port = PORT, stopMode = mode)
     },
     Helidon {
-        override fun invoke(mode: StopMode) = Helidon(port = 8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = Helidon(port = PORT, stopMode = mode)
     },
     KtorCIO {
-        override fun invoke(mode: StopMode) = KtorCIO(8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = KtorCIO(PORT, stopMode = mode)
     },
     KtorNetty {
-        override fun invoke(mode: StopMode) = KtorNetty(8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = KtorNetty(PORT, stopMode = mode)
     },
     Netty {
-        override fun invoke(mode: StopMode) = Netty(8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = Netty(PORT, stopMode = mode)
     },
     Ratpack {
-        override fun invoke(mode: StopMode) = Ratpack(port = 8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = Ratpack(PORT, stopMode = mode)
     },
     SunHttp {
-        override fun invoke(mode: StopMode) = SunHttp(port = 8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = SunHttp(PORT, stopMode = mode)
     },
     SunHttpLoom {
-        override fun invoke(mode: StopMode) = SunHttpLoom(port = 8000, stopMode = mode)
+        override fun invoke(mode: StopMode) = SunHttpLoom(PORT, stopMode = mode)
     },
     Undertow {
-        override fun invoke(mode: StopMode) = Undertow(port = 8000, mode)
+        override fun invoke(mode: StopMode) = Undertow(PORT, mode)
+    };
+
+    companion object {
+        const val PORT = 8000
     }
 }
