@@ -10,29 +10,29 @@ import org.http4k.ai.llm.chat.ChatSessionHandler
 import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
 import org.http4k.ai.llm.chat.ChatSessionState.Responding
 import org.http4k.core.Method.POST
-import org.http4k.datastar.MergeMode.append
+import org.http4k.datastar.MorphMode.append
 import org.http4k.datastar.Selector
 import org.http4k.format.asDatastarSignal
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
-import org.http4k.sse.sendMergeFragments
+import org.http4k.sse.sendPatchElements
 import org.http4k.sse.sendMergeSignals
-import org.http4k.template.DatastarFragmentRenderer
+import org.http4k.template.DatastarElementRenderer
 
-fun SendUserMessage(history: ChatHistory, renderer: DatastarFragmentRenderer, handler: ChatSessionHandler) =
+fun SendUserMessage(history: ChatHistory, renderer: DatastarElementRenderer, handler: ChatSessionHandler) =
     "/message" bind sse(
         POST to sse { sse ->
             val message = sse.datastarModel<IncomingMessage>().message
 
             sse
-                .sendMergeFragments(renderer(history.addUser(message)), append, Selector.of("#chat-container"))
+                .sendPatchElements(renderer(history.addUser(message)), append, Selector.of("#chat-container"))
                 .sendMergeSignals(ChatJson.asDatastarSignal(IncomingMessage("")))
 
             handler.onUserMessage(message)
                 .flatMap { handler.onUserMessage(message) }
                 .map { newState ->
                     when (newState) {
-                        is AwaitingApproval -> sse.sendMergeFragments(
+                        is AwaitingApproval -> sse.sendPatchElements(
                             renderer(
                                 history.addAi(newState.contents),
                                 history.addToolConsent(newState.pendingTools.first())
@@ -41,7 +41,7 @@ fun SendUserMessage(history: ChatHistory, renderer: DatastarFragmentRenderer, ha
                             Selector.of("#chat-container")
                         ).close()
 
-                        is Responding -> sse.sendMergeFragments(
+                        is Responding -> sse.sendPatchElements(
                             renderer(history.addAi(newState.contents)),
                             append,
                             Selector.of("#chat-container")

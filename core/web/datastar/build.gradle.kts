@@ -17,4 +17,12 @@ dependencies {
     api("dev.forkhandles:values4k:_")
 
     testImplementation(testFixtures(project(":http4k-core")))
+
+    // TEMP
+    testImplementation(project(":http4k-server-jetty"))
+    testImplementation(project(":http4k-web-datastar"))
+    testImplementation(project(":http4k-template-handlebars"))
+    testImplementation(project(":http4k-server-jetty"))
+    testImplementation(project(":http4k-format-moshi"))
+
 }

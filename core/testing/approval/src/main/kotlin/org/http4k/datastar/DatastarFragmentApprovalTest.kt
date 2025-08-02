@@ -5,7 +5,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.lens.datastarFragments
+import org.http4k.lens.datastarElements
 import org.http4k.testing.ApprovalSource
 import org.http4k.testing.ContentTypeAwareApprovalTest
 import org.http4k.testing.FileSystemApprovalSource
@@ -21,8 +21,8 @@ class DatastarFragmentApprovalTest(
     approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : ContentTypeAwareApprovalTest(ContentType.TEXT_EVENT_STREAM, testNamer, approvalSource) {
     override fun format(input: String): String = try {
-        val fragments = Body.datastarFragments().toLens()(Response(OK).body(input))
-            .flatMap { it.fragments.map { it.value } }
+        val fragments = Body.datastarElements().toLens()(Response(OK).body(input))
+            .flatMap { it.elements.map { it.value } }
             .joinToString("\n\n")
 
         formatXml("<span>$fragments</span>").removePrefix("<span>").removeSuffix("</span>")
