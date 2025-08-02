@@ -34,7 +34,6 @@ import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
-val a= Elicitation.Metadata.string.Format.DateTime
 object Elicitation {
 
     /**

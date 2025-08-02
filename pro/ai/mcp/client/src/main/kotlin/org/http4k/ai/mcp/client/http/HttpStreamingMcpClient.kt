@@ -76,7 +76,10 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.Long.Companion.MAX_VALUE
 import kotlin.concurrent.thread
 
 /**
@@ -95,7 +98,7 @@ class HttpStreamingMcpClient(
 
     private val sessionId = AtomicReference<SessionId>()
 
-    override fun start(): Result<ServerCapabilities, McpError> = http.send(
+    override fun start(overrideDefaultTimeout: Duration?): Result<ServerCapabilities, McpError> = http.send(
         McpInitialize, McpInitialize.Request(
             VersionedMcpEntity(name, version),
             capabilities,
@@ -105,6 +108,7 @@ class HttpStreamingMcpClient(
         .flatMap { it.first().asAOrFailure<McpInitialize.Response>() }
         .map(McpInitialize.Response::capabilities)
         .also {
+            val latch = CountDownLatch(1)
             thread(isDaemon = true) {
                 Http4kSseClient(
                     Request(GET, baseUri)
@@ -115,7 +119,10 @@ class HttpStreamingMcpClient(
                     .received()
                     .filterIsInstance<Event>()
                     .filter { it.event == "message" }
-                    .map { resultFrom { McpJson.parse(it.data) as MoshiObject } }
+                    .map {
+                        latch.countDown()
+                        resultFrom { McpJson.parse(it.data) as MoshiObject }
+                    }
                     .filterIsInstance<Success<MoshiObject>>()
                     .map { it.value }
                     .filter { it["method"] != null }
@@ -125,6 +132,8 @@ class HttpStreamingMcpClient(
                         callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
                     }
             }
+
+            latch.await(overrideDefaultTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)
         }
 
 

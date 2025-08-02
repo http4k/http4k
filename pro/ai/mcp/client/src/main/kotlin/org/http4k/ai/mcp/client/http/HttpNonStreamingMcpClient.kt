@@ -53,7 +53,7 @@ class HttpNonStreamingMcpClient(
 ) :
     McpClient {
 
-    override fun start() = Success(ServerCapabilities())
+    override fun start(overrideDefaultTimeout: Duration?) = Success(ServerCapabilities())
 
     override fun progress() = object : McpClient.RequestProgress {
         override fun onProgress(fn: (Progress) -> Unit) =

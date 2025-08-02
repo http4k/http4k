@@ -24,6 +24,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
+import java.time.Duration
 
 /**
  * Create an in-memory MCP test client - HTTP Streaming only. For Non-HTTP Streaming, use HttpNonStreamingMcpClient
@@ -46,7 +47,7 @@ class TestMcpClient(
     private val resources = TestingResources(sender)
     private val completions = TestingCompletions(sender)
 
-    override fun start(): McpResult<ServerCapabilities> {
+    override fun start(overrideDefaultTimeout: Duration?): McpResult<ServerCapabilities> {
         val initResponse = sender(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(McpEntity.of("client"), Version.of("1")),

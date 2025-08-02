@@ -56,7 +56,7 @@ abstract class AbstractMcpClient(
     private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
     protected val messageQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<McpNodeType>>()
 
-    override fun start(): McpResult<ServerCapabilities> {
+    override fun start(overrideDefaultTimeout: Duration?): McpResult<ServerCapabilities> {
         val startLatch = CountDownLatch(1)
 
         thread(isDaemon = true) {

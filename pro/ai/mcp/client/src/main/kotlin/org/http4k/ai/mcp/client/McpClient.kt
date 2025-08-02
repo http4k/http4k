@@ -25,7 +25,7 @@ import java.time.Duration
  * Client for the MCP protocol. Provides access to the various resources and tools on ths MCP Server
  */
 interface McpClient : AutoCloseable {
-    fun start(): McpResult<ServerCapabilities>
+    fun start(overrideDefaultTimeout: Duration? = null): McpResult<ServerCapabilities>
     fun stop() = close()
 
     fun tools(): Tools
