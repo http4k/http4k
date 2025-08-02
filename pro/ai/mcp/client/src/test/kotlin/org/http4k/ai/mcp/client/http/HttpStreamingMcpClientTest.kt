@@ -118,7 +118,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val mcpClient = clientFor(server.port())
 
-        mcpClient.start()
+        mcpClient.start(Duration.ofSeconds(1))
 
         val actual = mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
             .valueOrNull()
@@ -188,7 +188,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val latch = CountDownLatch(1)
 
-        mcpClient.start()
+        mcpClient.start(Duration.ofSeconds(1))
 
         mcpClient.tools().list().orThrow { error("bad things") }
 
@@ -252,7 +252,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
 
-        mcpClient.start()
+        mcpClient.start(Duration.ofSeconds(1))
 
         mcpClient.sampling().onSampled { samplingResponses.asSequence() }
 
@@ -308,7 +308,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 //
 //        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
 //
-//        mcpClient.start()
+//        mcpClient.start(Duration.ofSeconds(1))
 //
 //        mcpClient.elicitations()
 //            .onElicitation {
@@ -360,7 +360,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
 
-        mcpClient.start()
+        mcpClient.start(Duration.ofSeconds(1))
 
         val prog = AtomicReference<Progress>()
         mcpClient.progress().onProgress(fn = prog::set)
