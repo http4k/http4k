@@ -126,7 +126,7 @@ class ServerInDocker(private val events: Events = PrintEventsIfDebugFlagOn()) {
             dockerWorkspace("Dockerfile").toPath()
         )
 
-        val serverPackage = project("/build/distributions/http4k-server-shutdown-integration-test-LOCAL.zip")
+        val serverPackage = project("/build/distributions/http4k-server-shutdown-integration-test.zip")
 
         if (!serverPackage.exists()) {
             fail(
