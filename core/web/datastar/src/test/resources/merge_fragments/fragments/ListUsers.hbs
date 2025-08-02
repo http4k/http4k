@@ -1,0 +1,25 @@
+<div id="users">
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        {{#each users}}
+            <tr>
+                <td>{{firstName}} {{lastName}}</td>
+                <td>{{email}}</td>
+                <td>
+                    <button data-on-click="@get('/users/{{id}}/edit')">edit</button>
+                </td>
+                <td>
+                    <button data-on-click="@delete('/users/{{id}}/delete')">delete</button>
+                </td>
+            </tr>
+        {{/each}}
+
+    </table>
+    <button data-on-click="@get('/users/add')">add</button>
+</div>

@@ -17,4 +17,5 @@ dependencies {
     api("dev.forkhandles:values4k:_")
 
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(project(":http4k-server-jetty"))
 }

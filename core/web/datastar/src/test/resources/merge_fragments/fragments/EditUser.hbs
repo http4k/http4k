@@ -1,0 +1,18 @@
+<div id="users" data-signals='{{{ userString }}}'>
+    <label>
+        First Name
+        <input type="text" data-bind="firstName"/>
+    </label>
+    <label>
+        Last Name
+        <input type="text" data-bind="lastName"/>
+    </label>
+    <label>
+        Email
+        <input type="text" data-bind="email"/>
+    </label>
+    <div>
+        <button data-on-click="@patch('/users/{{user.id}}/update')">Save</button>
+        <button data-on-click="@get('/users')">Cancel</button>
+    </div>
+</div>

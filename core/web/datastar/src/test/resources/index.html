@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>http4k Datastar demo</title>
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <script type="module"
+            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
+    <style>
+        #contents {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        pre {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div
+    id="contents"
+    data-signals="{_contents: 'Click for Bad Apples', percentage: 0}"
+    data-on-click="@get('/bad_apple/updates')"
+>
+    <div><span data-text="$percentage.toFixed(2)"></span>%</div>
+    <div>
+        <pre data-text="$_contents"></pre>
+    </div>
+</div>
+</body>
+</html>
