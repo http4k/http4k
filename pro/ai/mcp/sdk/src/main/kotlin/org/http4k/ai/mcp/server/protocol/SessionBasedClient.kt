@@ -2,7 +2,6 @@ package org.http4k.ai.mcp.server.protocol
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
@@ -22,8 +21,9 @@ import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import java.time.Duration
-import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
@@ -38,7 +38,7 @@ class SessionBasedClient<Transport>(
 
     override fun elicit(request: ElicitationRequest, fetchNextTimeout: Duration?): McpResult<ElicitationResponse> {
         val id = McpMessageId.random(random)
-        val queue = LinkedBlockingDeque<ElicitationResponse>()
+        val queue = LinkedBlockingQueue<ElicitationResponse>()
         val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
 
         return when {
@@ -58,20 +58,22 @@ class SessionBasedClient<Transport>(
                     )
                 }
 
-                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
-                    null -> Failure(Timeout)
-                    else -> Success(nextMessage)
+                try {
+                    when {
+                        fetchNextTimeout != null -> queue.poll(fetchNextTimeout.toMillis(), MILLISECONDS)?.let { Success(it) } ?: Failure(Timeout)
+                        else -> Success(queue.take())
+                    }
+                } catch (_: InterruptedException) {
+                    Failure(Timeout)
                 }
             }
 
             else -> Failure(Protocol(InvalidRequest))
         }
-
     }
-
     override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
         val id = McpMessageId.random(random)
-        val queue = LinkedBlockingDeque<SamplingResponse>()
+        val queue = LinkedBlockingQueue<SamplingResponse>()
         val tracking = clientTracking() ?: return emptySequence()
 
         return when {
@@ -103,20 +105,18 @@ class SessionBasedClient<Transport>(
                 }
                 sequence {
                     while (true) {
-                        when (val nextMessage = queue.poll(
+                        val nextMessage = queue.poll(
                             fetchNextTimeout?.toMillis() ?: MAX_VALUE,
                             MILLISECONDS
-                        )) {
-                            null -> {
-                                yield(Failure(Timeout))
-                                break
-                            }
+                        )
 
-                            else -> {
-                                yield(Success(nextMessage))
-                                if (nextMessage.stopReason != null) break
-                            }
+                        if (nextMessage == null) {
+                            yield(Failure(Timeout))
+                            break
                         }
+
+                        yield(Success(nextMessage))
+                        if (nextMessage.stopReason != null) break
                     }
                 }
             }
