@@ -1,12 +1,12 @@
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.format.MoshiNode
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.ai.mcp.model.CompletionStatus
 import org.http4k.ai.mcp.model.CompletionStatus.Finished
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.format.MoshiNode
+import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
 
 class ClientTracking(initialize: McpInitialize.Request) {
@@ -21,9 +21,11 @@ class ClientTracking(initialize: McpInitialize.Request) {
     }
 
     fun processResult(id: McpMessageId, result: JsonRpcResult<MoshiNode>) {
-        synchronized(id) {
-            val done = calls[id]?.invoke(result) ?: Finished
-            if (done == Finished) calls.remove(id)
-        }
+        val done = calls[id]?.let {
+            synchronized(it) {
+                it(result)
+            }
+        } ?: Finished
+        if (done == Finished) calls.remove(id)
     }
 }
