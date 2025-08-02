@@ -3,7 +3,7 @@ package org.http4k.server
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.toParametersMap
@@ -24,6 +24,7 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
                                 }
                                 Http4kUndertowSseHandler(request, consumer).handleRequest(exchange)
                             }
+
                             else -> fallback.handleRequest(exchange)
                         }
                     }
@@ -36,5 +37,5 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
 }
 
 private fun HttpServerExchange.hasEventStreamContentType() =
-    requestHeaders["Accept"]?.any { it.equals(ContentType.TEXT_EVENT_STREAM.value, true) } ?: false
+    requestHeaders["Accept"]?.any { it.contains(TEXT_EVENT_STREAM.value, true) } ?: false
 
