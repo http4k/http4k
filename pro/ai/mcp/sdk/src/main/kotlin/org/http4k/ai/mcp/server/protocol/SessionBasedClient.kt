@@ -58,19 +58,17 @@ class SessionBasedClient<Transport>(
                     )
                 }
 
-                try {
-                    when {
-                        fetchNextTimeout != null -> queue.poll(fetchNextTimeout.toMillis(), MILLISECONDS)?.let { Success(it) } ?: Failure(Timeout)
-                        else -> Success(queue.take())
-                    }
-                } catch (_: InterruptedException) {
-                    Failure(Timeout)
+
+                when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                    null -> Failure(Timeout)
+                    else -> Success(nextMessage)
                 }
             }
 
             else -> Failure(Protocol(InvalidRequest))
         }
     }
+
     override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence<McpResult<SamplingResponse>> {
         val id = McpMessageId.random(random)
         val queue = LinkedBlockingQueue<SamplingResponse>()
@@ -103,20 +101,23 @@ class SessionBasedClient<Transport>(
                         ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
                     )
                 }
+
                 sequence {
                     while (true) {
-                        val nextMessage = queue.poll(
+                        when (val nextMessage = queue.poll(
                             fetchNextTimeout?.toMillis() ?: MAX_VALUE,
                             MILLISECONDS
-                        )
+                        )) {
+                            null -> {
+                                yield(Failure(Timeout))
+                                break
+                            }
 
-                        if (nextMessage == null) {
-                            yield(Failure(Timeout))
-                            break
+                            else -> {
+                                yield(Success(nextMessage))
+                                if (nextMessage.stopReason != null) break
+                            }
                         }
-
-                        yield(Success(nextMessage))
-                        if (nextMessage.stopReason != null) break
                     }
                 }
             }
