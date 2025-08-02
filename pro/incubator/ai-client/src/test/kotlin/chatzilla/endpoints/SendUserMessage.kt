@@ -16,7 +16,7 @@ import org.http4k.format.asDatastarSignal
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.sendPatchElements
-import org.http4k.sse.sendMergeSignals
+import org.http4k.sse.sendPatchSignals
 import org.http4k.template.DatastarElementRenderer
 
 fun SendUserMessage(history: ChatHistory, renderer: DatastarElementRenderer, handler: ChatSessionHandler) =
@@ -26,7 +26,7 @@ fun SendUserMessage(history: ChatHistory, renderer: DatastarElementRenderer, han
 
             sse
                 .sendPatchElements(renderer(history.addUser(message)), append, Selector.of("#chat-container"))
-                .sendMergeSignals(ChatJson.asDatastarSignal(IncomingMessage("")))
+                .sendPatchSignals(ChatJson.asDatastarSignal(IncomingMessage("")))
 
             handler.onUserMessage(message)
                 .flatMap { handler.onUserMessage(message) }

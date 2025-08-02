@@ -26,9 +26,9 @@ fun Sse.sendPatchElements(
     PatchElements(elements, morphMode, selector, useViewTransition, id).toSseEvent()
 )
 
-fun Sse.sendMergeSignals(vararg signals: Signal, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
-    sendMergeSignals(signals.toList(), onlyIfMissing, id)
+fun Sse.sendPatchSignals(vararg signals: Signal, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
+    sendPatchSignals(signals.toList(), onlyIfMissing, id)
 
-fun Sse.sendMergeSignals(signals: List<Signal>, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
+fun Sse.sendPatchSignals(signals: List<Signal>, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
     send(PatchSignals(signals, onlyIfMissing, id).toSseEvent())
 
