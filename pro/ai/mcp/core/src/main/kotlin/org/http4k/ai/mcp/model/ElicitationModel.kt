@@ -1,66 +1,146 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.asJsonObject
-import org.http4k.format.MoshiObject
-import kotlin.properties.ReadOnlyProperty
+import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-interface ElicitationModel {
-    fun string(vararg metadata: Elicitation.Metadata<String, *>) =
-        object : ReadOnlyProperty<ElicitationModel, String> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]!!
-                    .let { McpJson.text(it) }
-        }
+open class ElicitationModel {
 
-    fun optionalString(vararg metadata: Elicitation.Metadata<String, *>) =
-        object : ReadOnlyProperty<ElicitationModel, String?> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]
-                    ?.let { McpJson.text(it) }
-        }
+    private val data = mutableMapOf<String, Any?>()
 
-    fun long(vararg metadata: Elicitation.Metadata<Long, *>) = object : ReadOnlyProperty<ElicitationModel, Long> {
-        override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-            (thisRef.asJsonObject() as MoshiObject)[property.name]!!
-                .let { McpJson.integer(it) }
+    fun string(title: String, description: String, vararg metadata: Elicitation.Metadata<String, *>) =
+        ElicitationModelStringReadWriteProperty<String>(
+            data::get,
+            data::set,
+            title,
+            description,
+            true,
+            metadata.toList()
+        )
+
+    fun optionalString(title: String, description: String, vararg metadata: Elicitation.Metadata<String, *>) =
+        ElicitationModelStringReadWriteProperty<String?>(
+            data::get,
+            data::set,
+            title,
+            description,
+            false,
+            metadata.toList()
+        )
+
+    override fun equals(other: Any?) = when {
+        this === other -> true
+        other !is ElicitationModel -> false
+        data != other.data -> false
+        else -> true
     }
 
-    fun optionalLong(vararg metadata: Elicitation.Metadata<Long, *>) =
-        object : ReadOnlyProperty<ElicitationModel, Long?> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]
-                    ?.let { McpJson.integer(it) }
-        }
+    override fun hashCode() = data.hashCode()
 
-    fun integer(vararg metadata: Elicitation.Metadata<Int, *>) =
-        object : ReadOnlyProperty<ElicitationModel, Int> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]!!
-                    .let { McpJson.integer(it) }
-                    .toInt()
-        }
+//
+//    fun long(title: String, description: String, vararg metadata: Elicitation.Metadata<Long, *>) = object : ReadWriteProperty<ElicitationModel, Long> {
+//        override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
+//            (thisRef.asJsonObject() as MoshiObject)[property.name]!!
+//                .let { McpJson.integer(it) }
+//
+//        override fun setValue(
+//            thisRef: ElicitationModel,
+//            property: KProperty<*>,
+//            value: Long
+//        ) {
+//            TODO("Not yet implemented")
+//        }
+//    }
+//
+//    fun optionalLong(title: String, description: String, vararg metadata: Elicitation.Metadata<Long, *>) =
+//        object : ReadWriteProperty<ElicitationModel, Long?> {
+//            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
+//                (thisRef.asJsonObject() as MoshiObject)[property.name]
+//                    ?.let { McpJson.integer(it) }
+//
+//            override fun setValue(
+//                thisRef: ElicitationModel,
+//                property: KProperty<*>,
+//                value: Long?
+//            ) {
+//                TODO("Not yet implemented")
+//            }
+//        }
+//
+//    fun integer(title: String, description: String, vararg metadata: Elicitation.Metadata<Int, *>) =
+//        object : ReadWriteProperty<ElicitationModel, Int> {
+//            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
+//                (thisRef.asJsonObject() as MoshiObject)[property.name]!!
+//                    .let { McpJson.integer(it) }
+//                    .toInt()
+//
+//            override fun setValue(
+//                thisRef: ElicitationModel,
+//                property: KProperty<*>,
+//                value: Int
+//            ) {
+//                TODO("Not yet implemented")
+//            }
+//        }
+//
+//    fun optionalIntegar(title: String, description: String, vararg metadata: Elicitation.Metadata<Int, *>) =
+//        object : ReadWriteProperty<ElicitationModel, Int?> {
+//            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
+//                (thisRef.asJsonObject() as MoshiObject)[property.name]
+//                    ?.let { McpJson.integer(it) }
+//                    ?.toInt()
+//
+//            override fun setValue(
+//                thisRef: ElicitationModel,
+//                property: KProperty<*>,
+//                value: Int?
+//            ) {
+//                TODO("Not yet implemented")
+//            }
+//        }
+//
+//    fun boolean(title: String, description: String, vararg metadata: Elicitation.Metadata<Boolean, *>) =
+//        object : ReadWriteProperty<ElicitationModel, Boolean> {
+//            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
+//                (thisRef.asJsonObject() as MoshiObject)[property.name]!!
+//                    .let { McpJson.bool(it) }
+//
+//            override fun setValue(
+//                thisRef: ElicitationModel,
+//                property: KProperty<*>,
+//                value: Boolean
+//            ) {
+//                TODO("Not yet implemented")
+//            }
+//        }
+//
+//    fun optionalBoolean(title: String, description: String, vararg metadata: Elicitation.Metadata<Boolean, *>) =
+//        object : ReadWriteProperty<ElicitationModel, Boolean?> {
+//            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
+//                (thisRef.asJsonObject() as MoshiObject)[property.name]
+//                    ?.let { McpJson.bool(it) }
+//
+//            override fun setValue(
+//                thisRef: ElicitationModel,
+//                property: KProperty<*>,
+//                value: Boolean?
+//            ) {
+//                TODO("Not yet implemented")
+//            }
+//        }
+}
 
-    fun optionalIntegar(vararg metadata: Elicitation.Metadata<Int, *>) =
-        object : ReadOnlyProperty<ElicitationModel, Int?> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]
-                    ?.let { McpJson.integer(it) }
-                    ?.toInt()
-        }
+class ElicitationModelStringReadWriteProperty<T>(
+    private val get: (String) -> Any?,
+    private val set: (String, Any?) -> Unit,
+    val title: String,
+    val description: String,
+    val required: Boolean,
+    val metadata: List<Elicitation.Metadata<String, *>>
+) : ReadWriteProperty<ElicitationModel, T> {
+    @Suppress("UNCHECKED_CAST")
+    override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) = get(property.name) as T
 
-    fun boolean(vararg metadata: Elicitation.Metadata<Boolean, *>) =
-        object : ReadOnlyProperty<ElicitationModel, Boolean> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]!!
-                    .let { McpJson.bool(it) }
-        }
-
-    fun optionalBoolean(vararg metadata: Elicitation.Metadata<Boolean, *>) =
-        object : ReadOnlyProperty<ElicitationModel, Boolean?> {
-            override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
-                (thisRef.asJsonObject() as MoshiObject)[property.name]
-                    ?.let { McpJson.bool(it) }
-        }
+    override fun setValue(thisRef: ElicitationModel, property: KProperty<*>, value: T) {
+        set(property.name, value)
+    }
 }

@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.firstDeterministicSessionId
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationAction
+import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
@@ -278,13 +279,19 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         assertThat(eventStore.read(Session(firstDeterministicSessionId), null).toList().size, equalTo(5))
     }
 
-    data class FooBar(val foo: String, val bar: String)
+    class FooBar : ElicitationModel() {
+        var foo by string("foo", "bar")
+        var bar by optionalString("", "")
+    }
 
     @Test
     fun `can do elicitation`() {
-        val output = Elicitation.auto(FooBar("123", "324")).toLens("foo", "foo")
+        val output = Elicitation.auto(FooBar()).toLens("foo", "foo")
 
-        val response = FooBar("123", "324")
+        val response = FooBar().apply {
+            foo = "foo"
+            bar = "bar"
+        }
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
