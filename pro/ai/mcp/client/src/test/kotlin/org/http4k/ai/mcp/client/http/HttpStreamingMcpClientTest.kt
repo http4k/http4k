@@ -286,11 +286,10 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
     @Test
     fun `can do elicitation`() {
-        val output = Elicitation.auto(FooBar()).toLens("foo", "foo")
+        val output = Elicitation.auto(FooBar()).toLens("name", "it's a name")
 
         val response = FooBar().apply {
             foo = "foo"
-            bar = "bar"
         }
 
         val tools = ServerTools(

@@ -12,6 +12,8 @@ plugins {
 dependencies {
     api(platform("dev.forkhandles:forkhandles-bom:_"))
 
+    compileOnly("org.jetbrains.kotlin:kotlin-reflect:_")
+
     api(project(":http4k-realtime-core"))
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
