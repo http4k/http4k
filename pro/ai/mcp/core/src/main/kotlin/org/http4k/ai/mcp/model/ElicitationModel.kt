@@ -1,13 +1,12 @@
 package org.http4k.ai.mcp.model
 
-import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.recover
-import dev.forkhandles.result4k.resultFrom
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.StringParam
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 
 open class ElicitationModel {
 
@@ -15,12 +14,29 @@ open class ElicitationModel {
 
     private fun properties() =
         (this::class as KClass<ElicitationModel>).memberProperties
-            .filter {
-                it.isAccessible = true
-                it.getDelegate(this) is ElicitationModelStringReadWriteProperty<*>
-            }
+            .mapNotNull { p ->
+                (p.getDelegate(this) as? ElicitationModelStringReadWriteProperty<*>)
+                    ?.let { p.name to it }
+            }.toMap()
 
-    internal fun validate() = resultFrom { properties().forEach { it.get(this) } }.map { true }.recover { false }
+    fun toSchema() =
+        McpJson {
+            obj(
+                "type" to string("object"),
+                "required" to array(properties().filter { it.value.required }.map { string(it.key) }),
+                "properties" to obj(
+                    properties()
+                        .map {
+                            it.key to obj(
+                                "type" to string(it.value.type.description),
+                                "description" to string(it.value.description),
+                                "title" to string(it.value.title),
+                            )
+                        }
+                )
+            )
+
+        }
 
     fun string(title: String, description: String, vararg metadata: Elicitation.Metadata<String, *>) =
         ElicitationModelStringReadWriteProperty<String>(
@@ -28,6 +44,7 @@ open class ElicitationModel {
             data::set,
             title,
             description,
+            StringParam,
             true,
             metadata.toList()
         )
@@ -38,6 +55,7 @@ open class ElicitationModel {
             data::set,
             title,
             description,
+            StringParam,
             false,
             metadata.toList()
         )
@@ -148,13 +166,13 @@ class ElicitationModelStringReadWriteProperty<T>(
     private val set: (String, Any?) -> Unit,
     val title: String,
     val description: String,
+    val type: ParamMeta,
     val required: Boolean,
     val metadata: List<Elicitation.Metadata<String, *>>
 ) : ReadWriteProperty<ElicitationModel, T> {
+
     @Suppress("UNCHECKED_CAST")
     override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) = get(property.name) as T
 
-    override fun setValue(thisRef: ElicitationModel, property: KProperty<*>, value: T) {
-        set(property.name, value)
-    }
+    override fun setValue(thisRef: ElicitationModel, property: KProperty<*>, value: T) = set(property.name, value)
 }
