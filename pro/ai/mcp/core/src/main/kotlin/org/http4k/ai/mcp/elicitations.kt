@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.lens.McpLensTarget
+import org.http4k.lens.ParamMeta.ObjectParam
 
 /**
  *  Processes a elicitation request from an MCP server to a client
@@ -37,7 +38,18 @@ data class ElicitationRequest(
         message: String,
         vararg outputs: McpCapabilityLens<ElicitationResponse, *>,
         progressToken: ProgressToken? = null
-    ) : this(message, toSchema(outputs.toList()), progressToken)
+    ) : this(
+        message,
+        when {
+            outputs.first().meta.paramMeta == ObjectParam -> when (outputs.size) {
+                1 -> outputs.first().toSchema()
+                else -> error("only one Object allowed in outputs")
+            }
+
+            else -> toSchema(outputs.toList())
+        },
+        progressToken
+    )
 }
 
 private fun toSchema(outputs: List<McpCapabilityLens<ElicitationResponse, *>>) = obj(

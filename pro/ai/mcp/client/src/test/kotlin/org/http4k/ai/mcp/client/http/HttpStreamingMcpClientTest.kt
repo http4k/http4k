@@ -5,9 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.orThrow
-import dev.forkhandles.result4k.resultFrom
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationRequest
@@ -289,31 +287,19 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
     fun `can do elicitation`() {
         val output = Elicitation.auto(FooBar()).toLens("name", "it's a name")
 
-        val response = FooBar().apply {
-            foo = "foo"
-        }
+        val response = FooBar().apply { foo = "foo" }
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
-
-                val received =
-                    resultFrom {
-                        val request = ElicitationRequest("foobar", output, progressToken = it.meta.progress)
-                        System.err.println("HELLO!")
-                        it.client.elicit(
-                            request,
-                            Duration.ofSeconds(1)
-                        )
-                    }.onFailure {
-                        it.reason.printStackTrace()
-                        error("bad things")
-                    }
+                val request = ElicitationRequest("foobar", output, progressToken = it.meta.progress)
+                val received = it.client.elicit(request, Duration.ofSeconds(1))
 
                 assertThat(
                     received,
                     equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
                 )
 
+                println(response)
                 assertThat(output(received.valueOrNull()!!), equalTo(response))
 
                 Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))

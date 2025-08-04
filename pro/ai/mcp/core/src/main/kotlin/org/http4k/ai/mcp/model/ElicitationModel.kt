@@ -21,7 +21,11 @@ abstract class ElicitationModel {
                     ?.let { p.name to it }
             }.toMap()
 
-    fun toSchema() =
+    override fun toString() = (this::class.simpleName + "(" +
+        properties().map { (k, _) -> "$k=${data[k]}" }.joinToString(", ") +
+        ")").also { println(it) }
+
+    internal fun toSchema() =
         McpJson {
             obj(
                 "type" to string("object"),
@@ -37,7 +41,6 @@ abstract class ElicitationModel {
                         }
                 )
             )
-
         }
 
     fun string(title: String, description: String, vararg metadata: Elicitation.Metadata<String, *>) =
@@ -70,7 +73,7 @@ abstract class ElicitationModel {
     }
 
     override fun hashCode() = data.hashCode()
-}
+
 //
 //    fun long(title: String, description: String, vararg metadata: Elicitation.Metadata<Long, *>) = object : ReadWriteProperty<ElicitationModel, Long> {
 //        override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) =
@@ -162,6 +165,7 @@ abstract class ElicitationModel {
 //                TODO("Not yet implemented")
 //            }
 //        }
+}
 
 class ElicitationModelStringReadWriteProperty<T>(
     private val get: (String) -> Any?,

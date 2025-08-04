@@ -14,6 +14,11 @@ class ElicitationModelTest {
     fun `creates schema`(approver: Approver) {
         approver.assertApproved(McpJson.asFormatString(Foo().toSchema()), APPLICATION_JSON)
     }
+
+    @Test
+    fun `represent as string`() {
+        assert(Foo().apply { foo = "asd" }.toString() == "Foo(bar=null, foo=asd)")
+    }
 }
 
 class Foo : ElicitationModel() {
