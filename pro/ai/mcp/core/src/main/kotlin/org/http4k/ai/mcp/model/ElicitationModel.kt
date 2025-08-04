@@ -7,14 +7,17 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
-open class ElicitationModel {
+abstract class ElicitationModel {
 
     private val data = mutableMapOf<String, Any?>()
 
+    @Suppress("UNCHECKED_CAST")
     private fun properties() =
         (this::class as KClass<ElicitationModel>).memberProperties
             .mapNotNull { p ->
+                p.isAccessible = true
                 (p.getDelegate(this) as? ElicitationModelStringReadWriteProperty<*>)
                     ?.let { p.name to it }
             }.toMap()

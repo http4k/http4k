@@ -5,7 +5,9 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.orThrow
+import dev.forkhandles.result4k.resultFrom
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationRequest
@@ -65,7 +67,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.debugMcp
 import org.http4k.format.auto
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
@@ -294,11 +295,20 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
-                val request = ElicitationRequest("foobar", output, progressToken = it.meta.progress)
-                val received = it.client.elicit(
-                    request,
-                    Duration.ofSeconds(1)
-                )
+
+                val received =
+                    resultFrom {
+                        val request = ElicitationRequest("foobar", output, progressToken = it.meta.progress)
+                        System.err.println("HELLO!")
+                        it.client.elicit(
+                            request,
+                            Duration.ofSeconds(1)
+                        )
+                    }.onFailure {
+                        it.reason.printStackTrace()
+                        error("bad things")
+                    }
+
                 assertThat(
                     received,
                     equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
@@ -320,14 +330,13 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
             tools = tools,
         )
 
-        val mcpClient = clientFor(toPolyHandler(protocol).debugMcp().asServer(JettyLoom(0)).start().port())
+        val mcpClient = clientFor(toPolyHandler(protocol).asServer(JettyLoom(0)).start().port())
 
         mcpClient.start(Duration.ofSeconds(1))
 
-        mcpClient.elicitations()
-            .onElicitation {
-                ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!)).with(output of response)
-            }
+        mcpClient.elicitations().onElicitation {
+            ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!)).with(output of response)
+        }
 
         assertThat(
             mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
