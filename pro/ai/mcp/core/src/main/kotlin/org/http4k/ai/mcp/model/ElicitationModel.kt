@@ -15,6 +15,10 @@ import kotlin.reflect.jvm.isAccessible
 /**
  * Superclass for all elicitation models. Creates a JSON schema for the model and provides
  * properties for defining the model's fields.
+ *
+ * Extend this class to create a custom elicitation model and define properties via delegation.
+ *
+ * Note: Requires Kotlin-reflect dependency to introspect properties.
  */
 abstract class ElicitationModel {
 
