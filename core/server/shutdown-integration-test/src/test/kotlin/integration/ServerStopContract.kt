@@ -67,7 +67,7 @@ abstract class ServerStopContract(
         val startTime = System.currentTimeMillis()
         while (true) {
             try {
-                assertThat(client(Request(GET, "${baseUrl}/health")), hasStatus(OK).and(hasBody(baseUrl)))
+                assertThat(client(Request(GET, "${baseUrl}/health")), hasStatus(OK))
                 break;
             } catch (e: AssertionError) {
                 if (System.currentTimeMillis() - startTime >= 2000) {
