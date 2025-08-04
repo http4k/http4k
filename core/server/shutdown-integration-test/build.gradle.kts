@@ -21,6 +21,7 @@ dependencies {
     api(project(":http4k-server-netty"))
     api(project(":http4k-server-ktornetty"))
     api(project(":http4k-server-ktorcio"))
+    api(project(":http4k-client-okhttp"))
     api(project(":http4k-platform-core"))
     api(project(":http4k-config"))
     api(project(":http4k-format-jackson"))

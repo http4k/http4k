@@ -11,7 +11,6 @@ import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import com.github.dockerjava.transport.DockerHttpClient
-import okhttp3.internal.toImmutableList
 import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.events.Event
@@ -165,7 +164,7 @@ class ServerInDocker(private val events: Events = PrintEventsIfDebugFlagOn()) {
                     }
                 }
             }).awaitCompletion()
-        return list.toImmutableList()
+        return list.toList()
     }
 
     private fun waitForContainerToDisappear(id: String) {
