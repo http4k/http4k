@@ -1,5 +1,10 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.util.McpJson.asJsonObject
+import org.http4k.ai.mcp.util.McpJson.obj
+import org.http4k.ai.mcp.util.McpJson.string
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.lens.LensExtractor
@@ -8,11 +13,6 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.ai.mcp.ElicitationResponse
-import org.http4k.ai.mcp.util.McpJson.asJsonObject
-import org.http4k.ai.mcp.util.McpJson.obj
-import org.http4k.ai.mcp.util.McpJson.string
-import org.http4k.ai.mcp.util.McpNodeType
 
 open class ElicitationLensSpec<OUT : Any?>(
     internal val paramMeta: ParamMeta,
@@ -101,7 +101,7 @@ open class ElicitationLensSpec<OUT : Any?>(
         toSchema(it, metadata.mapValues { it.value as MoshiNode })
     }
 
-    private fun metaFor(
+    protected fun metaFor(
         required: Boolean,
         name: String,
         title: String,
@@ -127,3 +127,4 @@ open class ElicitationLensSpec<OUT : Any?>(
             values.fold(target) { m, v -> m.copy(content = asJsonObject(v)) }
         }, { obj(it.toList()) })
 }
+
