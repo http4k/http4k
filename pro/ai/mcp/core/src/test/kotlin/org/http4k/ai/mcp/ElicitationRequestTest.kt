@@ -9,12 +9,14 @@ import org.http4k.ai.mcp.model.Elicitation.Metadata.string.Format.Date
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MinLength
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.Pattern
+import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.boolean
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.number
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.util.McpJson.pretty
+import org.http4k.format.auto
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
@@ -26,7 +28,6 @@ class ElicitationRequestTest {
 
     @Test
     fun `can create schema from outputs`(approver: Approver) {
-
         val request = ElicitationRequest(
             "foo",
             Elicitation.string().required(
@@ -56,6 +57,19 @@ class ElicitationRequestTest {
         )
         approver.assertApproved(pretty(request.requestedSchema), APPLICATION_JSON)
     }
+
+    @Test
+    fun `can create schema from model`(approver: Approver) {
+        val request = ElicitationRequest(
+            "foo",
+            Elicitation.auto(BarFoo()).toLens("model", "description")
+        )
+        approver.assertApproved(pretty(request.requestedSchema), APPLICATION_JSON)
+    }
+}
+
+class BarFoo: ElicitationModel() {
+    var foo by string("foo", "the foo", MinLength(1), MaxLength(10))
 }
 
 enum class Option {

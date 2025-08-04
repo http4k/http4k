@@ -1,5 +1,7 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumNames
+import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
@@ -17,11 +19,31 @@ class ElicitationModelTest {
 
     @Test
     fun `represent as string`() {
-        assert(Foo().apply { foo = "asd" }.toString() == "Foo(bar=null, foo=asd)")
+        assert(Foo().apply {
+            s = "asd"
+            i = 123
+            d = 1.23
+            b = true
+            e = FooEnum.A
+        }.toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
     }
 }
 
 class Foo : ElicitationModel() {
-    var foo by string("foo", "the foo")
-    var bar by optionalString("bar", "the bar")
+    var s by string("s", "the s", MaxLength(10))
+    var os by optionalString("os", "the os")
+    var e by enum("e", "the e", EnumNames(FooEnum.entries.associateWith { it.name.lowercase() }))
+    var oe by enum<FooEnum>("oe", "the oe")
+    var l by long("l", "the l")
+    var ol by long("ol", "the ol")
+    var i by int("i", "the i")
+    var oi by optionalInt("oi", "the oi")
+    var d by double("d", "the d")
+    var od by optionalDouble("od", "the od")
+    var b by boolean("b", "the b")
+    var ob by optionalBoolean("ob", "the ob")
+}
+
+enum class FooEnum {
+    A, B, C
 }

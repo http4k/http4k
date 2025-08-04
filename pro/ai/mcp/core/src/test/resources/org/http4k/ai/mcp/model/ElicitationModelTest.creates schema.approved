@@ -1,18 +1,86 @@
 {
   "type": "object",
   "required": [
-    "foo"
+    "b",
+    "d",
+    "e",
+    "i",
+    "l",
+    "oe",
+    "ol",
+    "s"
   ],
   "properties": {
-    "bar": {
-      "type": "string",
-      "description": "the bar",
-      "title": "bar"
+    "b": {
+      "type": "boolean",
+      "description": "the b",
+      "title": "b"
     },
-    "foo": {
+    "d": {
+      "type": "number",
+      "description": "the d",
+      "title": "d"
+    },
+    "e": {
       "type": "string",
-      "description": "the foo",
-      "title": "foo"
+      "description": "the e",
+      "title": "e",
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "enumNames": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    "i": {
+      "type": "integer",
+      "description": "the i",
+      "title": "i"
+    },
+    "l": {
+      "type": "integer",
+      "description": "the l",
+      "title": "l"
+    },
+    "ob": {
+      "type": "boolean",
+      "description": "the ob",
+      "title": "ob"
+    },
+    "od": {
+      "type": "number",
+      "description": "the od",
+      "title": "od"
+    },
+    "oe": {
+      "type": "string",
+      "description": "the oe",
+      "title": "oe"
+    },
+    "oi": {
+      "type": "integer",
+      "description": "the oi",
+      "title": "oi"
+    },
+    "ol": {
+      "type": "integer",
+      "description": "the ol",
+      "title": "ol"
+    },
+    "os": {
+      "type": "string",
+      "description": "the os",
+      "title": "os"
+    },
+    "s": {
+      "type": "string",
+      "description": "the s",
+      "title": "s",
+      "maxLength": 10
     }
   }
 }
