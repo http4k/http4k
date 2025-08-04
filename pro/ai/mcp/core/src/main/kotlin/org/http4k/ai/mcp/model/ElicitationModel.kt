@@ -13,7 +13,6 @@ abstract class ElicitationModel {
 
     private val data = mutableMapOf<String, Any?>()
 
-    @Suppress("UNCHECKED_CAST")
     private fun properties() =
         (this::class as KClass<ElicitationModel>).memberProperties
             .mapNotNull { p ->
