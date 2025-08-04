@@ -66,12 +66,12 @@ abstract class ElicitationModel {
     fun optionalBoolean(title: String, description: String, vararg metadata: Elicitation.Metadata<Boolean, *>) =
         optional(title, description, BooleanParam, metadata)
 
-    private fun <T> required(
+    private fun <OUT> required(
         title: String,
         description: String,
         meta: ParamMeta,
-        metadata: Array<out Elicitation.Metadata<T, *>>
-    ): ElicitationModelStringReadWriteProperty<T> = ElicitationModelStringReadWriteProperty(
+        metadata: Array<out Elicitation.Metadata<OUT, *>>
+    ): ElicitationModelStringReadWriteProperty<OUT> = ElicitationModelStringReadWriteProperty(
         data::get,
         data::set,
         title,
@@ -81,12 +81,12 @@ abstract class ElicitationModel {
         metadata.toList()
     )
 
-    private fun <T> optional(
+    private fun <OUT> optional(
         title: String,
         description: String,
         meta: ParamMeta,
-        metadata: Array<out Elicitation.Metadata<T, *>>
-    ): ElicitationModelStringReadWriteProperty<T> = ElicitationModelStringReadWriteProperty(
+        metadata: Array<out Elicitation.Metadata<OUT, *>>
+    ): ElicitationModelStringReadWriteProperty<OUT> = ElicitationModelStringReadWriteProperty(
         data::get,
         data::set,
         title,
