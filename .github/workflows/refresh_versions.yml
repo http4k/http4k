@@ -1,6 +1,4 @@
-# Worfklow for https://jmfayard.github.io/refreshVersions/
-
-name: Refresh Dependencies
+name: Update Dependencies
 
 on:
   workflow_dispatch:
@@ -8,43 +6,80 @@ on:
     - cron: '0 7 * * 1'
 
 jobs:
-  refresh-versions:
-    name: Check New Versions
+  update-dependencies:
+    name: Update Version Catalog
     runs-on: "ubuntu-latest"
     steps:
-      - name: check-out
+      - name: Checkout repository
         uses: actions/checkout@v4.2.2
         with:
           ref: master
-      - name: setup-java
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          distribution: adopt
+          distribution: temurin
           java-version: 21
+      
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: create-branch
-        uses: peterjgrainger/action-create-branch@v3.0.0
-        with:
-          branch: dependency-update
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Gradle
-        run: ./gradlew refreshVersions
-      - name: Commit
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: GitHub Actions
-          author_email: noreply@github.com
-          message: Refresh versions.properties
-          new_branch: dependency-update
-          push: --force --set-upstream origin dependency-update
-      - name: Pull Request
+        
+      - name: Create dependency update branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -b dependency-update
+      
+      - name: Update version catalog
+        run: ./gradlew versionCatalogUpdate --no-daemon
+      
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in version catalog"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          fi
+      
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git add gradle/libs.versions.toml
+          git commit -m "Update dependency versions
+
+          🤖 Automated dependency update using version-catalog-update-plugin
+          
+          This PR was automatically created by GitHub Actions to update dependencies to their latest versions."
+          git push --force --set-upstream origin dependency-update
+      
+      - name: Create Pull Request
+        if: steps.verify-changed-files.outputs.changed == 'true'
         uses: repo-sync/pull-request@v2
         with:
           source_branch: dependency-update
           destination_branch: master
-          pr_title: Upgrade gradle dependencies
-          pr_body: '[refreshVersions](https://github.com/jmfayard/refreshVersions) has found those library updates!'
+          pr_title: "🔄 Update dependencies to latest versions"
+          pr_body: |
+            ## 🤖 Automated Dependency Update
+            
+            This PR was automatically created to update dependencies to their latest versions using the [version-catalog-update-plugin](https://github.com/littlerobots/version-catalog-update-plugin).
+            
+            ### Changes
+            - Updated `gradle/libs.versions.toml` with latest stable dependency versions
+            
+            ### What to do next
+            1. Review the changes in `gradle/libs.versions.toml`
+            2. Run tests locally or wait for CI to complete
+            3. Merge if all tests pass
+            
+            **Note:** Only stable versions are included in this update.
           pr_draft: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: No changes
+        if: steps.verify-changed-files.outputs.changed == 'false'
+        run: echo "No dependency updates available"
