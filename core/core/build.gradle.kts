@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(Kotlin.stdlib)
+    api(libs.kotlin.stdlib)
     implementation(libs.result4k)
     implementation(libs.values4k)
 
