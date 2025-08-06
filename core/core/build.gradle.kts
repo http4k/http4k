@@ -13,7 +13,7 @@ dependencies {
     implementation(libs.result4k)
     implementation(libs.values4k)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation(libs.junit.jupiter.params)
 
     testFixturesImplementation(platform("io.opentelemetry:opentelemetry-bom:_"))
     testFixturesImplementation("io.opentelemetry:opentelemetry-sdk")
@@ -28,5 +28,5 @@ dependencies {
     testFixturesApi(project(":http4k-client-websocket"))
     testFixturesApi(project(":http4k-server-apache"))
     testFixturesApi(libs.mock4k)
-    testFixturesApi("org.webjars:swagger-ui:_")
+    testFixturesApi(libs.swagger.ui)
 }

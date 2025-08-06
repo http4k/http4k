@@ -14,5 +14,5 @@ dependencies {
     api("io.undertow:undertow-core:_")
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation(libs.junit.jupiter.params)
 }
