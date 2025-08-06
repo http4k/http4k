@@ -8,6 +8,8 @@ com-google-devtools-ksp = "2.2.0-2.0.2"
 nu-studer-rocker = "3.0.5"
 org-openapi-generator = "7.14.0"
 com-microsoft-azure-azurefunctions = "1.11.1"
+com-github-ben-manes-versions = "0.51.0"
+gradle-use-latest-versions = "0.2.18"
 
 # Core versions
 kotlin = "2.2.0"
@@ -33,6 +35,7 @@ apache-httpasyncclient = "4.1.5"
 apache-httpclient5 = "5.5"
 apache-httpcore5 = "5.3.4"
 jetty-bom = "12.0.23"
+jetty11-bom = "11.0.20"
 undertow-core = "2.3.18.Final"
 netty-codec-http2 = "4.2.3.Final"
 
@@ -199,6 +202,12 @@ apache-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", versi
 
 # HTTP Servers
 jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
+jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
+jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
+jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
+jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
+jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
+jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
 helidon-bom = { module = "io.helidon:helidon-bom", version.ref = "helidon-bom" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "netty-codec-http2" }
@@ -229,6 +238,11 @@ exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", versio
 # Observability
 micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer-core" }
 opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-bom" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-bom" }
+opentelemetry-sdk-metrics = { module = "io.opentelemetry:opentelemetry-sdk-metrics", version.ref = "opentelemetry-bom" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-bom" }
+opentelemetry-extension-trace-propagators = { module = "io.opentelemetry:opentelemetry-extension-trace-propagators", version.ref = "opentelemetry-bom" }
+opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry-bom" }
 resilience4j-bom = { module = "io.github.resilience4j:resilience4j-bom", version.ref = "resilience4j-bom" }
 failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
 
@@ -351,3 +365,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "com-github-johnrengelman-shadow" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
 rocker = { id = "nu.studer.rocker", version.ref = "nu-studer-rocker" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }
+use-latest-versions = { id = "se.patrikerdes.use-latest-versions", version.ref = "gradle-use-latest-versions" }

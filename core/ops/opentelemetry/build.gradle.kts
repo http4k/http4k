@@ -12,12 +12,12 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-ops-core"))
     api(platform(libs.opentelemetry.bom))
-    api("io.opentelemetry:opentelemetry-sdk")
-    api("io.opentelemetry:opentelemetry-sdk-metrics")
+    api(libs.opentelemetry.sdk)
+    api(libs.opentelemetry.sdk.metrics)
     api(libs.opentelemetry.semconv)
     api(libs.opentelemetry.semconv.incubating)
-    testFixturesApi("io.opentelemetry:opentelemetry-extension-trace-propagators")
-    testFixturesApi("io.opentelemetry:opentelemetry-sdk-testing")
+    testFixturesApi(libs.opentelemetry.extension.trace.propagators)
+    testFixturesApi(libs.opentelemetry.sdk.testing)
 
     testImplementation(testFixtures(project(":http4k-core")))
 }

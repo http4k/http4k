@@ -13,18 +13,16 @@ dependencies {
     api(project(":http4k-realtime-core"))
     api(project(":http4k-bridge-servlet"))
 
-    val jettyVersion = "11.0.20"
-    api(platform("org.eclipse.jetty:jetty-bom:$jettyVersion"))
-
-    api("org.eclipse.jetty:jetty-server:$jettyVersion")
-    api("org.eclipse.jetty:jetty-servlet:$jettyVersion")
+    api(platform(libs.jetty11.bom))
+    api(libs.jetty11.server)
+    api(libs.jetty11.servlet)
     api(libs.jakarta.servlet.api)
 
-    api("org.eclipse.jetty.websocket:websocket-core-server:$jettyVersion")
+    api(libs.jetty11.websocket.core.server)
 
     // this list is for reference since http2 support is optional
-    implementation("org.eclipse.jetty.http2:http2-server:$jettyVersion")
-    implementation("org.eclipse.jetty:jetty-alpn-java-server:$jettyVersion")
+    implementation(libs.jetty11.http2.server)
+    implementation(libs.jetty11.alpn.java.server)
     implementation(libs.alpn.boot)
 
     testImplementation(testFixtures(project(":http4k-core")))
