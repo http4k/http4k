@@ -11,7 +11,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-format-core"))
-    api(KotlinX.dataframe)
+    api(libs.kotlinx.dataframe)
     testImplementation(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))

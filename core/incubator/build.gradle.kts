@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
 
-    api(Square.moshi.adapters)
+    api(libs.moshi.adapters)
     implementation(project(mapOf("path" to ":http4k-testing-webdriver")))
 
     compileOnly(platform(libs.junit.bom))

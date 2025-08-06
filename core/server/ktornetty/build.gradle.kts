@@ -12,7 +12,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-bridge-ktor"))
-    api(Ktor.server.netty)
+    api(libs.ktor.server.netty)
     testImplementation(testFixtures(project(":http4k-core")))
 }
 

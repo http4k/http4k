@@ -28,7 +28,7 @@ dependencies {
 
     api(libs.hikaricp)
     api(platform(libs.exposed.bom))
-    api(JetBrains.exposed.core)
-    api(JetBrains.exposed.jdbc)
+    api(libs.exposed.core)
+    api(libs.exposed.jdbc)
     api(libs.exposed.java.time)
 }

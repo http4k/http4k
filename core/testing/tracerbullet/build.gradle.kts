@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
-    api(Square.moshi.adapters)
+    api(libs.moshi.adapters)
     implementation(platform(libs.junit.bom))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
 

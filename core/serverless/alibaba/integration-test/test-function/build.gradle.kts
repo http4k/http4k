@@ -1,7 +1,7 @@
 description = "Testing against a functions deployed to ACF"
 
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.http4k.conventions")
 }
 

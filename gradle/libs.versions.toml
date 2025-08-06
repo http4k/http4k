@@ -182,6 +182,7 @@ konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
 jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-datatype-guava" }
@@ -221,6 +222,8 @@ mysql-connector-java = { module = "mysql:mysql-connector-java", version.ref = "m
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
 exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "jetbrains-exposed" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "jetbrains-exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "jetbrains-exposed" }
 exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "jetbrains-exposed" }
 
 # Observability
@@ -303,6 +306,11 @@ ratpack-core = { module = "io.ratpack:ratpack-core", version.ref = "ratpack-core
 micronaut-http = { module = "io.micronaut:micronaut-http", version.ref = "micronaut-http" }
 vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor" }
+
+# KotlinX
+kotlinx-dataframe = { module = "org.jetbrains.kotlinx:dataframe", version.ref = "kotlinx-dataframe" }
 
 # Utilities (additional)
 base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "base16-encoding" }
