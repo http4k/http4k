@@ -17,7 +17,7 @@ dependencies {
     implementation("org.springframework:spring-context:_")
     
     testImplementation(project(":http4k-testing-hamkrest"))
-    testImplementation("org.springframework:spring-test:_")
+    testImplementation(libs.spring.test)
     testFixturesApi(testFixtures(project(":http4k-bridge-servlet")))
     testRuntimeOnly("com.fasterxml.jackson.core:jackson-databind:_")
 }

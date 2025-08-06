@@ -163,6 +163,7 @@ gradle-license-report = "2.9"
 [libraries]
 # Kotlin
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
 # Testing
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
@@ -173,6 +174,9 @@ kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref 
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
+hamkrest = { module = "com.natpryce:hamkrest", version.ref = "hamkrest" }
+apiguardian-api = { module = "org.apiguardian:apiguardian-api", version.ref = "apiguardian-api" }
+konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
 
 # Serialization
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
@@ -200,6 +204,9 @@ netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "nett
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
 alpn-boot = { module = "org.mortbay.jetty.alpn:alpn-boot", version.ref = "alpn-boot" }
 
+# Spring Framework
+spring-test = { module = "org.springframework:spring-test", version.ref = "spring-test" }
+
 # Cloud/AWS
 aws-lambda-java-core = { module = "com.amazonaws:aws-lambda-java-core", version.ref = "aws-lambda-java-core" }
 aws-lambda-java-events = { module = "com.amazonaws:aws-lambda-java-events", version.ref = "aws-lambda-java-events" }
@@ -212,6 +219,7 @@ h2 = { module = "com.h2database:h2", version.ref = "h2" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 mysql-connector-java = { module = "mysql:mysql-connector-java", version.ref = "mysql-connector-java" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
 
 # Observability
 micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer-core" }
@@ -242,6 +250,9 @@ avro = { module = "org.apache.avro:avro", version.ref = "avro" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "java-websocket" }
 underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
+docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
+docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
+rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker-compiler" }
 
 # Kotshi
 kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }

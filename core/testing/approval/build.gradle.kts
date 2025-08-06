@@ -15,7 +15,7 @@ dependencies {
 
     api(platform(libs.junit.bom))
     api("org.junit.jupiter:junit-jupiter-api")
-    implementation("com.natpryce:hamkrest:_")
+    implementation(libs.hamkrest)
     api(project(":http4k-format-jackson-yaml"))
     implementation(project(":http4k-api-cloudevents"))
     implementation(project(":http4k-web-datastar"))

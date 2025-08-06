@@ -11,6 +11,6 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     implementation(project(":http4k-format-core"))
-    api("com.natpryce:hamkrest:_")
+    api(libs.hamkrest)
     testImplementation(project(":http4k-format-jackson"))
 }

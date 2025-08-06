@@ -20,7 +20,7 @@ dependencies {
     api("dev.forkhandles:values4k")
     api("dev.forkhandles:time4k")
 
-    testImplementation("org.hsqldb:hsqldb:_")
+    testImplementation(libs.hsqldb)
 
     testImplementation("org.postgresql:postgresql:_")
 
