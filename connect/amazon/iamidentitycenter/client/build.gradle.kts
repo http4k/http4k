@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    api("io.matthewnelson.encoding:base16:_")
+    api(libs.base16.encoding)
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

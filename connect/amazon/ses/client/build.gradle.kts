@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    implementation("com.sun.mail:jakarta.mail:_")
+    implementation(libs.mail)
 
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-jackson"))
-    api("com.graphql-java:graphql-java:_")
+    api(libs.graphql.java)
     testImplementation(testFixtures(project(":http4k-core")))
 }
 
