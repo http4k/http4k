@@ -75,6 +75,7 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
         jvmArgs = listOf("--enable-preview")
+        failOnNoDiscoveredTests = false
     }
 
     withType<GenerateModuleMetadata> {
