@@ -11,6 +11,6 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     implementation(project(":http4k-format-core"))
-    api("io.kotest:kotest-assertions-core-jvm:_")
+    api(libs.kotest.assertions.core)
     testImplementation(project(":http4k-format-jackson"))
 }
