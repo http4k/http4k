@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-template-core"))
-    api("com.github.jknack:handlebars:_")
+    api(libs.handlebars)
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-template-core")))
 }

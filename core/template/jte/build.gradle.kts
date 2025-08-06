@@ -10,8 +10,8 @@ plugins {
 
 dependencies {
     api(project(":http4k-template-core"))
-    api("gg.jte:jte:_")
-    api("gg.jte:jte-kotlin:_")
+    api(libs.jte)
+    api(libs.jte.kotlin)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-template-core")))
