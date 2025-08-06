@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
 
     testApi(project(":http4k-format-moshi"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))

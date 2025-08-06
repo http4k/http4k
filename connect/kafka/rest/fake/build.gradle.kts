@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    testFixturesApi("se.ansman.kotshi:api:_")
+    testFixturesApi(libs.kotshi.api)
 
     testFixturesApi(project(":http4k-connect-kafka-rest"))
 }

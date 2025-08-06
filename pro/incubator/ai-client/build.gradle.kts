@@ -19,7 +19,7 @@ dependencies {
     api(project(":http4k-ai-llm-anthropic"))
     api("org.jetbrains.kotlin:kotlin-reflect:_")
 
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
 
-    ksp("se.ansman.kotshi:compiler:_")
+    ksp(libs.kotshi.compiler)
 }

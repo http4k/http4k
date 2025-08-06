@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-ai-core"))
 
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
 
     testApi(project(":http4k-format-moshi"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))

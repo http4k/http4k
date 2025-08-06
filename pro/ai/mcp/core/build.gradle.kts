@@ -18,7 +18,7 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
     api(project(":http4k-api-jsonrpc"))
     api(project(":http4k-ai-core"))
 
@@ -26,7 +26,7 @@ dependencies {
     api("dev.forkhandles:result4k")
     api("dev.forkhandles:time4k")
 
-    ksp("se.ansman.kotshi:compiler:_")
+    ksp(libs.kotshi.compiler)
 
     testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))

@@ -232,6 +232,10 @@ thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 
+# Kotshi
+kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }
+kotshi-compiler = { module = "se.ansman.kotshi:compiler", version.ref = "kotshi-compiler" }
+
 # Web UI
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 redoc = { module = "org.webjars:redoc", version.ref = "redoc" }

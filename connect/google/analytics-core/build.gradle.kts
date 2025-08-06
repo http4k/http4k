@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
 }
 
 metadata {

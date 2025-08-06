@@ -17,9 +17,9 @@ dependencies {
     api("com.squareup:kotlinpoet-ksp:_")
     api("com.google.devtools.ksp:symbol-processing-api:_")
 
-    ksp("se.ansman.kotshi:compiler:_")
+    ksp(libs.kotshi.compiler)
 
-    testFixturesApi("se.ansman.kotshi:api:_")
+    testFixturesApi(libs.kotshi.api)
     testFixturesApi(project(":http4k-format-moshi"))
     testFixturesApi("dev.forkhandles:result4k")
 
