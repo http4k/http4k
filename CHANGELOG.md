@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-***: Upgrade versions
 - **http4k-web-datastar***: [Breaking] This is the post Datastar v1 release. The API has significantly changed to match the changes to D* mechanisms - most notably: `Fragments` are now called `Elements`, and the number of SSE events has been reduced from 5 to 2 (datastar-patch-elements and datastar-patch-signals). See the D* docs for more details. You can of course continue to use the old API by using an old version of this module.
 - **http4k-connect-amazon-cognito** [Breaking] Align RespondToAuthChallenge to the official doc. The `ChallengeResponses` in the response is now a `Map<String, String>` instead of the incorrect `Map<ChallengeName, String>`. H/T @alphaho
+- **http4k-testing-powerassert** [New Module!] Power Assert is now bundled with Kotlin, so it's the perfect assertions library to use! This module provides assertions for http4k entities in your tests.
 
 ### v6.16.0.0
 - **http4k-***: Upgrade versions, including Kotlin to 2.2.0
