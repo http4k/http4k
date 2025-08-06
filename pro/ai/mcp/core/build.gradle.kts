@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    api(platform("dev.forkhandles:forkhandles-bom:_"))
+    api(platform(libs.forkhandles.bom))
 
     compileOnly("org.jetbrains.kotlin:kotlin-reflect:_")
 

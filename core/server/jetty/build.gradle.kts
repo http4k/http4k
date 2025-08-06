@@ -19,7 +19,7 @@ dependencies {
     // this list is for reference since http2 support is optional
     implementation("org.eclipse.jetty.http2:jetty-http2-server")
     implementation("org.eclipse.jetty:jetty-alpn-java-server")
-    implementation("org.mortbay.jetty.alpn:alpn-boot:_")
+    implementation(libs.alpn.boot)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))

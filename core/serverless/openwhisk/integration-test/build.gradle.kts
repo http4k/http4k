@@ -14,7 +14,7 @@ dependencies {
     api(project(":http4k-client-okhttp"))
     api(testFixtures(project(":http4k-core")))
     api(testFixtures(project(":http4k-serverless-core")))
-    testImplementation("dev.forkhandles:bunting4k:_")
+    testImplementation(libs.bunting4k)
     testImplementation(project(":http4k-client-apache"))
     testImplementation(testFixtures(project(":http4k-core")))
 }

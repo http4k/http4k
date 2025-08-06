@@ -14,7 +14,7 @@ dependencies {
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-api-openapi"))
     testImplementation(project(":http4k-api-jsonrpc"))
-    testImplementation("dev.forkhandles:values4k:_")
+    testImplementation(libs.values4k)
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))
     testImplementation(testFixtures(project(":http4k-api-openapi")))

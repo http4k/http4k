@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(platform("dev.forkhandles:forkhandles-bom:_"))
+    api(platform(libs.forkhandles.bom))
     compileOnly(platform("org.junit:junit-bom:_"))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
     api(project(":http4k-core"))

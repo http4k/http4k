@@ -195,6 +195,8 @@ apache-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", versi
 jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "netty-codec-http2" }
+jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
+alpn-boot = { module = "org.mortbay.jetty.alpn:alpn-boot", version.ref = "alpn-boot" }
 
 # Cloud/AWS
 aws-lambda-java-core = { module = "com.amazonaws:aws-lambda-java-core", version.ref = "aws-lambda-java-core" }
@@ -220,6 +222,8 @@ forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "f
 result4k = { module = "dev.forkhandles:result4k", version.ref = "result4k" }
 values4k = { module = "dev.forkhandles:values4k", version.ref = "values4k" }
 mock4k = { module = "dev.forkhandles:mock4k", version.ref = "mock4k" }
+data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
+bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "bunting4k" }
 
 # Template engines
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }

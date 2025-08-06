@@ -18,14 +18,14 @@ dependencies {
 
     api("org.eclipse.jetty:jetty-server:$jettyVersion")
     api("org.eclipse.jetty:jetty-servlet:$jettyVersion")
-    api("jakarta.servlet:jakarta.servlet-api:_")
+    api(libs.jakarta.servlet.api)
 
     api("org.eclipse.jetty.websocket:websocket-core-server:$jettyVersion")
 
     // this list is for reference since http2 support is optional
     implementation("org.eclipse.jetty.http2:http2-server:$jettyVersion")
     implementation("org.eclipse.jetty:jetty-alpn-java-server:$jettyVersion")
-    implementation("org.mortbay.jetty.alpn:alpn-boot:_")
+    implementation(libs.alpn.boot)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))

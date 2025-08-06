@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    api(platform("dev.forkhandles:forkhandles-bom:_"))
+    api(platform(libs.forkhandles.bom))
     api(project(":http4k-connect-core"))
     api("dev.forkhandles:result4k")
 

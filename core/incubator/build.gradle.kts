@@ -20,7 +20,7 @@ dependencies {
 
     testImplementation(project(":http4k-client-apache"))
 
-    testImplementation("dev.forkhandles:values4k:_")
+    testImplementation(libs.values4k)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-helidon"))

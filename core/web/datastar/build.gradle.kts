@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":http4k-format-core"))
     implementation(project(":http4k-template-core"))
 
-    api("dev.forkhandles:values4k:_")
+    api(libs.values4k)
 
     testImplementation(testFixtures(project(":http4k-core")))
 

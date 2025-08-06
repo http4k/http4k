@@ -12,9 +12,9 @@ dependencies {
     api(project(":http4k-core"))
 
     implementation("javax.servlet:javax.servlet-api:_")
-    implementation("jakarta.servlet:jakarta.servlet-api:_")
+    implementation(libs.jakarta.servlet.api)
 
     testFixturesImplementation("javax.servlet:javax.servlet-api:_")
-    testFixturesImplementation("jakarta.servlet:jakarta.servlet-api:_")
-    testFixturesApi("dev.forkhandles:mock4k:_")
+    testFixturesImplementation(libs.jakarta.servlet.api)
+    testFixturesApi(libs.mock4k)
 }
