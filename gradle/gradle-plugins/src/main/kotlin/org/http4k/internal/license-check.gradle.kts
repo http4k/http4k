@@ -3,6 +3,7 @@ package org.http4k.internal
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.render.InventoryHtmlReportRenderer
 import com.github.jk1.license.render.JsonReportRenderer
+import com.github.jk1.license.render.ReportRenderer
 
 plugins {
     id("com.github.jk1.dependency-license-report")
@@ -26,7 +27,7 @@ licenseReport {
             true
         )
     )
-    renderers = arrayOf(JsonReportRenderer(), InventoryHtmlReportRenderer())
+    renderers = arrayOf<ReportRenderer>(JsonReportRenderer(), InventoryHtmlReportRenderer())
     allowedLicensesFile = "${project.rootProject.projectDir}/compliance/allowed-licenses.json"
     excludeBoms = true
     excludeOwnGroup = true
