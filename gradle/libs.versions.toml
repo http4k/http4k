@@ -285,6 +285,8 @@ kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
 gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
 tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
+cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
+cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
 
 # Testing Libraries (additional)
 selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
@@ -311,7 +313,7 @@ lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce-core
 okhttp-eventsource = { module = "com.launchdarkly:okhttp-eventsource", version.ref = "okhttp-eventsource" }
 
 # Security  
-jose4j = { module = "c:jose4j", version.ref = "jose4j" }
+jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
 
 # JakartaEE/JavaEE APIs

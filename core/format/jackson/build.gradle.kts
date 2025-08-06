@@ -14,8 +14,8 @@ dependencies {
     api(platform(libs.jackson.bom))
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.cloudevents:cloudevents-core:_")
-    implementation("io.cloudevents:cloudevents-json-jackson:_")
+    implementation(libs.cloudevents.core)
+    implementation(libs.cloudevents.json.jackson)
     implementation(libs.values4k)
     implementation(libs.data4k)
 

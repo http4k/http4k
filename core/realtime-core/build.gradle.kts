@@ -22,5 +22,5 @@ dependencies {
     testFixturesApi(project(":http4k-client-websocket"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-web-datastar"))
-    testFixturesApi("com.launchdarkly:okhttp-eventsource:_")
+    testFixturesApi(libs.okhttp.eventsource)
 }
