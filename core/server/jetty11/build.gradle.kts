@@ -13,7 +13,8 @@ dependencies {
     api(project(":http4k-realtime-core"))
     api(project(":http4k-bridge-servlet"))
 
-    api(platform(libs.jetty11.bom))
+    val jettyVersion = "11.0.25"
+    api(platform("org.eclipse.jetty:jetty-bom:$jettyVersion"))
     api(libs.jetty11.server)
     api(libs.jetty11.servlet)
     api(libs.jakarta.servlet.api)

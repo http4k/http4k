@@ -1,239 +1,135 @@
 # Generated from versions.properties for http4k gradle version catalog migration
 # This file contains all dependencies from refresh versions
-
 [versions]
-# Plugin versions
-com-github-johnrengelman-shadow = "8.1.1"
-com-google-devtools-ksp = "2.2.0-2.0.2"
-nu-studer-rocker = "3.0.5"
-org-openapi-generator = "7.14.0"
-com-microsoft-azure-azurefunctions = "1.11.1"
-com-github-ben-manes-versions = "0.51.0"
-gradle-use-latest-versions = "0.2.18"
-
-# Core versions
-kotlin = "2.2.0"
-junit = "5.13.4"
-kotest = "5.9.1"
-mockk = "1.14.5"
-strikt = "0.35.1"
-kotlinpoet = "2.2.0"
-
-# Framework versions
-kotlinx-serialization = "1.9.0"
-ktor = "3.2.3"
-moshi = "1.15.2"
-jackson-bom = "2.19.2"
-jackson-databind = "2.19.2"
-jackson-datatype-guava = "2.19.2"
-
-# HTTP Client/Server versions
-okhttp3 = "5.1.0"
-apache-httpclient = "4.5.14"
-apache-httpcore = "4.4.16"
+aliyun-fc-java-core = "1.4.1"
+alpn-boot = "8.1.13.v20181017"
 apache-httpasyncclient = "4.1.5"
+apache-httpclient = "4.5.14"
 apache-httpclient5 = "5.5"
+apache-httpcore = "4.4.16"
 apache-httpcore5 = "5.3.4"
-jetty-bom = "12.0.23"
-jetty11-bom = "11.0.20"
-undertow-core = "2.3.18.Final"
-netty-codec-http2 = "4.2.3.Final"
-
-# AWS versions
+apiguardian-api = "1.1.2"
+argo = "7.6"
+avro = "1.12.0"
 aws-lambda-java-core = "1.3.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.32.14"
-
-# Cloud/Serverless versions
+awssdk-bom = "2.32.16"
 azure-core = "1.55.5"
 azure-functions-java-library = "3.1.0"
-aliyun-fc-java-core = "1.4.1"
-gcp-functions-framework-api = "1.1.4"
-tencent-scf-java-events = "0.0.4"
+base16-encoding = "2.4.0"
+bcprov-jdk18on = "1.81"
+cloudevents-core = "4.0.1"
+cloudevents-json-jackson = "4.0.1"
+com-github-ben-manes-versions = "0.52.0"
+com-github-johnrengelman-shadow = "8.1.1"
+com-google-devtools-ksp = "2.2.0-2.0.2"
+commons-codec = "1.19.0"
 
-# Database versions
-h2 = "2.3.232"
-hikaricp = "7.0.0"
-mysql-connector-java = "8.0.33"
-postgresql = "42.7.7"
-hsqldb = "2.7.4"
-jetbrains-exposed = "0.61.0"
+# frozen
+docker-java-core = "3.5.2"
+docker-java-transport-httpclient5 = "3.5.2"
 
-# Serialization/Format versions
-gson = "2.13.1"
-klaxon = "5.6"
-argo = "7.6"
-json = "20250517"
-snakeyaml = "2.4"
-kondor-core = "3.5.2"
-
-# Template engines
+failsafe = "3.3.2"
+forkhandles-bom = "2.22.4.0"
 freemarker = "2.3.34"
+fuel = "2.3.1"
+gcp-functions-framework-api = "1.1.4"
+google-http-client = "1.47.1"
+gradle-use-latest-versions = "0.2.18"
+graphql-java = "24.2"
+gson = "2.13.1"
+guava = "33.4.8-jre"
+h2 = "2.3.232"
+hamkrest = "1.8.0.1"
 handlebars = "4.4.0"
+helidon-bom = "4.2.5"
+hikaricp = "7.0.0"
+hsqldb = "2.7.4"
+htmx-org = "2.0.6"
+hyperscript-org = "0.9.14"
+jackson-bom = "2.19.2"
+jakarta-inject-api = "2.0.1"
+jakarta-servlet-api = "6.1.0"
+jakarta-ws-rs-api = "4.0.0"
+java-websocket = "1.6.0"
+javax-servlet-api = "4.0.1"
+jetbrains-exposed = "0.61.0"
+jetty-bom = "12.0.24"
+jetty11-bom = "11.0.25"
+joda-time = "2.14.0"
+jose4j = "0.9.6"
+json = "20250517"
+jsoup = "1.21.1"
 jte = "3.2.1"
 jte-kotlin = "3.2.1"
-pebble = "3.2.4"
-pug4j = "2.3.1"
-rocker-compiler = "2.2.1"
-rocker-runtime = "2.2.1"
-thymeleaf = "3.1.3.RELEASE"
-
-# Utility libraries
-guava = "33.4.8-jre"
-commons-codec = "1.19.0"
-underscore = "1.116"
-joda-time = "2.14.0"
-base16-encoding = "2.4.0"
-
-# Testing libraries
-testcontainers-bom = "1.21.3"
-selenium-api = "4.34.0"
-playwright = "1.54.0"
-hamkrest = "1.8.0.1"
-apiguardian-api = "1.1.2"
-
-# Observability versions
+junit = "5.13.4"
+klaxon = "5.6"
+kondor-core = "3.5.2"
+konsist = "0.17.3"
+kotest = "5.9.1"
+kotlin = "2.2.0"
+kotlinpoet = "2.2.0"
+kotlinx-dataframe = "1.0.0-Beta2"
+kotlinx-serialization = "1.9.0"
+kotshi-api = "4.0.0"
+kotshi-compiler = "4.0.0"
+ktor = "3.2.3"
+langchain4j = "1.2.0"
+langchain4j-core = "1.2.0"
+langchain4j-http-client = "1.2.0"
+langchain4j-open-ai = "1.2.0"
+lettuce-core = "6.7.1.RELEASE"
+loremipsum = "1.0"
+mail = "2.0.2"
 micrometer-core = "1.15.2"
+micronaut-http = "4.9.9"
+mockk = "1.14.5"
+moshi = "1.15.2"
+mysql-connector-java = "8.0.33"
+netty-codec-http2 = "4.2.3.Final"
+nu-studer-rocker = "3.1"
+okhttp-eventsource = "4.1.1"
+okhttp3 = "5.1.0"
 opentelemetry-bom = "1.52.0"
 opentelemetry-semconv = "1.34.0"
 opentelemetry-semconv-incubating = "1.34.0-alpha"
-resilience4j-bom = "2.3.0"
-failsafe = "3.3.2"
-
-# Spring versions
-spring-webmvc = "6.2.9"
-spring-test = "6.2.9"
-spring-context = "6.2.9"
-
-# Other framework versions
-helidon-bom = "4.2.4"
+org-openapi-generator = "7.14.0"
+pebble = "3.2.4"
+playwright = "1.54.0"
+postgresql = "42.7.7"
+pug4j = "2.3.1"
 ratpack-core = "1.9.0"
-micronaut-http = "4.9.9"
-vertx-web = "5.0.1"
-
-# Web/UI versions
-swagger-ui = "5.27.0"
 redoc = "2.3.0"
-htmx-org = "2.0.6"
-hyperscript-org = "0.9.14"
-
-# Misc libraries
-fuel = "2.3.1"
-docker-java-core = "3.5.2"
-docker-java-transport-httpclient5 = "3.5.2"
-java-websocket = "1.6.0"
-jsoup = "1.21.1"
-mail = "2.0.2"
-graphql-java = "24.2"
-cloudevents-core = "4.0.1"
-cloudevents-json-jackson = "4.0.1"
-avro = "1.12.0"
-jose4j = "0.9.6"
-bcprov-jdk18on = "1.81"
-lettuce-core = "6.7.1.RELEASE"
-okhttp-eventsource = "4.1.1"
-jakarta-servlet-api = "6.1.0"
-javax-servlet-api = "4.0.1"
-jakarta-ws-rs-api = "4.0.0"
-jakarta-inject-api = "2.0.1"
+resilience4j-bom = "2.3.0"
 resteasy-core = "6.2.12.Final"
-alpn-boot = "8.1.13.v20181017"
-konsist = "0.17.3"
-langchain4j = "1.2.0"
-langchain4j-open-ai = "1.2.0"
-langchain4j-core = "1.2.0"
-langchain4j-http-client = "1.2.0"
-kotlinx-dataframe = "1.0.0-Beta2"
-google-http-client = "1.47.1"
-kotshi-api = "4.0.0"
-kotshi-compiler = "4.0.0"
+rocker-compiler = "2.2.1"
+rocker-runtime = "2.2.1"
+selenium-api = "4.34.0"
+snakeyaml = "2.4"
+spring-context = "6.2.9"
+spring-test = "6.2.9"
+spring-webmvc = "6.2.9"
+strikt = "0.35.1"
+swagger-ui = "5.27.1"
 symbol-processing-api = "2.2.0-2.0.2"
-loremipsum = "1.0"
-
-# Forkhandles versions  
-forkhandles-bom = "2.22.4.0"
-data4k = "2.22.4.0"
-bunting4k = "2.22.4.0"
-values4k = "2.22.4.0"
-result4k = "2.22.4.0"
-mock4k = "2.22.4.0"
-
-# Gradle plugin versions
-dokka-base = "2.0.0-Beta"
-dokka-gradle-plugin = "2.0.0-Beta"
-gradle-license-report = "2.9"
+tencent-scf-java-events = "0.0.4"
+testcontainers-bom = "1.21.3"
+thymeleaf = "3.1.3.RELEASE"
+underscore = "1.116"
+undertow-core = "2.3.18.Final"
+vertx-web = "5.0.2"
 
 [libraries]
-# Kotlin
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-
-# Testing
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.9.3" }
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
-hamkrest = { module = "com.natpryce:hamkrest", version.ref = "hamkrest" }
-apiguardian-api = { module = "org.apiguardian:apiguardian-api", version.ref = "apiguardian-api" }
-konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
-
-# Serialization
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
-moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
-moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
-jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
-jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
-jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
-
-# HTTP Clients  
-okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp3" }
-apache-httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "apache-httpclient" }
-apache-httpcore = { module = "org.apache.httpcomponents:httpcore", version.ref = "apache-httpcore" }
-apache-httpasyncclient = { module = "org.apache.httpcomponents:httpasyncclient", version.ref = "apache-httpasyncclient" }
-apache-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "apache-httpclient5" }
-apache-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore5" }
-
-# HTTP Servers
-jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
-jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty-bom" }
-jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }
-jetty-http2-server = { module = "org.eclipse.jetty.http2:jetty-http2-server", version.ref = "jetty-bom" }
-jetty-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty-bom" }
-jetty-client = { module = "org.eclipse.jetty:jetty-client", version.ref = "jetty-bom" }
-jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-client", version.ref = "jetty-bom" }
-jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
-jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
-jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
-jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
-jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
-jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
-helidon-bom = { module = "io.helidon:helidon-bom", version.ref = "helidon-bom" }
-helidon-webserver = { module = "io.helidon.webserver:helidon-webserver", version.ref = "helidon-bom" }
-helidon-webserver-sse = { module = "io.helidon.webserver:helidon-webserver-sse", version.ref = "helidon-bom" }
-helidon-webserver-websocket = { module = "io.helidon.webserver:helidon-webserver-websocket", version.ref = "helidon-bom" }
-helidon-webclient = { module = "io.helidon.webclient:helidon-webclient", version.ref = "helidon-bom" }
-helidon-webclient-websocket = { module = "io.helidon.webclient:helidon-webclient-websocket", version.ref = "helidon-bom" }
-undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
-netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "netty-codec-http2" }
-jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
+aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
 alpn-boot = { module = "org.mortbay.jetty.alpn:alpn-boot", version.ref = "alpn-boot" }
-
-# Spring Framework
-spring-test = { module = "org.springframework:spring-test", version.ref = "spring-test" }
-
-# Cloud/AWS
+apache-httpasyncclient = { module = "org.apache.httpcomponents:httpasyncclient", version.ref = "apache-httpasyncclient" }
+apache-httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "apache-httpclient" }
+apache-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "apache-httpclient5" }
+apache-httpcore = { module = "org.apache.httpcomponents:httpcore", version.ref = "apache-httpcore" }
+apache-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore5" }
+apiguardian-api = { module = "org.apiguardian:apiguardian-api", version.ref = "apiguardian-api" }
+argo = { module = "net.sourceforge.argo:argo", version.ref = "argo" }
+avro = { module = "org.apache.avro:avro", version.ref = "avro" }
 aws-lambda-java-core = { module = "com.amazonaws:aws-lambda-java-core", version.ref = "aws-lambda-java-core" }
 aws-lambda-java-events = { module = "com.amazonaws:aws-lambda-java-events", version.ref = "aws-lambda-java-events" }
 awssdk-bom = { module = "software.amazon.awssdk:bom", version.ref = "awssdk-bom" }
@@ -242,159 +138,164 @@ awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk-bom" }
 awssdk-sqs = { module = "software.amazon.awssdk:sqs", version.ref = "awssdk-bom" }
 azure-core = { module = "com.azure:azure-core", version.ref = "azure-core" }
 azure-functions-java-library = { module = "com.microsoft.azure.functions:azure-functions-java-library", version.ref = "azure-functions-java-library" }
-
-# Databases
-h2 = { module = "com.h2database:h2", version.ref = "h2" }
-hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
-mysql-connector-java = { module = "mysql:mysql-connector-java", version.ref = "mysql-connector-java" }
-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
-hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "base16-encoding" }
+bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
+bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-bom" }
+cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
+cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
+docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
+docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
 exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "jetbrains-exposed" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "jetbrains-exposed" }
-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "jetbrains-exposed" }
 exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "jetbrains-exposed" }
-
-# Observability
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "jetbrains-exposed" }
+failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
+forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles-bom" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
+fs4k = { module = "dev.forkhandles:fs4k", version.ref = "forkhandles-bom" }
+fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
+gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
+google-http-client = { module = "com.google.http-client:google-http-client", version.ref = "google-http-client" }
+graphql-java = { module = "com.graphql-java:graphql-java", version.ref = "graphql-java" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
+hamkrest = { module = "com.natpryce:hamkrest", version.ref = "hamkrest" }
+handlebars = { module = "com.github.jknack:handlebars", version.ref = "handlebars" }
+helidon-bom = { module = "io.helidon:helidon-bom", version.ref = "helidon-bom" }
+helidon-webclient = { module = "io.helidon.webclient:helidon-webclient", version.ref = "helidon-bom" }
+helidon-webclient-websocket = { module = "io.helidon.webclient:helidon-webclient-websocket", version.ref = "helidon-bom" }
+helidon-webserver = { module = "io.helidon.webserver:helidon-webserver", version.ref = "helidon-bom" }
+helidon-webserver-sse = { module = "io.helidon.webserver:helidon-webserver-sse", version.ref = "helidon-bom" }
+helidon-webserver-websocket = { module = "io.helidon.webserver:helidon-webserver-websocket", version.ref = "helidon-bom" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
+hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
+jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
+jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
+jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
+jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
+jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
+jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
+jakarta-ws-rs-api = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "jakarta-ws-rs-api" }
+java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "java-websocket" }
+javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version.ref = "javax-servlet-api" }
+jetty-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty-bom" }
+jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
+jetty-client = { module = "org.eclipse.jetty:jetty-client", version.ref = "jetty-bom" }
+jetty-http2-server = { module = "org.eclipse.jetty.http2:jetty-http2-server", version.ref = "jetty-bom" }
+jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty-bom" }
+jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-client", version.ref = "jetty-bom" }
+jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }
+jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
+jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
+jetty11-http2-server = "org.eclipse.jetty.http2:http2-server:11.0.25"
+jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
+jetty11-servlet = "org.eclipse.jetty:jetty-servlet:11.0.25"
+jetty11-websocket-core-server = "org.eclipse.jetty.websocket:websocket-core-server:11.0.25"
+joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
+jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
+jridgewell-sourcemap-codec = "org.webjars.npm:jridgewell__sourcemap-codec:1.5.4"
+json = { module = "org.json:json", version.ref = "json" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+jte = { module = "gg.jte:jte", version.ref = "jte" }
+jte-kotlin = { module = "gg.jte:jte-kotlin", version.ref = "jte-kotlin" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = "org.junit.platform:junit-platform-launcher:1.13.4"
+klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
+kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
+konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
+kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "kotlinpoet" }
+kotlinx-dataframe = { module = "org.jetbrains.kotlinx:dataframe", version.ref = "kotlinx-dataframe" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }
+kotshi-compiler = { module = "se.ansman.kotshi:compiler", version.ref = "kotshi-compiler" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
+langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j-core" }
+langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j-http-client" }
+langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j-open-ai" }
+lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce-core" }
+loremipsum = { module = "de.sven-jacobs:loremipsum", version.ref = "loremipsum" }
+mail = { module = "com.sun.mail:jakarta.mail", version.ref = "mail" }
 micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer-core" }
+micronaut-http = { module = "io.micronaut:micronaut-http", version.ref = "micronaut-http" }
+mock4k = { module = "dev.forkhandles:mock4k", version.ref = "forkhandles-bom" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+mysql-connector-java = { module = "mysql:mysql-connector-java", version.ref = "mysql-connector-java" }
+netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "netty-codec-http2" }
+okhttp-eventsource = { module = "com.launchdarkly:okhttp-eventsource", version.ref = "okhttp-eventsource" }
+okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp3" }
+openapi-generator-gradle-plugin = { module = "org.openapitools:openapi-generator-gradle-plugin", version.ref = "org-openapi-generator" }
 opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-bom" }
-opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-bom" }
-opentelemetry-sdk-metrics = { module = "io.opentelemetry:opentelemetry-sdk-metrics", version.ref = "opentelemetry-bom" }
 opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-bom" }
 opentelemetry-extension-trace-propagators = { module = "io.opentelemetry:opentelemetry-extension-trace-propagators", version.ref = "opentelemetry-bom" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-bom" }
+opentelemetry-sdk-metrics = { module = "io.opentelemetry:opentelemetry-sdk-metrics", version.ref = "opentelemetry-bom" }
 opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry-bom" }
+opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
+opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv-incubating" }
+parser4k = { module = "dev.forkhandles:parser4k", version.ref = "forkhandles-bom" }
+pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
+playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+pug4j = { module = "de.neuland-bfi:pug4j", version.ref = "pug4j" }
+ratpack-core = { module = "io.ratpack:ratpack-core", version.ref = "ratpack-core" }
+redoc = { module = "org.webjars:redoc", version.ref = "redoc" }
 resilience4j-bom = { module = "io.github.resilience4j:resilience4j-bom", version.ref = "resilience4j-bom" }
 resilience4j-bulkhead = { module = "io.github.resilience4j:resilience4j-bulkhead", version.ref = "resilience4j-bom" }
 resilience4j-circuitbreaker = { module = "io.github.resilience4j:resilience4j-circuitbreaker", version.ref = "resilience4j-bom" }
 resilience4j-ratelimiter = { module = "io.github.resilience4j:resilience4j-ratelimiter", version.ref = "resilience4j-bom" }
 resilience4j-retry = { module = "io.github.resilience4j:resilience4j-retry", version.ref = "resilience4j-bom" }
 resilience4j-timelimiter = { module = "io.github.resilience4j:resilience4j-timelimiter", version.ref = "resilience4j-bom" }
-failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
-
-# Forkhandles
-forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles-bom" }
-result4k = { module = "dev.forkhandles:result4k", version.ref = "forkhandles-bom" }
-values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }
-mock4k = { module = "dev.forkhandles:mock4k", version.ref = "forkhandles-bom" }
-data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
-bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-bom" }
-time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
-parser4k = { module = "dev.forkhandles:parser4k", version.ref = "forkhandles-bom" }
-fs4k = { module = "dev.forkhandles:fs4k", version.ref = "forkhandles-bom" }
-
-# Template engines
-freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
-handlebars = { module = "com.github.jknack:handlebars", version.ref = "handlebars" }
-jte = { module = "gg.jte:jte", version.ref = "jte" }
-jte-kotlin = { module = "gg.jte:jte-kotlin", version.ref = "jte-kotlin" }
-thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
-
-# Utilities
-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
-loremipsum = { module = "de.sven-jacobs:loremipsum", version.ref = "loremipsum" }
-avro = { module = "org.apache.avro:avro", version.ref = "avro" }
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "java-websocket" }
-underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
-docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
-docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
-rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker-compiler" }
-
-# Kotshi
-kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }
-kotshi-compiler = { module = "se.ansman.kotshi:compiler", version.ref = "kotshi-compiler" }
-
-# AI/ML
-langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
-langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j-open-ai" }
-langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j-core" }
-langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j-http-client" }
-
-# Web UI  
-swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
-redoc = { module = "org.webjars:redoc", version.ref = "redoc" }
-htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
-hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
-jridgewell-sourcemap-codec = { module = "org.webjars.npm:jridgewell__sourcemap-codec", version = "1.5.0" }
-
-# Template Engines (additional)
-pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
-pug4j = { module = "de.neuland-bfi:pug4j", version.ref = "pug4j" }
-rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker-runtime" }
-
-# JSON/Serialization (additional)
-json = { module = "org.json:json", version.ref = "json" }
-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
-argo = { module = "net.sourceforge.argo:argo", version.ref = "argo" }
-kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
-
-# Cloud/Serverless (additional)
-aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
-gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
-tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
-cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
-cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
-
-# Testing Libraries (additional)
-selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
-playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
-testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
-testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-bom" }
-
-# Observability (additional) 
-opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
-opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv-incubating" }
-
-# Misc Framework
-ratpack-core = { module = "io.ratpack:ratpack-core", version.ref = "ratpack-core" }
-micronaut-http = { module = "io.micronaut:micronaut-http", version.ref = "micronaut-http" }
-vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
-ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
-ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor" }
-
-# KotlinX
-kotlinx-dataframe = { module = "org.jetbrains.kotlinx:dataframe", version.ref = "kotlinx-dataframe" }
-
-# Utilities (additional)
-base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "base16-encoding" }
-joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
-fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
-mail = { module = "com.sun.mail:jakarta.mail", version.ref = "mail" }
-graphql-java = { module = "com.graphql-java:graphql-java", version.ref = "graphql-java" }
-google-http-client = { module = "com.google.http-client:google-http-client", version.ref = "google-http-client" }
-lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce-core" }
-okhttp-eventsource = { module = "com.launchdarkly:okhttp-eventsource", version.ref = "okhttp-eventsource" }
-
-# Security  
-jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
-bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
-
-# JakartaEE/JavaEE APIs
-jakarta-ws-rs-api = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "jakarta-ws-rs-api" }
-jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
-javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version.ref = "javax-servlet-api" }
 resteasy-core = { module = "org.jboss.resteasy:resteasy-core", version.ref = "resteasy-core" }
-
-# Spring (additional) 
-spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring-webmvc" }
+result4k = { module = "dev.forkhandles:result4k", version.ref = "forkhandles-bom" }
+rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker-compiler" }
+rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker-runtime" }
+selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 spring-context = { module = "org.springframework:spring-context", version.ref = "spring-context" }
-
-# Kotlin Compiler/Meta
-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "kotlinpoet" }
+spring-test = { module = "org.springframework:spring-test", version.ref = "spring-test" }
+spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring-webmvc" }
+strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
+swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "symbol-processing-api" }
-
-# OpenAPI Generator
-openapi-generator-gradle-plugin = { module = "org.openapitools:openapi-generator-gradle-plugin", version.ref = "org-openapi-generator" }
+tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-bom" }
+thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
+time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
+underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
+undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
+values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }
+vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "com-github-johnrengelman-shadow" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
 rocker = { id = "nu.studer.rocker", version.ref = "nu-studer-rocker" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "com-github-johnrengelman-shadow" }
 use-latest-versions = { id = "se.patrikerdes.use-latest-versions", version.ref = "gradle-use-latest-versions" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }
