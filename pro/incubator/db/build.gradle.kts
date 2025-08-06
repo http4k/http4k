@@ -27,8 +27,8 @@ dependencies {
     testImplementation(libs.mysql.connector.java)
 
     api(libs.hikaricp)
-    api(platform("org.jetbrains.exposed:exposed-bom:_"))
+    api(platform(libs.exposed.bom))
     api(JetBrains.exposed.core)
     api(JetBrains.exposed.jdbc)
-    api("org.jetbrains.exposed:exposed-java-time:_")
+    api(libs.exposed.java.time)
 }

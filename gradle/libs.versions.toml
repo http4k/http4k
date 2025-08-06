@@ -220,6 +220,8 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 mysql-connector-java = { module = "mysql:mysql-connector-java", version.ref = "mysql-connector-java" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "jetbrains-exposed" }
+exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "jetbrains-exposed" }
 
 # Observability
 micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer-core" }
