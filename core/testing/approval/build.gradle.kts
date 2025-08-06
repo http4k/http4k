@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("com.github.javadev:underscore:_")
+    api(libs.underscore)
     api(libs.jsoup)
 
     api(platform(libs.junit.bom))

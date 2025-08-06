@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
-    api("org.java-websocket:Java-WebSocket:_")
+    api(libs.java.websocket)
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-realtime-core")))
 }

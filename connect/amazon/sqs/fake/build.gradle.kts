@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
 //    testFixturesApi(Libs.sqs)  FIXME why doesn't this work?
-    testFixturesApi(platform("software.amazon.awssdk:bom:_"))
+    testFixturesApi(platform(libs.awssdk.bom))
     testFixturesApi("software.amazon.awssdk:sqs")
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

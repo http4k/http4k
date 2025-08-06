@@ -194,6 +194,7 @@ apache-httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", versi
 
 # HTTP Servers
 jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
+helidon-bom = { module = "io.helidon:helidon-bom", version.ref = "helidon-bom" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "netty-codec-http2" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
@@ -239,10 +240,18 @@ commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons
 loremipsum = { module = "de.sven-jacobs:loremipsum", version.ref = "loremipsum" }
 avro = { module = "org.apache.avro:avro", version.ref = "avro" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "java-websocket" }
+underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
 
 # Kotshi
 kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }
 kotshi-compiler = { module = "se.ansman.kotshi:compiler", version.ref = "kotshi-compiler" }
+
+# AI/ML
+langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
+langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j-open-ai" }
+langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j-core" }
+langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j-http-client" }
 
 # Web UI
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }

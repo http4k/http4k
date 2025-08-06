@@ -12,5 +12,5 @@ dependencies {
     api(project(":http4k-api-openapi"))
     api(project(":http4k-format-jackson"))
     api(project(":http4k-security-core"))
-    api("org.webjars:swagger-ui:_")
+    api(libs.swagger.ui)
 }

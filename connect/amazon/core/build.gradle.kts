@@ -16,7 +16,7 @@ dependencies {
     }
 
     api(libs.kotshi.api)
-    api("com.github.javadev:underscore:_")
+    api(libs.underscore)
     api(project(":http4k-format-core"))
 
     testFixturesApi(project(":http4k-testing-chaos"))
