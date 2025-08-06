@@ -13,8 +13,8 @@ dependencies {
     api(project(":http4k-bridge-servlet"))
     api(libs.jakarta.servlet.api)
 
-    implementation("org.springframework:spring-webmvc:_")
-    implementation("org.springframework:spring-context:_")
+    implementation(libs.spring.webmvc)
+    implementation(libs.spring.context)
     
     testImplementation(project(":http4k-testing-hamkrest"))
     testImplementation(libs.spring.test)

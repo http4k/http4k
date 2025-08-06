@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("org.webjars.npm:htmx.org:_")
+    api(libs.htmx.org)
     api(libs.hyperscript.org)
     api(libs.values4k)
 

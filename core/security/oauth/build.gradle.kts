@@ -17,5 +17,5 @@ dependencies {
     api(libs.result4k)
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation("commons-codec:commons-codec:_")
+    testImplementation(libs.commons.codec)
 }

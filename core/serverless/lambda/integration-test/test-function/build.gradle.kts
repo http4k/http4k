@@ -16,7 +16,7 @@ dependencies {
     api(testFixtures(project(":http4k-core")))
     api(testFixtures(project(":http4k-serverless-core")))
     api(libs.aws.lambda.java.events)
-    api("joda-time:joda-time:_")
+    api(libs.joda.time)
 }
 
 tasks {

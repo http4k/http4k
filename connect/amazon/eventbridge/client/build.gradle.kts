@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-connect-amazon-core"))
     compileOnly(project(":http4k-serverless-lambda"))
-    compileOnly("joda-time:joda-time:_")
+    compileOnly(libs.joda.time)
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }
