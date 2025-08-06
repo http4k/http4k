@@ -12,11 +12,11 @@ dependencies {
     api(project(":http4k-core"))
 
     api(platform(libs.resilience4j.bom))
-    api("io.github.resilience4j:resilience4j-bulkhead")
-    api("io.github.resilience4j:resilience4j-circuitbreaker")
-    api("io.github.resilience4j:resilience4j-ratelimiter")
-    api("io.github.resilience4j:resilience4j-retry")
-    api("io.github.resilience4j:resilience4j-timelimiter")
+    api(libs.resilience4j.bulkhead)
+    api(libs.resilience4j.circuitbreaker)
+    api(libs.resilience4j.ratelimiter)
+    api(libs.resilience4j.retry)
+    api(libs.resilience4j.timelimiter)
     testImplementation(testFixtures(project(":http4k-core")))
 }
 
