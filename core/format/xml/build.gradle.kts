@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-format-core"))
     api(project(":http4k-format-gson"))
-    api("org.json:json:_")
+    api(libs.json)
     testImplementation(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))

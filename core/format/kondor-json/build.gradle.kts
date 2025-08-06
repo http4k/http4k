@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-format-core"))
-    api("com.ubertob.kondor:kondor-core:_")
+    api(libs.kondor.core)
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-api-openapi"))
     testImplementation(project(":http4k-api-jsonrpc"))

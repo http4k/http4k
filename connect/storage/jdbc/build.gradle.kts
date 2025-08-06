@@ -13,6 +13,6 @@ dependencies {
     api("org.jetbrains.exposed:exposed-core:_")
     api("org.jetbrains.exposed:exposed-jdbc:_")
 
-    testFixturesApi("com.zaxxer:HikariCP:_")
+    testFixturesApi(libs.hikaricp)
     testFixturesApi("com.h2database:h2:_")
 }

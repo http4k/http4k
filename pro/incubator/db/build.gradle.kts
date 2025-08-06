@@ -22,11 +22,11 @@ dependencies {
 
     testImplementation(libs.hsqldb)
 
-    testImplementation("org.postgresql:postgresql:_")
+    testImplementation(libs.postgresql)
 
-    testImplementation("mysql:mysql-connector-java:_")
+    testImplementation(libs.mysql.connector.java)
 
-    api("com.zaxxer:HikariCP:_")
+    api(libs.hikaricp)
     api(platform("org.jetbrains.exposed:exposed-bom:_"))
     api(JetBrains.exposed.core)
     api(JetBrains.exposed.jdbc)

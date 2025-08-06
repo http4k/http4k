@@ -264,10 +264,71 @@ langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.
 langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j-core" }
 langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j-http-client" }
 
-# Web UI
+# Web UI  
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 redoc = { module = "org.webjars:redoc", version.ref = "redoc" }
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
+hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
+
+# Template Engines (additional)
+pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
+pug4j = { module = "de.neuland-bfi:pug4j", version.ref = "pug4j" }
+rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker-runtime" }
+
+# JSON/Serialization (additional)
+json = { module = "org.json:json", version.ref = "json" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+argo = { module = "net.sourceforge.argo:argo", version.ref = "argo" }
+kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
+
+# Cloud/Serverless (additional)
+aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
+gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
+tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
+
+# Testing Libraries (additional)
+selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
+playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
+
+# Observability (additional) 
+opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
+opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv-incubating" }
+
+# Misc Framework
+ratpack-core = { module = "io.ratpack:ratpack-core", version.ref = "ratpack-core" }
+micronaut-http = { module = "io.micronaut:micronaut-http", version.ref = "micronaut-http" }
+vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+
+# Utilities (additional)
+base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "base16-encoding" }
+joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
+fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
+mail = { module = "com.sun.mail:jakarta.mail", version.ref = "mail" }
+graphql-java = { module = "com.graphql-java:graphql-java", version.ref = "graphql-java" }
+google-http-client = { module = "com.google.http-client:google-http-client", version.ref = "google-http-client" }
+lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce-core" }
+okhttp-eventsource = { module = "com.launchdarkly:okhttp-eventsource", version.ref = "okhttp-eventsource" }
+
+# Security  
+jose4j = { module = "c:jose4j", version.ref = "jose4j" }
+bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
+
+# JakartaEE/JavaEE APIs
+jakarta-ws-rs-api = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "jakarta-ws-rs-api" }
+jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
+javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version.ref = "javax-servlet-api" }
+resteasy-core = { module = "org.jboss.resteasy:resteasy-core", version.ref = "resteasy-core" }
+
+# Spring (additional) 
+spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring-webmvc" }
+spring-context = { module = "org.springframework:spring-context", version.ref = "spring-context" }
+
+# Kotlin Compiler/Meta
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
+kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "kotlinpoet" }
+symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "symbol-processing-api" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

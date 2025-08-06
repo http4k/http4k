@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-api-openapi"))
-    api("org.webjars:redoc:_")
+    api(libs.redoc)
 
     testImplementation(testFixtures(project(":http4k-core")))
 }
