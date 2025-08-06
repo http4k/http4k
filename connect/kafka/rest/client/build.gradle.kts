@@ -14,12 +14,12 @@ dependencies {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
 
-    api("org.apache.avro:avro:_")
+    api(libs.avro)
     api(libs.kotshi.api)
 
     testFixturesApi("org.jetbrains.kotlin:kotlin-reflect")
 
     testFixturesApi(project(":http4k-connect-kafka-rest-fake"))
-    testFixturesImplementation("org.apache.avro:avro:_")
+    testFixturesImplementation(libs.avro)
     testFixturesApi(libs.kotshi.api)
 }

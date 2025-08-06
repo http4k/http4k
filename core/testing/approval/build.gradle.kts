@@ -13,7 +13,7 @@ dependencies {
     api("com.github.javadev:underscore:_")
     api("org.jsoup:jsoup:_")
 
-    api(platform("org.junit:junit-bom:_"))
+    api(platform(libs.junit.bom))
     api("org.junit.jupiter:junit-jupiter-api")
     implementation("com.natpryce:hamkrest:_")
     api(project(":http4k-format-jackson-yaml"))

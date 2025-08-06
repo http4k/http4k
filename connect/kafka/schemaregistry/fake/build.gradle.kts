@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api("org.apache.avro:avro:_")
+    api(libs.avro)
 
     testFixturesApi(libs.kotshi.api)
 

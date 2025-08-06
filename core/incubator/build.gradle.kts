@@ -15,7 +15,7 @@ dependencies {
     api(Square.moshi.adapters)
     implementation(project(mapOf("path" to ":http4k-testing-webdriver")))
 
-    compileOnly(platform("org.junit:junit-bom:_"))
+    compileOnly(platform(libs.junit.bom))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
 
     testImplementation(project(":http4k-client-apache"))

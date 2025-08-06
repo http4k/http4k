@@ -13,13 +13,13 @@ dependencies {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
 
-    api("org.apache.avro:avro:_")
+    api(libs.avro)
 
     api(libs.kotshi.api)
 
     testFixturesApi("org.jetbrains.kotlin:kotlin-reflect")
 
-    testFixturesImplementation("org.apache.avro:avro:_")
+    testFixturesImplementation(libs.avro)
 
     testFixturesApi(libs.kotshi.api)
 }

@@ -165,6 +165,7 @@ gradle-license-report = "2.9"
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 
 # Testing
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
@@ -235,6 +236,8 @@ thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 # Utilities
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+loremipsum = { module = "de.sven-jacobs:loremipsum", version.ref = "loremipsum" }
+avro = { module = "org.apache.avro:avro", version.ref = "avro" }
 
 # Kotshi
 kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }

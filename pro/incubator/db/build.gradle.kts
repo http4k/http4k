@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(platform(libs.forkhandles.bom))
-    compileOnly(platform("org.junit:junit-bom:_"))
+    compileOnly(platform(libs.junit.bom))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
     api(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))

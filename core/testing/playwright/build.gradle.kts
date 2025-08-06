@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api("com.microsoft.playwright:playwright:_")
-    api(platform("org.junit:junit-bom:_"))
+    api(platform(libs.junit.bom))
     api("org.junit.jupiter:junit-jupiter-api")
 
     testImplementation(testFixtures(project(":http4k-core")))
