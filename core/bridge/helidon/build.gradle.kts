@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
 
-    api(platform("io.helidon:helidon-bom:_"))
+    api(platform(libs.helidon.bom))
     api("io.helidon.webserver:helidon-webserver")
     api("io.helidon.webserver:helidon-webserver-sse")
     api("io.helidon.webserver:helidon-webserver-websocket")

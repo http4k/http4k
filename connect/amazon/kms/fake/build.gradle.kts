@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-format-moshi"))
-    api("org.bouncycastle:bcprov-jdk18on:_")
+    api(libs.bcprov.jdk18on)
 
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

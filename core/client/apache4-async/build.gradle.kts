@@ -10,6 +10,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("org.apache.httpcomponents:httpasyncclient:_")
+    api(libs.apache.httpasyncclient)
     testImplementation(testFixtures(project(":http4k-core")))
 }

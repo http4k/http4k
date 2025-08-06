@@ -10,6 +10,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("org.apache.httpcomponents:httpclient:_")
+    api(libs.apache.httpclient)
     testImplementation(testFixtures(project(":http4k-core")))
 }

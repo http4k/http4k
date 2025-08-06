@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
 
-    api(platform("io.github.resilience4j:resilience4j-bom:_"))
+    api(platform(libs.resilience4j.bom))
     api("io.github.resilience4j:resilience4j-bulkhead")
     api("io.github.resilience4j:resilience4j-circuitbreaker")
     api("io.github.resilience4j:resilience4j-ratelimiter")

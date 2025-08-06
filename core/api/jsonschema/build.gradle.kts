@@ -13,8 +13,8 @@ dependencies {
 
     implementation(project(":http4k-format-jackson"))
     implementation(project(":http4k-format-kondor-json"))
-    implementation("dev.forkhandles:values4k:_")
-    implementation("dev.forkhandles:data4k:_")
+    implementation(libs.values4k)
+    implementation(libs.data4k)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     testImplementation(project(":http4k-core"))

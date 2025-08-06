@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-template-core"))
-    api("io.pebbletemplates:pebble:_")
+    api(libs.pebble)
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-template-core")))
 }

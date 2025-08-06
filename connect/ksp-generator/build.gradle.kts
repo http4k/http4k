@@ -12,14 +12,14 @@ dependencies {
     api(project(":http4k-connect-core"))
 
     api(project(":http4k-format-moshi"))
-    api("com.squareup:kotlinpoet:_")
-    api("com.squareup:kotlinpoet-metadata:_")
-    api("com.squareup:kotlinpoet-ksp:_")
-    api("com.google.devtools.ksp:symbol-processing-api:_")
+    api(libs.kotlinpoet)
+    api(libs.kotlinpoet.metadata)
+    api(libs.kotlinpoet.ksp)
+    api(libs.symbol.processing.api)
 
-    ksp("se.ansman.kotshi:compiler:_")
+    ksp(libs.kotshi.compiler)
 
-    testFixturesApi("se.ansman.kotshi:api:_")
+    testFixturesApi(libs.kotshi.api)
     testFixturesApi(project(":http4k-format-moshi"))
     testFixturesApi("dev.forkhandles:result4k")
 

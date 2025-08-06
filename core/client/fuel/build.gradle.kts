@@ -10,6 +10,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("com.github.kittinunf.fuel:fuel:_")
+    api(libs.fuel)
     testImplementation(testFixtures(project(":http4k-core")))
 }

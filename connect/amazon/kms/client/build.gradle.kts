@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    testFixturesApi("org.bouncycastle:bcprov-jdk18on:_")
+    testFixturesApi(libs.bcprov.jdk18on)
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

@@ -17,8 +17,8 @@ dependencies {
     api(project(":http4k-connect-core"))
     api(project(":http4k-config"))
     ksp(project(":http4k-connect-ksp-generator"))
-    ksp("se.ansman.kotshi:compiler:_")
+    ksp("se.ansman.kotshi:compiler:4.0.0")
 
-    testFixturesApi("se.ansman.kotshi:compiler:_")
+    testFixturesApi("se.ansman.kotshi:compiler:4.0.0")
     testFixturesApi(testFixtures(project(":http4k-connect-core-fake")))
 }

@@ -15,8 +15,8 @@ dependencies {
         exclude("org.jetbrains.kotlin", "kotlin-reflect")
     }
 
-    api("se.ansman.kotshi:api:_")
-    api("com.github.javadev:underscore:_")
+    api(libs.kotshi.api)
+    api(libs.underscore)
     api(project(":http4k-format-core"))
 
     testFixturesApi(project(":http4k-testing-chaos"))

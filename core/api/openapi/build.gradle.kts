@@ -19,7 +19,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.openapitools:openapi-generator-gradle-plugin:_")
+        classpath(libs.openapi.generator.gradle.plugin)
     }
 }
 
@@ -28,12 +28,12 @@ dependencies {
     api(project(":http4k-api-jsonschema"))
     api(project(":http4k-security-core"))
 
-    implementation("dev.forkhandles:values4k:_")
+    implementation(libs.values4k)
     implementation(project(":http4k-security-oauth"))
     implementation(project(":http4k-format-jackson"))
     implementation(project(":http4k-multipart"))
 
-    testImplementation("dev.forkhandles:values4k:_")
+    testImplementation(libs.values4k)
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-format-kondor-json"))

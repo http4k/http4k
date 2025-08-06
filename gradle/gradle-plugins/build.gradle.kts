@@ -18,11 +18,11 @@ repositories {
 }
 
 dependencies {
-    api(Kotlin.gradlePlugin)
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0")
     api(gradleApi())
-    api("com.github.jk1:gradle-license-report:_")
-    api("org.jetbrains.dokka:dokka-base:_")
-    api("org.jetbrains.dokka:dokka-gradle-plugin:_")
-    api("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:_")
+    api("com.github.jk1:gradle-license-report:2.9")
+    api("org.jetbrains.dokka:dokka-base:2.0.0-Beta")
+    api("org.jetbrains.dokka:dokka-gradle-plugin:2.0.0-Beta")
+    api("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.2.0-2.0.2")
     api("com.vanniktech:gradle-maven-publish-plugin:0.34.0")
 }

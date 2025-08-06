@@ -11,14 +11,14 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
-    implementation("dev.forkhandles:values4k:_")
+    implementation(libs.values4k)
 
-    testImplementation("dev.forkhandles:values4k:_")
+    testImplementation(libs.values4k)
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-api-jsonrpc"))
     testImplementation(project(":http4k-testing-hamkrest"))
 
-    testFixturesImplementation("dev.forkhandles:values4k:_")
+    testFixturesImplementation(libs.values4k)
     testFixturesImplementation(testFixtures(project(":http4k-core")))
     testFixturesImplementation(testFixtures(project(":http4k-api-openapi")))
     testFixturesImplementation(testFixtures(project(":http4k-api-jsonrpc")))

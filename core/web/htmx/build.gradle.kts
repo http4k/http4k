@@ -10,9 +10,9 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("org.webjars.npm:htmx.org:_")
-    api("org.webjars.npm:hyperscript.org:_")
-    api("dev.forkhandles:values4k:_")
+    api(libs.htmx.org)
+    api(libs.hyperscript.org)
+    api(libs.values4k)
 
     // this is here to force the version of something which is no longer in maven
     implementation("org.webjars.npm:jridgewell__sourcemap-codec:1.5.0")

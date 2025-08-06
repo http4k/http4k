@@ -11,6 +11,6 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     implementation(project(":http4k-format-core"))
-    api("io.strikt:strikt-core:_")
+    api(libs.strikt.core)
     testImplementation(project(":http4k-format-jackson"))
 }

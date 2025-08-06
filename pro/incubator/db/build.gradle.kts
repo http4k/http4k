@@ -9,8 +9,8 @@ plugins {
 }
 
 dependencies {
-    api(platform("dev.forkhandles:forkhandles-bom:_"))
-    compileOnly(platform("org.junit:junit-bom:_"))
+    api(platform(libs.forkhandles.bom))
+    compileOnly(platform(libs.junit.bom))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
     api(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
@@ -20,15 +20,15 @@ dependencies {
     api("dev.forkhandles:values4k")
     api("dev.forkhandles:time4k")
 
-    testImplementation("org.hsqldb:hsqldb:_")
+    testImplementation(libs.hsqldb)
 
-    testImplementation("org.postgresql:postgresql:_")
+    testImplementation(libs.postgresql)
 
-    testImplementation("mysql:mysql-connector-java:_")
+    testImplementation(libs.mysql.connector.java)
 
-    api("com.zaxxer:HikariCP:_")
-    api(platform("org.jetbrains.exposed:exposed-bom:_"))
-    api(JetBrains.exposed.core)
-    api(JetBrains.exposed.jdbc)
-    api("org.jetbrains.exposed:exposed-java-time:_")
+    api(libs.hikaricp)
+    api(platform(libs.exposed.bom))
+    api(libs.exposed.core)
+    api(libs.exposed.jdbc)
+    api(libs.exposed.java.time)
 }

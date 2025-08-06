@@ -6,7 +6,7 @@ val license by project.extra { Apache2 }
 
 
 plugins {
-    id("nu.studer.rocker")
+    alias(libs.plugins.rocker)
     id("org.http4k.community")
 }
 
@@ -15,9 +15,9 @@ apply(plugin = "nu.studer.rocker")
 
 dependencies {
     api(project(":http4k-template-core"))
-    api("com.fizzed:rocker-runtime:_")
+    api(libs.rocker.runtime)
 
-    testImplementation("com.fizzed:rocker-compiler:_")
+    testImplementation(libs.rocker.compiler)
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-template-core")))
 }

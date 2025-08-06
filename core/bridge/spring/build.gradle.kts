@@ -11,13 +11,13 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-bridge-servlet"))
-    api("jakarta.servlet:jakarta.servlet-api:_")
+    api(libs.jakarta.servlet.api)
 
-    implementation("org.springframework:spring-webmvc:_")
-    implementation("org.springframework:spring-context:_")
+    implementation(libs.spring.webmvc)
+    implementation(libs.spring.context)
     
     testImplementation(project(":http4k-testing-hamkrest"))
-    testImplementation("org.springframework:spring-test:_")
+    testImplementation(libs.spring.test)
     testFixturesApi(testFixtures(project(":http4k-bridge-servlet")))
-    testRuntimeOnly("com.fasterxml.jackson.core:jackson-databind:_")
+    testRuntimeOnly(libs.jackson.databind)
 }

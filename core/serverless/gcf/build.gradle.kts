@@ -13,6 +13,6 @@ dependencies {
     api(project(":http4k-format-moshi")) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
     }
-    api("com.google.cloud.functions:functions-framework-api:_")
+    api(libs.gcp.functions.framework.api)
     testImplementation(testFixtures(project(":http4k-core")))
 }

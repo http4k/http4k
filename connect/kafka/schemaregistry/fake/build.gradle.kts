@@ -9,9 +9,9 @@ plugins {
 }
 
 dependencies {
-    api("org.apache.avro:avro:_")
+    api(libs.avro)
 
-    testFixturesApi("se.ansman.kotshi:api:_")
+    testFixturesApi(libs.kotshi.api)
 
     testFixturesApi(project(":http4k-connect-kafka-schemaregistry"))
 }

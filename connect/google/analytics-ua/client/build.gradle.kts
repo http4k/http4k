@@ -11,7 +11,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-google-analytics-core"))
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
 }
 
 metadata {

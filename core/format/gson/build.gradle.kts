@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-format-core"))
     api(project(":http4k-realtime-core"))
-    api("com.google.code.gson:gson:_")
+    api(libs.gson)
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-api-openapi"))
     testImplementation(project(":http4k-api-jsonrpc"))

@@ -15,5 +15,5 @@ dependencies {
 
     api(project(":http4k-security-oauth"))
 
-    api("se.ansman.kotshi:api:_")
+    api(libs.kotshi.api)
 }

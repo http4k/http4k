@@ -11,13 +11,13 @@ plugins {
 dependencies {
     api(project(":http4k-format-core"))
     api(project(":http4k-realtime-core"))
-    api(platform("com.fasterxml.jackson:jackson-bom:_"))
+    api(platform(libs.jackson.bom))
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.cloudevents:cloudevents-core:_")
-    implementation("io.cloudevents:cloudevents-json-jackson:_")
-    implementation("dev.forkhandles:values4k:_")
-    implementation("dev.forkhandles:data4k:_")
+    implementation(libs.cloudevents.core)
+    implementation(libs.cloudevents.json.jackson)
+    implementation(libs.values4k)
+    implementation(libs.data4k)
 
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-api-openapi"))

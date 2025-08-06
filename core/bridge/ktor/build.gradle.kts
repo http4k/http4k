@@ -10,8 +10,8 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("io.ktor:ktor-server-core-jvm:_")
+    api(libs.ktor.server.core)
 
-    api(Ktor.server.netty)
+    api(libs.ktor.server.netty)
     testFixturesApi(testFixtures(project(":http4k-core")))
 }

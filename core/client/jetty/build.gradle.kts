@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
-    api(platform("org.eclipse.jetty:jetty-bom:_"))
+    api(platform(libs.jetty.bom))
     api("org.eclipse.jetty:jetty-client")
     api("org.eclipse.jetty.websocket:jetty-websocket-jetty-client")
 

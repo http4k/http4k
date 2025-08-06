@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    implementation("io.vertx:vertx-web:_")
+    implementation(libs.vertx.web)
 
     testFixturesApi(testFixtures(project(":http4k-core")))
 }

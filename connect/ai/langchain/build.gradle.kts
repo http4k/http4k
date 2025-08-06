@@ -13,12 +13,12 @@ dependencies {
     api(project(":http4k-connect-ai-openai"))
     api(project(":http4k-connect-ai-ollama"))
     api(project(":http4k-connect-ai-lmstudio"))
-    api("dev.langchain4j:langchain4j-core:_")
-    api("dev.langchain4j:langchain4j-http-client:_")
+    api(libs.langchain4j.core)
+    api(libs.langchain4j.http.client)
 
-    testFixturesApi("dev.langchain4j:langchain4j-open-ai:_")
+    testFixturesApi(libs.langchain4j.open.ai)
 
-    testFixturesApi("dev.langchain4j:langchain4j:_")
+    testFixturesApi(libs.langchain4j)
     testFixturesApi(project(":http4k-connect-ai-openai-fake"))
     testFixturesApi(project(":http4k-connect-ai-ollama-fake"))
     testFixturesApi(project(":http4k-connect-ai-lmstudio-fake"))

@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    testFixturesApi("com.amazonaws:aws-lambda-java-events:_")
+    testFixturesApi(libs.aws.lambda.java.events)
     testFixturesApi(project(":http4k-format-moshi"))
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

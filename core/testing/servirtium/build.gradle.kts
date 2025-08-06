@@ -11,13 +11,13 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api(platform("org.junit:junit-bom:_"))
+    api(platform(libs.junit.bom))
     api("org.junit.jupiter:junit-jupiter-api")
     api(project(":http4k-client-apache"))
     api(project(":http4k-format-moshi"))
     api(project(":http4k-platform-core"))
     api(project(":http4k-tools-traffic-capture"))
-    testImplementation("org.apiguardian:apiguardian-api:_")
+    testImplementation(libs.apiguardian.api)
 
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-testing-approval"))

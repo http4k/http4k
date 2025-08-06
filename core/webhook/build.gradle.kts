@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("dev.forkhandles:values4k:_")
+    api(libs.values4k)
     api(project(":http4k-format-core"))
 
     testImplementation(project(":http4k-format-jackson"))

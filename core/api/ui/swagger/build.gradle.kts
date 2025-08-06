@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-api-openapi"))
-    api("org.webjars:swagger-ui:_")
+    api(libs.swagger.ui)
 
     testImplementation(testFixtures(project(":http4k-core")))
 }

@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-serverless-core"))
-    api("com.microsoft.azure.functions:azure-functions-java-library:_")
+    api(libs.azure.functions.java.library)
     testImplementation(testFixtures(project(":http4k-core")))
 }
 

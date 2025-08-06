@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("com.azure:azure-core:_")
+    api(libs.azure.core)
     testImplementation(project(":http4k-testing-hamkrest"))
 
     testFixturesImplementation(testFixtures(project(":http4k-core")))

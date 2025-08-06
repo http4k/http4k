@@ -13,8 +13,8 @@ dependencies {
     api(project(":http4k-ai-core"))
     implementation(project(":http4k-connect-storage-core"))
 
-    api("se.ansman.kotshi:api:_")
-    ksp("se.ansman.kotshi:compiler:_")
+    api(libs.kotshi.api)
+    ksp(libs.kotshi.compiler)
 
     testFixturesApi(project(":http4k-api-jsonrpc"))
     testFixturesApi(project(":http4k-connect-storage-core"))

@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-format-core"))
     api(project(":http4k-realtime-core"))
-    api("com.beust:klaxon:_")
+    api(libs.klaxon)
     testImplementation(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))

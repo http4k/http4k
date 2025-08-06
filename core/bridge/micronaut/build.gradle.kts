@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
 
-    implementation("io.micronaut:micronaut-http:_")
+    implementation(libs.micronaut.http)
 
     testFixturesApi(testFixtures(project(":http4k-core")))
 }
