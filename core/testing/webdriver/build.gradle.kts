@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("org.seleniumhq.selenium:selenium-api:_")
+    api(libs.selenium.api)
     api(libs.jsoup)
     implementation(project(mapOf("path" to ":http4k-multipart")))
     testImplementation(project(mapOf("path" to ":http4k-multipart")))

@@ -15,7 +15,7 @@ apply(plugin = "nu.studer.rocker")
 
 dependencies {
     api(project(":http4k-template-core"))
-    api("com.fizzed:rocker-runtime:_")
+    api(libs.rocker.runtime)
 
     testImplementation(libs.rocker.compiler)
     testImplementation(testFixtures(project(":http4k-core")))
