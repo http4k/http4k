@@ -10,8 +10,8 @@ plugins {
 
 dependencies {
     api(Kotlin.stdlib)
-    implementation("dev.forkhandles:result4k:_")
-    implementation("dev.forkhandles:values4k:_")
+    implementation(libs.result4k)
+    implementation(libs.values4k)
 
     testImplementation("org.junit.jupiter:junit-jupiter-params")
 
@@ -19,14 +19,14 @@ dependencies {
     testFixturesImplementation("io.opentelemetry:opentelemetry-sdk")
     testFixturesImplementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
-    testFixturesImplementation("dev.forkhandles:result4k:_")
-    testFixturesImplementation("dev.forkhandles:values4k:_")
+    testFixturesImplementation(libs.result4k)
+    testFixturesImplementation(libs.values4k)
     testFixturesApi(project(":http4k-client-apache4"))
     testFixturesApi(project(":http4k-testing-approval"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-format-jackson"))
     testFixturesApi(project(":http4k-client-websocket"))
     testFixturesApi(project(":http4k-server-apache"))
-    testFixturesApi("dev.forkhandles:mock4k:_")
+    testFixturesApi(libs.mock4k)
     testFixturesApi("org.webjars:swagger-ui:_")
 }
