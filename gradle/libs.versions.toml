@@ -188,8 +188,8 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
-jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-datatype-guava" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
+jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
 jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
@@ -272,11 +272,11 @@ failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
 
 # Forkhandles
 forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles-bom" }
-result4k = { module = "dev.forkhandles:result4k", version.ref = "result4k" }
-values4k = { module = "dev.forkhandles:values4k", version.ref = "values4k" }
-mock4k = { module = "dev.forkhandles:mock4k", version.ref = "mock4k" }
-data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
-bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "bunting4k" }
+result4k = { module = "dev.forkhandles:result4k", version.ref = "forkhandles-bom" }
+values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }
+mock4k = { module = "dev.forkhandles:mock4k", version.ref = "forkhandles-bom" }
+data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
+bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-bom" }
 time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
 parser4k = { module = "dev.forkhandles:parser4k", version.ref = "forkhandles-bom" }
 fs4k = { module = "dev.forkhandles:fs4k", version.ref = "forkhandles-bom" }
@@ -315,6 +315,7 @@ swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 redoc = { module = "org.webjars:redoc", version.ref = "redoc" }
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
+jridgewell-sourcemap-codec = { module = "org.webjars.npm:jridgewell__sourcemap-codec", version = "1.5.0" }
 
 # Template Engines (additional)
 pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
