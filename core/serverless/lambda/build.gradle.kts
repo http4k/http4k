@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-serverless-core"))
-    api("com.amazonaws:aws-lambda-java-core:_")
+    api(libs.aws.lambda.java.core)
     compileOnly(libs.aws.lambda.java.events)
     api(project(":http4k-format-moshi")) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")

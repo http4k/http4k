@@ -12,7 +12,7 @@ plugins {
 dependencies {
     api(platform(libs.forkhandles.bom))
 
-    compileOnly("org.jetbrains.kotlin:kotlin-reflect:_")
+    compileOnly(libs.kotlin.reflect)
 
     api(project(":http4k-realtime-core"))
     api(project(":http4k-format-moshi")) {

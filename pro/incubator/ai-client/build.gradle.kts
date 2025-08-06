@@ -17,7 +17,7 @@ dependencies {
     api(project(":http4k-web-datastar"))
     api(project(":http4k-template-handlebars"))
     api(project(":http4k-ai-llm-anthropic"))
-    api("org.jetbrains.kotlin:kotlin-reflect:_")
+    api(libs.kotlin.reflect)
 
     api(libs.kotshi.api)
 

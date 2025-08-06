@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("com.google.http-client:google-http-client:_")
+    api(libs.google.http.client)
 
     testImplementation(project(":http4k-testing-hamkrest"))
     testFixturesImplementation(testFixtures(project(":http4k-core")))
