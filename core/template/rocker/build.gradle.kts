@@ -6,7 +6,7 @@ val license by project.extra { Apache2 }
 
 
 plugins {
-    id("nu.studer.rocker") version "3.0.5"
+    alias(libs.plugins.rocker)
     id("org.http4k.community")
 }
 
