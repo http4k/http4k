@@ -10,9 +10,9 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    implementation("jakarta.inject:jakarta.inject-api:_")
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api:_")
+    implementation(libs.jakarta.inject.api)
+    implementation(libs.jakarta.ws.rs.api)
 
     testFixturesApi(testFixtures(project(":http4k-core")))
-    testApi("org.jboss.resteasy:resteasy-core:_")
+    testApi(libs.resteasy.core)
 }

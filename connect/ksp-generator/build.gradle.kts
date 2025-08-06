@@ -12,10 +12,10 @@ dependencies {
     api(project(":http4k-connect-core"))
 
     api(project(":http4k-format-moshi"))
-    api("com.squareup:kotlinpoet:_")
-    api("com.squareup:kotlinpoet-metadata:_")
-    api("com.squareup:kotlinpoet-ksp:_")
-    api("com.google.devtools.ksp:symbol-processing-api:_")
+    api(libs.kotlinpoet)
+    api(libs.kotlinpoet.metadata)
+    api(libs.kotlinpoet.ksp)
+    api(libs.symbol.processing.api)
 
     ksp(libs.kotshi.compiler)
 

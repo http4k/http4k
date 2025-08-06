@@ -14,8 +14,8 @@ dependencies {
     api(platform("io.opentelemetry:opentelemetry-bom:_"))
     api("io.opentelemetry:opentelemetry-sdk")
     api("io.opentelemetry:opentelemetry-sdk-metrics")
-    api("io.opentelemetry.semconv:opentelemetry-semconv:_")
-    api("io.opentelemetry.semconv:opentelemetry-semconv-incubating:_")
+    api(libs.opentelemetry.semconv)
+    api(libs.opentelemetry.semconv.incubating)
     testFixturesApi("io.opentelemetry:opentelemetry-extension-trace-propagators")
     testFixturesApi("io.opentelemetry:opentelemetry-sdk-testing")
 

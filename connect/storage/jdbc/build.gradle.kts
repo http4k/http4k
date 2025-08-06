@@ -14,5 +14,5 @@ dependencies {
     api("org.jetbrains.exposed:exposed-jdbc:_")
 
     testFixturesApi(libs.hikaricp)
-    testFixturesApi("com.h2database:h2:_")
+    testFixturesApi(libs.h2)
 }

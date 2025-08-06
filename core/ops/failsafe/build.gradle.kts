@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
-    api("dev.failsafe:failsafe:_")
+    api(libs.failsafe)
     testImplementation(testFixtures(project(":http4k-core")))
 }
 
