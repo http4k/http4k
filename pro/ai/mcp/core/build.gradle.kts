@@ -22,9 +22,9 @@ dependencies {
     api(project(":http4k-api-jsonrpc"))
     api(project(":http4k-ai-core"))
 
-    api("dev.forkhandles:values4k")
-    api("dev.forkhandles:result4k")
-    api("dev.forkhandles:time4k")
+    api(libs.values4k)
+    api(libs.result4k)
+    api(libs.time4k)
 
     ksp(libs.kotshi.compiler)
 

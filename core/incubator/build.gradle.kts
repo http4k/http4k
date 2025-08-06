@@ -16,7 +16,7 @@ dependencies {
     implementation(project(mapOf("path" to ":http4k-testing-webdriver")))
 
     compileOnly(platform(libs.junit.bom))
-    compileOnly("org.junit.jupiter:junit-jupiter-api")
+    compileOnly(libs.junit.jupiter.api)
 
     testImplementation(project(":http4k-client-apache"))
 

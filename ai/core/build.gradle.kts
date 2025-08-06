@@ -12,7 +12,7 @@ plugins {
 dependencies {
     api(platform(libs.forkhandles.bom))
     api(project(":http4k-connect-core"))
-    api("dev.forkhandles:result4k")
+    api(libs.result4k)
 
     api(project(":http4k-format-core"))
 

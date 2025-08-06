@@ -9,7 +9,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-platform-core"))
-    api("dev.forkhandles:values4k")
+    api(libs.values4k)
     compileOnly(project(":http4k-format-moshi"))
     testCompileOnly(project(":http4k-format-moshi"))
 }

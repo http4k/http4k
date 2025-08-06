@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-format-core"))
     api(project(":http4k-format-jackson"))
     api(platform(libs.jackson.bom))
-    api("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+    api(libs.jackson.dataformat.xml)
     testImplementation(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))

@@ -173,6 +173,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.9.3" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
@@ -210,6 +211,8 @@ jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty
 jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }
 jetty-http2-server = { module = "org.eclipse.jetty.http2:jetty-http2-server", version.ref = "jetty-bom" }
 jetty-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty-bom" }
+jetty-client = { module = "org.eclipse.jetty:jetty-client", version.ref = "jetty-bom" }
+jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-client", version.ref = "jetty-bom" }
 jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
 jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
 jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
@@ -217,6 +220,11 @@ jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocke
 jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
 jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
 helidon-bom = { module = "io.helidon:helidon-bom", version.ref = "helidon-bom" }
+helidon-webserver = { module = "io.helidon.webserver:helidon-webserver", version.ref = "helidon-bom" }
+helidon-webserver-sse = { module = "io.helidon.webserver:helidon-webserver-sse", version.ref = "helidon-bom" }
+helidon-webserver-websocket = { module = "io.helidon.webserver:helidon-webserver-websocket", version.ref = "helidon-bom" }
+helidon-webclient = { module = "io.helidon.webclient:helidon-webclient", version.ref = "helidon-bom" }
+helidon-webclient-websocket = { module = "io.helidon.webclient:helidon-webclient-websocket", version.ref = "helidon-bom" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "netty-codec-http2" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
@@ -229,6 +237,9 @@ spring-test = { module = "org.springframework:spring-test", version.ref = "sprin
 aws-lambda-java-core = { module = "com.amazonaws:aws-lambda-java-core", version.ref = "aws-lambda-java-core" }
 aws-lambda-java-events = { module = "com.amazonaws:aws-lambda-java-events", version.ref = "aws-lambda-java-events" }
 awssdk-bom = { module = "software.amazon.awssdk:bom", version.ref = "awssdk-bom" }
+awssdk-http-client-spi = { module = "software.amazon.awssdk:http-client-spi", version.ref = "awssdk-bom" }
+awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk-bom" }
+awssdk-sqs = { module = "software.amazon.awssdk:sqs", version.ref = "awssdk-bom" }
 azure-core = { module = "com.azure:azure-core", version.ref = "azure-core" }
 azure-functions-java-library = { module = "com.microsoft.azure.functions:azure-functions-java-library", version.ref = "azure-functions-java-library" }
 
@@ -266,6 +277,9 @@ values4k = { module = "dev.forkhandles:values4k", version.ref = "values4k" }
 mock4k = { module = "dev.forkhandles:mock4k", version.ref = "mock4k" }
 data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
 bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "bunting4k" }
+time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
+parser4k = { module = "dev.forkhandles:parser4k", version.ref = "forkhandles-bom" }
+fs4k = { module = "dev.forkhandles:fs4k", version.ref = "forkhandles-bom" }
 
 # Template engines
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
@@ -323,6 +337,9 @@ cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson",
 # Testing Libraries (additional)
 selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
 playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-bom" }
 
 # Observability (additional) 
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }

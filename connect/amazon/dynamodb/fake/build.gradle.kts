@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api("dev.forkhandles:parser4k")
+    api(libs.parser4k)
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
     testFixturesApi(project(path = ":http4k-connect-amazon-s3"))
 }

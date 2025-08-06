@@ -17,7 +17,7 @@ dependencies {
     api(libs.avro)
     api(libs.kotshi.api)
 
-    testFixturesApi("org.jetbrains.kotlin:kotlin-reflect")
+    testFixturesApi(libs.kotlin.reflect)
 
     testFixturesApi(project(":http4k-connect-kafka-rest-fake"))
     testFixturesImplementation(libs.avro)

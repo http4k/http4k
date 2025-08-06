@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-core"))
 
     implementation(platform(libs.awssdk.bom))
-    implementation("software.amazon.awssdk:http-client-spi")
+    implementation(libs.awssdk.http.client.spi)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-client-okhttp"))

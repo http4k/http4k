@@ -17,7 +17,7 @@ dependencies {
 
     api(libs.kotshi.api)
 
-    testFixturesApi("org.jetbrains.kotlin:kotlin-reflect")
+    testFixturesApi(libs.kotlin.reflect)
 
     testFixturesImplementation(libs.avro)
 

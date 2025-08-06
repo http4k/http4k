@@ -13,7 +13,7 @@ dependencies {
     api(project(":http4k-realtime-core"))
     api(project(":http4k-format-jackson"))
     api(platform(libs.jackson.bom))
-    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    api(libs.jackson.dataformat.yaml)
     testImplementation(project(":http4k-core"))
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))

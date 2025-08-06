@@ -13,9 +13,9 @@ dependencies {
     api(project(":http4k-realtime-core"))
 
     api(platform(libs.helidon.bom))
-    api("io.helidon.webserver:helidon-webserver")
-    api("io.helidon.webserver:helidon-webserver-sse")
-    api("io.helidon.webserver:helidon-webserver-websocket")
+    api(libs.helidon.webserver)
+    api(libs.helidon.webserver.sse)
+    api(libs.helidon.webserver.websocket)
 
     testFixturesApi(testFixtures(project(":http4k-core")))
 }

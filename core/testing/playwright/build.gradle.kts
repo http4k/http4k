@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-core"))
     api(libs.playwright)
     api(platform(libs.junit.bom))
-    api("org.junit.jupiter:junit-jupiter-api")
+    api(libs.junit.jupiter.api)
 
     testImplementation(testFixtures(project(":http4k-core")))
 

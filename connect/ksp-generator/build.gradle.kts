@@ -21,7 +21,7 @@ dependencies {
 
     testFixturesApi(libs.kotshi.api)
     testFixturesApi(project(":http4k-format-moshi"))
-    testFixturesApi("dev.forkhandles:result4k")
+    testFixturesApi(libs.result4k)
 
     kspTest(project(":http4k-connect-ksp-generator"))
     kspTestFixtures(project(":http4k-connect-ksp-generator"))

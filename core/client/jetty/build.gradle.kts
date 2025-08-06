@@ -12,8 +12,8 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
     api(platform(libs.jetty.bom))
-    api("org.eclipse.jetty:jetty-client")
-    api("org.eclipse.jetty.websocket:jetty-websocket-jetty-client")
+    api(libs.jetty.client)
+    api(libs.jetty.websocket.jetty.client)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-jetty"))

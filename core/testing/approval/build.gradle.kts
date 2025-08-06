@@ -14,7 +14,7 @@ dependencies {
     api(libs.jsoup)
 
     api(platform(libs.junit.bom))
-    api("org.junit.jupiter:junit-jupiter-api")
+    api(libs.junit.jupiter.api)
     implementation(libs.hamkrest)
     api(project(":http4k-format-jackson-yaml"))
     implementation(project(":http4k-api-cloudevents"))

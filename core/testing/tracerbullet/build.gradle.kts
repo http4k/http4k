@@ -13,7 +13,7 @@ dependencies {
     api(project(":http4k-format-moshi"))
     api(libs.moshi.adapters)
     implementation(platform(libs.junit.bom))
-    compileOnly("org.junit.jupiter:junit-jupiter-api")
+    compileOnly(libs.junit.jupiter.api)
 
     testImplementation(project(":http4k-testing-strikt"))
     testImplementation(project(":http4k-client-apache"))
