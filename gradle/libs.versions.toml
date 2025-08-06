@@ -238,6 +238,7 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 loremipsum = { module = "de.sven-jacobs:loremipsum", version.ref = "loremipsum" }
 avro = { module = "org.apache.avro:avro", version.ref = "avro" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 
 # Kotshi
 kotshi-api = { module = "se.ansman.kotshi:api", version.ref = "kotshi-api" }

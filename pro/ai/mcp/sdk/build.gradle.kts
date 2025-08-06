@@ -16,7 +16,7 @@ dependencies {
     testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))
 
-    testImplementation("org.jsoup:jsoup:_")
+    testImplementation(libs.jsoup)
     testImplementation("dev.forkhandles:fs4k")
 
     testImplementation(testFixtures(project(":http4k-core")))

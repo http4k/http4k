@@ -15,7 +15,7 @@ dependencies {
     api(project(":http4k-serverless-lambda"))
     api(testFixtures(project(":http4k-core")))
     api(testFixtures(project(":http4k-serverless-core")))
-    api("com.amazonaws:aws-lambda-java-events:_")
+    api(libs.aws.lambda.java.events)
     api("joda-time:joda-time:_")
 }
 

@@ -18,7 +18,7 @@ dependencies {
 
     testApi(project(":http4k-server-helidon"))
 
-    testFixturesApi("io.mockk:mockk:_")
+    testFixturesApi(libs.mockk)
     testFixturesApi(project(":http4k-client-websocket"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-web-datastar"))

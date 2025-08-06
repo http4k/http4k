@@ -11,7 +11,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api("com.github.javadev:underscore:_")
-    api("org.jsoup:jsoup:_")
+    api(libs.jsoup)
 
     api(platform(libs.junit.bom))
     api("org.junit.jupiter:junit-jupiter-api")
