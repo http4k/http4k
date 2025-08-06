@@ -10,17 +10,17 @@ repositories {
 }
 
 dependencies {
-    api(platform("dev.forkhandles:forkhandles-bom:_"))
+    api(platform("dev.forkhandles:forkhandles-bom:2.22.4.0"))
     api(project(":http4k-core"))
     api("dev.forkhandles:result4k")
 
-    testFixturesApi(platform("org.junit:junit-bom:_"))
+    testFixturesApi(platform("org.junit:junit-bom:5.13.4"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-testing-approval"))
 
     testFixturesApi("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testFixturesApi(platform("org.testcontainers:testcontainers-bom:_"))
+    testFixturesApi(platform("org.testcontainers:testcontainers-bom:1.21.3"))
     testFixturesApi("org.junit.jupiter:junit-jupiter-params")
     testFixturesApi("org.testcontainers:junit-jupiter")
     testFixturesApi("org.testcontainers:testcontainers")
