@@ -2,8 +2,8 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 plugins {
     id("org.http4k.project-metadata")
     id("org.http4k.api-docs")
+    id("nl.littlerobots.version-catalog-update") version "1.0.0"
     alias(libs.plugins.versions)
-    alias(libs.plugins.use.latest.versions)
 }
 
 fun isNonStable(version: String): Boolean {
