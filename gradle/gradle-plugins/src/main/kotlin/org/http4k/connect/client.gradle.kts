@@ -17,8 +17,14 @@ dependencies {
     api(project(":http4k-connect-core"))
     api(project(":http4k-config"))
     ksp(project(":http4k-connect-ksp-generator"))
-    ksp("se.ansman.kotshi:compiler:4.0.0")
+    ksp(lib("kotshi-compiler"))
 
-    testFixturesApi("se.ansman.kotshi:compiler:4.0.0")
+    testFixturesApi(lib("kotshi-compiler"))
     testFixturesApi(testFixtures(project(":http4k-connect-core-fake")))
 }
+
+
+fun lib(s: String) = the<VersionCatalogsExtension>()
+    .find("libs")
+    .flatMap { it.findLibrary(s) }
+    .get()

@@ -19,11 +19,6 @@ val metadata = kotlin.runCatching {
 apply(plugin = "com.vanniktech.maven.publish")
 
 configure<MavenPublishBaseExtension> {
-//    val javaComponent = components["java"] as AdhocComponentWithVariants
-//
-//    javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
-//    javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
-
     configure<PublishingExtension> {
         repositories {
             maven {
@@ -39,14 +34,6 @@ configure<MavenPublishBaseExtension> {
                 }
             }
         }
-
-//        publications {
-//            create<MavenPublication>("maven") {
-//                from(components["java"])
-//                artifact(tasks.named("sourcesJar"))
-//                artifact(tasks.named("javadocJar"))
-//            }
-//        }
 
         val enableSigning = project.findProperty("sign") == "true"
 
@@ -92,7 +79,6 @@ configure<MavenPublishBaseExtension> {
                     .appendNode("name", license.commonName).parent()
                     .appendNode("url", license.url)
             }
-//            from(components["java"])
 
             // replace all runtime dependencies with provided
             withXml {
@@ -102,8 +88,6 @@ configure<MavenPublishBaseExtension> {
                     .flatMap { it.childrenCalled("scope") }
                     .forEach { if (it.text() == "runtime") it.setValue("provided") }
             }
-//            artifact(tasks.named("sourcesJar"))
-//            artifact(tasks.named("javadocJar"))
         }
     }
 

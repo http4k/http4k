@@ -94,14 +94,18 @@ tasks {
 }
 
 dependencies {
+    testImplementation(lib("junit-jupiter-api"))
+    testImplementation(lib("junit-jupiter-engine"))
+    testImplementation(lib("hamkrest"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("com.natpryce:hamkrest:1.8.0.1")
-
-    testFixturesApi(platform("org.junit:junit-bom:5.13.4"))
-    testFixturesImplementation("org.junit.platform:junit-platform-launcher")
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testFixturesImplementation("com.natpryce:hamkrest:1.8.0.1")
+    testFixturesApi(platform(lib("junit-bom")))
+    testFixturesImplementation(lib("junit-platform-launcher"))
+    testFixturesImplementation(lib("junit-jupiter-api"))
+    testFixturesImplementation(lib("junit-jupiter-engine"))
+    testFixturesImplementation(lib("hamkrest"))
 }
+
+fun lib(s: String) = the<VersionCatalogsExtension>()
+    .find("libs")
+    .flatMap { it.findLibrary(s) }
+    .get()

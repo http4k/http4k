@@ -10,22 +10,28 @@ repositories {
 }
 
 dependencies {
-    api(platform("dev.forkhandles:forkhandles-bom:2.22.4.0"))
+    api(platform(lib("forkhandles-bom")))
     api(project(":http4k-core"))
-    api("dev.forkhandles:result4k")
+    api(lib("result4k"))
 
-    testFixturesApi(platform("org.junit:junit-bom:5.13.4"))
+    testFixturesApi(platform(lib("junit-bom")))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-testing-approval"))
 
-    testFixturesApi("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testFixturesApi(platform("org.testcontainers:testcontainers-bom:1.21.3"))
-    testFixturesApi("org.junit.jupiter:junit-jupiter-params")
-    testFixturesApi("org.testcontainers:junit-jupiter")
-    testFixturesApi("org.testcontainers:testcontainers")
-    testFixturesApi("dev.forkhandles:mock4k")
+    testFixturesApi(lib("junit-jupiter-api"))
+    testImplementation(lib("junit-jupiter-engine"))
+    testFixturesApi(platform(lib("testcontainers-bom")))
+    testFixturesApi(lib("junit-jupiter-params"))
+    testFixturesApi(lib("testcontainers-junit-jupiter"))
+    testFixturesApi(lib("testcontainers"))
+    testFixturesApi(lib("mock4k"))
 }
+
+
+fun lib(s: String) = the<VersionCatalogsExtension>()
+    .find("libs")
+    .flatMap { it.findLibrary(s) }
+    .get()
 
 
 tasks {

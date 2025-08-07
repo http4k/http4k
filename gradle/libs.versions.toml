@@ -24,6 +24,9 @@ com-github-ben-manes-versions = "0.52.0"
 com-github-johnrengelman-shadow = "8.1.1"
 com-google-devtools-ksp = "2.2.0-2.0.2"
 commons-codec = "1.19.0"
+com-github-jk1-gradle-license-report = "2.9"
+com-vanniktech-gradle-maven-publish-plugin = "0.34.0"
+dokka = "2.0.0-Beta"
 # frozen
 docker-java-core = "3.5.3"
 docker-java-transport-httpclient5 = "3.5.3"
@@ -145,6 +148,8 @@ bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-b
 cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
 cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
+dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
@@ -159,6 +164,8 @@ fs4k = { module = "dev.forkhandles:fs4k", version.ref = "forkhandles-bom" }
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
 gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
 google-http-client = { module = "com.google.http-client:google-http-client", version.ref = "google-http-client" }
+gradle-license-report = { module = "com.github.jk1:gradle-license-report", version.ref = "com-github-jk1-gradle-license-report" }
+gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "com-vanniktech-gradle-maven-publish-plugin" }
 graphql-java = { module = "com.graphql-java:graphql-java", version.ref = "graphql-java" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
