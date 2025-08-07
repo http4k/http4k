@@ -1,8 +1,8 @@
 plugins {
     id("org.http4k.project-metadata")
     id("org.http4k.api-docs")
-    id("nl.littlerobots.version-catalog-update") version "1.0.0"
     alias(libs.plugins.versions)
+    alias(libs.plugins.versionCatalogUpdate)
 }
 
 metadata {

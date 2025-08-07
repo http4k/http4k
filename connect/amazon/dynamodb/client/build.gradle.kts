@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-connect-amazon-core"))
-    testFixturesApi("org.jetbrains.kotlin", "kotlin-reflect")
+    testFixturesApi(libs.kotlin.reflect)
     testFixturesApi(project(":http4k-serverless-lambda"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))

@@ -1,7 +1,9 @@
+import org.jetbrains.kotlin.gradle.internal.backend.common.serialization.metadata.DynamicTypeDeserializer.id
+
 description = "Testing against a functions deployed to ACF"
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    alias(libs.plugins.shadow)
     id("org.http4k.conventions")
 }
 
