@@ -43,4 +43,4 @@ enum class BlockType {
 data class Attachment(val text: String, val fallback: String, val color: String)
 
 @JsonSerializable
-data class Block(val text: Text? = null, val type: BlockType = header, val expand: Boolean? = null)
+data class Block(val text: Text? = null, val fields: List<Text>? = null, val type: BlockType = header, val expand: Boolean? = null)
