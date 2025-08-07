@@ -307,6 +307,6 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 rocker = { id = "nu.studer.rocker", version.ref = "nu-studer-rocker" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "com-github-johnrengelman-shadow" }
-useLatestVersions = { id = "se.patrikerdes.use-latest-versions", version.ref = "gradle-use-latest-versions" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }
 versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }
