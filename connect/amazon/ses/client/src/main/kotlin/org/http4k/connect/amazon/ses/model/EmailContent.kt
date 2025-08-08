@@ -39,11 +39,23 @@ data class RawMessage(
 data class Message(
     @Json(name = "Body") val body: Body,
     @Json(name = "Subject") val subject: Content,
-    @Json(name = "Headers") val headers: List<MessageHeader>? = null
+    @Json(name = "Headers") val headers: List<MessageHeader>? = null,
+    @Json(name = "Attachments") val attachments: List<Attachment>? = null
 )
 
 @JsonSerializable
 data class MessageHeader(
     @Json(name = "Name") val name: String,
     @Json(name = "Value") val value: String
+)
+
+@JsonSerializable
+data class Attachment(
+    @Json(name = "FileName") val fileName: String,
+    @Json(name = "RawContent") val rawContent: Base64Blob,
+    @Json(name = "ContentDescription") val contentDescription: String? = null,
+    @Json(name = "ContentDisposition") val contentDisposition: String? = null,
+    @Json(name = "ContentId") val contentId: String? = null,
+    @Json(name = "ContentTransferEncoding") val contentTransferEncoding: String = "BASE64",
+    @Json(name = "ContentType") val contentType: String? = null
 )
