@@ -2,6 +2,7 @@ package org.http4k.connect.amazon.sns
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
 import org.http4k.connect.amazon.FakeAwsContract
 import org.http4k.connect.amazon.core.model.DataType.Number
 import org.http4k.connect.amazon.sns.action.PublishBatchRequestEntry
@@ -84,5 +85,20 @@ class FakeSNSTest : SNSContract, FakeAwsContract {
                 deleteTopic(topicArn).successValue()
             }
         }
+    }
+
+    @Test
+    fun `FakeSns listMessages helper`() {
+        with(sns) {
+            val topicArn = createTopic(topicName, listOf(), mapOf()).successValue().topicArn
+
+            publishMessage("hi", topicArn = topicArn).successValue()
+            publishMessage("by", topicArn = topicArn).successValue()
+        }
+
+        val messages = http.listMessages(topicName)
+        assertThat(messages, hasSize(equalTo(2)))
+        assertThat(messages[0].message, equalTo("hi"))
+        assertThat(messages[1].message, equalTo("by"))
     }
 }
