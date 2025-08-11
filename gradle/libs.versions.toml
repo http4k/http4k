@@ -71,7 +71,7 @@ kotest = "5.9.1"
 kotlin = "2.2.0"
 kotlinpoet = "2.2.0"
 # should NOT be a number
-kotlinx-dataframe = "1727"
+kotlinx-dataframe = "1.0.0-Beta2"
 kotlinx-serialization = "1.9.0"
 kotshi-api = "4.0.0"
 kotshi-compiler = "4.0.0"
