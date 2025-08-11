@@ -26,8 +26,8 @@ com-github-johnrengelman-shadow = "8.1.1"
 com-google-devtools-ksp = "2.2.0-2.0.2"
 com-vanniktech-gradle-maven-publish-plugin = "0.34.0"
 commons-codec = "1.19.0"
-# frozen
-docker-java-core = "3.5.3"
+# frozen to 3.5.2
+docker-java-core = "3.5.2"
 docker-java-transport-httpclient5 = "3.5.3"
 dokka = "2.0.0"
 failsafe = "3.3.2"
@@ -55,8 +55,8 @@ java-websocket = "1.6.0"
 javax-servlet-api = "4.0.1"
 jetbrains-exposed = "0.61.0"
 jetty-bom = "12.0.24"
-# frozen
-jetty11-bom = "12.0.24"
+# frozen to 11.0.25
+jetty11-bom = "11.0.25"
 joda-time = "2.14.0"
 jose4j = "0.9.6"
 json = "20250517"
