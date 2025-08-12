@@ -92,3 +92,6 @@ fun WsMessage.Companion.string() = wsRoot.map({ it.payload.asString() }, { Body(
 fun IntBiDiMappings.wsStatus() = BiDiMapping({ WsStatus(it, "") }, WsStatus::code)
 fun IntBiDiMappings.protocolStatus() =
     BiDiMapping({ error("Cannot deserialise generic ProtocolStatus") }, ProtocolStatus::code)
+
+fun WsMessage.with(vararg modifiers: (WsMessage) -> WsMessage): WsMessage =
+    modifiers.fold(this) { memo, next -> next(memo) }

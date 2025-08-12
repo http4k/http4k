@@ -8,7 +8,7 @@ sealed interface SseMessage {
 
     fun toMessage(): String
 
-    data class Data(val data: String) : SseMessage {
+    data class Data(val data: String = "") : SseMessage {
         constructor(data: ByteArray) : this(data.base64Encode())
         constructor(data: InputStream) : this(data.readAllBytes())
 
