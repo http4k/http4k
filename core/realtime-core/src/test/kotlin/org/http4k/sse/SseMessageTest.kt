@@ -22,10 +22,11 @@ class SseMessageTest {
     @Test
     fun `converts event toMessage`() {
         assertRoundtrip(
-            SseMessage.Event("event", "data1\ndata2", SseEventId("id")), """event: event
+            SseMessage.Event("event", "data1\ndata2", SseEventId("id"), Duration.ofMinutes(1)), """event: event
 data: data1
 data: data2
 id: id
+retry: 60000
 
 """
         )

@@ -3,7 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.17.0.0 (uncut)
+### v6.17.1.0 (uncut)
+- **http4k-***: Upgrade versions
+- **http4k-realtime-core**: SseMessage.Event now supports retry field.
+
+### v6.17.0.0
 - **http4k-***: Upgrade versions
 - **http4k-core***: Lenses, content negotiation & routing for accept-like header. H/T @npryce
 - **http4k-web-datastar***: [Breaking] This is the post Datastar v1 release. The API has significantly changed to match the changes to D* mechanisms - most notably: `Fragments` are now called `Elements`, and the number of SSE events has been reduced from 5 to 2 (datastar-patch-elements and datastar-patch-signals). See the D* docs for more details. You can of course continue to use the old API by using an old version of this module.
