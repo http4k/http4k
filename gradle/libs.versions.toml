@@ -205,7 +205,7 @@ jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-b
 jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
 jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
 jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
-jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server, version.ref = "jetty11-bom" }
+jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
 joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
 jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
 jridgewell-sourcemap-codec = "org.webjars.npm:jridgewell__sourcemap-codec:1.5.4"
