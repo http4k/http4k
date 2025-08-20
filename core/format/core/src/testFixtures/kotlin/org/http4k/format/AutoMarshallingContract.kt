@@ -361,4 +361,4 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = bigDecimal(::BigDecimalHold
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
 
-fun String.normaliseJson() = replace(" : ", ":").replace(": ", ":").replace(", ", ",")
+fun String.normaliseJson() = replace(" : ", ":").replace(": ", ":").replace(", ", ",").replace("\n", "\n")

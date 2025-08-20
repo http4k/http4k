@@ -10,29 +10,31 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class MoshiYamlAutoTest : AutoMarshallingContract(MoshiYaml) {
-    override val expectedAutoMarshallingResult: String = "string:hello\n" +
-        "child:\n" +
-        "  string:world\n" +
-        "  numbers:\n" +
-        "  - 1.0\n" +
-        "  bool:true\n" +
-        "numbers:[\n" +
-        "  ]\n" +
-        "bool:false\n"
+    override val expectedAutoMarshallingResult: String = """string:hello
+child:
+  string:world
+  numbers:
+  - 1
+  bool:true
+numbers:[
+  ]
+bool:false
+"""
 
-    override val expectedAutoMarshallingResultPrimitives: String = "period:P1Y2M3D\n" +
-        "duration:PT1S\n" +
-        "localDate:'2000-01-01'\n" +
-        "localTime:01:01:01\n" +
-        "localDateTime:'2000-01-01T01:01:01'\n" +
-        "zonedDateTime:2000-01-01T01:01:01Z[UTC]\n" +
-        "offsetTime:01:01:01Z\n" +
-        "offsetDateTime:'2000-01-01T01:01:01Z'\n" +
-        "instant:'1970-01-01T00:00:00Z'\n" +
-        "uuid:1a448854-1687-4f90-9562-7d527d64383c\n" +
-        "uri:http://uri:8000\n" +
-        "url:http://url:9000\n" +
-        "status:200.0\n"
+    override val expectedAutoMarshallingResultPrimitives: String = """period:P1Y2M3D
+duration:PT1S
+localDate:'2000-01-01'
+localTime:01:01:01
+localDateTime:'2000-01-01T01:01:01'
+zonedDateTime:2000-01-01T01:01:01Z[UTC]
+offsetTime:01:01:01Z
+offsetDateTime:'2000-01-01T01:01:01Z'
+instant:'1970-01-01T00:00:00Z'
+uuid:1a448854-1687-4f90-9562-7d527d64383c
+uri:http://uri:8000
+url:http://url:9000
+status:200
+"""
 
     override val expectedWrappedMap: String = "value:\n" +
         "  key:value\n" +
@@ -105,7 +107,7 @@ bool:true
         val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
-        assertThat(marshaller.asFormatString(wrapper), equalTo("'true'\n"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("true\n"))
         assertThat(marshaller.asA("true", BooleanHolder::class), equalTo(wrapper))
     }
 
@@ -114,7 +116,7 @@ bool:true
         val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
-        assertThat(marshaller.asFormatString(wrapper), equalTo("'1.01'\n"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("1.01\n"))
         assertThat(marshaller.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
     }
 
@@ -123,7 +125,7 @@ bool:true
         val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
-        assertThat(marshaller.asFormatString(wrapper), equalTo("'1'\n"))
+        assertThat(marshaller.asFormatString(wrapper), equalTo("1\n"))
         assertThat(marshaller.asA("1", BigIntegerHolder::class), equalTo(wrapper))
     }
 
@@ -150,7 +152,7 @@ bool:true
         }
 
         val value = StringHolder("stuff")
-        assertThat(moshi.asFormatString(value), equalTo("'\"stuff\"'\n"))
+        assertThat(moshi.asFormatString(value), equalTo("stuff\n"))
     }
 
     @Test

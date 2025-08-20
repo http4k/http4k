@@ -40,28 +40,19 @@ open class ConfigurableMoshiYaml(
 
     override fun <T : Any> asA(input: String, target: KClass<T>) = asA(input.byteInputStream(), target)
 
-    override fun asFormatString(input: Any): String {
-        val str = json.asFormatString(input)
-        val yaml = yaml()
-
-        return when (input) {
-            is Iterable<*> -> yaml.dump(json.asA<List<Any>>(str))
-            is Array<*> -> yaml.dump(json.asA<Array<Any>>(str))
-            else -> try {
-                yaml.dump(json.asA<Map<String, Any>>(str))
-            } catch (e: Exception) {
-                yaml.dump(str)
-            }
-        }
-    }
+    override fun asFormatString(input: Any) = yaml().dump(json.parse(json.asFormatString(input)))
 
     private fun yaml() = Yaml(
-        Constructor(LoaderOptions()), Representer(DumperOptions()), yamlDumperOptions, LoaderOptions(), resolver
+        Constructor(LoaderOptions()), object : Representer(yamlDumperOptions) {
+            init {
+                multiRepresenters.put(MoshiNode::class.java, { super.represent((it as MoshiNode).unwrap()) })
+            }
+        }, yamlDumperOptions, LoaderOptions(), resolver
     )
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map({ }, ::asFormatString)
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>({ asA(it) }, ::asFormatString)
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -85,7 +76,7 @@ open class ConfigurableMoshiYaml(
     /**
      * Convenience function to read an object as JSON from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 }
 
 val defaultDumperOptions = DumperOptions().apply {
