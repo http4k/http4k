@@ -13,7 +13,7 @@ argo = "7.6"
 avro = "1.12.0"
 aws-lambda-java-core = "1.3.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.32.24"
+awssdk-bom = "2.32.27"
 azure-core = "1.56.0"
 azure-functions-java-library = "3.1.0"
 base16-encoding = "2.4.0"
@@ -28,7 +28,7 @@ com-vanniktech-gradle-maven-publish-plugin = "0.34.0"
 commons-codec = "1.19.0"
 # frozen to 3.5.2
 docker-java-core = "3.5.2"
-docker-java-transport-httpclient5 = "3.5.3"
+docker-java-transport-httpclient5 = "3.6.0"
 dokka = "2.0.0"
 failsafe = "3.3.2"
 forkhandles-bom = "2.22.4.0"
@@ -43,7 +43,7 @@ h2 = "2.3.232"
 hamkrest = "1.8.0.1"
 handlebars = "4.5.0"
 helidon-bom = "4.2.6"
-hikaricp = "7.0.1"
+hikaricp = "7.0.2"
 hsqldb = "2.7.4"
 htmx-org = "2.0.6"
 hyperscript-org = "0.9.14"
@@ -54,8 +54,8 @@ jakarta-ws-rs-api = "4.0.0"
 java-websocket = "1.6.0"
 javax-servlet-api = "4.0.1"
 jetbrains-exposed = "0.61.0"
-jetty-bom = "12.0.25"
-# frozen to 11
+jetty-bom = "12.1.0"
+# frozen to 11.0.26
 jetty11-bom = "11.0.26"
 joda-time = "2.14.0"
 jose4j = "0.9.6"
@@ -84,7 +84,7 @@ lettuce-core = "6.8.0.RELEASE"
 loremipsum = "1.0"
 mail = "2.0.2"
 micrometer-core = "1.15.3"
-micronaut-http = "4.9.9"
+micronaut-http = "4.9.10"
 mockk = "1.14.5"
 moshi = "1.15.2"
 mysql-connector-java = "8.0.33"
@@ -202,10 +202,10 @@ jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-web
 jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }
 jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
 jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
-jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
+jetty11-http2-server = "org.eclipse.jetty.http2:http2-server:11.0.26"
 jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
-jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
-jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
+jetty11-servlet = "org.eclipse.jetty:jetty-servlet:11.0.26"
+jetty11-websocket-core-server = "org.eclipse.jetty.websocket:websocket-core-server:11.0.26"
 joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
 jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
 jridgewell-sourcemap-codec = "org.webjars.npm:jridgewell__sourcemap-codec:1.5.4"
