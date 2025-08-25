@@ -242,7 +242,7 @@ class BiDiLensSpecTest {
 
     @Test
     fun kduration() =
-        checkContract(spec.kduration(), 35.seconds, "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
+        checkContract(spec.kDuration(), 35.seconds, "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
 
     @Test
     fun zoneId() = checkContract(
