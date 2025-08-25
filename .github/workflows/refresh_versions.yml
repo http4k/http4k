@@ -44,7 +44,13 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
           fi
-      
+      - name: Build
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        timeout-minutes: 120
+        run: bin/build_ci.sh
+        env:
+          HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
+          HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
       - name: Commit and push changes
         if: steps.verify-changed-files.outputs.changed == 'true'
         run: |
