@@ -7,12 +7,15 @@ import org.eclipse.jetty.client.InputStreamRequestContent
 import org.eclipse.jetty.client.InputStreamResponseListener
 import org.eclipse.jetty.client.Result
 import org.eclipse.jetty.http.HttpCookieStore
-import org.eclipse.jetty.http.HttpField
 import org.eclipse.jetty.http.HttpFields
+import org.eclipse.jetty.io.ByteBufferPool
+import org.eclipse.jetty.util.IO.bufferSize
 import org.http4k.asByteBuffer
 import org.http4k.client.PreCannedJettyHttpClients.defaultJettyHttpClient
 import org.http4k.core.Body
 import org.http4k.core.BodyMode
+import org.http4k.core.BodyMode.Memory
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Headers
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -36,7 +39,7 @@ object JettyClient {
     @JvmName("create")
     operator fun invoke(
         client: HttpClient = defaultJettyHttpClient(),
-        bodyMode: BodyMode = BodyMode.Memory,
+        bodyMode: BodyMode = Memory,
         requestModifier: (JettyRequest) -> JettyRequest = { it }
     ): DualSyncAsyncHttpHandler {
         if (!client.isRunning) client.start()
@@ -51,8 +54,8 @@ object JettyClient {
             private fun HttpClient.send(request: Request): Response = with(newRequest(request)) {
                 try {
                     when (bodyMode) {
-                        BodyMode.Memory -> send().let { it.toHttp4kResponse().body(Body(it.content.asByteBuffer())) }
-                        BodyMode.Stream -> InputStreamResponseListener().run {
+                        Memory -> send().let { it.toHttp4kResponse().body(Body(it.content.asByteBuffer())) }
+                        Stream -> InputStreamResponseListener().run {
                             send(this)
                             get(timeoutOrMax(), MILLISECONDS).toHttp4kResponse().body(inputStream)
                         }
@@ -71,7 +74,7 @@ object JettyClient {
             private fun HttpClient.sendAsync(request: Request, fn: (Response) -> Unit) {
                 with(newRequest(request)) {
                     when (bodyMode) {
-                        BodyMode.Memory -> send(object : BufferingResponseListener() {
+                        Memory -> send(object : BufferingResponseListener() {
                             override fun onComplete(result: Result) {
                                 val response = if (result.isFailed) {
                                     result.failure.asHttp4kResponse()
@@ -82,7 +85,7 @@ object JettyClient {
                             }
                         })
 
-                        BodyMode.Stream -> send(object : InputStreamResponseListener() {
+                        Stream -> send(object : InputStreamResponseListener() {
                             override fun onHeaders(response: JettyResponse) {
                                 super.onHeaders(response)
                                 executor.execute {
@@ -99,13 +102,16 @@ object JettyClient {
                 }
             }
 
-            private fun HttpClient.newRequest(request: Request): org.eclipse.jetty.client.Request =
+            private fun HttpClient.newRequest(request: Request): JettyRequest =
                 newRequest(request.uri.toString()).method(request.method.name)
                     .headers { fields -> request.headers.toParametersMap().forEach { fields.put(it.key, it.value) } }
                     .body(
                         when (bodyMode) {
-                            BodyMode.Memory -> ByteBufferRequestContent(request.body.payload)
-                            BodyMode.Stream -> InputStreamRequestContent(request.body.stream)
+                            Memory -> ByteBufferRequestContent(request.body.payload)
+                            Stream -> InputStreamRequestContent(
+                                "application/octet-stream", request.body.stream,
+                                ByteBufferPool.Sized(null, false, bufferSize)
+                            )
                         }
                     )
                     .let(requestModifier)
