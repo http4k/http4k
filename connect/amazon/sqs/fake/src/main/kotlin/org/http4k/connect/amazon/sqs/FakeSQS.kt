@@ -7,6 +7,7 @@ import org.http4k.connect.amazon.AwsRestJsonFake
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
+import org.http4k.connect.amazon.sqs.model.QueueName
 import org.http4k.connect.amazon.sqs.model.SQSMessage
 import org.http4k.connect.storage.InMemory
 import org.http4k.connect.storage.Storage
@@ -40,6 +41,8 @@ class FakeSQS(
      * Convenience function to get a SQS client
      */
     fun client() = SQS.Http(region, { AwsCredentials("accessKey", "secret") }, this)
+
+    fun listMessages(queueName: QueueName) = queues[queueName.value].orEmpty()
 }
 
 fun main() {
