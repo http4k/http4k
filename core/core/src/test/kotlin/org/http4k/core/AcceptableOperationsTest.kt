@@ -18,13 +18,13 @@ class AcceptableOperationsTest {
     fun `selects client's preferred value from available list`() {
         val prefs = PriorityList(a q 1.0, b q 0.75, c q 0.5)
         
-        assertEquals(a, prefs.preferredOf(listOf(a), match = Any::equals))
-        assertEquals(b, prefs.preferredOf(listOf(b), match = Any::equals))
-        assertEquals(c, prefs.preferredOf(listOf(c), match = Any::equals))
-        assertEquals(a, prefs.preferredOf(listOf(a, b).shuffled(), match = Any::equals))
-        assertEquals(b, prefs.preferredOf(listOf(b, c).shuffled(), match = Any::equals))
-        assertEquals(a, prefs.preferredOf(listOf(a, c).shuffled(), match = Any::equals))
-        assertEquals(a, prefs.preferredOf(listOf(a, b, c).shuffled(), match = Any::equals))
+        assertEquals(a, prefs.preferred(listOf(a), match = Any::equals, by={it}))
+        assertEquals(b, prefs.preferred(listOf(b), match = Any::equals, by={it}))
+        assertEquals(c, prefs.preferred(listOf(c), match = Any::equals, by={it}))
+        assertEquals(a, prefs.preferred(listOf(a, b).shuffled(), match = Any::equals, by={it}))
+        assertEquals(b, prefs.preferred(listOf(b, c).shuffled(), match = Any::equals, by={it}))
+        assertEquals(a, prefs.preferred(listOf(a, c).shuffled(), match = Any::equals, by={it}))
+        assertEquals(a, prefs.preferred(listOf(a, b, c).shuffled(), match = Any::equals, by={it}))
     }
     
     @Test
@@ -34,12 +34,12 @@ class AcceptableOperationsTest {
             Exactly(b) q 0.75,
             Wildcard q 0.5)
         
-        assertEquals(a, prefs.preferredOf(listOf(a)))
-        assertEquals(b, prefs.preferredOf(listOf(b)))
-        assertEquals(c, prefs.preferredOf(listOf(c)))
-        assertEquals(a, prefs.preferredOf(listOf(a, b).shuffled()))
-        assertEquals(b, prefs.preferredOf(listOf(b, c).shuffled()))
-        assertEquals(a, prefs.preferredOf(listOf(a, c).shuffled()))
-        assertEquals(a, prefs.preferredOf(listOf(a, b, c).shuffled()))
+        assertEquals(a, prefs.preferred(listOf(a)))
+        assertEquals(b, prefs.preferred(listOf(b)))
+        assertEquals(c, prefs.preferred(listOf(c)))
+        assertEquals(a, prefs.preferred(listOf(a, b).shuffled()))
+        assertEquals(b, prefs.preferred(listOf(b, c).shuffled()))
+        assertEquals(a, prefs.preferred(listOf(a, c).shuffled()))
+        assertEquals(a, prefs.preferred(listOf(a, b, c).shuffled()))
     }
 }

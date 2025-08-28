@@ -1,6 +1,7 @@
 package org.http4k.lens
 
 import org.http4k.core.Accept
+import org.http4k.core.ContentEncodingName
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Credentials
@@ -20,6 +21,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.StringParam
+import java.util.Locale
 import java.util.Locale.getDefault
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
@@ -45,7 +47,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
     val LOCATION = map(::of, Uri::toString).required("location")
 
     val ACCEPT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
-
+    
     private fun parseAcceptContentHeader(value: String): Accept =
         value.split(",")
             .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
@@ -93,6 +95,12 @@ object Header : BiDiLensSpec<HttpMessage, String>(
 
     val WWW_AUTHENTICATE =
         map(WwwAuthenticate::parseHeader, WwwAuthenticate::toHeaderValue).optional("WWW-Authenticate")
+    
+    val CONTENT_LANGUAGE =
+        map(Locale::forLanguageTag, Locale::toLanguageTag).optional("content-language")
+    
+    val CONTENT_ENCODING =
+        map(::ContentEncodingName, {it.value}).optional("content-encoding")
 }
 
 private fun Pair<String, Parameters>.toAcceptContentType() =

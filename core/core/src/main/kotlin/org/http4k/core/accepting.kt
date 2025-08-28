@@ -8,7 +8,7 @@ import java.util.Locale
  * A content range (e.g. media type range, language range, etc.) weighted by priority
  */
 data class Weighted<T>(val range: T, val priority: Double) {
-    val contentType get() = range // backward compatiblity
+    val contentType get() = range // backward compatibility
 }
 
 /**
@@ -31,34 +31,45 @@ fun <T> PriorityList(vararg values: Weighted<T>): PriorityList<T> =
     PriorityList(values.toList().sortedByDescending { it.priority })
 
 /**
- * Selects the client's preferred option of type O from a set of options offered
- * by the server.
+ * Selects the client's preferred option from a set of options offered
+ * by the server, matching a priority list against the id of the options.
  *
  * Precondition: the Priority list is sorted in descending order of weight.
  * This is guaranteed by the header parser and the function that creates a
  * fixed PriorityList.
  *
- * @param match a predicate that reports whether a range contains the option.
+ * @param offered the list of options offered
+ * @param match a predicate that reports whether a range selects an option identified by its id
+ * @param by a function that returns an option's id
  */
-fun <R, O> PriorityList<R>.preferredOf(offered: List<O>, match: (R, O) -> Boolean): O? {
+inline fun <Range, Option: Any, OptionId> PriorityList<Range>.preferred(
+    offered: List<Option>,
+    match: (Range, OptionId) -> Boolean,
+    by: (Option)->OptionId
+): Option? {
     ranges.forEach { qr ->
         offered.forEach { o ->
-            if (match(qr.range, o)) return o
+            if (match(qr.range, by(o))) return o
         }
     }
     return null
 }
 
 /**
- * Selects the client's preferred option of type O from a set of options offered
- * by the server, when the range is a SimpleRange<O>.
+ * Selects the client's preferred option from a set of options offered
+ * by the server, when the range is a SimpleRange<Option>.
+ *
+ * This is useful for implementing content negotiation in the application,
+ * rather than in request routing.
  */
-fun <R, O> PriorityList<R>.preferredOf(offered: List<O>): O? where R : SimpleRange<O> =
-    preferredOf(offered, SimpleRange<O>::matches)
+fun <Range, Option: Any> PriorityList<Range>.preferred(offered: List<Option>): Option?
+where Range : SimpleRange<Option> =
+    preferred(offered, {r,o->r.matches(o)}, {it})
 
 
 internal typealias HeaderParams = Map<String, String>
 internal val NoParams = emptyMap<String, String>()
+
 
 /**
  * Parses a PriorityList from a header value.
@@ -94,7 +105,6 @@ fun <T> PriorityList<T>.toHeader(rangeToHeader: (T) -> Pair<String, HeaderParams
             params.entries.joinToString(";") { (key, value) -> "$key=$value" } +
             (if (q == 1.0) "" else ";q=$q") // RFC 9110, section 12.4.2
     }
-
 
 /**
  * A SimpleRange is either a value of some type, T, or a wildcard,
@@ -139,12 +149,26 @@ fun <T> SimpleRange<T>.forHeader(valueForHeader: (T) -> String) =
     )
 
 
+fun <OptionId> PriorityList.Companion.fromSimpleRangeHeader(
+    string: String,
+    optionFromHeader: (String) -> OptionId
+): PriorityList<SimpleRange<OptionId>> =
+    PriorityList.fromHeader(string) { s, _ -> SimpleRange.fromHeader(s, optionFromHeader) }
+
+
+fun <OptionId> PriorityList<SimpleRange<OptionId>>.toSimpleRangeHeader(
+    optionForHeader: (OptionId)-> String
+): String =
+    toHeader { range : SimpleRange<OptionId> -> range.forHeader(optionForHeader) }
+
+
+
 // RFC 9110 Section 12.5.2
 val Header.ACCEPT_CHARSET by lazyOf(
     Header
         .map(
-            { PriorityList.fromHeader(it) { s, _ -> SimpleRange.fromHeader(s, Charset::forName) } },
-            { it.toHeader { range -> range.forHeader { it.name().lowercase() } } }
+            { PriorityList.fromSimpleRangeHeader(it, Charset::forName) },
+            { it.toSimpleRangeHeader { charset -> charset.name().lowercase() } }
         )
         .optional("accept-charset")
 )
@@ -153,8 +177,8 @@ val Header.ACCEPT_CHARSET by lazyOf(
 val Header.ACCEPT_ENCODING by lazyOf(
     Header
         .map(
-            { PriorityList.fromHeader(it) { s, _ -> SimpleRange.fromHeader(s, ::ContentEncodingName) } },
-            { it.toHeader { range -> range.forHeader { it.value } } }
+            { PriorityList.fromSimpleRangeHeader(it, ::ContentEncodingName) },
+            { it.toSimpleRangeHeader(ContentEncodingName::value) }
         )
         .optional("accept-encoding")
 )
@@ -164,8 +188,9 @@ val Header.ACCEPT_ENCODING by lazyOf(
 val Header.ACCEPT_LANGUAGE by lazyOf(
     Header
         .map(
-            { PriorityList.fromHeader(it) { s, _ -> SimpleRange.fromHeader(s, Locale::forLanguageTag) } },
-            { it.toHeader { range -> range.forHeader { it.toLanguageTag() } } }
+            { PriorityList.fromSimpleRangeHeader(it, Locale::forLanguageTag) },
+            { it.toSimpleRangeHeader(Locale::toLanguageTag) }
         )
         .optional("accept-language")
 )
+
