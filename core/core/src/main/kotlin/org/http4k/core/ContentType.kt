@@ -20,6 +20,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
 
     fun structure() = Regex("\\+(\\w*)$").find(value)?.groups?.get(1)?.value
 
+    @Suppress("unused")
     companion object {
         fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
             "charset" to charset.name().lowercase(getDefault())
@@ -33,12 +34,12 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         val APPLICATION_ND_JSON = Text("application/x-ndjson")
         val APPLICATION_JRD_JSON = Text("application/jrd+json")
         val APPLICATION_LD_JSON = Text("application/ld+json")
-        val APPLICATION_PDF = Text("application/pdf")
+        val APPLICATION_PDF = ContentType("application/pdf")
         val APPLICATION_XML = Text("application/xml")
         val APPLICATION_YAML = Text("application/yaml")
-        val APPLICATION_ZIP = Text("application/zip")
-        val MULTIPART_FORM_DATA = Text("multipart/form-data")
-        val MULTIPART_MIXED = Text("multipart/mixed")
+        val APPLICATION_ZIP = ContentType("application/zip")
+        val MULTIPART_FORM_DATA = ContentType("multipart/form-data")
+        val MULTIPART_MIXED = ContentType("multipart/mixed")
         val OCTET_STREAM = ContentType("application/octet-stream")
         val TEXT_CSV = Text("text/csv")
         val TEXT_EVENT_STREAM = Text("text/event-stream")
@@ -46,7 +47,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
         val TEXT_HTML = Text("text/html")
         val TEXT_XML = Text("text/xml")
         val TEXT_YAML = Text("text/yaml")
-        val IMAGE_PNG = Text("image/png")
-        val IMAGE_JPG = Text("image/jpeg")
+        val IMAGE_PNG = ContentType("image/png")
+        val IMAGE_JPG = ContentType("image/jpeg")
     }
 }
