@@ -67,7 +67,7 @@ class TrafficFiltersTest : PortBasedTest {
         val cache = ReadWriteCache.Memory()
         cache[request] = response
         val notFound = Response(Status.NOT_FOUND)
-        val handler = org.http4k.filter.TrafficFilters.ServeCachedFrom(cache).then { notFound }
+        val handler = TrafficFilters.ServeCachedFrom(cache).then { notFound }
 
         assertThat(handler(request), equalTo(response))
         assertThat(handler(Request(GET, "/bob2")), equalTo(notFound))
@@ -79,7 +79,7 @@ class TrafficFiltersTest : PortBasedTest {
         cache[Request(GET, "/bob1")] = Response(OK)
         cache[Request(GET, "/bob2")] = Response(Status.ACCEPTED)
         cache[Request(GET, "/bob3")] = Response(Status.NOT_FOUND)
-        val handler = org.http4k.filter.TrafficFilters.ReplayFrom(cache).then { fail("") }
+        val handler = TrafficFilters.ReplayFrom(cache).then { fail("") }
 
         assertThat(handler(Request(GET, "/bob1")), equalTo(Response(OK)))
         assertThat(handler(Request(GET, "/bob2")), equalTo(Response(Status.ACCEPTED)))

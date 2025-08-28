@@ -529,7 +529,7 @@ class ResponseFiltersTest {
     @Test
     fun `modify response`() {
         val handler = ResponseFilters.Modify(CONTENT_TYPE of APPLICATION_PDF).then { Response(OK) }
-        assertThat(handler(Request(GET, "")), hasHeader("content-type", "application/pdf; charset=utf-8"))
+        assertThat(handler(Request(GET, "")), hasHeader("content-type", "application/pdf"))
     }
 
     @Test

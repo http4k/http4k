@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_PDF
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -145,7 +144,7 @@ class RequestFiltersTest {
     fun `modify request`() {
         val handler = Modify(CONTENT_TYPE of APPLICATION_PDF).then(
             RequestFilters.Assert(
-                hasHeader("content-type", "application/pdf; charset=utf-8")
+                hasHeader("content-type", "application/pdf")
             )
         ).then { Response(OK) }
         assertThat(handler(Request(GET, "")), hasStatus(OK))
@@ -156,7 +155,7 @@ class RequestFiltersTest {
         val app = RequestFilters.IncludeHeaders("foo", "bar")
             .then { request -> Response(OK).headers(request.headers) }
 
-        val response = app(Request(Method.GET, "").headers(listOf(
+        val response = app(Request(GET, "").headers(listOf(
             "foo" to "foo",
             "bar" to "bar",
             "baz" to "baz"
@@ -172,7 +171,7 @@ class RequestFiltersTest {
         val app = RequestFilters.ExcludeHeaders("foo", "bar")
             .then { request -> Response(OK).headers(request.headers) }
 
-        val response = app(Request(Method.GET, "").headers(listOf(
+        val response = app(Request(GET, "").headers(listOf(
             "foo" to "foo",
             "bar" to "bar",
             "baz" to "baz"
