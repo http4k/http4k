@@ -45,7 +45,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
     val LOCATION = map(::of, Uri::toString).required("location")
 
     val ACCEPT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
-
+    
     private fun parseAcceptContentHeader(value: String): Accept =
         value.split(",")
             .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
@@ -93,6 +93,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
 
     val WWW_AUTHENTICATE =
         map(WwwAuthenticate::parseHeader, WwwAuthenticate::toHeaderValue).optional("WWW-Authenticate")
+    
 }
 
 private fun Pair<String, Parameters>.toAcceptContentType() =
@@ -130,3 +131,4 @@ fun Request.bearerToken(): String? = header("Authorization")
     ?.substringAfter("earer ")
 
 fun Response.html(body: String) = contentType(TEXT_HTML).body(body)
+
