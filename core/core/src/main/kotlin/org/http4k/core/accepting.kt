@@ -1,9 +1,5 @@
 package org.http4k.core
 
-import org.http4k.lens.Header
-import java.nio.charset.Charset
-import java.util.Locale
-
 /**
  * A content range (e.g. media type range, language range, etc.) weighted by priority
  */
@@ -161,36 +157,4 @@ fun <OptionId> PriorityList<SimpleRange<OptionId>>.toSimpleRangeHeader(
 ): String =
     toHeader { range : SimpleRange<OptionId> -> range.forHeader(optionForHeader) }
 
-
-
-// RFC 9110 Section 12.5.2
-val Header.ACCEPT_CHARSET by lazyOf(
-    Header
-        .map(
-            { PriorityList.fromSimpleRangeHeader(it, Charset::forName) },
-            { it.toSimpleRangeHeader { charset -> charset.name().lowercase() } }
-        )
-        .optional("accept-charset")
-)
-
-// RFC 9110 Section 12.5.3
-val Header.ACCEPT_ENCODING by lazyOf(
-    Header
-        .map(
-            { PriorityList.fromSimpleRangeHeader(it, ::ContentEncodingName) },
-            { it.toSimpleRangeHeader(ContentEncodingName::value) }
-        )
-        .optional("accept-encoding")
-)
-
-// RFC 9110, Section 12.5.4
-// Supports language selection by the Basic Filtering scheme only (RFC 4647, Section 3.3.1)
-val Header.ACCEPT_LANGUAGE by lazyOf(
-    Header
-        .map(
-            { PriorityList.fromSimpleRangeHeader(it, Locale::forLanguageTag) },
-            { it.toSimpleRangeHeader(Locale::toLanguageTag) }
-        )
-        .optional("accept-language")
-)
 

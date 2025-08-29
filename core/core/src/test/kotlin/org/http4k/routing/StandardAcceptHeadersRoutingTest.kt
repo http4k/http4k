@@ -1,7 +1,5 @@
 package org.http4k.routing
 
-import org.http4k.core.ACCEPT_ENCODING
-import org.http4k.core.ACCEPT_LANGUAGE
 import org.http4k.core.ContentEncodingName.Companion.COMPRESS
 import org.http4k.core.ContentEncodingName.Companion.DEFLATE
 import org.http4k.core.ContentEncodingName.Companion.GZIP
@@ -16,6 +14,8 @@ import org.http4k.core.Wildcard
 import org.http4k.core.q
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.SetContentType
+import org.http4k.lens.ACCEPT_ENCODING
+import org.http4k.lens.ACCEPT_LANGUAGE
 import org.http4k.lens.Header
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -23,7 +23,10 @@ import java.util.Locale.ENGLISH
 import java.util.Locale.FRENCH
 import java.util.Locale.GERMAN
 
-
+/**
+ * See [org.http4k.routing.ProactiveContentNegotiationRoutingTest] for
+ * a detailed test of the underlying algorithm.
+ */
 class StandardAcceptHeadersRoutingTest {
     @Test
     fun `routes by language content negotiation`() {
