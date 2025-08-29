@@ -7,12 +7,12 @@ import io.cloudevents.core.builder.withDataSchema
 import io.cloudevents.core.builder.withSource
 import io.cloudevents.core.provider.EventFormatProvider
 import io.cloudevents.http4k.cloudEventsFormat
+import io.cloudevents.withData
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.format.Jackson.withData
 import org.http4k.lens.cloudEvent
 import org.http4k.testing.Approver
 import org.http4k.testing.CloudEventsJsonApprovalTest
