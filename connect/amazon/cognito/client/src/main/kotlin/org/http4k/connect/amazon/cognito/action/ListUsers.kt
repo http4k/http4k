@@ -15,6 +15,7 @@ import se.ansman.kotshi.JsonSerializable
 data class ListUsers(
     val UserPoolId: UserPoolId,
     val AttributesToGet: List<String>? = null, // all attributes
+    val Filter: String? = null,
     val Limit: Int = 60,
     val PaginationToken: String? = null
 ) : CognitoAction<PageOfListedUsers>(PageOfListedUsers::class)
