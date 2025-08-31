@@ -1,6 +1,8 @@
 package org.http4k.core
 
 import java.nio.charset.Charset
+import java.util.Locale
+import java.util.Locale.ROOT
 import java.util.Locale.getDefault
 import kotlin.text.Charsets.UTF_8
 
@@ -8,7 +10,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
 
     fun withNoDirectives() = copy(directives = emptyList())
 
-    fun withoutCharset() = copy(directives = directives.filter { it.first.lowercase(getDefault()) != "charset" })
+    fun withoutCharset() = copy(directives = directives.filter { it.first.lowercase(ROOT) != "charset" })
 
     fun toHeaderValue() = (
         listOf(value) +
@@ -23,7 +25,7 @@ data class ContentType(val value: String, val directives: Parameters = emptyList
     @Suppress("unused")
     companion object {
         fun Text(value: String, charset: Charset? = UTF_8) = ContentType(value, listOfNotNull(charset?.let {
-            "charset" to charset.name().lowercase(getDefault())
+            "charset" to charset.name().lowercase(ROOT)
         }))
 
         fun MultipartFormWithBoundary(boundary: String): ContentType = ContentType("multipart/form-data", listOf("boundary" to boundary))

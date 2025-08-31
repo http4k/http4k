@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import java.util.Locale
+import java.util.Locale.ROOT
 
 class Http4kConnectApiClientVisitor(private val log: (Any?) -> Unit) :
     KSEmptyVisitor<List<KSAnnotated>, List<FileSpec>>() {
@@ -22,7 +23,7 @@ class Http4kConnectApiClientVisitor(private val log: (Any?) -> Unit) :
             )
             FileSpec.builder(
                 it.declaration.packageName.asString(),
-                classDeclaration.simpleName.asString().lowercase(Locale.getDefault()) + "Extensions"
+                classDeclaration.simpleName.asString().lowercase(ROOT) + "Extensions"
             )
                 .apply {
                     data.filterForActionsOf(it)

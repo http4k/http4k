@@ -21,6 +21,7 @@ import dev.forkhandles.result4k.Result4k
 import org.http4k.connect.PagedAction
 import org.http4k.connect.RemoteFailure
 import java.util.Locale
+import java.util.Locale.ROOT
 
 class Http4kConnectActionVisitor(private val log: (Any?) -> Unit) :
     KSEmptyVisitor<KSClassDeclaration, Sequence<FunSpec>>() {
@@ -95,7 +96,7 @@ private fun generateExtensionFunction(
     returnType: TypeName
 ): FunSpec {
     val baseFunction = FunSpec.builder(
-        actionClazz.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) } + suffix)
+        actionClazz.simpleName.asString().replaceFirstChar { it.lowercase(ROOT) } + suffix)
         .addKdoc("@see ${actionClazz.qualifiedName!!.asString().replace('/', '.')}")
         .receiver(adapterClazz.toClassName())
         .returns(returnType)

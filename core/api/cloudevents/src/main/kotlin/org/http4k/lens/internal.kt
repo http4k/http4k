@@ -14,7 +14,8 @@ import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage
 import org.http4k.lens.Header.CONTENT_TYPE
 import java.nio.ByteBuffer
-import java.util.Locale.getDefault
+import java.util.Locale
+import java.util.Locale.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
@@ -59,9 +60,9 @@ internal class BinaryMessageReader(version: SpecVersion, private val request: Ht
 
     override fun isContentTypeHeader(key: String) = key.equals("Content-Type", ignoreCase = true)
 
-    override fun isCloudEventsHeader(key: String) = key.lowercase(getDefault()).startsWith("ce-")
+    override fun isCloudEventsHeader(key: String) = key.lowercase(ROOT).startsWith("ce-")
 
-    override fun toCloudEventsKey(key: String) = key.substring(3).lowercase(getDefault())
+    override fun toCloudEventsKey(key: String) = key.substring(3).lowercase(ROOT)
 
     override fun forEachHeader(fn: BiConsumer<String, String?>) {
         request.headers.forEach(Consumer { e -> fn.accept(e.first, e.second) })

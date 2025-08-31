@@ -11,6 +11,7 @@ import org.http4k.tracing.persistence.TraceMoshi.prettify
 import java.io.File
 import java.nio.file.Files.createTempDirectory
 import java.util.Locale
+import java.util.Locale.ROOT
 
 /**
  * Records all traces to JSON format in a known directory location.
@@ -35,7 +36,7 @@ fun TracePersistence.Companion.FileSystem(dir: File = createTempDirectory("").to
 fun TraceRenderPersistence.Companion.FileSystem(
     dir: File = createTempDirectory("").toFile()
 ) = TraceRenderPersistence {
-    val file = File(dir.apply { mkdirs() }, "${it.title}.${it.format.lowercase(Locale.getDefault())}")
+    val file = File(dir.apply { mkdirs() }, "${it.title}.${it.format.lowercase(ROOT)}")
     file.writeText(it.content)
     Uri.of("file:////" + file.absolutePath.replace(" ", "%20"))
 }

@@ -51,6 +51,7 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Locale
+import java.util.Locale.ROOT
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
@@ -96,7 +97,7 @@ class OpenApi3<NODE : Any>(
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.associate { pam -> pam.method.name.lowercase(Locale.getDefault()) to pam.pathSpec }
+                        it.value.associate { pam -> pam.method.name.lowercase(ROOT) to pam.pathSpec }
                             .toSortedMap()
                     }
                     .toSortedMap(),

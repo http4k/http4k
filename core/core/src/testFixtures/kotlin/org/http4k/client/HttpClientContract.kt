@@ -37,6 +37,8 @@ import org.http4k.server.ServerConfig
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
+import java.util.Locale
+import java.util.Locale.ROOT
 import java.util.Locale.getDefault
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -262,7 +264,7 @@ abstract class HttpClientContract(
         val response = client(Request(GET, "http://reallynotarealserver.bob"))
 
         assertThat(response.status.code, equalTo(SERVICE_UNAVAILABLE.code))
-        assertThat(response.status.toString().lowercase(getDefault()), containsSubstring("unknown"))
+        assertThat(response.status.toString().lowercase(ROOT), containsSubstring("unknown"))
     }
 
     @Test

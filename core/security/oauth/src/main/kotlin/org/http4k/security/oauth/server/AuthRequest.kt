@@ -9,6 +9,7 @@ import org.http4k.security.State
 import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.openid.RequestJwtContainer
 import java.util.*
+import java.util.Locale.ROOT
 
 data class AuthRequest(
     val client: ClientId,
@@ -25,7 +26,7 @@ data class AuthRequest(
     val resourceUri: Uri? = null,
 ) {
 
-    fun isOIDC() = scopes.map { it.lowercase(Locale.getDefault()) }.contains(OIDC_SCOPE)
+    fun isOIDC() = scopes.map { it.lowercase(ROOT) }.contains(OIDC_SCOPE)
 
     companion object {
 

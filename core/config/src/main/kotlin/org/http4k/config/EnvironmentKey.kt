@@ -10,7 +10,7 @@ import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.int
 import org.http4k.lens.mapWithNewMeta
 import java.util.Locale
-import java.util.Locale.getDefault
+import java.util.Locale.*
 
 /**
  * This models the key used to get a value out of the Environment using the standard Lens mechanic. Note that if your
@@ -34,7 +34,7 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
 
         fun serviceUriFor(serviceName: String, isHttps: Boolean = false) = int()
             .map(serviceName.toUriFor(isHttps)) { it.port ?: 80 }
-            .required("${serviceName.convertFromKey().uppercase(Locale.getDefault())}_SERVICE_PORT")
+            .required("${serviceName.convertFromKey().uppercase(getDefault())}_SERVICE_PORT")
 
         private fun String.toUriFor(https: Boolean): (Int) -> Uri = {
             Uri.of("/")
@@ -49,4 +49,4 @@ inline fun <reified T : Enum<T>> EnvironmentKey.enum(caseSensitive: Boolean = tr
     EnumParam(T::class)
 )
 
-internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").lowercase(getDefault())
+internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").lowercase(ROOT)

@@ -23,6 +23,8 @@ import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.HttpTimeoutException
 import java.nio.ByteBuffer
+import java.util.Locale
+import java.util.Locale.ROOT
 import java.util.Locale.getDefault
 
 /**
@@ -71,7 +73,7 @@ fun Request.fromHttp4k(bodyMode: BodyMode, requestModifier: (HttpRequest.Builder
         .uri(URI.create(uri.toString()))
         .apply {
             headers
-                .filterNot { disallowedHeaders.contains(it.first.lowercase(getDefault())) }
+                .filterNot { disallowedHeaders.contains(it.first.lowercase(ROOT)) }
                 .fold(this) { acc, next -> acc.header(next.first, next.second) }
         }.method(method.name, body.toRequestPublisher(bodyMode))
         .let(requestModifier)

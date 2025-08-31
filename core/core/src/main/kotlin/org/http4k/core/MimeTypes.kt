@@ -2,12 +2,14 @@ package org.http4k.core
 
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.util.loadMetaResource
+import java.util.Locale
+import java.util.Locale.ROOT
 import java.util.Locale.getDefault
 
 class MimeTypes private constructor(private val map: Map<String, ContentType>) {
     fun forFile(file: String): ContentType =
         file.drop(file.lastIndexOf('.') + 1).let {
-            if (it == file) OCTET_STREAM else map[it.lowercase(getDefault())] ?: OCTET_STREAM
+            if (it == file) OCTET_STREAM else map[it.lowercase(ROOT)] ?: OCTET_STREAM
         }
 
     companion object {
@@ -22,7 +24,7 @@ class MimeTypes private constructor(private val map: Map<String, ContentType>) {
                     .filter { it.trim().isNotBlank() }
                     .run {
                         if (size != 2) throw RuntimeException("mime.types file is malformed [$line]")
-                        this[1].split(" ").map(String::trim).map { it.lowercase(getDefault()) to ContentType(this[0]) }
+                        this[1].split(" ").map(String::trim).map { it.lowercase(ROOT) to ContentType(this[0]) }
                     }
             }.toMap()
     }

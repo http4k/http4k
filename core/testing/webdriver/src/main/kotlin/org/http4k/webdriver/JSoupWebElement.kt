@@ -26,7 +26,8 @@ import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 import java.io.File
 import java.nio.file.Files
-import java.util.Locale.getDefault
+import java.util.Locale
+import java.util.Locale.*
 
 data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) :
     WebElement {
@@ -103,8 +104,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 .map { it.getDomAttribute("name") to listOf(it.getDomAttribute("value")) }
 
             val ordinaryInputs = inputs + textAreas + selects + buttons
-            val addFormModifier = createForm(enctype, ordinaryInputs.toNotNullMap(),
-                fileInputs.toNotNullMap())
+            val addFormModifier = createForm(
+                enctype, ordinaryInputs.toNotNullMap(),
+                fileInputs.toNotNullMap()
+            )
 
             val actionString = form.element.attr("action") ?: ""
             val formActionUri = Uri.of(actionString)
@@ -135,7 +138,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         }
 
     private fun isUncheckedInput(input: WebElement): Boolean =
-        (listOf("checkbox", "radio").contains(input.getDomAttribute("type") ?: null)) && input.getDomAttribute("checked") == null
+        (listOf("checkbox", "radio").contains(
+            input.getDomAttribute("type") ?: null
+        )) && input.getDomAttribute("checked") == null
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
@@ -159,7 +164,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             isA("input") -> {
                 if (isDisabled()) return
                 val t = element.attr("type")
-                if (t == "" || t.lowercase(getDefault()) == "submit")
+                if (t == "" || t.lowercase(ROOT) == "submit")
                     submit()
             }
 
@@ -178,7 +183,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             isA("button") -> {
                 if (isDisabled()) return
                 val t = element.attr("type")
-                if (t == "" || t.lowercase(getDefault()) == "submit")
+                if (t == "" || t.lowercase(ROOT) == "submit")
                     submit()
             }
         }
@@ -232,7 +237,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 
-    private fun isA(tag: String) = tagName.lowercase(getDefault()) == tag.lowercase(getDefault())
+    private fun isA(tag: String) = tagName.lowercase(ROOT) == tag.lowercase(ROOT)
 
     private fun associatedFormElements(form: JSoupWebElement, tagName: String): List<WebElement> {
         val root = JSoupWebElement(navigate, getURL, form.element.root())

@@ -20,7 +20,7 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.StringParam
-import java.util.Locale.getDefault
+import java.util.Locale.ROOT
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
 
@@ -35,7 +35,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
             parseValueAndDirectives(it).let {
                 ContentType(
                     it.first, it.second
-                        .filter { it.first.lowercase(getDefault()) in setOf("boundary", "charset", "media-type") }
+                        .filter { it.first.lowercase(ROOT) in setOf("boundary", "charset", "media-type") }
                 )
             }
         },
@@ -96,7 +96,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
 }
 
 private fun Pair<String, Parameters>.toAcceptContentType() =
-    ContentType(first, second.filter { it.first.lowercase(getDefault()) != "q" }).withoutCharset()
+    ContentType(first, second.filter { it.first.lowercase(ROOT) != "q" }).withoutCharset()
 
 
 inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = mapWithNewMeta(

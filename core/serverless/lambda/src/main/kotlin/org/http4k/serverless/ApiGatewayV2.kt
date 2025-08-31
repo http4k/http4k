@@ -11,7 +11,8 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
-import java.util.Locale.getDefault
+import java.util.Locale
+import java.util.Locale.*
 
 /**
  * Function loader for ApiGatewayV2 Lambdas
@@ -52,7 +53,7 @@ object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
     override fun invoke(req: Map<String, Any>, ctx: Context) = runCatching { req.toHttp4kRequest() }
 
     override fun invoke(resp: Response): Map<String, Any> {
-        val nonCookies = resp.headers.filterNot { it.first.lowercase(getDefault()) == "set-cookie" }
+        val nonCookies = resp.headers.filterNot { it.first.lowercase(ROOT) == "set-cookie" }
         return mapOf(
             "statusCode" to resp.status.code,
             "headers" to nonCookies.toMap(),

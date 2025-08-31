@@ -5,7 +5,8 @@ import org.http4k.core.Uri
 import org.http4k.core.toParameters
 import org.http4k.filter.CanonicalPayload
 import org.http4k.urlEncoded
-import java.util.Locale.getDefault
+import java.util.Locale
+import java.util.Locale.*
 
 internal data class AwsCanonicalRequest(val value: String, val signedHeaders: String, val payloadHash: String) {
     companion object {
@@ -27,7 +28,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
 
         private val multipleSpaces = Regex("\\s+")
         private fun Request.canonicalHeaders(): String = headers
-            .map { it.first.lowercase(getDefault()) to (it.second?.replace(multipleSpaces, " ")?.trim().orEmpty()) }
+            .map { it.first.lowercase(ROOT) to (it.second?.replace(multipleSpaces, " ")?.trim().orEmpty()) }
             .groupBy({ it.first }) { it.second }
             .mapValues { it.value.joinToString(",") }
             .toList()
@@ -47,5 +48,5 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
 
 
 internal fun Request.signedHeaders(): String =
-    headers.map { it.first.lowercase(getDefault()) }.toSet().sorted().joinToString(";")
+    headers.map { it.first.lowercase(ROOT) }.toSet().sorted().joinToString(";")
 
