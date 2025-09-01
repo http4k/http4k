@@ -21,7 +21,7 @@ private fun standardConfig(
     .let(configFn)
     .done()
     .deactivateDefaultTyping()
-    .setSerializationInclusion(NON_NULL)
+    .setDefaultPropertyInclusion(NON_NULL)
     .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
     .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
     .configure(FAIL_ON_IGNORED_PROPERTIES, false)

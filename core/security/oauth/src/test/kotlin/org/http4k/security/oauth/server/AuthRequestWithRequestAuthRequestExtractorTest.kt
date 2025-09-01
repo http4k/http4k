@@ -1,6 +1,7 @@
 package org.http4k.security.oauth.server
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
@@ -581,7 +582,7 @@ internal object RequestObjectExtractorJson : ConfigurableJackson(
         .text(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue)
         .text(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue)
         .done()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        .setDefaultPropertyInclusion(NON_NULL)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
         .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
