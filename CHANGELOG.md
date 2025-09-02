@@ -5,11 +5,12 @@ changes with their rationale when appropriate:
 
 ### v6.17.0.0
 - **http4k-***: Upgrade versions
-- **http4k-realtime-core**: SseMessage.Event now supports retry field.
-- **http4k-core***: Lenses, content negotiation & routing for accept-like header. H/T @npryce
+- **http4k-mcp-***: [Breaking] These modules are now living under their new coordinates in `http4k-ai-mcp-*`. Please change your imports and dependencies to reflect this.
 - **http4k-web-datastar***: [Breaking] This is the post Datastar v1 release. The API has significantly changed to match the changes to D* mechanisms - most notably: `Fragments` are now called `Elements`, and the number of SSE events has been reduced from 5 to 2 (datastar-patch-elements and datastar-patch-signals). See the D* docs for more details. You can of course continue to use the old API by using an old version of this module.
 - **http4k-connect-amazon-cognito** [Breaking] Align RespondToAuthChallenge to the official doc. The `ChallengeResponses` in the response is now a `Map<String, String>` instead of the incorrect `Map<ChallengeName, String>`. H/T @alphaho
 - **http4k-testing-powerassert** [New Module!] Power Assert is now bundled with Kotlin, so it's the perfect assertions library to use! This module provides assertions for http4k entities in your tests.
+- **http4k-realtime-core**: SseMessage.Event now supports retry field.
+- **http4k-core***: Lenses, content negotiation & routing for accept-like header. H/T @npryce
 - **http4k-realtime-core**: SseMessage now supports lens injection.
 
 ### v6.16.0.0
