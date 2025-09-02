@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Http4kCommercial
+
 
 description = "http4k chat client"
 

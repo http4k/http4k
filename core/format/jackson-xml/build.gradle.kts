@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "http4k XML support using Jackson as an underlying engine"
 

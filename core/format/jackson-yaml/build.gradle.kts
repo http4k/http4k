@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "http4k YAML support using Jackson as an underlying engine"
 

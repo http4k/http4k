@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "Add a locally hosted Swagger UI to your server"
 

@@ -1,6 +1,3 @@
-import org.http4k.internal.ModuleLicense.Apache2
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-
 plugins {
     id("org.http4k.community")
     id("org.http4k.connect.module")

@@ -1,9 +1,10 @@
 package org.http4k
 
-import org.http4k.internal.ModuleLicense.Apache2
+
+import org.http4k.internal.ModuleLicense
 import org.http4k.internal.addLicenseToJars
 
-val license by project.extra { Apache2 }
+val license by project.extra { ModuleLicense.Apache2 }
 
 group = "org.http4k"
 
@@ -18,4 +19,4 @@ if (!project.name.contains("serverless")) {
     }
 }
 
-addLicenseToJars(Apache2)
+addLicenseToJars(ModuleLicense.Apache2)

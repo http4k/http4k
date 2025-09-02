@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 plugins {
     id("org.http4k.project-metadata")

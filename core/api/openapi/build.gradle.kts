@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 description = "http4k typesafe HTTP contracts and OpenApi support"

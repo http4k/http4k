@@ -38,7 +38,6 @@ configure<MavenPublishBaseExtension> {
 
         val enableSigning = project.findProperty("sign") == "true"
 
-
         if (enableSigning) {
             apply(plugin = "signing")
             signing {

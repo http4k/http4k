@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "Ultra-lightweight Selenium WebDriver implementation for http4k apps"
 

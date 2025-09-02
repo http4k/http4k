@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "http4k WS(S) Server implemented by TooTallNate/Java-WebSocket"
 

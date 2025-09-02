@@ -30,7 +30,7 @@ commons-codec = "1.19.0"
 docker-java-core = "3.5.2"
 # frozen to 3.5.2
 docker-java-transport-httpclient5 = "3.5.2"
-dokka = "2.0.0"
+dokka = "2.1.0-Beta"
 failsafe = "3.3.2"
 forkhandles-bom = "2.22.4.0"
 freemarker = "2.3.34"

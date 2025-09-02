@@ -1,9 +1,10 @@
 package org.http4k
 
-import org.http4k.internal.ModuleLicense.Http4kCommercial
+
+import org.http4k.internal.ModuleLicense
 import org.http4k.internal.addLicenseToJars
 
-val license by project.extra { Http4kCommercial }
+val license by project.extra { ModuleLicense.Http4kCommercial }
 
 group = "org.http4k.pro"
 
@@ -13,4 +14,4 @@ plugins {
     id("org.http4k.api-docs")
 }
 
-addLicenseToJars(Http4kCommercial)
+addLicenseToJars(ModuleLicense.Http4kCommercial)

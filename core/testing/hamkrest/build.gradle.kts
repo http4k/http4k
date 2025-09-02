@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "A set of Hamkrest matchers for common http4k types"
 

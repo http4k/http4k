@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 
 description = "http4k AI LLM Azure and Azure GitHubModels support"
 

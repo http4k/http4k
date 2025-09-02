@@ -1,4 +1,4 @@
-import org.http4k.internal.ModuleLicense.Apache2
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 description = "http4k HTTP Server built on top of Ktor CIO engine"
