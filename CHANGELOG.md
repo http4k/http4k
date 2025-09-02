@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.17.0.0 (uncut)
+### v6.17.0.0
 - **http4k-***: Upgrade versions
 - **http4k-realtime-core**: SseMessage.Event now supports retry field.
 - **http4k-core***: Lenses, content negotiation & routing for accept-like header. H/T @npryce
