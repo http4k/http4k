@@ -53,30 +53,4 @@ class StandardAcceptHeadersRoutingTest {
         assertEquals("fr", rsp.header("content-language"))
         assertEquals("accept-language", rsp.header("vary")?.lowercase())
     }
-    
-    @Test
-    fun `routes by encoding content negotiation`() {
-        val router = routes(
-            "/hello" bind GET to contentEncodings(
-                GZIP to { Response(OK).body("gzipped") },
-                DEFLATE to { Response(OK).body("deflated") },
-                COMPRESS to { Response(OK).body("compressed") }
-            )
-        ).withFilter(SetContentType(TEXT_PLAIN))
-        
-        val rsp = router(
-            Request(GET, "/hello").with(
-                Header.ACCEPT_ENCODING of PriorityList(
-                    Exactly(DEFLATE) q 1.0,
-                    Exactly(COMPRESS) q 0.75,
-                    Wildcard q 0.25
-                )
-            )
-        )
-        
-        assertEquals(OK, rsp.status)
-        assertEquals("deflated", rsp.bodyString())
-        assertEquals("deflate", rsp.header("content-encoding"))
-        assertEquals("accept-encoding", rsp.header("vary")?.lowercase())
-    }
 }

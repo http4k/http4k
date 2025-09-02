@@ -61,21 +61,3 @@ fun contentLanguages(routes: List<Pair<Locale, HttpHandler>>) =
  */
 fun contentLanguages(vararg routes: Pair<Locale, HttpHandler>) =
     contentLanguages(routes.toList())
-
-
-/**
- * Route by proactive negotiation of content encoding.
- */
-fun contentEncodings(routes: List<Pair<ContentEncodingName, HttpHandler>>) =
-    proactiveContentNegotiation(
-        acceptBy = Header.ACCEPT_ENCODING,
-        reportBy = Header.CONTENT_ENCODING,
-        match = { r, o -> r.matches(o) },
-        routes
-    )
-
-/**
- * Route by proactive negotiation of content language.
- */
-fun contentEncodings(vararg routes: Pair<ContentEncodingName, HttpHandler>) =
-    contentEncodings(routes.toList())
