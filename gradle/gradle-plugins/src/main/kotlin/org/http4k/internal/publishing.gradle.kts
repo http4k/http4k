@@ -4,13 +4,14 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import groovy.util.Node
 import java.net.URI
 import javax.xml.namespace.QName
-import org.gradle.api.publish.PublishingExtension
 
 plugins {
     kotlin("jvm")
     `java-library`
     signing
 }
+
+val license: ModuleLicense by project.extra
 
 val metadata = kotlin.runCatching {
     (project.extensions.getByName("metadata") as? ProjectMetadata.Extension)
@@ -51,7 +52,10 @@ configure<MavenPublishBaseExtension> {
         publishToMavenCentral(automaticRelease = true)
 
         coordinates(
-            "org.http4k",
+            when (license) {
+                ModuleLicense.Apache2 -> "org.http4k"
+                ModuleLicense.Http4kCommercial -> "org.http4k.pro"
+            },
             project.name,
             project.properties["releaseVersion"]?.toString() ?: "LOCAL"
         )

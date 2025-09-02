@@ -2,8 +2,6 @@ import org.http4k.internal.ModuleLicense.Http4kCommercial
 
 description = "http4k AI MCP Core"
 
-val license by project.extra { Http4kCommercial }
-
 plugins {
     id("org.http4k.pro")
     id("com.google.devtools.ksp")

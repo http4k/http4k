@@ -2,8 +2,6 @@ import org.http4k.internal.ModuleLicense.Apache2
 
 description = "Ultra-lightweight Selenium WebDriver implementation for http4k apps"
 
-val license by project.extra { Apache2 }
-
 plugins {
     id("org.http4k.community")
 }

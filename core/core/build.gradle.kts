@@ -2,8 +2,6 @@ import org.http4k.internal.ModuleLicense.Apache2
 
 description = "Dependency-lite Server as a Function in pure Kotlin"
 
-val license by project.extra { Apache2 }
-
 plugins {
     id("org.http4k.community")
 }

@@ -2,8 +2,6 @@ import org.http4k.internal.ModuleLicense.Apache2
 
 description = "A set of Power Assert matchers for common http4k types"
 
-val license by project.extra { Apache2 }
-
 plugins {
     id("org.http4k.community")
     id("org.jetbrains.kotlin.plugin.power-assert") version "2.2.20-Beta2"

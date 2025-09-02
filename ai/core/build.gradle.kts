@@ -2,8 +2,6 @@ import org.http4k.internal.ModuleLicense.Apache2
 
 description = "http4k AI core types"
 
-val license by project.extra { Apache2 }
-
 plugins {
     id("org.http4k.community")
     id("org.http4k.connect.module")
