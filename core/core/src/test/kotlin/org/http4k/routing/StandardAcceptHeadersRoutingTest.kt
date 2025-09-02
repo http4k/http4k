@@ -1,8 +1,5 @@
 package org.http4k.routing
 
-import org.http4k.core.ContentEncodingName.Companion.COMPRESS
-import org.http4k.core.ContentEncodingName.Companion.DEFLATE
-import org.http4k.core.ContentEncodingName.Companion.GZIP
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Exactly
 import org.http4k.core.Method.GET
@@ -14,7 +11,6 @@ import org.http4k.core.Wildcard
 import org.http4k.core.q
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.SetContentType
-import org.http4k.lens.ACCEPT_ENCODING
 import org.http4k.lens.ACCEPT_LANGUAGE
 import org.http4k.lens.Header
 import org.junit.jupiter.api.Assertions.assertEquals
