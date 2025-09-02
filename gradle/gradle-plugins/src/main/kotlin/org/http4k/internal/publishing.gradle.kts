@@ -49,7 +49,7 @@ configure<MavenPublishBaseExtension> {
             }
         }
 
-        publishToMavenCentral(automaticRelease = true)
+        publishToMavenCentral(automaticRelease = false)
 
         coordinates(
             when (license) {
