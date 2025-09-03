@@ -26,6 +26,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Publish
         env:
+          RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+          LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
+          LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
@@ -33,11 +38,11 @@ jobs:
         run: |
           ./gradlew publish --no-configuration-cache --info \
           -Psign=true \
-          -PreleaseVersion="${{ steps.tagName.outputs.tag }}" \
-          -PltsPublishingUser="${{ secrets.LTS_PUBLISHING_USER }}" \
-          -PltsPublishingPassword="${{ secrets.LTS_PUBLISHING_PASSWORD }}" \
-          -PsigningKey="${{ secrets.SIGNING_KEY }}" \
-          -PsigningPassword="${{ secrets.SIGNING_PASSWORD }}"
+          -PreleaseVersion="$RELEASE_VERSION" \
+          -PltsPublishingUser="$LTS_PUBLISHING_USER" \
+          -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
+          -PsigningKey="$SIGNING_KEY" \
+          -PsigningPassword="$SIGNING_PASSWORD"
         shell: bash
       - run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}
         env:
