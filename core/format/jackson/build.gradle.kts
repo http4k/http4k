@@ -12,8 +12,6 @@ dependencies {
     api(platform(libs.jackson.bom))
     api(libs.jackson.databind)
     api(libs.jackson.module.kotlin)
-    implementation(libs.cloudevents.core)
-    implementation(libs.cloudevents.json.jackson)
     implementation(libs.values4k)
     implementation(libs.data4k)
 
