@@ -47,6 +47,7 @@ helidon-bom = "4.2.6"
 hikaricp = "7.0.2"
 hsqldb = "2.7.4"
 htmx-org = "2.0.6"
+htmlflow = "4.8"
 hyperscript-org = "0.9.14"
 jackson-bom = "2.20.0"
 jakarta-inject-api = "2.0.1"
@@ -180,6 +181,7 @@ helidon-webserver-sse = { module = "io.helidon.webserver:helidon-webserver-sse",
 helidon-webserver-websocket = { module = "io.helidon.webserver:helidon-webserver-websocket", version.ref = "helidon-bom" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+htmlflow = { module = "com.github.xmlet:htmlflow", version.ref = "htmlflow" }
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
 jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
