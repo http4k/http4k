@@ -3,6 +3,7 @@ package workflows
 import io.typeflows.github.workflows.Cron
 import io.typeflows.github.workflows.GitHub
 import io.typeflows.github.workflows.Job
+import io.typeflows.github.workflows.Output
 import io.typeflows.github.workflows.RunsOn
 import io.typeflows.github.workflows.Secrets
 import io.typeflows.github.workflows.StrExp
@@ -28,6 +29,9 @@ class BroadcastRelease : Builder<Workflow> {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
 
             steps += Checkout()
+
+            outputs += Output.string("requires-broadcast", $$"${{ steps.check-version.outputs.requires-broadcast }}")
+            outputs += Output.string("version", $$"${{ steps.check-version.outputs.version }}")
 
             steps += UseAction(
                 "aws-actions/configure-aws-credentials@v4.2.1",

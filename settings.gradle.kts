@@ -1,6 +1,11 @@
 rootProject.name = "http4k"
 
 pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        mavenLocal()
+    }
     includeBuild("gradle/gradle-plugins")
 }
 

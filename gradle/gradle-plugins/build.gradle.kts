@@ -15,6 +15,7 @@ version = "0.0.0.0"
 repositories {
     gradlePluginPortal()
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {

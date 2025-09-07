@@ -10,6 +10,7 @@ plugins {
 repositories {
     gradlePluginPortal()
     mavenCentral()
+    mavenLocal()
 }
 
 group = "org.http4k"

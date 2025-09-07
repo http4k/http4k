@@ -1,0 +1,70 @@
+name: Broadcast Release
+'on':
+  schedule:
+  - cron: 0 * * * *
+  workflow_dispatch: {
+    }
+jobs:
+  check-new-version:
+    runs-on: ubuntu-latest
+    if: github.repository == 'http4k/http4k'
+    outputs:
+      requires-broadcast: ${{ steps.check-version.outputs.requires-broadcast }}
+      version: ${{ steps.check-version.outputs.version }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4.2.1
+      with:
+        aws-access-key-id: ${{ secrets.S3_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Check new version
+      id: check-version
+      run: |-
+        LOCAL_VERSION=$(jq -r .http4k.version ./version.json)
+        S3_VERSION=$(aws s3 cp s3://http4k/latest-broadcasted-version.txt -)
+
+        if [[ $S3_VERSION == $LOCAL_VERSION ]]; then
+          echo "Version $LOCAL_VERSION has been broadcasted already."
+          echo "requires-broadcast=false" >> $GITHUB_OUTPUT
+          exit 0
+        fi;
+
+        echo "Latest broadcasted version was ${S3_VERSION}. Checking for ${LOCAL_VERSION} in maven central..."
+
+        MC_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          "https://repo1.maven.org/maven2/org/http4k/http4k-core/${LOCAL_VERSION}/http4k-core-${LOCAL_VERSION}.pom"
+        )
+
+        if [[ $MC_STATUS == "200" ]]; then
+          echo "Version $LOCAL_VERSION available in MC. Preparing for broadcast..."
+          echo "${LOCAL_VERSION}" | aws s3 cp - s3://http4k/latest-broadcasted-version.txt
+          echo "requires-broadcast=true" >> $GITHUB_OUTPUT
+          echo "version=${LOCAL_VERSION}" >> $GITHUB_OUTPUT
+        fi;
+      shell: bash
+  broadcast-release:
+    runs-on: ubuntu-latest
+    if: needs.check-new-version.outputs.requires-broadcast == 'true'
+    needs:
+    - check-new-version
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
+    - name: Grab tag name
+      id: tagName
+      uses: olegtarasov/get-tag@v2.1.4
+    - name: Repository Dispatch
+      run: |-
+        curl -L \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/http4k/http4k/dispatches \
+          -d '{"event_type":"http4k-release","client_payload":{"version":{"value":"needs.check-new-version.outputs.version"}}}'
+      env:
+        GH_TOKEN: ${{ secrets.ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING }}
+      shell: bash

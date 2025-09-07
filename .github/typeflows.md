@@ -1,5 +1,6 @@
 # Workflows
 
+- **Broadcast Release**
 - **Build**
 - **New Release - GitHub**
 - **New Release - Update other projects**
@@ -13,6 +14,7 @@
 ## Table of Contents
 
 - [Workflow Triggers - Flowchart](#workflow-triggers---flowchart)
+- [Broadcast Release](#broadcast-release)
 - [Build](#build)
 - [New Release - GitHub](#new-release---github)
 - [New Release - Update other projects](#new-release---update-other-projects)
@@ -27,32 +29,52 @@
 
 ```mermaid
 flowchart LR
-    push(["📤 push<br/>branches#91;only: 1#93;, paths#91;ignore: 1#93;"])
-    pull_request(["🔀 pull_request<br/>#91;*#93;, branches"])
-    repository_dispatch_http4k_release(["🔔 repository_dispatch<br/>#91;http4k-release#93;"])
-    workflow_dispatch(["👤 workflow_dispatch"])
-    schedule(["⏰ schedule<br/>0 7 * * 1"])
-    build[Build]
-    new_release___github[New Release - GitHub]
-    new_release___update_other_projects[New Release - Update other projects]
-    update_dependencies[Update Dependencies]
-    release_api[Release API]
-    new_release___slack[New Release - Slack]
-    server_shutdown_tests[Server Shutdown Tests]
-    publish_artifacts[Publish Artifacts]
-    security___dependency_analysis_(dependabot)[Security - Dependency Analysis (dependabot)]
-    push --> build
-    push --> server_shutdown_tests
-    push --> publish_artifacts
-    push --> security___dependency_analysis_(dependabot)
-    pull_request --> build
-    repository_dispatch_http4k_release --> new_release___github
-    repository_dispatch_http4k_release --> new_release___update_other_projects
-    repository_dispatch_http4k_release --> release_api
-    repository_dispatch_http4k_release --> new_release___slack
-    workflow_dispatch --> update_dependencies
-    schedule --> update_dependencies
-    schedule --> security___dependency_analysis_(dependabot)
+    schedule(["⏰ schedule"])
+    workflowdispatch(["👤 workflow_dispatch"])
+    push(["📤 push"])
+    pullrequest(["🔀 pull_request"])
+    repositorydispatch(["🔔 repository_dispatch"])
+    broadcastrelease["Broadcast Release"]
+    build["Build"]
+    newreleasegithub["New Release - GitHub"]
+    newreleaseupdateotherprojects["New Release - Update other projects"]
+    updatedependencies["Update Dependencies"]
+    releaseapi["Release API"]
+    newreleaseslack["New Release - Slack"]
+    servershutdowntests["Server Shutdown Tests"]
+    publishartifacts["Publish Artifacts"]
+    securitydependencyanalysisdependabot["Security - Dependency Analysis (dependabot)"]
+    schedule -->|"0 * * * *"|broadcastrelease
+    schedule -->|"0 7 * * 1"|updatedependencies
+    schedule -->|"0 12 * * 3"|securitydependencyanalysisdependabot
+    workflowdispatch --> broadcastrelease
+    workflowdispatch --> updatedependencies
+    push -->|"branches(only: 1), paths(ignore: 1)"|build
+    push -->|"branches(only: 1), paths(ignore: 1)"|servershutdowntests
+    push -->|"tags(only: 1)"|publishartifacts
+    push -->|"branches(only: 1), paths(ignore: 1)"|securitydependencyanalysisdependabot
+    pullrequest -->|"(*), branches"|build
+    repositorydispatch -->|"http4k-release"|newreleasegithub
+    repositorydispatch -->|"http4k-release"|newreleaseupdateotherprojects
+    repositorydispatch -->|"http4k-release"|releaseapi
+    repositorydispatch -->|"http4k-release"|newreleaseslack
+    broadcastrelease --> repositorydispatch
+```
+
+## Broadcast Release
+
+```mermaid
+%%{init: {"flowchart": {"curve": "basis"}}}%%
+flowchart TD
+    schedule(["⏰ schedule<br/>0 * * * *"])
+    workflowdispatch(["👤 workflow_dispatch"])
+    subgraph broadcastrelease["Broadcast Release"]
+        broadcastrelease_checknewversion["check-new-version<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'<br/>📤 Outputs: requires-broadcast, version"]
+        broadcastrelease_broadcastrelease["broadcast-release<br/>🐧 ubuntu-latest<br/>🔐 if: needs.check-new-version.outputs.requires-broadcast == 'true'"]
+        broadcastrelease_checknewversion --> broadcastrelease_broadcastrelease
+    end
+    schedule --> broadcastrelease_checknewversion
+    workflowdispatch --> broadcastrelease_checknewversion
 ```
 
 ## Build
@@ -60,13 +82,13 @@ flowchart LR
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    push(["📤 push<br/>branches#91;only: 1#93;, paths#91;ignore: 1#93;"])
-    pull_request(["🔀 pull_request<br/>#91;*#93;, branches"])
+    push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
+    pullrequest(["🔀 pull_request<br/>(*), branches"])
     subgraph build["Build"]
         build_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
     push --> build_build
-    pull_request --> build_build
+    pullrequest --> build_build
 ```
 
 ## New Release - GitHub
@@ -74,12 +96,12 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    repository_dispatch(["🔔 repository_dispatch<br/>#91;http4k-release#93;"])
-    subgraph new_release___github["New Release - GitHub"]
-        new_release___github_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        new_release___github_release["release<br/>🐧 ubuntu-latest"]
+    repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
+    subgraph newreleasegithub["New Release - GitHub"]
+        newreleasegithub_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
+        newreleasegithub_release["release<br/>🐧 ubuntu-latest"]
     end
-    repository_dispatch --> new_release___github_release
+    repositorydispatch --> newreleasegithub_release
 ```
 
 ## New Release - Update other projects
@@ -87,11 +109,11 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    repository_dispatch(["🔔 repository_dispatch<br/>#91;http4k-release#93;"])
-    subgraph new_release___update_other_projects["New Release - Update other projects"]
-        new_release___update_other_projects_create_upgrade_branches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo #91;10 runs#93;"]
+    repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
+    subgraph newreleaseupdateotherprojects["New Release - Update other projects"]
+        newreleaseupdateotherprojects_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (10 runs)"]
     end
-    repository_dispatch --> new_release___update_other_projects_create_upgrade_branches
+    repositorydispatch --> newreleaseupdateotherprojects_createupgradebranches
 ```
 
 ## Update Dependencies
@@ -99,13 +121,13 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    workflow_dispatch(["👤 workflow_dispatch"])
+    workflowdispatch(["👤 workflow_dispatch"])
     schedule(["⏰ schedule<br/>0 7 * * 1"])
-    subgraph update_dependencies["Update Dependencies"]
-        update_dependencies_update_dependencies["Update Version Catalog<br/>🐧 ubuntu-latest"]
+    subgraph updatedependencies["Update Dependencies"]
+        updatedependencies_updatedependencies["Update Version Catalog<br/>🐧 ubuntu-latest"]
     end
-    workflow_dispatch --> update_dependencies_update_dependencies
-    schedule --> update_dependencies_update_dependencies
+    workflowdispatch --> updatedependencies_updatedependencies
+    schedule --> updatedependencies_updatedependencies
 ```
 
 ## Release API
@@ -113,11 +135,11 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    repository_dispatch(["🔔 repository_dispatch<br/>#91;http4k-release#93;"])
-    subgraph release_api["Release API"]
-        release_api_release_api["release-api<br/>🐧 ubuntu-latest"]
+    repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
+    subgraph releaseapi["Release API"]
+        releaseapi_releaseapi["release-api<br/>🐧 ubuntu-latest"]
     end
-    repository_dispatch --> release_api_release_api
+    repositorydispatch --> releaseapi_releaseapi
 ```
 
 ## New Release - Slack
@@ -125,12 +147,12 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    repository_dispatch(["🔔 repository_dispatch<br/>#91;http4k-release#93;"])
-    subgraph new_release___slack["New Release - Slack"]
-        new_release___slack_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        new_release___slack_slackify["slackify<br/>🐧 ubuntu-latest"]
+    repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
+    subgraph newreleaseslack["New Release - Slack"]
+        newreleaseslack_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
+        newreleaseslack_slackify["slackify<br/>🐧 ubuntu-latest"]
     end
-    repository_dispatch --> new_release___slack_slackify
+    repositorydispatch --> newreleaseslack_slackify
 ```
 
 ## Server Shutdown Tests
@@ -138,11 +160,11 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    push(["📤 push<br/>branches#91;only: 1#93;, paths#91;ignore: 1#93;"])
-    subgraph server_shutdown_tests["Server Shutdown Tests"]
-        server_shutdown_tests_run_tests["Run Shutdown Tests<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
+    push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
+    subgraph servershutdowntests["Server Shutdown Tests"]
+        servershutdowntests_runtests["Run Shutdown Tests<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
-    push --> server_shutdown_tests_run_tests
+    push --> servershutdowntests_runtests
 ```
 
 ## Publish Artifacts
@@ -150,12 +172,12 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    push(["📤 push"])
-    subgraph publish_artifacts["Publish Artifacts"]
-        publish_artifacts_metadata[["🔧 Workflow Config<br/>🌍 1 env var"]]
-        publish_artifacts_release["release<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
+    push(["📤 push<br/>tags(only: 1)"])
+    subgraph publishartifacts["Publish Artifacts"]
+        publishartifacts_metadata[["🔧 Workflow Config<br/>🌍 1 env var"]]
+        publishartifacts_release["release<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
     end
-    push --> publish_artifacts_release
+    push --> publishartifacts_release
 ```
 
 ## Security - Dependency Analysis (dependabot)
@@ -163,11 +185,11 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    push(["📤 push<br/>branches#91;only: 1#93;, paths#91;ignore: 1#93;"])
+    push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
     schedule(["⏰ schedule<br/>0 12 * * 3"])
-    subgraph security___dependency_analysis_(dependabot)["Security - Dependency Analysis (dependabot)"]
-        security___dependency_analysis_(dependabot)_build["Dependencies<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
+    subgraph securitydependencyanalysisdependabot["Security - Dependency Analysis (dependabot)"]
+        securitydependencyanalysisdependabot_build["Dependencies<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
     end
-    push --> security___dependency_analysis_(dependabot)_build
-    schedule --> security___dependency_analysis_(dependabot)_build
+    push --> securitydependencyanalysisdependabot_build
+    schedule --> securitydependencyanalysisdependabot_build
 ```
