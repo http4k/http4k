@@ -6,7 +6,8 @@ import io.typeflows.github.workflows.steps.marketplace.SetupJava
 
 object Standards {
     val Java = SetupJava(Adopt, V21)
-    val masterBranch = "master"
+    val MASTER_BRANCH = "master"
+    val MAIN_REPO = "http4k/http4k"
 
     val REELEASE_EVENT = "http4k-release"
 

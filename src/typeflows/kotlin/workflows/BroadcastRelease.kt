@@ -15,6 +15,7 @@ import io.typeflows.github.workflows.triggers.Schedule
 import io.typeflows.github.workflows.triggers.WorkflowDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.REELEASE_EVENT
+import workflows.Standards.MAIN_REPO
 
 class BroadcastRelease : Builder<Workflow> {
     override fun build() = Workflow("Broadcast Release") {
@@ -24,7 +25,7 @@ class BroadcastRelease : Builder<Workflow> {
         on += WorkflowDispatch()
 
         val checkNewVersion = Job("check-new-version", RunsOn.UBUNTU_LATEST) {
-            condition = GitHub.repository.isEqualTo("http4k/http4k")
+            condition = GitHub.repository.isEqualTo(MAIN_REPO)
 
             steps += Checkout()
 
@@ -32,8 +33,8 @@ class BroadcastRelease : Builder<Workflow> {
                 "aws-actions/configure-aws-credentials@v4.2.1",
                 "Configure AWS Credentials"
             ) {
-                with["aws-access-key-id"] = "\${{ secrets.S3_ACCESS_KEY_ID }}"
-                with["aws-secret-access-key"] = "\${{ secrets.S3_SECRET_ACCESS_KEY }}"
+                with["aws-access-key-id"] = Secrets.string("S3_ACCESS_KEY_ID")
+                with["aws-secret-access-key"] = Secrets.string("S3_SECRET_ACCESS_KEY")
                 with["aws-region"] = "us-east-1"
             }
 
@@ -84,7 +85,7 @@ class BroadcastRelease : Builder<Workflow> {
                 Secrets.string("ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING"),
                 mapOf("version" to StrExp.of("needs.check-new-version.outputs.version"))
             ) {
-                repository = StrExp.of("http4k/http4k")
+                repository = StrExp.of(Standards.MASTER_BRANCH)
             }
         }
     }

@@ -1,11 +1,11 @@
 package workflows
 
 import io.typeflows.github.workflows.*
-import io.typeflows.github.workflows.GitHub.env
 import io.typeflows.github.workflows.steps.*
 import io.typeflows.github.workflows.steps.marketplace.*
 import io.typeflows.github.workflows.triggers.*
 import io.typeflows.util.Builder
+import workflows.Standards.MAIN_REPO
 
 class UploadRelease : Builder<Workflow> {
     override fun build() = Workflow("Publish Artifacts") {
@@ -16,7 +16,7 @@ class UploadRelease : Builder<Workflow> {
         env["ACTIONS_ALLOW_UNSECURE_COMMANDS"] = "true"
         
         jobs += Job("Release", RunsOn.UBUNTU_LATEST) {
-            condition = GitHub.repository.isEqualTo("http4k/http4k")
+            condition = GitHub.repository.isEqualTo(MAIN_REPO)
             
             steps += Checkout {
                 ref = $$"${{ steps.tagName.outputs.tag }}"

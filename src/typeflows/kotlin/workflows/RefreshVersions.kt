@@ -6,7 +6,7 @@ import io.typeflows.github.workflows.steps.marketplace.*
 import io.typeflows.github.workflows.triggers.*
 import io.typeflows.util.Builder
 import workflows.Standards.Java
-import workflows.Standards.masterBranch
+import workflows.Standards.MASTER_BRANCH
 
 class RefreshVersions : Builder<Workflow> {
     override fun build() = Workflow("Update Dependencies") {
@@ -19,7 +19,7 @@ class RefreshVersions : Builder<Workflow> {
             name = "Update Version Catalog"
             
             steps += Checkout {
-                ref = masterBranch
+                ref = MASTER_BRANCH
                 token = Secrets.GITHUB_TOKEN.toString()
             }
             
@@ -70,7 +70,7 @@ class RefreshVersions : Builder<Workflow> {
             steps += UseAction("repo-sync/pull-request@v2", "Create Pull Request") {
                 condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
                 with["source_branch"] = "dependency-update"
-                with["destination_branch"] = masterBranch
+                with["destination_branch"] = MASTER_BRANCH
                 with["pr_title"] = "= Update dependencies to latest versions"
                 with["pr_body"] = $$"""
                     ## > Automated Dependency Update
