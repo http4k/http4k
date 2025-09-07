@@ -1,9 +1,11 @@
 package workflows
 
 import io.typeflows.github.workflows.*
+import io.typeflows.github.workflows.GitHub.repository
 import io.typeflows.github.workflows.steps.*
 import io.typeflows.github.workflows.triggers.*
 import io.typeflows.util.Builder
+import workflows.Standards.MAIN_REPO
 import workflows.Standards.REELEASE_EVENT
 
 class CreateUpgradeBranches : Builder<Workflow> {
@@ -25,12 +27,14 @@ class CreateUpgradeBranches : Builder<Workflow> {
                     "http4k/www"
                 )
             ))
-            
-            steps += UseAction("peter-evans/repository-dispatch@v3.0.0", $$"Trigger ${{ matrix.repo }}") {
-                with["token"] = Secrets.string("TOOLBOX_REPO_TOKEN")
-                with["repository"] = Matrix.string("repo")
-                with["event-type"] = REELEASE_EVENT
-                with["client-payload"] = $$"""{"version": "${{ github.event.client_payload.version }}"}"""
+
+            steps += SendRepositoryDispatch(
+                REELEASE_EVENT,
+                Secrets.string("TOOLBOX_REPO_TOKEN"),
+                mapOf("version" to StrExp.of("github.event.client_payload.version }}")),
+                $$"Trigger ${{ matrix.repo }}"
+            ) {
+                repository = Matrix.string("repo")
             }
         }
     }

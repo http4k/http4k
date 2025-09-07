@@ -59,6 +59,7 @@ flowchart LR
     repositorydispatch -->|"http4k-release"|releaseapi
     repositorydispatch -->|"http4k-release"|newreleaseslack
     broadcastrelease --> repositorydispatch
+    newreleaseupdateotherprojects --> repositorydispatch
 ```
 
 ## Broadcast Release
