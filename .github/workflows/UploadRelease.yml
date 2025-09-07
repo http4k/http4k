@@ -1,0 +1,54 @@
+name: Publish Artifacts
+'on':
+  push:
+    tags:
+    - '*'
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.repository == 'http4k/http4k'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
+      with:
+        ref: ${{ steps.tagName.outputs.tag }}
+    - name: Grab tag name
+      id: tagName
+      uses: olegtarasov/get-tag@v2.1.4
+    - name: Setup Java
+      uses: actions/setup-java@v5.0.0
+      with:
+        java-version: '21'
+        distribution: adopt
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4.4.2
+    - name: Publish
+      run: |-
+        ./gradlew publish --no-configuration-cache --info \
+        -Psign=true \
+        -PreleaseVersion="$RELEASE_VERSION" \
+        -PltsPublishingUser="$LTS_PUBLISHING_USER" \
+        -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
+        -PsigningKey="$SIGNING_KEY" \
+        -PsigningPassword="$SIGNING_PASSWORD"
+      env:
+        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
+        LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME
+          }}
+        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD
+          }}
+        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD
+          }}
+      shell: bash
+    - name: Notify LTS Slack
+      run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}
+      env:
+        LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
+      shell: bash

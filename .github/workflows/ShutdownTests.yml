@@ -1,0 +1,35 @@
+name: Server Shutdown Tests
+'on':
+  push:
+    branches:
+    - master
+    paths-ignore:
+    - '**/*.md'
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    name: Run Shutdown Tests
+    env:
+      BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
+      BUILDNOTE_GITHUB_JOB_NAME: run_tests
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
+    - name: Setup Java
+      uses: actions/setup-java@v5.0.0
+      with:
+        java-version: '21'
+        distribution: adopt
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4.4.2
+    - name: Build
+      timeout-minutes: 25
+      run: bin/run_shutdown_tests.sh
+      env:
+        SERVER_HOST: localhost
+        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
+        HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
+      shell: bash
+    - name: Buildnote
+      if: always()
+      uses: buildnote/action@main

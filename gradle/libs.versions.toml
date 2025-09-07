@@ -11,9 +11,9 @@ apache-httpcore5 = "5.3.5"
 apiguardian-api = "1.1.2"
 argo = "7.6"
 avro = "1.12.0"
-aws-lambda-java-core = "1.3.0"
+aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.33.0"
+awssdk-bom = "2.33.4"
 azure-core = "1.56.0"
 azure-functions-java-library = "3.1.0"
 base16-encoding = "2.4.0"
@@ -27,9 +27,9 @@ com-google-devtools-ksp = "2.2.10-2.0.2"
 com-vanniktech-gradle-maven-publish-plugin = "0.34.0"
 commons-codec = "1.19.0"
 # frozen to 3.5.2
-docker-java-core = "3.5.2"
+docker-java-core = "3.6.0"
 # frozen to 3.5.2
-docker-java-transport-httpclient5 = "3.5.2"
+docker-java-transport-httpclient5 = "3.6.0"
 dokka = "2.1.0-Beta"
 failsafe = "3.3.2"
 forkhandles-bom = "2.22.4.0"
@@ -68,7 +68,7 @@ junit = "5.13.4"
 klaxon = "5.6"
 kondor-core = "3.5.2"
 konsist = "0.17.3"
-kotest = "6.0.1"
+kotest = "6.0.2"
 kotlin = "2.2.10"
 kotlinpoet = "2.2.0"
 # should NOT be a number (1.0.0-Beta2)
@@ -81,19 +81,19 @@ langchain4j = "1.4.0"
 langchain4j-core = "1.4.0"
 langchain4j-http-client = "1.4.0"
 langchain4j-open-ai = "1.4.0"
-lettuce-core = "6.8.0.RELEASE"
+lettuce-core = "6.8.1.RELEASE"
 loremipsum = "1.0"
 mail = "2.0.2"
 micrometer-core = "1.15.3"
-micronaut-http = "4.9.10"
+micronaut-http = "4.9.11"
 mockk = "1.14.5"
 moshi = "1.15.2"
 mysql-connector-java = "8.0.33"
-netty-codec-http2 = "4.2.4.Final"
+netty-codec-http2 = "4.2.5.Final"
 nu-studer-rocker = "3.1"
 okhttp-eventsource = "4.1.1"
 okhttp3 = "5.1.0"
-opentelemetry-bom = "1.53.0"
+opentelemetry-bom = "1.54.0"
 opentelemetry-semconv = "1.37.0"
 opentelemetry-semconv-incubating = "1.37.0-alpha"
 org-openapi-generator = "7.15.0"
@@ -118,10 +118,11 @@ symbol-processing-api = "2.2.10-2.0.2"
 tencent-scf-java-events = "0.0.4"
 testcontainers-bom = "1.21.3"
 thymeleaf = "3.1.3.RELEASE"
+typeflows = "0.13.0-beta"
 underscore = "1.117"
-undertow-core = "2.3.18.Final"
+undertow-core = "2.3.19.Final"
 version-catalog-update = "1.0.0"
-vertx-web = "5.0.3"
+vertx-web = "5.0.4"
 
 [libraries]
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
@@ -296,6 +297,8 @@ testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-bom" }
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
+typeflows-github = { module = "io.typeflows:typeflows-github", version.ref = "typeflows" }
+typeflows-github-marketplace = { module = "io.typeflows:typeflows-github-marketplace", version.ref = "typeflows" }
 underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }
@@ -307,5 +310,6 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
 rocker = { id = "nu.studer.rocker", version.ref = "nu-studer-rocker" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "com-github-johnrengelman-shadow" }
+typeflows = { id = "io.typeflows", version.ref = "typeflows" }
 versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }

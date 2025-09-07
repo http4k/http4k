@@ -1,0 +1,59 @@
+name: Build
+'on':
+  push:
+    branches:
+    - master
+    paths-ignore:
+    - '**/*.md'
+  pull_request:
+    branches-ignore:
+    - dependency-update
+    paths-ignore:
+    - '**/*.md'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUILDNOTE_API_KEY: ${{ secrets.BUILDNOTE_API_KEY }}
+      BUILDNOTE_GITHUB_JOB_NAME: build
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
+      with:
+        persist-credentials: false
+        fetch-depth: 2
+    - name: Setup Java
+      uses: actions/setup-java@v5.0.0
+      with:
+        java-version: '21'
+        distribution: adopt
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4.4.2
+    - name: Build
+      timeout-minutes: 120
+      run: bin/build_ci.sh
+      env:
+        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
+        HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
+      shell: bash
+    - name: Buildnote
+      if: always()
+      uses: buildnote/action@main
+    - name: Publish Test Report
+      if: always()
+      uses: mikepenz/action-junit-report@v5.6.2
+      with:
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        check_annotations: 'true'
+        update_check: 'true'
+    - name: Release (if required)
+      if: github.ref == 'refs/heads/master'
+      run: |-
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git remote set-url origin https://x-access-token:${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${GITHUB_REPOSITORY}.git
+        bin/release_tag.sh
+      env:
+        GH_TOKEN: ${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}
+      shell: bash

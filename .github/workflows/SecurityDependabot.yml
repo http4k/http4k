@@ -1,0 +1,26 @@
+name: Security - Dependency Analysis (dependabot)
+'on':
+  push:
+    branches:
+    - master
+    paths-ignore:
+    - '**/*.md'
+  schedule:
+  - cron: 0 12 * * 3
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Dependencies
+    if: github.repository == 'http4k/http4k'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
+    - name: Setup Java
+      uses: actions/setup-java@v5.0.0
+      with:
+        java-version: '21'
+        distribution: adopt
+    - name: Generate and save dependency graph
+      uses: gradle/actions/dependency-submission@v4
+    permissions:
+      contents: write
