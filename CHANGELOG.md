@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.17.1.0
+- **http4k-***: Upgrade versions 
+
 ### v6.17.0.0
 - **http4k-***: Upgrade versions
 - **http4k-mcp-***: [Breaking] These modules are now living under their new coordinates in `http4k-ai-mcp-*`. Please change your imports and dependencies to reflect this.
