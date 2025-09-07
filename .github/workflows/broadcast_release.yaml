@@ -12,7 +12,7 @@ jobs:
       version: ${{ steps.check-version.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.2.1
         with:
@@ -50,7 +50,7 @@ jobs:
     if: ${{ needs.check-new-version.outputs.requires-broadcast == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
       - name: Grab tag name
         uses: olegtarasov/get-tag@v2.1.4
         id: tagName
