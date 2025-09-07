@@ -8,10 +8,11 @@ import io.typeflows.github.workflows.steps.*
 import io.typeflows.github.workflows.steps.marketplace.Checkout
 import io.typeflows.github.workflows.triggers.*
 import io.typeflows.util.Builder
+import workflows.Standards.REELEASE_EVENT
 
 class CreateGithubRelease : Builder<Workflow> {
     override fun build() = Workflow("New Release - GitHub") {
-        on += RepositoryDispatch("http4k-release")
+        on += RepositoryDispatch(REELEASE_EVENT)
         
         permissions = Permissions(Contents to PermissionLevel.Read)
         

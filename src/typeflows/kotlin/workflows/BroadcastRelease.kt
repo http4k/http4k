@@ -14,7 +14,7 @@ import io.typeflows.github.workflows.steps.marketplace.Checkout
 import io.typeflows.github.workflows.triggers.Schedule
 import io.typeflows.github.workflows.triggers.WorkflowDispatch
 import io.typeflows.util.Builder
-import workflows.Standards.releaseEvent
+import workflows.Standards.REELEASE_EVENT
 
 class BroadcastRelease : Builder<Workflow> {
     override fun build() = Workflow("Broadcast Release") {
@@ -80,7 +80,7 @@ class BroadcastRelease : Builder<Workflow> {
             }
 
             steps += SendRepositoryDispatch(
-                releaseEvent,
+                REELEASE_EVENT,
                 Secrets.string("ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING"),
                 mapOf("version" to StrExp.of("needs.check-new-version.outputs.version"))
             ) {

@@ -4,10 +4,11 @@ import io.typeflows.github.workflows.*
 import io.typeflows.github.workflows.steps.*
 import io.typeflows.github.workflows.triggers.*
 import io.typeflows.util.Builder
+import workflows.Standards.REELEASE_EVENT
 
 class CreateUpgradeBranches : Builder<Workflow> {
     override fun build() = Workflow("New Release - Update other projects") {
-        on += RepositoryDispatch("http4k-release")
+        on += RepositoryDispatch(REELEASE_EVENT)
         
         jobs += Job("create-upgrade-branches", RunsOn.UBUNTU_LATEST) {
             strategy = Strategy(mapOf(
@@ -25,10 +26,10 @@ class CreateUpgradeBranches : Builder<Workflow> {
                 )
             ))
             
-            steps += UseAction("peter-evans/repository-dispatch@v3.0.0", "Trigger ${'$'}{{ matrix.repo }}") {
+            steps += UseAction("peter-evans/repository-dispatch@v3.0.0", $$"Trigger ${{ matrix.repo }}") {
                 with["token"] = Secrets.string("TOOLBOX_REPO_TOKEN")
                 with["repository"] = Matrix.string("repo")
-                with["event-type"] = "http4k-release"
+                with["event-type"] = REELEASE_EVENT
                 with["client-payload"] = $$"""{"version": "${{ github.event.client_payload.version }}"}"""
             }
         }

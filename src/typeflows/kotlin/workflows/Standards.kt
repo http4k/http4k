@@ -8,6 +8,6 @@ object Standards {
     val Java = SetupJava(Adopt, V21)
     val masterBranch = "master"
 
-    val releaseEvent = "http4k-release"
+    val REELEASE_EVENT = "http4k-release"
 
 }

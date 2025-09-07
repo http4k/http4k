@@ -1,26 +1,21 @@
 package workflows
 
 import io.typeflows.github.workflows.Job
-import io.typeflows.github.workflows.RunsOn
 import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflows.Secrets
 import io.typeflows.github.workflows.Workflow
 import io.typeflows.github.workflows.steps.RunCommand
 import io.typeflows.github.workflows.steps.UseAction
 import io.typeflows.github.workflows.steps.marketplace.Checkout
-import io.typeflows.github.workflows.steps.marketplace.JavaDistribution
-import io.typeflows.github.workflows.steps.marketplace.JavaDistribution.Adopt
-import io.typeflows.github.workflows.steps.marketplace.JavaVersion
-import io.typeflows.github.workflows.steps.marketplace.JavaVersion.V21
 import io.typeflows.github.workflows.steps.marketplace.SetupGradle
-import io.typeflows.github.workflows.steps.marketplace.SetupJava
 import io.typeflows.github.workflows.triggers.RepositoryDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.Java
+import workflows.Standards.REELEASE_EVENT
 
 class ReleaseApi : Builder<Workflow> {
     override fun build() = Workflow("Release API") {
-        on += RepositoryDispatch("http4k-release")
+        on += RepositoryDispatch(REELEASE_EVENT)
 
         jobs += Job("release-api", UBUNTU_LATEST) {
             steps += Checkout()
