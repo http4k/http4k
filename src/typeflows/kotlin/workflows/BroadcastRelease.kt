@@ -14,8 +14,8 @@ import io.typeflows.github.workflows.steps.marketplace.Checkout
 import io.typeflows.github.workflows.triggers.Schedule
 import io.typeflows.github.workflows.triggers.WorkflowDispatch
 import io.typeflows.util.Builder
-import workflows.Standards.REELEASE_EVENT
 import workflows.Standards.MAIN_REPO
+import workflows.Standards.REELEASE_EVENT
 
 class BroadcastRelease : Builder<Workflow> {
     override fun build() = Workflow("Broadcast Release") {
@@ -72,7 +72,7 @@ class BroadcastRelease : Builder<Workflow> {
         jobs += Job("broadcast-release", RunsOn.UBUNTU_LATEST) {
             needs += checkNewVersion
 
-            condition = StrExp.of("needs.check-new-version.outputs.require").isEqualTo("true")
+            condition = StrExp.of("needs.check-new-version.outputs.requires-broadcast").isEqualTo("true")
 
             steps += Checkout()
 
@@ -85,7 +85,7 @@ class BroadcastRelease : Builder<Workflow> {
                 Secrets.string("ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING"),
                 mapOf("version" to StrExp.of("needs.check-new-version.outputs.version"))
             ) {
-                repository = StrExp.of(Standards.MASTER_BRANCH)
+                repository = StrExp.of(MAIN_REPO)
             }
         }
     }
