@@ -28,8 +28,6 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
 
             workflows += SecurityDependabot()
 
-            dependabot = ProjectDependabot().build()
-
             files += WorkflowVisualisations(workflows)
         }
     }
