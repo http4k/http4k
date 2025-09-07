@@ -1,39 +1,45 @@
 package workflows
 
-import io.typeflows.github.workflows.*
+import io.typeflows.github.workflows.GitHub
+import io.typeflows.github.workflows.Job
 import io.typeflows.github.workflows.Permission.Contents
+import io.typeflows.github.workflows.PermissionLevel
 import io.typeflows.github.workflows.PermissionLevel.Write
+import io.typeflows.github.workflows.Permissions
 import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
-import io.typeflows.github.workflows.steps.*
+import io.typeflows.github.workflows.Workflow
+import io.typeflows.github.workflows.steps.RunCommand
 import io.typeflows.github.workflows.steps.marketplace.Checkout
-import io.typeflows.github.workflows.triggers.*
+import io.typeflows.github.workflows.steps.marketplace.CreateRelease
+import io.typeflows.github.workflows.triggers.RepositoryDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.REELEASE_EVENT
 
 class CreateGithubRelease : Builder<Workflow> {
     override fun build() = Workflow("New Release - GitHub") {
         on += RepositoryDispatch(REELEASE_EVENT)
-        
+
         permissions = Permissions(Contents to PermissionLevel.Read)
-        
+
         jobs += Job("Release", UBUNTU_LATEST) {
             // for actions/create-release to create a release
             permissions = Permissions(Contents to Write)
-            
+
             steps += Checkout()
-            
+
             steps += RunCommand(
                 $$"bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md",
                 "Build release note"
             )
-            
-            steps += UseAction("actions/create-release@v1", "Create Release") {
+
+            steps += CreateRelease(
+                $$"${{ github.event.client_payload.version }}",
+                $$"${{ github.event.client_payload.version }}",
+            ) {
+                bodyPath = "NOTE.md"
+                draft = false
+                prerelease = false
                 env["GITHUB_TOKEN"] = GitHub.token
-                with["tag_name"] = $$"${{ github.event.client_payload.version }}"
-                with["release_name"] = $$"${{ github.event.client_payload.version }}"
-                with["body_path"] = "NOTE.md"
-                with["draft"] = "false"
-                with["prerelease"] = "false"
             }
         }
     }
