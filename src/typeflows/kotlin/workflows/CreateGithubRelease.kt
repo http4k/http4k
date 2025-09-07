@@ -16,7 +16,7 @@ class CreateGithubRelease : Builder<Workflow> {
         
         permissions = Permissions(Contents to PermissionLevel.Read)
         
-        jobs += Job("release", UBUNTU_LATEST) {
+        jobs += Job("Release", UBUNTU_LATEST) {
             // for actions/create-release to create a release
             permissions = Permissions(Contents to Write)
             
