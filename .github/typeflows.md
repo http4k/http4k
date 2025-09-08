@@ -33,7 +33,8 @@ flowchart LR
     workflowdispatch(["👤 workflow_dispatch"])
     push(["📤 push"])
     pullrequest(["🔀 pull_request"])
-    repositorydispatch(["🔔 repository_dispatch"])
+    repositorydispatchgithubrepository(["🔔 repository_dispatch<br/>→ this repo"])
+    repositorydispatchmatrixrepo(["🔔 repository_dispatch<br/>→ matrix.repo"])
     broadcastrelease["Broadcast Release"]
     build["Build"]
     newreleasegithub["New Release - GitHub"]
@@ -54,12 +55,12 @@ flowchart LR
     push -->|"tags(only: 1)"|publishartifacts
     push -->|"branches(only: 1), paths(ignore: 1)"|securitydependencyanalysisdependabot
     pullrequest -->|"(*), branches"|build
-    repositorydispatch -->|"http4k-release"|newreleasegithub
-    repositorydispatch -->|"http4k-release"|newreleaseupdateotherprojects
-    repositorydispatch -->|"http4k-release"|releaseapi
-    repositorydispatch -->|"http4k-release"|newreleaseslack
-    broadcastrelease --> repositorydispatch
-    newreleaseupdateotherprojects --> repositorydispatch
+    broadcastrelease --> repositorydispatchgithubrepository
+    repositorydispatchgithubrepository -->|"http4k-release"|newreleasegithub
+    repositorydispatchgithubrepository -->|"http4k-release"|newreleaseupdateotherprojects
+    repositorydispatchgithubrepository -->|"http4k-release"|releaseapi
+    repositorydispatchgithubrepository -->|"http4k-release"|newreleaseslack
+    newreleaseupdateotherprojects --> repositorydispatchmatrixrepo
 ```
 
 ## Broadcast Release
