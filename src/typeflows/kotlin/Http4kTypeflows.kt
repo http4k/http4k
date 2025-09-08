@@ -31,8 +31,6 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
 
             workflows += SecurityDependabot()
 
-            files += WorkflowVisualisations(workflows)
-
             files += ContentfulFile("ISSUE_TEMPLATE.md") {
                 content =
                     MarkdownContent.of("<!-- Love http4k? Please consider sponsoring the project: \uD83D\uDC49  https://github.com/sponsors/http4k -->")
@@ -41,6 +39,8 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             files += ContentfulFile("pr-labeler.yml") {
                 content = YamlContent.of(mapOf("automerge" to listOf("auto/*")))
             }
+
+            files += WorkflowVisualisations(workflows)
         }
     }
 }
