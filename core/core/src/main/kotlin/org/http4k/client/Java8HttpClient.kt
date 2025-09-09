@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.SocketException
@@ -69,6 +70,8 @@ object Java8HttpClient {
         } catch (e: SocketTimeoutException) {
             Response(CLIENT_TIMEOUT.toClientStatus(e))
         } catch (e: SocketException) {
+            Response(SERVICE_UNAVAILABLE.toClientStatus(e))
+        } catch (e: IOException) {
             Response(SERVICE_UNAVAILABLE.toClientStatus(e))
         }
     }
