@@ -351,7 +351,6 @@ abstract class HttpClientContract(
             val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
 
             assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
-//            assertThat(response.status.toString().lowercase(ROOT), containsSubstring("connection reset"))
         } finally {
             server.stop()
         }
@@ -374,7 +373,6 @@ abstract class HttpClientContract(
             val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
 
             assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
-//            assertThat(response.status.toString().lowercase(ROOT), containsSubstring("???"))
         } finally {
             server.stop()
         }
@@ -397,7 +395,6 @@ abstract class HttpClientContract(
             val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
 
             assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
-//            assertThat(response.status.toString().lowercase(ROOT), containsSubstring("???"))
         } finally {
             server.stop()
         }
@@ -420,7 +417,6 @@ abstract class HttpClientContract(
             val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
 
             assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
-//            assertThat(response.status.toString().lowercase(ROOT), containsSubstring("???"))
         } finally {
             server.stop()
         }
