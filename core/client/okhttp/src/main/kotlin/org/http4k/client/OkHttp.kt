@@ -53,6 +53,8 @@ object OkHttp {
                     }
                 } catch (e: SocketException) {
                     Response(SERVICE_UNAVAILABLE.toClientStatus(e))
+                } catch (e: IOException) {
+                    Response(SERVICE_UNAVAILABLE.toClientStatus(e))
                 }
 
             override operator fun invoke(request: Request, fn: (Response) -> Unit) =
