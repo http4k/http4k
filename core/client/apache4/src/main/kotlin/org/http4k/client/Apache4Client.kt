@@ -1,6 +1,7 @@
 package org.http4k.client
 
 import org.apache.http.Header
+import org.apache.http.MalformedChunkCodingException
 import org.apache.http.NoHttpResponseException
 import org.apache.http.StatusLine
 import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
@@ -71,6 +72,8 @@ object Apache4Client {
         } catch (e: SocketException) {
             Response(SERVICE_UNAVAILABLE.toClientStatus(e))
         } catch (e: NoHttpResponseException) {
+            Response(SERVICE_UNAVAILABLE.toClientStatus(e))
+        } catch (e: MalformedChunkCodingException) {
             Response(SERVICE_UNAVAILABLE.toClientStatus(e))
         }
     }
