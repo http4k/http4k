@@ -123,6 +123,7 @@ underscore = "1.117"
 undertow-core = "2.3.19.Final"
 version-catalog-update = "1.0.0"
 vertx-web = "5.0.4"
+wiremock = "3.13.1"
 
 [libraries]
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
@@ -303,6 +304,7 @@ underscore = { module = "com.github.javadev:underscore", version.ref = "undersco
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }
 vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
+wiremock-standalone = { module = "org.wiremock:wiremock-standalone", version.ref = "wiremock" }
 
 [plugins]
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
