@@ -379,4 +379,27 @@ abstract class HttpClientContract(
             server.stop()
         }
     }
+
+    @Test
+    fun `malformed response chunk is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.MALFORMED_RESPONSE_CHUNK)
+                    )
+            )
+
+            val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+//            assertThat(response.status.toString().lowercase(ROOT), containsSubstring("???"))
+        } finally {
+            server.stop()
+        }
+    }
 }
