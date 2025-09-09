@@ -23,4 +23,7 @@ class Apache4ClientStreamingTest : HttpClientContract(
 ) {
     @Test
     override fun `malformed response chunk is converted into 503`() = assumeTrue(false, "Unsupported feature")
+
+    @Test
+    override fun `random data then close is converted into 503`() = assumeTrue(false, "Unsupported feature")
 }
