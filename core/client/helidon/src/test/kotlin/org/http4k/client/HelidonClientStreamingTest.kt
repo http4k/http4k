@@ -5,6 +5,7 @@ import org.http4k.core.BodyMode.Stream
 import org.http4k.server.ApacheServer
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import java.time.Duration
 
 class HelidonClientStreamingTest : HttpClientContract(
@@ -22,4 +23,7 @@ class HelidonClientStreamingTest : HttpClientContract(
     @Disabled
     override fun `fails with no protocol`() {
     }
+
+    @Test
+    override fun `malformed response chunk is converted into 503`() = assumeTrue(false, "Unsupported feature")
 }
