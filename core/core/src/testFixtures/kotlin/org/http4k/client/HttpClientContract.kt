@@ -335,7 +335,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `connection reset is converted into 503`() {
+    open fun `connection reset is converted into 503`() {
         val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
         server.start()
 
@@ -357,7 +357,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `empty response is converted into 503`() {
+    open fun `empty response is converted into 503`() {
         val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
         server.start()
 

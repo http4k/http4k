@@ -30,4 +30,8 @@ class ApplicationLoadBalancerHttpClientTest :
     override fun `can receive multiple headers with same name`() = assumeTrue(false, "Unsupported feature")
     override fun `can send multiple cookies`() = assumeTrue(false, "Unsupported feature")
     override fun `can receive multiple cookies`() = assumeTrue(false, "Unsupported feature")
+    override fun `connection reset is converted into 503`() = assumeTrue(false, "Unsupported client feature")
+    override fun `empty response is converted into 503`() = assumeTrue(false, "Unsupported client feature")
+    override fun `malformed response chunk is converted into 503`() = assumeTrue(false, "Unsupported client feature")
+    override fun `random data then close is converted into 503`() = assumeTrue(false, "Unsupported client feature")
 }
