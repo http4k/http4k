@@ -59,15 +59,14 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
-    @Disabled
-    fun `matches subroutes`() {
-        val request = Request(GET, "/subroute")
+    fun `matches subroutes when prefixed`() {
+        val request = Request(GET, "/route-contract/subroute")
         assertThat(handler(request), hasStatus(OK))
 
         val withBasePath = handler.withBasePath("/prefix")
         assertThat(withBasePath(request), hasStatus(NOT_FOUND))
-        assertThat(withBasePath(Request(GET, "/prefix")), hasStatus(OK))
-        assertThat(withBasePath(Request(GET, "/prefix/subroute")), hasStatus(OK))
+        assertThat(withBasePath(Request(GET, "/prefix/route-contract")), hasStatus(OK))
+        assertThat(withBasePath(Request(GET, "/prefix/route-contract/subroute")), hasStatus(OK))
     }
 
     @Test

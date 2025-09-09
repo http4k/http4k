@@ -33,12 +33,18 @@ internal data class SinglePageAppRouteMatcher(
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
     override fun match(request: Request) = when (val m = router(request)) {
-        is Matched -> {
-            handler(request).let {
-                when {
-                    it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
-                    else -> RoutingMatch(2, m.description, filter.then { _: Request -> Response(NOT_FOUND) })
-                }
+        is Matched -> handler(request).let {
+            when {
+                it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
+                request.uri.path.startsWith(pathSegments) ->
+                    handler(Request(request.method, pathSegments)).let {
+                        when {
+                            it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
+                            else -> RoutingMatch(2, m.description, filter.then { _: Request -> Response(NOT_FOUND) })
+                        }
+                    }
+
+                else -> RoutingMatch(2, m.description, filter.then { _: Request -> Response(NOT_FOUND) })
             }
         }
 
