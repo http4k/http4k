@@ -402,4 +402,27 @@ abstract class HttpClientContract(
             server.stop()
         }
     }
+
+    @Test
+    open fun `random data then close is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.RANDOM_DATA_THEN_CLOSE)
+                    )
+            )
+
+            val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+//            assertThat(response.status.toString().lowercase(ROOT), containsSubstring("???"))
+        } finally {
+            server.stop()
+        }
+    }
 }
