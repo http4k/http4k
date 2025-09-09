@@ -381,7 +381,7 @@ abstract class HttpClientContract(
     }
 
     @Test
-    fun `malformed response chunk is converted into 503`() {
+    open fun `malformed response chunk is converted into 503`() {
         val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
         server.start()
 
