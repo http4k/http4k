@@ -1,5 +1,6 @@
 package org.http4k.client
 
+import io.helidon.common.buffers.DataReader
 import io.helidon.http.Method
 import io.helidon.webclient.api.ClientRequest
 import io.helidon.webclient.api.HttpClientRequest
@@ -49,6 +50,8 @@ object HelidonClient {
                 is SocketException -> Response(SERVICE_UNAVAILABLE.toClientStatus(e))
                 else -> throw e
             }
+        } catch (e: DataReader.InsufficientDataAvailableException) {
+            Response(SERVICE_UNAVAILABLE.toClientStatus(e))
         }
 
         private fun HttpClientResponse.asHttp4k() =
