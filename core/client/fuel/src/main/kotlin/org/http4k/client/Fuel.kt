@@ -12,6 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.toParametersMap
 import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.Duration
@@ -42,6 +43,7 @@ class Fuel(
             is ConnectException -> return Response(Status.CONNECTION_REFUSED.toClientStatus(error.exception as ConnectException))
             is UnknownHostException -> return Response(Status.UNKNOWN_HOST.toClientStatus(error.exception as UnknownHostException))
             is SocketTimeoutException -> return Response(Status.CLIENT_TIMEOUT.toClientStatus(error.exception as SocketTimeoutException))
+            is SocketException -> return Response(Status.SERVICE_UNAVAILABLE.toClientStatus(error.exception as SocketException))
         }
         val headers: Parameters = response.headers.toList().fold(listOf()) { acc, next ->
             acc + next.second.fold(listOf()) { keyAcc, nextValue -> keyAcc + (next.first to nextValue) }
