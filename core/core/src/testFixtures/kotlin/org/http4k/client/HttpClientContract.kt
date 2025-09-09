@@ -1,5 +1,11 @@
 package org.http4k.client
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.http.Fault
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
@@ -326,5 +332,27 @@ abstract class HttpClientContract(
     fun `sanitises uri`() {
         val response = client(Request(GET, "http://localhost:$port/encoded-uri/foo, bar & baz!"))
         assertThat(response.bodyString(), equalTo("foo, bar & baz!"))
+    }
+
+    @Test
+    fun `connection reset is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.CONNECTION_RESET_BY_PEER)
+                    )
+            )
+
+            val response = client(Request(Method.GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+        } finally {
+            server.stop()
+        }
     }
 }

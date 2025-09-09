@@ -13,6 +13,8 @@ dependencies {
 
     testImplementation(libs.junit.jupiter.params)
 
+    testFixturesImplementation("org.wiremock:wiremock-standalone:3.13.1")
+
     testFixturesImplementation(platform(libs.opentelemetry.bom))
     testFixturesImplementation(libs.opentelemetry.sdk)
     testFixturesImplementation(libs.opentelemetry.exporter.otlp)
