@@ -3,6 +3,7 @@ package org.http4k.client
 import org.eclipse.jetty.client.BufferingResponseListener
 import org.eclipse.jetty.client.ByteBufferRequestContent
 import org.eclipse.jetty.client.HttpClient
+import org.eclipse.jetty.client.HttpResponseException
 import org.eclipse.jetty.client.InputStreamRequestContent
 import org.eclipse.jetty.client.InputStreamResponseListener
 import org.eclipse.jetty.client.Result
@@ -66,6 +67,7 @@ object JettyClient {
                         is UnknownHostException -> Response(UNKNOWN_HOST.toClientStatus(e))
                         is ConnectException -> Response(CONNECTION_REFUSED.toClientStatus(e))
                         is EOFException -> Response(SERVICE_UNAVAILABLE.toClientStatus(e))
+                        is HttpResponseException -> Response(SERVICE_UNAVAILABLE.toClientStatus(e))
                         else -> throw e
                     }
                 } catch (e: TimeoutException) {
