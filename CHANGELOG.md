@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.17.1.0
 - **http4k-***: Upgrade versions 
+- **http4k-core**: Fix SPA routing bug with subroutes
 
 ### v6.17.0.0
 - **http4k-***: Upgrade versions
