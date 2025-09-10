@@ -17,9 +17,10 @@ import org.http4k.filter.ServerFilters.Cors
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
+class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler = validPath bind singlePageApp(
         ResourceLoader.Classpath()
     )
@@ -55,6 +56,18 @@ class SinglePageAppRoutingHttpHandlerTest  : RoutingHttpHandlerContract() {
     override fun `does not match a particular route`() {
         val request = Request(GET, "/not-found")
         assertThat(handler(request), hasStatus(NOT_FOUND))
+    }
+
+    @Test
+    @Disabled
+    fun `matches subroutes`() {
+        val request = Request(GET, "/subroute")
+        assertThat(handler(request), hasStatus(OK))
+
+        val withBasePath = handler.withBasePath("/prefix")
+        assertThat(withBasePath(request), hasStatus(NOT_FOUND))
+        assertThat(withBasePath(Request(GET, "/prefix")), hasStatus(OK))
+        assertThat(withBasePath(Request(GET, "/prefix/subroute")), hasStatus(OK))
     }
 
     @Test
