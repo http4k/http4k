@@ -10,5 +10,4 @@ object Standards {
     val MAIN_REPO = "http4k/http4k"
 
     val REELEASE_EVENT = "http4k-release"
-
 }

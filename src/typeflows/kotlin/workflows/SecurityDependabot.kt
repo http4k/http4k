@@ -12,7 +12,8 @@ import workflows.Standards.Java
 import workflows.Standards.MAIN_REPO
 
 class SecurityDependabot : Builder<Workflow> {
-    override fun build() = Workflow("Security - Dependency Analysis (dependabot)") {
+    override fun build() = Workflow("security-dependabot") {
+        displayName = "Security - Dependency Analysis (dependabot)"
         on += Push {
             branches = Branches.Only("master")
             paths = Paths.Ignore("**/*.md")

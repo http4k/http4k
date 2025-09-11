@@ -3,8 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.17.1.0
-- **http4k-***: Upgrade versions 
+### v6.18.0.0
+- **http4k-***: Upgrade versions, including Kotlin to 2.2.20
 - **http4k-core**: Fix SPA routing bug with subroutes
 
 ### v6.17.0.0

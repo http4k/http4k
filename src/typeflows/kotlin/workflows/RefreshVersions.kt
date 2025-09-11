@@ -9,7 +9,8 @@ import workflows.Standards.Java
 import workflows.Standards.MASTER_BRANCH
 
 class RefreshVersions : Builder<Workflow> {
-    override fun build() = Workflow("Update Dependencies") {
+    override fun build() = Workflow("refresh-versions") {
+        displayName = "Update Dependencies"
         on += WorkflowDispatch()
         on += Schedule {
             cron += Cron.of("0 7 * * 1") // Weekly on Monday at 7am

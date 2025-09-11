@@ -1,17 +1,17 @@
-# Broadcast Release
+# Broadcast Release (broadcast-release.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     schedule(["⏰ schedule<br/>0 * * * *"])
     workflowdispatch(["👤 workflow_dispatch"])
-    subgraph broadcastrelease["Broadcast Release"]
-        broadcastrelease_checknewversion["check-new-version<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'<br/>📤 Outputs: requires-broadcast, version"]
-        broadcastrelease_broadcastrelease["broadcast-release<br/>🐧 ubuntu-latest<br/>🔐 if: needs.check-new-version.outputs.requires-broadcast == 'true'"]
-        broadcastrelease_checknewversion --> broadcastrelease_broadcastrelease
+    subgraph broadcastreleaseyml["Broadcast Release"]
+        broadcastreleaseyml_checknewversion["check-new-version<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'<br/>📤 Outputs: requires-broadcast, version"]
+        broadcastreleaseyml_broadcastrelease["broadcast-release<br/>🐧 ubuntu-latest<br/>🔐 if: needs.check-new-version.outputs.requires-broadcast == 'true'"]
+        broadcastreleaseyml_checknewversion --> broadcastreleaseyml_broadcastrelease
     end
-    schedule --> broadcastrelease_checknewversion
-    workflowdispatch --> broadcastrelease_checknewversion
+    schedule --> broadcastreleaseyml_checknewversion
+    workflowdispatch --> broadcastreleaseyml_checknewversion
 ```
 
 ## Job: check-new-version

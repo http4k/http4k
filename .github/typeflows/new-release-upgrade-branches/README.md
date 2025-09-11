@@ -1,13 +1,13 @@
-# New Release - Update other projects
+# New Release - Update other projects (new-release-upgrade-branches.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
-    subgraph newreleaseupdateotherprojects["New Release - Update other projects"]
-        newreleaseupdateotherprojects_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (10 runs)"]
+    subgraph newreleaseupgradebranchesyml["New Release - Update other projects"]
+        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (10 runs)"]
     end
-    repositorydispatch --> newreleaseupdateotherprojects_createupgradebranches
+    repositorydispatch --> newreleaseupgradebranchesyml_createupgradebranches
 ```
 
 ## Job: create-upgrade-branches

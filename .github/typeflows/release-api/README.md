@@ -1,13 +1,13 @@
-# Release API
+# Release API (release-api.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
-    subgraph releaseapi["Release API"]
-        releaseapi_releaseapi["release-api<br/>🐧 ubuntu-latest"]
+    subgraph releaseapiyml["Release API"]
+        releaseapiyml_releaseapi["release-api<br/>🐧 ubuntu-latest"]
     end
-    repositorydispatch --> releaseapi_releaseapi
+    repositorydispatch --> releaseapiyml_releaseapi
 ```
 
 ## Job: release-api

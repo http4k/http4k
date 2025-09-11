@@ -1,15 +1,15 @@
-# Security - Dependency Analysis (dependabot)
+# Security - Dependency Analysis (dependabot) (security-dependabot.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
     schedule(["⏰ schedule<br/>0 12 * * 3"])
-    subgraph securitydependencyanalysisdependabot["Security - Dependency Analysis (dependabot)"]
-        securitydependencyanalysisdependabot_build["Dependencies<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
+    subgraph securitydependabotyml["Security - Dependency Analysis (dependabot)"]
+        securitydependabotyml_build["Dependencies<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
     end
-    push --> securitydependencyanalysisdependabot_build
-    schedule --> securitydependencyanalysisdependabot_build
+    push --> securitydependabotyml_build
+    schedule --> securitydependabotyml_build
 ```
 
 ## Job: Dependencies

@@ -16,7 +16,8 @@ import io.typeflows.util.Builder
 import workflows.Standards.REELEASE_EVENT
 
 class CreateGithubRelease : Builder<Workflow> {
-    override fun build() = Workflow("New Release - GitHub") {
+    override fun build() = Workflow("new-release-github") {
+        displayName = "New Release - GitHub"
         on += RepositoryDispatch(REELEASE_EVENT)
 
         permissions = Permissions(Contents to PermissionLevel.Read)

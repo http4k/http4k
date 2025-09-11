@@ -18,7 +18,8 @@ import io.typeflows.util.Builder
 import workflows.Standards.Java
 
 class Build : Builder<Workflow> {
-    override fun build() = Workflow("Build") {
+    override fun build() = Workflow("build") {
+        displayName = "Build"
         on += Push {
             branches = Branches.Only("master")
             paths = Paths.Ignore("**/*.md")

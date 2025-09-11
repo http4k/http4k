@@ -14,7 +14,8 @@ import workflows.Standards.Java
 import workflows.Standards.REELEASE_EVENT
 
 class ReleaseApi : Builder<Workflow> {
-    override fun build() = Workflow("Release API") {
+    override fun build() = Workflow("release-api", "Release API docs to api repo") {
+        displayName = "Release API"
         on += RepositoryDispatch(REELEASE_EVENT)
 
         jobs += Job("release-api", UBUNTU_LATEST) {

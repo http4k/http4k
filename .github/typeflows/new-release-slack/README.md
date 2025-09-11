@@ -1,14 +1,14 @@
-# New Release - Slack
+# New Release - Slack (new-release-slack.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
-    subgraph newreleaseslack["New Release - Slack"]
-        newreleaseslack_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        newreleaseslack_slackify["slackify<br/>🐧 ubuntu-latest"]
+    subgraph newreleaseslackyml["New Release - Slack"]
+        newreleaseslackyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
+        newreleaseslackyml_slackify["slackify<br/>🐧 ubuntu-latest"]
     end
-    repositorydispatch --> newreleaseslack_slackify
+    repositorydispatch --> newreleaseslackyml_slackify
 ```
 
 ## Job: slackify

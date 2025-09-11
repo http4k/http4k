@@ -8,7 +8,8 @@ import io.typeflows.util.Builder
 import workflows.Standards.MAIN_REPO
 
 class UploadRelease : Builder<Workflow> {
-    override fun build() = Workflow("Publish Artifacts") {
+    override fun build() = Workflow("publish-artifacts") {
+        displayName = "Publish Artifacts"
         on += Push {
             tags += Tag.of("*")
         }

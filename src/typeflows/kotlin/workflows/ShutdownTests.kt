@@ -18,7 +18,8 @@ import io.typeflows.github.workflows.triggers.Push
 import io.typeflows.util.Builder
 
 class ShutdownTests : Builder<Workflow> {
-    override fun build() = Workflow("Server Shutdown Tests") {
+    override fun build() = Workflow("shutdown-tests") {
+        displayName = "Server Shutdown Tests"
         on += Push {
             branches = Branches.Only("master")
             paths = Paths.Ignore("**/*.md")

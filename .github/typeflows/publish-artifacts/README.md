@@ -1,14 +1,14 @@
-# Publish Artifacts
+# Publish Artifacts (publish-artifacts.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>tags(only: 1)"])
-    subgraph publishartifacts["Publish Artifacts"]
-        publishartifacts_metadata[["🔧 Workflow Config<br/>🌍 1 env var"]]
-        publishartifacts_release["release<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
+    subgraph publishartifactsyml["Publish Artifacts"]
+        publishartifactsyml_metadata[["🔧 Workflow Config<br/>🌍 1 env var"]]
+        publishartifactsyml_release["release<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
     end
-    push --> publishartifacts_release
+    push --> publishartifactsyml_release
 ```
 
 ## Job: release

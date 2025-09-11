@@ -1,13 +1,13 @@
-# Server Shutdown Tests
+# Server Shutdown Tests (shutdown-tests.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
-    subgraph servershutdowntests["Server Shutdown Tests"]
-        servershutdowntests_runtests["Run Shutdown Tests<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
+    subgraph shutdowntestsyml["Server Shutdown Tests"]
+        shutdowntestsyml_runtests["Run Shutdown Tests<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
-    push --> servershutdowntests_runtests
+    push --> shutdowntestsyml_runtests
 ```
 
 ## Job: Run Shutdown Tests

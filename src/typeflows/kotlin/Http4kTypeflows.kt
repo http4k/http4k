@@ -3,7 +3,7 @@ import io.typeflows.fs.MarkdownContent
 import io.typeflows.fs.YamlContent
 import io.typeflows.github.DotGitHub
 import io.typeflows.github.TypeflowsGitHubRepo
-import io.typeflows.github.workflows.WorkflowVisualisations
+import io.typeflows.github.visualisation.WorkflowVisualisations
 import io.typeflows.util.Builder
 import workflows.BroadcastRelease
 import workflows.Build

@@ -19,7 +19,8 @@ import workflows.Standards.MAIN_REPO
 import workflows.Standards.REELEASE_EVENT
 
 class BroadcastRelease : Builder<Workflow> {
-    override fun build() = Workflow("Broadcast Release") {
+    override fun build() = Workflow("broadcast-release", "Broadcast new release to public repo") {
+        displayName = "Broadcast Release"
         on += Schedule {
             cron += Cron.of("0 * * * *") // every hour
         }

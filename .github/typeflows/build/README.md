@@ -1,15 +1,15 @@
-# Build
+# Build (build.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
     pullrequest(["🔀 pull_request<br/>(*), branches"])
-    subgraph build["Build"]
-        build_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
+    subgraph buildyml["Build"]
+        buildyml_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
-    push --> build_build
-    pullrequest --> build_build
+    push --> buildyml_build
+    pullrequest --> buildyml_build
 ```
 
 ## Job: build

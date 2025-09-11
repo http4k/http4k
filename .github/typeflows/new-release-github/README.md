@@ -1,14 +1,14 @@
-# New Release - GitHub
+# New Release - GitHub (new-release-github.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
-    subgraph newreleasegithub["New Release - GitHub"]
-        newreleasegithub_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        newreleasegithub_release["release<br/>🐧 ubuntu-latest"]
+    subgraph newreleasegithubyml["New Release - GitHub"]
+        newreleasegithubyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
+        newreleasegithubyml_release["release<br/>🐧 ubuntu-latest"]
     end
-    repositorydispatch --> newreleasegithub_release
+    repositorydispatch --> newreleasegithubyml_release
 ```
 
 ## Job: release

@@ -9,7 +9,8 @@ import workflows.Standards.MAIN_REPO
 import workflows.Standards.REELEASE_EVENT
 
 class CreateUpgradeBranches : Builder<Workflow> {
-    override fun build() = Workflow("New Release - Update other projects") {
+    override fun build() = Workflow("new-release-upgrade-branches", "Create upgrade branches in other repos") {
+        displayName = "New Release - Update other projects"
         on += RepositoryDispatch(REELEASE_EVENT)
         
         jobs += Job("create-upgrade-branches", RunsOn.UBUNTU_LATEST) {

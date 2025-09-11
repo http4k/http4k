@@ -1,15 +1,15 @@
-# Update Dependencies
+# Update Dependencies (refresh-versions.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     workflowdispatch(["👤 workflow_dispatch"])
     schedule(["⏰ schedule<br/>0 7 * * 1"])
-    subgraph updatedependencies["Update Dependencies"]
-        updatedependencies_updatedependencies["Update Version Catalog<br/>🐧 ubuntu-latest"]
+    subgraph refreshversionsyml["Update Dependencies"]
+        refreshversionsyml_updatedependencies["Update Version Catalog<br/>🐧 ubuntu-latest"]
     end
-    workflowdispatch --> updatedependencies_updatedependencies
-    schedule --> updatedependencies_updatedependencies
+    workflowdispatch --> refreshversionsyml_updatedependencies
+    schedule --> refreshversionsyml_updatedependencies
 ```
 
 ## Job: Update Version Catalog

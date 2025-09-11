@@ -14,7 +14,8 @@ import io.typeflows.util.Builder
 import workflows.Standards.REELEASE_EVENT
 
 class SendToSlack : Builder<Workflow> {
-    override fun build() = Workflow("New Release - Slack") {
+    override fun build() = Workflow("new-release-slack", "Notify Slack of new release") {
+        displayName = "New Release - Slack"
         on += RepositoryDispatch(REELEASE_EVENT)
         permissions = Permissions(Contents to Read)
         
