@@ -1,5 +1,6 @@
 package org.http4k.client
 
+import io.helidon.common.buffers.DataReader
 import io.helidon.http.Method
 import io.helidon.webclient.api.ClientRequest
 import io.helidon.webclient.api.HttpClientRequest
@@ -12,11 +13,13 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.queries
 import org.http4k.core.toParametersMap
 import java.io.UncheckedIOException
 import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -44,8 +47,11 @@ object HelidonClient {
                 is UnknownHostException -> Response(UNKNOWN_HOST.toClientStatus(e))
                 is ConnectException -> Response(UNKNOWN_HOST.toClientStatus(e))
                 is SocketTimeoutException -> Response(CLIENT_TIMEOUT.toClientStatus(e))
+                is SocketException -> Response(SERVICE_UNAVAILABLE.toClientStatus(e))
                 else -> throw e
             }
+        } catch (e: DataReader.InsufficientDataAvailableException) {
+            Response(SERVICE_UNAVAILABLE.toClientStatus(e))
         }
 
         private fun HttpClientResponse.asHttp4k() =

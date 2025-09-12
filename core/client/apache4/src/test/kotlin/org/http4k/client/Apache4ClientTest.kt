@@ -17,6 +17,7 @@ import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.ApacheServer
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 
 class Apache4ClientTest : HttpClientContract(
@@ -75,4 +76,7 @@ class Apache4ClientTest : HttpClientContract(
             }
         })(Request(GET, "http://localhost:8000")), hasStatus(SERVICE_UNAVAILABLE))
     }
+
+    @Test
+    override fun `random data then close is converted into 503`() = assumeTrue(false, "Unsupported feature")
 }

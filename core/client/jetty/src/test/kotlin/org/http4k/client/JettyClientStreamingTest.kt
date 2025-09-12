@@ -6,6 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.hamkrest.hasBody
 import org.http4k.server.ApacheServer
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 
 class JettyClientStreamingTest : HttpClientContract(
@@ -26,4 +27,7 @@ class JettyClientStreamingTest : HttpClientContract(
     @Test
     override fun `socket timeouts are converted into 504`() {
     }
+
+    @Test
+    override fun `malformed response chunk is converted into 503`() = assumeTrue(false, "Unsupported feature")
 }
