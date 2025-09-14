@@ -32,7 +32,7 @@ class CreateUpgradeBranches : Builder<Workflow> {
             steps += SendRepositoryDispatch(
                 REELEASE_EVENT,
                 Secrets.string("TOOLBOX_REPO_TOKEN"),
-                mapOf("version" to StrExp.of("github.event.client_payload.version }}")),
+                mapOf("version" to StrExp.of("github.event.client_payload.version").toString()),
                 $$"Trigger ${{ matrix.repo }}"
             ) {
                 repository = Matrix.string("repo")
