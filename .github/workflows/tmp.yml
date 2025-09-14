@@ -7,21 +7,23 @@ on:
 
 jobs:
   dump-event:
-    if: github.event.type == 'repository_dispatch'
+    if: github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     steps:
       - run: echo "${{ toJson(github.event) }}" > event.json
         shell: bash
 
   check-new-version:
-    if: github.event.type == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
-        version: 6.18.0.1
+        version: ${{ steps.set-version.outputs.version }}
     steps:
-      - run: echo "version=6.18.0.1"
+      - id: set-version
+        run: echo "version=6.18.0.1" >> $GITHUB_OUTPUT
 
   broadcast-release:
+    if: github.event_name == 'workflow_dispatch'
     needs: check-new-version
     runs-on: ubuntu-latest
     steps:
