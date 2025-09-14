@@ -1,12 +1,12 @@
 package workflows
 
-import io.typeflows.github.workflows.GitHub
 import io.typeflows.github.workflows.Job
 import io.typeflows.github.workflows.Permission.Contents
 import io.typeflows.github.workflows.PermissionLevel
 import io.typeflows.github.workflows.PermissionLevel.Write
 import io.typeflows.github.workflows.Permissions
 import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
+import io.typeflows.github.workflows.Secrets
 import io.typeflows.github.workflows.Workflow
 import io.typeflows.github.workflows.steps.RunCommand
 import io.typeflows.github.workflows.steps.marketplace.Checkout
@@ -40,7 +40,7 @@ class CreateGithubRelease : Builder<Workflow> {
                 bodyPath = "NOTE.md"
                 draft = false
                 prerelease = false
-                env["GITHUB_TOKEN"] = GitHub.token
+                env["GITHUB_TOKEN"] = Secrets.GITHUB_TOKEN
             }
         }
     }

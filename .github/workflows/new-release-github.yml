@@ -17,7 +17,7 @@ jobs:
     - name: Create Release
       uses: actions/create-release@v1.1.4
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.event.client_payload.version }}
         release_name: ${{ github.event.client_payload.version }}
