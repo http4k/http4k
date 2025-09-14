@@ -18,6 +18,7 @@ import java.io.IOException
 import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.NoRouteToHostException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.security.SecureRandom
@@ -50,6 +51,10 @@ object OkHttp {
                         e.message == "timeout" -> Response(CLIENT_TIMEOUT.toClientStatus(e))
                         else -> throw e
                     }
+                } catch (e: SocketException) {
+                    Response(SERVICE_UNAVAILABLE.toClientStatus(e))
+                } catch (e: IOException) {
+                    Response(SERVICE_UNAVAILABLE.toClientStatus(e))
                 }
 
             override operator fun invoke(request: Request, fn: (Response) -> Unit) =

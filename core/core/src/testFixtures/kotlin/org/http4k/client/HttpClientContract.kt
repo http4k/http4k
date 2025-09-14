@@ -1,5 +1,11 @@
 package org.http4k.client
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.http.Fault
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
@@ -326,5 +332,93 @@ abstract class HttpClientContract(
     fun `sanitises uri`() {
         val response = client(Request(GET, "http://localhost:$port/encoded-uri/foo, bar & baz!"))
         assertThat(response.bodyString(), equalTo("foo, bar & baz!"))
+    }
+
+    @Test
+    open fun `connection reset is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.CONNECTION_RESET_BY_PEER)
+                    )
+            )
+
+            val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    open fun `empty response is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.EMPTY_RESPONSE)
+                    )
+            )
+
+            val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    open fun `malformed response chunk is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.MALFORMED_RESPONSE_CHUNK)
+                    )
+            )
+
+            val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    open fun `random data then close is converted into 503`() {
+        val server = WireMockServer(WireMockConfiguration.options().dynamicPort())
+        server.start()
+
+        try {
+            server.stubFor(
+                get(urlEqualTo("/badResponse"))
+                    .willReturn(
+                        aResponse()
+                            .withFault(Fault.RANDOM_DATA_THEN_CLOSE)
+                    )
+            )
+
+            val response = client(Request(GET, "http://localhost:${server.port()}/badResponse"))
+
+            assertThat(response.status, equalTo(SERVICE_UNAVAILABLE))
+        } finally {
+            server.stop()
+        }
     }
 }
