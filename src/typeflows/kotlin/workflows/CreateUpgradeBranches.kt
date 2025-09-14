@@ -35,7 +35,7 @@ class CreateUpgradeBranches : Builder<Workflow> {
                 mapOf("version" to StrExp.of("github.event.client_payload.version").toString()),
                 $$"Trigger ${{ matrix.repo }}"
             ) {
-                repository = Matrix.string("repo")
+                repository = Matrix.string("repo").toString()
             }
         }
     }

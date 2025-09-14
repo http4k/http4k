@@ -7,7 +7,7 @@ flowchart LR
     push(["📤 push"])
     pullrequest(["🔀 pull_request"])
     repositorydispatchgithubrepository(["🔔 repository_dispatch<br/>→ this repo"])
-    repositorydispatchmatrixrepo(["🔔 repository_dispatch<br/>→ matrix.repo"])
+    repositorydispatchmatrixrepo(["🔔 repository_dispatch<br/>→ ${{ matrix.repo }}"])
     broadcastreleaseyml["Broadcast Release"]
     buildyml["Build"]
     newreleasegithubyml["New Release - GitHub"]
