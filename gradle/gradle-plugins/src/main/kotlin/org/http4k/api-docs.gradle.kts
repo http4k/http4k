@@ -9,7 +9,7 @@ plugins {
 dokka {
     dokkaPublications.html {
         pluginsConfiguration.html {
-            moduleVersion.set(version.toString())
+            moduleVersion.set(project.properties["releaseVersion"]?.toString() ?: "LOCAL")
             footerMessage.set("(c) ${Year.now().value} http4k")
             homepageLink.set("https://http4k.org")
             customAssets.from(
