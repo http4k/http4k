@@ -25,16 +25,14 @@ typeflows {
     typeflowsClass = "Http4kTypeflows"
 }
 
+dependencies {
+    subprojects.forEach { subproject ->
+        dokka(subproject)
+    }
+}
+
 dokka {
     moduleName.set("http4k")
-
-    dokkaSourceSets.main {
-        subprojects.forEach { subproject ->
-            if (subproject.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
-                sourceRoots.from(subproject.layout.projectDirectory.dir("src/main/kotlin"))
-            }
-        }
-    }
 
     dokkaPublications.html {
         includes.from("README.md")

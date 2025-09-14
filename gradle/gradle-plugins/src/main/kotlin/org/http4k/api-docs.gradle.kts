@@ -7,6 +7,13 @@ plugins {
 }
 
 dokka {
+    dokkaSourceSets.configureEach {
+        sourceLink {
+            remoteUrl("https://github.com/http4k/http4k/tree/master")
+            localDirectory.set(rootDir)
+        }
+    }
+
     dokkaPublications.html {
         pluginsConfiguration.html {
             moduleVersion.set(project.properties["releaseVersion"]?.toString() ?: "LOCAL")
