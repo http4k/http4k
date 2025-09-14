@@ -9,6 +9,7 @@ plugins {
     kotlin("jvm")
     `java-library`
     signing
+    `maven-publish`
 }
 
 val license: ModuleLicense by project.extra
@@ -18,6 +19,11 @@ val metadata = kotlin.runCatching {
 }.getOrNull() ?: rootProject.extensions.getByType<ProjectMetadata.Extension>()
 
 apply(plugin = "com.vanniktech.maven.publish")
+
+(components["java"] as? AdhocComponentWithVariants)?.apply {
+    withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+    withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+}
 
 configure<MavenPublishBaseExtension> {
     configure<PublishingExtension> {
