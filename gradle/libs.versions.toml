@@ -13,7 +13,7 @@ argo = "7.6"
 avro = "1.12.0"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.33.8"
+awssdk-bom = "2.33.9"
 azure-core = "1.56.1"
 azure-functions-java-library = "3.1.0"
 base16-encoding = "2.4.0"
@@ -26,9 +26,7 @@ com-github-johnrengelman-shadow = "8.1.1"
 com-google-devtools-ksp = "2.2.20-2.0.3"
 com-vanniktech-gradle-maven-publish-plugin = "0.34.0"
 commons-codec = "1.19.0"
-# frozen to 3.5.2
 docker-java-core = "3.6.0"
-# frozen to 3.5.2
 docker-java-transport-httpclient5 = "3.6.0"
 dokka = "2.1.0-Beta"
 failsafe = "3.3.2"
@@ -308,8 +306,8 @@ wiremock-standalone = { module = "org.wiremock:wiremock-standalone", version.ref
 [plugins]
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
+powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 rocker = { id = "nu.studer.rocker", version.ref = "nu-studer-rocker" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "com-github-johnrengelman-shadow" }
 typeflows = { id = "io.typeflows", version.ref = "typeflows" }

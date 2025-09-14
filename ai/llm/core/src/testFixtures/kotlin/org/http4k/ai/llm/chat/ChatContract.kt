@@ -28,7 +28,7 @@ interface ChatContract {
     fun `can ask a simple question text`() {
         val response = chat(
             ChatRequest(
-                "what is 2+2? do not explain, do not use tools, just give the answer",
+                "what is 2+2? do not explain, do not use tools, just give the answer as a number only with no whitespace",
                 ModelParams(model, ZERO, responseFormat = Text)
             )
         ).orThrow { error(it) }

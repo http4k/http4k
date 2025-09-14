@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.18.1.0 (uncut)
+- **http4k-***: Handle additional connection issues in HTTP Clients. H/T @alex859
+
 ### v6.18.0.1
 - **http4k-***: Fix maven dependencies in published POMs
  
