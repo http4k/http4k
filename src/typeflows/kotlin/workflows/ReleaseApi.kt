@@ -26,7 +26,7 @@ class ReleaseApi : Builder<Workflow> {
             steps += SetupGradle()
 
             steps += RunCommand(
-                $$"./gradlew -i dokkaHtmlMultiModule -PreleaseVersion=\"${{ github.event.client_payload.version }}\" -Porg.gradle.parallel=false",
+                $$"./gradlew -i dokkaGenerateHtml -PreleaseVersion=\"${{ github.event.client_payload.version }}\" -Porg.gradle.parallel=false",
                 "Generate API docs"
             )
 
@@ -36,7 +36,7 @@ class ReleaseApi : Builder<Workflow> {
                 token = Secrets.string("AUTHOR_TOKEN").toString()
             }
 
-            steps += RunCommand("cp -R build/dokka/htmlMultiModule/* tmp/", "Copy docs")
+            steps += RunCommand("cp -R build/dokka/html/* tmp/", "Copy docs")
 
             steps += UseAction("EndBug/add-and-commit@v9", "Commit API docs") {
                 with["cwd"] = "tmp"

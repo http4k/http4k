@@ -1,3 +1,5 @@
+import java.time.Year
+
 plugins {
     id("org.http4k.project-metadata")
     id("org.http4k.api-docs")
@@ -22,3 +24,34 @@ dependencies {
 typeflows {
     typeflowsClass = "Http4kTypeflows"
 }
+
+dokka {
+    moduleName.set("http4k")
+
+    dokkaSourceSets.main {
+        subprojects.forEach { subproject ->
+            if (subproject.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
+                sourceRoots.from(subproject.layout.projectDirectory.dir("src/main/kotlin"))
+            }
+        }
+    }
+
+    dokkaPublications.html {
+        includes.from("README.md")
+
+        pluginsConfiguration.html {
+            moduleVersion.set(version.toString())
+            footerMessage.set("(c) ${Year.now().value} http4k")
+            homepageLink.set("https://http4k.org")
+            customAssets.from(
+                file("${rootProject.projectDir}/gradle/gradle-plugins/src/main/resources/logo-icon.svg")
+            )
+            customStyleSheets.from(
+                file("${rootProject.projectDir}/gradle/gradle-plugins/src/main/resources/dokka.css").takeIf { it.exists() }
+            )
+        }
+    }
+
+    basePublicationsDirectory.set(layout.buildDirectory.dir("docs/api"))
+}
+
