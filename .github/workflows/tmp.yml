@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         version: 6.18.0.1
+    steps:
+      - run: echo "version=6.18.0.1"
 
   broadcast-release:
     needs: check-new-version
