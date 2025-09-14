@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled("need up to date model list")
 class RealAzureClientGitHubModelsChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     val apiKey = EnvironmentKey.value(ApiKey).optional("GITHUB_MODELS_TOKEN")
