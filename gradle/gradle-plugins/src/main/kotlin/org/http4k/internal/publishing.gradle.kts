@@ -3,7 +3,7 @@ package org.http4k.internal
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import groovy.util.Node
 import java.net.URI
-import javax.xml.namespace.QName
+import groovy.namespace.QName
 
 plugins {
     kotlin("jvm")
