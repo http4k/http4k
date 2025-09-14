@@ -53,6 +53,7 @@ class ApacheAsyncClientTest : AsyncHttpHandlerContract(::SunHttp, ApacheAsyncCli
 
             override fun awaitShutdown(waitTime: TimeValue?) {}
 
+            @Deprecated("Deprecated in Java")
             override fun register(hostname: String?, uriPattern: String?, supplier: Supplier<AsyncPushConsumer>?) {}
 
             override fun <T : Any?> doExecute(target: HttpHost?, requestProducer: AsyncRequestProducer?, responseConsumer: AsyncResponseConsumer<T>?, pushHandlerFactory: HandlerFactory<AsyncPushConsumer>?, context: HttpContext?, callback: FutureCallback<T>?): Future<T> {
@@ -84,6 +85,7 @@ class ApacheAsyncClientTest : AsyncHttpHandlerContract(::SunHttp, ApacheAsyncCli
 
             override fun awaitShutdown(waitTime: TimeValue?) {}
 
+            @Deprecated("Deprecated in Java")
             override fun register(hostname: String?, uriPattern: String?, supplier: Supplier<AsyncPushConsumer>?) {}
 
             override fun <T : Any?> doExecute(target: HttpHost?, requestProducer: AsyncRequestProducer?, responseConsumer: AsyncResponseConsumer<T>?, pushHandlerFactory: HandlerFactory<AsyncPushConsumer>?, context: HttpContext?, callback: FutureCallback<T>?): Future<T> {

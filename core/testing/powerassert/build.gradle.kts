@@ -4,7 +4,7 @@ description = "A set of Power Assert matchers for common http4k types"
 
 plugins {
     id("org.http4k.community")
-    id("org.jetbrains.kotlin.plugin.power-assert") version "2.2.20-Beta2"
+    alias(libs.plugins.powerAssert)
 }
 
 dependencies {
