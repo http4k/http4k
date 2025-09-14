@@ -20,6 +20,7 @@ val metadata = kotlin.runCatching {
 
 apply(plugin = "com.vanniktech.maven.publish")
 
+// workaround so test fixture dependencies don't end up in the published POM
 (components["java"] as? AdhocComponentWithVariants)?.apply {
     withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
     withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
