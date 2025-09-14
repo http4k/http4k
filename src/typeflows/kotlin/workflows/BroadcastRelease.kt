@@ -88,7 +88,7 @@ class BroadcastRelease : Builder<Workflow> {
             steps += SendRepositoryDispatch(
                 REELEASE_EVENT,
                 Secrets.string("ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING"),
-                mapOf("version" to StrExp.of("needs.check-new-version.outputs.version"))
+                mapOf("version" to StrExp.of("needs.check-new-version.outputs.version").toString())
             )
         }
     }
