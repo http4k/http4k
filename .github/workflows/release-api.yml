@@ -17,7 +17,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4.4.2
     - name: Generate API docs
-      run: ./gradlew -i dokkaGeneratePublicationHtml -PreleaseVersion="${{ github.event.client_payload.version
+      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="${{ github.event.client_payload.version
         }}" -Porg.gradle.parallel=false
       shell: bash
     - name: Checkout API repo
@@ -27,7 +27,7 @@ jobs:
         token: ${{ secrets.AUTHOR_TOKEN }}
         path: tmp
     - name: Copy docs
-      run: cp -R build/dokka/html/* tmp/
+      run: cp -R build/docs/api/html/* tmp/
       shell: bash
     - name: Commit API docs
       uses: EndBug/add-and-commit@v9

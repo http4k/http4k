@@ -36,7 +36,7 @@ class ReleaseApi : Builder<Workflow> {
                 token = Secrets.string("AUTHOR_TOKEN").toString()
             }
 
-            steps += RunCommand("cp -R build/dokka/html/* tmp/", "Copy docs")
+            steps += RunCommand("cp -R build/docs/api/html/* tmp/", "Copy docs")
 
             steps += UseAction("EndBug/add-and-commit@v9", "Commit API docs") {
                 with["cwd"] = "tmp"
