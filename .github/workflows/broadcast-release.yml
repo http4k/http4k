@@ -47,7 +47,7 @@ jobs:
       shell: bash
   broadcast-release:
     runs-on: ubuntu-latest
-    if: needs.check-new-version.outputs.requires-broadcast == 'true'
+#    if: needs.check-new-version.outputs.requires-broadcast == 'true'
     needs:
     - check-new-version
     steps:
