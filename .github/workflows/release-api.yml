@@ -1,6 +1,8 @@
 name: Release API
 'on':
-  workflow_dispatch:
+  repository_dispatch:
+    types:
+    - http4k-release
 jobs:
   release-api:
     runs-on: ubuntu-latest
@@ -15,7 +17,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4.4.2
     - name: Generate API docs
-      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="6.18.0.1" -Porg.gradle.parallel=false
+      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="${{ github.event.client_payload.version }}" -Porg.gradle.parallel=false
       shell: bash
     - name: Checkout API repo
       uses: actions/checkout@v5.0.0
