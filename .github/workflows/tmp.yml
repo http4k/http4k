@@ -10,8 +10,8 @@ jobs:
     if: github.event.type == 'repository_dispatch'
     runs-on: ubuntu-latest
     steps:
-    - name: Dump event
-      run: echo "${{ toJson(github.event) }}" > event.json
+      - run: echo "${{ toJson(github.event) }}" > event.json
+        shell: bash
 
   check-new-version:
     if: github.event.type == 'workflow_dispatch'
