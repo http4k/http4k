@@ -15,7 +15,7 @@ aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
 awssdk-bom = "2.33.11"
 azure-core = "1.56.1"
-azure-functions-java-library = "3.1.0"
+azure-functions-java-library = "3.2.0"
 base16-encoding = "2.4.0"
 bcprov-jdk18on = "1.82"
 cloudevents-core = "4.0.1"
@@ -37,7 +37,7 @@ gcp-functions-framework-api = "1.1.4"
 google-http-client = "2.0.0"
 graphql-java = "24.2"
 gson = "2.13.2"
-guava = "33.4.8-jre"
+guava = "33.5.0-jre"
 h2 = "2.3.232"
 hamkrest = "1.8.0.1"
 handlebars = "4.5.0"
@@ -124,7 +124,6 @@ vertx-web = "5.0.4"
 wiremock = "3.13.1"
 
 [libraries]
-http4k-standards = { module = "org.http4k.standards:typeflows", version.ref = "http4k-standards-typeflows" }
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
 alpn-boot = { module = "org.mortbay.jetty.alpn:alpn-boot", version.ref = "alpn-boot" }
 apache-httpasyncclient = { module = "org.apache.httpcomponents:httpasyncclient", version.ref = "apache-httpasyncclient" }
@@ -182,6 +181,7 @@ helidon-webserver-websocket = { module = "io.helidon.webserver:helidon-webserver
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
+http4k-standards = { module = "org.http4k.standards:typeflows", version.ref = "http4k-standards-typeflows" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
 jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
