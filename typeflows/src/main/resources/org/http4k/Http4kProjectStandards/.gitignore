@@ -1,0 +1,16 @@
+.idea/
+*.iml
+.gradle
+.kotlin
+.http4k
+build/
+.DS_Store
+classes/
+/site/
+out/
+store/
+intellij-settings/
+**/*.actual
+**/generated/**
+jte-classes
+**/CLAUDE.md
