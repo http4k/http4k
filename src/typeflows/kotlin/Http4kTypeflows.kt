@@ -1,6 +1,5 @@
-import io.typeflows.fs.ContentfulFile
 import io.typeflows.fs.MarkdownContent
-import io.typeflows.fs.YamlContent
+import io.typeflows.fs.TextContent
 import io.typeflows.github.DotGitHub
 import io.typeflows.github.TypeflowsGitHubRepo
 import io.typeflows.github.visualisation.WorkflowVisualisations
@@ -31,14 +30,10 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
 
             workflows += SecurityDependabot()
 
-            files += ContentfulFile("ISSUE_TEMPLATE.md") {
-                content =
-                    MarkdownContent.of("<!-- Love http4k? Please consider sponsoring the project: \uD83D\uDC49  https://github.com/sponsors/http4k -->")
-            }
+            files += MarkdownContent.of("<!-- Love http4k? Please consider sponsoring the project: \uD83D\uDC49  https://github.com/sponsors/http4k -->")
+                .asTypeflowsFile("ISSUE_TEMPLATE.md")
 
-            files += ContentfulFile("pr-labeler.yml") {
-                content = YamlContent.of(mapOf("automerge" to listOf("auto/*")))
-            }
+            files += TextContent.of("automerge: [auto/*]").asTypeflowsFile("pr-labeler.yml")
 
             files += WorkflowVisualisations(workflows)
         }
