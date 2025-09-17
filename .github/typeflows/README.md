@@ -12,17 +12,17 @@ flowchart LR
     buildyml["Build"]
     newreleasegithubyml["New Release - GitHub"]
     newreleaseupgradebranchesyml["New Release - Update other projects"]
-    refreshversionsyml["Update Dependencies"]
+    updatedependenciesyml["Update Dependencies"]
     releaseapiyml["Release API"]
     newreleaseslackyml["New Release - Slack"]
     shutdowntestsyml["Server Shutdown Tests"]
     publishartifactsyml["Publish Artifacts"]
     securitydependabotyml["Security - Dependency Analysis (dependabot)"]
     schedule -->|"0 * * * *"|broadcastreleaseyml
-    schedule -->|"0 7 * * 1"|refreshversionsyml
+    schedule -->|"0 8 * * 1"|updatedependenciesyml
     schedule -->|"0 12 * * 3"|securitydependabotyml
     workflowdispatch --> broadcastreleaseyml
-    workflowdispatch --> refreshversionsyml
+    workflowdispatch --> updatedependenciesyml
     push -->|"branches(only: 1), paths(ignore: 1)"|buildyml
     push -->|"branches(only: 1), paths(ignore: 1)"|shutdowntestsyml
     push -->|"tags(only: 1)"|publishartifactsyml
@@ -44,7 +44,7 @@ flowchart LR
 - [New Release - Slack](./new-release-slack/)
 - [New Release - Update other projects](./new-release-upgrade-branches/)
 - [Publish Artifacts](./publish-artifacts/)
-- [Update Dependencies](./refresh-versions/)
 - [Release API](./release-api/)
 - [Security - Dependency Analysis (dependabot)](./security-dependabot/)
 - [Server Shutdown Tests](./shutdown-tests/)
+- [Update Dependencies](./update-dependencies/)

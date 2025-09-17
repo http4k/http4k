@@ -45,6 +45,7 @@ helidon-bom = "4.2.7"
 hikaricp = "7.0.2"
 hsqldb = "2.7.4"
 htmx-org = "2.0.7"
+http4k-standards-typeflows = "1.0.0.0"
 hyperscript-org = "0.9.14"
 jackson-bom = "2.20.0"
 jakarta-inject-api = "2.0.1"
@@ -123,6 +124,7 @@ vertx-web = "5.0.4"
 wiremock = "3.13.1"
 
 [libraries]
+http4k-standards = { module = "org.http4k.standards:typeflows", version.ref = "http4k-standards-typeflows" }
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
 alpn-boot = { module = "org.mortbay.jetty.alpn:alpn-boot", version.ref = "alpn-boot" }
 apache-httpasyncclient = { module = "org.apache.httpcomponents:httpasyncclient", version.ref = "apache-httpasyncclient" }
@@ -295,8 +297,6 @@ testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-bom" }
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
-typeflows-github = { module = "io.typeflows:typeflows-github", version.ref = "typeflows" }
-typeflows-github-marketplace = { module = "io.typeflows:typeflows-github-marketplace", version.ref = "typeflows" }
 underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }

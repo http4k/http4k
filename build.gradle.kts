@@ -17,18 +17,15 @@ metadata {
 }
 
 dependencies {
-    typeflowsApi(libs.typeflows.github)
-    typeflowsApi(libs.typeflows.github.marketplace)
+    typeflowsApi(libs.http4k.standards)
+
+    subprojects.forEach { subproject ->
+        dokka(subproject)
+    }
 }
 
 typeflows {
     typeflowsClass = "Http4kTypeflows"
-}
-
-dependencies {
-    subprojects.forEach { subproject ->
-        dokka(subproject)
-    }
 }
 
 dokka {

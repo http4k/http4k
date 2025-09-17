@@ -3,7 +3,13 @@ import io.typeflows.fs.TextContent
 import io.typeflows.github.DotGitHub
 import io.typeflows.github.TypeflowsGitHubRepo
 import io.typeflows.github.visualisation.WorkflowVisualisations
+import io.typeflows.github.workflows.Cron
+import io.typeflows.github.workflows.Secrets
+import io.typeflows.github.workflows.StrExp
+import io.typeflows.github.workflows.steps.RunCommand
 import io.typeflows.util.Builder
+import org.http4k.typeflows.Http4kProjectStandards
+import org.http4k.typeflows.UpdateGradleProjectDependencies
 import workflows.BroadcastRelease
 import workflows.Build
 import workflows.CreateGithubRelease
@@ -22,7 +28,16 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += Build()
             workflows += CreateGithubRelease()
             workflows += CreateUpgradeBranches()
-            workflows += RefreshVersions()
+            workflows += UpdateGradleProjectDependencies(
+                "update-dependencies",
+                Cron.of("0 8 * * 1"),
+                RunCommand("bin/build_ci.sh", "Build") {
+                    condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
+                    timeoutMinutes = 120
+                    env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
+                    env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
+                }
+            )
             workflows += ReleaseApi()
             workflows += SendToSlack()
             workflows += ShutdownTests()
@@ -37,5 +52,7 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
 
             files += WorkflowVisualisations(workflows)
         }
+
+        files += Http4kProjectStandards()
     }
 }
