@@ -11,12 +11,12 @@ import io.typeflows.github.workflows.steps.marketplace.SetupGradle
 import io.typeflows.github.workflows.triggers.RepositoryDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.Java
-import workflows.Standards.REELEASE_EVENT
+import workflows.Standards.RELEASE_EVENT
 
 class ReleaseApi : Builder<Workflow> {
     override fun build() = Workflow("release-api", "Release API docs to api repo") {
         displayName = "Release API"
-        on += RepositoryDispatch(REELEASE_EVENT)
+        on += RepositoryDispatch(RELEASE_EVENT)
 
         jobs += Job("release-api", UBUNTU_LATEST) {
             steps += Checkout()

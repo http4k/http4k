@@ -9,5 +9,5 @@ object Standards {
     val MASTER_BRANCH = "master"
     val MAIN_REPO = "http4k/http4k"
 
-    val REELEASE_EVENT = "http4k-release"
+    val RELEASE_EVENT = "http4k-release"
 }

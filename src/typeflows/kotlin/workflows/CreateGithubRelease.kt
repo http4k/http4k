@@ -13,12 +13,12 @@ import io.typeflows.github.workflows.steps.marketplace.Checkout
 import io.typeflows.github.workflows.steps.marketplace.CreateRelease
 import io.typeflows.github.workflows.triggers.RepositoryDispatch
 import io.typeflows.util.Builder
-import workflows.Standards.REELEASE_EVENT
+import workflows.Standards.RELEASE_EVENT
 
 class CreateGithubRelease : Builder<Workflow> {
     override fun build() = Workflow("new-release-github") {
         displayName = "New Release - GitHub"
-        on += RepositoryDispatch(REELEASE_EVENT)
+        on += RepositoryDispatch(RELEASE_EVENT)
 
         permissions = Permissions(Contents to PermissionLevel.Read)
 

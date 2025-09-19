@@ -11,12 +11,12 @@ import io.typeflows.github.workflows.steps.RunCommand
 import io.typeflows.github.workflows.steps.marketplace.Checkout
 import io.typeflows.github.workflows.triggers.RepositoryDispatch
 import io.typeflows.util.Builder
-import workflows.Standards.REELEASE_EVENT
+import workflows.Standards.RELEASE_EVENT
 
 class SendToSlack : Builder<Workflow> {
     override fun build() = Workflow("new-release-slack", "Notify Slack of new release") {
         displayName = "New Release - Slack"
-        on += RepositoryDispatch(REELEASE_EVENT)
+        on += RepositoryDispatch(RELEASE_EVENT)
         permissions = Permissions(Contents to Read)
         
         jobs += Job("slackify", UBUNTU_LATEST) {
