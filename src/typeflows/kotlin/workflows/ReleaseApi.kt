@@ -1,14 +1,14 @@
 package workflows
 
-import io.typeflows.github.workflows.Job
-import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
-import io.typeflows.github.workflows.Secrets
-import io.typeflows.github.workflows.Workflow
-import io.typeflows.github.workflows.steps.RunCommand
-import io.typeflows.github.workflows.steps.UseAction
-import io.typeflows.github.workflows.steps.marketplace.Checkout
-import io.typeflows.github.workflows.steps.marketplace.SetupGradle
-import io.typeflows.github.workflows.triggers.RepositoryDispatch
+import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.Workflow
+import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.UseAction
+import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.SetupGradle
+import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.Java
 import workflows.Standards.RELEASE_EVENT

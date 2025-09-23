@@ -1,17 +1,17 @@
 package workflows
 
-import io.typeflows.github.workflows.Job
-import io.typeflows.github.workflows.Permission.Contents
-import io.typeflows.github.workflows.PermissionLevel
-import io.typeflows.github.workflows.PermissionLevel.Write
-import io.typeflows.github.workflows.Permissions
-import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
-import io.typeflows.github.workflows.Secrets
-import io.typeflows.github.workflows.Workflow
-import io.typeflows.github.workflows.steps.RunCommand
-import io.typeflows.github.workflows.steps.marketplace.Checkout
-import io.typeflows.github.workflows.steps.marketplace.CreateRelease
-import io.typeflows.github.workflows.triggers.RepositoryDispatch
+import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel
+import io.typeflows.github.workflow.PermissionLevel.Write
+import io.typeflows.github.workflow.Permissions
+import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.Workflow
+import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.CreateRelease
+import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.RELEASE_EVENT
 

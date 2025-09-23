@@ -1,12 +1,12 @@
 package workflows
 
-import io.typeflows.github.workflows.*
-import io.typeflows.github.workflows.Permission.Contents
-import io.typeflows.github.workflows.PermissionLevel.Write
-import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
-import io.typeflows.github.workflows.steps.*
-import io.typeflows.github.workflows.steps.marketplace.*
-import io.typeflows.github.workflows.triggers.*
+import io.typeflows.github.workflow.*
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Write
+import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
+import io.typeflows.github.workflow.step.*
+import io.typeflows.github.workflow.step.marketplace.*
+import io.typeflows.github.workflow.trigger.*
 import io.typeflows.util.Builder
 import workflows.Standards.Java
 import workflows.Standards.MAIN_REPO

@@ -1,20 +1,20 @@
 package workflows
 
-import io.typeflows.github.workflows.Conditions.always
-import io.typeflows.github.workflows.Job
-import io.typeflows.github.workflows.RunsOn
-import io.typeflows.github.workflows.Secrets
-import io.typeflows.github.workflows.Workflow
-import io.typeflows.github.workflows.steps.RunCommand
-import io.typeflows.github.workflows.steps.UseAction
-import io.typeflows.github.workflows.steps.marketplace.Checkout
-import io.typeflows.github.workflows.steps.marketplace.JavaDistribution.Adopt
-import io.typeflows.github.workflows.steps.marketplace.JavaVersion.V21
-import io.typeflows.github.workflows.steps.marketplace.SetupGradle
-import io.typeflows.github.workflows.steps.marketplace.SetupJava
-import io.typeflows.github.workflows.triggers.Branches
-import io.typeflows.github.workflows.triggers.Paths
-import io.typeflows.github.workflows.triggers.Push
+import io.typeflows.github.workflow.Conditions.always
+import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.RunsOn
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.Workflow
+import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.UseAction
+import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.JavaDistribution.Adopt
+import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
+import io.typeflows.github.workflow.step.marketplace.SetupGradle
+import io.typeflows.github.workflow.step.marketplace.SetupJava
+import io.typeflows.github.workflow.trigger.Branches
+import io.typeflows.github.workflow.trigger.Paths
+import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 
 class ShutdownTests : Builder<Workflow> {

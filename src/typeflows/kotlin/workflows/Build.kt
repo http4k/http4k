@@ -1,19 +1,19 @@
 package workflows
 
-import io.typeflows.github.workflows.Conditions.always
-import io.typeflows.github.workflows.GitHub
-import io.typeflows.github.workflows.Job
-import io.typeflows.github.workflows.RunsOn.Companion.UBUNTU_LATEST
-import io.typeflows.github.workflows.Secrets
-import io.typeflows.github.workflows.Workflow
-import io.typeflows.github.workflows.steps.RunCommand
-import io.typeflows.github.workflows.steps.UseAction
-import io.typeflows.github.workflows.steps.marketplace.Checkout
-import io.typeflows.github.workflows.steps.marketplace.SetupGradle
-import io.typeflows.github.workflows.triggers.Branches
-import io.typeflows.github.workflows.triggers.Paths
-import io.typeflows.github.workflows.triggers.PullRequest
-import io.typeflows.github.workflows.triggers.Push
+import io.typeflows.github.workflow.Conditions.always
+import io.typeflows.github.workflow.GitHub
+import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.Workflow
+import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.UseAction
+import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.SetupGradle
+import io.typeflows.github.workflow.trigger.Branches
+import io.typeflows.github.workflow.trigger.Paths
+import io.typeflows.github.workflow.trigger.PullRequest
+import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 import workflows.Standards.Java
 

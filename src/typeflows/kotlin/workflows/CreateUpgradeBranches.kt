@@ -1,8 +1,8 @@
 package workflows
 
-import io.typeflows.github.workflows.*
-import io.typeflows.github.workflows.steps.*
-import io.typeflows.github.workflows.triggers.*
+import io.typeflows.github.workflow.*
+import io.typeflows.github.workflow.step.*
+import io.typeflows.github.workflow.trigger.*
 import io.typeflows.util.Builder
 import workflows.Standards.RELEASE_EVENT
 

@@ -3,10 +3,10 @@ import io.typeflows.fs.TextContent
 import io.typeflows.github.DotGitHub
 import io.typeflows.github.TypeflowsGitHubRepo
 import io.typeflows.github.visualisation.WorkflowVisualisations
-import io.typeflows.github.workflows.Cron
-import io.typeflows.github.workflows.Secrets
-import io.typeflows.github.workflows.StrExp
-import io.typeflows.github.workflows.steps.RunCommand
+import io.typeflows.github.workflow.Cron
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.StrExp
+import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.util.Builder
 import org.http4k.typeflows.Http4kProjectStandards
 import org.http4k.typeflows.UpdateGradleProjectDependencies
@@ -14,7 +14,6 @@ import workflows.BroadcastRelease
 import workflows.Build
 import workflows.CreateGithubRelease
 import workflows.CreateUpgradeBranches
-import workflows.RefreshVersions
 import workflows.ReleaseApi
 import workflows.SecurityDependabot
 import workflows.SendToSlack
