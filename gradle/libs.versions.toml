@@ -44,6 +44,8 @@ handlebars = "4.5.0"
 helidon-bom = "4.2.7"
 hikaricp = "7.0.2"
 hsqldb = "2.7.4"
+htmlflow = "5.0.1"
+htmlflow-view-loader = "5.0.1"
 htmx-org = "2.0.7"
 http4k-standards-typeflows = "1.0.1.0"
 hyperscript-org = "0.9.14"
@@ -180,6 +182,8 @@ helidon-webserver-sse = { module = "io.helidon.webserver:helidon-webserver-sse",
 helidon-webserver-websocket = { module = "io.helidon.webserver:helidon-webserver-websocket", version.ref = "helidon-bom" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+htmlflow = { module = "com.github.xmlet:htmlflow", version.ref = "htmlflow" }
+htmlflow-view-loader = { module = "com.github.xmlet:htmlflow-view-loader", version.ref = "htmlflow-view-loader" }
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
 http4k-standards = { module = "org.http4k.standards:typeflows", version.ref = "http4k-standards-typeflows" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
