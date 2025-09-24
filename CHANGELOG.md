@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.18.1.0 (uncut)
+### v6.18.1.0
 - **http4k-***: Upgrade versions
+- **http4k-template-htmlflow**: [New module] Typesafe templates using HTMLFlow. H/T @BernardoPe
 - **http4k-***: Handle additional connection issues in HTTP Clients. H/T @alex859
 
 ### v6.18.0.1
