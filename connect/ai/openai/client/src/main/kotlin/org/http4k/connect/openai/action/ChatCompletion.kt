@@ -107,7 +107,7 @@ sealed class ResponseFormat {
 
     @JsonSerializable
     @PolymorphicLabel("json_schema")
-    data class JsonSchema(val strict: Boolean, val json_schema: Map<String, Any>) : ResponseFormat()
+    data class JsonSchema(val strict: Boolean?, val json_schema: Map<String, Any>) : ResponseFormat()
 }
 
 @JsonSerializable

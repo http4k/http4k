@@ -33,7 +33,7 @@ import org.http4k.connect.openai.action.ToolCall
 import java.util.UUID
 
 fun ChatResponseFormat.toOpenAI() = when (this) {
-    is Json -> JsonSchema(true, LLMJson.convert(schema))
+    is Json -> JsonSchema(null, LLMJson.convert(schema))
     Text -> null
 }
 
