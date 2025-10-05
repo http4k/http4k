@@ -68,7 +68,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
                                 is Retry -> builder().reconnectDelay(message.backoff).data("")
                                 is Ping -> builder().data("")
                                 is Data -> builder().data(message.sanitizeForMultipleRecords())
-                                is Event -> builder().name(message.event).data(message.data.replace("\n", "\ndata:"))
+                                is Event -> builder().name(message.event).data(message.data)
                                     .let { if (message.id == null) it else it.id(message.id?.value) }
                             }.build()
                         )
