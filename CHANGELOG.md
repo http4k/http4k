@@ -8,6 +8,7 @@ changes with their rationale when appropriate:
 
 ### v6.18.1.0
 - **http4k-***: Upgrade versions
+- **http4k-server-helidon**: [Unlikely break] Helidon upgrade has slightly changed behaviour around new lines in data events. Before, new lines would be put into multiple data events, now they are preserved in a single event.
 - **http4k-template-htmlflow**: [New module] Typesafe templates using HTMLFlow. H/T @BernardoPe
 - **http4k-***: Handle additional connection issues in HTTP Clients. H/T @alex859
 
