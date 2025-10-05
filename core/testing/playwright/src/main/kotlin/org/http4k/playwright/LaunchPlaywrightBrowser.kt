@@ -38,7 +38,7 @@ class LaunchPlaywrightBrowser @JvmOverloads constructor(
         Uri.of("http://localhost:${server.port()}")
     )
 
-    override fun beforeTestExecution(context: ExtensionContext?) {
+    override fun beforeTestExecution(context: ExtensionContext) {
         playwright.set(createPlaywright())
         server.start()
     }

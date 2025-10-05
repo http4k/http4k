@@ -3,5 +3,5 @@ package org.http4k.routing
 class WebJarsHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler = webJars()
 
-    override val validPath = "/webjars/swagger-ui/5.28.1/index.html"
+    override val validPath = "/webjars/swagger-ui/5.29.2/index.html"
 }

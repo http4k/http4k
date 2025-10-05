@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.19.0.0
+- **http4k-***: Upgrade versions, including JUnit to v6.0.0
+
 ### v6.18.1.0
 - **http4k-***: Upgrade versions
 - **http4k-template-htmlflow**: [New module] Typesafe templates using HTMLFlow. H/T @BernardoPe
@@ -622,7 +625,7 @@ val bufferedBinary = WsMessage(MemoryBody(imageBytes), WsMessage.Mode.Binary)
 - **http4k-*** : [New module] Azure SDK integration - use an http4k client with the official libraries
 - **http4k-server-*** : [Fix #1163] Request.version is always HTTP/1.1 for server requests, even when using HTTP/2.0
 
-### v5.28.1.0
+### v5.29.2.0
 
 - **http4k-*** : Upgrade some dependency versions.
 - **http4k-multipart** : [Fix] Further fixes to deletion of temporary files. @H/T @oharaandrew314

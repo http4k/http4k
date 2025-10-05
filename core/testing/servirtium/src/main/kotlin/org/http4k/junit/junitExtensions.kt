@@ -49,7 +49,7 @@ class ServirtiumRecording
         } else InteractionControl.StorageBased(storage)
     }
 
-    override fun beforeTestExecution(context: ExtensionContext?) {
+    override fun beforeTestExecution(context: ExtensionContext) {
         inTest = true
     }
 
