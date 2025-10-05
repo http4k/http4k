@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.19.0.0
 - **http4k-***: Upgrade versions, including JUnit to v6.0.0
+- **http4k-ai-llm-gemini**: Fix #1421. Make strict flag nullable for Gemini chat completions.
 
 ### v6.18.1.0
 - **http4k-***: Upgrade versions
