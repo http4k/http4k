@@ -103,6 +103,7 @@ abstract class ElicitationModel {
     )
 
     private fun properties() =
+        @Suppress("UNCHECKED_CAST")
         (this::class as KClass<ElicitationModel>).memberProperties
             .mapNotNull { p ->
                 p.isAccessible = true
