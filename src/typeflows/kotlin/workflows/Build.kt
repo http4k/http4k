@@ -45,20 +45,22 @@ class Build : Builder<Workflow> {
 
             steps += SetupGradle()
 
-            steps += RunCommand("bin/build_ci.sh", "Build") {
+            steps += RunCommand("bin/build_ci.sh") {
+                name = "Build"
                 timeoutMinutes = 120
                 env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
 
-            steps += UseAction("buildnote/action@main", "Buildnote") {
+            steps += UseAction("buildnote/action@main") {
+                name = "Buildnote"
                 condition = always()
             }
 
             steps += UseAction(
                 "mikepenz/action-junit-report@v5.6.2",
-                "Publish Test Report"
             ) {
+                name = "Publish Test Report"
                 condition = always()
                 with["report_paths"] = "**/build/test-results/test/TEST-*.xml"
                 with["github_token"] = Secrets.GITHUB_TOKEN
@@ -72,8 +74,9 @@ class Build : Builder<Workflow> {
                 git config user.email github-actions@github.com
                 git remote set-url origin https://x-access-token:${'$'}{{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${'$'}{GITHUB_REPOSITORY}.git
                 bin/release_tag.sh
-            """.trimIndent(), "Release (if required)"
+            """.trimIndent()
             ) {
+                name = "Release (if required)"
                 condition = GitHub.ref.isEqualTo("refs/heads/master")
                 env["GH_TOKEN"] = Secrets.string("ORG_PUBLIC_REPO_RELEASE_TRIGGERING")
             }

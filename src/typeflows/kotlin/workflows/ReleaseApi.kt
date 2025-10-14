@@ -14,7 +14,8 @@ import workflows.Standards.Java
 import workflows.Standards.RELEASE_EVENT
 
 class ReleaseApi : Builder<Workflow> {
-    override fun build() = Workflow("release-api", "Release API docs to api repo") {
+    override fun build() = Workflow("release-api") {
+        displayName = "Release API docs to api repo"
         displayName = "Release API"
         on += RepositoryDispatch(RELEASE_EVENT)
 
@@ -27,24 +28,30 @@ class ReleaseApi : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"./gradlew -i dokkaGenerateHtml -PreleaseVersion=\"${{ github.event.client_payload.version }}\" -Porg.gradle.parallel=false",
-                "Generate API docs"
-            )
+            ) {
+                name = "Generate API docs"
+            }
 
-            steps += Checkout("Checkout API repo") {
+            steps += Checkout {
+                name = "Checkout API repo"
                 repository = "http4k/api"
                 path = "tmp"
                 token = Secrets.string("AUTHOR_TOKEN").toString()
             }
 
-            steps += RunCommand("cp -R build/docs/api/html/* tmp/", "Copy docs")
+            steps += RunCommand("cp -R build/docs/api/html/* tmp/") {
+                name = "Copy docs"
+            }
 
-            steps += UseAction("EndBug/add-and-commit@v9", "Commit API docs") {
+            steps += UseAction("EndBug/add-and-commit@v9") {
+                name = "Commit API docs"
                 with["cwd"] = "tmp"
                 with["message"] = "release API docs"
                 env["GITHUB_TOKEN"] = Secrets.string("AUTHOR_TOKEN")
             }
 
-            steps += UseAction("ad-m/github-push-action@master", "Push API docs") {
+            steps += UseAction("ad-m/github-push-action@master") {
+                name = "Push API docs"
                 with["github_token"] = Secrets.string("AUTHOR_TOKEN")
                 with["directory"] = "tmp"
                 with["repository"] = "http4k/api"

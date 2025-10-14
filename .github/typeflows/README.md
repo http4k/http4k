@@ -27,7 +27,7 @@ flowchart LR
     push -->|"branches(only: 1), paths(ignore: 1)"|shutdowntestsyml
     push -->|"tags(only: 1)"|publishartifactsyml
     push -->|"branches(only: 1), paths(ignore: 1)"|securitydependabotyml
-    pullrequest -->|"(*), branches"|buildyml
+    pullrequest -->|"(*), branches(ignore: 1), paths(ignore: 1)"|buildyml
     broadcastreleaseyml --> repositorydispatchgithubrepository
     repositorydispatchgithubrepository -->|"http4k-release"|newreleasegithubyml
     repositorydispatchgithubrepository -->|"http4k-release"|newreleaseupgradebranchesyml

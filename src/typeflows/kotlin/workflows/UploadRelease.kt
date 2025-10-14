@@ -1,9 +1,19 @@
 package workflows
 
-import io.typeflows.github.workflow.*
-import io.typeflows.github.workflow.step.*
-import io.typeflows.github.workflow.step.marketplace.*
-import io.typeflows.github.workflow.trigger.*
+import io.typeflows.github.workflow.GitHub
+import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.RunsOn
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.Tag
+import io.typeflows.github.workflow.Workflow
+import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.UseAction
+import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.JavaDistribution.Adopt
+import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
+import io.typeflows.github.workflow.step.marketplace.SetupGradle
+import io.typeflows.github.workflow.step.marketplace.SetupJava
+import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 import workflows.Standards.MAIN_REPO
 
@@ -13,25 +23,27 @@ class UploadRelease : Builder<Workflow> {
         on += Push {
             tags += Tag.of("*")
         }
-        
+
         env["ACTIONS_ALLOW_UNSECURE_COMMANDS"] = "true"
-        
+
         jobs += Job("Release", RunsOn.UBUNTU_LATEST) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
-            
+
             steps += Checkout {
                 ref = $$"${{ steps.tagName.outputs.tag }}"
             }
-            
-            steps += UseAction("olegtarasov/get-tag@v2.1.4", "Grab tag name") {
+
+            steps += UseAction("olegtarasov/get-tag@v2.1.4") {
+                name = "Grab tag name"
                 id = "tagName"
             }
-            
-            steps += SetupJava(JavaDistribution.Adopt, JavaVersion.V21, "Setup Java")
-            
+
+            steps += SetupJava(Adopt, V21)
+
             steps += SetupGradle()
-            
-            steps += RunCommand($$"""
+
+            steps += RunCommand(
+                $$"""
                 ./gradlew publish --no-configuration-cache --info \
                 -Psign=true \
                 -PreleaseVersion="$RELEASE_VERSION" \
@@ -39,7 +51,9 @@ class UploadRelease : Builder<Workflow> {
                 -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
                 -PsigningKey="$SIGNING_KEY" \
                 -PsigningPassword="$SIGNING_PASSWORD"
-            """.trimIndent(), "Publish") {
+            """.trimIndent()
+            ) {
+                name = "Publish"
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
                 env["LTS_PUBLISHING_USER"] = Secrets.string("LTS_PUBLISHING_USER")
@@ -51,8 +65,9 @@ class UploadRelease : Builder<Workflow> {
                 env["ORG_GRADLE_PROJECT_signingInMemoryKey"] = Secrets.string("SIGNING_KEY")
                 env["ORG_GRADLE_PROJECT_signingInMemoryKeyPassword"] = Secrets.string("SIGNING_PASSWORD")
             }
-            
-            steps += RunCommand("bin/notify_lts_slack.sh ${'$'}{{ steps.tagName.outputs.tag }}", "Notify LTS Slack") {
+
+            steps += RunCommand($$"bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}") {
+                name = "Notify LTS Slack"
                 env["LTS_SLACK_WEBHOOK"] = Secrets.string("LTS_SLACK_WEBHOOK")
             }
         }

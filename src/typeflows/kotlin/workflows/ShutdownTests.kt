@@ -32,18 +32,20 @@ class ShutdownTests : Builder<Workflow> {
 
             steps += Checkout()
 
-            steps += SetupJava(Adopt, V21, "Setup Java")
+            steps += SetupJava(Adopt, V21)
 
             steps += SetupGradle()
 
-            steps += RunCommand("bin/run_shutdown_tests.sh", "Build") {
+            steps += RunCommand("bin/run_shutdown_tests.sh") {
+                name = "Build"
                 timeoutMinutes = 25
                 env["SERVER_HOST"] = "localhost"
                 env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
 
-            steps += UseAction("buildnote/action@main", "Buildnote") {
+            steps += UseAction("buildnote/action@main") {
+                name = "Buildnote"
                 condition = always()
             }
         }

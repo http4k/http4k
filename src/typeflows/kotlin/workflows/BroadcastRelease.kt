@@ -19,14 +19,17 @@ import workflows.Standards.MAIN_REPO
 import workflows.Standards.RELEASE_EVENT
 
 class BroadcastRelease : Builder<Workflow> {
-    override fun build() = Workflow("broadcast-release", "Broadcast new release to public repo") {
+    override fun build() = Workflow("broadcast-release") {
         displayName = "Broadcast Release"
         on += Schedule {
             cron += Cron.of("0 * * * *") // every hour
         }
         on += WorkflowDispatch()
 
-        val checkNewVersion = Job("check-new-version", RunsOn.UBUNTU_LATEST) {
+        val checkNewVersion = Job(
+            "check-new-version",
+            RunsOn.UBUNTU_LATEST
+        ) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
 
             steps += Checkout()
@@ -36,8 +39,9 @@ class BroadcastRelease : Builder<Workflow> {
 
             steps += UseAction(
                 "aws-actions/configure-aws-credentials@v4.2.1",
-                "Configure AWS Credentials"
             ) {
+                name = "Configure AWS Credentials"
+
                 with["aws-access-key-id"] = Secrets.string("S3_ACCESS_KEY_ID")
                 with["aws-secret-access-key"] = Secrets.string("S3_SECRET_ACCESS_KEY")
                 with["aws-region"] = "us-east-1"
@@ -66,8 +70,9 @@ class BroadcastRelease : Builder<Workflow> {
                   echo "requires-broadcast=true" >> $GITHUB_OUTPUT
                   echo "version=${LOCAL_VERSION}" >> $GITHUB_OUTPUT
                 fi;
-            """.trimIndent(), "Check new version"
+            """.trimIndent()
             ) {
+                name = "Check new version"
                 id = "check-version"
                 shell = "bash"
             }
@@ -81,7 +86,8 @@ class BroadcastRelease : Builder<Workflow> {
 
             steps += Checkout()
 
-            steps += UseAction("olegtarasov/get-tag@v2.1.4", "Grab tag name") {
+            steps += UseAction("olegtarasov/get-tag@v2.1.4") {
+                name = "Grab tag name"
                 id = "tagName"
             }
 

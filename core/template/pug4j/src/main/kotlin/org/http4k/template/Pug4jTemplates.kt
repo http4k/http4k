@@ -6,6 +6,7 @@ import de.neuland.pug4j.template.FileTemplateLoader
 import de.neuland.pug4j.template.TemplateLoader
 import java.io.File
 import java.io.InputStreamReader
+import java.io.UncheckedIOException
 import java.nio.file.NoSuchFileException
 
 /**
@@ -34,8 +35,7 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
             try {
                 val template = configure.getTemplate(basePath + viewModel.template())
                 return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
-            } catch (e: NoSuchFileException) {
-                e.printStackTrace()
+            } catch (_: UncheckedIOException) {
                 throw ViewNotFound(viewModel)
             }
         }
@@ -61,7 +61,7 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
     private fun safeRender(fn: (ViewModel) -> String): (ViewModel) -> String = {
         try {
             fn(it)
-        } catch (e: NoSuchFileException) {
+        } catch (_: NoSuchFileException) {
             throw ViewNotFound(it)
         }
     }

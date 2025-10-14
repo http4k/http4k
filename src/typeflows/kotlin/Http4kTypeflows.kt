@@ -30,7 +30,8 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += UpdateGradleProjectDependencies(
                 "update-dependencies",
                 Cron.of("0 8 * * 1"),
-                RunCommand("bin/build_ci.sh", "Build") {
+                RunCommand("bin/build_ci.sh") {
+                    name = "Build"
                     condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
                     timeoutMinutes = 120
                     env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")

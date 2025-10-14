@@ -4,7 +4,7 @@
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
-    pullrequest(["🔀 pull_request<br/>(*), branches"])
+    pullrequest(["🔀 pull_request<br/>(*), branches(ignore: 1), paths(ignore: 1)"])
     subgraph buildyml["Build"]
         buildyml_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end

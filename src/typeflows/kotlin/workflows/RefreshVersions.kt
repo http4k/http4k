@@ -1,9 +1,17 @@
 package workflows
 
-import io.typeflows.github.workflow.*
-import io.typeflows.github.workflow.step.*
-import io.typeflows.github.workflow.step.marketplace.*
-import io.typeflows.github.workflow.trigger.*
+import io.typeflows.github.workflow.Cron
+import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.RunsOn
+import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.StrExp
+import io.typeflows.github.workflow.Workflow
+import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.UseAction
+import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.SetupGradle
+import io.typeflows.github.workflow.trigger.Schedule
+import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.Java
 import workflows.Standards.MASTER_BRANCH
@@ -15,29 +23,35 @@ class RefreshVersions : Builder<Workflow> {
         on += Schedule {
             cron += Cron.of("0 7 * * 1") // Weekly on Monday at 7am
         }
-        
+
         jobs += Job("update-dependencies", RunsOn.UBUNTU_LATEST) {
             name = "Update Version Catalog"
-            
+
             steps += Checkout {
                 ref = MASTER_BRANCH
                 token = Secrets.GITHUB_TOKEN.toString()
             }
-            
+
             steps += Java
-            
+
             steps += SetupGradle()
-            
+
             steps += RunCommand(
                 """
                 git config --global user.name 'github-actions[bot]'
                 git config --global user.email 'github-actions[bot]@users.noreply.github.com'
                 git checkout -b dependency-update
-            """.trimIndent(), "Create dependency update branch")
-            
-            steps += RunCommand("./gradlew versionCatalogUpdate --no-daemon", "Update version catalog")
-            
-            steps += RunCommand($$"""
+            """.trimIndent()
+            ) {
+                name = "Create dependency update branch"
+            }
+
+            steps += RunCommand("./gradlew versionCatalogUpdate --no-daemon") {
+                name = "Update version catalog"
+            }
+
+            steps += RunCommand(
+                $$"""
                 if [ -n "$(git status --porcelain)" ]; then
                   echo "changed=true" >> $GITHUB_OUTPUT
                   echo "Changes detected in version catalog"
@@ -45,18 +59,22 @@ class RefreshVersions : Builder<Workflow> {
                   echo "changed=false" >> $GITHUB_OUTPUT
                   echo "No changes detected"
                 fi
-            """.trimIndent(), "Check for changes") {
+            """.trimIndent()
+            ) {
+                name = "Check for changes"
                 id = "verify-changed-files"
             }
-            
-            steps += RunCommand("bin/build_ci.sh", "Build") {
+
+            steps += RunCommand("bin/build_ci.sh") {
+                name = "Build"
                 condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
                 timeoutMinutes = 120
                 env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
-            
-            steps += RunCommand($$"""
+
+            steps += RunCommand(
+                $$"""
                 git add gradle/libs.versions.toml
                 git commit -m "Update dependency versions
 
@@ -64,11 +82,14 @@ class RefreshVersions : Builder<Workflow> {
                 
                 This PR was automatically created by GitHub Actions to update dependencies to their latest versions."
                 git push --force --set-upstream origin dependency-update
-            """.trimIndent(), "Commit and push changes") {
+            """.trimIndent()
+            ) {
+                name = "Commit and push changes"
                 condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
             }
-            
-            steps += UseAction("repo-sync/pull-request@v2", "Create Pull Request") {
+
+            steps += UseAction("repo-sync/pull-request@v2") {
+                name = "Create Pull Request"
                 condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
                 with["source_branch"] = "dependency-update"
                 with["destination_branch"] = MASTER_BRANCH
@@ -91,8 +112,9 @@ class RefreshVersions : Builder<Workflow> {
                 with["pr_draft"] = "false"
                 with["github_token"] = Secrets.GITHUB_TOKEN
             }
-            
-            steps += RunCommand("echo \"No dependency updates available\"", "No changes") {
+
+            steps += RunCommand("echo \"No dependency updates available\"") {
+                name = "No changes"
                 condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("false")
             }
         }

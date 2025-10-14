@@ -30,8 +30,9 @@ class CreateGithubRelease : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md",
-                "Build release note"
-            )
+            ) {
+                name = "Build release note"
+            }
 
             steps += CreateRelease(
                 $$"${{ github.event.client_payload.version }}",

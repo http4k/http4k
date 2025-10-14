@@ -14,15 +14,16 @@ import io.typeflows.util.Builder
 import workflows.Standards.RELEASE_EVENT
 
 class SendToSlack : Builder<Workflow> {
-    override fun build() = Workflow("new-release-slack", "Notify Slack of new release") {
+    override fun build() = Workflow("new-release-slack") {
         displayName = "New Release - Slack"
         on += RepositoryDispatch(RELEASE_EVENT)
         permissions = Permissions(Contents to Read)
-        
+
         jobs += Job("slackify", UBUNTU_LATEST) {
             steps += Checkout()
-            
-            steps += RunCommand("bin/notify_slack.sh ${'$'}{{ github.event.client_payload.version }}", "Notify Slack") {
+
+            steps += RunCommand($$"bin/notify_slack.sh ${{ github.event.client_payload.version }}") {
+                name = "Notify Slack"
                 env["SLACK_WEBHOOK"] = Secrets.string("SLACK_WEBHOOK")
             }
         }
