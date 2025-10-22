@@ -26,6 +26,7 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerCapabilities
+import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
@@ -41,11 +42,15 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
+import org.http4k.core.with
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * JSON Rpc connection MCP client.
@@ -54,8 +59,9 @@ class HttpNonStreamingMcpClient(
     private val baseUri: Uri,
     private val http: HttpHandler = JavaHttpClient(),
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
-) :
-    McpClient {
+) : McpClient {
+
+    private val sessionId = AtomicReference<SessionId>()
 
     override fun start(overrideDefaultTimeout: Duration?) = Success(ServerCapabilities())
 
@@ -151,7 +157,11 @@ class HttpNonStreamingMcpClient(
     override fun close() {}
 
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
-        val response = this(message.toHttpRequest(protocolVersion, baseUri, rpc).accept(TEXT_EVENT_STREAM))
+        val response = this(message.toHttpRequest(protocolVersion, baseUri, rpc)
+            .with(Header.MCP_SESSION_ID of sessionId.get())
+            .accept(TEXT_EVENT_STREAM))
+
+        sessionId.set(Header.MCP_SESSION_ID(response))
 
         return when {
             response.status.successful -> resultFrom { SseMessage.parse(response.bodyString()) as Event }

@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.20.0.2
+- **http4k-ai-mcp-***: [Fix] Add session id to output in HttpNonStreaming mode
+
 ### v6.20.0.1
 - **http4k-ai-mcp-***: [Fix] Some MCP clients require a 200 instead of a 202 in MCP responses (that are stateless)
  
