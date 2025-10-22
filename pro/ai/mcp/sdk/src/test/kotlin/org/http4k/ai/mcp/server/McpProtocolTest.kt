@@ -388,7 +388,7 @@ class McpProtocolTest {
     fun `deal with tools`() {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
-        val output = Tool.Output.auto(FooBar("bar")).toLens()
+        val output = auto(FooBar("bar")).toLens()
 
         val unstructuredTool = Tool("unstructured", "description", stringArg, intArg, title = "title")
         val structuredTool = Tool("structured", "description", output = output, title = "title")
@@ -798,7 +798,7 @@ private fun PolyHandler.sendToMcp(body: McpNodeType) =
     assertThat(
         http!!(
             Request(POST, "/message?sessionId=$firstDeterministicSessionId").body(McpJson.compact(body))
-        ), hasStatus(ACCEPTED)
+        ).status.successful, equalTo(true)
     )
 
 val firstDeterministicSessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")

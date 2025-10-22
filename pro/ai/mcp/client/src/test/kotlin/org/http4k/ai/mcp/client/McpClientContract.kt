@@ -61,7 +61,7 @@ interface McpClientContract<T> : PortBasedTest {
     fun `can interact with server`() {
 
         val toolArg = Tool.Arg.string().required("name")
-        val output = Tool.Output.auto(FooBar("bar")).toLens()
+        val output = auto(FooBar("bar")).toLens()
 
         val tools = ServerTools(
             Tool("reverse", "description", toolArg) bind {

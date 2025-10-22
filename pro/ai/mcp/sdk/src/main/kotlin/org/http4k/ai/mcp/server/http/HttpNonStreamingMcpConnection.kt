@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.util.asHttp
+import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.sse.Sse
@@ -25,7 +26,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
         POST to { req ->
             with(protocol) {
                 when (val session = retrieveSession(req)) {
-                    is Session -> receive(FakeSse(req), session, req).asHttp()
+                    is Session -> receive(FakeSse(req), session, req).asHttp(OK)
                     is InvalidSession -> Response(NOT_FOUND)
                 }
             }

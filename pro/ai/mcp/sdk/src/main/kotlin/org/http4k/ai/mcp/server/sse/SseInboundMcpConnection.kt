@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.util.asHttp
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.routing.bind
 import org.http4k.sse.Sse
 
@@ -17,7 +18,7 @@ import org.http4k.sse.Sse
 fun SseInboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/message" bind POST to { req ->
         when (val session = protocol.retrieveSession(req)) {
-            is Session -> protocol.receive(protocol.transportFor(Subscription(session)), session, req).asHttp()
+            is Session -> protocol.receive(protocol.transportFor(Subscription(session)), session, req).asHttp(ACCEPTED)
             InvalidSession -> Response(BAD_REQUEST)
         }
     }
