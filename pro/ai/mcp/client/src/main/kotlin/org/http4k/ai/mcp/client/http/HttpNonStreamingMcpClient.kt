@@ -2,7 +2,10 @@ package org.http4k.ai.mcp.client.http
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.McpError.Http
@@ -35,11 +38,12 @@ import org.http4k.ai.mcp.util.McpJson.asFormatString
 import org.http4k.ai.mcp.util.McpJson.convert
 import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.accept
+import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
 
@@ -147,10 +151,12 @@ class HttpNonStreamingMcpClient(
     override fun close() {}
 
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
-        val response = this(message.toHttpRequest(protocolVersion, baseUri, rpc).accept(APPLICATION_JSON))
+        val response = this(message.toHttpRequest(protocolVersion, baseUri, rpc).accept(TEXT_EVENT_STREAM))
 
         return when {
-            response.status.successful -> Event("message", response.bodyString()).asAOrFailure<T>()
+            response.status.successful -> resultFrom { SseMessage.parse(response.bodyString()) as Event }
+                .flatMap { it.asAOrFailure<T>() }
+                .mapFailure { Http(response) }
 
             else -> Failure(Http(response))
         }

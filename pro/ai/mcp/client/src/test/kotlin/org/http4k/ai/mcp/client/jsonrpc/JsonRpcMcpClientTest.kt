@@ -17,7 +17,7 @@ class JsonRpcMcpClientTest : McpClientContract<Unit> {
 
     override fun clientSessions() = JsonRpcSessions()
 
-    override fun clientFor(port: Int) = org.http4k.ai.mcp.client.jsonrpc.JsonRpcMcpClient(
+    override fun clientFor(port: Int) = JsonRpcMcpClient(
         Uri.of("http://localhost:${port}/jsonrpc"),
         ClientFilters.BearerAuth("123").then(JavaHttpClient()),
     )

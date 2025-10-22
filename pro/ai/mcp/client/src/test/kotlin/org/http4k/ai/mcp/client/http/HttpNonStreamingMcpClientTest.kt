@@ -2,15 +2,6 @@ package org.http4k.ai.mcp.client.http
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.JavaHttpClient
-import org.http4k.core.Credentials
-import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Uri
-import org.http4k.core.then
-import org.http4k.filter.ClientFilters
-import org.http4k.format.renderResult
-import org.http4k.lens.basicAuthentication
 import org.http4k.ai.mcp.client.McpClientContract
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ServerMetaData
@@ -24,8 +15,18 @@ import org.http4k.ai.mcp.server.http.HttpStreamingSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.BasicAuthMcpSecurity
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.Credentials
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
+import org.http4k.format.renderResult
+import org.http4k.lens.basicAuthentication
 import org.http4k.routing.poly
 import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
 
 class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
@@ -70,7 +71,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
 
         with(McpJson) {
             assertThat(
-                parse(response.bodyString()),
+                parse((SseMessage.parse(response.bodyString()) as SseMessage.Event).data),
                 equalTo(
                     array(
                         listOf(

@@ -3,11 +3,6 @@ package org.http4k.ai.mcp.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
-import org.http4k.ai.model.Role.Companion.Assistant
-import org.http4k.ai.model.ToolName
-import org.http4k.core.PolyHandler
-import org.http4k.core.Uri
-import org.http4k.lens.with
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.PromptRequest
@@ -35,9 +30,15 @@ import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.util.McpJson.auto
 import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.ToolName
+import org.http4k.core.PolyHandler
+import org.http4k.core.Uri
+import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
@@ -52,7 +53,7 @@ interface McpClientContract<T> : PortBasedTest {
 
     val doesNotifications: Boolean
 
-    fun clientSessions(): org.http4k.ai.mcp.server.protocol.Sessions<T>
+    fun clientSessions(): Sessions<T>
 
     data class FooBar(val foo: String)
 

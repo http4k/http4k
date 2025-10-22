@@ -3,9 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.19.1.0 (uncut)
+### v6.20.0.0
 - **http4k-***: Upgrade versions
-- **http4k-ai-mcp-***: Non-streaming mode spec: Alignment with the spec to be compatible with clients such as Claude Desktop (change to the spec to not support JSON RPC)
+- **http4k-ai-mcp-***: [Breaking] Non-streaming mode spec: Alignment with the MCP spec to be compatible with clients such as Claude Desktop (change to the spec to not support JSON RPC). This simplifies integration points.
 
 ### v6.19.0.0
 - **http4k-***: Upgrade versions, including JUnit to v6.0.0
