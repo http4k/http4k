@@ -27,6 +27,7 @@ import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.with
 import org.http4k.format.AutoMappingConfiguration
@@ -91,7 +92,8 @@ abstract class ConfigurableMcpJson(
     /**
      * Auto-marshalled lens for a tool output. You will need Kotlin reflection on the classpath for this to work.
      */
-    inline fun <reified T : Any> auto(example: T): ToolOutputLensBuilder<T> {
+    @Suppress("UnusedReceiverParameter")
+    inline fun <reified T : Any> Tool.Output.auto(example: T): ToolOutputLensBuilder<T> {
         val autoJsonToJsonSchema = AutoJsonToJsonSchema(this@ConfigurableMcpJson)
         val jsonSchemaCollapser = JsonSchemaCollapser(this@ConfigurableMcpJson)
 
@@ -122,9 +124,9 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(Version)
 }
 
-fun Result4k<McpNodeType, McpNodeType>.asHttp(okStatus: Status) =
+fun Result4k<McpNodeType, McpNodeType>.asHttp() =
     when (val response = this) {
-        is Success<McpNodeType> -> response.get().asHttp(okStatus)
+        is Success<McpNodeType> -> response.get().asHttp(ACCEPTED)
         is Failure<McpNodeType> -> response.get().asHttp(BAD_REQUEST)
     }
 
