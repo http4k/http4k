@@ -388,7 +388,7 @@ class McpProtocolTest {
     fun `deal with tools`() {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
-        val output = auto(FooBar("bar")).toLens()
+        val output = Tool.Output.auto(FooBar("bar")).toLens()
 
         val unstructuredTool = Tool("unstructured", "description", stringArg, intArg, title = "title")
         val structuredTool = Tool("structured", "description", output = output, title = "title")

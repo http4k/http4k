@@ -27,7 +27,6 @@ import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.with
 import org.http4k.format.AutoMappingConfiguration
@@ -124,9 +123,9 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(Version)
 }
 
-fun Result4k<McpNodeType, McpNodeType>.asHttp() =
+fun Result4k<McpNodeType, McpNodeType>.asHttp(status: Status) =
     when (val response = this) {
-        is Success<McpNodeType> -> response.get().asHttp(ACCEPTED)
+        is Success<McpNodeType> -> response.get().asHttp(status)
         is Failure<McpNodeType> -> response.get().asHttp(BAD_REQUEST)
     }
 
