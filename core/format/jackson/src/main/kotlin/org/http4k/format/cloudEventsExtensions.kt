@@ -1,6 +1,6 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.jacksonTypeRef
 import io.cloudevents.CloudEvent
 import io.cloudevents.jackson.PojoCloudEventDataMapper
 import org.http4k.lens.Lens

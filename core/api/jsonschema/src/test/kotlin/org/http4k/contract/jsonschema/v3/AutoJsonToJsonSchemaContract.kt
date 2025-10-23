@@ -1,7 +1,7 @@
 package org.http4k.contract.jsonschema.v3
 
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonPropertyDescription
+import tools.jackson.annotation.JsonProperty
+import tools.jackson.annotation.JsonPropertyDescription
 import dev.forkhandles.data.MapDataContainer
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory

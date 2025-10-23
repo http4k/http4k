@@ -1,9 +1,9 @@
 package org.http4k.contract.openapi.v3
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.UpperCamelCaseStrategy
-import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.PropertyNamingStrategies.SNAKE_CASE
+import tools.jackson.databind.PropertyNamingStrategies.UpperCamelCaseStrategy
+import tools.jackson.databind.annotation.JsonNaming
+import tools.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws

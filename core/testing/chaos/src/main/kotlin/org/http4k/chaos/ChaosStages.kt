@@ -1,6 +1,6 @@
 package org.http4k.chaos
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter

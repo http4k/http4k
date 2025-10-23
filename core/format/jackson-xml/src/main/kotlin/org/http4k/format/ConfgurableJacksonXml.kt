@@ -1,8 +1,8 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.dataformat.xml.JacksonXmlModule
+import tools.jackson.dataformat.xml.XmlMapper
+import tools.jackson.module.kotlin.KotlinModule
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType

@@ -1,14 +1,14 @@
 package org.http4k.contract.jsonschema.v3
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
-import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.annotation.JsonInclude.Include.NON_NULL
+import tools.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
+import tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
+import tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
+import tools.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY
+import tools.jackson.module.kotlin.KotlinModule
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK

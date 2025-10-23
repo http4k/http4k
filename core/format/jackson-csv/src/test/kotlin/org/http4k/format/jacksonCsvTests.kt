@@ -1,7 +1,7 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import tools.jackson.annotation.JsonPropertyOrder
+import tools.jackson.dataformat.csv.CsvSchema
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has

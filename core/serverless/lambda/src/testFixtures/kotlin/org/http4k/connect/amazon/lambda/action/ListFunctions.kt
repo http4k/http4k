@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.lambda.action
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import tools.jackson.annotation.JsonProperty
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.map
 import org.http4k.connect.RemoteFailure

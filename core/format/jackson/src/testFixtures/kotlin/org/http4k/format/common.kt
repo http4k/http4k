@@ -1,8 +1,8 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonView
+import tools.jackson.annotation.JsonSubTypes
+import tools.jackson.annotation.JsonTypeInfo
+import tools.jackson.annotation.JsonView
 
 open class Public
 class Private : Public()

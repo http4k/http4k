@@ -1,9 +1,9 @@
 package io.cloudevents.jackson;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.cloudevents.CloudEventData;
 import io.cloudevents.core.data.PojoCloudEventData;
 import io.cloudevents.rw.CloudEventDataMapper;

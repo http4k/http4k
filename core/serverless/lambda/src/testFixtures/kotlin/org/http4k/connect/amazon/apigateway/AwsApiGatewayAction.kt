@@ -1,9 +1,9 @@
 package org.http4k.connect.amazon.apigateway
 
-import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.annotation.Nulls
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.annotation.JsonSetter
+import tools.jackson.annotation.Nulls
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success

@@ -1,6 +1,6 @@
 package org.http4k.connect.amazon.lambda.action
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import tools.jackson.annotation.JsonProperty
 import org.http4k.base64Encode
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.LambdaJackson.auto

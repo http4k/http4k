@@ -1,6 +1,6 @@
 package org.http4k.contract.openapi.v3
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import tools.jackson.annotation.JsonProperty
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws

@@ -1,8 +1,8 @@
 package org.http4k.testing
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.PropertyNamingStrategies
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import tools.jackson.module.kotlin.KotlinModule
 import org.http4k.events.Event
 import org.http4k.events.Events
 import org.http4k.format.ConfigurableJackson

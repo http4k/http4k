@@ -1,6 +1,6 @@
 package org.http4k.contract.openapi.v3
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import tools.jackson.annotation.JsonProperty
 import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo

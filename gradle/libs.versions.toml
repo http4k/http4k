@@ -49,7 +49,7 @@ htmlflow-view-loader = "5.0.1"
 htmx-org = "2.0.7"
 http4k-standards-typeflows = "1.2.0.0"
 hyperscript-org = "0.9.14"
-jackson-bom = "2.20.0"
+jackson-bom = "3.0.1"
 jakarta-inject-api = "2.0.1"
 jakarta-servlet-api = "6.1.0"
 jakarta-ws-rs-api = "4.0.0"
@@ -186,13 +186,13 @@ htmlflow-view-loader = { module = "com.github.xmlet:htmlflow-view-loader", versi
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
 http4k-standards = { module = "org.http4k.standards:typeflows", version.ref = "http4k-standards-typeflows" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
-jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson-bom" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
-jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
-jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
+jackson-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson-bom" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson-bom" }
+jackson-dataformat-csv = { module = "tools.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
+jackson-dataformat-xml = { module = "tools.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
+jackson-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
+jackson-datatype-guava = { module = "tools.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
 jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
 jakarta-ws-rs-api = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "jakarta-ws-rs-api" }

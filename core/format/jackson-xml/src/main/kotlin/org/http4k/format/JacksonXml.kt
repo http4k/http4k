@@ -1,7 +1,7 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.KotlinModule
 
 /**
  * To implement custom XML configuration, create your own object singleton. Extra mappings can be added before done() is called.
