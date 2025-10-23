@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.20.0.1
 - **http4k-ai-mcp-***: [Fix] Some MCP clients require a 200 instead of a 202 in MCP responses (that are stateless)
-- 
+ 
 ### v6.20.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-***: [Breaking] Non-streaming mode spec: Alignment with the MCP spec to be compatible with clients such as Claude Desktop (change to the spec to not support JSON RPC). This simplifies integration points.
