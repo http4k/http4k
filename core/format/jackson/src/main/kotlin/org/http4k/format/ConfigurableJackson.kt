@@ -32,6 +32,7 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import tools.jackson.databind.json.JsonMapper
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -142,7 +143,7 @@ open class ConfigurableJackson(
         withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
 }
 
-fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
+fun KotlinModule.asConfigurable() = asConfigurable(JsonMapper.builder())
 
 inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it) }
 

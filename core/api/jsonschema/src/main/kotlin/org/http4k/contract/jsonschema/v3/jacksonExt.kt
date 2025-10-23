@@ -7,6 +7,7 @@ import tools.jackson.databind.PropertyNamingStrategy
 import tools.jackson.databind.annotation.JsonNaming
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
+import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
 
@@ -38,7 +39,7 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
         val namingStrategy = clazz.annotations
                 .filterIsInstance<JsonNaming>()
                 .map { it.value }.getOrNull(0)?.createInstance()
-            ?: json.mapper.propertyNamingStrategy
+            ?: (json.mapper as JsonMapper).propertyNamingStrategy
 
         return if (namingStrategy is PropertyNamingStrategies.NamingBase) {
             { name: String -> namingStrategy.translate(name) }

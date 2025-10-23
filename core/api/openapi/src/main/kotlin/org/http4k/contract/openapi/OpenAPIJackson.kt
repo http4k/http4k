@@ -12,10 +12,13 @@ import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
+import tools.jackson.databind.json.JsonMapper
 
 private fun standardConfig(
-    configFn: AutoMappingConfiguration<ObjectMapper>.() -> AutoMappingConfiguration<ObjectMapper>
-) = KotlinModule.Builder().build()
+    configFn: AutoMappingConfiguration<JsonMapper>.() -> AutoMappingConfiguration<JsonMapper>
+) = JsonMapper.builder()
+    .addModule(KotlinModule.Builder().build())
+    .build()
     .asConfigurable()
     .withStandardMappings()
     .let(configFn)
