@@ -7,6 +7,7 @@ import org.http4k.lens.Lens
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSpec
 import org.http4k.lens.ParamMeta.ObjectParam
+import kotlin.text.orEmpty
 
 inline fun <reified T : Any> ConfigurableJackson.cloudEventDataLens(): Lens<CloudEvent, T> {
     val get = LensGet<CloudEvent, T> { _, target ->

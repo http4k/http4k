@@ -19,7 +19,6 @@ azure-functions-java-library = "3.2.1"
 base16-encoding = "2.5.0"
 bcprov-jdk18on = "1.82"
 cloudevents-core = "4.0.1"
-cloudevents-json-jackson = "4.0.1"
 com-github-ben-manes-versions = "0.53.0"
 com-github-jk1-gradle-license-report = "2.9"
 com-google-devtools-ksp = "2.2.20-2.0.4"
@@ -149,7 +148,6 @@ base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
 bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-bom" }
 cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
-cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }

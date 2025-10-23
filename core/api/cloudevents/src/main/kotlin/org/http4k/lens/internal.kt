@@ -19,7 +19,7 @@ import java.util.Locale.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-internal fun HttpMessage.toCloudEventReader(): MessageReader {
+fun HttpMessage.toCloudEventReader(): MessageReader {
     val byContentType = header("content-type")
         ?.let { EventFormatProvider.getInstance().resolveFormat(it) }
         ?.let { GenericStructuredMessageReader(it, body.payload.array()) }
@@ -31,7 +31,7 @@ internal fun HttpMessage.toCloudEventReader(): MessageReader {
     return byContentType ?: bySpecVersion ?: throw newUnknownEncodingException()
 }
 
-internal fun HttpMessage.write(cloudEvent: CloudEvent): HttpMessage = this
+fun HttpMessage.write(cloudEvent: CloudEvent): HttpMessage = this
     .addHeaderIfPresent("id", cloudEvent.id)
     .addHeaderIfPresent("datacontenttype", cloudEvent.dataContentType)
     .addHeaderIfPresent("schemaurl", cloudEvent.dataSchema?.toString())

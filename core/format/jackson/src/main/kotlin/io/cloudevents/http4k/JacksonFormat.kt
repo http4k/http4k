@@ -3,7 +3,7 @@ package io.cloudevents.http4k
 import com.fasterxml.jackson.core.JsonProcessingException
 import io.cloudevents.CloudEvent
 import io.cloudevents.CloudEventData
-import io.cloudevents.core.builder.CloudEventBuilder.from
+import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.core.format.EventDeserializationException
 import io.cloudevents.core.format.EventFormat
 import io.cloudevents.core.format.EventSerializationException
@@ -38,13 +38,13 @@ fun ConfigurableJackson.cloudEventsFormat(): EventFormat {
             return when (val data = deserialized.data) {
                 null -> deserialized
                 else -> try {
-                    from(deserialized).withData(mapper.map(data)).build()
+                    CloudEventBuilder.from(deserialized).withData(mapper.map(data)).build()
                 } catch (e: CloudEventRWException) {
                     throw EventDeserializationException(e)
                 }
             }
         }
 
-        override fun serializedContentType() = ContentType.CLOUD_EVENT_JSON.value
+        override fun serializedContentType() = ContentType.Companion.CLOUD_EVENT_JSON.value
     }
 }
