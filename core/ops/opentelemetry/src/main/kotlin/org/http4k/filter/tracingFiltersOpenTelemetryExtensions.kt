@@ -139,8 +139,8 @@ val defaultSpanNamer: (Request) -> String = {
 private fun Span.addStandardDataFrom(resp: Response, req: Request) {
     resp.body.length?.also {
         setAttribute(HTTP_RESPONSE_BODY_SIZE, it)
-            .setAttribute("message.type", "RECEIVED")
-            .setAttribute("messaging.message_payload_size_bytes", it)
+        setAttribute("message.type", "RECEIVED")
+        setAttribute("messaging.message_payload_size_bytes", it)
     }
     req.body.length?.also { setAttribute(HTTP_REQUEST_BODY_SIZE, it) }
     setAttribute("http.status_code", resp.status.code.toLong())
