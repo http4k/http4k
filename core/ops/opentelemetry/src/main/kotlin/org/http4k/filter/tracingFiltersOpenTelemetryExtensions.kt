@@ -41,11 +41,13 @@ fun ClientFilters.OpenTelemetryTracing(
             with(
                 tracer.spanBuilder(spanNamer(req))
                 .setSpanKind(CLIENT)
+                .apply {
+                    setAttribute("http.method", req.method.name)
+                    setAttribute("http.url", req.uri.toString())
+                }
                 .let { spanCreationMutator(it) }
                 .startSpan()) {
                 try {
-                    setAttribute("http.method", req.method.name)
-                    setAttribute("http.url", req.uri.toString())
                     makeCurrent().use {
                         val ref = AtomicReference(req)
                         textMapPropagator.inject(Context.current(), ref, setter)
@@ -88,15 +90,17 @@ fun ServerFilters.OpenTelemetryTracing(
                 tracer.spanBuilder(spanNamer(req))
                 .setParent(textMapPropagator.extract(Context.current(), req, getter))
                 .setSpanKind(SERVER)
-                .let { spanCreationMutator(it, req) }
-                .startSpan()) {
-                makeCurrent().use {
-                    try {
+                .apply {
                         if (req is RoutedMessage && req.xUriTemplate != null)
                             setAttribute("http.route", req.xUriTemplate.toString())
 
                         setAttribute("http.method", req.method.name)
                         setAttribute("http.url", req.uri.toString())
+                }
+                .let { spanCreationMutator(it, req) }
+                .startSpan()) {
+                makeCurrent().use {
+                    try {
                         val ref = AtomicReference(next(req))
 
                         textMapPropagator.inject(Context.current(), ref, setter)
