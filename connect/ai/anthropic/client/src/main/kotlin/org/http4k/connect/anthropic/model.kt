@@ -64,16 +64,8 @@ class ApiVersion private constructor(value: LocalDate) : LocalDateValue(value), 
     }
 }
 
-@Deprecated("Use Models instead")
-val ModelName.Companion.CLAUDE_3_7_SONNET get() = ModelName.of("claude-3-7-sonnet-20250219")
-
-@Deprecated("Use Models instead")
-val ModelName.Companion.CLAUDE_3_5_SONNET get() = ModelName.of("claude-3-5-sonnet-20240620")
-
 object AnthropicModels {
-    val Claude_Opus_4_0 = ModelName.of("claude-opus-4-0")
-    val Claude_Sonnet_4_0 = ModelName.of("claude-sonnet-4-0")
-    val Claude_Sonnet_3_7 = ModelName.of("claude-3-7-sonnet-latest")
-    val Claude_Sonnet_3_5 = ModelName.of("claude-3-5-sonnet-latest")
-    val Claude_Haiku_3_5 = ModelName.of("claude-3-5-haiku-latest")
+    val Claude_Opus_4_1 = ModelName.of("claude-opus-4-1")
+    val Claude_Sonnet_4_5 = ModelName.of("claude-sonnet-4-5")
+    val Claude_Haiku_4_5 = ModelName.of("claude-haiku-4-5")
 }

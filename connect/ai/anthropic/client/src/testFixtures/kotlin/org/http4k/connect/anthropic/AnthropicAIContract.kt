@@ -27,7 +27,7 @@ interface AnthropicAIContract {
     @Test
     fun `generate message response non-stream`(resourceLoader: ResourceLoader) {
         val responses = anthropicAi.messageCompletion(
-            ModelName.of("claude-3-5-sonnet-20240620"),
+            AnthropicModels.Claude_Haiku_4_5,
             listOf(
                 Message.User(
                     listOf(
@@ -50,7 +50,7 @@ interface AnthropicAIContract {
     @Test
     fun `generate message response stream`() {
         val responses = anthropicAi.messageCompletionStream(
-            ModelName.of("claude-3-5-sonnet-20240620"),
+            AnthropicModels.Claude_Haiku_4_5,
             listOf(
                 Message.User(listOf(Content.Text("You are Leonardo Da Vinci")))
             ),

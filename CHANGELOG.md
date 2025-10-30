@@ -3,6 +3,13 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.20.1.0
+- **http4k-***: Upgrade versions
+- **http4k-ops-opentelemetry**: Set open telemetry http.user_agent and http.client_ip attributes as they are used by AWS Xray. H/T @aharin
+- **http4k-ops-opentelemetry**: AWS Xray requires message.type and messaging.message_payload_size_bytes. H/T @aharin
+- **http4k-ops-opentelemetry**: Set span request attribute before span is created so that they can be used by RuleBasedRoutingSampler. H/T @aharin
+- **http4k-platform-aws**: Add support for configurable payload mode in `AwsRequestPreSigner`. H/T @torfinnberset
+
 ### v6.20.0.3
 - **http4k-ai-mcp-***: [Fix] Fix up missing extension (accidentally removed).
 

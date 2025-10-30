@@ -9,7 +9,9 @@ import org.http4k.filter.debug
 import org.http4k.lens.value
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Disabled
 
+@Disabled("Github sees these requests a jailbreaking attempts")
 class RealGitHubModelsChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     val apiKey = EnvironmentKey.value(ApiKey).optional("GITHUB_MODELS_TOKEN")

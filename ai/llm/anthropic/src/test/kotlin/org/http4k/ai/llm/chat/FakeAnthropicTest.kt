@@ -12,7 +12,7 @@ import org.http4k.util.PortBasedTest
 class FakeAnthropicTest : ChatContract, PortBasedTest {
 
     private val http =
-        FakeAnthropicAI(completionGenerators = mapOf(AnthropicModels.Claude_Haiku_3_5 to MessageContentGenerator { it ->
+        FakeAnthropicAI(completionGenerators = mapOf(AnthropicModels.Claude_Haiku_4_5 to MessageContentGenerator { it ->
             when {
                 it.last().toString().contains("ToolResult") -> listOf(Content.Text("four"))
                 it.last().toString().contains("use the tool") -> listOf(
@@ -30,5 +30,5 @@ class FakeAnthropicTest : ChatContract, PortBasedTest {
 
     override val chat = Chat.AnthropicAI(ApiKey.of("asd"), http)
 
-    override val model = AnthropicModels.Claude_Haiku_3_5
+    override val model = AnthropicModels.Claude_Haiku_4_5
 }
