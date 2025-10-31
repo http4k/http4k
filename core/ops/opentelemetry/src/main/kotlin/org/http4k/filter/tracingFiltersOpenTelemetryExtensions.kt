@@ -96,6 +96,9 @@ fun ServerFilters.OpenTelemetryTracing(
 
                         setAttribute("http.method", req.method.name)
                         setAttribute("http.url", req.uri.toString())
+
+                        req.header("User-Agent")?.also { setAttribute("http.user_agent", it) }
+                        req.remoteAddress()?.also { setAttribute("http.client_ip", it) }
                 }
                 .let { spanCreationMutator(it, req) }
                 .startSpan()) {
@@ -149,4 +152,7 @@ private fun Span.addStandardDataFrom(resp: Response, req: Request) {
     req.body.length?.also { setAttribute(HTTP_REQUEST_BODY_SIZE, it) }
     setAttribute("http.status_code", resp.status.code.toLong())
 }
+
+private fun Request.remoteAddress(): String? =
+    header("X-Forwarded-For")?.split(",")?.firstOrNull() ?: source?.address
 
