@@ -4,10 +4,12 @@
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
+    workflowdispatch(["👤 workflow_dispatch<br/>inputs: version"])
     subgraph releaseapiyml["Release API"]
         releaseapiyml_releaseapi["release-api<br/>🐧 ubuntu-latest"]
     end
     repositorydispatch --> releaseapiyml_releaseapi
+    workflowdispatch --> releaseapiyml_releaseapi
 ```
 
 ## Job: release-api

@@ -1,5 +1,6 @@
 package workflows
 
+import io.typeflows.github.workflow.Input
 import io.typeflows.github.workflow.Job
 import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
@@ -9,6 +10,7 @@ import io.typeflows.github.workflow.step.UseAction
 import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
+import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.Java
 import workflows.Standards.RELEASE_EVENT
@@ -18,6 +20,9 @@ class ReleaseApi : Builder<Workflow> {
         displayName = "Release API docs to api repo"
         displayName = "Release API"
         on += RepositoryDispatch(RELEASE_EVENT)
+        on += WorkflowDispatch {
+            inputs += Input.string("version", "The version of the API to tag in the docs")
+        }
 
         jobs += Job("release-api", UBUNTU_LATEST) {
             steps += Checkout()
@@ -27,7 +32,7 @@ class ReleaseApi : Builder<Workflow> {
             steps += SetupGradle()
 
             steps += RunCommand(
-                $$"./gradlew -i dokkaGenerateHtml -PreleaseVersion=\"${{ github.event.client_payload.version }}\" -Porg.gradle.parallel=false",
+                $$"./gradlew -i dokkaGenerateHtml -PreleaseVersion=\"${{ github.event.client_payload.version || inputs.version }}\" -Porg.gradle.parallel=true",
             ) {
                 name = "Generate API docs"
             }

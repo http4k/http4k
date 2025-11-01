@@ -23,8 +23,8 @@ import workflows.UploadRelease
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
     override fun build() = TypeflowsGitHubRepo {
         dotGithub = DotGitHub {
-            workflows += BroadcastRelease()
             workflows += Build()
+            workflows += BroadcastRelease()
             workflows += CreateGithubRelease()
             workflows += CreateUpgradeBranches()
             workflows += UpdateGradleProjectDependencies(

@@ -18,7 +18,7 @@ import io.typeflows.util.Builder
 import workflows.Standards.Java
 
 class Build : Builder<Workflow> {
-    override fun build() = Workflow("build") {
+    override fun build() = Workflow("build-http4k") {
         displayName = "Build"
         on += Push {
             branches = Branches.Only("master")

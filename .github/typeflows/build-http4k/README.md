@@ -1,15 +1,15 @@
-# Build (build.yml)
+# Build (build-http4k.yml)
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
     pullrequest(["🔀 pull_request<br/>(*), branches(ignore: 1), paths(ignore: 1)"])
-    subgraph buildyml["Build"]
-        buildyml_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
+    subgraph buildhttp4kyml["Build"]
+        buildhttp4kyml_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
-    push --> buildyml_build
-    pullrequest --> buildyml_build
+    push --> buildhttp4kyml_build
+    pullrequest --> buildhttp4kyml_build
 ```
 
 ## Job: build
