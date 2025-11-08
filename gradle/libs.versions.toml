@@ -28,7 +28,8 @@ com-vanniktech-gradle-maven-publish-plugin = "0.34.0"
 commons-codec = "1.20.0"
 docker-java-core = "3.6.0"
 docker-java-transport-httpclient5 = "3.6.0"
-dokka = "2.1.0"
+# Blocked on 2.1.0-Beta
+dokka = "2.1.0-Beta"
 failsafe = "3.3.2"
 # Blocked on 2.22.5.0 until Jackson 3 upgrade
 forkhandles-bom = "2.22.5.0"
