@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v6.20.2.0
 - **http4k-***: Upgrade versions
+- **http4k-realtime-core**: SSE client now supports more line ending types (previously only /n/n)
+- **http4k-ai-mcp-client**: MCP client now supports more line ending types (previously only /n/n)
 
 ### v6.20.1.0
 - **http4k-***: Upgrade versions
