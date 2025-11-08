@@ -299,7 +299,6 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
                     equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
                 )
 
-                println(response)
                 assertThat(output(received.valueOrNull()!!), equalTo(response))
 
                 Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
