@@ -11,9 +11,9 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 @ConsistentCopyVisibility
 data class ServerCapabilities internal constructor(
-    val tools: ToolCapabilities,
-    val prompts: PromptCapabilities,
-    val resources: ResourceCapabilities,
+    val tools: ToolCapabilities?,
+    val prompts: PromptCapabilities?,
+    val resources: ResourceCapabilities?,
     val completions: Unit?,
     val logging: Unit?,
     val experimental: Unit?

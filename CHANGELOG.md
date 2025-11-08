@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.20.1.1 (uncut)
+### v6.20.2.0 (uncut)
 - **http4k-***: Upgrade versions
 
 ### v6.20.1.0
