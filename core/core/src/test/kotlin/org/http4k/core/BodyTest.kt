@@ -2,6 +2,7 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.sameInstance
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
@@ -107,6 +108,45 @@ class BodyTest {
         val body = Body(ByteBuffer.wrap(bytes, 2, 4))
 
         assertThat("body to string", body.toString(), equalTo("cdef"))
+    }
+
+    @Test
+    fun `text converts body to string`() {
+        val bytes = "abc".toByteArray(Charsets.UTF_8)
+        val body = Body(ByteBuffer.wrap(bytes))
+        assertThat("body text", body.text, equalTo("abc"))
+    }
+
+    @Test
+    fun `body text is memoized after first call`() {
+        val bytes = "abc".toByteArray(Charsets.UTF_8)
+
+        // Both MemoryBody and StreamBody implement text memoization, so we test both here
+        val memoryBody = MemoryBody(bytes)
+        val text1 = memoryBody.text
+        val text2 = memoryBody.text
+        assertThat("memory body text", text2, sameInstance(text1))
+
+        val streamBody = StreamBody(ByteArrayInputStream(bytes))
+        val text3 = streamBody.text
+        val text4 = streamBody.text
+        assertThat("stream body text", text4, sameInstance(text3))
+    }
+
+    @Test
+    fun `body initialized with string returns same instance as text`() {
+        val bodyString = "abc"
+        val body = Body(bodyString)
+        assertThat("body text", body.text, sameInstance(bodyString))
+    }
+
+    @Test
+    fun `bodyString on HttpMessage uses same memoization as body text`() {
+        val bytes = "abc".toByteArray()
+        val response = Response(OK).body(Body(ByteBuffer.wrap(bytes)))
+        val bodyString1 = response.bodyString()
+        val bodyString2 = response.bodyString()
+        assertThat("body string", bodyString2, sameInstance(bodyString1))
     }
 
     @Test
