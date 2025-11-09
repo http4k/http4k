@@ -23,12 +23,16 @@ import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.SetHostFrom
+import org.http4k.filter.debug
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.sse.SseMessage.Event
