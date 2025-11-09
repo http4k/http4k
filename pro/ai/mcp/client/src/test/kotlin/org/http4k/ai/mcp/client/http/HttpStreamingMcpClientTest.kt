@@ -55,7 +55,7 @@ import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode.Disconnect
-import org.http4k.client.chunkedSseSequence
+import org.http4k.sse.chunkedSseSequence
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET

@@ -11,7 +11,7 @@ import org.http4k.lens.accept
 import org.http4k.sse.SseClient
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
-import java.io.InputStream
+import org.http4k.sse.chunkedSseSequence
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -70,68 +70,4 @@ class Http4kSseClient(
         running.set(false)
         reconnectionMode = Disconnect
     }
-}
-
-fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
-    use {
-        val buffer = StringBuilder()
-        var consecutiveLineBreaks = 0
-        var lastWasCR = false
-
-        while (true) {
-            val current = it.read()
-            if (current == -1) {
-                if (buffer.isNotEmpty()) {
-                    try {
-                        yield(SseMessage.parse(buffer.toString().trim()))
-                    } catch (e: Exception) {
-                        // Invalid message, skip
-                    }
-                }
-                break
-            }
-
-            when (val char = current.toChar()) {
-                '\r' -> {
-                    buffer.append(char)
-                    consecutiveLineBreaks++
-                    lastWasCR = true
-
-                    if (consecutiveLineBreaks == 2) {
-                        emitMessage(buffer)
-                    }
-                }
-                '\n' -> {
-                    if (lastWasCR) {
-                        buffer.append(char)
-                        lastWasCR = false
-                    } else {
-                        buffer.append(char)
-                        consecutiveLineBreaks++
-
-                        if (consecutiveLineBreaks == 2) {
-                            emitMessage(buffer)
-                        }
-                    }
-                }
-                else -> {
-                    buffer.append(char)
-                    consecutiveLineBreaks = 0
-                    lastWasCR = false
-                }
-            }
-        }
-    }
-}
-
-private suspend fun SequenceScope<SseMessage>.emitMessage(buffer: StringBuilder) {
-    val content = buffer.toString().trimEnd('\r', '\n')
-    if (content.isNotEmpty()) {
-        try {
-            yield(SseMessage.parse(content))
-        } catch (e: Exception) {
-            // Invalid message, skip
-        }
-    }
-    buffer.clear()
 }

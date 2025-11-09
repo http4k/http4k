@@ -59,7 +59,7 @@ import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode
 import org.http4k.client.ReconnectionMode.Immediate
-import org.http4k.client.chunkedSseSequence
+import org.http4k.sse.chunkedSseSequence
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
