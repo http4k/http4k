@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.20.3.0 (uncut)
+- **http4k-***: Upgrade versions
+
 ### v6.20.2.1
 - **http4k-realtime-core**: [Fix] Better support for all SSE delimiters.
 - **http4k-ai-mcp-client**: [Fix] Better support for all SSE delimiters.
