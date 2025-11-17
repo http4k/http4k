@@ -8,10 +8,12 @@ class MimeType private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<MimeType>(::MimeType) {
         fun of(value: ContentType) = MimeType(value.withNoDirectives().value)
 
-        val IMAGE_JPG = MimeType.of("image/jpeg")
-        val IMAGE_PNG = MimeType.of("image/png")
-        val IMAGE_GIF = MimeType.of("image/gif")
-        val IMAGE_WEBP = MimeType.of("image/webp")
-        val APPLICATION_PDF = MimeType.of("application/pdf")
+        val TEXT_PLAIN = of("text/plain")
+        val IMAGE_JPG = of("image/jpeg")
+        val IMAGE_PNG = of("image/png")
+        val IMAGE_GIF = of("image/gif")
+        val IMAGE_WEBP = of("image/webp")
+        val APPLICATION_PDF = of("application/pdf")
+        val APPLICATION_JSON = of("application/json")
     }
 }

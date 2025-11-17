@@ -247,7 +247,7 @@ class TestMcpClientTest {
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val serverTools = ServerTools(listOf(tool bind {
-            it.meta.progress?.let { p ->
+            it.meta.progressToken?.let { p ->
                 it.client.progress(1, 5.0)
                 it.client.progress(2, 5.0)
             }

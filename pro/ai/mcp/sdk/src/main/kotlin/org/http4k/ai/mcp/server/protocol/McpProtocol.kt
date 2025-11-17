@@ -5,7 +5,6 @@ import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
 import org.http4k.ai.mcp.Client
-import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.McpException
@@ -45,6 +44,7 @@ import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
+import org.http4k.format.MoshiLong
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
@@ -162,37 +162,37 @@ class McpProtocol<Transport>(
                     }
 
                     McpResource.Subscribe.Method -> {
-                        when (resources) {
-                            is ObservableResources -> {
-                                val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
-                                resources.subscribe(session, subscribeRequest) {
-                                    sessions.respond(
-                                        transport,
-                                        session,
-                                        McpResource.Updated.Notification(subscribeRequest.uri)
-                                            .toJsonRpc(McpResource.Updated)
-                                    )
+                        transport.respondTo<McpResource.Subscribe.Request>(session, jsonReq, httpReq) { _, _ ->
+                            when (resources) {
+                                is ObservableResources -> {
+                                    val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
+                                    resources.subscribe(session, subscribeRequest) {
+                                        sessions.respond(
+                                            transport,
+                                            session,
+                                            McpResource.Updated.Notification(subscribeRequest.uri)
+                                                .toJsonRpc(McpResource.Updated)
+                                        )
+                                    }
                                 }
-                                ok()
                             }
-
-                            else -> ok()
+                            ServerMessage.Response.Empty
                         }
                     }
 
-                    McpLogging.SetLevel.Method -> {
-                        logger.setLevel(session, jsonReq.fromJsonRpc<McpLogging.SetLevel.Request>().level)
-                        ok()
-                    }
-
-                    McpResource.Unsubscribe.Method -> when (resources) {
-                        is ObservableResources -> {
-                            resources.unsubscribe(session, jsonReq.fromJsonRpc())
-                            ok()
+                    McpLogging.SetLevel.Method ->
+                        transport.respondTo<McpLogging.SetLevel.Request>(session, jsonReq, httpReq) { _, _ ->
+                            logger.setLevel(session, jsonReq.fromJsonRpc<McpLogging.SetLevel.Request>().level)
+                            ServerMessage.Response.Empty
                         }
 
-                        else -> ok()
-                    }
+                    McpResource.Unsubscribe.Method ->
+                        transport.respondTo<McpResource.Unsubscribe.Request>(session, jsonReq, httpReq) { _, _ ->
+                            when (resources) {
+                                is ObservableResources -> resources.unsubscribe(session, jsonReq.fromJsonRpc())
+                            }
+                            ServerMessage.Response.Empty
+                        }
 
                     McpInitialize.Initialized.Method -> ok()
 
@@ -257,24 +257,21 @@ class McpProtocol<Transport>(
         fn: (IN, Client) -> ServerMessage.Response
     ) = sessions.respond(this, session, jsonReq.runCatching { jsonReq.fromJsonRpc<IN>() }
         .mapCatching {
-            when (val progress = it._meta.progress) {
-                null -> fn(it, NoOp)
-                else -> {
-                    val context = ClientCall(progress, session)
-                    sessions.assign(context, this, httpReq)
-                    try {
-                        fn(
-                            it,
-                            SessionBasedClient(
-                                progress,
-                                context,
-                                sessions,
-                                random
-                            ) { clientTracking[session] })
-                    } finally {
-                        sessions.end(context)
-                    }
-                }
+            val progressToken = it._meta.progressToken ?: 0
+            val context = ClientCall(progressToken, session, jsonReq.id ?: MoshiLong(random.nextLong()))
+            try {
+                sessions.assign(context, this, httpReq)
+                fn(
+                    it,
+                    SessionBasedClient(
+                        progressToken,
+                        context,
+                        sessions,
+                        logger,
+                        random
+                    ) { clientTracking[session] })
+            } finally {
+                sessions.end(context)
             }
         }
         .map { it.toJsonRpc(jsonReq.id) }
@@ -294,10 +291,10 @@ class McpProtocol<Transport>(
 
         val context = Subscription(session)
 
-        logger.subscribe(session, error) { level, logger, data ->
+        logger.subscribe(session, error) { data, level, logger ->
             sessions.request(
                 context,
-                McpLogging.LoggingMessage.Notification(level, logger, data).toJsonRpc(McpLogging.LoggingMessage)
+                McpLogging.LoggingMessage.Notification(data, level, logger).toJsonRpc(McpLogging.LoggingMessage)
             )
         }
 

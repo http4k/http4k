@@ -12,15 +12,19 @@ import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.model.CompletionStatus.Finished
 import org.http4k.ai.mcp.model.CompletionStatus.InProgress
+import org.http4k.ai.mcp.model.LogLevel
+import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ProgressToken
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
+import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import java.time.Duration
 import java.util.concurrent.LinkedBlockingQueue
@@ -32,6 +36,7 @@ class SessionBasedClient<Transport>(
     private val progressToken: ProgressToken,
     private val context: ClientRequestContext,
     private val sessions: Sessions<Transport>,
+    private val logger: Logger,
     private val random: Random,
     private val clientTracking: () -> ClientTracking?
 ) : Client {
@@ -131,5 +136,14 @@ class SessionBasedClient<Transport>(
             context, McpProgress.Notification(progressToken, progress, total, description)
                 .toJsonRpc(McpProgress)
         )
+    }
+
+    override fun log(data: McpNodeType, level: LogLevel, logger: String?) {
+        if (level >= this.logger.levelFor(context.session)) {
+            sessions.request(
+                context,
+                McpLogging.LoggingMessage.Notification(data, level, logger).toJsonRpc(McpLogging.LoggingMessage)
+            )
+        }
     }
 }

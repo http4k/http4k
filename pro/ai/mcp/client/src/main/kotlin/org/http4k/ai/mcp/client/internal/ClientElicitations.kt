@@ -20,7 +20,7 @@ internal class ClientElicitations(
             McpCallback(McpElicitations.Request::class) { request, requestId ->
                 if (requestId == null) return@McpCallback
 
-                val response = fn(ElicitationRequest(request.message, request.requestedSchema, request._meta.progress))
+                val response = fn(ElicitationRequest(request.message, request.requestedSchema, request._meta.progressToken))
 
                 val timeout = overrideDefaultTimeout ?: defaultTimeout
 

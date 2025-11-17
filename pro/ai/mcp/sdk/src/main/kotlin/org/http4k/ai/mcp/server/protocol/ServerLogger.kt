@@ -1,30 +1,32 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.model.LogLevel
+import org.http4k.ai.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 
 class ServerLogger : Logger {
 
-    private val subscriptions = ConcurrentHashMap<Session, Pair<LogLevel, LogFunction>>()
+    private val logLevels = ConcurrentHashMap<Session, LogLevel>()
+    private val subscriptions = ConcurrentHashMap<Session, LogFunction>()
 
     override fun subscribe(session: Session, level: LogLevel, onLog: LogFunction) {
-        subscriptions[session] = level to onLog
+        logLevels[session] = level
+        subscriptions[session] = onLog
     }
 
     override fun unsubscribe(session: Session) {
+        logLevels.remove(session)
         subscriptions.remove(session)
     }
 
     override fun setLevel(session: Session, newLevel: LogLevel) {
-        subscriptions[session]?.also { (_, logFunction) ->
-            subscriptions[session] = newLevel to logFunction
-        }
-
+        logLevels[session] = newLevel
     }
 
-    override fun log(session: Session, level: LogLevel, logger: String, data: Map<String, Any>) {
-        subscriptions[session]?.also { (actualLevel, logFunction) ->
-            if (level >= actualLevel) logFunction(level, logger, data)
-        }
+    override fun levelFor(session: Session) = logLevels[session] ?: LogLevel.info
+
+    override fun log(session: Session, data: McpNodeType, level: LogLevel, logger: String?) {
+        val minimum = logLevels[session] ?: LogLevel.error
+        subscriptions[session]?.also { if (level >= minimum) it(data, level, logger) }
     }
 }

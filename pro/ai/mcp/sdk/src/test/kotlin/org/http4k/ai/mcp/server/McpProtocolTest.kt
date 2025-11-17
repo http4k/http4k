@@ -81,7 +81,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.MoshiInteger
@@ -89,7 +88,6 @@ import org.http4k.format.MoshiString
 import org.http4k.format.renderError
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
-import org.http4k.hamkrest.hasStatus
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
@@ -113,8 +111,10 @@ class McpProtocolTest {
     private val serverName = McpEntity.of("server")
     private val clientName = McpEntity.of("server")
 
-    private val metadata = ServerMetaData(serverName, Version.of("1"),
-        title = "title", instructions = "instructions")
+    private val metadata = ServerMetaData(
+        serverName, Version.of("1"),
+        title = "title", instructions = "instructions"
+    )
 
     private val random = Random(0)
 
@@ -296,11 +296,15 @@ class McpProtocolTest {
 
             mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
 
+            assertNextMessage(ServerMessage.Response.Empty)
+
             resources.triggerUpdated(resource.uri)
 
             assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
 
             mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
+
+            assertNextMessage(ServerMessage.Response.Empty)
 
             resources.triggerUpdated(resource.uri)
 
@@ -402,7 +406,7 @@ class McpProtocolTest {
                     val stringArg1 = stringArg(it)
                     val intArg1 = intArg(it)
 
-                    it.meta.progress?.let { _ ->
+                    it.meta.progressToken?.let { _ ->
                         it.client.progress(1, 5.0, "d1")
                         it.client.progress(2, 5.0, "d2")
                     }
@@ -517,17 +521,19 @@ class McpProtocolTest {
 
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
-            logger.log(Session(firstDeterministicSessionId), LogLevel.info, "message", emptyMap())
+            logger.log(Session(firstDeterministicSessionId), McpJson.string("hello"), LogLevel.info, "message")
 
             assertNoResponse()
 
             mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
 
-            logger.log(Session(firstDeterministicSessionId), LogLevel.info, "message", emptyMap())
+            assertNextMessage(ServerMessage.Response.Empty)
+
+            logger.log(Session(firstDeterministicSessionId), McpJson.string("hello"), LogLevel.info)
 
             assertNextMessage(
                 McpLogging.LoggingMessage,
-                McpLogging.LoggingMessage.Notification(LogLevel.info, "message", emptyMap())
+                McpLogging.LoggingMessage.Notification(McpJson.string("hello"), LogLevel.info)
             )
         }
     }
@@ -537,7 +543,7 @@ class McpProtocolTest {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind {
-                it.meta.progress?.let { _ ->
+                it.meta.progressToken?.let { _ ->
                     it.client.progress(1, 5.0, "d1")
                     it.client.progress(2, 5.0, "d2")
                 }

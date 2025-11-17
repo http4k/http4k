@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.20.3.0 (uncut)
+### v6.21.0.0
 - **http4k-***: Upgrade versions
+- **http4k-ai-mcp-sdk**: [Breaking] Various tweaks to align with MCP conformance tests. Some trivial breaks, which should make servers better aligned with the spec.
 
 ### v6.20.2.1
 - **http4k-realtime-core**: [Fix] Better support for all SSE delimiters.

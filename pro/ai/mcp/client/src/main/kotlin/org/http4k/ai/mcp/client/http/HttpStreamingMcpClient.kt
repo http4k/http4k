@@ -234,7 +234,7 @@ class HttpStreamingMcpClient(
                 McpCallback(McpElicitations.Request::class) { request, requestId ->
                     if (requestId == null) return@McpCallback
 
-                    with(with(request) { fn(ElicitationRequest(message, requestedSchema, _meta.progress)) }) {
+                    with(with(request) { fn(ElicitationRequest(message, requestedSchema, _meta.progressToken)) }) {
                         http.send(
                             McpElicitations,
                             McpElicitations.Response(action, content, _meta),
@@ -264,7 +264,7 @@ class HttpStreamingMcpClient(
                                     stopSequences,
                                     modelPreferences,
                                     metadata,
-                                    _meta.progress
+                                    _meta.progressToken
                                 )
                             )
                         }

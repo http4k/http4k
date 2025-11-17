@@ -21,7 +21,7 @@ class TestingElicitations(sender: TestMcpSender) : McpClient.Elicitations {
         sender.on(McpElicitations) { event ->
             val (id, req) =
                 event.nextEvent<ElicitationRequest, McpElicitations.Request> {
-                    ElicitationRequest(message, requestedSchema, _meta.progress)
+                    ElicitationRequest(message, requestedSchema, _meta.progressToken)
                 }.valueOrNull()!!
             onElicitation.forEach { handler ->
                 sender(with(handler(req)) { McpElicitations.Response(action, content, _meta) }, id!!)

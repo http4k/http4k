@@ -291,12 +291,12 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
-                val request = ElicitationRequest("foobar", output, progressToken = it.meta.progress)
+                val request = ElicitationRequest("foobar", output, progressToken = it.meta.progressToken)
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
 
                 assertThat(
                     received,
-                    equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progress!!)).with(output of response)))
+                    equalTo(Success(ElicitationResponse(ElicitationAction.valueOf(it.meta.progressToken!!.toString())).with(output of response)))
                 )
 
                 assertThat(output(received.valueOrNull()!!), equalTo(response))
@@ -320,7 +320,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
         mcpClient.start(Duration.ofSeconds(1))
 
         mcpClient.elicitations().onElicitation {
-            ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!)).with(output of response)
+            ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!.toString())).with(output of response)
         }
 
         assertThat(
