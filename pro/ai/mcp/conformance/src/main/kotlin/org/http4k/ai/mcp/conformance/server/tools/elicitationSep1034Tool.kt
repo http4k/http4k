@@ -24,7 +24,7 @@ class DefaultsForm : ElicitationModel() {
 
 val defaultForm = Elicitation.auto(DefaultsForm()).toLens("form", "it's a form")
 
-fun elicitationToolSep1034() = Tool("test_elicitation_sep1034_defaults", "test_elicitation_sep1034_defaults") bind {
+fun elicitationSep1034Tool() = Tool("test_elicitation_sep1034_defaults", "test_elicitation_sep1034_defaults") bind {
     it.client.elicit(
         ElicitationRequest(
             "Please review and update the form fields with defaults",
