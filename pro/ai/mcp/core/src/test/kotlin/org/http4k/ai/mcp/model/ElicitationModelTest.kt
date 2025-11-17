@@ -25,12 +25,13 @@ class ElicitationModelTest {
             d = 1.23
             b = true
             e = FooEnum.A
-        }.toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
+        }
+            .toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
     }
 }
 
 class Foo : ElicitationModel() {
-    var s by string("s", "the s", MaxLength(10))
+    var s by string("s", "the s", null, MaxLength(10))
     var os by optionalString("os", "the os")
     var e by enum("e", "the e", EnumNames(FooEnum.entries.associateWith { it.name.lowercase() }))
     var oe by optionalEnum<FooEnum>("oe", "the oe")

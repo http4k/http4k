@@ -62,7 +62,7 @@ open class ElicitationLensSpec<OUT : Any?>(
         val setLens = set(name)
         return McpCapabilityLens(
             meta, { getLens(it).firstOrNull() },
-            { out: OUT?, target -> setLens(out?.let { listOf(it) } ?: emptyList(), target) },
+            { out, target -> setLens(out?.let { listOf(it) } ?: emptyList(), target) },
             meta.toJsonSchema()
         )
     }
@@ -73,11 +73,7 @@ open class ElicitationLensSpec<OUT : Any?>(
         title: String,
         description: String,
         vararg metadata: Elicitation.Metadata<OUT, *>
-    ): McpCapabilityLens<ElicitationResponse, OUT> = defaulted(
-        name,
-        { default },
-        title, description, *metadata
-    )
+    ) = defaulted(name, { default }, title, description, *metadata)
 
     fun defaulted(
         name: String,
@@ -91,8 +87,8 @@ open class ElicitationLensSpec<OUT : Any?>(
         val setLens = set(name)
         return McpCapabilityLens(
             meta,
-            { it: ElicitationResponse -> getLens(it).run { if (isEmpty()) default(it) else first() } },
-            { out: OUT, target: ElicitationResponse -> setLens(out?.let { listOf(it) } ?: emptyList(), target) },
+            { getLens(it).run { if (isEmpty()) default(it) else first() } },
+            { out, target -> setLens(out?.let { listOf(it) } ?: emptyList(), target) },
             meta.toJsonSchema()
         )
     }
@@ -120,10 +116,8 @@ open class ElicitationLensSpec<OUT : Any?>(
     companion object : ElicitationLensSpec<MoshiNode>(
         ObjectParam,
         emptyMap(),
-        LensGet { name, target ->
-            listOfNotNull((target.content as MoshiObject)[name])
-        },
-        LensSet { name: String, values, target ->
+        LensGet { name, target -> listOfNotNull((target.content as MoshiObject)[name]) },
+        LensSet { _, values, target ->
             values.fold(target) { m, v -> m.copy(content = asJsonObject(v)) }
         }, { obj(it.toList()) })
 }

@@ -15,7 +15,7 @@ class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
             JsonType.Object -> json.fields(node)
                 .fold(node) { acc, (fieldName, field) ->
                     when {
-                        fieldName != "\$ref" -> json.obj(json.fields(acc) + (fieldName to processChild(field)))
+                        fieldName != $$"$ref" -> json.obj(json.fields(acc) + (fieldName to processChild(field)))
                         else -> acc
                     }
                 }

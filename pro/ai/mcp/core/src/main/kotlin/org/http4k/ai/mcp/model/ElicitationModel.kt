@@ -24,65 +24,124 @@ abstract class ElicitationModel {
 
     private val data = mutableMapOf<String, Any?>()
 
-    fun string(title: String, description: String, vararg metadata: Elicitation.Metadata<String, *>) =
-        required(title, description, StringParam, metadata) { it }
-
-    fun optionalString(title: String, description: String, vararg metadata: Elicitation.Metadata<String, *>) =
-        optional(title, description, StringParam, metadata) { it }
-
-    fun int(title: String, description: String, vararg metadata: Elicitation.Metadata<Int, *>) =
-        required(title, description, IntegerParam, metadata) { it }
-
-    fun optionalInt(title: String, description: String, vararg metadata: Elicitation.Metadata<Int, *>) =
-        optional(title, description, IntegerParam, metadata) { it }
-
-    fun long(title: String, description: String, vararg metadata: Elicitation.Metadata<Long, *>) =
-        required(title, description, IntegerParam, metadata) { it }
-
-    fun optionalLong(title: String, description: String, vararg metadata: Elicitation.Metadata<Long, *>) =
-        optional(title, description, IntegerParam, metadata) { it }
-
-    fun double(title: String, description: String, vararg metadata: Elicitation.Metadata<Double, *>) =
-        required(title, description, NumberParam, metadata) { it }
-
-    fun optionalDouble(title: String, description: String, vararg metadata: Elicitation.Metadata<Double, *>) =
-        optional(title, description, NumberParam, metadata) { it }
-
-    fun <T : Enum<T>> enum(
+    fun string(
         title: String,
         description: String,
+        default: String? = null,
+        vararg metadata: Elicitation.Metadata<String, *>
+    ) =
+        required(title, description, StringParam, default, metadata) { it }
+
+    fun optionalString(
+        title: String,
+        description: String,
+        default: String? = null,
+        vararg metadata: Elicitation.Metadata<String, *>
+    ) =
+        optional(title, description, StringParam, default, metadata) { it }
+
+    fun int(
+        title: String,
+        description: String,
+        default: Int? = null,
+        vararg metadata: Elicitation.Metadata<Int, *>
+    ) =
+        required(title, description, IntegerParam, default, metadata) { it }
+
+    fun optionalInt(
+        title: String,
+        description: String,
+        default: Int? = null,
+        vararg metadata: Elicitation.Metadata<Int, *>
+    ) =
+        optional(title, description, IntegerParam, default, metadata) { it }
+
+    fun long(
+        title: String,
+        description: String,
+        default: Long? = null,
+        vararg metadata: Elicitation.Metadata<Long, *>
+    ) =
+        required(title, description, IntegerParam, default, metadata) { it }
+
+    fun optionalLong(
+        title: String,
+        description: String,
+        default: Long? = null,
+        vararg metadata: Elicitation.Metadata<Long, *>
+    ) =
+        optional(title, description, IntegerParam, default, metadata) { it }
+
+    fun double(
+        title: String,
+        description: String,
+        default: Double? = null,
+        vararg metadata: Elicitation.Metadata<Double, *>
+    ) =
+        required(title, description, NumberParam, default, metadata) { it }
+
+    fun optionalDouble(
+        title: String,
+        description: String,
+        default: Double? = null,
+        vararg metadata: Elicitation.Metadata<Double, *>
+    ) = optional(title, description, NumberParam, default, metadata) { it }
+
+    inline fun <reified T : Enum<T>> enum(
+        title: String,
+        description: String,
+        nameOverrides: Elicitation.Metadata.EnumNames<T>,
+        default: T? = null,
+    ): ElicitationModelStringReadWriteProperty<T> = enumWithValues(title, description, default, nameOverrides)
+
+    fun <T : Enum<T>> enumWithValues(
+        title: String,
+        description: String,
+        default: T? = null,
         nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
-    ) = required(
-        title,
-        description,
-        StringParam,
-        nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
+    ): ElicitationModelStringReadWriteProperty<T> {
+        return required(
+            title,
+            description,
+            StringParam,
+            default,
+            nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
+    }
 
     fun <T : Enum<T>> optionalEnum(
         title: String,
         description: String,
+        default: T? = null,
         nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
-    ) = optional(title, description, StringParam, nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
+    ) = optional(title, description, StringParam, default, nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
 
-    fun boolean(title: String, description: String, vararg metadata: Elicitation.Metadata<Boolean, *>) =
-        required(title, description, BooleanParam, metadata) { it }
+    fun boolean(
+        title: String, description: String,
+        default: Boolean? = null,
+        vararg metadata: Elicitation.Metadata<Boolean, *>
+    ) = required(title, description, BooleanParam, default, metadata) { it }
 
-    fun optionalBoolean(title: String, description: String, vararg metadata: Elicitation.Metadata<Boolean, *>) =
-        optional(title, description, BooleanParam, metadata) { it }
+    fun optionalBoolean(
+        title: String, description: String,
+        default: Boolean? = null,
+        vararg metadata: Elicitation.Metadata<Boolean, *>
+    ) = optional(title, description, BooleanParam, default, metadata) { it }
 
     private fun <OUT, IN> required(
         title: String,
         description: String,
         meta: ParamMeta,
+        default: Any?,
         metadata: Array<out Elicitation.Metadata<OUT, *>>,
         map: (OUT) -> IN
-    ): ElicitationModelStringReadWriteProperty<IN, OUT> = ElicitationModelStringReadWriteProperty(
+    ): ElicitationModelStringReadWriteProperty<OUT> = ElicitationModelStringReadWriteProperty(
         data::get,
         { key, value -> data[key] = value?.let { map(it) } },
         title,
         description,
         meta,
         true,
+        default,
         metadata.toList()
     )
 
@@ -90,15 +149,17 @@ abstract class ElicitationModel {
         title: String,
         description: String,
         meta: ParamMeta,
+        default: Any?,
         metadata: Array<out Elicitation.Metadata<OUT, *>>,
         map: (OUT) -> IN
-    ): ElicitationModelStringReadWriteProperty<IN, OUT> = ElicitationModelStringReadWriteProperty(
+    ): ElicitationModelStringReadWriteProperty<OUT> = ElicitationModelStringReadWriteProperty(
         data::get,
         { key, value -> data[key] = value?.let { map(it) } },
         title,
         description,
         meta,
         false,
+        default,
         metadata.toList()
     )
 
@@ -107,12 +168,12 @@ abstract class ElicitationModel {
         (this::class as KClass<ElicitationModel>).memberProperties
             .mapNotNull { p ->
                 p.isAccessible = true
-                (p.getDelegate(this) as? ElicitationModelStringReadWriteProperty<*, *>)
+                (p.getDelegate(this) as? ElicitationModelStringReadWriteProperty<*>)
                     ?.let { p.name to it }
             }.toMap()
 
     override fun toString() = (this::class.simpleName + "(" +
-            properties().map { (k, _) -> "$k=${data[k]}" }.joinToString(", ") + ")")
+        properties().map { (k, _) -> "$k=${data[k]}" }.joinToString(", ") + ")")
 
     internal fun toSchema() =
         McpJson {
@@ -127,6 +188,8 @@ abstract class ElicitationModel {
                                     "type" to string(it.value.type.description),
                                     "description" to string(it.value.description),
                                     "title" to string(it.value.title),
+                                    "default" to (it.value.default?.let { McpJson.asJsonObject(it) }
+                                        ?: McpJson.nullNode()),
                                 ) + it.value.metadata.flatMap {
                                     it.data().map { it.first to McpJson.asJsonObject(it.second) }
                                 },
@@ -147,17 +210,18 @@ abstract class ElicitationModel {
 
 }
 
-class ElicitationModelStringReadWriteProperty<IN, T>(
+class ElicitationModelStringReadWriteProperty<T>(
     private val get: (String) -> Any?,
     private val set: (String, T?) -> Unit,
     val title: String,
     val description: String,
     val type: ParamMeta,
     val required: Boolean,
+    val default: Any?,
     val metadata: List<Elicitation.Metadata<in T, *>>
 ) : ReadWriteProperty<ElicitationModel, T> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) = get(property.name) as T
+    override fun getValue(thisRef: ElicitationModel, property: KProperty<*>) = (get(property.name) ?: default) as T
     override fun setValue(thisRef: ElicitationModel, property: KProperty<*>, value: T) = set(property.name, value)
 }

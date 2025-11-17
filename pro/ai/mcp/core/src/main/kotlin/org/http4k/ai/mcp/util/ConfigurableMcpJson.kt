@@ -45,6 +45,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.sse.SseMessage.Event
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
@@ -79,7 +80,7 @@ abstract class ConfigurableMcpJson(
         val jsonSchemaCollapser = JsonSchemaCollapser(this@ConfigurableMcpJson)
 
         return ToolArgLensSpec(
-            ParamMeta.ObjectParam,
+            ObjectParam,
             LensGet { name, target -> listOf(convert<Any, T>(target.args[name]!!)) },
             LensSet { name, values, target ->
                 values.fold(target) { acc, next -> target.copy(args = acc.args + (name to asJsonObject(next))) }

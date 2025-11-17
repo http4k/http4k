@@ -76,6 +76,7 @@ object Elicitation {
 
         class EnumNames<T : Enum<T>>(mappings: Map<T, String>) :
             Metadata<T, List<String>>("enum") {
+
             private val sorted = mappings.toList().sortedBy { it.second }
             override val value = mappings.keys.sortedBy { it.ordinal }.map { it.name }
 
@@ -83,6 +84,14 @@ object Elicitation {
                 name to sorted.map { it.first.name },
                 "enumNames" to sorted.map { it.second }
             )
+
+            companion object {
+                /**
+                 * Create a set of names from an enum class.
+                 */
+                inline operator fun <reified T : Enum<T>> invoke() =
+                    EnumNames(enumValues<T>().associateWith { it.toString() })
+            }
         }
     }
 }

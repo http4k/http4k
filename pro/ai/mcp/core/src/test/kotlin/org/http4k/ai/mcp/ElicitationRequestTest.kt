@@ -69,7 +69,7 @@ class ElicitationRequestTest {
 }
 
 class BarFoo: ElicitationModel() {
-    var foo by string("foo", "the foo", MinLength(1), MaxLength(10))
+    var foo by string("foo", "the foo", null, MinLength(1), MaxLength(10))
 }
 
 enum class Option {
