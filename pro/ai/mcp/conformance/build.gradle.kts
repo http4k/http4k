@@ -1,7 +1,7 @@
-description = "http4k AI MCP Conformance tests"
+description = "http4k AI MCP Conformance suite"
 
 plugins {
-    id("org.http4k.conventions")
+    id("org.http4k.pro")
 }
 
 dependencies {
@@ -10,11 +10,13 @@ dependencies {
     api(project(":http4k-server-jetty"))
 }
 
+val complianceServerMainClass = "org.http4k.ai.mcp.conformance.server.McpConformanceServerKt"
+
 tasks.register<JavaExec>("runMcpConformanceServer") {
     group = "application"
     description = "Run the MCP Conformance Server"
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass.set("McpConformanceServerKt")
+    mainClass.set(complianceServerMainClass)
 }
 
 tasks.register<JavaExec>("startMcpConformanceServer") {
@@ -26,8 +28,7 @@ tasks.register<JavaExec>("startMcpConformanceServer") {
     doFirst {
         val pidFile = file("${project.buildDir}/mcp-server.pid")
         pidFile.parentFile.mkdirs()
-        
-        ProcessBuilder("java", "-cp", classpath.asPath, "McpConformanceServerKt").apply {
+        ProcessBuilder("java", "-cp", classpath.asPath, complianceServerMainClass).apply {
             directory(projectDir)
             val process = start()
             pidFile.writeText(process.pid().toString())

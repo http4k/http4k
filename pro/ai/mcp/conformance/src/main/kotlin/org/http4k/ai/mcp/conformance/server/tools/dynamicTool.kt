@@ -1,7 +1,6 @@
-package tools
+package org.http4k.ai.mcp.conformance.server.tools
 
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.routing.bind
 

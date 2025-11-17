@@ -1,9 +1,8 @@
-package tools
+package org.http4k.ai.mcp.conformance.server.tools
 
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.LogLevel.info
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.routing.bind
 
 fun loggingTool() =

@@ -1,4 +1,4 @@
-package prompts
+package org.http4k.ai.mcp.conformance.server.prompts
 
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.routing.bind

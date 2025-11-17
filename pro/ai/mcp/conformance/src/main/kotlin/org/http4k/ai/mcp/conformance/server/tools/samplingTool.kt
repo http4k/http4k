@@ -1,4 +1,4 @@
-package tools
+package org.http4k.ai.mcp.conformance.server.tools
 
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map

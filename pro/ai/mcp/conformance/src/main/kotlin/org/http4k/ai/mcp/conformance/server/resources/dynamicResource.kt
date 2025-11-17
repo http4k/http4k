@@ -1,4 +1,4 @@
-package resources
+package org.http4k.ai.mcp.conformance.server.resources
 
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName

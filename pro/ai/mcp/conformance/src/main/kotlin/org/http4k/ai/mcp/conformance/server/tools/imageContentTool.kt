@@ -1,10 +1,8 @@
-package tools
+package org.http4k.ai.mcp.conformance.server.tools
 
-import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.*
 import org.http4k.ai.mcp.model.Content.Image
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
 import org.http4k.routing.bind
