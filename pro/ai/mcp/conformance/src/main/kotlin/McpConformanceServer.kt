@@ -2,12 +2,9 @@ import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.capability.ServerCompletions
-import org.http4k.ai.mcp.server.http.HttpStreamingMcp
-import org.http4k.ai.mcp.server.http.HttpStreamingSessions
-import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.filter.debugMcp
+import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import prompts.argumentsPrompt
@@ -36,38 +33,35 @@ import tools.simpleTextTool
 
 
 fun main() {
-    val mcpServer = HttpStreamingMcp(
-        McpProtocol(
-            ServerMetaData(
-                McpEntity.of("http4k MCP conformance"), Version.of("0.1.0"),
-                *ServerProtocolCapability.entries.toTypedArray()
-            ),
-            HttpStreamingSessions().apply { start() },
-            simpleTextTool(),
-            imageContentTool(),
-            audioContentTool(),
-            embeddedResourceTool(),
-            multipleContentTypesTool(),
-            progressTool(),
-            errorHandlingTool(),
-            samplingTool(),
-            elicitationTool(),
-            elicitationToolSep1034(),
-            dynamicTool(),
-            loggingTool(),
-            staticTextResource(),
-            staticBinaryResource(),
-            templateResource(),
-            watchedResource(),
-            dynamicResource(),
-            simplePrompt(),
-            argumentsPrompt(),
-            imagePrompt(),
-            embeddedResourcePrompt(),
-            dynamicPrompt(),
-            emptyCompletion()
+    val mcpServer = mcpHttpStreaming(
+        ServerMetaData(
+            McpEntity.of("http4k MCP conformance"), Version.of("0.1.0"),
+            *ServerProtocolCapability.entries.toTypedArray()
         ),
-        NoMcpSecurity
+        NoMcpSecurity,
+        simpleTextTool(),
+        imageContentTool(),
+        audioContentTool(),
+        embeddedResourceTool(),
+        multipleContentTypesTool(),
+        progressTool(),
+        errorHandlingTool(),
+        samplingTool(),
+        elicitationTool(),
+        elicitationToolSep1034(),
+        dynamicTool(),
+        loggingTool(),
+        staticTextResource(),
+        staticBinaryResource(),
+        templateResource(),
+        watchedResource(),
+        dynamicResource(),
+        simplePrompt(),
+        argumentsPrompt(),
+        imagePrompt(),
+        embeddedResourcePrompt(),
+        dynamicPrompt(),
+        emptyCompletion()
     )
 
     mcpServer.debugMcp().asServer(JettyLoom(4001)).start()

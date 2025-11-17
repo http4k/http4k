@@ -8,9 +8,9 @@ import org.http4k.routing.bind
 
 fun loggingTool() =
     Tool("test_tool_with_logging", "test_tool_with_logging") bind {
-        it.client.log(McpJson.string("Tool execution started"), info)
-        it.client.log(McpJson.string("Tool processing data"), info)
-        it.client.log(McpJson.string("Tool execution completed"), info)
+        it.client.log("Tool execution started", info)
+        it.client.log("Tool processing data", info)
+        it.client.log("Tool execution completed", info)
 
         Ok(textContent)
     }

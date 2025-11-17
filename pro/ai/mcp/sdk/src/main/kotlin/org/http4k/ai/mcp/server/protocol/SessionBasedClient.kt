@@ -138,11 +138,11 @@ class SessionBasedClient<Transport>(
         )
     }
 
-    override fun log(data: McpNodeType, level: LogLevel, logger: String?) {
+    override fun log(data: Any, level: LogLevel, logger: String?) {
         if (level >= this.logger.levelFor(context.session)) {
             sessions.request(
                 context,
-                McpLogging.LoggingMessage.Notification(data, level, logger).toJsonRpc(McpLogging.LoggingMessage)
+                McpLogging.LoggingMessage.Notification(McpJson.asJsonObject(data), level, logger).toJsonRpc(McpLogging.LoggingMessage)
             )
         }
     }
