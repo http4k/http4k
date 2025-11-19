@@ -7,6 +7,7 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
+import org.http4k.ai.mcp.model.TaskMetadata
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.connect.model.MimeType
@@ -51,7 +52,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = Meta.default
+            override val _meta: Meta = Meta.default,
+            override val task: TaskMetadata? = null
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
@@ -67,7 +69,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = Meta.default
+            override val _meta: Meta = Meta.default,
+            override val task: TaskMetadata? = null
         ) : PaginatedRequest, HasMeta
 
         @JsonSerializable
@@ -91,8 +94,9 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = Meta.default
-        ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
+            override val _meta: Meta = Meta.default,
+            override val task: TaskMetadata? = null
+        ) : ClientMessage.Request, PaginatedRequest, HasMeta
 
         @JsonSerializable
         data class Response(
@@ -116,7 +120,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = Meta.default
+            override val _meta: Meta = Meta.default,
+            override val task: TaskMetadata? = null
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -126,7 +131,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = Meta.default
+            override val _meta: Meta = Meta.default,
+            override val task: TaskMetadata? = null
         ) : ClientMessage.Request, HasMeta
     }
 
