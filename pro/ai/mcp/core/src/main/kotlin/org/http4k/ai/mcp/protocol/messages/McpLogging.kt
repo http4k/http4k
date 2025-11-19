@@ -2,8 +2,8 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.TaskMetadata
 import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 
@@ -12,7 +12,11 @@ object McpLogging {
         override val Method = McpRpcMethod.of("logging/setLevel")
 
         @JsonSerializable
-        data class Request(val level: LogLevel, override val _meta: Meta = Meta.default) :
+        data class Request(
+            val level: LogLevel,
+            override val _meta: Meta = Meta.default,
+            override val task: TaskMetadata? = null
+        ) :
             ClientMessage.Request,
             HasMeta
     }
