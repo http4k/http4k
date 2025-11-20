@@ -182,7 +182,7 @@ interface HttpMessage : Closeable {
 }
 
 enum class Method {
-    GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD;
+    GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD, QUERY;
 
     companion object
 }
