@@ -49,7 +49,7 @@ import java.net.http.HttpResponse.BodyHandlers
 
 abstract class ServerContract(
     private val serverConfig: (Int, StopMode) -> ServerConfig, protected val client: HttpHandler,
-    private val requiredMethods: Array<Method> = Method.entries.toTypedArray()
+    private val requiredMethods: Iterable<Method> = Method.entries
 ) : PortBasedTest {
     private lateinit var server: Http4kServer
 

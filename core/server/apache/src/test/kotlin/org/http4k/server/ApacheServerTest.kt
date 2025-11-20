@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Disabled
 class ApacheServerTest : ServerContract(
     ::ApacheServer,
     ClientForServerTesting(),
-    Method.entries.filter { it != Method.PURGE }.toTypedArray()
+    Method.entries.filter { it != Method.PURGE }
 ) {
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
