@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.ai.mcp.model.TaskMetadata
+import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 
@@ -9,6 +9,6 @@ object McpPing : McpRpc {
 
     @JsonSerializable
     data object Request : ClientMessage.Request, ServerMessage.Notification {
-        override val task: TaskMetadata? = null
+        override val task: TaskMeta? = null
     }
 }

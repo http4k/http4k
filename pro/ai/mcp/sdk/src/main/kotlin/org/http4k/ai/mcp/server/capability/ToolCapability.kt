@@ -43,7 +43,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     )
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http) }
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {

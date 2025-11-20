@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
+import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 
@@ -30,10 +31,11 @@ fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
 
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
-    val meta: Meta = default,
+    override val meta: Meta = default,
+    override val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
-) :
+) : CapabilityRequest,
     McpLensTarget,
     Map<String, Any> by args
 

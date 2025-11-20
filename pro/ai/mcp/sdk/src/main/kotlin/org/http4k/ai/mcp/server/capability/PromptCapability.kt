@@ -23,7 +23,7 @@ fun PromptCapability(prompt: Prompt, handler: PromptHandler) = object : PromptCa
     })
 
     override fun get(mcp: McpPrompt.Get.Request, client: Client, http: Request) = try {
-        this(PromptRequest(mcp.arguments, mcp._meta, client, http))
+        handler(PromptRequest(mcp.arguments, mcp._meta, mcp.task, client, http))
             .let { McpPrompt.Get.Response(it.messages, it.description) }
     } catch (e: LensFailure) {
         throw McpException(InvalidParams, e)
