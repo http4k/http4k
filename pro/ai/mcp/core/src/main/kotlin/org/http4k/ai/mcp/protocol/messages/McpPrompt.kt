@@ -3,7 +3,7 @@ package org.http4k.ai.mcp.protocol.messages
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
-import org.http4k.ai.mcp.model.TaskMetadata
+import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
@@ -31,7 +31,7 @@ data class McpPrompt(
             val name: PromptName,
             val arguments: Map<String, String> = emptyMap(),
             override val _meta: Meta = Meta.default,
-            override val task: TaskMetadata? = null
+            override val task: TaskMeta? = null
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
@@ -48,7 +48,7 @@ data class McpPrompt(
         @JsonSerializable
         data class Request(
             override val _meta: Meta = Meta.default,
-            override val task: TaskMetadata? = null
+            override val task: TaskMeta? = null
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
