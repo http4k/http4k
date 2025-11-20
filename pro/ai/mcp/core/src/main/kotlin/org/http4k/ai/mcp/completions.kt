@@ -4,6 +4,8 @@ import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Meta.Companion.default
+import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.core.Request
 
 /**
@@ -26,18 +28,20 @@ fun CompletionFilter.then(next: CompletionHandler): CompletionHandler = this(nex
 data class CompletionRequest(
     val argument: CompletionArgument,
     val context: CompletionContext = CompletionContext(),
-    val meta: Meta = Meta.default,
+    override val meta: Meta = default,
+    override val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
-) {
+) : CapabilityRequest {
     constructor(
         name: String,
         value: String,
         context: CompletionContext = CompletionContext(),
-        meta: Meta = Meta.default,
+        task: TaskMeta? = null,
+        meta: Meta = default,
         client: Client = NoOp,
         connectRequest: Request? = null
-    ) : this(CompletionArgument(name, value), context, meta, client, connectRequest)
+    ) : this(CompletionArgument(name, value), context, meta, task, client, connectRequest)
 }
 
 

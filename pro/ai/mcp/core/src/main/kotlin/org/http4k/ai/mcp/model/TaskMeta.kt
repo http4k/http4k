@@ -4,4 +4,4 @@ import org.http4k.connect.model.TimeToLive
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class TaskMetadata(val ttl: TimeToLive? = null)
+data class TaskMeta(val ttl: TimeToLive? = null)
