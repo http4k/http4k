@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-***: Upgrade versions
 - **http4k-core***: [Unlikely break] Introduce QUERY HTTP method as RFC has been approved. H/T @npryce
 - **http4k-core***: [Fix #1438] URL encode Flash cookie content. H/T @cies
+- **http4k-core***: [Fix #1426] Avoiding repeated copies of HttpMessage.bodyString(). H/T @hermannm
 
 ### v6.21.1.0
 - **http4k-***: Upgrade versions
