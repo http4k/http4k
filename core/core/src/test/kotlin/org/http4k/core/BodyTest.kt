@@ -134,10 +134,13 @@ class BodyTest {
     }
 
     @Test
-    fun `body initialized with string returns same instance as text`() {
+    fun `body initialized with string memoizes text`() {
         val bodyString = "abc"
         val body = Body(bodyString)
-        assertThat("body text", body.text, sameInstance(bodyString))
+        val text1 = body.text
+        val text2 = body.text
+        assertThat("body text is equal", text1, equalTo(bodyString))
+        assertThat("text is memoized", text1, sameInstance(text2))
     }
 
     @Test
