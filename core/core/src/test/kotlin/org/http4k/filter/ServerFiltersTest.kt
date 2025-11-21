@@ -27,8 +27,10 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Uri
+import org.http4k.core.cookie.cookies
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.FLASH_COOKIE
 import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
@@ -852,6 +854,34 @@ class ServerFiltersTest {
             val request = Request(GET, "/").withFlash("input flash")
             val response = handler(request)
             assertThat(response.flash(), equalTo(""))
+        }
+
+        @Test
+        fun `flash cookie setting escapes non-printable non-ASCII characters`() {
+            // A string that includes characters outside the RFC6265 allowed range.
+            val invalidCookieContent = "bad ‘ ’ — € \u0007 end"
+            val handler = FlashAttributesFilter.then { _ -> Response(OK).withFlash(invalidCookieContent) }
+
+            val response = handler(Request(GET, "/"))
+
+            // Extract the encoded `flash` cookie's value of the `Set-Cookie` header.
+            val cookieValue = response.cookies().firstOrNull { it.name == FLASH_COOKIE }!!.value
+
+            // Only printable ASCII (0x21 - 0x7E) is allowed, according to the RFC6265 spec.
+            val allowed = Regex("^[\\x21-\\x7E]*$")
+            assertThat(allowed.matches(cookieValue), equalTo(true))
+        }
+
+        @Test
+        fun `flash cookie round-trips through encoding and decoding do not change the content with unicode input`() {
+            // A string that includes characters outside the RFC6265 allowed range.
+            val input = "αβγ ‘ ’ — € ☃"
+
+            val handler = FlashAttributesFilter.then { _ -> Response(OK).withFlash(input) }
+            val response = handler(Request(GET, "/"))
+
+            val output = response.flash()
+            assertThat(input, equalTo(output))
         }
     }
 
