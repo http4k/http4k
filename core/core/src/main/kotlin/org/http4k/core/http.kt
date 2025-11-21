@@ -10,7 +10,6 @@ import org.http4k.routing.RequestWithContext
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
-import kotlin.concurrent.Volatile
 
 typealias Headers = Parameters
 
@@ -21,15 +20,12 @@ typealias Headers = Parameters
 interface Body : Closeable {
     val stream: InputStream
     val payload: ByteBuffer
+
     /**
      * Returns a string representation of the body, decoded as UTF-8. This will realize any
      * underlying stream.
-     *
-     * This property has a default implementation for backwards compatibility. Implementations may
-     * override this to avoid copying the body on each call (see [MemoryBody.text] and
-     * [StreamBody.text] as an example).
      */
-    val text: String get() = payload.asString()
+    val text get() = payload.asString()
 
     /**
      * Will be `null` for bodies where it's impossible to a priori determine - e.g. StreamBody
@@ -70,12 +66,10 @@ fun Body.hasContentToRead() = stream.read(ByteArray(0)) > -1
  * Represents a body that is backed by an in-memory ByteBuffer. Closing this has no effect.
  **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {
-    constructor(payload: String) : this(payload.asByteBuffer()) { _text = payload }
+    constructor(payload: String) : this(payload.asByteBuffer())
     constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
-    /** Saves result of the first call to [text]. Volatile for thread safety. */
-    @Volatile private var _text: String? = null
-    override val text: String get() = _text ?: payload.asString().also { _text = it }
+    override val text: String by lazy { payload.asString() }
 
     override val length get() = payload.length().toLong()
     override fun close() {}
@@ -93,10 +87,7 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
  */
 class StreamBody(override val stream: InputStream, override val length: Long? = null) : Body {
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
-
-    /** Saves result of the first call to [text]. Volatile for thread safety. */
-    @Volatile private var _text: String? = null
-    override val text: String get() = _text ?: payload.asString().also { _text = it }
+    override val text: String by lazy { payload.asString() }
 
     override fun close() {
         stream.close()
