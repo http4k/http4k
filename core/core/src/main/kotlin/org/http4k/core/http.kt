@@ -66,10 +66,14 @@ fun Body.hasContentToRead() = stream.read(ByteArray(0)) > -1
  * Represents a body that is backed by an in-memory ByteBuffer. Closing this has no effect.
  **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {
-    constructor(payload: String) : this(payload.asByteBuffer())
+    private var _text: String? = null
+
+    constructor(payload: String) : this(payload.asByteBuffer()) {
+        _text = payload
+    }
     constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
-    override val text: String by lazy { payload.asString() }
+    override val text: String by lazy { _text ?: payload.asString() }
 
     override val length get() = payload.length().toLong()
     override fun close() {}
