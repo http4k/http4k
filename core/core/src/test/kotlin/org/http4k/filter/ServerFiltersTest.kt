@@ -229,7 +229,7 @@ class ServerFiltersTest {
                     .and(
                         hasHeader(
                             "access-control-allow-methods",
-                            "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD"
+                            "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD, QUERY"
                         )
                     )
                     .and(hasHeader("access-control-allow-credentials", "true"))
