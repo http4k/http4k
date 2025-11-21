@@ -22,6 +22,12 @@ interface Body : Closeable {
     val payload: ByteBuffer
 
     /**
+     * Returns a string representation of the body, decoded as UTF-8. This will realize any
+     * underlying stream.
+     */
+    val text get() = payload.asString()
+
+    /**
      * Will be `null` for bodies where it's impossible to a priori determine - e.g. StreamBody
      */
     val length: Long?
@@ -63,22 +69,25 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(payload.asByteBuffer())
     constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
+    override val text: String by lazy { payload.asString() }
+
     override val length get() = payload.length().toLong()
     override fun close() {}
     override val stream get() = payload.array().inputStream(payload.position(), payload.length())
-    override fun toString() = payload.asString()
+    override fun toString() = text
 }
 
 /**
  * Represents a body that is backed by a (lazy) InputStream. Operating with StreamBody has a number of potential
  * gotchas:
  * 1. Attempts to consume the stream will pull all of the contents into memory, and should thus be avoided.
- * This includes calling `equals()` and `payload`
+ * This includes calling `equals()`, `payload` and `text`
  * 2. If this Body is NOT being returned to the caller (via a Server implementation or otherwise), close() should be called.
  * 3. Depending on the source of the stream, this body may or may not contain a known length.
  */
 class StreamBody(override val stream: InputStream, override val length: Long? = null) : Body {
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
+    override val text: String by lazy { payload.asString() }
 
     override fun close() {
         stream.close()
@@ -167,7 +176,7 @@ interface HttpMessage : Closeable {
     /**
      * This will realise any underlying stream.
      */
-    fun bodyString(): String = String(body.payload.array())
+    fun bodyString(): String = body.text
 
     companion object {
         const val HTTP_1_1 = "HTTP/1.1"
