@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.23.0.0 (uncut)
+- **http4k-***: Upgrade versions, including Kotlin to 2.2.21
+
 ### v6.22.0.0
 - **http4k-***: Upgrade versions
 - **http4k-core***: [Unlikely break] Introduce QUERY HTTP method as RFC has been approved. H/T @npryce
