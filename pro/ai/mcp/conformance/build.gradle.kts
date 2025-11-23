@@ -26,7 +26,7 @@ tasks.register<JavaExec>("startMcpConformanceServer") {
     mainClass.set("McpConformanceServerKt")
     
     doFirst {
-        val pidFile = file("${project.buildDir}/mcp-server.pid")
+        val pidFile = file("${project.layout.buildDirectory}/mcp-server.pid")
         pidFile.parentFile.mkdirs()
         ProcessBuilder("java", "-cp", classpath.asPath, complianceServerMainClass).apply {
             directory(projectDir)
@@ -43,7 +43,7 @@ tasks.register<Exec>("stopMcpConformanceServer") {
     description = "Stop the MCP Conformance Server"
     
     doFirst {
-        val pidFile = file("${project.buildDir}/mcp-server.pid")
+        val pidFile = file("${project.layout.buildDirectory}/mcp-server.pid")
         if (pidFile.exists()) {
             val pid = pidFile.readText().trim()
             try {
