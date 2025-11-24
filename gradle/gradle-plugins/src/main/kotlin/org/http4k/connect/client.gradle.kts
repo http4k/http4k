@@ -1,16 +1,8 @@
 package org.http4k.connect
 
-import com.google.devtools.ksp.gradle.KspTask
-
 plugins {
     id("org.http4k.connect.module")
     id("com.google.devtools.ksp")
-}
-
-tasks {
-    withType<KspTask> {
-        outputs.upToDateWhen { false }
-    }
 }
 
 dependencies {
