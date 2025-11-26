@@ -1,22 +1,22 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.core.JsonParser.NumberType.BIG_INTEGER
-import com.fasterxml.jackson.core.JsonParser.NumberType.INT
-import com.fasterxml.jackson.core.JsonParser.NumberType.LONG
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.BigIntegerNode
-import com.fasterxml.jackson.databind.node.BooleanNode
-import com.fasterxml.jackson.databind.node.DecimalNode
-import com.fasterxml.jackson.databind.node.NullNode
-import com.fasterxml.jackson.databind.node.NumericNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.fasterxml.jackson.module.kotlin.readValue
+import tools.jackson.core.JsonParser.NumberType.BIG_INTEGER
+import tools.jackson.core.JsonParser.NumberType.INT
+import tools.jackson.core.JsonParser.NumberType.LONG
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.node.ArrayNode
+import tools.jackson.databind.node.BigIntegerNode
+import tools.jackson.databind.node.BooleanNode
+import tools.jackson.databind.node.DecimalNode
+import tools.jackson.databind.node.NullNode
+import tools.jackson.databind.node.NumericNode
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.databind.node.StringNode
+import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.convertValue
+import tools.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.readValue
 import io.cloudevents.core.builder.CloudEventBuilder
 import io.cloudevents.jackson.JsonCloudEventData
 import org.http4k.core.Body
@@ -32,6 +32,7 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import tools.jackson.databind.json.JsonMapper
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -43,7 +44,7 @@ open class ConfigurableJackson(
 ) : AutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
-        is TextNode -> JsonType.String
+        is StringNode -> JsonType.String
         is BooleanNode -> JsonType.Boolean
         is NumericNode -> when (value.numberType()) {
             INT, LONG, BIG_INTEGER -> Integer
@@ -57,7 +58,7 @@ open class ConfigurableJackson(
     }
 
     override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)
-    override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
+    override fun String?.asJsonValue(): JsonNode = this?.let { StringNode(this) } ?: NullNode.instance
     override fun Int?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(toBigInteger()) } ?: NullNode.instance
     override fun Double?.asJsonValue(): JsonNode = this?.let { DecimalNode(BigDecimal(this)) } ?: NullNode.instance
     override fun Long?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(toBigInteger()) } ?: NullNode.instance
@@ -72,16 +73,21 @@ open class ConfigurableJackson(
 
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
-        mapper.createObjectNode().also { it.setAll<JsonNode>(toList().toMap()) }
+        mapper.createObjectNode().also { it.setAll(toList().toMap()) }
 
     override fun fields(node: JsonNode) = node.properties().asSequence().map { (key, value) -> key to value }.toList()
 
-    override fun elements(value: JsonNode) = value.elements().asSequence().asIterable()
-    override fun text(value: JsonNode): String = value.asText()
+    override fun elements(value: JsonNode) = value.asIterable()
+
+    override fun text(value: JsonNode): String = when (value) {
+        is NullNode -> "null"
+        else -> value.asString()
+    }
+
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
     override fun integer(value: JsonNode) = value.asLong()
     override fun decimal(value: JsonNode) = BigDecimal(value.toString())
-    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
+    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asString()
 
     // auto
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
@@ -142,7 +148,7 @@ open class ConfigurableJackson(
         withData(defaultContentType.value, JsonCloudEventData.wrap(asJsonObject(t)))
 }
 
-fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
+fun KotlinModule.asConfigurable() = asConfigurable(JsonMapper.builder())
 
 inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it) }
 

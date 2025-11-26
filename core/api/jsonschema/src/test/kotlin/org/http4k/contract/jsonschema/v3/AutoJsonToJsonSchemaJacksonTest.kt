@@ -1,14 +1,6 @@
 package org.http4k.contract.jsonschema.v3
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
-import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -24,21 +16,37 @@ import org.http4k.lens.BiDiMapping
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
+import tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
+import tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
+import tools.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinModule
 
 class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>() {
     override fun autoJson() = ConfigurableJackson(
         KotlinModule.Builder().build()
-            .asConfigurable()
+            .asConfigurable(
+                JsonMapper.builder().deactivateDefaultTyping()
+                    .changeDefaultPropertyInclusion {
+                        it
+                            .withContentInclusion(NON_NULL)
+                            .withValueInclusion(NON_NULL)
+                    }
+            )
             .withStandardMappings()
             .value(MyInt)
             .done()
-            .deactivateDefaultTyping()
-            .setDefaultPropertyInclusion(NON_NULL)
+            .rebuild()
             .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(FAIL_ON_IGNORED_PROPERTIES, false)
             .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
             .configure(USE_BIG_INTEGER_FOR_INTS, true)
+            .build()
     )
 
     @Suppress("DEPRECATION")
@@ -46,18 +54,22 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
     fun `renders schema for objects with metadata`(approver: Approver) {
         val jackson = object : ConfigurableJackson(
             KotlinModule.Builder().build()
-                .asConfigurable()
+                .asConfigurable(
+                    JsonMapper.builder().deactivateDefaultTyping()
+                        .changeDefaultPropertyInclusion {
+                            it.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
+                        })
                 .withStandardMappings()
                 .value(MyInt)
                 .done()
-                .deactivateDefaultTyping()
-                .setDefaultPropertyInclusion(NON_NULL)
+                .rebuild()
                 .configure(FAIL_ON_NULL_FOR_PRIMITIVES, true)
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(FAIL_ON_IGNORED_PROPERTIES, false)
                 .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
                 .configure(USE_BIG_INTEGER_FOR_INTS, true)
                 .configure(SORT_PROPERTIES_ALPHABETICALLY, true)
+                .build()
         ) {}
 
         approver.assertApproved(

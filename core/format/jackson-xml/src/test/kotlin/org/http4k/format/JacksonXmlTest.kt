@@ -1,7 +1,7 @@
 package org.http4k.format
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

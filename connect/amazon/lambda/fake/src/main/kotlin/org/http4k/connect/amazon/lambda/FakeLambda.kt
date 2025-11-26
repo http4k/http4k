@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.ClientContext
 import com.amazonaws.services.lambda.runtime.CognitoIdentity
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream
+import tools.jackson.databind.util.ByteBufferBackedInputStream
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start

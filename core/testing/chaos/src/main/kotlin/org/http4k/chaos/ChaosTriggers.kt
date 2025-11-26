@@ -1,6 +1,6 @@
 package org.http4k.chaos
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline

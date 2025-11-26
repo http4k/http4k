@@ -1,6 +1,6 @@
 package org.http4k.contract.jsonschema.v3
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK

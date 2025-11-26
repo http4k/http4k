@@ -2,11 +2,12 @@ package org.http4k.contract.jsonschema.v3
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
-import com.fasterxml.jackson.databind.annotation.JsonNaming
+import tools.jackson.databind.PropertyNamingStrategies
+import tools.jackson.databind.PropertyNamingStrategy
+import tools.jackson.databind.annotation.JsonNaming
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
+import tools.jackson.databind.json.JsonMapper
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
 
@@ -38,10 +39,10 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
         val namingStrategy = clazz.annotations
                 .filterIsInstance<JsonNaming>()
                 .map { it.value }.getOrNull(0)?.createInstance()
-            ?: json.mapper.propertyNamingStrategy
+            ?: json.mapper.serializationConfig().propertyNamingStrategy
 
         return if (namingStrategy is PropertyNamingStrategies.NamingBase) {
-            { name: String -> namingStrategy.translate(name) }
+            { name -> namingStrategy.nameForField(null, null, name) }
         } else {
             { name -> name }
         }

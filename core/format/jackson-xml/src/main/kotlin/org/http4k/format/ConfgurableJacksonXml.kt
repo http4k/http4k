@@ -1,8 +1,5 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -15,6 +12,8 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
+import tools.jackson.dataformat.xml.XmlMapper
+import tools.jackson.module.kotlin.KotlinModule
 import java.io.InputStream
 import kotlin.reflect.KClass
 
@@ -37,9 +36,9 @@ open class ConfigurableJacksonXml(
     /**
      * Convenience function to read an object as XML from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>({ it.asA<T>() }, { it.asXmlString() })
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -61,9 +60,8 @@ open class ConfigurableJacksonXml(
             .map({ it.asA<T>() }, { it.asXmlString() })
 }
 
-fun KotlinModule.asConfigurableXml() = asConfigurable(
-    XmlMapper(JacksonXmlModule().apply { setDefaultUseWrapper(false) })
-)
+fun KotlinModule.asConfigurableXml() = asConfigurable(XmlMapper.builder().defaultUseWrapper(false))
 
 inline operator fun <reified T : Any> ConfigurableJacksonXml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
-inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonXml.invoke(item: T) = autoBody<T>().toLens().of<R>(item)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonXml.invoke(item: T) =
+    autoBody<T>().toLens().of<R>(item)

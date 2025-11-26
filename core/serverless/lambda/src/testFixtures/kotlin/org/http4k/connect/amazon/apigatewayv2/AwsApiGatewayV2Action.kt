@@ -1,7 +1,7 @@
 package org.http4k.connect.amazon.apigatewayv2
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
@@ -36,9 +36,10 @@ object ApiGatewayJackson : ConfigurableJackson(
         .text(BiDiMapping(::StageName, StageName::value))
         .text(BiDiMapping(::IntegrationId, IntegrationId::value))
         .done()
-        .deactivateDefaultTyping()
+        .rebuild()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
         .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
         .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+        .build()
 )

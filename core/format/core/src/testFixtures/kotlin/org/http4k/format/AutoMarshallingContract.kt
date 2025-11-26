@@ -253,7 +253,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
-        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomNumber))
+        assertThat(marshaller.asFormatString(wrapper).trim(), equalTo(expectedCustomNumber))
         assertThat(marshaller.asA(expectedCustomNumber, BigIntegerHolder::class), equalTo(wrapper))
     }
 
@@ -262,7 +262,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
-        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomDecimal))
+        assertThat(marshaller.asFormatString(wrapper).trim(), equalTo(expectedCustomDecimal))
         assertThat(marshaller.asA(expectedCustomDecimal, BigDecimalHolder::class), equalTo(wrapper))
     }
 
@@ -283,7 +283,7 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
-        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomBoolean))
+        assertThat(marshaller.asFormatString(wrapper).trim(), equalTo(expectedCustomBoolean))
         assertThat(marshaller.asA(expectedCustomBoolean, BooleanHolder::class), equalTo(wrapper))
     }
 

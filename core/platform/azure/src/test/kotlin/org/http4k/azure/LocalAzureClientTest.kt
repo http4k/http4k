@@ -10,6 +10,7 @@ import com.azure.storage.common.sas.AccountSasSignatureValues
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.HttpHandler
 import org.http4k.util.PortBasedTest
 import org.http4k.util.assumeDockerDaemonRunning
 import org.junit.jupiter.api.AfterEach

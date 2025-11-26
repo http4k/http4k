@@ -98,7 +98,6 @@
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "b": {
                     "type": "boolean",
@@ -127,7 +126,8 @@
                 "required": [
                   "b",
                   "j"
-                ]
+                ],
+                "type": "object"
               }
             }
           },
@@ -157,7 +157,6 @@
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "b": {
                     "type": "boolean",
@@ -171,7 +170,8 @@
                 "required": [
                   "b",
                   "j"
-                ]
+                ],
+                "type": "object"
               }
             }
           },
@@ -525,19 +525,19 @@
             "schema": {
               "type": "string"
             },
+            "description": "requiredCookie",
             "in": "cookie",
             "name": "b",
-            "required": true,
-            "description": "requiredCookie"
+            "required": true
           },
           {
             "schema": {
               "type": "string"
             },
+            "description": "optionalCookie",
             "in": "cookie",
             "name": "s",
-            "required": false,
-            "description": "optionalCookie"
+            "required": false
           }
         ],
         "responses": {
@@ -585,10 +585,10 @@
             "schema": {
               "type": "boolean"
             },
+            "description": "booleanHeader",
             "in": "header",
             "name": "b",
-            "required": true,
-            "description": "booleanHeader"
+            "required": true
           },
           {
             "schema": {
@@ -596,60 +596,60 @@
               "pattern": ".*",
               "nullable": true
             },
+            "description": "stringHeader",
             "in": "header",
             "name": "s",
-            "required": false,
-            "description": "stringHeader"
+            "required": false
           },
           {
             "schema": {
               "type": "integer",
               "default": 42
             },
+            "description": "intHeader",
             "in": "header",
             "name": "i",
-            "required": false,
-            "description": "intHeader"
+            "required": false
           },
           {
             "schema": {
               "type": "number",
               "default": 0
             },
+            "description": "dHeader",
             "in": "header",
             "name": "d",
-            "required": false,
-            "description": "dHeader"
+            "required": false
           },
           {
             "schema": {
               "type": "number",
               "default": 4.2
             },
+            "description": "bigDHeader",
             "in": "header",
             "name": "bd",
-            "required": false,
-            "description": "bigDHeader"
+            "required": false
           },
           {
             "schema": {
               "type": "integer",
               "default": 6547262478
             },
+            "description": "bigIHeader",
             "in": "header",
             "name": "bi",
-            "required": false,
-            "description": "bigIHeader"
+            "required": false
           },
           {
             "schema": {
               "type": "integer",
               "default": 8493575243
             },
+            "description": "lHeader",
             "in": "header",
             "name": "l",
-            "required": false,
-            "description": "lHeader"
+            "required": false
           },
           {
             "schema": {
@@ -659,10 +659,10 @@
                 "b"
               ]
             },
+            "description": "listHeader",
             "in": "header",
             "name": "list",
-            "required": false,
-            "description": "listHeader"
+            "required": false
           },
           {
             "schema": {
@@ -671,26 +671,26 @@
                 "a": "b"
               }
             },
+            "description": "objHeader",
             "in": "header",
             "name": "obj",
-            "required": false,
-            "description": "objHeader"
+            "required": false
           },
           {
+            "description": "enumHeader",
             "in": "header",
             "name": "e",
             "required": false,
-            "description": "enumHeader",
             "schema": {
               "$ref": "#/components/schemas/Foo",
               "default": "bar"
             }
           },
           {
+            "description": "jsonHeader",
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader",
             "schema": {
               "$ref": "#/components/schemas/object1955914966",
               "default": {
@@ -723,7 +723,6 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "stringField": {
                     "type": "array",
@@ -743,7 +742,8 @@
                   "stringField",
                   "fileField",
                   "jsonField"
-                ]
+                ],
+                "type": "object"
               }
             }
           },
@@ -970,34 +970,34 @@
                 false
               ]
             },
+            "description": "booleanQuery",
             "in": "query",
             "name": "b",
-            "required": true,
-            "description": "booleanQuery"
+            "required": true
           },
           {
             "schema": {
               "type": "string"
             },
+            "description": "stringQuery",
             "in": "query",
             "name": "s",
-            "required": false,
-            "description": "stringQuery"
+            "required": false
           },
           {
             "schema": {
               "type": "integer"
             },
+            "description": "intQuery",
             "in": "query",
             "name": "i",
-            "required": false,
-            "description": "intQuery"
+            "required": false
           },
           {
+            "description": "enumQuery",
             "in": "query",
             "name": "e",
             "required": false,
-            "description": "enumQuery",
             "schema": {
               "$ref": "#/components/schemas/Foo"
             }
@@ -1015,16 +1015,16 @@
                 "nullable": false
               }
             },
+            "description": "enumQueryList",
             "in": "query",
             "name": "el",
-            "required": false,
-            "description": "enumQueryList"
+            "required": false
           },
           {
+            "description": "jsonQuery",
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery",
             "schema": {
               "$ref": "#/components/schemas/object1955914966"
             }

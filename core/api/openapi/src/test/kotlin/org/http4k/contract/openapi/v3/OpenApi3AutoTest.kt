@@ -1,6 +1,6 @@
 package org.http4k.contract.openapi.v3
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import org.http4k.contract.ArbObject2
 import org.http4k.contract.AutoContractRendererContract
 import org.http4k.contract.jsonschema.v3.FieldMetadata
