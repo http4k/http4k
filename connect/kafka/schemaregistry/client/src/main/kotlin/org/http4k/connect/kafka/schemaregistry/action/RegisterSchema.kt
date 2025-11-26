@@ -1,6 +1,5 @@
 package org.http4k.connect.kafka.schemaregistry.action
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.apache.avro.Schema
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.NonNullAutoMarshalledAction
@@ -19,6 +18,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.SCHEMA_REGISTRY
 import org.http4k.core.with
+import se.ansman.kotshi.JsonSerializable
 
 @Http4kConnectAction
 data class RegisterSchema(
@@ -35,17 +35,17 @@ data class RegisterSchema(
         )
 }
 
-@JsonSerialize
+@JsonSerializable
 data class References(
     val name: SchemaName,
     val subject: Subject,
     val version: Version
 )
 
-@JsonSerialize
+@JsonSerializable
 data class RegisteredSchema(val id: SchemaId)
 
-@JsonSerialize
+@JsonSerializable
 data class RegisterSchemaVersionReq(
     val schema: Schema,
     val schemaType: SchemaType,

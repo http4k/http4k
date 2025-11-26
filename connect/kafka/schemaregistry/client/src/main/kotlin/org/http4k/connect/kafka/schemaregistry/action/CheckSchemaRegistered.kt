@@ -30,6 +30,6 @@ data class CheckSchemaRegistered(val subject: Subject, val schema: Schema) :
 @JsonSerializable
 data class RegisteredSchemaVersion(val subject: Subject, val id: SchemaId, val version: Version, val schema: Schema)
 
-@JsonSerialize
+@JsonSerializable
 data class PostedSchema(val schema: Schema)
 
