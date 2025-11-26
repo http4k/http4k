@@ -13,6 +13,7 @@ dependencies {
     api(platform(libs.jackson.bom))
     api(libs.jackson.dataformat.yaml)
     testImplementation(project(":http4k-core"))
+    testImplementation(libs.values4k)
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-format-core")))
     testImplementation(testFixtures(project(":http4k-format-jackson")))

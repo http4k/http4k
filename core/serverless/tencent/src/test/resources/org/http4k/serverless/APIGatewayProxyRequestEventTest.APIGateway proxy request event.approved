@@ -1,37 +1,37 @@
 {
-  "requestContext": {
-    "serviceId": "service-abc",
-    "path": "/test/{path}",
-    "httpMethod": "POST",
-    "requestId": "req-1",
-    "identity": {
-      "secretId": "abcdefg"
-    },
-    "sourceIp": "10.0.0.1",
-    "stage": "release",
-    "isBase64Encoded": false
+  "body": "input body",
+  "headerParameters": {
+    "headerParam": "hp"
   },
   "headers": {
     "accept": "text/html",
     "content-type": "application/json"
   },
-  "body": "input body",
+  "httpMethod": "POST",
+  "isBase64Encoded": true,
+  "path": "/test/value",
   "pathParameters": {
     "path": "value"
+  },
+  "queryString": {
+    "query": "value"
   },
   "queryStringParameters": {
     "query": "value"
   },
-  "headerParameters": {
-    "headerParam": "hp"
+  "requestContext": {
+    "httpMethod": "POST",
+    "identity": {
+      "secretId": "abcdefg"
+    },
+    "isBase64Encoded": false,
+    "path": "/test/{path}",
+    "requestId": "req-1",
+    "serviceId": "service-abc",
+    "sourceIp": "10.0.0.1",
+    "stage": "release"
   },
   "stageVariables": {
     "stage": "release"
-  },
-  "path": "/test/value",
-  "queryString": {
-    "query": "value"
-  },
-  "httpMethod": "POST",
-  "isBase64Encoded": true
+  }
 }
