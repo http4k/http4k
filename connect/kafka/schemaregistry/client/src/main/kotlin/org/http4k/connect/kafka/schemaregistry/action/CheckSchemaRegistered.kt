@@ -1,6 +1,5 @@
 package org.http4k.connect.kafka.schemaregistry.action
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.apache.avro.Schema
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.NullableAutoMarshalledAction
