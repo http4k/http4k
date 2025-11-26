@@ -1,7 +1,6 @@
 package org.http4k.format
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
@@ -14,6 +13,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.JacksonCsv.auto
 import org.junit.jupiter.api.Test
+import tools.jackson.dataformat.csv.CsvSchema
 import java.net.URI
 import java.time.Duration
 import java.time.Instant
@@ -113,8 +113,8 @@ class JacksonCsvBodyTest {
         )
 
         val csv =
-            """duration,instant,localDate,localDateTime,localTime,offsetDateTime,offsetTime,period,status,uri,url,uuid,zonedDateTime
-PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:01:01Z,01:01:01Z,P1Y2M3D,200,http://uri:8000,http://url:9000,"1a448854-1687-4f90-9562-7d527d64383c","2000-01-01T01:01:01Z[UTC]"
+            """period,duration,localDate,localTime,localDateTime,zonedDateTime,offsetTime,offsetDateTime,instant,uuid,uri,url,status
+P1Y2M3D,PT1S,2000-01-01,01:01:01,2000-01-01T01:01:01,"2000-01-01T01:01:01Z[UTC]",01:01:01Z,2000-01-01T01:01:01Z,1970-01-01T00:00:00Z,"1a448854-1687-4f90-9562-7d527d64383c",http://uri:8000,http://url:9000,200
 """
 
         val lens = Body.auto<CommonJdkPrimitives>().toLens()

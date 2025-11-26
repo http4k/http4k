@@ -1,8 +1,5 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
@@ -23,6 +20,9 @@ import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.KotlinModule
 import java.math.BigDecimal
 
 class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
@@ -77,7 +77,9 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
     override fun strictMarshaller() =
         object : ConfigurableJackson(
             KotlinModule.Builder().build().asConfigurable().customise()
+                .rebuild()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+                .build()
         ) {}
 
     override fun customMarshaller() =
@@ -122,7 +124,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(
             Response(OK).with(
                 Body.auto<Interface>().toLens() of InterfaceImpl()
-            ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}""")
+            ).bodyString(), equalTo("""{"subValue":"123","value":"hello"}""")
         )
     }
 
@@ -131,7 +133,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(
             Response(OK).with(
                 Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
-            ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]""")
+            ).bodyString(), equalTo("""[{"subValue":"123","value":"hello"}]""")
         )
     }
 
@@ -253,6 +255,8 @@ class JacksonDataContainerTest {
 class JacksonAutoEventsTest : AutoMarshallingEventsContract(Jackson) {
     override fun extendedMarshaller() = object : ConfigurableJackson(
         KotlinModule.Builder().build().asConfigurable().customise()
+            .rebuild()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+            .build()
     ) {}
 }

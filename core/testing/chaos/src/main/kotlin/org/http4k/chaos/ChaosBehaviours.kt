@@ -1,6 +1,5 @@
 package org.http4k.chaos
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosBehaviours.BlockThread
 import org.http4k.chaos.ChaosBehaviours.EatMemory
 import org.http4k.chaos.ChaosBehaviours.KillProcess
@@ -23,6 +22,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.CHAOS
 import org.http4k.lens.Header
+import tools.jackson.databind.JsonNode
 import java.io.InputStream
 import java.lang.Thread.sleep
 import java.time.Duration
