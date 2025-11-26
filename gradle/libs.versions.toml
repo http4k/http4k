@@ -20,7 +20,6 @@ azure-storage-blob = "12.35.2"
 base16-encoding = "2.6.0"
 bcprov-jdk18on = "1.86"
 cloudevents-core = "5.0.0"
-cloudevents-json-jackson = "5.0.0"
 com-diffplug-spotless = "8.10.3"
 com-github-ben-manes-versions = "0.65.0"
 com-github-jk1-gradle-license-report = "3.1.4"
@@ -29,9 +28,6 @@ com-gradleup-shadow = "9.6.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.37.0"
 commons-codec = "1.22.1"
 cyclonedx-gradle-plugin = "3.5.0"
-# Blocked on 2.22.5.0 until Jackson 3 upgrade
-# @pin
-data4k = "2.22.5.0"
 detekt = "1.23.8"
 docker-java-core = "3.7.1"
 docker-java-transport-httpclient5 = "3.7.1"
@@ -59,7 +55,7 @@ htmlflow-view-loader = "5.0.4"
 htmx-org = "4.0.0"
 http4k-standards-typeflows = "1.32.0.0"
 hyperscript-org = "0.9.93"
-jackson-bom = "2.22.3"
+jackson-bom = "3.2.3"
 jakarta-inject-api = "2.0.1"
 jakarta-servlet-api = "6.1.0"
 jakarta-ws-rs-api = "4.0.0"
@@ -136,9 +132,7 @@ underscore = "1.123"
 undertow-core = "2.4.4.Final"
 version-catalog-update = "1.1.1"
 vertx-web = "5.2.0"
-# frozen to 0.30.3 until Jackson upgrade
-# @pin
-webauthn4j = "0.30.3.RELEASE"
+webauthn4j = "0.31.11.RELEASE"
 wiremock = "3.13.2"
 
 [libraries]
@@ -165,10 +159,9 @@ base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
 bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-bom" }
 cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
-cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 cyclonedx-gradle-plugin = { module = "org.cyclonedx:cyclonedx-gradle-plugin", version.ref = "cyclonedx-gradle-plugin" }
-data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
+data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
 detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
@@ -206,13 +199,13 @@ htmlflow-view-loader = { module = "com.github.xmlet:htmlflow-view-loader", versi
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
 http4k-standards = { module = "org.http4k:typeflows", version.ref = "http4k-standards-typeflows" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
-jackson-bom = "com.fasterxml.jackson:jackson-bom:2.22.3"
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
-jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
-jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
+jackson-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson-bom" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson-bom" }
+jackson-dataformat-csv = { module = "tools.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
+jackson-dataformat-xml = { module = "tools.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
+jackson-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
+jackson-datatype-guava = { module = "tools.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
 jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
 jakarta-ws-rs-api = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "jakarta-ws-rs-api" }

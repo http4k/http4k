@@ -1,6 +1,5 @@
 package org.http4k.chaos
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
@@ -11,6 +10,7 @@ import org.http4k.chaos.ChaosTriggers.PercentageBased
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.server.supportedOrNull
+import tools.jackson.databind.JsonNode
 import java.time.Clock
 import java.time.Clock.systemUTC
 import java.time.Duration

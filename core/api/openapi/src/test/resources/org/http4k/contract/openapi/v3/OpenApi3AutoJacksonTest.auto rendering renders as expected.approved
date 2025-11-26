@@ -541,7 +541,6 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "stringField": {
                     "type": "array",
@@ -561,7 +560,8 @@
                   "stringField",
                   "fileField",
                   "autoJsonField"
-                ]
+                ],
+                "type": "object"
               }
             }
           },

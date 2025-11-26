@@ -1,7 +1,6 @@
 package org.http4k.format
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -18,6 +17,7 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.lens.BiDiMapping
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.KotlinModule
 
 data class NullableListContainerBug(val children: List<String>?)
 

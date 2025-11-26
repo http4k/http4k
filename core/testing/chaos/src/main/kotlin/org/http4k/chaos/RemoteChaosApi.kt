@@ -82,7 +82,7 @@ object RemoteChaosApi {
     ): RoutingHttpHandler {
         val setStages by lazy {
             Body.json().map { node ->
-                (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
+                (if (node.isArray) node.values().asSequence() else sequenceOf(node))
                     .map { it.asStage(clock) }
                     .reduce { acc, next -> acc.then(next) }
             }.toLens()

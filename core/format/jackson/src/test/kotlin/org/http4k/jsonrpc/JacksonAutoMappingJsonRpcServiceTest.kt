@@ -1,6 +1,6 @@
 package org.http4k.jsonrpc
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.format.Jackson
+import tools.jackson.databind.JsonNode
 
 class JacksonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonNode>(Jackson)
