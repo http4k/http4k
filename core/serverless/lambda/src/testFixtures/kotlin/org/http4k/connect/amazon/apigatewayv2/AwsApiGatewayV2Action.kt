@@ -1,7 +1,5 @@
 package org.http4k.connect.amazon.apigatewayv2
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
@@ -16,6 +14,8 @@ import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.http4k.lens.BiDiMapping
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.module.kotlin.KotlinModule
 import kotlin.reflect.KClass
 
 abstract class AwsApiGatewayV2Action<R : Any>(private val clazz: KClass<R>) : Action<Result<R, RemoteFailure>> {
@@ -36,9 +36,10 @@ object ApiGatewayJackson : ConfigurableJackson(
         .text(BiDiMapping(::StageName, StageName::value))
         .text(BiDiMapping(::IntegrationId, IntegrationId::value))
         .done()
-        .deactivateDefaultTyping()
+        .rebuild()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
         .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
         .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+        .build()
 )

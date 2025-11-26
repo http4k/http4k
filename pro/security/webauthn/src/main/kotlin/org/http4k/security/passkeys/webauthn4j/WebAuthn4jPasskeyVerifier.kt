@@ -44,6 +44,7 @@ import org.http4k.security.passkeys.model.RegistrationOptions
 import org.http4k.security.passkeys.model.RegistrationResponse
 import org.http4k.security.passkeys.model.RelyingParty
 import org.http4k.security.passkeys.model.UserVerification.REQUIRED
+import tools.jackson.core.JacksonException
 
 /**
  * A [PasskeyVerifier] backed by webauthn4j: decodes CBOR/COSE, checks the challenge, origin, rpId hash,
@@ -91,6 +92,8 @@ class WebAuthn4jPasskeyVerifier(
         Failure(e.toPasskeyError())
     } catch (_: DataConversionException) {
         Failure(Unknown)
+    } catch (_: JacksonException) {
+        Failure(Unknown)
     } catch (_: IllegalArgumentException) {
         Failure(Unknown)
     }
@@ -127,6 +130,8 @@ class WebAuthn4jPasskeyVerifier(
     } catch (e: VerificationException) {
         Failure(e.toPasskeyError())
     } catch (_: DataConversionException) {
+        Failure(Unknown)
+    } catch (_: JacksonException) {
         Failure(Unknown)
     } catch (_: IllegalArgumentException) {
         Failure(Unknown)
