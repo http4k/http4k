@@ -1,6 +1,5 @@
 package org.http4k.connect.amazon.lambda.action
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.base64Encode
 import org.http4k.connect.amazon.lambda.LambdaAction
 import org.http4k.connect.amazon.lambda.LambdaJackson.auto
@@ -11,6 +10,8 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
+import se.ansman.kotshi.JsonProperty
+import se.ansman.kotshi.ExperimentalKotshiApi
 
 class CreateFunction(private val functionPackage: FunctionPackage) : LambdaAction<FunctionDetailsData>(kClass()) {
     override fun toRequest(): Request {
@@ -27,6 +28,7 @@ class CreateFunction(private val functionPackage: FunctionPackage) : LambdaActio
             )
     }
 
+    @ExperimentalKotshiApi
     private data class CreateFunction(
         @JsonProperty("Code") val code: Code,
         @JsonProperty("FunctionName") val functionName: String,
@@ -38,6 +40,8 @@ class CreateFunction(private val functionPackage: FunctionPackage) : LambdaActio
         @JsonProperty("MemorySize") val memory: Int = 128
     )
 
+    @ExperimentalKotshiApi
     private data class Code(@JsonProperty("ZipFile") val zipFile: String)
+    @ExperimentalKotshiApi
     private data class Environment(@JsonProperty("Variables") val variables: Map<String, String>)
 }

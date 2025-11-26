@@ -1,9 +1,10 @@
 package org.http4k.contract.openapi.v3
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.UpperCamelCaseStrategy
-import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.annotation.JsonInclude
+import tools.jackson.databind.PropertyNamingStrategies.SNAKE_CASE
+import tools.jackson.databind.PropertyNamingStrategies.UpperCamelCaseStrategy
+import tools.jackson.databind.annotation.JsonNaming
+import tools.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -16,6 +17,7 @@ import org.http4k.format.Jackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
 
 internal class JacksonJsonNamingAnnotatedTest {
 
@@ -56,9 +58,12 @@ internal class JacksonJsonNamingAnnotatedTest {
 
     object CustomJackson : ConfigurableJackson(
         KotlinModule.Builder().build()
-            .asConfigurable()
+            .asConfigurable(JsonMapper.builder().deactivateDefaultTyping()
+                .changeDefaultPropertyInclusion {
+                    inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL)
+                })
             .withStandardMappings()
-            .done().setPropertyNamingStrategy(SNAKE_CASE)
+            .done()
     )
 
     @Test

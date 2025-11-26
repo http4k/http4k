@@ -1,15 +1,7 @@
 package org.http4k.security.oauth.server
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
-import com.fasterxml.jackson.databind.node.NullNode
-import com.fasterxml.jackson.databind.node.TextNode
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
@@ -37,6 +29,14 @@ import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.node.ArrayNode
+import tools.jackson.databind.node.JsonNodeFactory.instance
+import tools.jackson.databind.node.NullNode
+import tools.jackson.databind.node.StringNode
+import tools.jackson.module.kotlin.KotlinModule
 
 internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
@@ -549,8 +549,8 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     private fun audienceToJson(audience: List<String>) = when {
         audience.isEmpty() -> NullNode.instance
-        audience.size == 1 -> TextNode(audience[0])
-        else -> ArrayNode(instance, audience.map { TextNode(it) })
+        audience.size == 1 -> StringNode(audience[0])
+        else -> ArrayNode(instance, audience.map { StringNode(it) })
     }
 
     private fun underTest(strategy: AuthRequestWithRequestAuthRequestExtractor.CombineAuthRequestRequestStrategy = Combine) =
@@ -574,7 +574,9 @@ internal data class RequestObjectJson(
 
 internal object RequestObjectExtractorJson : ConfigurableJackson(
     KotlinModule.Builder().build()
-        .asConfigurable()
+        .asConfigurable(
+            JsonMapper.builder().deactivateDefaultTyping()
+                .changeDefaultPropertyInclusion { inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL) })
         .text(Uri.Companion::of, Uri::toString)
         .text(::ClientId, ClientId::value)
         .text(::State, State::value)
@@ -582,10 +584,11 @@ internal object RequestObjectExtractorJson : ConfigurableJackson(
         .text(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue)
         .text(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue)
         .done()
-        .setDefaultPropertyInclusion(NON_NULL)
+        .rebuild()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
         .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
         .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
         .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
+        .build()
 )
