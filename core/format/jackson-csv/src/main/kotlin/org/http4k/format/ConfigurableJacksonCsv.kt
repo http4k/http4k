@@ -1,7 +1,7 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.dataformat.csv.CsvMapper
-import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import tools.jackson.dataformat.csv.CsvMapper
+import tools.jackson.dataformat.csv.CsvSchema
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType

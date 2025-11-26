@@ -1,8 +1,8 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
@@ -77,7 +77,9 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
     override fun strictMarshaller() =
         object : ConfigurableJackson(
             KotlinModule.Builder().build().asConfigurable().customise()
+                .rebuild()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+                .build()
         ) {}
 
     override fun customMarshaller() =
@@ -253,6 +255,8 @@ class JacksonDataContainerTest {
 class JacksonAutoEventsTest : AutoMarshallingEventsContract(Jackson) {
     override fun extendedMarshaller() = object : ConfigurableJackson(
         KotlinModule.Builder().build().asConfigurable().customise()
+            .rebuild()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+            .build()
     ) {}
 }

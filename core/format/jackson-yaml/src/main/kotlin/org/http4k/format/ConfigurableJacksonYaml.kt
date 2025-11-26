@@ -1,6 +1,5 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_YAML
@@ -12,10 +11,13 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.dataformat.yaml.YAMLMapper
+import tools.jackson.module.kotlin.KotlinModule
 import java.io.InputStream
 import kotlin.reflect.KClass
 
-open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaultContentType: ContentType = TEXT_YAML) :
+open class ConfigurableJacksonYaml(val mapper: YAMLMapper, override val defaultContentType: ContentType = TEXT_YAML) :
     AutoMarshalling() {
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
@@ -50,6 +52,8 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
      */
     inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 }
+
+fun KotlinModule.asConfigurableYaml() = asConfigurable(YAMLMapper.builder())
 
 inline operator fun <reified T : Any> ConfigurableJacksonYaml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
 inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonYaml.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

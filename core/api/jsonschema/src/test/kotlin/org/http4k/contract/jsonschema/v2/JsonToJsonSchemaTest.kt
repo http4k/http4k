@@ -55,7 +55,7 @@ class JsonToJsonSchemaTest {
         }, "bob", "prefix")
     }
 
-    private fun Approver.assertApproved(obj: com.fasterxml.jackson.databind.JsonNode, name: String, prefix: String? = null) {
+    private fun Approver.assertApproved(obj: tools.jackson.databind.JsonNode, name: String, prefix: String? = null) {
         assertApproved(
             Response(Status.OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
