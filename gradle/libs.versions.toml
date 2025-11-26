@@ -13,11 +13,11 @@ argo = "7.6"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.39.2"
+awssdk-bom = "2.39.4"
 azure-core = "1.57.0"
 azure-functions-java-library = "3.2.2"
 base16-encoding = "2.5.0"
-bcprov-jdk18on = "1.82"
+bcprov-jdk18on = "1.83"
 cloudevents-core = "4.0.1"
 cloudevents-json-jackson = "4.0.1"
 com-github-ben-manes-versions = "0.53.0"
@@ -65,7 +65,6 @@ jose4j = "0.9.6"
 json = "20250517"
 jsoup = "1.21.2"
 jte = "3.2.1"
-jte-kotlin = "3.2.1"
 junit = "6.0.1"
 klaxon = "5.6"
 kondor-core = "3.6.1"
@@ -77,11 +76,8 @@ kotlinx-dataframe = "1.0.0-Beta3"
 kotlinx-serialization = "1.9.0"
 kotshi-api = "4.0.0"
 kotshi-compiler = "4.0.0"
-ktor = "3.3.2"
-langchain4j = "1.8.0"
-langchain4j-core = "1.8.0"
-langchain4j-http-client = "1.8.0"
-langchain4j-open-ai = "1.8.0"
+ktor = "3.3.3"
+langchain4j = "1.9.0"
 lettuce-core = "7.1.0.RELEASE"
 loremipsum = "1.0"
 mail = "2.0.2"
@@ -103,16 +99,13 @@ playwright = "1.56.0"
 postgresql = "42.7.8"
 pug4j = "2.4.1"
 ratpack-core = "1.9.0"
-redoc = "2.3.0"
+redoc = "2.5.1"
 resilience4j-bom = "2.3.0"
 resteasy-core = "7.0.0.Final"
-rocker-compiler = "2.4.0"
-rocker-runtime = "2.4.0"
+rocker = "2.4.0"
 selenium-api = "4.38.0"
 snakeyaml = "2.5"
-spring-context = "7.0.1"
-spring-test = "7.0.1"
-spring-webmvc = "7.0.1"
+spring = "7.0.1"
 strikt = "0.35.1"
 swagger-ui = "5.30.2"
 tencent-scf-java-events = "0.0.4"
@@ -218,7 +211,7 @@ jridgewell-sourcemap-codec = "org.webjars.npm:jridgewell__sourcemap-codec:1.5.5"
 json = { module = "org.json:json", version.ref = "json" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 jte = { module = "gg.jte:jte", version.ref = "jte" }
-jte-kotlin = { module = "gg.jte:jte-kotlin", version.ref = "jte-kotlin" }
+jte-kotlin = { module = "gg.jte:jte-kotlin", version.ref = "jte" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
@@ -244,9 +237,9 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor"
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
-langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j-core" }
-langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j-http-client" }
-langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j-open-ai" }
+langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j" }
+langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j" }
+langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j" }
 lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce-core" }
 loremipsum = { module = "de.sven-jacobs:loremipsum", version.ref = "loremipsum" }
 mail = { module = "com.sun.mail:jakarta.mail", version.ref = "mail" }
@@ -285,13 +278,13 @@ resilience4j-retry = { module = "io.github.resilience4j:resilience4j-retry", ver
 resilience4j-timelimiter = { module = "io.github.resilience4j:resilience4j-timelimiter", version.ref = "resilience4j-bom" }
 resteasy-core = { module = "org.jboss.resteasy:resteasy-core", version.ref = "resteasy-core" }
 result4k = { module = "dev.forkhandles:result4k", version.ref = "forkhandles-bom" }
-rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker-compiler" }
-rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker-runtime" }
+rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker" }
+rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker" }
 selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
-spring-context = { module = "org.springframework:spring-context", version.ref = "spring-context" }
-spring-test = { module = "org.springframework:spring-test", version.ref = "spring-test" }
-spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring-webmvc" }
+spring-context = { module = "org.springframework:spring-context", version.ref = "spring" }
+spring-test = { module = "org.springframework:spring-test", version.ref = "spring" }
+spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring" }
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "com-google-devtools-ksp" }
