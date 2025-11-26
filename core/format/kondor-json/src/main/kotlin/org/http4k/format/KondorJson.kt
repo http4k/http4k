@@ -38,8 +38,12 @@ class KondorJson(
         fun <T : Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
             register(target.java, converter)
         }
+        
+        inline fun <reified T: Any, JN: JsonNode> register(converter: JsonConverter<T, JN>): InitContext = apply {
+            register(T::class, converter)
+        }
     }
-
+    
     private val converters = mutableMapOf<Class<*>, JsonConverter<*, *>>()
 
     init {
