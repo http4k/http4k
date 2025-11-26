@@ -3,7 +3,7 @@
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ComplexCondition:ClientCapabilities.kt$ClientCapabilities.Companion$!hasList &amp;&amp; !hasCancel &amp;&amp; !hasSamplingCreateMessage &amp;&amp; !hasElicitationCreate</ID>
-    <ID>ConstructorParameterNaming:ArrayItems.kt$ArrayItem.Ref$@Suppress("unused") val `$ref`: String</ID>
+    <ID>ConstructorParameterNaming:ArrayItems.kt$ArrayItem.Ref$@JsonProperty($$"$ref") val `$ref`: String</ID>
     <ID>ConstructorParameterNaming:JsonWebKey.kt$JsonWebKey$val `x5t#S256`: String? = null</ID>
     <ID>CyclomaticComplexMethod:a2aJsonRpc.kt$private fun A2A.dispatchJsonRpc( message: A2AJsonRpcRequest, httpReq: org.http4k.core.Request, ): Response</ID>
     <ID>CyclomaticComplexMethod:a2aRest.kt$private fun a2aHttpEndpoints(protocol: A2A)</ID>

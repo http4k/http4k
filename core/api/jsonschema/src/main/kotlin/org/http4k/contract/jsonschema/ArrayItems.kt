@@ -1,5 +1,6 @@
 package org.http4k.contract.jsonschema
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.contract.jsonschema.v3.value
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
@@ -49,7 +50,7 @@ sealed interface ArrayItem : ArrayItems {
     }
 
     class Ref(
-        @Suppress("unused")
+        @JsonProperty($$"$ref")
         val `$ref`: String,
         @Transient
         private val definitions: Iterable<SchemaNode> = emptyList()

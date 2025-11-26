@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.ClientContext
 import com.amazonaws.services.lambda.runtime.CognitoIdentity
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream
 import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
@@ -18,6 +17,7 @@ import org.http4k.routing.routes
 import org.http4k.serverless.AwsEnvironment.AWS_LAMBDA_FUNCTION_NAME
 import org.http4k.serverless.FnHandler
 import org.http4k.serverless.FnLoader
+import tools.jackson.databind.util.ByteBufferBackedInputStream
 import java.io.InputStream
 import java.time.Clock
 import java.util.UUID

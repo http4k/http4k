@@ -1,12 +1,12 @@
 package org.http4k.chaos
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.then
+import tools.jackson.databind.JsonNode
 import java.time.Clock
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -85,7 +85,7 @@ fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
 
         "repeat" -> Repeat {
             this["stages"]!!
-                .elements().asSequence()
+                .values().asSequence()
                 .map { it.asStage(clock) }
                 .reduce { acc, next -> acc.then(next) }
         }

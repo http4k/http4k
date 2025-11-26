@@ -1,6 +1,5 @@
 package org.http4k.contract.jsonschema.v3
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -11,6 +10,7 @@ import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import tools.jackson.databind.JsonNode
 import java.math.BigDecimal
 
 @ExtendWith(JsonApprovalTest::class)
