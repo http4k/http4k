@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.23.0.0 (uncut)
 - **http4k-***: Upgrade versions, including Kotlin to 2.2.21
+- **http4k-format-kondor**: Simpler API for registering converters. H/T @npryce
 
 ### v6.22.0.0
 - **http4k-***: Upgrade versions
