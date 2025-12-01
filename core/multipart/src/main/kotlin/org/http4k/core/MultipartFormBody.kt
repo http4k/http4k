@@ -162,7 +162,7 @@ data class MultipartFormBody private constructor(
                         it.fileName!!,
                         ContentType(it.contentType!!, TEXT_HTML.directives),
                         it.newInputStream,
-                        it.headers.mapKeys { it.key.lowercase() }.get("content-length")?.toLongOrNull(),
+                        it.headers.mapKeys { it.key.lowercase() }["content-length"]?.toLongOrNull(),
                         it,
                     )
                 )
