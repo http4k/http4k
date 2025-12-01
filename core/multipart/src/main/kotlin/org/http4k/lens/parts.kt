@@ -33,13 +33,15 @@ data class MultipartFormFile internal constructor(
     val filename: String,
     val contentType: ContentType,
     val content: InputStream,
+    val length: Long?,
     val closeable: Closeable
 ) : Closeable {
 
-    constructor(filename: String, contentType: ContentType, content: InputStream) : this(
+    constructor(filename: String, contentType: ContentType, content: InputStream, length: Long?= null) : this(
         filename,
         contentType,
         content,
+        length,
         Closeable { })
 
     override fun close() {
@@ -64,7 +66,7 @@ data class MultipartFormFile internal constructor(
     companion object : BiDiLensSpec<MultipartForm, MultipartFormFile>("form",
         FileParam,
         LensGet { name, form ->
-            form.files[name]?.map { MultipartFormFile(it.filename, it.contentType, it.content) }
+            form.files[name]?.map { MultipartFormFile(it.filename, it.contentType, it.content, it.length) }
                 ?: emptyList()
         },
         LensSet { name, values, target -> values.fold(target.minusFile(name)) { m, next -> m + (name to next) } }
@@ -72,6 +74,6 @@ data class MultipartFormFile internal constructor(
         /**
          * Use this when it doesn't matter about the name or content type of the file uploaded.
          */
-        fun inputStream() = map({ it.content }, { MultipartFormFile(nextInt(0, MAX_VALUE).toString(), OCTET_STREAM, it) })
+        fun inputStream() = map({ it.content }, { MultipartFormFile(nextInt(0, MAX_VALUE).toString(), OCTET_STREAM, it, null) })
     }
 }
