@@ -209,6 +209,13 @@ class PathTest {
         checkContract(Path.value(MyUUID), UUID(0, 0).toString(), MyUUID.of(UUID(0, 0)))
     }
 
+    val Path.foo by lazy { Path.int().of("foo") }
+
+    @Test
+    fun `use path injector function to create paths`() {
+        assertThat(Path { "bar/${foo}" }, equalTo("bar/{foo}"))
+    }
+
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
         assertThat(requiredLens(valueAsString), equalTo(tValue))

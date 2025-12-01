@@ -105,6 +105,8 @@ object Path : BiDiPathLensSpec<String>(
         )
     }) {
 
+    inline operator fun invoke(mkPath: Path.() -> String) = mkPath()
+
     fun fixed(name: String): PathLens<String> {
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
