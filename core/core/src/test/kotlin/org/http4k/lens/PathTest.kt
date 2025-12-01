@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.with
+import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.routing.RequestWithContext
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -209,12 +210,13 @@ class PathTest {
         checkContract(Path.value(MyUUID), UUID(0, 0).toString(), MyUUID.of(UUID(0, 0)))
     }
 
-    val Path.foo by lazy { Path.int().of("foo") }
+    val Path.foo by Path.int()
 
     @Test
     fun `use path injector function to create paths`() {
         assertThat(Path { "bar/${foo}" }, equalTo("bar/{foo}"))
     }
+
 
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
@@ -222,3 +224,4 @@ class PathTest {
         assertThat({ requiredLens("hello") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 }
+

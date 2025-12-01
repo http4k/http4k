@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
     it.path(meta.name)?.let(get) ?: throw LensFailure(Missing(meta), target = it)
@@ -39,7 +41,7 @@ class BiDiPathLens<FINAL>(
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathLensSpec<out OUT>(
+open class PathLensSpec<OUT>(
     protected val paramMeta: ParamMeta,
     internal val get: LensGet<String, OUT>
 ) {
@@ -60,7 +62,7 @@ open class BiDiPathLensSpec<OUT>(
     paramMeta: ParamMeta,
     get: LensGet<String, OUT>,
     private val set: LensSet<Request, OUT>
-) : PathLensSpec<OUT>(paramMeta, get) {
+) : PathLensSpec<OUT>(paramMeta, get), ReadOnlyProperty<BiDiPathLensSpec<*>, BiDiPathLens<OUT>> {
 
     /**
      * Create another BiDiPathLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -88,6 +90,12 @@ open class BiDiPathLensSpec<OUT>(
             { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun getValue(
+        thisRef: BiDiPathLensSpec<*>,
+        property: KProperty<*>
+    ) = thisRef.of(property.name) as BiDiPathLens<OUT>
 }
 
 object Path : BiDiPathLensSpec<String>(
@@ -105,8 +113,6 @@ object Path : BiDiPathLensSpec<String>(
         )
     }) {
 
-    inline operator fun invoke(mkPath: Path.() -> String) = mkPath()
-
     fun fixed(name: String): PathLens<String> {
         if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
@@ -119,6 +125,8 @@ object Path : BiDiPathLensSpec<String>(
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
         }
     }
+
+    inline operator fun invoke(mkPath: Path.() -> String) = mkPath()
 }
 
 fun Path.string() = this
