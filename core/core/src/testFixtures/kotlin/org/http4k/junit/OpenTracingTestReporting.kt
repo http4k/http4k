@@ -24,7 +24,7 @@ class OpenTracingTestReporting : TestExecutionListener {
     init {
         val honeycombApiKey = System.getenv("HONEYCOMB_API_KEY")
 
-        if (honeycombApiKey == null) {
+        if (honeycombApiKey == null || honeycombApiKey.isEmpty()) {
             openTelemetry = null
         } else {
             val resource = Resource.getDefault()
