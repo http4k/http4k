@@ -43,15 +43,23 @@ class DynamoDbTableMapper<Document : Any, HashKey : Any, SortKey : Any>(
         return primarySchema.key(hashKey, sortKey)
     }
 
-    operator fun get(hashKey: HashKey, sortKey: SortKey? = null) = dynamoDb.getItem(
+    operator fun get(
+        hashKey: HashKey,
+        sortKey: SortKey? = null,
+        consistentRead: Boolean? = null,
+    ) = dynamoDb.getItem(
         TableName = tableName,
-        Key = primarySchema.key(hashKey, sortKey)
+        Key = primarySchema.key(hashKey, sortKey),
+        ConsistentRead = consistentRead,
     )
         .onFailure { it.reason.throwIt() }
         .item
         ?.let(primarySchema.lens)
 
-    fun batchGet(keys: Collection<Pair<HashKey, SortKey?>>): Sequence<Document> {
+    fun batchGet(
+        keys: Collection<Pair<HashKey, SortKey?>>,
+        consistentRead: Boolean? = null,
+    ): Sequence<Document> {
         if (keys.isEmpty()) return emptySequence()
 
         return keys
@@ -61,7 +69,7 @@ class DynamoDbTableMapper<Document : Any, HashKey : Any, SortKey : Any>(
             .flatMap { chunk ->
                 val response = dynamoDb.batchGetItem(
                     mapOf(
-                        tableName to ReqGetItem.Get(chunk)
+                        tableName to ReqGetItem.Get(Keys = chunk, ConsistentRead = consistentRead),
                     )
                 ).onFailure { it.reason.throwIt() }
 
@@ -122,7 +130,7 @@ class DynamoDbTableMapper<Document : Any, HashKey : Any, SortKey : Any>(
         }
     }
 
-    fun <NewDocument: Any, NewHashKey : Any, NewSortKey : Any> index(
+    fun <NewDocument : Any, NewHashKey : Any, NewSortKey : Any> index(
         schema: DynamoDbTableMapperSchema<NewDocument, NewHashKey, NewSortKey>,
     ) = DynamoDbIndexMapper(dynamoDb, tableName, schema)
 
