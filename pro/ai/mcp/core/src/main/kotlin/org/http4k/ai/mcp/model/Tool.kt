@@ -39,8 +39,6 @@ class Tool private constructor(
     val title: String? = null,
     val annotations: ToolAnnotations? = null,
 ) : CapabilitySpec {
-    val outputSchema: McpNodeType? = null
-
     constructor(
         name: String,
         description: String,

@@ -38,7 +38,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
         tool.name, tool.description,
         tool.title,
         McpJson.convert(tool.toSchema()),
-        tool.outputSchema?.let { McpJson.convert(it) },
+        tool.output?.toSchema()?.let { McpJson.convert(it) },
         tool.annotations
     )
 

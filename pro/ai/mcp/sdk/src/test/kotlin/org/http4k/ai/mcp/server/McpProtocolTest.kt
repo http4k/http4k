@@ -454,7 +454,18 @@ class McpProtocolTest {
                                 "required" to listOf<String>(),
                                 "properties" to emptyMap<String, Any>()
                             ),
-                            null,
+                            mapOf(
+                                "properties" to mapOf(
+                                    "foo" to mapOf(
+                                        "example" to "bar",
+                                        "type" to "string",
+                                        "nullable" to false
+                                    ),
+                                ),
+                                "example" to mapOf("foo" to "bar"),
+                                "type" to "object",
+                                "required" to listOf("foo")
+                            ),
                             null
                         )
                     )
