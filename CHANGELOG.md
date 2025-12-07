@@ -4,8 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.23.1.0
-- **http4k-***: Upgrade versions, including Kotlin to 2.2.21
-- **http4k-ai-mcp-sdk***: [Fix] Wire in outputSchema for MCP tools.
+- **http4k-***: Upgrade versions
+- **http4k-ai-mcp-sdk***: [Fix] Wire in outputSchema for MCP tools
 
 ### v6.23.0.0
 - **http4k-***: Upgrade versions, including Kotlin to 2.2.21
