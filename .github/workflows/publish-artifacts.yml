@@ -26,7 +26,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v5.0.0
     - name: Publish
       run: |-
-        ./gradlew publish --no-configuration-cache --info \
+        ./gradlew publish --no-configuration-cache \
         -Psign=true \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \

@@ -44,7 +44,7 @@ class UploadRelease : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"""
-                ./gradlew publish --no-configuration-cache --info \
+                ./gradlew publish --no-configuration-cache \
                 -Psign=true \
                 -PreleaseVersion="$RELEASE_VERSION" \
                 -PltsPublishingUser="$LTS_PUBLISHING_USER" \
