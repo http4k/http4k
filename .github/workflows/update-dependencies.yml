@@ -1,9 +1,8 @@
 name: Update Dependencies
-'on':
+on:
   schedule:
   - cron: 0 8 * * 1
-  workflow_dispatch: {
-    }
+  workflow_dispatch:
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
@@ -22,7 +21,7 @@ jobs:
         java-version: '21'
         distribution: temurin
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4.4.2
+      uses: gradle/actions/setup-gradle@v5.0.0
     - name: Build
       run: ./gradlew versionCatalogUpdate
       shell: bash

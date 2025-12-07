@@ -1,5 +1,5 @@
 name: Publish Artifacts
-'on':
+on:
   push:
     tags:
     - '*'
@@ -23,7 +23,7 @@ jobs:
         java-version: '21'
         distribution: adopt
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4.4.2
+      uses: gradle/actions/setup-gradle@v5.0.0
     - name: Publish
       run: |-
         ./gradlew publish --no-configuration-cache --info \
@@ -39,13 +39,10 @@ jobs:
         LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
         SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME
-          }}
-        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD
-          }}
+        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
-        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD
-          }}
+        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
     - name: Notify LTS Slack
       run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}

@@ -1,5 +1,5 @@
 name: Build
-'on':
+on:
   push:
     branches:
     - master
@@ -28,7 +28,7 @@ jobs:
         java-version: '21'
         distribution: adopt
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4.4.2
+      uses: gradle/actions/setup-gradle@v5.0.0
     - name: Build
       timeout-minutes: 120
       run: bin/build_ci.sh

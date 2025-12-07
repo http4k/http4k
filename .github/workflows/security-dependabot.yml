@@ -1,5 +1,5 @@
 name: Security - Dependency Analysis (dependabot)
-'on':
+on:
   push:
     branches:
     - master

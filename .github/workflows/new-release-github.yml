@@ -1,5 +1,5 @@
 name: New Release - GitHub
-'on':
+on:
   repository_dispatch:
     types:
     - http4k-release
@@ -14,8 +14,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5.0.0
     - name: Build release note
-      run: bin/build_release_note.sh ${{ github.event.client_payload.version }} >
-        NOTE.md
+      run: bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md
       shell: bash
     - name: Create Release
       uses: actions/create-release@v1.1.4

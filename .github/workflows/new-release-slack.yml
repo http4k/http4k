@@ -1,5 +1,5 @@
 name: New Release - Slack
-'on':
+on:
   repository_dispatch:
     types:
     - http4k-release

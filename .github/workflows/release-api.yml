@@ -1,5 +1,5 @@
 name: Release API
-'on':
+on:
   repository_dispatch:
     types:
     - http4k-release
@@ -20,10 +20,9 @@ jobs:
         java-version: '21'
         distribution: adopt
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4.4.2
+      uses: gradle/actions/setup-gradle@v5.0.0
     - name: Generate API docs
-      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="${{ github.event.client_payload.version
-        || inputs.version }}" -Porg.gradle.parallel=true
+      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="${{ github.event.client_payload.version || inputs.version }}" -Porg.gradle.parallel=true
       shell: bash
     - name: Checkout API repo
       uses: actions/checkout@v5.0.0
