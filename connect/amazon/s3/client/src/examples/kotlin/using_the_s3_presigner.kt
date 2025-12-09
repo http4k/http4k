@@ -3,14 +3,25 @@ import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.s3.model.BucketKey
 import org.http4k.connect.amazon.s3.model.BucketName
 import org.http4k.connect.amazon.s3.model.S3BucketPreSigner
+import org.http4k.core.Uri
+import java.time.Clock
 import java.time.Duration
 
 fun main() {
+    val credentials = AwsCredentials("accessKeyId", "secretKey")
+
     // create pre-signer
     val preSigner = S3BucketPreSigner(
         bucketName = BucketName.of("foobar"),
         region = Region.of("us-east-1"),
-        credentials = AwsCredentials("accessKeyId", "secretKey")
+        credentials = credentials
+    )
+
+    val alternateProviderPresigner = S3BucketPreSigner(
+        bucketName = BucketName.of("lovely-bucket"),
+        region = Region.of("us-west-000"),
+        credentials = credentials,
+        overrideEndpoint = Uri.of("https://s3.us-west-000.backblazeb2.com") // region is not interpolated atm.
     )
 
     val key = BucketKey.of("keyName")
