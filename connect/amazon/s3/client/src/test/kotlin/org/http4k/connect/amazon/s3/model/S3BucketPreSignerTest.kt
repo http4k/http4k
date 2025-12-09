@@ -27,6 +27,6 @@ class S3BucketPreSignerTest {
         val request = signer.get(key = BucketKey.of("happy-key"), duration = Duration.ofMinutes(1))
 
         assertThat(request.uri, hasHost("s3.us-west-000.backblazeb2.com"))
-        assertThat(request.uri, hasUriPath("/lovely-bucket"))
+        assertThat(request.uri, hasUriPath("/lovely-bucket/happy-key"))
     }
 }
