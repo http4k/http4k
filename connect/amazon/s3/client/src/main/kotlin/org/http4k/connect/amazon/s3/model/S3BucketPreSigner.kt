@@ -23,20 +23,23 @@ class S3BucketPreSigner(
     region: Region,
     credentialsProvider: CredentialsProvider,
     clock: Clock = Clock.systemUTC(),
-    forcePathStyle: Boolean = false
+    forcePathStyle: Boolean = false,
+    overrideEndpoint: Uri? = null,
 ) {
     constructor(
         bucketName: BucketName,
         region: Region,
         credentials: AwsCredentials,
         clock: Clock = Clock.systemUTC(),
-        forcePathStyle: Boolean = false
+        forcePathStyle: Boolean = false,
+        overrideEndpoint: Uri? = null,
     ) : this(
         bucketName = bucketName,
         region = region,
         credentialsProvider = { credentials },
         clock = clock,
-        forcePathStyle = forcePathStyle
+        forcePathStyle = forcePathStyle,
+        overrideEndpoint = overrideEndpoint,
     )
 
     /**
@@ -48,13 +51,15 @@ class S3BucketPreSigner(
         env: Environment = Environment.ENV,
         clock: Clock = Clock.systemUTC(),
         forcePathStyle: Boolean = false,
-        credentialsProvider: CredentialsProvider = CredentialsProvider.Environment(env)
+        credentialsProvider: CredentialsProvider = CredentialsProvider.Environment(env),
+        overrideEndpoint: Uri? = null,
     ) : this(
         bucketName = bucketName,
         region = region,
         credentialsProvider = credentialsProvider,
         clock = clock,
-        forcePathStyle = forcePathStyle
+        forcePathStyle = forcePathStyle,
+        overrideEndpoint = overrideEndpoint,
     )
 
     private val preSigner = AwsRequestPreSigner(
@@ -63,7 +68,7 @@ class S3BucketPreSigner(
         clock = clock
     )
 
-    private val bucketUri = let {
+    private val bucketUri = overrideEndpoint?.appendToPath("/$bucketName") ?: let {
         val usePathStyleApi = forcePathStyle || bucketName.requiresPathStyleApi()
         val pathPrefix = if (usePathStyleApi) "/$bucketName" else ""
         val subdomain = if (usePathStyleApi) "" else "$bucketName."
