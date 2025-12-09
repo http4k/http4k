@@ -8,18 +8,19 @@ import java.time.Clock
 import java.time.Duration
 
 fun main() {
+    val credentials = AwsCredentials("accessKeyId", "secretKey")
+
     // create pre-signer
     val preSigner = S3BucketPreSigner(
         bucketName = BucketName.of("foobar"),
         region = Region.of("us-east-1"),
-        credentials = AwsCredentials("accessKeyId", "secretKey")
+        credentials = credentials
     )
 
     val alternateProviderPresigner = S3BucketPreSigner(
         bucketName = BucketName.of("lovely-bucket"),
         region = Region.of("us-west-000"),
-        credentials = AwsCredentials("access-key", "secret-key"),
-        clock = Clock.systemUTC(),
+        credentials = credentials,
         overrideEndpoint = Uri.of("https://s3.us-west-000.backblazeb2.com") // region is not interpolated atm.
     )
 
