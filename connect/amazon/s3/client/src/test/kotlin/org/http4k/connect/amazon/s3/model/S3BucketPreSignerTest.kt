@@ -14,13 +14,27 @@ import java.time.Duration
 class S3BucketPreSignerTest {
 
     @Test
+    fun `using stock urls`() {
+
+        val signer = S3BucketPreSigner(
+            bucketName = BucketName.of("lovely-bucket"),
+            region = Region.EU_WEST_1,
+            credentials = AwsCredentials("access-key", "secret-key"),
+        )
+
+        val request = signer.get(key = BucketKey.of("happy-key"), duration = Duration.ofMinutes(1))
+
+        assertThat(request.uri, hasHost("lovely-bucket.s3.eu-west-1.amazonaws.com"))
+        assertThat(request.uri, hasUriPath("/happy-key"))
+    }
+
+    @Test
     fun `using alternative urls`() {
 
         val signer = S3BucketPreSigner(
             bucketName = BucketName.of("lovely-bucket"),
             region = Region.of("us-west-000"),
             credentials = AwsCredentials("access-key", "secret-key"),
-            clock = Clock.systemUTC(),
             overrideEndpoint = Uri.of("https://s3.us-west-000.backblazeb2.com")
         )
 
@@ -29,4 +43,7 @@ class S3BucketPreSignerTest {
         assertThat(request.uri, hasHost("s3.us-west-000.backblazeb2.com"))
         assertThat(request.uri, hasUriPath("/lovely-bucket/happy-key"))
     }
+
+
+
 }
