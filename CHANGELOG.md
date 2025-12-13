@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.24.0.0
+- **http4k-***: Upgrade versions
+- **http4k-platform-docker***: [New module!] Utility module for working with Docker configurations H/T @time4tea
+- **http4k-format-toon***: [New module!] Support for compact Toon format. Includes auto-marshalling capabilities.
+
 ### v6.23.1.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk***: [Fix] Wire in outputSchema for MCP tools
