@@ -16,6 +16,7 @@ aws-lambda-java-events = "3.16.1"
 awssdk-bom = "2.40.8"
 azure-core = "1.57.0"
 azure-functions-java-library = "3.2.2"
+azure-storage-blob = "12.32.0"
 base16-encoding = "2.5.0"
 bcprov-jdk18on = "1.83"
 cloudevents-core = "4.0.1"
@@ -137,6 +138,7 @@ awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk-bom" }
 awssdk-sqs = { module = "software.amazon.awssdk:sqs", version.ref = "awssdk-bom" }
 azure-core = { module = "com.azure:azure-core", version.ref = "azure-core" }
 azure-functions-java-library = { module = "com.microsoft.azure.functions:azure-functions-java-library", version.ref = "azure-functions-java-library" }
+azure-storage-blob = { module = "com.azure:azure-storage-blob", version.ref = "azure-storage-blob" }
 base16-encoding = { module = "io.matthewnelson.encoding:base16", version.ref = "base16-encoding" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprov-jdk18on" }
 bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-bom" }
@@ -290,6 +292,7 @@ swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "com-google-devtools-ksp" }
 tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
 testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
+testcontainers-azure = "org.testcontainers:azure:1.21.3"
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
 testcontainers-junit-jupiter = "org.testcontainers:junit-jupiter:1.21.3"
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }

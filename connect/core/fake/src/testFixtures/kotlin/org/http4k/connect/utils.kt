@@ -34,14 +34,6 @@ fun <T, E> Result<T, E>.failureValue(fn: (E) -> Unit = {}): E = when (this) {
     is Failure -> reason.also(fn)
 }
 
-fun assumeDockerDaemonRunning() {
-    assumeTrue(
-        getRuntime().exec(arrayOf("docker", "ps")).errorStream.bufferedReader().readText().isEmpty(),
-        "Docker is not running"
-    )
-    assumeTrue(System.getenv("GITHUB_ACTIONS") == null, "Running in GHA")
-}
-
 class TestClock(private var time: Instant = Instant.EPOCH) : Clock() {
     override fun getZone(): ZoneId = TODO("Not yet implemented")
 

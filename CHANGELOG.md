@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.24.0.0
 - **http4k-***: Upgrade versions
+- **http4k-platform-azure**: [Fix #1453] AzureHttpClient blocks forever.
 - **http4k-platform-docker***: [New module!] Utility module for working with Docker configurations H/T @time4tea
 - **http4k-format-toon***: [New module!] Support for compact Toon format. Includes auto-marshalling capabilities.
 

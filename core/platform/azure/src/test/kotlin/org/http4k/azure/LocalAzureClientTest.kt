@@ -11,6 +11,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
+import org.http4k.util.assumeDockerDaemonRunning
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,25 +20,11 @@ import org.testcontainers.utility.DockerImageName
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
-class AzureBlobStorageFileUploadClient(
-    private val endpoint: String,
-    private val containerName: String,
-    private val sasToken: String,
-    private val httpClient: HttpHandler,
-) {
+class LocalAzureClientTest {
 
-    fun upload(filename: String, contents: String) {
-        BlobContainerClientBuilder()
-            .httpClient(AzureHttpClient(httpClient))
-            .endpoint(endpoint)
-            .containerName(containerName)
-            .sasToken(sasToken)
-            .buildClient().getBlobClient(filename)
-            .blockBlobClient.upload(BinaryData.fromString(contents), false)
+    init {
+        assumeDockerDaemonRunning()
     }
-}
-
-class RealAzureClientTest {
 
     val container = AzuriteContainer(DockerImageName.parse("mcr.microsoft.com/azure-storage/azurite:3.35.0"))
 
@@ -49,11 +36,11 @@ class RealAzureClientTest {
 
     @Test
     fun `should connect to microsoft azure`() {
-
-        val endpoint = "http://${container.host}:${container.getMappedPort(10000)}/devstoreaccount1"
         val serviceClient =
             BlobServiceClientBuilder().connectionString(container.connectionString).buildClient()
+
         val containerName = serviceClient.createBlobContainer("test").blobContainerName
+
         val sasToken =
             serviceClient.generateAccountSas(
                 AccountSasSignatureValues(
@@ -63,21 +50,18 @@ class RealAzureClientTest {
                     AccountSasResourceType().setObject(true),
                 )
             )
-        val uploadClient =
-            AzureBlobStorageFileUploadClient(
-                endpoint = endpoint,
-                containerName = containerName,
-                sasToken = sasToken,
-                httpClient = JavaHttpClient(),
-            )
-        val filename = "test-file"
-        val contents = buildString {
-            repeat(1025) {
-                append("Hello\n")
-            }
-        }
 
-        uploadClient.upload(filename, contents)
+        val filename = "test-file"
+        val contents = buildString { repeat(1025) { append("Hello\n") } }
+
+        BlobContainerClientBuilder()
+            .httpClient(AzureHttpClient(JavaHttpClient()))
+            .endpoint("http://${container.host}:${container.getMappedPort(10000)}/devstoreaccount1")
+            .containerName(containerName)
+            .sasToken(sasToken)
+            .buildClient().getBlobClient(filename)
+            .blockBlobClient.upload(BinaryData.fromString(contents), false)
+
         val client = serviceClient.getBlobContainerClient(containerName)
         assertThat(client.listBlobs().map { it.name }, equalTo(listOf(filename)))
         assertThat(client.getBlobClient(filename).downloadContent().toString(), equalTo(contents))

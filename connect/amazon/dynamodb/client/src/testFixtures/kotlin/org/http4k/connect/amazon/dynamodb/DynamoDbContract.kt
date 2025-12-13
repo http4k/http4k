@@ -47,7 +47,7 @@ interface DynamoDbContract : AwsContract {
 
     private val dynamo get() = DynamoDb.Http(aws.region, { aws.credentials }, http)
 
-    open val table get() = TableName.sample(suffix = uuid(0).toString())
+    val table get() = TableName.sample(suffix = uuid(0).toString())
 
     @BeforeEach
     fun create() {

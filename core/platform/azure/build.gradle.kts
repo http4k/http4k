@@ -8,10 +8,10 @@ dependencies {
     api(project(":http4k-core"))
     api(libs.azure.core)
     testImplementation(project(":http4k-testing-hamkrest"))
-    testImplementation("org.testcontainers:azure:1.21.3")
-    testImplementation("com.azure:azure-storage-blob:12.32.0")
+    testImplementation(libs.testcontainers.azure)
+    testImplementation(libs.azure.storage.blob)
 
-    testFixturesImplementation(testFixtures(project(":http4k-core")))
+    testFixturesApi(testFixtures(project(":http4k-core")))
     testFixturesImplementation(project(":http4k-platform-core"))
     testFixturesImplementation(project(":http4k-config"))
     testFixturesImplementation(project(":http4k-client-okhttp"))
