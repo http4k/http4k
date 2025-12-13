@@ -11,12 +11,12 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers.boundedElastic
 import java.io.InputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
-import java.util.concurrent.CountDownLatch
 
 /**
  * Pluggable Http client adapter for Azure SDK.
@@ -29,27 +29,10 @@ internal fun Flux<ByteBuffer>.toInputStream(): InputStream {
     val pipedInputStream = PipedInputStream()
     val pipedOutputStream = PipedOutputStream(pipedInputStream)
 
-    val latch = CountDownLatch(1)
-
-    doOnNext { byteBuffer ->
-        val bytes = ByteArray(byteBuffer.remaining())
-        byteBuffer.get(bytes)
-        pipedOutputStream.write(bytes)
-    }.doOnComplete {
-        try {
-            pipedOutputStream.close()
-        } finally {
-            latch.countDown()
-        }
-    }.doOnError {
-        try {
-            pipedOutputStream.close()
-        } finally {
-            latch.countDown()
-        }
-    }.subscribe()
-
-    latch.await()
+    subscribeOn(boundedElastic())
+        .doOnNext { pipedOutputStream.write(ByteArray(it.remaining()).apply { it.get(this) }) }
+        .doFinally { runCatching { pipedOutputStream.close() } }
+        .subscribe()
 
     return pipedInputStream
 }
@@ -73,9 +56,7 @@ private fun Response.fromHttp4k(request: HttpRequest): Mono<HttpResponse> = Mono
                 -1 -> it.complete()
                 else -> it.next(ByteBuffer.wrap(buffer, 0, bytesRead))
             }
-        }.doFinally {
-            close()
-        }
+        }.doFinally { close() }
 
         override fun getBodyAsByteArray() = Mono.just(this@fromHttp4k.body.stream.readBytes())
 
@@ -85,5 +66,5 @@ private fun Response.fromHttp4k(request: HttpRequest): Mono<HttpResponse> = Mono
     })
 
 private fun HttpRequest.toHttp4k() = Request(Method.valueOf(httpMethod.name), url.toExternalForm())
-        .headers(headers.flatMap { h -> h.values.map { h.name to it } })
-        .body(body.toInputStream())
+    .headers(headers.flatMap { h -> h.values.map { h.name to it } })
+    .body(body.toInputStream())
