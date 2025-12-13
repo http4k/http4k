@@ -188,7 +188,7 @@ fun Moshi.Builder.asConfigurable(
 
 private object UnitAdapter : JsonAdapter<Unit>() {
     override fun fromJson(reader: JsonReader) {
-        reader.readJsonValue(); Unit
+        reader.readJsonValue()
     }
 
     override fun toJson(writer: JsonWriter, value: Unit?) {

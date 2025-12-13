@@ -119,6 +119,10 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
     protected abstract val expectedRegexSpecial: String
     protected abstract val expectedAutoMarshallingZonesAndLocale: String
 
+    protected val expectedCustomNumber = "1"
+    protected val expectedCustomBoolean = "true"
+    protected val expectedCustomDecimal = "1.01"
+
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
@@ -249,8 +253,8 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BigIntegerHolder(1.toBigInteger())
-        assertThat(marshaller.asFormatString(wrapper), equalTo("1"))
-        assertThat(marshaller.asA("1", BigIntegerHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomNumber))
+        assertThat(marshaller.asA(expectedCustomNumber, BigIntegerHolder::class), equalTo(wrapper))
     }
 
     @Test
@@ -258,8 +262,8 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         val marshaller = customMarshaller()
 
         val wrapper = BigDecimalHolder(1.01.toBigDecimal())
-        assertThat(marshaller.asFormatString(wrapper), equalTo("1.01"))
-        assertThat(marshaller.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomDecimal))
+        assertThat(marshaller.asA(expectedCustomDecimal, BigDecimalHolder::class), equalTo(wrapper))
     }
 
     @Test
@@ -273,13 +277,14 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(marshaller.asA("{\"value\":null}", MyValueHolderHolder::class), equalTo(MyValueHolderHolder(null)))
     }
 
+
     @Test
     open fun `roundtrip custom boolean`() {
         val marshaller = customMarshaller()
 
         val wrapper = BooleanHolder(true)
-        assertThat(marshaller.asFormatString(wrapper), equalTo("true"))
-        assertThat(marshaller.asA("true", BooleanHolder::class), equalTo(wrapper))
+        assertThat(marshaller.asFormatString(wrapper), equalTo(expectedCustomBoolean))
+        assertThat(marshaller.asA(expectedCustomBoolean, BooleanHolder::class), equalTo(wrapper))
     }
 
     @Test
