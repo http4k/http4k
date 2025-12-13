@@ -26,15 +26,13 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
         return PebbleTemplateRenderer(configure(PebbleEngine.Builder().loader(loader)).build())
     }
 
-    override fun Caching(baseTemplateDir: String): TemplateRenderer {
-        val loader = FileLoader()
-        loader.prefix = baseTemplateDir
-        return PebbleTemplateRenderer(configure(PebbleEngine.Builder().cacheActive(true).loader(loader)).build())
-    }
+    override fun Caching(baseTemplateDir: String): TemplateRenderer =
+        PebbleTemplateRenderer(configure(PebbleEngine.Builder().cacheActive(true).loader(
+            FileLoader(File(baseTemplateDir).absolutePath)
+        )).build())
 
-    override fun HotReload(baseTemplateDir: String): TemplateRenderer {
-        val loader = FileLoader()
-        loader.prefix = baseTemplateDir
-        return PebbleTemplateRenderer(configure(PebbleEngine.Builder().cacheActive(false).loader(loader)).build())
-    }
+    override fun HotReload(baseTemplateDir: String): TemplateRenderer =
+        PebbleTemplateRenderer(configure(PebbleEngine.Builder().cacheActive(false).loader(
+            FileLoader(File(baseTemplateDir).absolutePath)
+        )).build())
 }
