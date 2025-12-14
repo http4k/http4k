@@ -64,7 +64,7 @@ abstract class TransactorContract {
     }
 
     @Test
-    fun `throw if read operation is performed in read-only transaction`() {
+    fun `throw if write operation is performed in read-only transaction`() {
         val transactor = transactor()
 
         expectThrows<Exception> {
