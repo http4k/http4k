@@ -3,12 +3,11 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
-import com.natpryce.hamkrest.throws
 import dev.toonformat.jtoon.DecodeOptions
 import dev.toonformat.jtoon.EncodeOptions
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.invoke
+import org.http4k.format.Toon.toon
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -69,6 +68,13 @@ locale:en-CA"""
     @Test
     @Disabled("No support yet")
     override fun `fails decoding when a extra key found`() {
+    }
+
+    @Test
+    fun `direct injection + extraction into message`() {
+        val item = MyValueHolder(MyValue("foobar"))
+        val req = Request(GET, "/foo").toon(item)
+        assertThat(req.toon<MyValueHolder>(), equalTo(item))
     }
 
     @Test
