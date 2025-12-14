@@ -89,11 +89,6 @@ locale:en-CA"""
         assertThat(marshaller.asA("{\"value\":null}", MyValueHolderHolder::class), equalTo(MyValueHolderHolder(null)))
     }
 
-//    @Test
-//    @Disabled("No support yet")
-//    override fun `roundtrip regex special as equals isn't comparable`() {
-//    }
-
     override fun strictMarshaller() = Toon
 
     override fun customMarshaller() = ConfigurableToon(
