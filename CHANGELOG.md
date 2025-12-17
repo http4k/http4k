@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.24.1.0
+- **http4k-connect-amazon-scheduler**: [New module!] AWS EventBridge Scheduler client. H/T @aharin
+- **http4k-connect-amazon-scheduler-fake**: [New module!] AWS EventBridge Scheduler fake. H/T @aharin
+
 ### v6.24.0.0
 - **http4k-***: Upgrade versions
 - **http4k-platform-azure**: [Fix #1453] AzureHttpClient blocks forever.
