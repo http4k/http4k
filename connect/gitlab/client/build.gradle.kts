@@ -12,6 +12,6 @@ dependencies {
     }
     api(libs.kotshi.api)
 
-    testApi(project(":http4k-format-moshi"))
+    testImplementation(project(":http4k-format-moshi"))
     testFixturesApi(testFixtures(project(":http4k-connect-core")))
 }

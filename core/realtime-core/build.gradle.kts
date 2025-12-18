@@ -12,9 +12,9 @@ dependencies {
     implementation(project(":http4k-security-core"))
 
     testFixturesApi(testFixtures(project(":http4k-core")))
-    testApi(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-core")))
 
-    testApi(project(":http4k-server-helidon"))
+    testImplementation(project(":http4k-server-helidon"))
 
     testFixturesApi(libs.mockk)
     testFixturesApi(project(":http4k-client-websocket"))

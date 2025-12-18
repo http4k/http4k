@@ -12,5 +12,5 @@ dependencies {
     implementation(libs.jakarta.ws.rs.api)
 
     testFixturesApi(testFixtures(project(":http4k-core")))
-    testApi(libs.resteasy.core)
+    testImplementation(libs.resteasy.core)
 }
