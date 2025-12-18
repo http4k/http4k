@@ -25,7 +25,7 @@ dependencies {
 tasks {
     withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
-            freeCompilerArgs.add("-Xjvm-default=all")
+            freeCompilerArgs.add("-jvm-default=enable")
         }
     }
 }

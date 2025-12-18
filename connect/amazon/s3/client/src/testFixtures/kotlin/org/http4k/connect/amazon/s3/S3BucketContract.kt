@@ -233,7 +233,7 @@ interface S3BucketContract : AwsContract {
             s3Bucket.headObject(key).successValue().also { status ->
                 assertThat(status!!.storageClass, equalTo(StorageClass.GLACIER))
                 assertThat(status.restoreStatus!!.ongoingRequest, equalTo(false))
-                assertThat(status.restoreStatus!!.expiryDate!!.value, greaterThan(ZonedDateTime.now(clock)))
+                assertThat(status.restoreStatus.expiryDate!!.value, greaterThan(ZonedDateTime.now(clock)))
             }
             assertThat(s3Bucket[key].successValue()?.reader()?.readText(), equalTo("coldStuff"))
         } finally {
@@ -337,7 +337,7 @@ interface S3BucketContract : AwsContract {
         }
     }
 
-    open fun waitForBucketCreation() {}
+    fun waitForBucketCreation() {}
 
     private fun S3Bucket.waitForRestore(key: BucketKey, timeout: Duration = Duration.ofMinutes(5)) {
         println("Restoring $key... please wait for up to $timeout")

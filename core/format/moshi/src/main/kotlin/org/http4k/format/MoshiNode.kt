@@ -48,7 +48,7 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
         obj is Double && obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
         obj is Double && obj.isSafeToConvertToLong() -> MoshiLong(obj.toLong())
         obj is Long && obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
-        obj is Long -> MoshiLong(obj.toLong())
+        obj is Long -> MoshiLong(obj)
         obj is Int || obj is Short -> MoshiInteger(obj.toInt())
         else -> MoshiDecimal(obj.toDouble())
     }

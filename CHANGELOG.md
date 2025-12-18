@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.25.0.0
+- **http4k-***: Upgrade versions, including Kotlin to 2.3.0
+
 ### v6.24.1.0
 - **http4k-connect-amazon-scheduler**: [New module!] AWS EventBridge Scheduler client. H/T @aharin
 - **http4k-connect-amazon-scheduler-fake**: [New module!] AWS EventBridge Scheduler fake. H/T @aharin

@@ -10,7 +10,7 @@ import com.azure.storage.common.sas.AccountSasSignatureValues
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.HttpHandler
+import org.http4k.util.PortBasedTest
 import org.http4k.util.assumeDockerDaemonRunning
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -20,7 +20,7 @@ import org.testcontainers.utility.DockerImageName
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
-class LocalAzureClientTest {
+class LocalAzureClientTest : PortBasedTest {
 
     init {
         assumeDockerDaemonRunning()

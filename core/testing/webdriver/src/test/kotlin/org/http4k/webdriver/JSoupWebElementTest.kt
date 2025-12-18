@@ -17,22 +17,22 @@ import org.openqa.selenium.WebElement
 class JSoupWebElementTest {
 
     private var newLocation: Pair<Method, String>? = null
-    private val navigate: (Request) -> Unit = { it -> newLocation = it.method to it.uri.toString() }
+    private val navigate: (Request) -> Unit = { newLocation = it.method to it.uri.toString() }
     private val getURL: () -> String? = { null }
-    private fun input(type: String): WebElement = JSoupWebElement(navigate, getURL, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
+    private fun input(type: String): WebElement = JSoupWebElement(navigate, getURL, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))
 
     private fun select(multiple: Boolean): WebElement =
         JSoupWebElement(navigate, getURL, Jsoup.parse("""<select name="bob" ${if (multiple) "multiple" else ""}>
             <option>foo1</option>
             <option>foo2</option>
             </select>"""
-        )).findElement(By.tagName("select"))!!
+        )).findElement(By.tagName("select"))
 
     private fun element(tag: String = "a"): WebElement =
         JSoupWebElement(navigate, getURL, Jsoup.parse("""<$tag id="bob" href="/link">
         |<span>hello</span>
         |<disabled disabled>disabled</disabled>
-        |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
+        |</$tag>""".trimMargin())).findElement(By.tagName(tag))
 
     private fun form(method: Method = POST) = JSoupWebElement(navigate, getURL, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
@@ -44,7 +44,7 @@ class JSoupWebElementTest {
             <textarea id="textarea" value="bob"/>
             <p>inner</p>
         </form>
-        """)).findElement(By.tagName("form"))!!
+        """)).findElement(By.tagName("form"))
 
     private fun radioGroupForm() = JSoupWebElement(navigate, getURL, Jsoup.parse("""
         <form>
@@ -52,7 +52,7 @@ class JSoupWebElementTest {
             <input id="radio12" name="group1" type="radio" value="group1value2"/>
             <input id="radio21" name="group2" type="radio" value="group2value1" checked/>
         </form>
-        """)).findElement(By.tagName("form"))!!
+        """)).findElement(By.tagName("form"))
 
     @Test
     fun `find sub elements`() = assertThat(element().findElements(By.tagName("span"))[0].text, equalTo("hello"))
@@ -146,7 +146,7 @@ class JSoupWebElementTest {
 
     @Test
     fun `submit an element inside the form`() {
-        form(DELETE).findElement(By.tagName("p"))!!.submit()
+        form(DELETE).findElement(By.tagName("p")).submit()
         assertThat(newLocation, equalTo(DELETE to "/posted?checkedCheckbox=checkedCheckbox&radio=checkedRadio"))
     }
 

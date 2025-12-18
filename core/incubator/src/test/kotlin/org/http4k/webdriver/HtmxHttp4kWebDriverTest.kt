@@ -72,20 +72,20 @@ class HtmxHttp4kWebDriverTest {
     fun `issues a GET request on click and swaps text content`() {
         driver.navigate().to("/")
 
-        val button = driver.findElement(By.id("hx-get-button"))!!
+        val button = driver.findElement(By.id("hx-get-button"))
         button.click()
 
-        assertThat(driver.findElement(By.id("hx-get-button"))!!.text, equalTo("foo"))
+        assertThat(driver.findElement(By.id("hx-get-button")).text, equalTo("foo"))
     }
 
     @Test
     fun `issues a GET request on click and swaps html content`() {
         driver.navigate().to("/")
 
-        val div = driver.findElement(By.id("hx-get-div"))!!
+        val div = driver.findElement(By.id("hx-get-div"))
         div.click()
 
-        val loadedDiv = driver.findElement(By.id("loaded-div"))!!
+        val loadedDiv = driver.findElement(By.id("loaded-div"))
         loadedDiv.click()
 
         assertThat(loadedDiv.text, equalTo("bar"))
@@ -97,19 +97,19 @@ class HtmxHttp4kWebDriverTest {
         fun `Example 3 - Click to Load`() {
             driver.navigate().to("/")
 
-            assertThat(driver.findElement(By.id("example3tbody"))!!.text, equalTo("Load More Agents..."))
+            assertThat(driver.findElement(By.id("example3tbody")).text, equalTo("Load More Agents..."))
 
-            driver.findElement(By.id("example3button"))!!.click()
+            driver.findElement(By.id("example3button")).click()
 
             assertThat(
-                driver.findElement(By.id("example3tbody"))!!.text,
+                driver.findElement(By.id("example3tbody")).text,
                 equalTo("Agent Smithvoid1@null.org1 Load More Agents...")
             )
 
-            driver.findElement(By.id("example3button"))!!.click()
+            driver.findElement(By.id("example3button")).click()
 
             assertThat(
-                driver.findElement(By.id("example3tbody"))!!.text,
+                driver.findElement(By.id("example3tbody")).text,
                 equalTo("Agent Smithvoid1@null.org1Agent Smithvoid2@null.org2 Load More Agents...")
             )
         }

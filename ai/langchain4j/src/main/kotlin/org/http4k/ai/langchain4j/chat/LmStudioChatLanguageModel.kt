@@ -94,7 +94,7 @@ fun LmStudioChatLanguageModel(lmStudio: LmStudio, options: LmStudioChatModelOpti
                         ChatResponse.builder()
                             .aiMessage(
                                 AiMessage(
-                                    it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""
+                                    it.choices.mapNotNull { it.message?.content }.joinToString("")
                                 )
                             )
                             .tokenUsage(it.usage?.let {

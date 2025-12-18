@@ -10,7 +10,6 @@ import org.http4k.core.MultipartFormBody
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
-import org.http4k.core.body.Form
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -54,15 +53,15 @@ class Http4kWebDriverFormTest {
                 })
         )
         driver.navigate().to(Uri.of("http://host/"))
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("button")).submit()
         assertThat(driver.pageSource, equalTo("http://host/submit"))
     }
 
     @Test
     fun `POSTing a form with multiple values associated with a single name`() {
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("other_checkbox1"))!!.click()
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("other_checkbox1")).click()
+        driver.findElement(By.id("button")).submit()
         driver.assertOnPage("https://example.com/form")
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&checkbox1=other_checkbox1_value&textarea1=textarea&select1=option1&select1=option2&button=yes"))
         assertThat(driver, showsWeUsedTheMethod("POST"))
@@ -71,7 +70,7 @@ class Http4kWebDriverFormTest {
     @Test
     fun `POST form`() {
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("button")).submit()
         driver.assertOnPage("https://example.com/form")
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
         assertThat(driver, showsWeUsedTheMethod("POST"))
@@ -80,9 +79,9 @@ class Http4kWebDriverFormTest {
     @Test
     fun `POST form via button click`() {
         driver.get("/bob")
-        driver.findElement(By.id("resetbutton"))!!.click()
+        driver.findElement(By.id("resetbutton")).click()
         driver.assertOnPage("/bob")
-        driver.findElement(By.id("button"))!!.click()
+        driver.findElement(By.id("button")).click()
         driver.assertOnPage("/form")
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
         assertThat(driver, showsWeUsedTheMethod("POST"))
@@ -107,7 +106,7 @@ class Http4kWebDriverFormTest {
 
         val n0 = loadCount
         driver.get("http://example.com/bob")
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("button")).submit()
         driver.assertOnPage("http://example.com/bob")
         assertThat(loadCount, equalTo(n0 + 2))
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
@@ -132,7 +131,7 @@ class Http4kWebDriverFormTest {
         })
         val n0 = loadCount
         driver.get("http://127.0.0.1/bob")
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("button")).submit()
         driver.assertOnPage("http://127.0.0.1/bob")
         assertThat(loadCount, equalTo(n0 + 2))
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
@@ -144,7 +143,7 @@ class Http4kWebDriverFormTest {
         val driver = driverFor("test.html", action = "fragmentWithNoLeadingSlash")
 
         driver.get("http://example.com/bob/was/here/today")
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("button")).submit()
         assertThat(driver, hasCurrentUrl("http://example.com/bob/was/here/fragmentWithNoLeadingSlash"))
     }
 
@@ -154,7 +153,7 @@ class Http4kWebDriverFormTest {
         val driver = driverFor("test.html", method = GET)
 
         driver.get("/bob")
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.id("button")).submit()
         driver.assertOnPage("/form?text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
 
         assertThat(driver, showsWeSentTheBody(""))
@@ -164,8 +163,8 @@ class Http4kWebDriverFormTest {
     @Test
     fun `POST form with an empty text box`() {
         driver.get("https://example.com/bob")
-        driver.findElement(By.tagName("textarea"))!!.sendKeys("")
-        driver.findElement(By.id("button"))!!.submit()
+        driver.findElement(By.tagName("textarea")).sendKeys("")
+        driver.findElement(By.id("button")).submit()
         driver.assertOnPage("https://example.com/form")
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes"))
         assertThat(driver, showsWeUsedTheMethod("POST"))
@@ -176,7 +175,7 @@ class Http4kWebDriverFormTest {
     @Test
     fun `POST form via input of type 'submit' click`() {
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("input-submit"))!!.click()
+        driver.findElement(By.id("input-submit")).click()
         driver.assertOnPage("https://example.com/form")
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
         assertThat(driver, showsWeUsedTheMethod("POST"))
@@ -185,7 +184,7 @@ class Http4kWebDriverFormTest {
     @Test
     fun `POST form - activated submit buttons ('input' elements) are submitted with the form`() {
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("only-send-when-activated"))!!.submit()
+        driver.findElement(By.id("only-send-when-activated")).submit()
         driver.assertOnPage("https://example.com/form")
         val expectedFormBody = "text1=textValue&checkbox1=checkbox&only-send-when-activated=only-send-when-activated&textarea1=textarea&select1=option1&select1=option2"
 
@@ -198,7 +197,7 @@ class Http4kWebDriverFormTest {
         val driver = driverFor("form_element_association.html")
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("button"))!!.click()
+        driver.findElement(By.id("button")).click()
         driver.assertOnPage("https://example.com/form")
         val expectedFormBody = "text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"
 
@@ -210,7 +209,7 @@ class Http4kWebDriverFormTest {
         val driver = driverFor("disabled-controls.html", POST)
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("button"))!!.click()
+        driver.findElement(By.id("button")).click()
         driver.assertOnPage("https://example.com/form")
         val expectedFormBody = "only-thing-submitted=only-thing-submitted"
 
@@ -222,7 +221,7 @@ class Http4kWebDriverFormTest {
         val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("disabled-button"))!!.click()
+        driver.findElement(By.id("disabled-button")).click()
 
         driver.assertNotOnPage("https://example.com/should-not-navigate-to-here")
         driver.assertOnPage("https://example.com/bob")
@@ -233,7 +232,7 @@ class Http4kWebDriverFormTest {
         val driver = driverFor("disabled-controls.html", POST, action = "/should-not-navigate-to-here")
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.id("disabled-submit-input"))!!.click()
+        driver.findElement(By.id("disabled-submit-input")).click()
 
         driver.assertNotOnPage("https://example.com/should-not-navigate-to-here")
         driver.assertOnPage("https://example.com/bob")
@@ -251,7 +250,7 @@ class Http4kWebDriverFormTest {
             val pairsOfOtherFields =
                 otherFieldNames.flatMap { fieldName -> formBody.fieldValues(fieldName).map { fieldName to it } }
             val otherFieldsString =
-                pairsOfOtherFields.map { (fieldName, value) -> "$fieldName=$value" }.joinToString("&")
+                pairsOfOtherFields.joinToString("&") { (fieldName, value) -> "$fieldName=$value" }
 
             Response(Status.OK).body(
                 body
@@ -267,8 +266,8 @@ class Http4kWebDriverFormTest {
         Files.newBufferedWriter(filePath).use { it.write(fileContent) }
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.cssSelector("input[type=file]"))!!.sendKeys(filePath.toString())
-        driver.findElement(By.tagName("button"))!!.submit()
+        driver.findElement(By.cssSelector("input[type=file]")).sendKeys(filePath.toString())
+        driver.findElement(By.tagName("button")).submit()
 
         assertThat(driver, hasElement(By.tagName("theformencoding"), hasText(startsWith("multipart/form-data"))))
         assertThat(driver, hasElement(By.tagName("thefilename"), hasText(equalTo(filePath.fileName.toString()))))

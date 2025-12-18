@@ -86,7 +86,7 @@ tasks {
         if (name == "compileTestKotlin") {
             compilerOptions {
                 jvmTarget.set(JVM_21)
-                freeCompilerArgs.add("-Xjvm-default=all")
+                freeCompilerArgs.add("-jvm-default=enable")
                 freeCompilerArgs.add("-Xannotation-default-target=param-property")
             }
         }
