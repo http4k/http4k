@@ -36,9 +36,8 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
 
     private fun renamingStrategyIfRequired(clazz: Class<*>): (String) -> String {
         val namingStrategy = clazz.annotations
-            .filterIsInstance<JsonNaming>()
-            .map { it.value }.getOrNull(0)
-            ?.let { it.createInstance() as PropertyNamingStrategy }
+                .filterIsInstance<JsonNaming>()
+                .map { it.value }.getOrNull(0)?.createInstance()
             ?: json.mapper.propertyNamingStrategy
 
         return if (namingStrategy is PropertyNamingStrategies.NamingBase) {

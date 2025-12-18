@@ -204,9 +204,6 @@ class KondorJson(
         }.value
 }
 
-inline fun <reified T : Any, JN : JsonNode> KondorJson.InitContext.register(converter: JsonConverter<T, JN>) =
-    register(T::class, converter)
-
 fun <T : Any> JsonConverter<T, *>.autoBody(
     description: String? = null,
     contentNegotiation: ContentNegotiation = ContentNegotiation.None,

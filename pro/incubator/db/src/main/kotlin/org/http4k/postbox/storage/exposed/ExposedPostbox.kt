@@ -10,25 +10,23 @@ import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
-import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
+import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.RequestNotFound
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
-import org.http4k.postbox.RequestProcessingStatus.*
+import org.http4k.postbox.RequestProcessingStatus.Dead
+import org.http4k.postbox.RequestProcessingStatus.Pending
+import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.DEAD
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PROCESSED
-import org.jetbrains.exposed.sql.PlusOp
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.ASC
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.javatime.duration
-import org.jetbrains.exposed.sql.javatime.durationLiteral
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsertReturning
 import java.time.Duration
@@ -71,7 +69,7 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
         DEAD -> Success(Dead(this[table.response]?.let(Response::parse)))
     }
 
-    override fun markProcessed(requestId: RequestId, response: Response) =
+    override fun markProcessed(requestId: RequestId, response: Response): Result<Unit, PostboxError> =
         status(requestId)
             .onFailure { return it }
             .let {

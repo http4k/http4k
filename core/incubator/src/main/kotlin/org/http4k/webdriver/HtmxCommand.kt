@@ -43,7 +43,7 @@ data class HtmxCommand(
         swap
             .performSwap(
                 element = target,
-                newElements = responseBody ?: emptyList()
+                newElements = responseBody
             )
     }
 

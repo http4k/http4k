@@ -92,7 +92,7 @@ private fun okhttp3.Response.asHttp4k(bodyMode: BodyMode): Response {
     val init = Response(Status(code, message))
     val headers = headers.toMultimap().flatMap { it.value.map { hValue -> it.key to hValue } }
 
-    return (body?.let { init.body(bodyMode(it.byteStream())) } ?: init).headers(headers)
+    return body.let { init.body(bodyMode(it.byteStream())) }.headers(headers)
 }
 
 object PreCannedOkHttpClients {

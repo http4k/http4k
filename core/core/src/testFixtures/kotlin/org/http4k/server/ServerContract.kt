@@ -102,7 +102,7 @@ abstract class ServerContract(
                 Response(OK)
                     .header("x-address", request.source?.address ?: "")
                     .header("x-port", (request.source?.port ?: 0).toString())
-                    .header("x-scheme", (request.source?.scheme ?: "unsupported").toString())
+                    .header("x-scheme", (request.source?.scheme ?: "unsupported"))
             },
             "/status-with-foobar-description" bind GET to {
                 Response(Status(201, "FooBar"))

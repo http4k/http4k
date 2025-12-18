@@ -26,8 +26,8 @@ import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 import java.io.File
 import java.nio.file.Files
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
+import java.util.Locale.getDefault
 
 data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) :
     WebElement {
@@ -47,7 +47,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         else -> element.attr(name)
     }
 
-    override fun getDomProperty(name: String): String? {
+    override fun getDomProperty(name: String): String {
         // TODO need to work out how to get the property from the element...
         throw UnsupportedOperationException("Not implemented")
     }
@@ -109,7 +109,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 fileInputs.toNotNullMap()
             )
 
-            val actionString = form.element.attr("action") ?: ""
+            val actionString = form.element.attr("action")
             val formActionUri = Uri.of(actionString)
             val current = getURL()?.let { Uri.of(it) }
             val formUri = current?.relative(formActionUri) ?: formActionUri
@@ -139,7 +139,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun isUncheckedInput(input: WebElement): Boolean =
         (listOf("checkbox", "radio").contains(
-            input.getDomAttribute("type") ?: null
+            input.getDomAttribute("type")
         )) && input.getDomAttribute("checked") == null
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
@@ -237,7 +237,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 
-    private fun isA(tag: String) = tagName.lowercase(ROOT) == tag.lowercase(ROOT)
+    private fun isA(tag: String) = tagName.equals(tag, ignoreCase = true)
 
     private fun associatedFormElements(form: JSoupWebElement, tagName: String): List<WebElement> {
         val root = JSoupWebElement(navigate, getURL, form.element.root())

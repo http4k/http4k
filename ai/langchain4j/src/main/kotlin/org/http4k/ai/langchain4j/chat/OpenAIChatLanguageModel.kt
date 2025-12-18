@@ -99,7 +99,7 @@ fun OpenAiChatLanguageModel(
                     ChatResponse.builder()
                         .aiMessage(
                             AiMessage(
-                                it.choices?.mapNotNull { it.message?.content }?.joinToString("") ?: ""
+                                it.choices.mapNotNull { it.message.content }.joinToString("")
                             )
                         )
                         .tokenUsage(it.usage?.let {
