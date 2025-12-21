@@ -17,6 +17,7 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.extend
+import org.http4k.core.relative
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
@@ -173,7 +174,7 @@ object ClientFilters {
         ): Response =
             next(request).let {
                 if (it.isRedirection()) {
-                    if (attempt == 10) throw IllegalStateException("Too many redirection")
+                    if (attempt == 10) throw IllegalStateException("Too many redirections")
                     it.assureBodyIsConsumed()
                     makeRequest(
                         next,
@@ -229,10 +230,8 @@ object ClientFilters {
             if (method == GET || method == HEAD) this else method(GET)
 
         private fun Request.newLocation(location: String): Uri =
-            Uri.of(location).run {
-                if (host.isBlank()) authority(uri.authority).scheme(uri.scheme) else this
-            }
-
+            uri.relative(location)
+        
         override fun invoke(next: HttpHandler): HttpHandler = { makeRequest(next, it) }
 
         /**
