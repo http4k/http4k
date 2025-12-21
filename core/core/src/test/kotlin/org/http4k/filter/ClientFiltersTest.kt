@@ -35,6 +35,7 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
+import org.http4k.lens.location
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
@@ -53,6 +54,8 @@ class ClientFiltersTest {
         when (request.uri.path) {
             "/redirect" -> Response(FOUND).header("location", "/ok")
             "/see-other" -> Response(SEE_OTHER).header("location", "/ok-with-no-body")
+            "/parent/child" -> Response(FOUND).header("location", "other-child")
+            "/parent/other-child" -> Response(OK).body("other child")
             "/loop" -> Response(FOUND).header("location", "/loop")
             "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(INTERNAL_SERVER_ERROR)
             "/absolute-redirect" -> Response(MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
@@ -151,6 +154,14 @@ class ClientFiltersTest {
         assertThat(
             followRedirects(Request(GET, "http://myhost/absolute-redirect")),
             equalTo(Response(OK).body("absolute"))
+        )
+    }
+    
+    @Test
+    fun `supports relative redirects`() {
+        assertThat(
+            followRedirects(Request(GET, "http://myhost/parent/child")),
+            equalTo(Response(OK).body("other child"))
         )
     }
 
