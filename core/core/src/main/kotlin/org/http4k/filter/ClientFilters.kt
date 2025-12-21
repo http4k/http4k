@@ -173,7 +173,7 @@ object ClientFilters {
         ): Response =
             next(request).let {
                 if (it.isRedirection()) {
-                    if (attempt == 10) throw IllegalStateException("Too many redirection")
+                    if (attempt == 10) throw IllegalStateException("Too many redirections")
                     it.assureBodyIsConsumed()
                     makeRequest(
                         next,

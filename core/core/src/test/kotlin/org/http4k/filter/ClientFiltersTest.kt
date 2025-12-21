@@ -173,7 +173,7 @@ class ClientFiltersTest {
             followRedirects(Request(GET, "http://myhost/loop"))
             fail("should have looped")
         } catch (e: IllegalStateException) {
-            assertThat(e.message, equalTo("Too many redirection"))
+            assertThat(e.message, equalTo("Too many redirections"))
         }
     }
 
