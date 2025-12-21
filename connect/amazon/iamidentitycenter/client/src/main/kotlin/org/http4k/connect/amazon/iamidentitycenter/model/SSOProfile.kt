@@ -42,9 +42,9 @@ fun SSOProfile.cachedTokenPath(dir: Path): Path = dir.resolve("${sha1hex(session
 
 fun SSOProfile.sessionName(): String = ssoSession?.toString() ?: startUri.toString()
 
-private fun sha1hex(input: String): String = MessageDigest.getInstance("SHA-1").apply {
+private fun sha1hex(input: String) = MessageDigest.getInstance("SHA-1").apply {
     update(input.toByteArray(Charsets.UTF_8))
-}.digest().encodeToString(Base16 { encodeToLowercase = true })
+}.digest().encodeToString(Base16.Builder { encodeLowercase(true) })
 
 fun SSOProfile.cachedRegistrationPath(dir: Path, clientName: ClientName): Path {
     val region = region.value

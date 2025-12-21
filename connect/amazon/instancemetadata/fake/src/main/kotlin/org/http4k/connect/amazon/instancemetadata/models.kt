@@ -38,7 +38,7 @@ data class InstanceMetadata(
     private var credentials = mutableMapOf<Ec2ProfileName, Ec2Credentials>()
     fun credentials() = credentials.toMap()
 
-    fun getCredentials(profile: Ec2ProfileName, time: ZonedDateTime) = synchronized(credentials) fn@{
+    fun getCredentials(profile: Ec2ProfileName, time: ZonedDateTime): Ec2Credentials? = synchronized(credentials) fn@{
         if (profile !in profiles) return@fn null
 
         credentials[profile]

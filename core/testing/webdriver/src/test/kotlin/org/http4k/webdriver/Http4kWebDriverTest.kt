@@ -41,7 +41,7 @@ class Http4kWebDriverTest {
         driver.get("/bob")
         assertThat(driver.currentUrl, equalTo("/bob"))
         assertThat(driver.title, equalTo("Page title"))
-        assertThat(driver.findElement(By.id("firstId"))!!.text, equalTo("the first text"))
+        assertThat(driver.findElement(By.id("firstId")).text, equalTo("the first text"))
     }
 
 
@@ -60,10 +60,10 @@ class Http4kWebDriverTest {
         driver.assertOnPage("http://localhost/bob")
         driver.navigate().forward()
         driver.assertOnPage("/bill")
-        val preRefreshTime = driver.findElement(By.tagName("h2"))!!.text
+        val preRefreshTime = driver.findElement(By.tagName("h2")).text
         driver.navigate().refresh()
         driver.assertOnPage("/bill")
-        assertThat(driver.findElement(By.tagName("h2"))!!.text, !equalTo(preRefreshTime))
+        assertThat(driver.findElement(By.tagName("h2")).text, !equalTo(preRefreshTime))
         driver.get(Uri.of("https://localhost/rita"))
         driver.assertOnPage("https://localhost/rita")
         driver.get("/bill")
@@ -116,7 +116,7 @@ class Http4kWebDriverTest {
 
     private fun assertLinkGoesTo(initial: String, by: By, expected: String) {
         driver.get(initial)
-        driver.findElement(by)!!.click()
+        driver.findElement(by).click()
         driver.assertOnPage(expected)
     }
 

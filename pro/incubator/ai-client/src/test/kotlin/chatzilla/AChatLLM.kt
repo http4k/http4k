@@ -25,7 +25,7 @@ class AChatLLM : Chat {
                 ChatResponse(
                     Assistant(
                         emptyList(), listOf(
-                            ToolRequest(RequestId.of("tool-1"), request.params!!.tools[0].name, mapOf("name" to "Bob"))
+                            ToolRequest(RequestId.of("tool-1"), request.params.tools[0].name, mapOf("name" to "Bob"))
                         )
                     ),
                     Metadata(ResponseId.of("1"), ModelName.of("foo"))

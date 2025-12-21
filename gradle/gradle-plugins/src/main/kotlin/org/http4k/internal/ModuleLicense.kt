@@ -1,11 +1,8 @@
 package org.http4k.internal
 
-import gradle.kotlin.dsl.accessors._45fd76dc729b81c2a4255a063893a6f3.jar
-import gradle.kotlin.dsl.accessors._45fd76dc729b81c2a4255a063893a6f3.main
 import gradle.kotlin.dsl.accessors._45fd76dc729b81c2a4255a063893a6f3.sourceSets
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
 
 enum class ModuleLicense(val commonName: String, val url: String, val licenseDir: String) {
@@ -22,14 +19,14 @@ enum class ModuleLicense(val commonName: String, val url: String, val licenseDir
 }
 
 fun Project.addLicenseToJars(license: ModuleLicense) {
-    tasks.jar {
+    tasks.named<Jar>("jar") {
         from(rootProject.file(license.licenseDir).absolutePath) {
             include("LICENSE")
         }
     }
 
     tasks.named<Jar>("sourcesJar") {
-        from(sourceSets.main.get().allSource)
+        from(sourceSets.named("main").get().allSource)
         from(rootProject.file(license.licenseDir).absolutePath) {
             include("LICENSE")
         }

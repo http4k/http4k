@@ -1,4 +1,4 @@
-package org.http4k.webdriver
+    package org.http4k.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -13,7 +13,7 @@ class JSoupElementFinderTest {
     private val state = JSoupElementFinder({}, { null }, Jsoup.parse(contents))
 
     @Test
-    fun `find element`() = assertThat(state.findElement(By.tagName("span"))!!.text, equalTo("this is a span"))
+    fun `find element`() = assertThat(state.findElement(By.tagName("span")).text, equalTo("this is a span"))
 
     @Test
     fun `find elements`() = assertThat(state.findElements(By.tagName("span"))[0].text, equalTo("this is a span"))

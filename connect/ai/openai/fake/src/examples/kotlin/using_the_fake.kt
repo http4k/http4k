@@ -34,9 +34,9 @@ fun main() {
         .toList()
         .first()
         .choices
-        ?.forEach {
-            println(it.message?.role)
-            println(it.message?.content)
+        .forEach {
+            println(it.message.role)
+            println(it.message.content)
         }
 
     // generate an image

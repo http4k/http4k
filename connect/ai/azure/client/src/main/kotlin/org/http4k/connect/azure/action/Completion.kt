@@ -19,9 +19,9 @@ data class Completion(
     val temperature: Temperature = Temperature.ONE,
     override val stream: Boolean = false,
     val max_tokens: MaxTokens? = null,
-    val seed: Integer? = null,
+    val seed: Int? = null,
     val stop: List<String>? = null,
-    val n: Integer? = null,
+    val n: Int? = null,
     val top_p: Double = 1.0,
 ) : ModelCompletion {
     override fun toRequest() = Request(POST, "/completions")

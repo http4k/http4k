@@ -18,15 +18,11 @@ internal fun InputStream.asString(): String {
 }
 
 internal fun WebDriver.assertOnPage(expected: String) {
-    assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
+    assertThat(findElement(By.tagName("h1")).text, equalTo(expected))
 }
 
 internal fun WebDriver.assertNotOnPage(expected: String) {
-    assertThat(findElement(By.tagName("h1"))!!.text, !equalTo(expected))
-}
-
-internal fun Http4kWebDriver.assertCurrentUrl(expectedUrl: String) {
-    assertThat(this, hasCurrentUrl(expectedUrl))
+    assertThat(findElement(By.tagName("h1")).text, !equalTo(expected))
 }
 
 internal fun hasCurrentUrl(url: String): Matcher<WebDriver> = object : Matcher<WebDriver> {
@@ -39,27 +35,17 @@ internal fun hasCurrentUrl(url: String): Matcher<WebDriver> = object : Matcher<W
 
 internal fun hasElement(by: By, matcher: Matcher<WebElement>): Matcher<SearchContext> = object :
     Matcher<SearchContext> {
-    override val description: String = "has the element matching ${by} that " + matcher.description
+    override val description: String = "has the element matching $by that " + matcher.description
 
-    override fun invoke(actual: SearchContext): MatchResult {
-        val element: WebElement? = actual.findElement(by)
-
-        return when (element) {
-            null -> MatchResult.Mismatch("could not find element")
-            else -> matcher(element)
-        }
+    override fun invoke(actual: SearchContext) = try {
+        matcher(actual.findElement(by))
+    } catch (_: NoSuchElementException) {
+        MatchResult.Mismatch("could not find element")
     }
 }
 
 internal fun hasText(matcher: Matcher<String>): Matcher<WebElement> = object : Matcher<WebElement> {
     override val description: String = "has the text content " + matcher.description
 
-    override fun invoke(actual: WebElement): MatchResult {
-        val text : String? = actual.text
-
-        return when (text) {
-            null -> MatchResult.Mismatch("could not find any text content")
-            else -> matcher(text)
-        }
-    }
+    override fun invoke(actual: WebElement) = matcher(actual.text)
 }

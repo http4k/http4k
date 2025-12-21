@@ -40,7 +40,7 @@ data class ChatCompletion(
     val response_format: ResponseFormat? = null,
     val tools: List<Tool>? = null,
     val tool_choice: Any? = null,
-    val n: Integer? = null,
+    val n: Int? = null,
 ) : ModelCompletion {
     override fun toRequest() = Request(Method.POST, "/chat/completions")
         .with(autoBody<ChatCompletion>().toLens() of this)

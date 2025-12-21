@@ -266,8 +266,8 @@ class OpenTelemetryTracingTest {
             assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/client"))
             assertThat(traceId, equalTo(sentTraceId))
-            assertThat(spanId, !equalTo(serverContext!!.spanId))
-            assertThat(parentSpanId, equalTo(serverContext!!.spanId))
+            assertThat(spanId, !equalTo(serverContext.spanId))
+            assertThat(parentSpanId, equalTo(serverContext.spanId))
         }
     }
 }

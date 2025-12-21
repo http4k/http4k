@@ -67,22 +67,22 @@ class ServerFiltersTest {
             var newThreadLocal: ZipkinTraces? = null
             val svc = ServerFilters.RequestTracing().then {
                 newThreadLocal = ZipkinTracesStorage.THREAD_LOCAL.forCurrentThread()
-                assertThat(newThreadLocal!!.traceId, present())
-                assertThat(newThreadLocal!!.spanId, present())
-                assertThat(newThreadLocal!!.parentSpanId, absent())
-                assertThat(newThreadLocal!!.samplingDecision, equalTo(SAMPLE))
+                assertThat(newThreadLocal.traceId, present())
+                assertThat(newThreadLocal.spanId, present())
+                assertThat(newThreadLocal.parentSpanId, absent())
+                assertThat(newThreadLocal.samplingDecision, equalTo(SAMPLE))
 
                 val setOnRequest = ZipkinTraces(it)
-                assertThat(setOnRequest.traceId, equalTo(newThreadLocal!!.traceId))
-                assertThat(setOnRequest.spanId, equalTo(newThreadLocal!!.spanId))
+                assertThat(setOnRequest.traceId, equalTo(newThreadLocal.traceId))
+                assertThat(setOnRequest.spanId, equalTo(newThreadLocal.spanId))
                 assertThat(setOnRequest.parentSpanId, absent())
-                assertThat(setOnRequest.samplingDecision, equalTo(newThreadLocal!!.samplingDecision))
+                assertThat(setOnRequest.samplingDecision, equalTo(newThreadLocal.samplingDecision))
                 Response(OK)
             }
 
             val received = ZipkinTraces(svc(Request(GET, "")))
 
-            assertThat(received, equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE)))
+            assertThat(received, equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal.spanId, null, SAMPLE)))
         }
 
 
@@ -128,11 +128,11 @@ class ServerFiltersTest {
             assertThat(ZipkinTraces(actual), equalTo(originalTraces))
 
             assertThat(start!!.first, equalTo(originalRequest))
-            assertThat(start!!.second, equalTo(originalTraces))
+            assertThat(start.second, equalTo(originalTraces))
 
             assertThat(end!!.first, equalTo(originalRequest))
-            assertThat(end!!.second, equalTo(ZipkinTraces(originalTraces, Response(OK))))
-            assertThat(end!!.third, equalTo(originalTraces))
+            assertThat(end.second, equalTo(ZipkinTraces(originalTraces, Response(OK))))
+            assertThat(end.third, equalTo(originalTraces))
         }
 
         private val trace_id = "x-b3-traceid"
@@ -730,7 +730,7 @@ class ServerFiltersTest {
                 Missing(Header.required("bill").meta),
                 target = Request(GET, "")
             )
-            val handler = ServerFilters.CatchLensFailure { it -> Response(OK).body(it.localizedMessage) }
+            val handler = ServerFilters.CatchLensFailure { Response(OK).body(it.localizedMessage) }
                 .then { throw e }
 
             val response = handler(Request(GET, "/"))
