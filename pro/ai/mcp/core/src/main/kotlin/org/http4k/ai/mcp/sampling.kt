@@ -2,7 +2,6 @@ package org.http4k.ai.mcp
 
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.SystemPrompt
@@ -19,7 +18,7 @@ import org.http4k.ai.mcp.model.SamplingIncludeContext
 typealias SamplingHandler = (SamplingRequest) -> Sequence<SamplingResponse>
 
 fun interface SamplingFilter {
-    operator fun invoke(request: SamplingHandler): SamplingHandler
+    operator fun invoke(handler: SamplingHandler): SamplingHandler
     companion object
 }
 

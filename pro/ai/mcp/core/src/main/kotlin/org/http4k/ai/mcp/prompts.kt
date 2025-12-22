@@ -14,7 +14,7 @@ import org.http4k.ai.mcp.Client.Companion.NoOp
 typealias PromptHandler = (PromptRequest) -> PromptResponse
 
 fun interface PromptFilter {
-    operator fun invoke(request: PromptHandler): PromptHandler
+    operator fun invoke(handler: PromptHandler): PromptHandler
     companion object
 }
 

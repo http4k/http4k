@@ -12,7 +12,7 @@ import org.http4k.core.Request
 typealias CompletionHandler = (CompletionRequest) -> CompletionResponse
 
 fun interface CompletionFilter {
-    operator fun invoke(request: CompletionHandler): CompletionHandler
+    operator fun invoke(handler: CompletionHandler): CompletionHandler
 
     companion object
 }

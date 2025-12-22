@@ -17,7 +17,7 @@ import org.http4k.ai.mcp.util.McpNodeType
 typealias ToolHandler = (ToolRequest) -> ToolResponse
 
 fun interface ToolFilter {
-    operator fun invoke(request: ToolHandler): ToolHandler
+    operator fun invoke(handler: ToolHandler): ToolHandler
 
     companion object
 }

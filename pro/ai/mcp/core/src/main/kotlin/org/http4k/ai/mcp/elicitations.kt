@@ -18,7 +18,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
 typealias ElicitationHandler = (ElicitationRequest) -> ElicitationResponse
 
 fun interface ElicitationFilter {
-    operator fun invoke(request: ElicitationHandler): ElicitationHandler
+    operator fun invoke(handler: ElicitationHandler): ElicitationHandler
 
     companion object
 }

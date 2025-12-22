@@ -12,7 +12,7 @@ import org.http4k.ai.mcp.Client.Companion.NoOp
 typealias ResourceHandler = (ResourceRequest) -> ResourceResponse
 
 fun interface ResourceFilter {
-    operator fun invoke(request: ResourceHandler): ResourceHandler
+    operator fun invoke(handler: ResourceHandler): ResourceHandler
     companion object
 }
 
