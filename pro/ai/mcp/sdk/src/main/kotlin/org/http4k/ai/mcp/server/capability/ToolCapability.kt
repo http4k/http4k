@@ -47,7 +47,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
-                    handler(it)
+                    this(it)
                 } catch (e: LensFailure) {
                     throw McpException(InvalidParams)
                 } catch (e: Exception) {
