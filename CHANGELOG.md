@@ -5,6 +5,8 @@ changes with their rationale when appropriate:
 
 ### v6.25.1.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-connect-amazon-cognito***: Implement additional AWS Cognito actions H/T @torfinnberset
+- **http4k-connect-slack**: Support better BlockKit options  H/T @torfinnberset
 - **http4k-core**: [Fix] ClientFilters.FollowRedirects handles relative URLs in the Location header. H/T @npryce
 
 ### v6.25.0.0
