@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.25.1.0 (uncut)
+### v6.25.1.0
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-cognito***: Implement additional AWS Cognito actions H/T @torfinnberset
 - **http4k-connect-slack**: Support better BlockKit options  H/T @torfinnberset
