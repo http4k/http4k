@@ -11,8 +11,10 @@ import org.http4k.connect.amazon.cognito.model.AuthFlow.USER_PASSWORD_AUTH
 import org.http4k.connect.amazon.cognito.model.ChallengeName.NEW_PASSWORD_REQUIRED
 import org.http4k.connect.amazon.cognito.model.ClientName
 import org.http4k.connect.amazon.cognito.model.CloudFrontDomain
+import org.http4k.connect.amazon.cognito.model.DeliveryMedium
 import org.http4k.connect.amazon.cognito.model.OAuthFlow.client_credentials
 import org.http4k.connect.amazon.cognito.model.PoolName
+import org.http4k.connect.amazon.cognito.model.RefreshToken
 import org.http4k.connect.amazon.cognito.model.UserCode
 import org.http4k.connect.amazon.cognito.model.UserPoolId
 import org.http4k.connect.amazon.core.model.Password
@@ -222,6 +224,41 @@ interface CognitoContract : AwsContract {
             deleteUserPoolClient(id, client.ClientId).successValue()
 
             adminDeleteUser(username, id).successValue()
+        }
+    }
+
+    @Test
+    fun `can get tokens from refresh token`() {
+        withCognitoPool { id ->
+            val poolClient = createUserPoolClient(id)
+            val response = getTokensFromRefreshToken(
+                ClientId = poolClient.ClientId,
+                RefreshToken = RefreshToken.of("fake-refresh-token")
+            ).successValue()
+            assertThat(response.AuthenticationResult.TokenType, equalTo("Bearer"))
+        }
+    }
+
+    @Test
+    fun `can resend confirmation code`() {
+        withCognitoPool { id ->
+            val poolClient = createUserPoolClient(id)
+            val response = resendConfirmationCode(
+                ClientId = poolClient.ClientId,
+                Username = Username.of("test@example.com")
+            ).successValue()
+            assertThat(response.CodeDeliveryDetails.DeliveryMedium, equalTo(DeliveryMedium.EMAIL))
+        }
+    }
+
+    @Test
+    fun `can revoke token`() {
+        withCognitoPool { id ->
+            val poolClient = createUserPoolClient(id)
+            revokeToken(
+                ClientId = poolClient.ClientId,
+                Token = RefreshToken.of("fake-refresh-token")
+            ).successValue()
         }
     }
 

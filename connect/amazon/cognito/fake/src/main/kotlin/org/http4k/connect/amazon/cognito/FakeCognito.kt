@@ -10,6 +10,9 @@ import org.http4k.connect.amazon.cognito.endpoints.createUserPoolClient
 import org.http4k.connect.amazon.cognito.endpoints.createUserPoolDomain
 import org.http4k.connect.amazon.cognito.endpoints.deleteUserPool
 import org.http4k.connect.amazon.cognito.endpoints.deleteUserPoolDomain
+import org.http4k.connect.amazon.cognito.endpoints.getTokensFromRefreshToken
+import org.http4k.connect.amazon.cognito.endpoints.resendConfirmationCode
+import org.http4k.connect.amazon.cognito.endpoints.revokeToken
 import org.http4k.connect.amazon.cognito.endpoints.wellKnown
 import org.http4k.connect.amazon.cognito.oauth.CognitoOAuth
 import org.http4k.connect.amazon.core.model.AwsService
@@ -36,7 +39,10 @@ class FakeCognito(
         api.createUserPoolDomain(pools),
         api.createUserPoolClient(pools),
         api.deleteUserPoolDomain(pools),
-        api.deleteUserPool(pools)
+        api.deleteUserPool(pools),
+        api.getTokensFromRefreshToken(pools),
+        api.resendConfirmationCode(pools),
+        api.revokeToken(pools)
     )
 
     /**
