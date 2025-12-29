@@ -33,14 +33,33 @@ enum class TextType {
 }
 
 @JsonSerializable
-data class Text(val text: String, val type: TextType)
+data class Text(val text: String, val type: TextType, val emoji: Boolean? = null)
 
 enum class BlockType {
-    section, header, divider
+    section, header, divider, actions
 }
+
+enum class BlockElementType {
+    button
+}
+
+@JsonSerializable
+data class BlockElement(
+    val type: BlockElementType,
+    val text: Text,
+    val url: String? = null,
+    val action_id: String? = null,
+    val style: String? = null,
+)
 
 @JsonSerializable
 data class Attachment(val text: String, val fallback: String, val color: String)
 
 @JsonSerializable
-data class Block(val text: Text? = null, val fields: List<Text>? = null, val type: BlockType = header, val expand: Boolean? = null)
+data class Block(
+    val text: Text? = null,
+    val fields: List<Text>? = null,
+    val type: BlockType = header,
+    val expand: Boolean? = null,
+    val elements: List<BlockElement>? = null
+)
