@@ -7,8 +7,11 @@ import org.http4k.lens.RequestKey
 
 private const val TRANSACTION_RESOURCE_KEY = "http4k-db-transactor"
 
-fun <Resource : Any> TransactionPerRequestFilter(transactor: Transactor<Resource>): Filter {
-    val key = RequestKey.required<Resource>(TRANSACTION_RESOURCE_KEY)
+fun <Resource : Any> TransactionPerRequestFilter(
+    transactor: Transactor<Resource>,
+    keyName: String = TRANSACTION_RESOURCE_KEY
+): Filter {
+    val key = RequestKey.required<Resource>(keyName)
 
     return Filter { next ->
         { request: Request ->
@@ -19,8 +22,8 @@ fun <Resource : Any> TransactionPerRequestFilter(transactor: Transactor<Resource
     }
 }
 
-fun <T : Any> Request.transactionResource(): T {
-    val key = RequestKey.required<T>(TRANSACTION_RESOURCE_KEY)
+fun <T : Any> Request.transactionResource(keyName: String = TRANSACTION_RESOURCE_KEY): T {
+    val key = RequestKey.required<T>(keyName)
 
     return key(this)
 }
