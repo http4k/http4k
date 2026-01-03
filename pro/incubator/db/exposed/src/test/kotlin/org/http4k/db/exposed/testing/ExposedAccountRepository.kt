@@ -1,5 +1,6 @@
-package org.http4k.db.testing
+package org.http4k.db.exposed.testing
 
+import org.http4k.db.testing.AccountRepository
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Expression
 import org.jetbrains.exposed.sql.IntegerColumnType

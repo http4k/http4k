@@ -10,7 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.db.DataSourceTransactor
+import org.http4k.db.jdbc.DataSourceTransactor
 import org.http4k.db.TransactionPerRequestFilter
 import org.http4k.db.transactionResource
 import org.http4k.routing.bind

@@ -2,7 +2,7 @@ package org.http4k.postbox.storage.exposed
 
 import dev.forkhandles.time.TimeSource
 import dev.forkhandles.time.systemTime
-import org.http4k.db.ExposedTransactor
+import org.http4k.db.exposed.ExposedTransactor
 import org.http4k.postbox.PostboxTransactor
 import javax.sql.DataSource
 

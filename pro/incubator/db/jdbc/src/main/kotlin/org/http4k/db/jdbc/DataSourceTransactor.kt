@@ -1,5 +1,6 @@
-package org.http4k.db
+package org.http4k.db.jdbc
 
+import org.http4k.db.Transactor
 import java.sql.Connection
 import java.sql.SQLException
 import javax.sql.DataSource

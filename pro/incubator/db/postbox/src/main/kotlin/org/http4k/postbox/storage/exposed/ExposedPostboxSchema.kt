@@ -1,6 +1,6 @@
 package org.http4k.postbox.storage.exposed
 
-import org.http4k.db.ExposedTransactor
+import org.http4k.db.exposed.ExposedTransactor
 import org.http4k.db.Transactor
 import org.jetbrains.exposed.sql.SchemaUtils
 import javax.sql.DataSource

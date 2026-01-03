@@ -1,9 +1,10 @@
-package org.http4k.db
+package org.http4k.db.jdbc
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.hsqldb.Server
 import org.hsqldb.persist.HsqlProperties
+import org.http4k.db.TransactorWithRetryContract
 import org.http4k.db.testing.PlainSqlAccountRepository
 import org.junit.jupiter.api.AfterEach
 import java.sql.Connection

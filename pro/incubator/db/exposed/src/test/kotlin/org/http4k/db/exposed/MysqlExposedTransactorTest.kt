@@ -1,6 +1,7 @@
-package org.http4k.db
+package org.http4k.db.exposed
 
-import org.http4k.db.testing.ExposedAccountRepository
+import org.http4k.db.TransactorContract
+import org.http4k.db.exposed.testing.ExposedAccountRepository
 import org.http4k.db.testing.createMysqlDataSource
 import org.http4k.db.testing.setupDatabase
 
