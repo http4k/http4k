@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.update
-import java.util.*
+import java.util.UUID
 
 object Accounts: Table("ACCOUNTS"){
     val name: Column<String> = varchar("name", 255)

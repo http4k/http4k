@@ -8,13 +8,14 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.db.testing.AccountRepository
+import org.http4k.db.testing.InMemoryAccountRepository
 import org.http4k.db.testing.PlainSqlAccountRepository
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 
 fun main() {
-    val transactor = DataSourceTransactor(createDataSource(), ::PlainSqlAccountRepository)
+    val transactor = InMemoryTransactor(::InMemoryAccountRepository)
 
     val app = routes(
         "/balance/{account}" bind GET to

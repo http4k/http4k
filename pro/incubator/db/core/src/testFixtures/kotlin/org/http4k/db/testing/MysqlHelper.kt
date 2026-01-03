@@ -6,7 +6,7 @@ import org.opentest4j.TestAbortedException
 import javax.sql.DataSource
 import kotlin.use
 
-fun createDatasourceForDb(database: String = "") = try {
+fun createMysqlDataSource(database: String = "") = try {
     HikariDataSource(HikariConfig().apply {
         driverClassName = "com.mysql.cj.jdbc.Driver"
         username = "root"

@@ -1,25 +1,13 @@
-package org.http4k.db
+package org.http4k.db.testing
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.http4k.db.testing.ExposedAccountRepository
-import org.http4k.db.testing.PlainSqlAccountRepository
 import org.opentest4j.TestAbortedException
 import java.sql.Connection
+import kotlin.use
 
-class PostgresDataSourceTransactorTest : TransactorWithRetryContract() {
-    override val dataSource = createDataSource()
-    override fun transactor() = DataSourceTransactor(dataSource, ::PlainSqlAccountRepository)
-    override fun prepareDb() = initialisePostgres(dataSource.connection)
-}
 
-class PostgresExposedTransactorTest : TransactorContract() {
-    override val dataSource = createDataSource()
-    override fun transactor() = ExposedTransactor(dataSource, { ExposedAccountRepository() })
-    override fun prepareDb() = initialisePostgres(dataSource.connection)
-}
-
-fun createDataSource() = try {
+fun createPostgresDataSource() = try {
     HikariDataSource(HikariConfig().apply {
         driverClassName = "org.postgresql.Driver"
         username = "postgres"
@@ -30,7 +18,7 @@ fun createDataSource() = try {
     throw TestAbortedException("Postgres not available")
 }
 
-private fun initialisePostgres(connection: Connection) {
+fun initialisePostgres(connection: Connection) {
     connection.createStatement().use {
         it.execute(
             """DROP SCHEMA public CASCADE; 
