@@ -7,7 +7,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit
 
 abstract class TransactorWithRetryContract: TransactorContract() {
 
@@ -24,12 +24,12 @@ abstract class TransactorWithRetryContract: TransactorContract() {
         val updateInThreadTwo = executor.submit(updateTwo).also { testSemaphore.tryAcquireOrFail() }
 
         updateTwo.resume(false)
-        expectThat(updateInThreadTwo.get(2, SECONDS)).isEqualTo(Success(Unit))
+        expectThat(updateInThreadTwo.get(2, TimeUnit.SECONDS)).isEqualTo(Success(Unit))
         transactor.verifyBalance("Alice", 93)
         transactor.verifyBalance("Bob", 107)
 
         updateOne.resume(false)
-        expectThat(updateInThreadOne.get(2, SECONDS)).isEqualTo(Success(Unit))
+        expectThat(updateInThreadOne.get(2, TimeUnit.SECONDS)).isEqualTo(Success(Unit))
         transactor.verifyBalance("Alice", 90)
         transactor.verifyBalance("Bob", 110)
     }
@@ -44,24 +44,24 @@ abstract class TransactorWithRetryContract: TransactorContract() {
         val results = updaters.map { executor.submit(it).also { semaphore.tryAcquireOrFail() } }
 
         updaters[0].resume(false)
-        expectThat(results[0].get(2, SECONDS)).isEqualTo(Success(Unit))
+        expectThat(results[0].get(2, TimeUnit.SECONDS)).isEqualTo(Success(Unit))
         (1..3).forEach { updaters[it].resume(true).also { semaphore.tryAcquireOrFail() } }
 
         updaters[1].resume(false)
-        expectThat(results[1].get(2, SECONDS)).isEqualTo(Success(Unit))
+        expectThat(results[1].get(2, TimeUnit.SECONDS)).isEqualTo(Success(Unit))
         (2..3).forEach { updaters[it].resume(true).also { semaphore.tryAcquireOrFail() } }
 
         updaters[2].resume(false)
-        expectThat(results[2].get(2, SECONDS)).isEqualTo(Success(Unit))
+        expectThat(results[2].get(2, TimeUnit.SECONDS)).isEqualTo(Success(Unit))
 
         updaters[3].resume(false)
-        expectThat(results[3].get(2, SECONDS)).not().isEqualTo(Success(Unit))
+        expectThat(results[3].get(2, TimeUnit.SECONDS)).not().isEqualTo(Success(Unit))
 
         transactor.verifyBalance("Alice", 85)
         transactor.verifyBalance("Bob", 115)
     }
 
     private fun Semaphore.tryAcquireOrFail(permits: Int = 1) {
-        if (!tryAcquire(permits, 1, SECONDS)) throw Exception("Failed to acquire $permits after 1 second")
+        if (!tryAcquire(permits, 1, TimeUnit.SECONDS)) throw Exception("Failed to acquire $permits after 1 second")
     }
 }

@@ -8,6 +8,7 @@ import org.http4k.db.testing.PlainSqlAccountRepository
 import org.junit.jupiter.api.AfterEach
 import java.sql.Connection
 import java.sql.DriverManager
+import kotlin.use
 
 class HSqlDataSourceTransactorTest : TransactorWithRetryContract() {
 
@@ -50,11 +51,11 @@ class HSqlServer {
     }
 
      fun dataSource() = HikariDataSource(HikariConfig().apply {
-        driverClassName = "org.hsqldb.jdbcDriver"
-        username = "SA"
-        password = ""
-        jdbcUrl = "jdbc:hsqldb:hsql://localhost/http4k-testing"
-    })
+         driverClassName = "org.hsqldb.jdbcDriver"
+         username = "SA"
+         password = ""
+         jdbcUrl = "jdbc:hsqldb:hsql://localhost/http4k-testing"
+     })
 }
 
 fun HSqlServer.setUpDbForTesting() {

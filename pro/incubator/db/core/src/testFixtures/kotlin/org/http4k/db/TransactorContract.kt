@@ -1,16 +1,13 @@
 package org.http4k.db
 
-import org.http4k.db.Transactor.Mode.ReadOnly
 import org.http4k.db.testing.AccountRepository
-import org.http4k.db.testing.AccountRepository.Direction.CREDIT
-import org.http4k.db.testing.AccountRepository.Direction.DEBIT
 import org.http4k.db.testing.PlainSqlAccountRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
-import java.util.*
+import java.util.UUID
 import javax.sql.DataSource
 
 abstract class TransactorContract {
@@ -32,8 +29,8 @@ abstract class TransactorContract {
 
         transactor.perform { repository ->
             with(UUID.randomUUID()) {
-                repository.recordMovement(this, "Alice", 10, DEBIT)
-                repository.recordMovement(this, "Bob", 10, CREDIT)
+                repository.recordMovement(this, "Alice", 10, AccountRepository.Direction.DEBIT)
+                repository.recordMovement(this, "Bob", 10, AccountRepository.Direction.CREDIT)
             }
             repository.adjustBalance("Alice", -10)
             repository.adjustBalance("Bob", 10)
@@ -50,8 +47,8 @@ abstract class TransactorContract {
         expectThrows<Exception> {
             transactor.perform { repository ->
                 with(UUID.randomUUID()) {
-                    repository.recordMovement(this, "Alice", 10, DEBIT)
-                    repository.recordMovement(this, "Bob", 10, CREDIT)
+                    repository.recordMovement(this, "Alice", 10, AccountRepository.Direction.DEBIT)
+                    repository.recordMovement(this, "Bob", 10, AccountRepository.Direction.CREDIT)
                 }
                 repository.adjustBalance("Alice", -10)
                 repository.failOperation()
@@ -68,7 +65,7 @@ abstract class TransactorContract {
         val transactor = transactor()
 
         expectThrows<Exception> {
-            transactor.perform(ReadOnly) { it.adjustBalance("Alice", 10) }
+            transactor.perform(Transactor.Mode.ReadOnly) { it.adjustBalance("Alice", 10) }
         }
     }
 

@@ -1,6 +1,4 @@
-
-
-description = "http4k db module"
+description = "http4k db JDBC module"
 
 plugins {
     id("org.http4k.pro")
@@ -11,25 +9,18 @@ dependencies {
     compileOnly(platform(libs.junit.bom))
     compileOnly(libs.junit.jupiter.api)
     api(project(":http4k-core"))
-    testImplementation(testFixtures(project(":http4k-core")))
+    api(project(":http4k-incubator-db-core"))
 
-    testImplementation(project(":http4k-testing-strikt"))
+    testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-incubator-db-core")))
+
     api(libs.result4k)
     api(libs.values4k)
     api(libs.time4k)
 
     testImplementation(libs.hsqldb)
-
     testImplementation(libs.postgresql)
-
     testImplementation(libs.mysql.connector.java)
 
-    testFixturesImplementation(libs.junit.jupiter.api)
-    testFixturesImplementation(project(":http4k-testing-strikt"))
-
     api(libs.hikaricp)
-    api(platform(libs.exposed.bom))
-    api(libs.exposed.core)
-    api(libs.exposed.jdbc)
-    api(libs.exposed.java.time)
 }

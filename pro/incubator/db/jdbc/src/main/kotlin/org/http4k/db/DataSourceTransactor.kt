@@ -1,7 +1,5 @@
 package org.http4k.db
 
-import org.http4k.db.Transactor.Mode
-import org.http4k.db.Transactor.Mode.ReadOnly
 import java.sql.Connection
 import java.sql.SQLException
 import javax.sql.DataSource
@@ -13,11 +11,11 @@ class DataSourceTransactor<Resource>(
     constructor(dataSource: DataSource, createResource: (Connection) -> Resource) :
         this(dataSource::getConnection, createResource)
 
-    override fun <T> perform(mode: Mode, work: (Resource) -> T): T =
+    override fun <T> perform(mode: Transactor.Mode, work: (Resource) -> T): T =
         getConnection().use { c ->
             c.autoCommit = false
             c.transactionIsolation = Connection.TRANSACTION_SERIALIZABLE
-            c.isReadOnly = (mode == ReadOnly)
+            c.isReadOnly = (mode == Transactor.Mode.ReadOnly)
 
             c.runTransaction(createResource(c), work)
         }
