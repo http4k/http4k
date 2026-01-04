@@ -121,6 +121,9 @@
               "nullable": false
             }
           }
+        },
+        "execution": {
+          "taskSupport": "optional"
         }
       }
     ],
