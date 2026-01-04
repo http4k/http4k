@@ -17,6 +17,7 @@ sealed class Resource : CapabilitySpec {
     abstract val mimeType: MimeType?
     abstract val title: String?
     abstract val annotations: Annotations?
+    abstract val icons: List<Icon>?
 
     data class Static(
         val uri: Uri,
@@ -26,12 +27,14 @@ sealed class Resource : CapabilitySpec {
         override val size: Size? = null,
         override val annotations: Annotations? = null,
         override val title: String? = null,
+        override val icons: List<Icon>? = null,
     ) : Resource() {
         constructor(
             uri: String, name: String, description: String? = null,
             mimeType: MimeType? = null, size: Size? = null,
-            annotations: Annotations? = null, title: String? = null
-        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations, title)
+            annotations: Annotations? = null, title: String? = null,
+            icons: List<Icon>? = null
+        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations, title, icons)
 
         override fun matches(uri: Uri) = this.uri == uri
     }
@@ -44,6 +47,7 @@ sealed class Resource : CapabilitySpec {
         override val size: Size? = null,
         override val annotations: Annotations? = null,
         override val title: String? = null,
+        override val icons: List<Icon>? = null,
         internal val matchFn: ResourceUriTemplate.(Uri) -> Boolean = { matches(it) },
     ) : Resource() {
         constructor(
@@ -54,9 +58,10 @@ sealed class Resource : CapabilitySpec {
             size: Size? = null,
             annotations: Annotations? = null,
             title: String? = null,
+            icons: List<Icon>? = null,
         ) : this(
             ResourceUriTemplate.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations,
-            title
+            title, icons
         )
 
         override fun matches(uri: Uri) = matchFn(uriTemplate, uri)
