@@ -40,7 +40,8 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
         McpJson.convert(tool.toSchema()),
         tool.output?.toSchema()?.let { McpJson.convert(it) },
         tool.annotations,
-        tool.icons
+        tool.icons,
+        tool.execution
     )
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =

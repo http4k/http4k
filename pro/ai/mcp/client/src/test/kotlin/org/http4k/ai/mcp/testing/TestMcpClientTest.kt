@@ -38,7 +38,9 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
+import org.http4k.ai.mcp.model.TaskSupport
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerCapabilities
@@ -245,7 +247,15 @@ class TestMcpClientTest {
         val intArg = Tool.Arg.int().optional("bar", "description2")
         val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
 
-        val tool = Tool("name", "description", stringArg, intArg, title = "title", icons = icons)
+        val tool = Tool(
+            "name",
+            "description",
+            stringArg,
+            intArg,
+            title = "title",
+            icons = icons,
+            execution = ToolExecution(TaskSupport.optional)
+        )
 
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -286,7 +296,8 @@ class TestMcpClientTest {
                                 ),
                                 null,
                                 null,
-                                icons
+                                icons,
+                                ToolExecution(TaskSupport.optional)
                             )
                         )
                     )
