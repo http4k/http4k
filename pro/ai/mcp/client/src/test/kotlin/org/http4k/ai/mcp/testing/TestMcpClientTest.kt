@@ -96,7 +96,8 @@ class TestMcpClientTest {
     @Test
     fun `deal with prompts`() {
         val intArg = Prompt.Arg.int().required("name", "description", mapOf("title" to "title"))
-        val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title")
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title", icons = icons)
 
         val serverPrompts = ServerPrompts(
             listOf(
@@ -125,7 +126,8 @@ class TestMcpClientTest {
                         listOf(
                             McpPrompt(
                                 PromptName.of("prompt"), "description", "title",
-                                listOf(McpPrompt.Argument("name", "description", "title", true))
+                                listOf(McpPrompt.Argument("name", "description", "title", true)),
+                                icons
                             )
                         )
                     )
@@ -157,7 +159,8 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with static resources`() {
-        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description")
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description", icons = icons)
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
         val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
@@ -174,7 +177,7 @@ class TestMcpClientTest {
         mcp.useClient {
             assertThat(
                 resources().list(), equalTo(
-                    Success(listOf(McpResource(resource.uri, ResourceName.of("HTTP4K"), "description")))
+                    Success(listOf(McpResource(resource.uri, ResourceName.of("HTTP4K"), "description", icons = icons)))
                 )
             )
 
@@ -240,8 +243,9 @@ class TestMcpClientTest {
     fun `deal with tools`() {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
 
-        val tool = Tool("name", "description", stringArg, intArg, title = "title")
+        val tool = Tool("name", "description", stringArg, intArg, title = "title", icons = icons)
 
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -281,7 +285,8 @@ class TestMcpClientTest {
                                     )
                                 ),
                                 null,
-                                null
+                                null,
+                                icons
                             )
                         )
                     )
