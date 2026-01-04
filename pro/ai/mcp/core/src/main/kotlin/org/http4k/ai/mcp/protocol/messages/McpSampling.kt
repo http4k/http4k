@@ -5,6 +5,8 @@ import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ModelPreferences
 import org.http4k.ai.mcp.model.SamplingIncludeContext
+import org.http4k.ai.mcp.model.ToolChoice
+import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
@@ -27,6 +29,8 @@ object McpSampling : McpRpc {
         val stopSequences: List<String>? = null,
         val modelPreferences: ModelPreferences? = null,
         val metadata: Map<String, Any> = emptyMap(),
+        val tools: kotlin.collections.List<McpTool>? = null,
+        val toolChoice: ToolChoice = ToolChoice(ToolChoiceMode.auto),
         override val _meta: Meta = Meta.default
     ) : ServerMessage.Request, HasMeta
 
