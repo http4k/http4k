@@ -40,6 +40,8 @@ import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.TaskSupport
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.ToolChoice
+import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
@@ -404,17 +406,30 @@ class TestMcpClientTest {
 
         val model = ModelName.of("name")
 
+        val testTool = org.http4k.ai.mcp.protocol.messages.McpTool(
+            ToolName.of("test_tool"),
+            "test tool description",
+            null,
+            emptyMap(),
+            null,
+            null
+        )
+
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 metadata, HttpStreamingSessions(SessionProvider.Random(random)),
                 tools = ServerTools(
                     Tool("sample", "description") bind {
-                        val size = it.client.sample(
-                            SamplingRequest(listOf(), MaxTokens.of(1)),
+                        val samplingRequest = it.client.sample(
+                            SamplingRequest(
+                                messages = listOf(),
+                                maxTokens = MaxTokens.of(1),
+                                tools = listOf(testTool),
+                                toolChoice = org.http4k.ai.mcp.model.ToolChoice(org.http4k.ai.mcp.model.ToolChoiceMode.auto)
+                            ),
                             Duration.ofSeconds(1)
-                        ).toList().size
-                        // TODO fix me!
-                        ToolResponse.Ok(listOf(Content.Text(size.toString())))
+                        ).toList()
+                        ToolResponse.Ok(listOf(Content.Text(samplingRequest.size.toString())))
                     }
                 ),
                 random = random
@@ -423,7 +438,10 @@ class TestMcpClientTest {
         ).testMcpClient()
 
         mcp.useClient {
-            sampling().onSampled {
+            sampling().onSampled { request ->
+                assertThat(request.tools, equalTo(listOf(testTool)))
+                assertThat(request.toolChoice, equalTo(org.http4k.ai.mcp.model.ToolChoice(org.http4k.ai.mcp.model.ToolChoiceMode.auto)))
+
                 sequenceOf(
                     SamplingResponse(model, Assistant, content, null),
                     SamplingResponse(model, Assistant, content, StopReason.of("bored")),
