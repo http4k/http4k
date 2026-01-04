@@ -3,6 +3,8 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import io.opentelemetry.api.GlobalOpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.semconv.HttpAttributes
 import io.opentelemetry.semconv.NetworkAttributes
@@ -64,8 +66,8 @@ class OpenTelemetry2xMetricsServerTest {
                 1,
                 1000.0,
                 Attributes.of(
-                    HttpAttributes.HTTP_ROUTE, "/duration/one",
-                    HttpAttributes.HTTP_REQUEST_METHOD, "GET",
+                    stringKey("http.route"), "/duration/one",
+                    stringKey("http.request.method"), "GET",
                     HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200,
                     NetworkAttributes.NETWORK_PROTOCOL_VERSION, "1.1",
                 )
@@ -77,8 +79,8 @@ class OpenTelemetry2xMetricsServerTest {
                 2,
                 2000.0,
                 Attributes.of(
-                    HttpAttributes.HTTP_ROUTE, "/duration/two/:name",
-                    HttpAttributes.HTTP_REQUEST_METHOD, "POST",
+                    stringKey("http.route"), "/duration/two/:name",
+                    stringKey("http.request.method"), "POST",
                     HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200,
                     NetworkAttributes.NETWORK_PROTOCOL_VERSION, "1.1",
                 )

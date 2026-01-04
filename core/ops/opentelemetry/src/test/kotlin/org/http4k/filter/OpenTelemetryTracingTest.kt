@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.GlobalOpenTelemetry
@@ -94,6 +95,38 @@ class OpenTelemetryTracingTest {
             assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
             assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{id}"))
+            assertThat(traceId, !equalTo(TraceId.getInvalid()))
+            assertThat(spanId, !equalTo(SpanId.getInvalid()))
+            assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
+        }
+    }
+
+    @Test
+    fun `server creates new span with semantic convention attributes`() {
+        var createdContext: SpanData? = null
+
+        val app = ServerFilters.OpenTelemetryTracing(attributeKeys = OpenTelemetrySemanticConventions)
+            .then(routes("/foo/{id}" bind GET to {
+                Span.current().spanContext
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
+                Response(OK)
+            }))
+
+        val resp = app(Request(GET, "http://localhost:8080/foo/bar?a=b")
+            .header("User-Agent", "my-browser")
+            .header("X-Forwarded-For", "10.1.2.3")
+        )
+
+        assertThat(resp, hasHeader("x-b3-traceid", !equalTo(TraceId.getInvalid())))
+        assertThat(resp, hasHeader("x-b3-spanid", !equalTo(TraceId.getInvalid())))
+        assertThat(resp, hasHeader("x-b3-sampled", equalTo("1")))
+
+        with(createdContext!!) {
+            assertThat(attributes.get(stringKey("http.request.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey("user_agent.original")), equalTo("my-browser"))
+            assertThat(attributes.get(stringKey("client.address")), equalTo("10.1.2.3"))
+            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{id}"))
+            assertThat(attributes.get(stringKey("http.url")), absent())
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
@@ -223,6 +256,24 @@ class OpenTelemetryTracingTest {
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
+        }
+    }
+
+    @Test
+    fun `client creates new span with semantic convention attributes`() {
+        var createdContext: SpanData? = null
+
+        val app = ClientFilters.OpenTelemetryTracing(attributeKeys = OpenTelemetrySemanticConventions)
+            .then {
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
+                Response(I_M_A_TEAPOT)
+            }
+
+        app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
+
+        with(createdContext!!) {
+            assertThat(attributes.get(stringKey("http.request.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey("url.full")), equalTo("http://localhost:8080/foo/bar?a=b"))
         }
     }
 

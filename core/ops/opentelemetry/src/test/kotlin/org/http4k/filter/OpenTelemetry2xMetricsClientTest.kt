@@ -2,6 +2,9 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import io.opentelemetry.api.GlobalOpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.AttributeKey.longKey
+import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.semconv.ErrorAttributes
 import io.opentelemetry.semconv.HttpAttributes
@@ -54,8 +57,8 @@ class OpenTelemetry2xMetricsClientTest {
                 1000.0,
                 Attributes.of(
                     ServerAttributes.SERVER_ADDRESS, "test.server.com",
-                    HttpAttributes.HTTP_REQUEST_METHOD, "GET",
-                    HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200,
+                    stringKey("http.request.method"), "GET",
+                    longKey("http.response.status_code"), 200,
                     ServerAttributes.SERVER_PORT, 9999,
                     NetworkAttributes.NETWORK_PROTOCOL_VERSION, "1.1"
                 )
@@ -68,7 +71,7 @@ class OpenTelemetry2xMetricsClientTest {
                 1000.0,
                 Attributes.of(
                     ServerAttributes.SERVER_ADDRESS, "test.server.com",
-                    HttpAttributes.HTTP_REQUEST_METHOD, "GET",
+                    stringKey("http.request.method"), "GET",
                     HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200,
                     ServerAttributes.SERVER_PORT, 9999,
                     NetworkAttributes.NETWORK_PROTOCOL_VERSION, "1.1"
@@ -82,8 +85,8 @@ class OpenTelemetry2xMetricsClientTest {
                 2000.0,
                 Attributes.of(
                     ServerAttributes.SERVER_ADDRESS, "another.server.com",
-                    HttpAttributes.HTTP_REQUEST_METHOD, "POST",
-                    HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 404,
+                    stringKey("http.request.method"), "POST",
+                    longKey("http.response.status_code"), 404,
                     ServerAttributes.SERVER_PORT, 8888,
                     NetworkAttributes.NETWORK_PROTOCOL_VERSION, "1.1",
                     ErrorAttributes.ERROR_TYPE, "Not Found"
