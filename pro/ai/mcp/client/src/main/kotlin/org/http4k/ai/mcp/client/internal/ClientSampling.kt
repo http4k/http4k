@@ -11,13 +11,13 @@ import java.time.Duration
 internal class ClientSampling(
     private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
-    private val sender: org.http4k.ai.mcp.client.internal.McpRpcSender,
-    private val register: (McpRpc, org.http4k.ai.mcp.client.internal.McpCallback<*>) -> Any
+    private val sender: McpRpcSender,
+    private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Sampling {
 
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
         register(McpSampling,
-            org.http4k.ai.mcp.client.internal.McpCallback(McpSampling.Request::class) { request, requestId ->
+            McpCallback(McpSampling.Request::class) { request, requestId ->
                 if (requestId == null) return@McpCallback
 
                 val responses = fn(
@@ -29,7 +29,9 @@ internal class ClientSampling(
                         request.temperature,
                         request.stopSequences,
                         request.modelPreferences,
-                        request.metadata
+                        request.metadata,
+                        request.tools ?: emptyList(),
+                        request.toolChoice
                     )
                 )
 
