@@ -13,7 +13,8 @@ data class McpPrompt(
     val name: PromptName,
     val description: String?,
     val title: String?,
-    val arguments: kotlin.collections.List<Argument>
+    val arguments: kotlin.collections.List<Argument>,
+    val icons: kotlin.collections.List<org.http4k.ai.mcp.model.Icon>? = null
 ) {
     @JsonSerializable
     data class Argument(
