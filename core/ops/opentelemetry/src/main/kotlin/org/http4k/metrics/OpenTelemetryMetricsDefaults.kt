@@ -1,5 +1,7 @@
 package org.http4k.metrics
 
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.semconv.ErrorAttributes
@@ -33,7 +35,7 @@ data class OpenTelemetryMetricsDefaults(
                     if (tx.request.uri.scheme.isNotBlank())
                         put(UrlAttributes.URL_SCHEME, tx.request.uri.scheme.lowercase())
                     put(
-                        HttpAttributes.HTTP_ROUTE,
+                        stringKey("http.route"),
                         if (tx.routingGroup != "UNMAPPED") "/${tx.routingGroup.replaceRegexes()}" else tx.routingGroup
                     )
                 }
@@ -58,7 +60,7 @@ data class OpenTelemetryMetricsDefaults(
 
         private fun AttributesBuilder.putBaseHttpInformationFrom(tx: HttpTransaction): AttributesBuilder =
             apply {
-                put(HttpAttributes.HTTP_REQUEST_METHOD, tx.request.method.toString().uppercase())
+                put(stringKey("http.request.method"), tx.request.method.toString().uppercase())
                 put(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, tx.response.status.code.toLong())
                 if (!tx.response.status.successful)
                     put(ErrorAttributes.ERROR_TYPE, tx.response.status.description)

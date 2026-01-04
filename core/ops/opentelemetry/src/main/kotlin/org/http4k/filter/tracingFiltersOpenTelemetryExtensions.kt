@@ -31,6 +31,7 @@ fun ClientFilters.OpenTelemetryTracing(
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
+    attributeKeys: OpenTelemetryAttributesKeys = LegacyHttp4kConventions
 ): Filter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
@@ -42,8 +43,8 @@ fun ClientFilters.OpenTelemetryTracing(
                 tracer.spanBuilder(spanNamer(req))
                 .setSpanKind(CLIENT)
                 .apply {
-                    setAttribute("http.method", req.method.name)
-                    setAttribute("http.url", req.uri.toString())
+                    setAttribute(attributeKeys.method, req.method.name)
+                    setAttribute(attributeKeys.clientUrl, req.uri.toString())
                 }
                 .let { spanCreationMutator(it) }
                 .startSpan()) {
@@ -55,7 +56,7 @@ fun ClientFilters.OpenTelemetryTracing(
                             setAttribute(SERVER_ADDRESS, req.uri.host)
                             req.uri.port?.also { if (it != 80 && it != 443) setAttribute(SERVER_PORT, it) }
 
-                            addStandardDataFrom(it, req)
+                            addStandardDataFrom(it, req, attributeKeys)
 
                             spanCompletionMutator(this@with, req, it)
                             if (it.status.clientError || it.status.serverError) setStatus(ERROR)
@@ -78,6 +79,7 @@ fun ServerFilters.OpenTelemetryTracing(
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
+    attributeKeys: OpenTelemetryAttributesKeys = LegacyHttp4kConventions
 ): Filter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
@@ -92,13 +94,13 @@ fun ServerFilters.OpenTelemetryTracing(
                 .setSpanKind(SERVER)
                 .apply {
                         if (req is RoutedMessage && req.xUriTemplate != null)
-                            setAttribute("http.route", req.xUriTemplate.toString())
+                            setAttribute(attributeKeys.httpRoute, req.xUriTemplate.toString())
 
-                        setAttribute("http.method", req.method.name)
-                        setAttribute("http.url", req.uri.toString())
+                        setAttribute(attributeKeys.method, req.method.name)
+                        attributeKeys.serverUrl?.let { setAttribute(it, req.uri.toString()) }
 
-                        req.header("User-Agent")?.also { setAttribute("http.user_agent", it) }
-                        req.remoteAddress()?.also { setAttribute("http.client_ip", it) }
+                        req.header("User-Agent")?.also { setAttribute(attributeKeys.userAgent, it) }
+                        req.remoteAddress()?.also { setAttribute(attributeKeys.clientAddress, it) }
                 }
                 .let { spanCreationMutator(it, req) }
                 .startSpan()) {
@@ -108,7 +110,7 @@ fun ServerFilters.OpenTelemetryTracing(
 
                         textMapPropagator.inject(Context.current(), ref, setter)
                         ref.get().also {
-                            addStandardDataFrom(it, req)
+                            addStandardDataFrom(it, req, attributeKeys)
                             spanCompletionMutator(this, req, it)
                             if (it.status.serverError) setStatus(ERROR)
                             else if (it.status.clientError) setStatus(UNSET)
@@ -143,14 +145,14 @@ val defaultSpanNamer: (Request) -> String = {
     }
 }
 
-private fun Span.addStandardDataFrom(resp: Response, req: Request) {
+private fun Span.addStandardDataFrom(resp: Response, req: Request, attributeKeys: OpenTelemetryAttributesKeys) {
     resp.body.length?.also {
         setAttribute(HTTP_RESPONSE_BODY_SIZE, it)
         setAttribute("message.type", "RECEIVED")
         setAttribute("messaging.message_payload_size_bytes", it)
     }
     req.body.length?.also { setAttribute(HTTP_REQUEST_BODY_SIZE, it) }
-    setAttribute("http.status_code", resp.status.code.toLong())
+    setAttribute(attributeKeys.statusCode, resp.status.code.toLong())
 }
 
 private fun Request.remoteAddress(): String? =
