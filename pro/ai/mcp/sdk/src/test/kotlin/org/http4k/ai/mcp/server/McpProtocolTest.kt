@@ -667,7 +667,8 @@ class McpProtocolTest {
             stringValueArg,
             dateValueArg,
             objectValueArg,
-            listObjectValueArg
+            listObjectValueArg,
+            execution = org.http4k.ai.mcp.model.ToolExecution(org.http4k.ai.mcp.model.TaskSupport.optional)
         )
 
         val mcp = SseMcp(
@@ -697,7 +698,13 @@ class McpProtocolTest {
         val objectValueArg = Tool.Arg.auto(example).required("complexValue")
         val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).required("listArg", "description9")
 
-        val tool = Tool("name", "description", objectValueArg, listObjectValueArg)
+        val tool = Tool(
+            "name",
+            "description",
+            objectValueArg,
+            listObjectValueArg,
+            execution = org.http4k.ai.mcp.model.ToolExecution(org.http4k.ai.mcp.model.TaskSupport.required)
+        )
 
         val mcp = SseMcp(
             McpProtocol(
