@@ -16,7 +16,7 @@ dependencies {
 
 ## Usage
 
-See [Example](`../jdbc/src/test/kotlin/org/http4k/db/example/Example.kt`)
+See [Example](../jdbc/src/test/kotlin/org/http4k/db/example/Example.kt)
 
 ## Testing
 

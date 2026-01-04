@@ -10,11 +10,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.db.InMemoryTransactor
 import org.http4k.db.jdbc.DataSourceTransactor
 import org.http4k.db.TransactionPerRequestFilter
 import org.http4k.db.transactionResource
+import org.http4k.lens.Path
+import org.http4k.lens.int
 import org.http4k.routing.bind
-import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.opentest4j.TestAbortedException
 import java.sql.Connection
@@ -86,28 +88,37 @@ class PostgresMessageRepository(private val connection: Connection) : MessageRep
     }
 }
 
+private val messageId = Path.int().of("id")
+
 fun main() {
     initialisePostgresDatabase(createPostgresDataSource().connection)
 
-    val transactor = DataSourceTransactor(createPostgresDataSource(), ::PostgresMessageRepository) // or use org.http4k.db.example.InMemoryMessageRepository for testing
+    val transactor = DataSourceTransactor(
+        createPostgresDataSource(),
+        ::PostgresMessageRepository
+    )
+
+    // or use in-memory for testing
+    // val transactor = InMemoryTransactor(::InMemoryMessageRepository)
 
     val app = routes(
         "/message/{id}" bind Method.GET to
-                { req: Request ->
-                    val repository: MessageRepository =
-                        req.transactionResource() // access the org.http4k.db.example.MessageRepository from the request
-                    val message = repository.getMessage(req.path("id")!!.toInt())
-                    if (message == null) Response.Companion(Status.NOT_FOUND)
-                        .body("Message not found") else Response.Companion(OK).body(message)
-                },
+            { request: Request ->
+                val repository: MessageRepository = request.transactionResource()
+
+                val message = repository.getMessage(messageId(request))
+
+                if (message == null) Response.Companion(Status.NOT_FOUND)
+                    .body("Message not found") else Response.Companion(OK).body(message)
+            },
         "/message/{id}" bind Method.POST to
-                { req: Request ->
-                    val repository: MessageRepository =
-                        req.transactionResource() // access the org.http4k.db.example.MessageRepository from the request
-                    val id = req.path("id")!!.toInt()
-                    repository.saveMessage(id, req.bodyString())
-                    Response.Companion(OK)
-                })
+            { request: Request ->
+                val repository: MessageRepository = request.transactionResource()
+
+                repository.saveMessage(messageId(request), request.bodyString())
+
+                Response.Companion(OK)
+            })
 
     val server = Filter.NoOp
         .then(TransactionPerRequestFilter(transactor)) // injects the AccountRepository into the request
