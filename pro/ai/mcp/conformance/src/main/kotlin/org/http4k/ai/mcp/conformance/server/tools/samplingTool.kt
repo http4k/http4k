@@ -9,6 +9,8 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.ToolChoice
+import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.Role.Companion.User
@@ -17,8 +19,14 @@ import org.http4k.routing.bind
 val prompt = Tool.Arg.string().required("prompt")
 
 fun samplingTool() = Tool("test_sampling", "test_sampling", prompt) bind {
-    it.client.sample(SamplingRequest(listOf(Message(User, Text(prompt(it)))), MaxTokens.of(10000)))
-        .toList()
+    it.client.sample(
+        SamplingRequest(
+            messages = listOf(Message(User, Text(prompt(it)))),
+            maxTokens = MaxTokens.of(10000),
+            tools = emptyList(),
+            toolChoice = ToolChoice(ToolChoiceMode.auto)
+        )
+    ).toList()
         .first()
         .map { Ok(it.content.toString()) }
         .mapFailure { Error(1, "Problem with response") }

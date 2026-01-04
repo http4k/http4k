@@ -26,6 +26,8 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         systemPrompt, includeContext,
                         temperature, stopSequences,
                         modelPreferences, metadata,
+                        tools ?: emptyList(),
+                        toolChoice,
                         _meta.progressToken,
                         )
                 }.valueOrNull()!!

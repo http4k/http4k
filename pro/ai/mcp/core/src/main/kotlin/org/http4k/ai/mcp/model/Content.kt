@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.model.ToolName
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
 import se.ansman.kotshi.JsonSerializable
@@ -26,4 +27,23 @@ sealed class Content {
     data class Text(val text: String, val annotations: Annotations? = null) : Content() {
         constructor(value: Any, annotations: Annotations? = null) : this(value.toString(), annotations)
     }
+
+    @JsonSerializable
+    @PolymorphicLabel("tool_use")
+    data class ToolUse(
+        val id: ToolUseId,
+        val name: ToolName,
+        val input: Map<String, Any>,
+        val _meta: Meta? = null
+    ) : Content()
+
+    @JsonSerializable
+    @PolymorphicLabel("tool_result")
+    data class ToolResult(
+        val toolUseId: ToolUseId,
+        val content: List<Content>? = null,
+        val structuredContent: Map<String, Any>? = null,
+        val isError: Boolean? = false,
+        val _meta: Meta? = null
+    ) : Content()
 }

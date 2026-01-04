@@ -264,6 +264,8 @@ class HttpStreamingMcpClient(
                                     stopSequences,
                                     modelPreferences,
                                     metadata,
+                                    tools ?: emptyList(),
+                                    toolChoice,
                                     _meta.progressToken
                                 )
                             )
