@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.protocol.messages
 
+import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
@@ -14,7 +15,7 @@ data class McpPrompt(
     val description: String?,
     val title: String?,
     val arguments: kotlin.collections.List<Argument>,
-    val icons: kotlin.collections.List<org.http4k.ai.mcp.model.Icon>? = null
+    val icons: kotlin.collections.List<Icon>? = null
 ) {
     @JsonSerializable
     data class Argument(

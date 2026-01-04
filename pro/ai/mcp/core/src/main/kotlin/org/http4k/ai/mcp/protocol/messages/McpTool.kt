@@ -1,14 +1,15 @@
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.ai.mcp.model.ToolAnnotations
-import org.http4k.ai.model.ToolName
-import org.http4k.format.MoshiNode
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Cursor
+import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.TaskMeta
+import org.http4k.ai.mcp.model.ToolAnnotations
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
+import org.http4k.ai.model.ToolName
+import org.http4k.format.MoshiNode
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -19,6 +20,7 @@ data class McpTool(
     val inputSchema: Map<String, Any>,
     val outputSchema: Map<String, Any>?,
     val annotations: ToolAnnotations?,
+    val icons: kotlin.collections.List<Icon>? = null
 ) {
     object List : McpRpc {
         override val Method = of("tools/list")
