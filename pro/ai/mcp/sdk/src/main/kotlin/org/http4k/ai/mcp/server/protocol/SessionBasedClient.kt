@@ -102,6 +102,8 @@ class SessionBasedClient<Transport>(
                             stopSequences,
                             modelPreferences,
                             metadata,
+                            tools,
+                            toolChoice,
                             _meta = Meta(progressToken)
                         ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
                     )
