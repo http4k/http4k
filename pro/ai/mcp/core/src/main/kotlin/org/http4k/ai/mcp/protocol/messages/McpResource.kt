@@ -2,6 +2,7 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Annotations
 import org.http4k.ai.mcp.model.Cursor
+import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
@@ -24,7 +25,8 @@ data class McpResource internal constructor(
     val title: String?,
     val mimeType: MimeType?,
     val size: Size?,
-    val annotations: Annotations?
+    val annotations: Annotations?,
+    val icons: kotlin.collections.List<Icon>? = null
 ) {
     constructor(
         uri: Uri,
@@ -33,8 +35,9 @@ data class McpResource internal constructor(
         mimeType: MimeType? = null,
         size: Size? = null,
         annotations: Annotations? = null,
-        title: String? = null
-    ) : this(uri, null, name, description, title, mimeType, size, annotations)
+        title: String? = null,
+        icons: kotlin.collections.List<Icon>? = null
+    ) : this(uri, null, name, description, title, mimeType, size, annotations, icons)
 
     constructor(
         uriTemplate: ResourceUriTemplate,
@@ -44,7 +47,8 @@ data class McpResource internal constructor(
         size: Size? = null,
         annotations: Annotations? = null,
         title: String? = null,
-    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations)
+        icons: kotlin.collections.List<Icon>? = null
+    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons)
 
     object Read : McpRpc {
         override val Method = of("resources/read")
