@@ -1,17 +1,15 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.Client
-import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.server.protocol.Tasks
-import org.http4k.ai.mcp.server.storage.InMemoryTaskStorage
 import org.http4k.ai.mcp.server.storage.TaskStorage
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 
 class ServerTasks(
-    private val storage: TaskStorage = InMemoryTaskStorage()
+    private val storage: TaskStorage = TaskStorage.InMemory()
 ) : Tasks {
     override fun get(req: McpTask.Get.Request, client: Client, http: Request): McpTask.Get.Response {
         val task = storage.get(req.taskId)
