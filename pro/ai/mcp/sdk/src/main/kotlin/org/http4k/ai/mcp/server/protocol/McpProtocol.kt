@@ -20,6 +20,7 @@ import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRoot
+import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
@@ -33,6 +34,7 @@ import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerRoots
+import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
@@ -68,6 +70,7 @@ class McpProtocol<Transport>(
     private val logger: Logger = ServerLogger(),
     private val roots: Roots = ServerRoots(),
     private val cancellations: Cancellations = ServerCancellations(),
+    private val tasks: Tasks = ServerTasks(),
     private val random: Random = Random,
     private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) }
 ) {
@@ -227,6 +230,26 @@ class McpProtocol<Transport>(
                     McpTool.List.Method ->
                         transport.respondTo<McpTool.List.Request>(session, jsonReq, httpReq) { it, c ->
                             tools.list(it, c, httpReq)
+                        }
+
+                    McpTask.Get.Method ->
+                        transport.respondTo<McpTask.Get.Request>(session, jsonReq, httpReq) { it, c ->
+                            tasks.get(it, c, httpReq)
+                        }
+
+                    McpTask.Result.Method ->
+                        transport.respondTo<McpTask.Result.Request>(session, jsonReq, httpReq) { it, c ->
+                            tasks.result(it, c, httpReq)
+                        }
+
+                    McpTask.Cancel.Method ->
+                        transport.respondTo<McpTask.Cancel.Request>(session, jsonReq, httpReq) { it, c ->
+                            tasks.cancel(it, c, httpReq)
+                        }
+
+                    McpTask.List.Method ->
+                        transport.respondTo<McpTask.List.Request>(session, jsonReq, httpReq) { it, c ->
+                            tasks.list(it, c, httpReq)
                         }
 
                     else -> sessions.respond(transport, session, MethodNotFound.toJsonRpc(jsonReq.id))
