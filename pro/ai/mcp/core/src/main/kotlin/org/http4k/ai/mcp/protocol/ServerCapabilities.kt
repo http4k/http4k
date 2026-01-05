@@ -5,6 +5,9 @@ import org.http4k.ai.mcp.protocol.ServerProtocolCapability.Logging
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.PromptsChanged
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.ResourcesChanged
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.Completions
+import org.http4k.ai.mcp.protocol.ServerProtocolCapability.TaskCancel
+import org.http4k.ai.mcp.protocol.ServerProtocolCapability.TaskList
+import org.http4k.ai.mcp.protocol.ServerProtocolCapability.TaskToolCall
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.ToolsChanged
 import se.ansman.kotshi.JsonSerializable
 
@@ -16,7 +19,8 @@ data class ServerCapabilities internal constructor(
     val resources: ResourceCapabilities?,
     val completions: Unit?,
     val logging: Unit?,
-    val experimental: Unit?
+    val experimental: Unit?,
+    val tasks: Tasks?
 ) {
     constructor(vararg capabilities: ServerProtocolCapability = ServerProtocolCapability.entries.toTypedArray()) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
@@ -25,6 +29,7 @@ data class ServerCapabilities internal constructor(
         if (capabilities.contains(Completions)) Unit else null,
         if (capabilities.contains(Logging)) Unit else null,
         if (capabilities.contains(Experimental)) Unit else null,
+        buildTasks(capabilities.toList())
     )
 
     @JsonSerializable
@@ -35,5 +40,40 @@ data class ServerCapabilities internal constructor(
 
     @JsonSerializable
     data class ResourceCapabilities(val subscribe: Boolean? = false, val listChanged: Boolean? = false)
+
+    @JsonSerializable
+    data class Tasks(
+        val list: Unit? = null,
+        val cancel: Unit? = null,
+        val requests: TaskRequests? = null
+    )
+
+    @JsonSerializable
+    data class TaskRequests(
+        val tools: ToolRequests? = null
+    )
+
+    @JsonSerializable
+    data class ToolRequests(
+        val call: Unit? = null
+    )
+
+    companion object {
+        private fun buildTasks(capabilities: List<ServerProtocolCapability>): Tasks? {
+            val hasList = capabilities.contains(TaskList)
+            val hasCancel = capabilities.contains(TaskCancel)
+            val hasToolCall = capabilities.contains(TaskToolCall)
+
+            if (!hasList && !hasCancel && !hasToolCall) return null
+
+            return Tasks(
+                list = if (hasList) Unit else null,
+                cancel = if (hasCancel) Unit else null,
+                requests = TaskRequests(
+                    tools = if (hasToolCall) ToolRequests(Unit) else null
+                )
+            )
+        }
+    }
 }
 
