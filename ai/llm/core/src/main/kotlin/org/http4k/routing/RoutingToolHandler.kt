@@ -10,7 +10,7 @@ import org.http4k.ai.llm.tools.ToolRequest
 
 class RoutingToolHandler(private val tools: List<Pair<LLMTool, ToolHandler>>) : LLMTools,
     Iterable<Pair<LLMTool, ToolHandler>> by tools {
-    private val byName = tools.map { it.first.name to it.second }.toMap()
+    private val byName = tools.associate { it.first.name to it.second }
 
     override fun list() = Success(tools.map { it.first })
 
