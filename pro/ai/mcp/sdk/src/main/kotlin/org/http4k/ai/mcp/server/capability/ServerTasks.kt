@@ -17,10 +17,8 @@ class ServerTasks(
         return McpTask.Get.Response(task)
     }
 
-    override fun result(req: McpTask.Result.Request, client: Client, http: Request): McpTask.Result.Response {
-        val result = storage.getResult(req.taskId)
-        return McpTask.Result.Response(result)
-    }
+    override fun result(req: McpTask.Result.Request, client: Client, http: Request): McpTask.Result.Response =
+        McpTask.Result.Response(storage.resultFor(req.taskId))
 
     override fun cancel(req: McpTask.Cancel.Request, client: Client, http: Request): McpTask.Cancel.Response {
         storage.delete(req.taskId)
