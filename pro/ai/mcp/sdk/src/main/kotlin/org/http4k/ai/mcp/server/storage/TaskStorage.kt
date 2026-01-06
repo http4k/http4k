@@ -30,17 +30,17 @@ interface TaskStorage {
     /**
      * List all tasks with optional pagination.
      */
-    fun list(cursor: Cursor? = null, limit: Int): TaskPage
+    fun list(cursor: Cursor? = null): TaskPage
 
     /**
      * Store the result payload for a completed task.
      */
-    fun storeResult(taskId: TaskId, result: Any?)
+    fun storeResult(taskId: TaskId, result: Map<String, Any>)
 
     /**
      * Retrieve the result payload for a task.
      */
-    fun getResult(taskId: TaskId): Any?
+    fun resultFor(taskId: TaskId): Map<String, Any>?
 
     data class TaskPage(
         val tasks: List<Task>,
@@ -54,7 +54,7 @@ interface TaskStorage {
          */
         fun InMemory(clock: Clock = Clock.systemUTC()) = object : TaskStorage {
             private val tasks = ConcurrentHashMap<TaskId, Task>()
-            private val results = ConcurrentHashMap<TaskId, Any?>()
+            private val results = ConcurrentHashMap<TaskId, Map<String, Any>>()
 
             override fun store(task: Task) {
                 tasks[task.taskId] = task
@@ -75,24 +75,19 @@ interface TaskStorage {
                 results.remove(taskId)
             }
 
-            override fun list(cursor: Cursor?, limit: Int): TaskPage {
+            override fun list(cursor: Cursor?): TaskPage {
                 cleanupExpired()
 
                 val offset = cursor?.let { it.toIntOrNull() ?: 0 } ?: 0
                 val allTasks = tasks.values.sortedBy { it.createdAt }
-                val page = allTasks.drop(offset).take(limit)
-                val nextCursor = if (allTasks.size > offset + limit) {
-                    (offset + limit).toString()
-                } else null
-
-                return TaskPage(page, nextCursor)
+                return TaskPage(allTasks.drop(offset), if (allTasks.size > offset) offset.toString() else null)
             }
 
-            override fun storeResult(taskId: TaskId, result: Any?) {
+            override fun storeResult(taskId: TaskId, result: Map<String, Any>) {
                 results[taskId] = result
             }
 
-            override fun getResult(taskId: TaskId) = get(taskId)?.taskId
+            override fun resultFor(taskId: TaskId) = results[taskId]
 
             private fun isExpired(task: Task): Boolean {
                 val ttl = task.ttl ?: return false

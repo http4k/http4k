@@ -39,7 +39,7 @@ object McpTask {
 
         @JsonSerializable
         data class Response(
-            val result: Any?,
+            val result: Map<String, Any>?,
             override val _meta: Meta = Meta.default
         ) : ClientMessage.Response, ServerMessage.Response, HasMeta
     }
