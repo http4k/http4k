@@ -13,7 +13,7 @@ argo = "7.13"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.40.17"
+awssdk-bom = "2.41.3"
 azure-core = "1.57.0"
 azure-functions-java-library = "3.2.2"
 azure-storage-blob = "12.32.0"
@@ -24,7 +24,7 @@ cloudevents-json-jackson = "4.0.1"
 com-github-ben-manes-versions = "0.53.0"
 com-github-jk1-gradle-license-report = "3.0.1"
 com-google-devtools-ksp = "2.3.4"
-com-gradleup-shadow = "9.3.0"
+com-gradleup-shadow = "9.3.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.35.0"
 commons-codec = "1.20.0"
 docker-java-core = "3.7.0"
@@ -64,9 +64,9 @@ jetty11-bom = "11.0.26"
 joda-time = "2.14.0"
 jose4j = "0.9.6"
 json = "20251224"
-jsoup = "1.21.2"
+jsoup = "1.22.1"
 jte = "3.2.1"
-junit = "6.0.1"
+junit = "6.0.2"
 klaxon = "5.6"
 kondor-core = "3.6.1"
 konsist = "0.17.3"
@@ -218,7 +218,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.0.1"
+junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.0.2"
 klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
 kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }

@@ -233,7 +233,7 @@ class ClientFiltersTest {
                 Triple(
                     Request(GET, ""),
                     Response(OK),
-                    ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SAMPLE)
+                    ZipkinTraces(TraceId("originalTraceId"), end.third.spanId, TraceId("originalSpanId"), SAMPLE)
                 )
             )
         )

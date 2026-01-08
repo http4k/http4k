@@ -30,7 +30,6 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.cookies
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
-import org.http4k.filter.FLASH_COOKIE
 import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
