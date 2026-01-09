@@ -9,17 +9,17 @@ import se.ansman.kotshi.PolymorphicLabel
 
 @JsonSerializable
 @Polymorphic("type")
-sealed class ChatSessionState {
+sealed class SessionState {
 
     @JsonSerializable
     @PolymorphicLabel("waiting")
-    data object WaitingForInput : ChatSessionState()
+    data object WaitingForInput : SessionState()
 
     @JsonSerializable
     @PolymorphicLabel("awaitingApproval")
-    data class AwaitingApproval(val contents: List<Content>, val pendingTools: List<ToolRequest>) : ChatSessionState()
+    data class AwaitingApproval(val contents: List<Content>, val pendingTools: List<ToolRequest>) : SessionState()
 
     @JsonSerializable
     @PolymorphicLabel("responding")
-    data class Responding(val contents: List<Content>) : ChatSessionState()
+    data class Responding(val contents: List<Content>) : SessionState()
 }

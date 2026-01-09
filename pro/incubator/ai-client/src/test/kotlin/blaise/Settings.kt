@@ -1,4 +1,4 @@
-package chatzilla
+package blaise
 
 import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName

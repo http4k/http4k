@@ -1,12 +1,12 @@
-package chatzilla
+package blaise
 
-import chatzilla.ChatHistoryItem.*
+import blaise.HistoryItem.*
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.model.RequestId
 
-fun ChatHistory.Companion.InMemory() = object : ChatHistory {
-    private val _content = mutableListOf<ChatHistoryItem>()
+fun History.Companion.InMemory() = object : History {
+    private val _content = mutableListOf<HistoryItem>()
 
     override fun addUser(message: String) = User(_content.size.toString(), message).also(_content::add)
     override fun addAi(contents: List<Content>) = Ai(_content.size.toString(), contents).also(_content::add)

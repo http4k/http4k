@@ -1,6 +1,6 @@
-package chatzilla.endpoints
+package blaise.endpoints
 
-import chatzilla.ChatHistory
+import blaise.History
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -10,7 +10,7 @@ import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
 
-fun GetHistory(history: ChatHistory, renderer: TemplateRenderer) =
+fun GetHistory(history: History, renderer: TemplateRenderer) =
     "/history" bind GET to {
         Response(OK).datastarElements(
             history.map(renderer),

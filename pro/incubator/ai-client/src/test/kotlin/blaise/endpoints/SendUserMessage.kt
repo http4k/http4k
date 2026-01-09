@@ -1,14 +1,14 @@
-package chatzilla.endpoints
+package blaise.endpoints
 
-import chatzilla.ChatHistory
+import blaise.History
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.onFailure
 import org.http4k.ai.llm.chat.ChatJson
 import org.http4k.ai.llm.chat.ChatJson.datastarModel
-import org.http4k.ai.llm.chat.ChatSessionHandler
-import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
-import org.http4k.ai.llm.chat.ChatSessionState.Responding
+import org.http4k.ai.llm.chat.SessionHandler
+import org.http4k.ai.llm.chat.SessionState.AwaitingApproval
+import org.http4k.ai.llm.chat.SessionState.Responding
 import org.http4k.core.Method.POST
 import org.http4k.datastar.MorphMode.append
 import org.http4k.datastar.Selector
@@ -19,7 +19,7 @@ import org.http4k.sse.sendPatchElements
 import org.http4k.sse.sendPatchSignals
 import org.http4k.template.DatastarElementRenderer
 
-fun SendUserMessage(history: ChatHistory, renderer: DatastarElementRenderer, handler: ChatSessionHandler) =
+fun SendUserMessage(history: History, renderer: DatastarElementRenderer, handler: SessionHandler) =
     "/message" bind sse(
         POST to sse { sse ->
             val message = sse.datastarModel<IncomingMessage>().message

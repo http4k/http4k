@@ -1,12 +1,12 @@
-package chatzilla.endpoints
+package blaise.endpoints
 
-import chatzilla.ChatHistory
+import blaise.History
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.onFailure
 import org.http4k.ai.llm.chat.ChatJson.datastarModel
-import org.http4k.ai.llm.chat.ChatSessionHandler
-import org.http4k.ai.llm.chat.ChatSessionState.AwaitingApproval
-import org.http4k.ai.llm.chat.ChatSessionState.Responding
+import org.http4k.ai.llm.chat.SessionHandler
+import org.http4k.ai.llm.chat.SessionState.AwaitingApproval
+import org.http4k.ai.llm.chat.SessionState.Responding
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ToolName
 import org.http4k.datastar.MorphMode.append
@@ -18,7 +18,7 @@ import org.http4k.template.DatastarElementRenderer
 
 data class ToolDenial(val id: RequestId, val toolName: ToolName)
 
-fun DenyTool(history: ChatHistory, renderer: DatastarElementRenderer, handler: ChatSessionHandler) =
+fun DenyTool(history: History, renderer: DatastarElementRenderer, handler: SessionHandler) =
     "/deny" bind sse { sse ->
         val denial = sse.datastarModel<ToolDenial>()
         sse.sendPatchElements(

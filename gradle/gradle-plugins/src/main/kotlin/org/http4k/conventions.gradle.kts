@@ -63,7 +63,6 @@ tasks {
         compilerOptions {
             jvmTarget.set(JVM_21)
             freeCompilerArgs.add("-Xannotation-default-target=param-property")
-            freeCompilerArgs.add("-Xwarning-level=IDENTITY_SENSITIVE_OPERATIONS_WITH_VALUE_TYPE:disabled")
         }
     }
 

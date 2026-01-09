@@ -1,4 +1,4 @@
-package chatzilla.endpoints
+package blaise.endpoints
 
 import org.http4k.core.Method.GET
 import org.http4k.core.Response

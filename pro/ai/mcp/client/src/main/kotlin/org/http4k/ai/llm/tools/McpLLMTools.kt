@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.toLLM
 import org.http4k.ai.mcp.toLLM
+import org.http4k.ai.mcp.ToolRequest as McpToolRequest
 
 /**
  * Tools implementation for the MCP protocol.
@@ -18,10 +19,11 @@ import org.http4k.ai.mcp.toLLM
 class McpLLMTools(private val client: McpClient) : LLMTools {
     override fun list() = client.tools().list()
         .map { it.map(McpTool::toLLM) }
-        .mapFailure { LLMError.Internal(java.lang.Exception(it.toString())) }
+        .mapFailure { LLMError.Internal(Exception(it.toString())) }
 
     override fun invoke(request: ToolRequest) =
-        client.tools().call(request.name, org.http4k.ai.mcp.ToolRequest(request.arguments, meta = Meta(request.id.value)))
+        client.tools()
+            .call(request.name, McpToolRequest(request.arguments, meta = Meta(request.id.value)))
             .mapFailure { it.toLLM() }
             .flatMap {
                 when (it) {

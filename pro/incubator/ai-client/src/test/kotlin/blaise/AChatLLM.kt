@@ -1,4 +1,4 @@
-package chatzilla
+package blaise
 
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.llm.LLMResult
@@ -11,9 +11,17 @@ import org.http4k.ai.llm.model.Message.Assistant
 import org.http4k.ai.llm.model.Message.ToolResult
 import org.http4k.ai.llm.model.Message.User
 import org.http4k.ai.llm.tools.ToolRequest
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.string
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ResponseId
+
+private val path = Tool.Arg.string().required("path")
+
+val getFullNameTool = Tool("getFullName", "get the full name", path)
+val greetingTool = Tool("greeting", "greet a person by name", path)
+
 
 class AChatLLM : Chat {
     override fun invoke(request: ChatRequest): LLMResult<ChatResponse> {
