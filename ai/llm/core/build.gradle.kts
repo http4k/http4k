@@ -14,6 +14,8 @@ dependencies {
     api(libs.kotshi.api)
     ksp(libs.kotshi.compiler)
 
+    testImplementation(libs.mock4k)
+
     testFixturesApi(project(":http4k-api-jsonrpc"))
     testFixturesApi(project(":http4k-connect-storage-core"))
 }

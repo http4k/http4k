@@ -7,4 +7,7 @@ import org.http4k.ai.llm.LLMResult
  */
 interface LLMTools : ToolHandler {
     fun list(): LLMResult<List<LLMTool>>
+
+    companion object
 }
+
