@@ -210,7 +210,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object540438179"
+                  "$ref": "#/components/schemas/object540438148"
                 }
               }
             }
@@ -278,7 +278,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object540438179"
+                  "$ref": "#/components/schemas/object540438148"
                 }
               }
             }
@@ -476,7 +476,7 @@
                       "schema": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/object540438179"
+                          "$ref": "#/components/schemas/object540438148"
                         }
                       }
                     }
@@ -493,7 +493,7 @@
                           "aNumberField": 123
                         },
                         "schema": {
-                          "$ref": "#/components/schemas/object540438179"
+                          "$ref": "#/components/schemas/object540438148"
                         }
                       }
                     }
@@ -587,7 +587,7 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object744721296",
+              "$ref": "#/components/schemas/object744721264",
               "default": {
                 "a": "b"
               }
@@ -976,7 +976,7 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object744721296"
+              "$ref": "#/components/schemas/object744721264"
             },
             "in": "query",
             "name": "j",
@@ -1065,7 +1065,7 @@
                   "aString": "a message of some kind"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-1104991605"
+                  "$ref": "#/components/schemas/object-1104991636"
                 }
               }
             }
@@ -1100,7 +1100,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object540438179"
+                  "$ref": "#/components/schemas/object540438148"
                 }
               }
             }
@@ -1117,7 +1117,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object540438179"
+                  "$ref": "#/components/schemas/object540438148"
                 }
               }
             }
@@ -1145,14 +1145,14 @@
           "bing"
         ]
       },
-      "object744721296": {
+      "object744721264": {
         "type": "object",
         "required": [
         ],
         "properties": {
         }
       },
-      "object540438179": {
+      "object540438148": {
         "type": "object",
         "required": [
         ],
@@ -1163,7 +1163,7 @@
           }
         }
       },
-      "prefix_object540438179": {
+      "prefix_object540438148": {
         "type": "object",
         "required": [
         ],
@@ -1180,11 +1180,11 @@
         ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/prefix_object540438179"
+            "$ref": "#/components/schemas/prefix_object540438148"
           }
         }
       },
-      "object-1104991605": {
+      "object-1104991636": {
         "type": "object",
         "required": [
         ],
