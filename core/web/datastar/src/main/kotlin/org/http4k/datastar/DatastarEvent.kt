@@ -24,16 +24,11 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         override val id: SseEventId? = null,
     ) : DatastarEvent(
         "datastar-patch-elements",
-        run {
-            val nullable = listOfNotNull(
-                selector?.value?.let { "selector $it" },
-            )
-            val other = listOf(
-                "mode $mode",
-                "useViewTransition $useViewTransition"
-            )
-            elements.map { "elements $it" } + nullable + other
-        },
+        elements.map { "elements $it" } + listOfNotNull(
+            selector?.value?.let { "selector $it" },
+            mode.takeIf { it != outer }?.let { "mode $it" },
+            useViewTransition.takeIf { it }?.let { "useViewTransition $it" }
+        ),
         id
     ) {
         constructor(
@@ -81,7 +76,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
                 "datastar-patch-elements" -> {
                     PatchElements(
                         data("elements", Element.Companion::of),
-                        data("mode", MorphMode::valueOf).first(),
+                        data("mode", MorphMode::valueOf).firstOrNull() ?: outer,
                         data("selector", Selector.Companion::of).firstOrNull(),
                         data("useViewTransition", String::toBoolean).firstOrNull() ?: false,
                         event.id
