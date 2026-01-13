@@ -8,13 +8,27 @@ import org.junit.jupiter.api.Test
 class DatastarEventTest {
 
     @Test
-    fun `path element to event`() {
+    fun `patch elements to event`() {
         assertThat(
             DatastarEvent.PatchElements(Element.of("foo"), Element.of("bar")).toSseEvent(),
             equalTo(
                 SseMessage.Event(
                     "datastar-patch-elements",
-                    "elements foo\nelements bar\nmode outer\nuseViewTransition false",
+                    "elements foo\nelements bar",
+                    null
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `only include useViewTransition and mode in event if defaults are overridden`() {
+        assertThat(
+            DatastarEvent.PatchElements(Element.of("foo"), morphMode = MorphMode.replace, useViewTransition = true).toSseEvent(),
+            equalTo(
+                SseMessage.Event(
+                    "datastar-patch-elements",
+                    "elements foo\nmode replace\nuseViewTransition true",
                     null
                 )
             )
