@@ -12,6 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.PatchSignals
+import org.http4k.datastar.MorphMode
 import org.http4k.datastar.Signal
 import org.http4k.filter.debug
 import org.http4k.lens.accept
@@ -50,7 +51,13 @@ abstract class DatastarServerContract(
     fun before() {
         server = poly(
             routes("/noStream" hbind {
-                Response(OK).datastarElements(DatastarEvent.PatchElements("hello"))
+                Response(OK).datastarElements(
+                    DatastarEvent.PatchElements(
+                        "hello",
+                        useViewTransition = true,
+                        morphMode = MorphMode.replace
+                    )
+                )
             }),
             sse
         ).asServer(serverConfig(0)).start()
@@ -86,8 +93,8 @@ abstract class DatastarServerContract(
             equalTo(
                 """event: datastar-patch-elements
 data: elements hello
-data: mode outer
-data: useViewTransition false
+data: mode replace
+data: useViewTransition true
 
 """
             )
