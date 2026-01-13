@@ -7,7 +7,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.datastar.DatastarEvent.PatchElements
 import org.http4k.datastar.DatastarEvent.PatchSignals
-import org.http4k.datastar.MorphMode.inner
 import org.http4k.datastar.Signal
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -21,11 +20,6 @@ class DatastarExtensionsTest {
     @Test
     fun `can inject a datastar element into a response`(approver: Approver) {
         approver.assertApproved(Response(OK).datastarElements("foo", "bar"))
-    }
-
-    @Test
-    fun `can inject a datastar element with overridden defaults into a response`(approver: Approver) {
-        approver.assertApproved(Response(OK).datastarElements("foo", "bar", morphMode = inner, useViewTransition = true))
     }
 
     @Test

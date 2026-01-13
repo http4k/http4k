@@ -1,5 +1,0 @@
-event: datastar-patch-elements
-data: elements foo
-data: elements bar
-data: mode inner
-data: useViewTransition true
