@@ -1,4 +1,4 @@
-package mcp
+package mcp.tools
 
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Tool

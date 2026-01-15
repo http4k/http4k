@@ -9,8 +9,11 @@ import blaise.endpoints.GetHistory
 import blaise.endpoints.GetMessageForm
 import blaise.endpoints.Index
 import blaise.endpoints.SendUserMessage
-import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
+import mcp.tools.DeleteFile
+import mcp.tools.EditFile
+import mcp.tools.ListFiles
+import mcp.tools.ReadFile
 import org.http4k.ai.llm.chat.AnthropicAI
 import org.http4k.ai.llm.chat.Chat
 import org.http4k.ai.llm.chat.SessionHandler
@@ -52,7 +55,7 @@ fun BlaiseCode(env: Environment): PolyHandler {
         llm.debug(),
         LLMMemory.InMemory(),
         McpLLMTools(client),
-//        setOf(DeleteFile.name, EditFile.name, ListFiles.name, ReadFile.name)
+        setOf(DeleteFile.name, EditFile.name, ListFiles.name, ReadFile.name)
     ) { ModelParams(MODEL(env), tools = it) }
         .apply { start().valueOrNull()!! }
 

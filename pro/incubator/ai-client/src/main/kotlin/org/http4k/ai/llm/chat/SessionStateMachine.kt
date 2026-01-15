@@ -95,7 +95,7 @@ class SessionStateMachine(
         .flatMap { history ->
             tools.list().map { ChatRequest(history, chatParams(it)) }
                 .flatMap { llm(it) }
-                .flatMap { resp -> memory.add(memoryId, listOf(resp.message).drop(history.size)).map { resp } }
+                .flatMap { resp -> memory.add(memoryId, listOf(resp.message)).map { resp } }
                 .flatMap { it.process() }
         }
 
