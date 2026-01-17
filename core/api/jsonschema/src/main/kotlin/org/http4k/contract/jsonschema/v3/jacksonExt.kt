@@ -36,14 +36,13 @@ class JacksonJsonNamingAnnotated(private val json: ConfigurableJackson = Jackson
     )(target, name)
 
     private fun renamingStrategyIfRequired(clazz: Class<*>): (String) -> String {
-        val namingStrategy: PropertyNamingStrategy = clazz.annotations
+        val namingStrategy = clazz.annotations
                 .filterIsInstance<JsonNaming>()
                 .map { it.value }.getOrNull(0)?.createInstance()
-            ?: error("No @JsonNaming annotation found on class ${clazz.simpleName}")
-
+            ?: json.mapper.serializationConfig().propertyNamingStrategy
 
         return if (namingStrategy is PropertyNamingStrategies.NamingBase) {
-            { name: String -> TODO("FIX THIS") }
+            { name -> namingStrategy.nameForField(null, null, name) }
         } else {
             { name -> name }
         }
