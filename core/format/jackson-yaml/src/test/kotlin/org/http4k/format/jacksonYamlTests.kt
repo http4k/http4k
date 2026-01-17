@@ -50,8 +50,8 @@ class JacksonYamlBodyTest {
             Response(Status.OK).with(
                 Body.auto<Interface>().toLens() of InterfaceImpl()
             ).bodyString(), equalTo(
-                """value: "hello"
-subValue: "123"
+                """subValue: "123"
+value: "hello"
 """
             )
         )
@@ -63,8 +63,8 @@ subValue: "123"
             Response(Status.OK).with(
                 Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
             ).bodyString(), equalTo(
-                """- value: "hello"
-  subValue: "123"
+                """- subValue: "123"
+  value: "hello"
 """
             )
         )
