@@ -41,7 +41,7 @@ fun <T : ObjectMapper> KotlinModule.asConfigurable(builder: MapperBuilder<T, *>)
             adapter(mapping, JsonGenerator::writeBoolean, JsonParser::getBooleanValue)
 
         override fun <OUT> text(mapping: BiDiMapping<String, OUT>) =
-            adapter(mapping, JsonGenerator::writeString, JsonParser::getText)
+            adapter(mapping, JsonGenerator::writeString, JsonParser::getValueAsString)
                 .apply {
                     if (mapping.clazz.isEnum) {
                         addKeySerializer(mapping.clazz, object : ValueSerializer<OUT>() {

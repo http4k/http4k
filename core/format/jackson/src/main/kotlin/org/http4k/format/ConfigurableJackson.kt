@@ -82,7 +82,7 @@ open class ConfigurableJackson(
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
     override fun integer(value: JsonNode) = value.asLong()
     override fun decimal(value: JsonNode) = BigDecimal(value.toString())
-    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
+    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asString()
 
     // auto
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)

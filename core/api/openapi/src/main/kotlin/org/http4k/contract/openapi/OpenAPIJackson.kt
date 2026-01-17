@@ -5,6 +5,7 @@ import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
+import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule
@@ -13,7 +14,7 @@ private fun standardConfig(
     configFn: AutoMappingConfiguration<JsonMapper>.() -> AutoMappingConfiguration<JsonMapper>
 ) = KotlinModule.Builder().build()
     .asConfigurable(
-        JsonMapper.builder().deactivateDefaultTyping()
+        JsonMapper.builder().enable(INCLUDE_SOURCE_IN_LOCATION).deactivateDefaultTyping()
             .changeDefaultPropertyInclusion {
                 it
                     .withContentInclusion(NON_NULL)

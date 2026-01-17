@@ -1,6 +1,6 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.annotation.JsonInclude
+import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
@@ -10,8 +10,7 @@ import tools.jackson.module.kotlin.KotlinModule
 
 object JacksonCsv : ConfigurableJacksonCsv(
     KotlinModule.Builder().build()
-        .asConfigurable(CsvMapper.builder().deactivateDefaultTyping()
-            .changeDefaultPropertyInclusion { inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL) })
+        .asConfigurable(CsvMapper.builder().enable(INCLUDE_SOURCE_IN_LOCATION).deactivateDefaultTyping())
         .withStandardMappings()
         .done()
         .rebuild()

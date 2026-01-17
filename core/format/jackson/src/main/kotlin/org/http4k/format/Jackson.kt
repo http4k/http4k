@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import tools.jackson.core.StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
@@ -11,7 +12,7 @@ import tools.jackson.module.kotlin.KotlinModule
 fun standardConfig(
     configFn: AutoMappingConfiguration<JsonMapper>.() -> AutoMappingConfiguration<JsonMapper>
 ) = KotlinModule.Builder().build()
-    .asConfigurable(JsonMapper.builder().deactivateDefaultTyping())
+    .asConfigurable(JsonMapper.builder().deactivateDefaultTyping().enable(INCLUDE_SOURCE_IN_LOCATION))
     .withStandardMappings()
     .let(configFn)
     .done()
