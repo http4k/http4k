@@ -11,8 +11,8 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
-import tools.jackson.databind.json.JsonMapper
 import tools.jackson.dataformat.yaml.YAMLMapper
+import tools.jackson.dataformat.yaml.YAMLWriteFeature.WRITE_DOC_START_MARKER
 import tools.jackson.module.kotlin.KotlinModule
 import java.io.InputStream
 import kotlin.reflect.KClass
@@ -29,7 +29,7 @@ open class ConfigurableJacksonYaml(val mapper: YAMLMapper, override val defaultC
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
-    inline fun <reified T: Any> asBiDiMapping() = BiDiMapping<String, List<T>>(mapper.read(), mapper.write())
+    inline fun <reified T : Any> asBiDiMapping() = BiDiMapping<String, List<T>>(mapper.read(), mapper.write())
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -50,10 +50,11 @@ open class ConfigurableJacksonYaml(val mapper: YAMLMapper, override val defaultC
     /**
      * Convenience function to read an object as YAML from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 }
 
-fun KotlinModule.asConfigurableYaml() = asConfigurable(YAMLMapper.builder())
+fun KotlinModule.asConfigurableYaml() = asConfigurable(YAMLMapper.builder().disable(WRITE_DOC_START_MARKER))
 
 inline operator fun <reified T : Any> ConfigurableJacksonYaml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
-inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonYaml.invoke(item: T) = autoBody<T>().toLens().of<R>(item)
+inline operator fun <reified T : Any, R : HttpMessage> ConfigurableJacksonYaml.invoke(item: T) =
+    autoBody<T>().toLens().of<R>(item)
