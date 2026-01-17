@@ -51,17 +51,17 @@ sealed interface ArrayItem : ArrayItems {
 
     class Ref(
         @JsonProperty($$"$ref")
-        val ref: String,
+        val `$ref`: String,
         @Transient
         private val definitions: Iterable<SchemaNode> = emptyList()
     ) : ArrayItem {
         override fun definitions(): Iterable<SchemaNode> = definitions
         override fun equals(other: Any?): Boolean = when (other) {
-            is Ref -> this.ref == other.ref
+            is Ref -> this.`$ref` == other.`$ref`
             else -> false
         }
 
-        override fun hashCode(): Int = ref.hashCode()
+        override fun hashCode(): Int = `$ref`.hashCode()
     }
 }
 
