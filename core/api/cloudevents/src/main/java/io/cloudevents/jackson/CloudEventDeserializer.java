@@ -38,24 +38,12 @@ import tools.jackson.databind.node.ObjectNode;
 
 import java.nio.charset.StandardCharsets;
 
-class CloudEventDeserializer extends StdDeserializer<CloudEvent> {
-    private final boolean forceExtensionNameLowerCaseDeserialization;
-    private final boolean forceIgnoreInvalidExtensionNameDeserialization;
-    private final boolean disableDataContentTypeDefaulting;
+import static io.cloudevents.jackson.CloudEventsContentType.dataIsJsonContentType;
 
-    protected CloudEventDeserializer() {
-        this(false, false, false);
-    }
+public class CloudEventDeserializer extends StdDeserializer<CloudEvent> {
 
-    protected CloudEventDeserializer(
-        boolean forceExtensionNameLowerCaseDeserialization,
-        boolean forceIgnoreInvalidExtensionNameDeserialization,
-        boolean disableDataContentTypeDefaulting
-    ) {
+    public CloudEventDeserializer() {
         super(CloudEvent.class);
-        this.forceExtensionNameLowerCaseDeserialization = forceExtensionNameLowerCaseDeserialization;
-        this.forceIgnoreInvalidExtensionNameDeserialization = forceIgnoreInvalidExtensionNameDeserialization;
-        this.disableDataContentTypeDefaulting = disableDataContentTypeDefaulting;
     }
 
     private static class JsonMessage implements CloudEventReader {
@@ -124,7 +112,7 @@ class CloudEventDeserializer extends StdDeserializer<CloudEvent> {
                             if (isBase64) {
                                 data = BytesCloudEventData.wrap(node.remove("data").binaryValue());
                             } else {
-                                if (JsonFormat.dataIsJsonContentType(contentType)) {
+                                if (dataIsJsonContentType(contentType)) {
                                     // This solution is quite bad, but i see no alternatives now.
                                     // Hopefully in future we can improve it
                                     data = JsonCloudEventData.wrap(node.remove("data"));
@@ -142,7 +130,7 @@ class CloudEventDeserializer extends StdDeserializer<CloudEvent> {
                         if (node.has("data_base64")) {
                             data = BytesCloudEventData.wrap(node.remove("data_base64").binaryValue());
                         } else if (node.has("data")) {
-                            if (JsonFormat.dataIsJsonContentType(contentType)) {
+                            if (dataIsJsonContentType(contentType)) {
                                 // This solution is quite bad, but i see no alternatives now.
                                 // Hopefully in future we can improve it
                                 data = JsonCloudEventData.wrap(node.remove("data"));
@@ -263,7 +251,7 @@ class CloudEventDeserializer extends StdDeserializer<CloudEvent> {
         ObjectNode node = ctxt.readValue(p, ObjectNode.class);
 
         try {
-            return new JsonMessage(p, node, this.forceExtensionNameLowerCaseDeserialization, this.forceIgnoreInvalidExtensionNameDeserialization, this.disableDataContentTypeDefaulting)
+            return new JsonMessage(p, node, false, false, false)
                 .read(CloudEventBuilder::fromSpecVersion);
         } catch (RuntimeException e) {
             throw MismatchedInputException.from(p, CloudEvent.class, e.getMessage());

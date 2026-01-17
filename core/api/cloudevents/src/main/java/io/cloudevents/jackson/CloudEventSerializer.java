@@ -31,20 +31,15 @@ import tools.jackson.databind.ser.std.StdSerializer;
 
 import java.nio.charset.StandardCharsets;
 
+import static io.cloudevents.jackson.CloudEventsContentType.dataIsJsonContentType;
+
 /**
  * Jackson {@link SerializationContext} for {@link CloudEvent}
  */
-class CloudEventSerializer extends StdSerializer<CloudEvent> {
-
-    private final boolean forceDataBase64Serialization;
-    private final boolean forceStringSerialization;
-
-    protected CloudEventSerializer(boolean forceDataBase64Serialization, boolean forceStringSerialization) {
+public class CloudEventSerializer extends StdSerializer<CloudEvent> {
+    public CloudEventSerializer() {
         super(CloudEvent.class);
-        this.forceDataBase64Serialization = forceDataBase64Serialization;
-        this.forceStringSerialization = forceStringSerialization;
     }
-
 
     private static class JsonContextWriter implements CloudEventContextWriter {
 
@@ -104,7 +99,9 @@ class CloudEventSerializer extends StdSerializer<CloudEvent> {
             CloudEventData data = value.getData();
             if (data instanceof JsonCloudEventData) {
                 gen.writeName("data");
-                gen.writeEmbeddedObject(((JsonCloudEventData) data).getNode());
+                gen.writeStartObject();
+                gen.writeTree(((JsonCloudEventData) data).getNode());
+                gen.writeEndObject();
             } else {
                 byte[] dataBytes = data.toBytes();
                 String contentType = value.getDataContentType();
@@ -121,7 +118,7 @@ class CloudEventSerializer extends StdSerializer<CloudEvent> {
                             gen.writeBinary(dataBytes);
                             break;
                     }
-                } else if (JsonFormat.dataIsJsonContentType(contentType)) {
+                } else if (dataIsJsonContentType(contentType)) {
                     // TODO really bad b/c it allocates stuff, is there another solution out there?
                     char[] dataAsString = new String(dataBytes, StandardCharsets.UTF_8).toCharArray();
                     gen.writeName("data");
@@ -136,11 +133,6 @@ class CloudEventSerializer extends StdSerializer<CloudEvent> {
     }
 
     private boolean shouldSerializeBase64(String contentType) {
-        if (JsonFormat.dataIsJsonContentType(contentType)) {
-            return this.forceDataBase64Serialization;
-        } else {
-            return !this.forceStringSerialization;
-        }
+        return !dataIsJsonContentType(contentType);
     }
-
 }
