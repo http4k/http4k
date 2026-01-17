@@ -207,7 +207,7 @@ private class ArrayItemsJsonAdapter(private val moshi: Moshi) : JsonAdapter<Arra
             is ArrayItem.Ref -> {
                 writer.beginObject()
                 writer.name("\$ref")
-                moshi.adapter<Any>(String::class.java).toJson(writer, value.`$ref`)
+                moshi.adapter<Any>(String::class.java).toJson(writer, value.ref)
                 writer.endObject()
             }
             is ArrayItem.NonObject -> {

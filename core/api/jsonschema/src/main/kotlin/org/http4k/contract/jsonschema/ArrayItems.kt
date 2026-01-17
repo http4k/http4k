@@ -1,5 +1,6 @@
 package org.http4k.contract.jsonschema
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.contract.jsonschema.v3.value
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ArrayParam
@@ -49,18 +50,18 @@ sealed interface ArrayItem : ArrayItems {
     }
 
     class Ref(
-        @Suppress("unused")
-        val `$ref`: String,
+        @JsonProperty($$"$ref")
+        val ref: String,
         @Transient
         private val definitions: Iterable<SchemaNode> = emptyList()
     ) : ArrayItem {
         override fun definitions(): Iterable<SchemaNode> = definitions
         override fun equals(other: Any?): Boolean = when (other) {
-            is Ref -> this.`$ref` == other.`$ref`
+            is Ref -> this.ref == other.ref
             else -> false
         }
 
-        override fun hashCode(): Int = `$ref`.hashCode()
+        override fun hashCode(): Int = ref.hashCode()
     }
 }
 
