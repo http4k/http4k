@@ -32,7 +32,6 @@ public class JsonCloudEventData implements CloudEventData {
 
     /**
      * @param node the json node to wrap
-     * @deprecated You should use {@link #wrap(JsonNode)}
      */
     public JsonCloudEventData(JsonNode node) {
         Objects.requireNonNull(node);

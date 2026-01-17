@@ -124,7 +124,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(text(number(BigInteger("1"))), equalTo("1"))
             assertThat(text(number(BigDecimal("1.1"))), equalTo("1.1"))
             assertThat(text(boolean(false)), equalTo("false"))
-            assertThat(text(nullNode()), equalTo(""))
+            assertThat(text(nullNode()), equalTo("null"))
         }
     }
 

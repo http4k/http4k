@@ -78,7 +78,12 @@ open class ConfigurableJackson(
     override fun fields(node: JsonNode) = node.properties().asSequence().map { (key, value) -> key to value }.toList()
 
     override fun elements(value: JsonNode) = value.asIterable()
-    override fun text(value: JsonNode): String = value.asString()
+
+    override fun text(value: JsonNode): String = when (value) {
+        is NullNode -> "null"
+        else -> value.asString()
+    }
+
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
     override fun integer(value: JsonNode) = value.asLong()
     override fun decimal(value: JsonNode) = BigDecimal(value.toString())
