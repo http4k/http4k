@@ -124,7 +124,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(
             Response(OK).with(
                 Body.auto<Interface>().toLens() of InterfaceImpl()
-            ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}""")
+            ).bodyString(), equalTo("""{"subValue":"123","value":"hello"}""")
         )
     }
 
@@ -133,7 +133,7 @@ class JacksonAutoTest : AutoMarshallingJsonContract(Jackson) {
         assertThat(
             Response(OK).with(
                 Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
-            ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]""")
+            ).bodyString(), equalTo("""[{"subValue":"123","value":"hello"}]""")
         )
     }
 

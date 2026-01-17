@@ -1,20 +1,17 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
 import tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import tools.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
 import tools.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
-import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.KotlinModule
 
 fun standardConfig(
     configFn: AutoMappingConfiguration<JsonMapper>.() -> AutoMappingConfiguration<JsonMapper>
 ) = KotlinModule.Builder().build()
-    .asConfigurable(JsonMapper.builder().deactivateDefaultTyping()
-        .changeDefaultPropertyInclusion { inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL) })
+    .asConfigurable(JsonMapper.builder().deactivateDefaultTyping())
     .withStandardMappings()
     .let(configFn)
     .done()
