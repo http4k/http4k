@@ -1,6 +1,6 @@
 package org.http4k.contract.openapi
 
-import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.asConfigurable
@@ -14,7 +14,11 @@ private fun standardConfig(
 ) = KotlinModule.Builder().build()
     .asConfigurable(
         JsonMapper.builder().deactivateDefaultTyping()
-            .changeDefaultPropertyInclusion { inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL) })
+            .changeDefaultPropertyInclusion {
+                it
+                    .withContentInclusion(NON_NULL)
+                    .withValueInclusion(NON_NULL)
+            })
     .withStandardMappings()
     .let(configFn)
     .done()
