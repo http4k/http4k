@@ -1,6 +1,6 @@
 package org.http4k.contract.jsonschema.v3
 
-import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -29,8 +29,14 @@ import tools.jackson.module.kotlin.KotlinModule
 class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>() {
     override fun autoJson() = ConfigurableJackson(
         KotlinModule.Builder().build()
-            .asConfigurable(JsonMapper.builder().deactivateDefaultTyping()
-                .changeDefaultPropertyInclusion { inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL) })
+            .asConfigurable(
+                JsonMapper.builder().deactivateDefaultTyping()
+                    .changeDefaultPropertyInclusion {
+                        it
+                            .withContentInclusion(NON_NULL)
+                            .withValueInclusion(NON_NULL)
+                    }
+            )
             .withStandardMappings()
             .value(MyInt)
             .done()
@@ -50,7 +56,9 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
             KotlinModule.Builder().build()
                 .asConfigurable(
                     JsonMapper.builder().deactivateDefaultTyping()
-                        .changeDefaultPropertyInclusion { inc -> inc.withValueInclusion(JsonInclude.Include.NON_NULL) })
+                        .changeDefaultPropertyInclusion {
+                            it.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
+                        })
                 .withStandardMappings()
                 .value(MyInt)
                 .done()
