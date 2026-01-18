@@ -99,9 +99,7 @@ public class CloudEventSerializer extends StdSerializer<CloudEvent> {
             CloudEventData data = value.getData();
             if (data instanceof JsonCloudEventData) {
                 gen.writeName("data");
-                gen.writeStartObject();
                 gen.writeTree(((JsonCloudEventData) data).getNode());
-                gen.writeEndObject();
             } else {
                 byte[] dataBytes = data.toBytes();
                 String contentType = value.getDataContentType();

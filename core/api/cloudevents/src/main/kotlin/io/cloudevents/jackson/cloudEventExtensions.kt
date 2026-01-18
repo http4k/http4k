@@ -8,10 +8,15 @@ import java.io.StringWriter
 class Http4kSerDe(private val mapper: ObjectMapper) {
     fun serialize(event: CloudEvent): ByteArray {
         val s = StringWriter()
-        CloudEventSerializer().serialize(event, mapper.createGenerator(s), null)
-        return String(s.buffer).toByteArray()
+        val generator = mapper.createGenerator(s)
+        CloudEventSerializer().serialize(event, generator, null)
+        generator.flush()
+        return s.toString().toByteArray()
     }
 
-    fun deserialize(bytes: ByteArray) = CloudEventDeserializer()
-        .deserialize(mapper.createParser(ByteArrayInputStream(bytes)), null)
+    fun deserialize(bytes: ByteArray): CloudEvent {
+        val parser = mapper.createParser(ByteArrayInputStream(bytes))
+        parser.nextToken()
+        return CloudEventDeserializer().deserialize(parser, null)
+    }
 }
