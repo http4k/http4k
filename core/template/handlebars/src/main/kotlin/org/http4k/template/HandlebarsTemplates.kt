@@ -61,7 +61,7 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
         try {
             fn(it)
         } catch (e: FileNotFoundException) {
-            throw ViewNotFound(it)
+            throw ViewNotFound(it, e)
         }
     }
 }

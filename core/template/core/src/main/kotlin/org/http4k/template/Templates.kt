@@ -43,7 +43,7 @@ interface Templates {
 fun TemplateRenderer.then(that: TemplateRenderer): TemplateRenderer = {
     try {
         this(it)
-    } catch (e: ViewNotFound) {
+    } catch (_: ViewNotFound) {
         that(it)
     }
 }

@@ -54,7 +54,7 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
             })
         } catch (e: TemplateInputException) {
             when (e.cause) {
-                is FileNotFoundException -> throw ViewNotFound(viewModel)
+                is FileNotFoundException -> throw ViewNotFound(viewModel, e)
                 else -> throw e
             }
         }
