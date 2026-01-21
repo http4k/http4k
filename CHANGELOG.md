@@ -4,7 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v2.26.1.0 (uncut)
-- **http4k-connect-amazon-secretsmanager**: Add the `SecretsManagerRotationEvent`
+- **http4k-connect-amazon-secretsmanager**: Add the `SecretsManagerRotationEvent`.  H/T @oharaandrew314
 
 ### v6.26.0.0
 - **http4k-***: Upgrade versions
