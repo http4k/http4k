@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v2.26.1.0 (uncut)
+- **http4k-connect-amazon-secretsmanager**: Add the `SecretsManagerRotationEvent`
+
 ### v6.26.0.0
 - **http4k-***: Upgrade versions
 - **http4k-web-datastar***: [Unlikely break] #1467: Only include useViewTransition and mode fields in events if values are overridden. H/T @Christian-Broomfield
