@@ -36,7 +36,7 @@ class HtmlFlowTemplates: Templates {
             try {
                 renderer(model)
             } catch (e: htmlflow.viewloader.ViewNotFound) {
-                throw ViewNotFound(model)
+                throw ViewNotFound(model, e)
             }
         }
     }

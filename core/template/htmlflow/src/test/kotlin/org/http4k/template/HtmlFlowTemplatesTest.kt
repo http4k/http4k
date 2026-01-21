@@ -6,6 +6,8 @@ import com.natpryce.hamkrest.throws
 import org.http4k.template.contract.HtmlFlowTemplatesContract
 import org.http4k.template.contract.HtmlFlowViewModelContract
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
+import org.junit.jupiter.api.assertThrows
 
 class HtmlFlowTemplatesTest : HtmlFlowTemplatesContract<HtmlFlowTemplates>(HtmlFlowTemplates()) {
     private val items = listOf(
@@ -24,11 +26,9 @@ class HtmlFlowTemplatesTest : HtmlFlowTemplatesContract<HtmlFlowTemplates>(HtmlF
         val renderer = onClassPath.renderer()
         assertOnClasspath(renderer)
         val notAtRootViewModel = onClasspathNotAtRootViewModel(items)
-        assertThat(
-            { renderer(notAtRootViewModel) },
-            throws(equalTo(ViewNotFound(notAtRootViewModel)))
-        )
-    }
+        
+        val exception = assertThrows<ViewNotFound> { renderer(notAtRootViewModel) }
+        assertNotNull(exception.cause, "should report underlying cause")    }
 
     fun assertOnClasspath(renderer: TemplateRenderer) {
         assertThat(
