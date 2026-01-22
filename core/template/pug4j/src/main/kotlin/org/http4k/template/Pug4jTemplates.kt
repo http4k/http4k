@@ -35,8 +35,8 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
             try {
                 val template = configure.getTemplate(basePath + viewModel.template())
                 return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
-            } catch (_: UncheckedIOException) {
-                throw ViewNotFound(viewModel)
+            } catch (e: UncheckedIOException) {
+                throw ViewNotFound(viewModel, e)
             }
         }
     }
@@ -61,8 +61,8 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
     private fun safeRender(fn: (ViewModel) -> String): (ViewModel) -> String = {
         try {
             fn(it)
-        } catch (_: NoSuchFileException) {
-            throw ViewNotFound(it)
+        } catch (e: NoSuchFileException) {
+            throw ViewNotFound(it, e)
         }
     }
 }

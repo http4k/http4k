@@ -41,7 +41,7 @@ class FreemarkerTemplates(
             template.process(viewModel, stringWriter)
             stringWriter.toString()
         } catch (e: TemplateNotFoundException) {
-            throw ViewNotFound(viewModel)
+            throw ViewNotFound(viewModel, e)
         }
     }
 }

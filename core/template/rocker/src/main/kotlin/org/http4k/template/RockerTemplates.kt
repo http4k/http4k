@@ -30,7 +30,7 @@ class RockerTemplates : Templates {
 
         override fun invoke(p1: ViewModel) = kotlin.runCatching {
             Rocker.template(p1.template())
-        }.onFailure { throw ViewNotFound(p1) }
+        }.onFailure { throw ViewNotFound(p1, it) }
             .map {
                 it
                     .bind(

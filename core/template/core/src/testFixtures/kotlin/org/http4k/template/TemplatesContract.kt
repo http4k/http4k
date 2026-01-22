@@ -1,9 +1,11 @@
 package org.http4k.template
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
+import org.junit.jupiter.api.assertThrows
 
 abstract class TemplatesContract<out T : Templates>(protected val templates: T) {
 
@@ -70,6 +72,12 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     open fun atRootViewModel(items: List<Item>): ViewModel = AtRoot(items)
 
     private fun checkNonExistent(renderer: TemplateRenderer) {
-        assertThat({ renderer(NonExistent) }, throws(equalTo(ViewNotFound(NonExistent))))
+        val exception = assertThrows<ViewNotFound> { renderer(NonExistent) }
+        assertThat(exception.message ?: "", containsSubstring(NonExistent.template()))
+        checkCauseOfNonExistent(exception)
+    }
+    
+    protected open fun checkCauseOfNonExistent(exception: ViewNotFound) {
+        assertNotNull(exception.cause, "should report the underlying cause")
     }
 }
