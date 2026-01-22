@@ -305,6 +305,7 @@ vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
 wiremock-standalone = { module = "org.wiremock:wiremock-standalone", version.ref = "wiremock" }
 
 [plugins]
+jte = { id = "gg.jte.gradle", version.ref = "jte" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
