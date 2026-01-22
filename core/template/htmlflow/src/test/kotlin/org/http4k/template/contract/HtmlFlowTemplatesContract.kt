@@ -15,6 +15,8 @@ import org.http4k.template.Templates
 import org.http4k.template.ViewModel
 import org.http4k.template.ViewNotFound
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
+import org.junit.jupiter.api.assertThrows
 
 abstract class HtmlFlowTemplatesContract<out T : Templates>(protected val templates: T) {
 
@@ -78,7 +80,8 @@ abstract class HtmlFlowTemplatesContract<out T : Templates>(protected val templa
     }
 
     private fun checkNonExistent(renderer: TemplateRenderer) {
-        assertThat({ renderer(NonExistent) }, throws(equalTo(ViewNotFound(NonExistent))))
+        val exception = assertThrows<ViewNotFound>({ renderer(NonExistent) })
+        assertNotNull(exception.cause, "should report underlying cause")
     }
 
     fun String.trimHtml(): String =
