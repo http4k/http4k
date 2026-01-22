@@ -16,6 +16,7 @@ aws-lambda-java-events = "3.16.1"
 awssdk-bom = "2.41.12"
 azure-core = "1.57.1"
 azure-functions-java-library = "3.2.2"
+# [blocked] on 12.32.0 until azurite upgraded
 azure-storage-blob = "12.32.0"
 base16-encoding = "2.6.0"
 bcprov-jdk18on = "1.83"
