@@ -3,8 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v2.26.1.0 (uncut)
-- **http4k-connect-amazon-secretsmanager**: Add the `SecretsManagerRotationEvent`.  H/T @oharaandrew314
+### v6.27.0.0 (uncut)
+
+- **http4k-connect-amazon-secretsmanager**: Add the `SecretsManagerRotationEvent`. H/T @oharaandrew314
+- **http4k-server-undertow**: [Fix] CVE-2024-3884 CVE-2024-4027 CVE-2025-12543
+- **http4k-template-***: Templates report underlying cause when ViewNotFound. H/T @npryce
 
 ### v6.26.0.0
 - **http4k-***: Upgrade versions
