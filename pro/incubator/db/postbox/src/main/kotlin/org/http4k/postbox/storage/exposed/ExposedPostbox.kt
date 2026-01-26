@@ -21,14 +21,15 @@ import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.DEAD
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PROCESSED
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SortOrder.ASC
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.update
-import org.jetbrains.exposed.sql.upsertReturning
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.lessEq
+import org.jetbrains.exposed.v1.core.plus
+import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.update
+import org.jetbrains.exposed.v1.jdbc.upsertReturning
 import java.time.Duration
 import java.time.Instant
 
@@ -145,7 +146,7 @@ class ExposedPostbox(prefix: String, private val timeSource: TimeSource) : Postb
     override fun pendingRequests(batchSize: Int, atTime: Instant) =
         table.select(listOf(table.requestId, table.request, table.processAt, table.failures))
             .where((table.status eq PENDING) and (table.processAt lessEq atTime))
-            .orderBy(table.processAt, ASC)
+            .orderBy(table.processAt, SortOrder.ASC)
             .limit(batchSize)
             .map {
                 Postbox.PendingRequest(

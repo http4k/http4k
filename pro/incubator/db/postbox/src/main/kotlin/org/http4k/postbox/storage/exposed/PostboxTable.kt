@@ -1,11 +1,9 @@
 package org.http4k.postbox.storage.exposed
 
 import org.http4k.postbox.storage.exposed.PostboxTable.Status.PENDING
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.CustomFunction
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.javatime.JavaInstantColumnType
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.javatime.timestamp
 import java.time.Instant
 
 class PostboxTable(prefix: String) : Table("${prefix}_postbox") {

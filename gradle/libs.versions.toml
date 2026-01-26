@@ -58,7 +58,7 @@ jakarta-servlet-api = "6.1.0"
 jakarta-ws-rs-api = "4.0.0"
 java-websocket = "1.6.0"
 javax-servlet-api = "4.0.1"
-jetbrains-exposed = "0.61.0"
+jetbrains-exposed = "1.0.0"
 jetty-bom = "12.1.5"
 # frozen to 11.0.26
 jetty11-bom = "11.0.26"
