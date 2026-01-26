@@ -23,15 +23,19 @@
       "type": "string",
       "description": "the e",
       "title": "e",
-      "enum": [
-        "A",
-        "B",
-        "C"
-      ],
-      "enumNames": [
-        "a",
-        "b",
-        "c"
+      "oneOf": [
+        {
+          "title": "a",
+          "const": "A"
+        },
+        {
+          "title": "b",
+          "const": "B"
+        },
+        {
+          "title": "c",
+          "const": "C"
+        }
       ]
     },
     "i": {

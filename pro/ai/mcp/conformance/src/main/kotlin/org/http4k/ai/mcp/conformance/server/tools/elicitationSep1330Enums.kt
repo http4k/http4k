@@ -20,16 +20,36 @@ class DefaultsForm2 : ElicitationModel() {
     val untitledSingle by enum("untitledSingle", "", Elicitation.Metadata.EnumNames<Options>())
 
     //2. Titled single-select: { type: "string", oneOf: [{ const: "value1", title: "First Option" }, ...] }
-    val titledSingle by enum("titledSingle", "", Elicitation.Metadata.EnumNames<Values>())
+    val titledSingle by enum(
+        "titledSingle", "", Elicitation.Metadata.EnumNames<Values>(
+            mappings = mapOf(
+                Values.value1 to "First Option",
+                Values.value2 to "Second Option",
+                Values.value3 to "Third Option"
+            )
+        )
+    )
 
     //3. Legacy titled (deprecated): { type: "string", enum: ["opt1", "opt2", "opt3"], enumNames: ["Option One", "Option Two", "Option Three"] }
-    val legacyEnum by enum("legacyEnum", "", Elicitation.Metadata.EnumNames<Opt>())
+    val legacyEnum by enum(
+        "legacyEnum", "", Elicitation.Metadata.EnumNames<Opt>(
+            mappings = mapOf(Opt.opt1 to "Option One", Opt.opt2 to "Option Two", Opt.opt3 to "Option Three")
+        )
+    )
 
     //4. Untitled multi-select: { type: "array", items: { type: "string", enum: ["option1", "option2", "option3"] } }
     val untitledMulti by enum("untitledMulti", "", Elicitation.Metadata.EnumNames<Options>())
 
     //5. Titled multi-select: { type: "array", items: { anyOf: [{ const: "value1", title: "First Choice" }, ...] } }
-    val titledMulti by enum("titledMulti", "", Elicitation.Metadata.EnumNames<Values>())
+    val titledMulti by enum(
+        "titledMulti", "", Elicitation.Metadata.EnumNames<Values>(
+            mappings = mapOf(
+                Values.value1 to "First Choice",
+                Values.value2 to "Second Choice",
+                Values.value3 to "Third Choice"
+            )
+        )
+    )
 }
 
 val defaultForm2 = Elicitation.auto(DefaultsForm2()).toLens("form", "it's a form")

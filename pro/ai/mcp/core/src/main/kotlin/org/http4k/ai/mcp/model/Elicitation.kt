@@ -75,14 +75,18 @@ object Elicitation {
         }
 
         class EnumNames<T : Enum<T>>(mappings: Map<T, String>) :
-            Metadata<T, List<String>>("enum") {
+            Metadata<T, List<MoshiNode>>("enum") {
 
             private val sorted = mappings.toList().sortedBy { it.second }
-            override val value = mappings.keys.sortedBy { it.ordinal }.map { it.name }
+            override val value = mappings.keys.sortedBy { it.ordinal }.map { McpJson.string(it.name) }
 
             override fun data() = listOf(
-                name to sorted.map { it.first.name },
-                "enumNames" to sorted.map { it.second }
+                "oneOf" to sorted.map {
+                    McpJson.obj(
+                        "title" to McpJson.string(it.second),
+                        "const" to McpJson.string(it.first.name)
+                    )
+                }
             )
 
             companion object {

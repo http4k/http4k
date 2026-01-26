@@ -1,11 +1,13 @@
 {
-  "enum": [
-    "BAR",
-    "FOO"
-  ],
-  "enumNames": [
-    "Bar description",
-    "Foo description"
+  "oneOf": [
+    {
+      "title": "Bar description",
+      "const": "BAR"
+    },
+    {
+      "title": "Foo description",
+      "const": "FOO"
+    }
   ],
   "type": "string",
   "title": "title",
