@@ -1,7 +1,5 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
-import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMappings
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.model.FooEnum.A
 import org.http4k.ai.mcp.model.FooEnum.B
@@ -40,12 +38,14 @@ class Foo : ElicitationModel() {
     var e by enum(
         "e",
         "the e",
-        EnumMapping(FooEnum.entries.associateWith { it.name.lowercase() }, A)
+        FooEnum.entries.associateWith { it.name.lowercase() },
+        A
     )
     var me by enums(
         "e",
         "the e",
-        EnumMappings(FooEnum.entries.associateWith { it.name.lowercase() }, listOf(A, B))
+        FooEnum.entries.associateWith { it.name.lowercase() },
+        listOf(A, B)
     )
     var oe by optionalEnum<FooEnum>("oe", "the oe")
     var l by long("l", "the l")
