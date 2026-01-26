@@ -3,6 +3,8 @@ package org.http4k.ai.mcp.model
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
 import org.http4k.ai.mcp.model.ElicitationLensSpec.Companion.mapWithNewMeta
+import org.http4k.ai.mcp.model.EnumSelection.Multi
+import org.http4k.ai.mcp.model.EnumSelection.Single
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.bool
 import org.http4k.ai.mcp.util.McpJson.decimal
@@ -74,27 +76,45 @@ object Elicitation {
             data class Default(override val value: Boolean) : boolean<Boolean>("default")
         }
 
-        class EnumNames<T : Enum<T>>(mappings: Map<T, String>) :
-            Metadata<T, List<MoshiNode>>("enum") {
+        class EnumMappings<T : Enum<T>>(
+            private val selection: EnumSelection<T>,
+            mappings: Map<T, String> = emptyMap()
+        ) : Metadata<T, MoshiNode>("enum") {
 
             private val sorted = mappings.toList().sortedBy { it.second }
-            override val value = mappings.keys.sortedBy { it.ordinal }.map { McpJson.string(it.name) }
+            override val value = McpJson.array(mappings.keys.sortedBy { it.ordinal }.map { McpJson.string(it.name) })
 
-            override fun data() = listOf(
-                "oneOf" to sorted.map {
-                    McpJson.obj(
-                        "title" to McpJson.string(it.second),
-                        "const" to McpJson.string(it.first.name)
+            override fun data() = when (selection) {
+                is Single -> listOfNotNull(
+                    "oneOf" to McpJson.array(
+                        sorted.map {
+                            McpJson.obj(
+                                "title" to McpJson.string(it.second),
+                                "const" to McpJson.string(it.first.name)
+                            )
+                        }
                     )
-                }
-            )
+                )
+
+                is Multi -> listOfNotNull(
+                    "items" to McpJson.obj(
+                        "anyOf" to McpJson.array(
+                            sorted.map {
+                                McpJson.obj(
+                                    "title" to McpJson.string(it.second),
+                                    "const" to McpJson.string(it.first.name)
+                                )
+                            }
+                        ))
+                )
+            }
 
             companion object {
                 /**
                  * Create a set of names from an enum class.
                  */
                 inline operator fun <reified T : Enum<T>> invoke() =
-                    EnumNames(enumValues<T>().associateWith { it.toString() })
+                    EnumMappings(Single(), enumValues<T>().associateWith { it.toString() })
             }
         }
     }
@@ -119,6 +139,11 @@ fun Elicitation.number() = mapWithNewMeta(
 )
 
 fun Elicitation.boolean() = mapWithNewMeta({ bool(it) }, { MoshiBoolean(it) }, BooleanParam)
+
+sealed interface EnumSelection<T : Enum<T>> {
+    data class Single<T : Enum<T>>(val default: T? = null) : EnumSelection<T>
+    data class Multi<T : Enum<T>>(val defaults: List<T> = emptyList()) : EnumSelection<T>
+}
 
 inline fun <reified T : Enum<T>> Elicitation.enum() =
     mapWithNewMeta(

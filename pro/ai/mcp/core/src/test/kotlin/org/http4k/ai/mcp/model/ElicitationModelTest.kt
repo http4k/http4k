@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumNames
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMappings
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -33,7 +33,11 @@ class ElicitationModelTest {
 class Foo : ElicitationModel() {
     var s by string("s", "the s", null, MaxLength(10))
     var os by optionalString("os", "the os")
-    var e by enum("e", "the e", EnumNames(FooEnum.entries.associateWith { it.name.lowercase() }))
+    var e by enum(
+        "e",
+        "the e",
+        EnumMappings(EnumSelection.Single(), FooEnum.entries.associateWith { it.name.lowercase() })
+    )
     var oe by optionalEnum<FooEnum>("oe", "the oe")
     var l by long("l", "the l")
     var ol by optionalLong("ol", "the ol")
