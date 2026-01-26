@@ -99,14 +99,12 @@ abstract class ElicitationModel {
         description: String,
         default: T? = null,
         nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
-    ): ElicitationModelStringReadWriteProperty<T> {
-        return required(
-            title,
-            description,
-            StringParam,
-            default,
-            nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
-    }
+    ): ElicitationModelStringReadWriteProperty<T> = required(
+        title,
+        description,
+        StringParam,
+        default,
+        nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
 
     fun <T : Enum<T>> optionalEnum(
         title: String,

@@ -16,6 +16,7 @@ fun ConformanceTools() = CapabilityPack(
     samplingTool(),
     elicitationTool(),
     elicitationSep1034Tool(),
+    elicitationSep1330Enums(),
     dynamicTool(),
     loggingTool()
 )
