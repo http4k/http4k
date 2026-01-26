@@ -29,15 +29,19 @@
       "description": "description"
     },
     "enum": {
-      "enum": [
-        "Bar",
-        "Baz",
-        "Foo"
-      ],
-      "enumNames": [
-        "bar",
-        "baz",
-        "foo"
+      "oneOf": [
+        {
+          "title": "bar",
+          "const": "Bar"
+        },
+        {
+          "title": "baz",
+          "const": "Baz"
+        },
+        {
+          "title": "foo",
+          "const": "Foo"
+        }
       ],
       "type": "string",
       "title": "title",

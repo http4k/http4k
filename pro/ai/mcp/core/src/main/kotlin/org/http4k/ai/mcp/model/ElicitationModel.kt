@@ -1,6 +1,8 @@
 package org.http4k.ai.mcp.model
 
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.format.MoshiNode
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
@@ -181,15 +183,22 @@ abstract class ElicitationModel {
                 "properties" to obj(
                     properties()
                         .map {
+                            val listOf: List<Pair<String, MoshiNode>> = listOf(
+                                "type" to string(it.value.type.description),
+                                "description" to string(it.value.description),
+                                "title" to string(it.value.title),
+                                "default" to (it.value.default?.let { McpJson.asJsonObject(it) }
+                                    ?: McpJson.nullNode()),
+                            )
                             it.key to obj(
-                                listOf(
-                                    "type" to string(it.value.type.description),
-                                    "description" to string(it.value.description),
-                                    "title" to string(it.value.title),
-                                    "default" to (it.value.default?.let { McpJson.asJsonObject(it) }
-                                        ?: McpJson.nullNode()),
-                                ) + it.value.metadata.flatMap {
-                                    it.data().map { it.first to McpJson.asJsonObject(it.second) }
+                                listOf + it.value.metadata.flatMap {
+                                    it.data().map {
+                                        it.first to
+                                            when (it.second) {
+                                                is McpNodeType -> it.second as McpNodeType
+                                                else -> McpJson.asJsonObject(it.second)
+                                            }
+                                    }
                                 },
                             )
                         }
