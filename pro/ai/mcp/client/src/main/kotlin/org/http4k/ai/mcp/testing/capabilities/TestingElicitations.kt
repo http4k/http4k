@@ -19,12 +19,26 @@ class TestingElicitations(sender: TestMcpSender) : McpClient.Elicitations {
 
     init {
         sender.on(McpElicitations) { event ->
-            val (id, req) =
-                event.nextEvent<ElicitationRequest, McpElicitations.Request> {
-                    ElicitationRequest(message, requestedSchema, _meta.progressToken)
-                }.valueOrNull()!!
+            val result = event.nextEvent<McpElicitations.Request, McpElicitations.Request> { this }.valueOrNull()!!
+            val (id, protocolRequest) = result
+
+            val domainRequest = when (protocolRequest) {
+                is McpElicitations.Request.Form -> ElicitationRequest.Form(
+                    protocolRequest.message,
+                    protocolRequest.requestedSchema,
+                    protocolRequest._meta.progressToken
+                )
+
+                is McpElicitations.Request.Url -> ElicitationRequest.Url(
+                    protocolRequest.message,
+                    protocolRequest.url,
+                    protocolRequest.elicitationId,
+                    protocolRequest._meta.progressToken
+                )
+            }
+
             onElicitation.forEach { handler ->
-                sender(with(handler(req)) { McpElicitations.Response(action, content, _meta) }, id!!)
+                sender(with(handler(domainRequest)) { McpElicitations.Response(action, content, _meta) }, id!!)
             }
         }
     }

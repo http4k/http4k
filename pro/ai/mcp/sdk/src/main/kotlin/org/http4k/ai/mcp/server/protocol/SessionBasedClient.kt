@@ -4,6 +4,8 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationRequest.Form
+import org.http4k.ai.mcp.ElicitationRequest.Url
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.McpError.Protocol
 import org.http4k.ai.mcp.McpError.Timeout
@@ -13,7 +15,6 @@ import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.model.CompletionStatus.Finished
 import org.http4k.ai.mcp.model.CompletionStatus.InProgress
 import org.http4k.ai.mcp.model.LogLevel
-import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ProgressToken
@@ -24,7 +25,6 @@ import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import java.time.Duration
 import java.util.concurrent.LinkedBlockingQueue
@@ -55,13 +55,25 @@ class SessionBasedClient<Transport>(
                     }
                 }
 
-                with(request) {
-                    sessions.request(
-                        context, McpElicitations.Request(
-                            message, requestedSchema, Meta(progressToken)
-                        ).toJsonRpc(McpElicitations, McpJson.asJsonObject(id))
+                val protocolRequest = when (request) {
+                    is Form -> McpElicitations.Request.Form(
+                        request.message,
+                        request.requestedSchema,
+                        Meta(progressToken)
+                    )
+
+                    is Url -> McpElicitations.Request.Url(
+                        request.message,
+                        request.url,
+                        request.elicitationId,
+                        Meta(progressToken)
                     )
                 }
+
+                sessions.request(
+                    context,
+                    protocolRequest.toJsonRpc(McpElicitations, McpJson.asJsonObject(id))
+                )
 
 
                 when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
@@ -144,7 +156,8 @@ class SessionBasedClient<Transport>(
         if (level >= this.logger.levelFor(context.session)) {
             sessions.request(
                 context,
-                McpLogging.LoggingMessage.Notification(McpJson.asJsonObject(data), level, logger).toJsonRpc(McpLogging.LoggingMessage)
+                McpLogging.LoggingMessage.Notification(McpJson.asJsonObject(data), level, logger)
+                    .toJsonRpc(McpLogging.LoggingMessage)
             )
         }
     }

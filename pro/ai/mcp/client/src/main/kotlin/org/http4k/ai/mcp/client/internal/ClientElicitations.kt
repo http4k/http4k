@@ -17,10 +17,42 @@ internal class ClientElicitations(
 
     override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
         register(McpElicitations,
-            McpCallback(McpElicitations.Request::class) { request, requestId ->
+            McpCallback(McpElicitations.Request.Form::class) { request, requestId ->
                 if (requestId == null) return@McpCallback
 
-                val response = fn(ElicitationRequest(request.message, request.requestedSchema, request._meta.progressToken))
+                val response = fn(
+                    ElicitationRequest.Form(
+                        request.message,
+                        request.requestedSchema,
+                        request._meta.progressToken
+                    )
+                )
+
+                val timeout = overrideDefaultTimeout ?: defaultTimeout
+
+                sender(
+                    McpElicitations,
+                    McpElicitations.Response(response.action, response.content, response._meta),
+                    timeout,
+                    requestId
+                )
+
+                tidyUp(requestId)
+            })
+
+        register(
+            McpElicitations,
+            McpCallback(McpElicitations.Request.Url::class) { request, requestId ->
+                if (requestId == null) return@McpCallback
+
+                val response = fn(
+                    ElicitationRequest.Url(
+                        request.message,
+                        request.url,
+                        request.elicitationId,
+                        request._meta.progressToken
+                    )
+                )
 
                 val timeout = overrideDefaultTimeout ?: defaultTimeout
 

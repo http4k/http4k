@@ -143,12 +143,12 @@ abstract class AbstractMcpClient(
         }
 
     override fun sampling(): McpClient.Sampling =
-        org.http4k.ai.mcp.client.internal.ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
+        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun elicitations(): McpClient.Elicitations =
-        org.http4k.ai.mcp.client.internal.ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
+        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 

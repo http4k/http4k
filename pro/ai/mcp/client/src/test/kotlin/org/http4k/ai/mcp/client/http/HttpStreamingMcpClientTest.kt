@@ -291,7 +291,7 @@ class HttpStreamingMcpClientTest : McpClientContract<Sse> {
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
-                val request = ElicitationRequest("foobar", output, progressToken = it.meta.progressToken)
+                val request = ElicitationRequest.Form("foobar", output, progressToken = it.meta.progressToken)
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
 
                 assertThat(

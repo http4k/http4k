@@ -10,10 +10,14 @@ internal class McpCallback<T : Any>(
     private val clazz: KClass<T>,
     private val callback: (T, McpMessageId?) -> Unit
 ) {
-    operator fun invoke(req: JsonRpcRequest<McpNodeType>, messageId: McpMessageId?) {
-        callback(
-            McpJson.asA(McpJson.asFormatString(req.params ?: McpJson.nullNode()), clazz),
-            messageId
-        )
-    }
+    operator fun invoke(req: JsonRpcRequest<McpNodeType>, messageId: McpMessageId?): Boolean =
+        try {
+            callback(
+                McpJson.asA(McpJson.asFormatString(req.params ?: McpJson.nullNode()), clazz),
+                messageId
+            )
+            true
+        } catch (e: Exception) {
+            false
+        }
 }
