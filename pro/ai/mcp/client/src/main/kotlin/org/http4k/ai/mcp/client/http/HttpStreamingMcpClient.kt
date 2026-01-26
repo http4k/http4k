@@ -129,7 +129,7 @@ class HttpStreamingMcpClient(
                     .forEach {
                         val message = JsonRpcRequest(McpJson, it.attributes)
                         val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                        callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
+                        callbacks[McpRpcMethod.of(message.method)]?.any { it(message, id) }
                     }
             }
 
@@ -181,7 +181,7 @@ class HttpStreamingMcpClient(
                                 val message =
                                     JsonRpcRequest(McpJson, (McpJson.parse(it.data) as MoshiObject).attributes)
                                 val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                                callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
+                                callbacks[McpRpcMethod.of(message.method)]?.any { it(message, id) }
                                 null
                             }
                         }
@@ -231,10 +231,32 @@ class HttpStreamingMcpClient(
     override fun elicitations() = object : McpClient.Elicitations {
         override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
             callbacks.getOrPut(McpElicitations.Method) { mutableListOf() }.add(
-                McpCallback(McpElicitations.Request::class) { request, requestId ->
+                McpCallback(McpElicitations.Request.Form::class) { request, requestId ->
                     if (requestId == null) return@McpCallback
 
-                    with(with(request) { fn(ElicitationRequest(message, requestedSchema, _meta.progressToken)) }) {
+                    with(with(request) { fn(ElicitationRequest.Form(message, requestedSchema, _meta.progressToken)) }) {
+                        http.send(
+                            McpElicitations,
+                            McpElicitations.Response(action, content, _meta),
+                            requestId
+                        )
+                    }
+                }
+            )
+            callbacks.getOrPut(McpElicitations.Method) { mutableListOf() }.add(
+                McpCallback(McpElicitations.Request.Url::class) { request, requestId ->
+                    if (requestId == null) return@McpCallback
+
+                    with(with(request) {
+                        fn(
+                            ElicitationRequest.Url(
+                                message,
+                                url,
+                                elicitationId,
+                                _meta.progressToken
+                            )
+                        )
+                    }) {
                         http.send(
                             McpElicitations,
                             McpElicitations.Response(action, content, _meta),

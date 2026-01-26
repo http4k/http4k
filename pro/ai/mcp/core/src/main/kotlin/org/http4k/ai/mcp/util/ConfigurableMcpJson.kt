@@ -6,6 +6,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Priority
@@ -13,6 +14,7 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
+import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
@@ -111,6 +113,7 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     withStandardMappings()
     withAiMappings()
     value(Base64Blob)
+    value(ElicitationId)
     value(McpEntity)
     value(McpRpcMethod)
     value(McpMessageId)
@@ -121,6 +124,7 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(ResourceUriTemplate)
     value(SessionId)
     value(Size)
+    value(TaskId)
     value(Version)
 }
 
