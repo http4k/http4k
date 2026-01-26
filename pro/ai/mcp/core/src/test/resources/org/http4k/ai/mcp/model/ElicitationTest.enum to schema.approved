@@ -9,6 +9,7 @@
       "const": "FOO"
     }
   ],
+  "default": "BAR",
   "type": "string",
   "title": "title",
   "description": "description"
