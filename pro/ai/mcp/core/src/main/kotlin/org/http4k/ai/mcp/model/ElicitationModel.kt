@@ -92,28 +92,28 @@ abstract class ElicitationModel {
     inline fun <reified T : Enum<T>> enum(
         title: String,
         description: String,
-        nameOverrides: Elicitation.Metadata.EnumNames<T>,
+        mappings: Elicitation.Metadata.EnumMappings<T>,
         default: T? = null,
-    ): ElicitationModelStringReadWriteProperty<T> = enumWithValues(title, description, default, nameOverrides)
+    ): ElicitationModelStringReadWriteProperty<T> = enumWithMappings(title, description, default, mappings)
 
-    fun <T : Enum<T>> enumWithValues(
+    fun <T : Enum<T>> enumWithMappings(
         title: String,
         description: String,
         default: T? = null,
-        nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
+        mappings: Elicitation.Metadata.EnumMappings<T>? = null
     ): ElicitationModelStringReadWriteProperty<T> = required(
         title,
         description,
         StringParam,
         default,
-        nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
+        mappings?.let { arrayOf(it) } ?: emptyArray()) { it }
 
     fun <T : Enum<T>> optionalEnum(
         title: String,
         description: String,
         default: T? = null,
-        nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
-    ) = optional(title, description, StringParam, default, nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
+        enums: Elicitation.Metadata.EnumMappings<T>? = null
+    ) = optional(title, description, StringParam, default, enums?.let { arrayOf(it) } ?: emptyArray()) { it }
 
     fun boolean(
         title: String, description: String,

@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MinLength
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.Pattern
 import org.http4k.ai.mcp.model.ElicitationModel
+import org.http4k.ai.mcp.model.EnumSelection.Single
 import org.http4k.ai.mcp.model.boolean
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.int
@@ -52,7 +53,8 @@ class ElicitationRequestTest {
             Elicitation.number().optional("optNum", "title", "description"),
             Elicitation.enum<Option>().required(
                 "enum", "title", "description",
-                Elicitation.Metadata.EnumNames(
+                Elicitation.Metadata.EnumMappings(
+                    Single(),
                     mapOf(
                         Foo to "foo",
                         Bar to "bar",
