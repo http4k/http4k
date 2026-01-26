@@ -2,15 +2,10 @@ package org.http4k.ai.mcp.client.http
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isA
-import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.orThrow
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceResponse
-import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpStreamingClientContract
 import org.http4k.ai.mcp.firstDeterministicSessionId
@@ -37,7 +32,6 @@ import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.model.Role.Companion.Assistant
-import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.BodyMode.Stream
@@ -53,7 +47,6 @@ import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
-import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
@@ -94,32 +87,6 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse> {
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
         HttpStreamingMcp(
             protocol, OAuthMcpSecurity(Uri.of("http://auth1"), Uri.of("http://mcp/mcp")) { it == "123" })
-
-    @Test
-    fun `deals with error`() {
-        val toolArg = Tool.Arg.string().required("name")
-
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            Tool("reverse", "description", toolArg) bind { error("bad things") }
-        )
-
-        val server = toPolyHandler(protocol)
-            .asServer(JettyLoom(0)).start()
-
-        val mcpClient = clientFor(server.port())
-
-        mcpClient.start(Duration.ofSeconds(1))
-
-        val actual = mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
-            .valueOrNull()
-
-        assertThat(actual, present(isA<ToolResponse.Error>()))
-
-        mcpClient.stop()
-        server.stop()
-    }
 
     @Test
     fun `can get to auth server details`(approver: Approver) {

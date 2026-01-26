@@ -2,6 +2,8 @@ package org.http4k.ai.mcp.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
+import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ElicitationRequest
@@ -9,6 +11,7 @@ import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Elicitation
@@ -18,6 +21,7 @@ import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.capability.ServerTools
@@ -184,6 +188,30 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         )
 
         assertThat(prog.get(), equalTo(Progress("progress", 1, 2.0)))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `deals with error`() {
+        val toolArg = Tool.Arg.string().required("name")
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            Tool("reverse", "description", toolArg) bind { error("bad things") }
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        val actual = mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
+            .valueOrNull()
+
+        assertThat(actual, present(isA<ToolResponse.Error>()))
 
         mcpClient.stop()
         server.stop()
