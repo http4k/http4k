@@ -76,7 +76,7 @@ object Elicitation {
         }
 
         class EnumMapping<T : Enum<T>>(
-            mappings: Map<T, String> = emptyMap(),
+            mappings: Map<T, String>,
             private val default: T? = null
         ) : Metadata<T, MoshiNode>("enum") {
 
@@ -97,8 +97,8 @@ object Elicitation {
         }
 
         class EnumMappings<T : Enum<T>>(
-            mappings: Map<T, String> = emptyMap(),
-            private val defaults: List<T> = emptyList(),
+            mappings: Map<T, String>,
+            private val defaults: List<T>,
         ) : Metadata<List<T>, MoshiNode>("enum") {
 
             private val sorted = mappings.toList().sortedBy { it.second }
@@ -118,14 +118,6 @@ object Elicitation {
                 defaults.takeIf { it.isNotEmpty() }
                     ?.let { "default" to McpJson.array(it.map { McpJson.string(it.name) }) }
             )
-        }
-
-        companion object {
-            /**
-             * Create a set of names from an enum class.
-             */
-            inline operator fun <reified T : Enum<T>> invoke() =
-                EnumMapping(enumValues<T>().associateWith { it.toString() })
         }
     }
 }

@@ -19,7 +19,7 @@ class DefaultsForm : ElicitationModel() {
     val name by string("name", "User name", "John Doe")
     val age by int("age", "User age", 30)
     val score by double("score", "User score", 95.5)
-    val status by enum("status", "User status", EnumMapping(), active)
+    val status by enum("status", "User status", default = active)
     val verified by boolean("verified", "Verification status", true)
 }
 

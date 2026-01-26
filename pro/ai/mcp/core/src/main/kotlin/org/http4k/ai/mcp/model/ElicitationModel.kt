@@ -1,5 +1,7 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMappings
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.MoshiNode
@@ -92,34 +94,34 @@ abstract class ElicitationModel {
     inline fun <reified T : Enum<T>> enum(
         title: String,
         description: String,
-        mappings: Elicitation.Metadata.EnumMapping<T> = Elicitation.Metadata.EnumMapping(),
+        mappings: Map<T, String>? = null,
         default: T? = null,
     ): ElicitationModelStringReadWriteProperty<T> = required(
         title,
         description,
         StringParam,
         default,
-        arrayOf(mappings)
+        arrayOf(EnumMapping(mappings ?: enumValues<T>().associateWith { it.toString() }))
     ) { it }
 
     inline fun <reified T : Enum<T>> enums(
         title: String,
         description: String,
-        mappings: Elicitation.Metadata.EnumMappings<T> = Elicitation.Metadata.EnumMappings(),
-        default: T? = null,
+        mappings: Map<T, String>? = null,
+        defaults: List<T>? = null,
     ): ElicitationModelStringReadWriteProperty<List<T>> = required<List<T>, List<T>>(
         title,
         description,
         StringParam,
-        default,
-        arrayOf(mappings)
+        defaults,
+        arrayOf(EnumMappings(mappings ?: enumValues<T>().associateWith { it.toString() }, defaults ?: emptyList()))
     ) { it }
 
     fun <T : Enum<T>> optionalEnum(
         title: String,
         description: String,
         default: T? = null,
-        enums: Elicitation.Metadata.EnumMapping<T>? = null
+        enums: EnumMapping<T>? = null
     ) = optional(title, description, StringParam, default, enums?.let { arrayOf(it) } ?: emptyArray()) { it }
 
     fun boolean(
