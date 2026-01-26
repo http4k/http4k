@@ -6,9 +6,9 @@ import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Elicitation
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMappings
 import org.http4k.ai.mcp.model.ElicitationModel
-import org.http4k.ai.mcp.model.EnumSelection.Multi
-import org.http4k.ai.mcp.model.EnumSelection.Single
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.format.auto
 import org.http4k.routing.bind
@@ -19,12 +19,11 @@ enum class Opt { opt1, opt2, opt3 }
 
 class DefaultsForm2 : ElicitationModel() {
     //1. Untitled single-select: { type: "string", enum: ["option1", "option2", "option3"] }
-    val untitledSingle by enum("untitledSingle", "", Elicitation.Metadata.EnumMappings<Options>())
+    val untitledSingle by enum("untitledSingle", "", EnumMapping<Options>())
 
     //2. Titled single-select: { type: "string", oneOf: [{ const: "value1", title: "First Option" }, ...] }
     val titledSingle by enum(
-        "titledSingle", "", Elicitation.Metadata.EnumMappings<Values>(
-            Single(),
+        "titledSingle", "", EnumMapping(
             mappings = mapOf(
                 Values.value1 to "First Option",
                 Values.value2 to "Second Option",
@@ -35,21 +34,17 @@ class DefaultsForm2 : ElicitationModel() {
 
     //3. Legacy titled (deprecated): { type: "string", enum: ["opt1", "opt2", "opt3"], enumNames: ["Option One", "Option Two", "Option Three"] }
     val legacyEnum by enum(
-        "legacyEnum", "", Elicitation.Metadata.EnumMappings(
-            Single(),
+        "legacyEnum", "", EnumMapping(
             mappings = mapOf(Opt.opt1 to "Option One", Opt.opt2 to "Option Two", Opt.opt3 to "Option Three")
         )
     )
 
     //4. Untitled multi-select: { type: "array", items: { type: "string", enum: ["option1", "option2", "option3"] } }
-    val untitledMulti by enum(
-        "untitledMulti", "", Elicitation.Metadata.EnumMappings<Options>(Multi())
-    )
+    val untitledMulti by enums<Options>("untitledMulti", "")
 
     //5. Titled multi-select: { type: "array", items: { anyOf: [{ const: "value1", title: "First Choice" }, ...] } }
-    val titledMulti by enum(
-        "titledMulti", "", Elicitation.Metadata.EnumMappings(
-            Multi(),
+    val titledMulti by enums(
+        "titledMulti", "", EnumMappings(
             mappings = mapOf(
                 Values.value1 to "First Choice",
                 Values.value2 to "Second Choice",

@@ -5,12 +5,13 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.conformance.server.tools.Status.active
 import org.http4k.ai.mcp.model.Elicitation
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
 import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.format.auto
 import org.http4k.routing.bind
-import org.http4k.ai.mcp.conformance.server.tools.Status.active
 
 enum class Status { active, inactive, pending }
 
@@ -18,7 +19,7 @@ class DefaultsForm : ElicitationModel() {
     val name by string("name", "User name", "John Doe")
     val age by int("age", "User age", 30)
     val score by double("score", "User score", 95.5)
-    val status by enum("status", "User status", Elicitation.Metadata.EnumMappings<Status>(), active)
+    val status by enum("status", "User status", EnumMapping(), active)
     val verified by boolean("verified", "Verification status", true)
 }
 

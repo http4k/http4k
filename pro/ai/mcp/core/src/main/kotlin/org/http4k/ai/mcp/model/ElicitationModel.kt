@@ -92,27 +92,34 @@ abstract class ElicitationModel {
     inline fun <reified T : Enum<T>> enum(
         title: String,
         description: String,
-        mappings: Elicitation.Metadata.EnumMappings<T>,
+        mappings: Elicitation.Metadata.EnumMapping<T> = Elicitation.Metadata.EnumMapping(),
         default: T? = null,
-    ): ElicitationModelStringReadWriteProperty<T> = enumWithMappings(title, description, default, mappings)
-
-    fun <T : Enum<T>> enumWithMappings(
-        title: String,
-        description: String,
-        default: T? = null,
-        mappings: Elicitation.Metadata.EnumMappings<T>? = null
     ): ElicitationModelStringReadWriteProperty<T> = required(
         title,
         description,
         StringParam,
         default,
-        mappings?.let { arrayOf(it) } ?: emptyArray()) { it }
+        arrayOf(mappings)
+    ) { it }
+
+    inline fun <reified T : Enum<T>> enums(
+        title: String,
+        description: String,
+        mappings: Elicitation.Metadata.EnumMappings<T> = Elicitation.Metadata.EnumMappings(),
+        default: T? = null,
+    ): ElicitationModelStringReadWriteProperty<List<T>> = required<List<T>, List<T>>(
+        title,
+        description,
+        StringParam,
+        default,
+        arrayOf(mappings)
+    ) { it }
 
     fun <T : Enum<T>> optionalEnum(
         title: String,
         description: String,
         default: T? = null,
-        enums: Elicitation.Metadata.EnumMappings<T>? = null
+        enums: Elicitation.Metadata.EnumMapping<T>? = null
     ) = optional(title, description, StringParam, default, enums?.let { arrayOf(it) } ?: emptyArray()) { it }
 
     fun boolean(
@@ -127,7 +134,7 @@ abstract class ElicitationModel {
         vararg metadata: Elicitation.Metadata<Boolean, *>
     ) = optional(title, description, BooleanParam, default, metadata) { it }
 
-    private fun <OUT, IN> required(
+    fun <OUT, IN> required(
         title: String,
         description: String,
         meta: ParamMeta,
