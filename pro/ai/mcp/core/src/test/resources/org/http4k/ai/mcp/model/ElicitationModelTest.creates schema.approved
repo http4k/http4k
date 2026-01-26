@@ -6,6 +6,7 @@
     "e",
     "i",
     "l",
+    "me",
     "s"
   ],
   "properties": {
@@ -23,6 +24,7 @@
       "type": "string",
       "description": "the e",
       "title": "e",
+      "default": "A",
       "oneOf": [
         {
           "title": "a",
@@ -47,6 +49,31 @@
       "type": "integer",
       "description": "the l",
       "title": "l"
+    },
+    "me": {
+      "type": "string",
+      "description": "the e",
+      "title": "e",
+      "default": [
+        "A",
+        "B"
+      ],
+      "items": {
+        "anyOf": [
+          {
+            "title": "a",
+            "const": "A"
+          },
+          {
+            "title": "b",
+            "const": "B"
+          },
+          {
+            "title": "c",
+            "const": "C"
+          }
+        ]
+      }
     },
     "ob": {
       "type": "boolean",
