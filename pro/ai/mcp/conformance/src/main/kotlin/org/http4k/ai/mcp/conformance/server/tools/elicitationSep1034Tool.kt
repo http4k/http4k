@@ -26,7 +26,7 @@ val defaultForm = Elicitation.auto(DefaultsForm()).toLens("form", "it's a form")
 
 fun elicitationSep1034Tool() = Tool("test_elicitation_sep1034_defaults", "test_elicitation_sep1034_defaults") bind {
     it.client.elicit(
-        ElicitationRequest(
+        ElicitationRequest.Form(
             "Please review and update the form fields with defaults",
             defaultForm,
             progressToken = it.meta.progressToken

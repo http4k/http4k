@@ -22,7 +22,7 @@ val message = Tool.Arg.string().required("message")
 val userForm = Elicitation.auto(UserForm()).toLens("form", "it's a form")
 
 fun elicitationTool() = Tool("test_elicitation", "test_elicitation", message) bind {
-    it.client.elicit(ElicitationRequest(message(it), userForm, progressToken = it.meta.progressToken))
+    it.client.elicit(ElicitationRequest.Form(message(it), userForm, progressToken = it.meta.progressToken))
         .map { Ok(it.content.toString()) }
         .mapFailure { Error(1, "Problem with response") }
         .get()
