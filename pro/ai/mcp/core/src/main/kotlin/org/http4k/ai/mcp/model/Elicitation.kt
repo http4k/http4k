@@ -93,7 +93,8 @@ object Elicitation {
                                 "const" to McpJson.string(it.first.name)
                             )
                         }
-                    )
+                    ),
+                    selection.default?.let { "default" to McpJson.string(it.name) }
                 )
 
                 is Multi -> listOfNotNull(
@@ -105,7 +106,9 @@ object Elicitation {
                                     "const" to McpJson.string(it.first.name)
                                 )
                             }
-                        ))
+                        )),
+                    selection.defaults.takeIf { it.isNotEmpty() }
+                        ?.let { "default" to McpJson.array(it.map { McpJson.string(it.name) }) }
                 )
             }
 
