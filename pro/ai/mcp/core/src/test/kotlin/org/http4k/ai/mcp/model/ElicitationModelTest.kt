@@ -30,7 +30,7 @@ class ElicitationModelTest {
             e = A
             me = listOf(A, B)
         }
-            .toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
+            .toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, me=[A, B], ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
     }
 }
 
