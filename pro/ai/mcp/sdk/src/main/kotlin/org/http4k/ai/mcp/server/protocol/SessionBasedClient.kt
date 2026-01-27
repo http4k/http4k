@@ -55,7 +55,12 @@ class SessionBasedClient<Transport>(
             tracking.supportsElicitation -> {
                 tracking.trackRequest(id) {
                     with(it.fromJsonRpc<McpElicitations.Response>()) {
-                        queue.put(ElicitationResponse(action, content))
+                        val t = task
+                        val response = when {
+                            t != null -> ElicitationResponse.Task(t)
+                            else -> ElicitationResponse.Ok(action!!, content!!, _meta)
+                        }
+                        queue.put(response)
                         Finished
                     }
                 }
@@ -64,14 +69,16 @@ class SessionBasedClient<Transport>(
                     is Form -> McpElicitations.Request.Form(
                         request.message,
                         request.requestedSchema,
-                        Meta(progressToken)
+                        Meta(progressToken),
+                        request.task
                     )
 
                     is Url -> McpElicitations.Request.Url(
                         request.message,
                         request.url,
                         request.elicitationId,
-                        Meta(progressToken)
+                        Meta(progressToken),
+                        request.task
                     )
                 }
 

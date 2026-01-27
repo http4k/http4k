@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.ElicitationResponse.Ok
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.lens.Meta
@@ -13,7 +13,7 @@ class ElicitationContentLensSpec<OUT : ElicitationModel>(
     fun toLens(name: String, description: String) = McpCapabilityLens(
         Meta(true, "elicitationResponse", ObjectParam, name, description, emptyMap()),
         { json.asA(json.asFormatString(it.content), example::class) },
-        { out, target: ElicitationResponse -> target.copy(content = json.asJsonObject(out)) },
+        { out, target: Ok -> target.copy(content = json.asJsonObject(out)) },
         { example.toSchema() }
     )
 }

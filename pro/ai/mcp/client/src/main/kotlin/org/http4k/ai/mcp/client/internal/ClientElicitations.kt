@@ -2,6 +2,7 @@ package org.http4k.ai.mcp.client.internal
 
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpMessageId
@@ -33,7 +34,8 @@ internal class ClientElicitations(
                     ElicitationRequest.Form(
                         request.message,
                         request.requestedSchema,
-                        request._meta.progressToken
+                        request._meta.progressToken,
+                        request.task
                     )
                 )
 
@@ -41,7 +43,7 @@ internal class ClientElicitations(
 
                 sender(
                     McpElicitations,
-                    McpElicitations.Response(response.action, response.content, response._meta),
+                    response.toProtocol(),
                     timeout,
                     requestId
                 )
@@ -59,7 +61,8 @@ internal class ClientElicitations(
                         request.message,
                         request.url,
                         request.elicitationId,
-                        request._meta.progressToken
+                        request._meta.progressToken,
+                        request.task
                     )
                 )
 
@@ -67,7 +70,7 @@ internal class ClientElicitations(
 
                 sender(
                     McpElicitations,
-                    McpElicitations.Response(response.action, response.content, response._meta),
+                    response.toProtocol(),
                     timeout,
                     requestId
                 )
@@ -75,4 +78,9 @@ internal class ClientElicitations(
                 tidyUp(requestId)
             })
     }
+}
+
+private fun ElicitationResponse.toProtocol() = when (this) {
+    is ElicitationResponse.Ok -> McpElicitations.Response(action, content, _meta = _meta)
+    is ElicitationResponse.Task -> McpElicitations.Response(task = task)
 }
