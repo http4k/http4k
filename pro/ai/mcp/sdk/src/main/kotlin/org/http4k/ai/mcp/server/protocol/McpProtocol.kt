@@ -234,26 +234,26 @@ class McpProtocol<Transport>(
 
                     McpTask.Get.Method ->
                         transport.respondTo<McpTask.Get.Request>(session, jsonReq, httpReq) { it, c ->
-                            tasks.get(it, c, httpReq)
+                            tasks.get(session, it, c, httpReq)
                         }
 
                     McpTask.Result.Method ->
                         transport.respondTo<McpTask.Result.Request>(session, jsonReq, httpReq) { it, c ->
-                            tasks.result(it, c, httpReq)
+                            tasks.result(session, it, c, httpReq)
                         }
 
                     McpTask.Cancel.Method ->
                         transport.respondTo<McpTask.Cancel.Request>(session, jsonReq, httpReq) { it, c ->
-                            tasks.cancel(it, c, httpReq)
+                            tasks.cancel(session, it, c, httpReq)
                         }
 
                     McpTask.List.Method ->
                         transport.respondTo<McpTask.List.Request>(session, jsonReq, httpReq) { it, c ->
-                            tasks.list(it, c, httpReq)
+                            tasks.list(session, it, c, httpReq)
                         }
 
                     McpTask.Status.Method -> {
-                        tasks.update(jsonReq.fromJsonRpc<McpTask.Status.Notification>())
+                        tasks.update(session, jsonReq.fromJsonRpc<McpTask.Status.Notification>())
                         ok()
                     }
 
@@ -296,7 +296,8 @@ class McpProtocol<Transport>(
                         context,
                         sessions,
                         logger,
-                        random
+                        random,
+                        tasks
                     ) { clientTracking[session] })
             } finally {
                 sessions.end(context)
@@ -358,6 +359,7 @@ class McpProtocol<Transport>(
             if (resources is ObservableCapability) resources.remove(session)
             if (tools is ObservableCapability) tools.remove(session)
             logger.unsubscribe(session)
+            tasks.remove(session)
         }
         return McpInitialize.Response(
             metaData.entity, metaData.capabilities, when {

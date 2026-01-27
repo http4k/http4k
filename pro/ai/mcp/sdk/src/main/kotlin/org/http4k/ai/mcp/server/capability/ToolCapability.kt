@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.ToolHandler
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.ToolResponse.Task
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
@@ -58,18 +59,25 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
             }
             .get()
             .let {
-                McpTool.Call.Response(
-                    when (it) {
-                        is Ok -> it.content
-                        is Error -> listOf(Text("ERROR: " + it.error.code + " " + it.error.message))
-                    },
-                    when (it) {
-                        is Ok -> it.structuredContent?.let(McpJson::convert)
-                        is Error -> null
-                    },
-                    it is Error,
-                    it.meta
-                )
+                when (it) {
+                    is Ok -> McpTool.Call.Response(
+                        content = it.content,
+                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        isError = false,
+                        _meta = it.meta
+                    )
+
+                    is Error -> McpTool.Call.Response(
+                        content = listOf(Text("ERROR: " + it.error.code + " " + it.error.message)),
+                        isError = true,
+                        _meta = it.meta
+                    )
+
+                    is Task -> McpTool.Call.Response(
+                        task = it.task,
+                        _meta = it.meta
+                    )
+                }
             }
 
     override fun invoke(p1: ToolRequest) = handler(p1)
