@@ -35,6 +35,7 @@ import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
+import org.http4k.filter.debugMcp
 import org.http4k.format.auto
 import org.http4k.lens.with
 import org.http4k.routing.bind
@@ -169,6 +170,51 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         assertThat(
             mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
             equalTo(Success(Ok(Content.Text("cancel"))))
+        )
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `can do elicitation with task response`() {
+        val output = Elicitation.auto(StreamingFooBar()).toLens("name", "it's a name")
+        val taskId = TaskId.of("elicitation-task-123")
+        val now = Instant.now()
+        val expectedTask = Task(taskId, TaskStatus.working, "Processing elicitation...", now, now)
+
+        val tools = ServerTools(
+            Tool("elicit-task", "description") bind {
+                val request = ElicitationRequest.Form("foobar", output, progressToken = it.meta.progressToken)
+                val received = it.client.elicit(request, Duration.ofSeconds(1))
+
+                assertThat(received, present(isA<Success<ElicitationResponse.Task>>()))
+                val taskResponse = received.valueOrNull() as ElicitationResponse.Task
+                assertThat(taskResponse.task.taskId, equalTo(taskId))
+                assertThat(taskResponse.task.status, equalTo(TaskStatus.working))
+
+                Ok(listOf(Content.Text("done")))
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools,
+        )
+
+        val server = toPolyHandler(protocol).debugMcp().asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.elicitations().onElicitation {
+            ElicitationResponse.Task(expectedTask)
+        }
+
+        assertThat(
+            mcpClient.tools().call(ToolName.of("elicit-task"), ToolRequest(meta = Meta("elicit-task"))),
+            equalTo(Success(Ok(Content.Text("done"))))
         )
 
         mcpClient.stop()

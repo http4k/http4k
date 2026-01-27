@@ -50,6 +50,7 @@ import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.messages.McpPing.Request.task
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
@@ -427,5 +428,5 @@ class HttpStreamingMcpClient(
 
 private fun ElicitationResponse.toProtocol() = when (this) {
     is ElicitationResponse.Ok -> McpElicitations.Response(action, content, _meta = _meta)
-    is ElicitationResponse.Task -> McpElicitations.Response(task = task)
+    is ElicitationResponse.Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
 }
