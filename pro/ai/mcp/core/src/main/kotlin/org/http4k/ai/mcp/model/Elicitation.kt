@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.util.McpJson.integer
 import org.http4k.ai.mcp.util.McpJson.string
 import org.http4k.ai.mcp.util.McpJson.text
 import org.http4k.core.Uri
+import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiBoolean
 import org.http4k.format.MoshiDecimal
 import org.http4k.format.MoshiInteger
@@ -98,7 +99,7 @@ object Elicitation {
 
         class EnumMappings<T : Enum<T>>(
             mappings: Map<T, String>,
-            private val defaults: List<T>,
+            private val defaults: List<T> = emptyList(),
         ) : Metadata<List<T>, MoshiNode>("enum") {
 
             private val sorted = mappings.toList().sortedBy { it.second }
@@ -148,13 +149,13 @@ inline fun <reified T : Enum<T>> Elicitation.enum() =
         { MoshiString(it.name) },
         EnumParam(T::class)
     )
-// TODO add multi to lens spec
-//inline fun <reified T : Enum<T>> Elicitation.enums() =
-//    mapWithNewMeta(
-//        { enumValueOf<T>(it.toString()) },
-//        { MoshiString(it.name) },
-//        ArrayParam(EnumParam(T::class))
-//    )
+
+inline fun <reified T : Enum<T>> Elicitation.enums(): ElicitationLensSpec<List<T>> =
+    mapWithNewMeta(
+        { (it as MoshiArray).elements.map { enumValueOf<T>(it.toString()) } },
+        { it.map { MoshiString(it.toString()) }.let(::MoshiArray) },
+        ArrayParam(EnumParam(T::class))
+    )
 
 /**
  * Typesafe extension functions for creating Elicitation lenses.

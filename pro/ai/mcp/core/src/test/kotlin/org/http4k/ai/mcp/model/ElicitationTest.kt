@@ -80,18 +80,20 @@ class ElicitationTest {
         approver.approve(
             Elicitation.enum<FooBar>().required(
                 "name", "title", "description",
-                EnumMapping(mapOf(FOO to "Foo description", BAR to "Bar description"), FooBar.BAR)
+                EnumMapping(mapOf(FOO to "Foo description", BAR to "Bar description"), BAR)
             )
         )
     }
 
     @Test
-    @Disabled // TODO fix me
-    fun `enum2 to schema`(approver: Approver) {
+    fun `enums to schema`(approver: Approver) {
         approver.approve(
-            Elicitation.enum<FooBar>().required(
+            Elicitation.enums<FooBar>().required(
                 "name", "title", "description",
-                EnumMapping(mapOf(FOO to "Foo description", BAR to "Bar description"))
+                Elicitation.Metadata.EnumMappings(
+                    mapOf(FOO to "Foo description", BAR to "Bar description"),
+                    listOf(BAR)
+                )
             )
         )
     }
