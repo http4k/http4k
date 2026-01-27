@@ -3,6 +3,7 @@ package org.http4k.ai.mcp.testing.capabilities
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
@@ -37,19 +38,25 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
                 is McpElicitations.Request.Form -> ElicitationRequest.Form(
                     protocolRequest.message,
                     protocolRequest.requestedSchema,
-                    protocolRequest._meta.progressToken
+                    protocolRequest._meta.progressToken,
+                    protocolRequest.task
                 )
 
                 is McpElicitations.Request.Url -> ElicitationRequest.Url(
                     protocolRequest.message,
                     protocolRequest.url,
                     protocolRequest.elicitationId,
-                    protocolRequest._meta.progressToken
+                    protocolRequest._meta.progressToken,
+                    protocolRequest.task
                 )
             }
 
             onElicitation.forEach { handler ->
-                sender(with(handler(domainRequest)) { McpElicitations.Response(action, content, _meta) }, id!!)
+                val protocolResponse = when (val response = handler(domainRequest)) {
+                    is ElicitationResponse.Ok -> McpElicitations.Response(response.action, response.content, _meta = response._meta)
+                    is ElicitationResponse.Task -> McpElicitations.Response(task = response.task)
+                }
+                sender(protocolResponse, id!!)
             }
         }
     }

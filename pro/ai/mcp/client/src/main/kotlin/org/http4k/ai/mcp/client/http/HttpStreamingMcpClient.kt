@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Http
@@ -239,35 +240,34 @@ class HttpStreamingMcpClient(
                 McpCallback(McpElicitations.Request.Form::class) { request, requestId ->
                     if (requestId == null) return@McpCallback
 
-                    with(with(request) { fn(ElicitationRequest.Form(message, requestedSchema, _meta.progressToken)) }) {
-                        http.send(
-                            McpElicitations,
-                            McpElicitations.Response(action, content, _meta),
-                            requestId
-                        )
-                    }
+                    val response = with(request) { fn(ElicitationRequest.Form(message, requestedSchema, _meta.progressToken, task)) }
+                    http.send(
+                        McpElicitations,
+                        response.toProtocol(),
+                        requestId
+                    )
                 }
             )
             callbacks.getOrPut(McpElicitations.Method) { mutableListOf() }.add(
                 McpCallback(McpElicitations.Request.Url::class) { request, requestId ->
                     if (requestId == null) return@McpCallback
 
-                    with(with(request) {
+                    val response = with(request) {
                         fn(
                             ElicitationRequest.Url(
                                 message,
                                 url,
                                 elicitationId,
-                                _meta.progressToken
+                                _meta.progressToken,
+                                task
                             )
                         )
-                    }) {
-                        http.send(
-                            McpElicitations,
-                            McpElicitations.Response(action, content, _meta),
-                            requestId
-                        )
                     }
+                    http.send(
+                        McpElicitations,
+                        response.toProtocol(),
+                        requestId
+                    )
                 }
             )
         }
@@ -423,4 +423,9 @@ class HttpStreamingMcpClient(
             else -> Failure(Http(response))
         }
     }
+}
+
+private fun ElicitationResponse.toProtocol() = when (this) {
+    is ElicitationResponse.Ok -> McpElicitations.Response(action, content, _meta = _meta)
+    is ElicitationResponse.Task -> McpElicitations.Response(task = task)
 }

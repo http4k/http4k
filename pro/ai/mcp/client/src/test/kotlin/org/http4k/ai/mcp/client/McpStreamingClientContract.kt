@@ -120,18 +120,19 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
                     received,
                     equalTo(
                         Success(
-                            ElicitationResponse(ElicitationAction.valueOf(it.meta.progressToken!!.toString())).with(
+                            ElicitationResponse.Ok(ElicitationAction.valueOf(it.meta.progressToken!!.toString())).with(
                                 output of response
                             )
                         )
                     )
                 )
 
-                assertThat(output(received.valueOrNull()!!), equalTo(response))
+                val ok = received.valueOrNull()!! as ElicitationResponse.Ok
+                assertThat(output(ok), equalTo(response))
 
                 it.client.elicitationComplete(elicitationId)
 
-                Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
+                Ok(listOf(Content.Text(ok.action.name)))
             }
         )
 
@@ -150,7 +151,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         mcpClient.elicitations().onComplete { receivedElicitationId.set(it) }
 
         mcpClient.elicitations().onElicitation {
-            ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!.toString())).with(output of response)
+            ElicitationResponse.Ok(ElicitationAction.valueOf(it.progressToken!!.toString())).with(output of response)
         }
 
         assertThat(

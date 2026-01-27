@@ -3,6 +3,8 @@ package org.http4k.ai.mcp.protocol.messages
 import org.http4k.ai.mcp.model.ElicitationAction
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Uri
@@ -21,7 +23,8 @@ object McpElicitations : McpRpc {
         data class Form(
             val message: String,
             val requestedSchema: McpNodeType,
-            override val _meta: Meta = Meta.default
+            override val _meta: Meta = Meta.default,
+            val task: TaskMeta? = null
         ) : Request()
 
         @JsonSerializable
@@ -30,14 +33,16 @@ object McpElicitations : McpRpc {
             val message: String,
             val url: Uri,
             val elicitationId: ElicitationId,
-            override val _meta: Meta = Meta.default
+            override val _meta: Meta = Meta.default,
+            val task: TaskMeta? = null
         ) : Request()
     }
 
     @JsonSerializable
     data class Response(
-        val action: ElicitationAction,
-        val content: McpNodeType,
+        val action: ElicitationAction? = null,
+        val content: McpNodeType? = null,
+        val task: Task? = null,
         override val _meta: Meta = Meta.default
     ) : ClientMessage.Response, HasMeta
 

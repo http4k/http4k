@@ -2,7 +2,7 @@ package org.http4k.ai.mcp.model
 
 import dev.forkhandles.values.LocalDateValue
 import dev.forkhandles.values.LocalDateValueFactory
-import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.ElicitationResponse.Ok
 import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
 import org.http4k.ai.mcp.model.Elicitation.Metadata.boolean.Default
 import org.http4k.ai.mcp.model.Elicitation.Metadata.integer.Max
@@ -98,7 +98,7 @@ class ElicitationTest {
         )
     }
 
-    private fun Approver.approve(lens: McpCapabilityLens<ElicitationResponse, *>) {
+    private fun Approver.approve(lens: McpCapabilityLens<Ok, *>) {
         assertApproved(asFormatString(lens.toSchema()), APPLICATION_JSON)
     }
 }
