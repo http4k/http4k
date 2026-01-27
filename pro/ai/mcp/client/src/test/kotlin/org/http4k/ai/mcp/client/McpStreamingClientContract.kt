@@ -21,6 +21,9 @@ import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
+import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
@@ -39,6 +42,9 @@ import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -221,6 +227,103 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             .valueOrNull()
 
         assertThat(actual, present(isA<ToolResponse.Error>()))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `task lifecycle - create, list, get, update status, store result`() {
+        val taskId = TaskId.of("lifecycle-task")
+        val now = Instant.now()
+        val workingTask = Task(taskId, TaskStatus.working, "Processing...", now, now)
+        val completedTask = Task(taskId, TaskStatus.completed, "Done", now, now)
+        val expectedResult = mapOf("answer" to "42", "status" to "success")
+
+        val receivedTask = AtomicReference<Task>()
+        val latch = CountDownLatch(1)
+
+        val tools = ServerTools(
+            Tool("start-task", "starts a task") bind {
+                it.client.tasks().update(workingTask)
+                Ok(Content.Text("started"))
+            },
+            Tool("complete-task", "completes a task") bind {
+                it.client.tasks().update(completedTask)
+                it.client.tasks().storeResult(taskId, expectedResult)
+                Ok(Content.Text("completed"))
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.tasks().onUpdate { t, _ ->
+            receivedTask.set(t)
+            latch.countDown()
+        }
+
+        mcpClient.tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
+
+        assertThat(latch.await(5, SECONDS), equalTo(true))
+        assertThat(receivedTask.get().taskId, equalTo(taskId))
+
+        val tasks = mcpClient.tasks().list().valueOrNull()
+        assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
+
+        val retrieved = mcpClient.tasks().get(taskId).valueOrNull()
+        assertThat(retrieved?.taskId, equalTo(taskId))
+        assertThat(retrieved?.status, equalTo(TaskStatus.working))
+
+        mcpClient.tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta("tasks")))
+
+        val result = mcpClient.tasks().result(taskId).valueOrNull()
+        assertThat(result, equalTo(expectedResult))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `task cancellation - create then cancel`() {
+        val taskId = TaskId.of("cancel-task")
+        val now = Instant.now()
+        val task = Task(taskId, TaskStatus.working, "Processing...", now, now)
+
+        val tools = ServerTools(
+            Tool("create-task", "creates a task") bind {
+                it.client.tasks().update(task)
+                Ok(Content.Text("task created"))
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.tools().call(ToolName.of("create-task"), ToolRequest(meta = Meta("tasks")))
+
+        assertThat(mcpClient.tasks().get(taskId).valueOrNull()?.taskId, equalTo(taskId))
+
+        val cancelResult = mcpClient.tasks().cancel(taskId)
+        assertThat(cancelResult, isA<Success<Unit>>())
+
+        assertThat(mcpClient.tasks().get(taskId).valueOrNull(), equalTo(null))
 
         mcpClient.stop()
         server.stop()

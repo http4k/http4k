@@ -21,6 +21,7 @@ interface Client {
         fun cancel(taskId: TaskId, timeout: Duration? = null): McpResult<Unit>
         fun result(taskId: TaskId, timeout: Duration? = null): McpResult<Map<String, Any>?>
         fun update(task: Task, meta: Meta = Meta.default, timeout: Duration? = null)
+        fun storeResult(taskId: TaskId, result: Map<String, Any>)
     }
 
     companion object {
@@ -37,6 +38,7 @@ interface Client {
                 override fun cancel(taskId: TaskId, timeout: Duration?) = error("NoOp")
                 override fun result(taskId: TaskId, timeout: Duration?) = error("NoOp")
                 override fun update(task: Task, meta: Meta, timeout: Duration?) = error("NoOp")
+                override fun storeResult(taskId: TaskId, result: Map<String, Any>) = error("NoOp")
             }
         }
     }

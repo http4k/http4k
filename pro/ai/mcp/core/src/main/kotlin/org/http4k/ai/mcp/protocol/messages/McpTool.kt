@@ -4,6 +4,7 @@ import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.model.ToolAnnotations
 import org.http4k.ai.mcp.model.ToolExecution
@@ -62,9 +63,10 @@ data class McpTool(
 
         @JsonSerializable
         data class Response(
-            val content: kotlin.collections.List<Content>?,
+            val content: kotlin.collections.List<Content>? = null,
             val structuredContent: Map<String, Any>? = null,
             val isError: Boolean? = false,
+            val task: Task? = null,
             override val _meta: Meta = Meta.default,
         ) : ServerMessage.Response, HasMeta
     }

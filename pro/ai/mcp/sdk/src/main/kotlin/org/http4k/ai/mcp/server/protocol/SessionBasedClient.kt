@@ -42,6 +42,7 @@ class SessionBasedClient<Transport>(
     private val sessions: Sessions<Transport>,
     private val logger: Logger,
     private val random: Random,
+    private val tasks: Tasks,
     private val clientTracking: () -> ClientTracking?
 ) : Client {
 
@@ -179,6 +180,7 @@ class SessionBasedClient<Transport>(
         context,
         sessions,
         random,
+        tasks,
         clientTracking
     )
 }
@@ -188,6 +190,7 @@ internal class SessionBasedClientTasks<Transport>(
     private val context: ClientRequestContext,
     private val sessions: Sessions<Transport>,
     private val random: Random,
+    private val tasks: Tasks,
     private val clientTracking: () -> ClientTracking?
 ) : Client.Tasks {
 
@@ -311,10 +314,12 @@ internal class SessionBasedClientTasks<Transport>(
     }
 
     override fun update(task: Task, meta: Meta, timeout: Duration?) {
-        sessions.request(
-            context,
-            McpTask.Status.Notification(task, meta)
-                .toJsonRpc(McpTask.Status)
-        )
+        val notification = McpTask.Status.Notification(task, meta)
+        tasks.update(context.session, notification)
+        sessions.request(context, notification.toJsonRpc(McpTask.Status))
+    }
+
+    override fun storeResult(taskId: TaskId, result: Map<String, Any>) {
+        tasks.storeResult(context.session, taskId, result)
     }
 }

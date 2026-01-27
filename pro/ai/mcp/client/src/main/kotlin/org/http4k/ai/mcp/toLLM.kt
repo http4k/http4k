@@ -33,4 +33,5 @@ fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
     )
 
     is Error -> Failure(Protocol(error).toLLM())
+    is org.http4k.ai.mcp.ToolResponse.Task -> Failure(Custom("Task responses cannot be converted to LLM responses"))
 }
