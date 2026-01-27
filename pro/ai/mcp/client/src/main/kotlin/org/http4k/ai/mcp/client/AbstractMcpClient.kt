@@ -18,6 +18,7 @@ import org.http4k.ai.mcp.client.internal.ClientPrompts
 import org.http4k.ai.mcp.client.internal.ClientRequestProgress
 import org.http4k.ai.mcp.client.internal.ClientResources
 import org.http4k.ai.mcp.client.internal.ClientSampling
+import org.http4k.ai.mcp.client.internal.ClientTasks
 import org.http4k.ai.mcp.client.internal.ClientTools
 import org.http4k.ai.mcp.client.internal.McpCallback
 import org.http4k.ai.mcp.client.internal.asOrFailure
@@ -164,6 +165,11 @@ abstract class AbstractMcpClient(
 
     override fun completions(): McpClient.Completions =
         ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random)
+
+    override fun tasks(): McpClient.Tasks =
+        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, random, defaultTimeout) { rpc, callback ->
+            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
+        }
 
     protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit>
 

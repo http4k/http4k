@@ -16,6 +16,7 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationAction
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
@@ -50,8 +51,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         val model = ModelName.of("my model")
 
         val samplingResponses = listOf(
-            SamplingResponse(model, Assistant, Content.Text("hello"), null),
-            SamplingResponse(model, Assistant, Content.Text("world"), StopReason.of("foobar"))
+            SamplingResponse(model, Assistant, listOf(Content.Text("hello")), null),
+            SamplingResponse(model, Assistant, listOf(Content.Text("world")), StopReason.of("foobar"))
         )
 
         val tools = ServerTools(
@@ -102,6 +103,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         val output = Elicitation.auto(StreamingFooBar()).toLens("name", "it's a name")
 
         val response = StreamingFooBar().apply { foo = "foo" }
+        val elicitationId = ElicitationId.of("test-elicitation-123")
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
@@ -121,6 +123,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
 
                 assertThat(output(received.valueOrNull()!!), equalTo(response))
 
+                it.client.elicitationComplete(elicitationId)
+
                 Ok(listOf(Content.Text(received.valueOrNull()!!.action.name)))
             }
         )
@@ -136,6 +140,9 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
 
         mcpClient.start(Duration.ofSeconds(1))
 
+        val receivedElicitationId = AtomicReference<ElicitationId>()
+        mcpClient.elicitations().onComplete { receivedElicitationId.set(it) }
+
         mcpClient.elicitations().onElicitation {
             ElicitationResponse(ElicitationAction.valueOf(it.progressToken!!.toString())).with(output of response)
         }
@@ -144,6 +151,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
             equalTo(Success(Ok(Content.Text("accept"))))
         )
+
+        assertThat(receivedElicitationId.get(), equalTo(elicitationId))
 
         assertThat(
             mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),

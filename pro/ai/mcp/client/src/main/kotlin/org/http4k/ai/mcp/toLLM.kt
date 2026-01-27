@@ -19,7 +19,8 @@ fun McpError.toLLM(): LLMError = when (this) {
     is McpError.Http -> Http(response)
     is McpError.Internal -> Internal(cause)
     is Protocol -> Custom(error)
-    McpError.Timeout -> Timeout
+    is McpError.Timeout -> Timeout
+    is McpError.URLElicitationRequired -> Custom(elicitations) // ??? should this be here?
 }
 
 fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {

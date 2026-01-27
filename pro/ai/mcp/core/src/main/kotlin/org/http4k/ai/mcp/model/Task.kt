@@ -10,7 +10,7 @@ data class Task(
     val status: TaskStatus,
     val statusMessage: String? = null,
     val createdAt: Instant,
-    val updatedAt: Instant,
+    val lastUpdatedAt: Instant,
     val ttl: TimeToLive? = null,
     val pollInterval: Int? = null
 )

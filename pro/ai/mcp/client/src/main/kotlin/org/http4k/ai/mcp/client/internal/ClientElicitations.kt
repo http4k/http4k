@@ -3,6 +3,7 @@ package org.http4k.ai.mcp.client.internal
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpRpc
@@ -14,6 +15,14 @@ internal class ClientElicitations(
     private val sender: McpRpcSender,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Elicitations {
+
+    override fun onComplete(fn: (ElicitationId) -> Unit) {
+        register(
+            McpElicitations.Complete,
+            McpCallback(McpElicitations.Complete.Notification::class) { notification, _ ->
+                fn(notification.elicitationId)
+            })
+    }
 
     override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
         register(McpElicitations,

@@ -17,6 +17,7 @@ import org.http4k.ai.mcp.testing.capabilities.TestingPrompts
 import org.http4k.ai.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.ai.mcp.testing.capabilities.TestingResources
 import org.http4k.ai.mcp.testing.capabilities.TestingSampling
+import org.http4k.ai.mcp.testing.capabilities.TestingTasks
 import org.http4k.ai.mcp.testing.capabilities.TestingTools
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -46,6 +47,7 @@ class TestMcpClient(
     private val elicitations = TestingElicitations(sender)
     private val resources = TestingResources(sender)
     private val completions = TestingCompletions(sender)
+    private val tasks = TestingTasks(sender)
 
     override fun start(overrideDefaultTimeout: Duration?): McpResult<ServerCapabilities> {
         val initResponse = sender(
@@ -74,6 +76,8 @@ class TestMcpClient(
     override fun resources() = resources
 
     override fun completions() = completions
+
+    override fun tasks() = tasks
 
     override fun close() {}
 }
