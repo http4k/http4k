@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Http
 import org.http4k.ai.mcp.McpResult
@@ -29,8 +30,11 @@ import org.http4k.ai.mcp.client.internal.McpCallback
 import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
@@ -50,6 +54,7 @@ import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpSampling
+import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asA
@@ -266,6 +271,14 @@ class HttpStreamingMcpClient(
                 }
             )
         }
+
+        override fun onComplete(fn: (ElicitationId) -> Unit) {
+            callbacks.getOrPut(McpElicitations.Complete.Method) { mutableListOf() }.add(
+                McpCallback(McpElicitations.Complete.Notification::class) { notification, _ ->
+                    fn(notification.elicitationId)
+                }
+            )
+        }
     }
 
     override fun sampling() = object : McpClient.Sampling {
@@ -348,6 +361,43 @@ class HttpStreamingMcpClient(
             http.send(McpCompletion, McpCompletion.Request(ref, request.argument))
                 .flatMap { it.first().asAOrFailure<McpCompletion.Response>() }
                 .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
+    }
+
+    override fun tasks() = object : McpClient.Tasks {
+        override fun onUpdate(fn: (Task, Meta) -> Unit) {
+            callbacks.getOrPut(McpTask.Status.Method) { mutableListOf() }.add(
+                McpCallback(McpTask.Status.Notification::class) { notification, _ ->
+                    fn(
+                        notification.toTask(),
+                        notification._meta
+                    )
+                }
+            )
+        }
+
+        override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send(McpTask.Get, McpTask.Get.Request(taskId))
+                .flatMap { it.first().asAOrFailure<McpTask.Get.Response>() }
+                .map { it.task }
+
+        override fun list(overrideDefaultTimeout: Duration?) =
+            http.send(McpTask.List, McpTask.List.Request())
+                .flatMap { it.first().asAOrFailure<McpTask.List.Response>() }
+                .map { it.tasks }
+
+        override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send(McpTask.Cancel, McpTask.Cancel.Request(taskId))
+                .flatMap { it.first().asAOrFailure<McpTask.Cancel.Response>() }
+                .map { }
+
+        override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send(McpTask.Result, McpTask.Result.Request(taskId))
+                .flatMap { it.first().asAOrFailure<McpTask.Result.Response>() }
+                .map { it.result }
+
+        override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) {
+            http.send(McpTask.Status, McpTask.Status.Notification(task, meta))
+        }
     }
 
     override fun close() {}

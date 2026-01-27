@@ -48,6 +48,6 @@ data class SamplingRequest(
 data class SamplingResponse(
     val model: ModelName,
     val role: Role,
-    val content: Content,
+    val content: List<Content>,
     val stopReason: StopReason? = null
 )

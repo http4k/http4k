@@ -3,6 +3,7 @@ package org.http4k.ai.mcp.model
 import org.http4k.ai.model.ToolName
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
+import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -21,6 +22,17 @@ sealed class Content {
     @JsonSerializable
     @PolymorphicLabel("resource")
     data class EmbeddedResource(val resource: Resource.Content, val annotations: Annotations? = null) : Content()
+
+    @JsonSerializable
+    @PolymorphicLabel("resource_link")
+    data class ResourceLink(
+        val uri: Uri,
+        val name: ResourceName,
+        val title: String? = null,
+        val description: String? = null,
+        val mimeType: MimeType? = null,
+        val annotations: Annotations? = null
+    ) : Content()
 
     @JsonSerializable
     @PolymorphicLabel("text")

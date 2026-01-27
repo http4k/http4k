@@ -14,14 +14,18 @@ import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.model.CompletionStatus.Finished
 import org.http4k.ai.mcp.model.CompletionStatus.InProgress
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ProgressToken
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpSampling
+import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
@@ -47,7 +51,7 @@ class SessionBasedClient<Transport>(
         val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
 
         return when {
-            tracking.supportsElicitations -> {
+            tracking.supportsElicitation -> {
                 tracking.trackRequest(id) {
                     with(it.fromJsonRpc<McpElicitations.Response>()) {
                         queue.put(ElicitationResponse(action, content))
@@ -160,5 +164,157 @@ class SessionBasedClient<Transport>(
                     .toJsonRpc(McpLogging.LoggingMessage)
             )
         }
+    }
+
+    override fun elicitationComplete(elicitationId: ElicitationId) {
+        sessions.request(
+            context,
+            McpElicitations.Complete.Notification(elicitationId)
+                .toJsonRpc(McpElicitations.Complete)
+        )
+    }
+
+    override fun tasks(): Client.Tasks = SessionBasedClientTasks(
+        progressToken,
+        context,
+        sessions,
+        random,
+        clientTracking
+    )
+}
+
+internal class SessionBasedClientTasks<Transport>(
+    private val progressToken: ProgressToken,
+    private val context: ClientRequestContext,
+    private val sessions: Sessions<Transport>,
+    private val random: Random,
+    private val clientTracking: () -> ClientTracking?
+) : Client.Tasks {
+
+    override fun get(taskId: TaskId, timeout: Duration?): McpResult<Task> {
+        val id = McpMessageId.random(random)
+        val queue = LinkedBlockingQueue<Task>()
+        val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
+
+        return when {
+            tracking.supportsTasks -> {
+                tracking.trackRequest(id) {
+                    with(it.fromJsonRpc<McpTask.Get.Response>()) {
+                        queue.put(task)
+                        Finished
+                    }
+                }
+
+                sessions.request(
+                    context,
+                    McpTask.Get.Request(taskId, Meta(progressToken))
+                        .toJsonRpc(McpTask.Get, McpJson.asJsonObject(id))
+                )
+
+                when (val result = queue.poll(timeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                    null -> Failure(Timeout)
+                    else -> Success(result)
+                }
+            }
+
+            else -> Failure(Protocol(InvalidRequest))
+        }
+    }
+
+    override fun list(timeout: Duration?): McpResult<List<Task>> {
+        val id = McpMessageId.random(random)
+        val queue = LinkedBlockingQueue<List<Task>>()
+        val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
+
+        return when {
+            tracking.supportsTasks -> {
+                tracking.trackRequest(id) {
+                    with(it.fromJsonRpc<McpTask.List.Response>()) {
+                        queue.put(tasks)
+                        Finished
+                    }
+                }
+
+                sessions.request(
+                    context,
+                    McpTask.List.Request(_meta = Meta(progressToken))
+                        .toJsonRpc(McpTask.List, McpJson.asJsonObject(id))
+                )
+
+                when (val result = queue.poll(timeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                    null -> Failure(Timeout)
+                    else -> Success(result)
+                }
+            }
+
+            else -> Failure(Protocol(InvalidRequest))
+        }
+    }
+
+    override fun cancel(taskId: TaskId, timeout: Duration?): McpResult<Unit> {
+        val id = McpMessageId.random(random)
+        val queue = LinkedBlockingQueue<Unit>()
+        val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
+
+        return when {
+            tracking.supportsTasks -> {
+                tracking.trackRequest(id) {
+                    it.fromJsonRpc<McpTask.Cancel.Response>()
+                    queue.put(Unit)
+                    Finished
+                }
+
+                sessions.request(
+                    context,
+                    McpTask.Cancel.Request(taskId, Meta(progressToken))
+                        .toJsonRpc(McpTask.Cancel, McpJson.asJsonObject(id))
+                )
+
+                when (queue.poll(timeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                    null -> Failure(Timeout)
+                    else -> Success(Unit)
+                }
+            }
+
+            else -> Failure(Protocol(InvalidRequest))
+        }
+    }
+
+    override fun result(taskId: TaskId, timeout: Duration?): McpResult<Map<String, Any>?> {
+        val id = McpMessageId.random(random)
+        val queue = LinkedBlockingQueue<Map<String, Any>>()
+        val tracking = clientTracking() ?: return Failure(Protocol(InvalidRequest))
+
+        return when {
+            tracking.supportsTasks -> {
+                tracking.trackRequest(id) {
+                    with(it.fromJsonRpc<McpTask.Result.Response>()) {
+                        queue.put(result ?: emptyMap())
+                        Finished
+                    }
+                }
+
+                sessions.request(
+                    context,
+                    McpTask.Result.Request(taskId, Meta(progressToken))
+                        .toJsonRpc(McpTask.Result, McpJson.asJsonObject(id))
+                )
+
+                when (val result = queue.poll(timeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
+                    null -> Failure(Timeout)
+                    else -> Success(result.takeIf { it.isNotEmpty() })
+                }
+            }
+
+            else -> Failure(Protocol(InvalidRequest))
+        }
+    }
+
+    override fun update(task: Task, meta: Meta, timeout: Duration?) {
+        sessions.request(
+            context,
+            McpTask.Status.Notification(task, meta)
+                .toJsonRpc(McpTask.Status)
+        )
     }
 }

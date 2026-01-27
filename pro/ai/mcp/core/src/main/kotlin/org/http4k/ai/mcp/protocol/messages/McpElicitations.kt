@@ -40,4 +40,11 @@ object McpElicitations : McpRpc {
         val content: McpNodeType,
         override val _meta: Meta = Meta.default
     ) : ClientMessage.Response, HasMeta
+
+    object Complete : McpRpc {
+        override val Method = McpRpcMethod.of("notifications/elicitation/complete")
+
+        @JsonSerializable
+        data class Notification(val elicitationId: ElicitationId) : ServerMessage.Notification
+    }
 }

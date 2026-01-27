@@ -154,6 +154,8 @@ class HttpNonStreamingMcpClient(
                 .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
     }
 
+    override fun tasks(): McpClient.Tasks = throw UnsupportedOperationException()
+
     override fun close() {}
 
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {

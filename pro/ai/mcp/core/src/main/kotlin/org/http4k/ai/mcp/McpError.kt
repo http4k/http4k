@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp
 
+import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.core.Response
 import org.http4k.jsonrpc.ErrorMessage
 
@@ -27,4 +28,10 @@ sealed interface McpError {
      * Unexpected error
      */
     data class Internal(val cause: Exception) : McpError
+
+    /**
+     * Error indicating that URL elicitation is required before the request can proceed.
+     */
+    // TODO?? WHERE SHOULD THIS GO?
+    data class URLElicitationRequired(val elicitations: List<McpElicitations.Request.Url>) : McpError
 }

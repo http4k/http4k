@@ -252,6 +252,11 @@ class McpProtocol<Transport>(
                             tasks.list(it, c, httpReq)
                         }
 
+                    McpTask.Status.Method -> {
+                        tasks.update(jsonReq.fromJsonRpc<McpTask.Status.Notification>())
+                        ok()
+                    }
+
                     else -> sessions.respond(transport, session, MethodNotFound.toJsonRpc(jsonReq.id))
                 }
             }

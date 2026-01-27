@@ -4,10 +4,21 @@ import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
+import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
+import org.http4k.connect.model.TimeToLive
 import se.ansman.kotshi.JsonSerializable
+import java.time.Instant
 
 object McpTask {
+    object Create {
+        @JsonSerializable
+        data class Response(
+            val task: Task,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Response, ServerMessage.Response, HasMeta
+    }
+
     object Get : McpRpc {
         override val Method = of("tasks/get")
 
@@ -86,7 +97,20 @@ object McpTask {
         @JsonSerializable
         data class Notification(
             val taskId: TaskId,
-            val task: Task
-        ) : ClientMessage.Notification, ServerMessage.Notification
+            val status: TaskStatus,
+            val statusMessage: String? = null,
+            val createdAt: Instant,
+            val lastUpdatedAt: Instant,
+            val ttl: TimeToLive? = null,
+            val pollInterval: Int? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta {
+            constructor(task: Task, meta: Meta = Meta.default) : this(
+                task.taskId, task.status, task.statusMessage,
+                task.createdAt, task.lastUpdatedAt, task.ttl, task.pollInterval, meta
+            )
+
+            fun toTask() = Task(taskId, status, statusMessage, createdAt, lastUpdatedAt, ttl, pollInterval)
+        }
     }
 }

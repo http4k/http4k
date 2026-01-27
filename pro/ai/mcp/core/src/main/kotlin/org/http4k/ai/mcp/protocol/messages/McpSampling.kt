@@ -39,7 +39,7 @@ object McpSampling : McpRpc {
         val model: ModelName,
         val stopReason: StopReason?,
         val role: Role,
-        val content: Content
+        val content: List<Content>
     ) : ClientMessage.Response
 }
 
