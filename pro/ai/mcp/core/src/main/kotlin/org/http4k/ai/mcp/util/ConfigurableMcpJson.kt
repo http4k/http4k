@@ -24,6 +24,7 @@ import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.util.withAiMappings
 import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.TimeToLive
 import org.http4k.contract.jsonschema.JsonSchemaCollapser
 import org.http4k.contract.jsonschema.v3.AutoJsonToJsonSchema
 import org.http4k.core.ContentType
@@ -125,6 +126,7 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(SessionId)
     value(Size)
     value(TaskId)
+    value(TimeToLive)
     value(Version)
 }
 
