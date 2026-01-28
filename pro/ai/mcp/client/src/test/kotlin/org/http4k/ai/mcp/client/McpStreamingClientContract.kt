@@ -280,12 +280,10 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
     }
 
     @Test
-    fun `task lifecycle - create, list, get, update status, store result`() {
-        val taskId = TaskId.of("lifecycle-task")
+    fun `task onUpdate callback receives task updates`() {
+        val taskId = TaskId.of("callback-task")
         val now = Instant.now()
         val workingTask = Task(taskId, TaskStatus.working, "Processing...", now, now)
-        val completedTask = Task(taskId, TaskStatus.completed, "Done", now, now)
-        val expectedResult = mapOf("answer" to "42", "status" to "success")
 
         val receivedTask = AtomicReference<Task>()
         val latch = CountDownLatch(1)
@@ -294,11 +292,6 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             Tool("start-task", "starts a task") bind {
                 it.client.tasks().update(workingTask)
                 Ok(Content.Text("started"))
-            },
-            Tool("complete-task", "completes a task") bind {
-                it.client.tasks().update(completedTask)
-                it.client.tasks().storeResult(taskId, expectedResult)
-                Ok(Content.Text("completed"))
             }
         )
 
@@ -322,55 +315,6 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
 
         assertThat(latch.await(5, SECONDS), equalTo(true))
         assertThat(receivedTask.get().taskId, equalTo(taskId))
-
-        val tasks = mcpClient.tasks().list().valueOrNull()
-        assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
-
-        val retrieved = mcpClient.tasks().get(taskId).valueOrNull()
-        assertThat(retrieved?.taskId, equalTo(taskId))
-        assertThat(retrieved?.status, equalTo(TaskStatus.working))
-
-        mcpClient.tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta("tasks")))
-
-        val result = mcpClient.tasks().result(taskId).valueOrNull()
-        assertThat(result, equalTo(expectedResult))
-
-        mcpClient.stop()
-        server.stop()
-    }
-
-    @Test
-    fun `task cancellation - create then cancel`() {
-        val taskId = TaskId.of("cancel-task")
-        val now = Instant.now()
-        val task = Task(taskId, TaskStatus.working, "Processing...", now, now)
-
-        val tools = ServerTools(
-            Tool("create-task", "creates a task") bind {
-                it.client.tasks().update(task)
-                Ok(Content.Text("task created"))
-            }
-        )
-
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools
-        )
-
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
-
-        mcpClient.start(Duration.ofSeconds(1))
-
-        mcpClient.tools().call(ToolName.of("create-task"), ToolRequest(meta = Meta("tasks")))
-
-        assertThat(mcpClient.tasks().get(taskId).valueOrNull()?.taskId, equalTo(taskId))
-
-        val cancelResult = mcpClient.tasks().cancel(taskId)
-        assertThat(cancelResult, isA<Success<Unit>>())
-
-        assertThat(mcpClient.tasks().get(taskId).valueOrNull(), equalTo(null))
 
         mcpClient.stop()
         server.stop()

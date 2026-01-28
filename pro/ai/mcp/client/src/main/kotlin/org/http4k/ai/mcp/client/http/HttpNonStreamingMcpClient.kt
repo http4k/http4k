@@ -20,9 +20,12 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
 import org.http4k.ai.mcp.client.toHttpRequest
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerCapabilities
@@ -32,6 +35,7 @@ import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
@@ -154,7 +158,28 @@ class HttpNonStreamingMcpClient(
                 .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
     }
 
-    override fun tasks(): McpClient.Tasks = throw UnsupportedOperationException()
+    override fun tasks() = object : McpClient.Tasks {
+        override fun onUpdate(fn: (Task, Meta) -> Unit) = throw UnsupportedOperationException()
+
+        override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.Get.Response>(McpTask.Get, McpTask.Get.Request(taskId))
+                .map { it.task }
+
+        override fun list(overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.List.Response>(McpTask.List, McpTask.List.Request())
+                .map { it.tasks }
+
+        override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.Cancel.Response>(McpTask.Cancel, McpTask.Cancel.Request(taskId))
+                .map { }
+
+        override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.Result.Response>(McpTask.Result, McpTask.Result.Request(taskId))
+                .map { it.result }
+
+        override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) =
+            throw UnsupportedOperationException()
+    }
 
     override fun close() {}
 

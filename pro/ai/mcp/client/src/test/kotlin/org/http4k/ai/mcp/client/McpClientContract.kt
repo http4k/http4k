@@ -21,6 +21,10 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
+import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
@@ -44,6 +48,8 @@ import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -166,6 +172,60 @@ interface McpClientContract<T> : PortBasedTest {
 
             assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(0))
         }
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `task lifecycle - create, list, get, store result, cancel`() {
+        val taskId = TaskId.of("lifecycle-task")
+        val now = Instant.now()
+        val workingTask = Task(taskId, TaskStatus.working, "Processing...", now, now)
+        val completedTask = Task(taskId, TaskStatus.completed, "Done", now, now)
+        val expectedResult = mapOf("answer" to "42", "status" to "success")
+
+        val tools = ServerTools(
+            Tool("start-task", "starts a task") bind {
+                it.client.tasks().update(workingTask)
+                ToolResponse.Ok(Content.Text("started"))
+            },
+            Tool("complete-task", "completes a task") bind {
+                it.client.tasks().update(completedTask)
+                it.client.tasks().storeResult(taskId, expectedResult)
+                ToolResponse.Ok(Content.Text("completed"))
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
+
+        val tasks = mcpClient.tasks().list().valueOrNull()
+        assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
+
+        val retrieved = mcpClient.tasks().get(taskId).valueOrNull()
+        assertThat(retrieved?.taskId, equalTo(taskId))
+        assertThat(retrieved?.status, equalTo(TaskStatus.working))
+
+        mcpClient.tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta("tasks")))
+
+        val result = mcpClient.tasks().result(taskId).valueOrNull()
+        assertThat(result, equalTo(expectedResult))
+
+        val cancelResult = mcpClient.tasks().cancel(taskId)
+        assertThat(cancelResult.valueOrNull(), equalTo(Unit))
+
+        assertThat(mcpClient.tasks().get(taskId).valueOrNull(), equalTo(null))
 
         mcpClient.stop()
         server.stop()
