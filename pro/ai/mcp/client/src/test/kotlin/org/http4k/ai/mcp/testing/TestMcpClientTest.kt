@@ -443,9 +443,14 @@ class TestMcpClientTest {
                 assertThat(request.toolChoice, equalTo(org.http4k.ai.mcp.model.ToolChoice(org.http4k.ai.mcp.model.ToolChoiceMode.auto)))
 
                 sequenceOf(
-                    SamplingResponse(model, Assistant, listOf(content), null),
-                    SamplingResponse(model, Assistant, listOf(content), StopReason.of("bored")),
-                    SamplingResponse(model, Assistant, listOf(content), StopReason.of("this should not be processed"))
+                    SamplingResponse.Ok(model, Assistant, listOf(content), null),
+                    SamplingResponse.Ok(model, Assistant, listOf(content), StopReason.of("bored")),
+                    SamplingResponse.Ok(
+                        model,
+                        Assistant,
+                        listOf(content),
+                        StopReason.of("this should not be processed")
+                    )
                 )
             }
             assertThat(

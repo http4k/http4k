@@ -21,6 +21,7 @@ import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.SamplingRequest
+import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Error
@@ -306,10 +307,20 @@ class HttpStreamingMcpClient(
                                 )
                             )
                         }
-                    responses.forEach {
+                    responses.forEach { response ->
+                        val protocolResponse = when (response) {
+                            is SamplingResponse.Ok -> McpSampling.Response(
+                                response.model,
+                                response.stopReason,
+                                response.role,
+                                response.content
+                            )
+
+                            is SamplingResponse.Task -> McpSampling.Response(task = response.task)
+                        }
                         http.send(
                             McpSampling,
-                            McpSampling.Response(it.model, it.stopReason, it.role, it.content),
+                            protocolResponse,
                             requestId
                         )
                     }
