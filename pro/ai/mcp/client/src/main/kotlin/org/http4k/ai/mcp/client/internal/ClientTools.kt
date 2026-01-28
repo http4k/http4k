@@ -7,6 +7,7 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.ToolResponse.Task
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpRpc
@@ -53,8 +54,10 @@ internal class ClientTools(
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }
             .map {
-                when (it.isError) {
-                    true -> Error(
+                val task = it.task
+                when {
+                    task != null -> Task(task, it._meta)
+                    it.isError == true -> Error(
                         ErrorMessage(
                             -1, it.content?.joinToString()
                                 ?: it.structuredContent?.let(McpJson::asFormatString)

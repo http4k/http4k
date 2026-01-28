@@ -1,9 +1,5 @@
 package org.http4k.ai.mcp.client.websocket
 
-import org.http4k.client.WebsocketClient
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.client.McpClientContract
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.Version
@@ -11,6 +7,10 @@ import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.websocket.WebsocketMcp
 import org.http4k.ai.mcp.server.websocket.WebsocketSessions
+import org.http4k.client.WebsocketClient
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
 import java.time.Duration
 

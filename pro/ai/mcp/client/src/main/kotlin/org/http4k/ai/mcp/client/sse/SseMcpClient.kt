@@ -84,7 +84,8 @@ class SseMcpClient(
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean
     ): McpResult<McpMessageId> {
-        val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
+        val latch =
+            CountDownLatch(if (message is ClientMessage.Notification || message is ClientMessage.Response) 0 else 1)
 
         requests[messageId] = latch
 
