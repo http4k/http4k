@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.client.websocket
 
-import org.http4k.ai.mcp.client.McpClientContract
+import org.http4k.ai.mcp.client.McpStreamingClientContract
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -14,7 +14,7 @@ import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WebsocketMcpClientTest : McpClientContract<Websocket> {
+class WebsocketMcpClientTest : McpStreamingClientContract<Websocket> {
 
     override val doesNotifications = true
 
