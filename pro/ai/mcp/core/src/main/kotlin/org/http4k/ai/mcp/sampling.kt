@@ -45,9 +45,13 @@ data class SamplingRequest(
     val progressToken: ProgressToken? = null
 )
 
-data class SamplingResponse(
-    val model: ModelName,
-    val role: Role,
-    val content: List<Content>,
-    val stopReason: StopReason? = null
-)
+sealed interface SamplingResponse {
+    data class Ok(
+        val model: ModelName,
+        val role: Role,
+        val content: List<Content>,
+        val stopReason: StopReason? = null
+    ) : SamplingResponse
+
+    data class Task(val task: org.http4k.ai.mcp.model.Task) : SamplingResponse
+}

@@ -107,8 +107,14 @@ class SessionBasedClient<Transport>(
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
                     with(it.fromJsonRpc<McpSampling.Response>()) {
-                        queue.put(SamplingResponse(model, role, content, stopReason))
+                        val t = task
+                        val response = when {
+                            t != null -> SamplingResponse.Task(t)
+                            else -> SamplingResponse.Ok(model!!, role!!, content!!, stopReason)
+                        }
+                        queue.put(response)
                         when {
+                            t != null -> Finished
                             stopReason == null -> InProgress
                             else -> Finished
                         }
@@ -146,7 +152,10 @@ class SessionBasedClient<Transport>(
 
                             else -> {
                                 yield(Success(nextMessage))
-                                if (nextMessage.stopReason != null) break
+                                when (nextMessage) {
+                                    is SamplingResponse.Task -> break
+                                    is SamplingResponse.Ok -> if (nextMessage.stopReason != null) break
+                                }
                             }
                         }
                     }

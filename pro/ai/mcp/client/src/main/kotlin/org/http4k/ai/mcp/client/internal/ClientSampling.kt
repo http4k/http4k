@@ -2,6 +2,7 @@ package org.http4k.ai.mcp.client.internal
 
 import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.SamplingRequest
+import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpRpc
@@ -37,15 +38,28 @@ internal class ClientSampling(
 
                 val timeout = overrideDefaultTimeout ?: defaultTimeout
 
-                responses.forEach {
+                responses.forEach { response ->
+                    val protocolResponse = when (response) {
+                        is SamplingResponse.Ok -> McpSampling.Response(
+                            response.model,
+                            response.stopReason,
+                            response.role,
+                            response.content
+                        )
+
+                        is SamplingResponse.Task -> McpSampling.Response(task = response.task)
+                    }
                     sender(
                         McpSampling,
-                        McpSampling.Response(it.model, it.stopReason, it.role, it.content),
+                        protocolResponse,
                         timeout,
                         requestId
                     )
 
-                    if (it.stopReason != null) tidyUp(requestId)
+                    when (response) {
+                        is SamplingResponse.Task -> tidyUp(requestId)
+                        is SamplingResponse.Ok -> if (response.stopReason != null) tidyUp(requestId)
+                    }
                 }
             })
     }

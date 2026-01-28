@@ -58,8 +58,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         val model = ModelName.of("my model")
 
         val samplingResponses = listOf(
-            SamplingResponse(model, Assistant, listOf(Content.Text("hello")), null),
-            SamplingResponse(model, Assistant, listOf(Content.Text("world")), StopReason.of("foobar"))
+            SamplingResponse.Ok(model, Assistant, listOf(Content.Text("hello")), null),
+            SamplingResponse.Ok(model, Assistant, listOf(Content.Text("world")), StopReason.of("foobar"))
         )
 
         val tools = ServerTools(
