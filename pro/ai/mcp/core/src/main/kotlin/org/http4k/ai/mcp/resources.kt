@@ -4,7 +4,6 @@ import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.ai.mcp.model.Resource
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.core.Request
 import org.http4k.core.Uri
 
@@ -27,7 +26,6 @@ fun ResourceFilter.then(next: ResourceHandler): ResourceHandler = this(next)
 data class ResourceRequest(
     val uri: Uri,
     override val meta: Meta = default,
-    override val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
 ) : CapabilityRequest

@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.Meta.Companion.default
-import org.http4k.ai.mcp.model.TaskMeta
 
 /**
  * A PromptHandler is a function which creates a Prompt from a set of inputs
@@ -29,7 +28,6 @@ fun PromptFilter.then(next: PromptHandler): PromptHandler = this(next)
 data class PromptRequest(
     val args: Map<String, String> = emptyMap(),
     override val meta: Meta = default,
-    override val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
 ) : Map<String, String> by args, CapabilityRequest, McpLensTarget

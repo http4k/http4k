@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.connect.model.MimeType
@@ -56,8 +55,7 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
@@ -73,8 +71,7 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : PaginatedRequest, HasMeta
 
         @JsonSerializable
@@ -98,8 +95,7 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, PaginatedRequest, HasMeta
 
         @JsonSerializable
@@ -124,8 +120,7 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
     }
 
@@ -135,8 +130,7 @@ data class McpResource internal constructor(
         @JsonSerializable
         data class Request(
             val uri: Uri,
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
     }
 

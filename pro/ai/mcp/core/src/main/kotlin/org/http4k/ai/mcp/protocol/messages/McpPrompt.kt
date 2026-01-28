@@ -4,7 +4,6 @@ import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
@@ -32,8 +31,7 @@ data class McpPrompt(
         data class Request(
             val name: PromptName,
             val arguments: Map<String, String> = emptyMap(),
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
@@ -49,8 +47,7 @@ data class McpPrompt(
 
         @JsonSerializable
         data class Request(
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable

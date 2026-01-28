@@ -1,7 +1,6 @@
 package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.McpRpcMethod
@@ -19,8 +18,7 @@ object McpInitialize : McpRpc {
     data class Request(
         val clientInfo: VersionedMcpEntity,
         val capabilities: ClientCapabilities = All,
-        val protocolVersion: ProtocolVersion = LATEST_VERSION,
-        override val task: TaskMeta? = null
+        val protocolVersion: ProtocolVersion = LATEST_VERSION
     ) : ClientMessage.Request
 
     @JsonSerializable

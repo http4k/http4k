@@ -5,7 +5,6 @@ import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.core.Request
 
 /**
@@ -29,7 +28,6 @@ data class CompletionRequest(
     val argument: CompletionArgument,
     val context: CompletionContext = CompletionContext(),
     override val meta: Meta = default,
-    override val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
 ) : CapabilityRequest {
@@ -37,11 +35,10 @@ data class CompletionRequest(
         name: String,
         value: String,
         context: CompletionContext = CompletionContext(),
-        task: TaskMeta? = null,
         meta: Meta = default,
         client: Client = NoOp,
         connectRequest: Request? = null
-    ) : this(CompletionArgument(name, value), context, meta, task, client, connectRequest)
+    ) : this(CompletionArgument(name, value), context, meta, client, connectRequest)
 }
 
 

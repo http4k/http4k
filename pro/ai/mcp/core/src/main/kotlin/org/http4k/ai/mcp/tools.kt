@@ -33,7 +33,7 @@ fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
     override val meta: Meta = default,
-    override val task: TaskMeta? = null,
+    val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
 ) : CapabilityRequest,
