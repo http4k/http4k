@@ -6,6 +6,7 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ModelPreferences
 import org.http4k.ai.mcp.model.SamplingIncludeContext
 import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.model.ToolChoice
 import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.protocol.McpRpcMethod
@@ -32,7 +33,8 @@ object McpSampling : McpRpc {
         val metadata: Map<String, Any> = emptyMap(),
         val tools: List<McpTool>? = null,
         val toolChoice: ToolChoice = ToolChoice(ToolChoiceMode.auto),
-        override val _meta: Meta = Meta.default
+        override val _meta: Meta = Meta.default,
+        val task: TaskMeta? = null
     ) : ServerMessage.Request, HasMeta
 
     @JsonSerializable

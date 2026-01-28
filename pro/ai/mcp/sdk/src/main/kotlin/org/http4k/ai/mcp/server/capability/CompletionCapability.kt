@@ -17,7 +17,7 @@ fun CompletionCapability(ref: Reference, handler: CompletionHandler) = object : 
     override fun toReference() = ref
 
     override fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
-        handler(CompletionRequest(mcp.argument, mcp.context, mcp._meta, mcp.task, client, http))
+        handler(CompletionRequest(mcp.argument, mcp.context, mcp._meta, client, http))
             .let { McpCompletion.Response(Completion(it.values, it.total, it.hasMore)) }
 
     override fun invoke(p1: CompletionRequest) = handler(p1)

@@ -5,7 +5,6 @@ import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Reference
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
 
@@ -17,8 +16,7 @@ object McpCompletion : McpRpc {
         val ref: Reference,
         val argument: CompletionArgument,
         val context: CompletionContext = CompletionContext(),
-        override val _meta: Meta = Meta.default,
-        override val task: TaskMeta? = null
+        override val _meta: Meta = Meta.default
     ) : ClientMessage.Request, HasMeta
 
     @JsonSerializable

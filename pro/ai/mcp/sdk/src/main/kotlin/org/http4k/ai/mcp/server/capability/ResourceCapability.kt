@@ -27,7 +27,7 @@ fun ResourceCapability(resource: Resource, handler: ResourceHandler) = object : 
     override fun matches(uri: Uri) = resource.matches(uri)
 
     override fun read(mcp: McpResource.Read.Request, client: Client, http: Request) =
-        this(ResourceRequest(mcp.uri, mcp._meta, mcp.task, client, http)).let {
+        this(ResourceRequest(mcp.uri, mcp._meta, client, http)).let {
             McpResource.Read.Response(it.list, it.meta)
         }
 

@@ -4,10 +4,11 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationResponse.Ok
+import org.http4k.ai.mcp.ElicitationResponse.Task
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.conformance.server.tools.Status.active
 import org.http4k.ai.mcp.model.Elicitation
-import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
 import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.format.auto
@@ -33,7 +34,12 @@ fun elicitationSep1034Tool() = Tool("test_elicitation_sep1034_defaults", "test_e
             progressToken = it.meta.progressToken
         )
     )
-        .map { ToolResponse.Ok(it.content.toString()) }
+        .map {
+            when (it) {
+                is Ok -> ToolResponse.Ok(it.content.toString())
+                is Task -> error("Unexpected task response")
+            }
+        }
         .mapFailure { ToolResponse.Error(1, "Problem with response") }
         .get()
 }

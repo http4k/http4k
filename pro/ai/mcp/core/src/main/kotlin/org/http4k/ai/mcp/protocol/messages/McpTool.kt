@@ -31,8 +31,7 @@ data class McpTool(
         @JsonSerializable
         data class Request(
             override val cursor: Cursor? = null,
-            override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            override val _meta: Meta = Meta.default
         ) : ClientMessage.Request, HasMeta, PaginatedRequest
 
         @JsonSerializable
@@ -58,7 +57,7 @@ data class McpTool(
             val name: ToolName,
             val arguments: Map<String, MoshiNode> = emptyMap(),
             override val _meta: Meta = Meta.default,
-            override val task: TaskMeta? = null
+            val task: TaskMeta? = null
         ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
