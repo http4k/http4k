@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.util.McpJson
 import java.time.Duration
 
 internal class ClientElicitations(
@@ -82,5 +83,6 @@ internal class ClientElicitations(
 
 private fun ElicitationResponse.toProtocol() = when (this) {
     is ElicitationResponse.Ok -> McpElicitations.Response(action, content, _meta = _meta)
-    is ElicitationResponse.Task -> McpElicitations.Response(task = task)
+    is ElicitationResponse.Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
 }
+
