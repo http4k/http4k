@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 
 - **http4k-***: Upgrade versions
 - **http4k-***: [Breaking] Upgrades to Exposed v1.0.0 will mean API changes are required. See the Exposed docs for details
+- **http4k-testing-webdriver**: [Fix] Was throwing wrong NoSuchElementException.
 
 ### v6.26.1.0
 - **http4k-***: Upgrade versions
