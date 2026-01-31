@@ -7,7 +7,7 @@ changes with their rationale when appropriate:
 
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-dynamo-fake**:[Fix #1477]  Fake DynamoDB KeyConditionExpression sometimes fails with floating-point values
-- **http4k-***: [Breaking] Upgrades to Exposed v1.0.0 will mean API changes are required. See the Exposed docs for details
+- **http4k-***: [Breaking] Upgrades to Exposed v1.0.0 will mean API changes are requiredfor modules relying on that library. See the Exposed docs for details
 - **http4k-testing-webdriver**: [Fix] Was throwing wrong NoSuchElementException.
 
 ### v6.26.1.0
