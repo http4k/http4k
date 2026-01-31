@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.27.0.0 (uncut)
+### v6.27.0.0
 
 - **http4k-***: Upgrade versions
+- **http4k-connect-amazon-dynamo-fake**:[Fix #1477]  Fake DynamoDB KeyConditionExpression sometimes fails with floating-point values
 - **http4k-***: [Breaking] Upgrades to Exposed v1.0.0 will mean API changes are required. See the Exposed docs for details
 - **http4k-testing-webdriver**: [Fix] Was throwing wrong NoSuchElementException.
 
