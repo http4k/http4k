@@ -24,6 +24,7 @@ data class ClientCapabilities internal constructor(
     val experimental: Unit?,
     val elicitation: Elicitation?,
     val tasks: Tasks?,
+    val extensions: Map<String, Any>? = null,
 ) {
     constructor(vararg capabilities: ClientProtocolCapability = ClientProtocolCapability.entries.toTypedArray()) : this(
         Roots(capabilities.contains(RootChanged)),

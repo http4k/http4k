@@ -20,7 +20,8 @@ data class ServerCapabilities internal constructor(
     val completions: Unit?,
     val logging: Unit?,
     val experimental: Unit?,
-    val tasks: Tasks?
+    val tasks: Tasks?,
+    val extensions: Map<String, Any>? = null,
 ) {
     constructor(vararg capabilities: ServerProtocolCapability = ServerProtocolCapability.entries.toTypedArray()) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
