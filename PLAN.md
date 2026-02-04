@@ -6,7 +6,7 @@ This document tracks remaining work for MCP 2025-11-25 spec compliance.
 
 | Category      | Gaps |
 |---------------|------|
-| Test Coverage | 1    |
+| Test Coverage | 0    |
 
 ---
 
@@ -14,19 +14,25 @@ This document tracks remaining work for MCP 2025-11-25 spec compliance.
 
 ### Gap 1: Tasks operations tests
 
-**Status:** Not started
+**Status:** ✅ Complete
 
 Add to `McpStreamingClientContract`:
 
-- `can list tasks`
-- `can get task by id`
-- `can cancel task`
-- `can get task result`
-- `receives task update notifications`
+- ✅ `can list tasks`
+- ✅ `can get task by id`
+- ✅ `can cancel task`
+- ✅ `can get task result`
+- ✅ `receives task update notifications` (client-side already existed)
+- ✅ `server Tasks onUpdate callback receives client task updates`
 
-**Files to modify:**
+**Also added:**
+
+- ✅ `ServerTasksTest.onUpdate callback is invoked when task is updated` (unit test)
+
+**Files modified:**
 
 - `pro/ai/mcp/client/src/test/kotlin/org/http4k/ai/mcp/client/McpStreamingClientContract.kt`
+- `pro/ai/mcp/sdk/src/test/kotlin/org/http4k/ai/mcp/server/capability/ServerTasksTest.kt`
 
 ---
 
@@ -55,3 +61,4 @@ Add to `McpStreamingClientContract`:
 - ✅ SSE client extends McpStreamingClientContract
 - ✅ WebSocket client extends McpStreamingClientContract
 - ✅ Resource subscription tests (fixed bugs in HttpStreamingMcpClient and McpProtocol notification routing)
+- ✅ Tasks operations tests (list, get, cancel, result, onUpdate callbacks)

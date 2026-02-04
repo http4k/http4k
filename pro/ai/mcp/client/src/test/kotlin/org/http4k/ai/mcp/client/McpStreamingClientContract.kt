@@ -4,7 +4,9 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.isEmpty
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
@@ -362,6 +364,61 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
         assertThat(receivedTask.get().statusMessage, equalTo("Client processing..."))
         assertThat(receivedMeta.get().progressToken, equalTo("server-token" as Any))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `task lifecycle - list, get, cancel, result`() {
+        val now = Instant.now()
+        val task1 = Task(TaskId.of("task-1"), TaskStatus.working, "Task 1", now, now)
+        val task2 = Task(TaskId.of("task-2"), TaskStatus.completed, "Task 2", now, now)
+        val expectedResult = mapOf("output" to "success", "count" to 42.0)
+
+        val serverTasks = ServerTasks()
+
+        val tools = ServerTools(
+            Tool("setup-tasks", "creates test tasks") bind {
+                it.client.updateTask(task1)
+                it.client.updateTask(task2)
+                it.client.storeTaskResult(task2.taskId, expectedResult)
+                Ok(Content.Text("created"))
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools,
+            tasks = serverTasks
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.tools().call(ToolName.of("setup-tasks"), ToolRequest())
+
+        // list
+        val tasks = mcpClient.tasks().list().orThrow { error("unexpected failure") }
+        assertThat(tasks.size, equalTo(2))
+        assertThat(tasks.map { it.taskId }.toSet(), equalTo(setOf(TaskId.of("task-1"), TaskId.of("task-2"))))
+
+        // get
+        val retrieved = mcpClient.tasks().get(TaskId.of("task-1")).orThrow { error("unexpected failure") }
+        assertThat(retrieved.taskId, equalTo(TaskId.of("task-1")))
+        assertThat(retrieved.status, equalTo(TaskStatus.working))
+        assertThat(retrieved.statusMessage, equalTo("Task 1"))
+
+        // result
+        val result = mcpClient.tasks().result(TaskId.of("task-2")).orThrow { error("unexpected failure") }
+        assertThat(result, equalTo(expectedResult))
+
+        // cancel
+        mcpClient.tasks().cancel(TaskId.of("task-1")).orThrow { error("unexpected failure") }
+        assertThat(mcpClient.tasks().list().orThrow { error("unexpected failure") }.size, equalTo(1))
 
         mcpClient.stop()
         server.stop()
