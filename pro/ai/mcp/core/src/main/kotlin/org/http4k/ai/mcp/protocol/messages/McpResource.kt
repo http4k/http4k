@@ -107,7 +107,7 @@ data class McpResource internal constructor(
     }
 
     data object Updated : McpRpc {
-        override val Method: McpRpcMethod = of("notifications/resources/list_changed")
+        override val Method: McpRpcMethod = of("notifications/resources/updated")
 
         @JsonSerializable
         data class Notification(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification,

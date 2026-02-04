@@ -7,6 +7,7 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskMeta
+import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
@@ -58,4 +59,10 @@ sealed interface ToolResponse {
     }
 
     data class Task(val task: org.http4k.ai.mcp.model.Task, override val meta: Meta = default) : ToolResponse
+
+    data class ElicitationRequired(
+        val elicitations: List<McpElicitations.Request.Url>,
+        val message: String = "This request requires more information.",
+        override val meta: Meta = default
+    ) : ToolResponse
 }

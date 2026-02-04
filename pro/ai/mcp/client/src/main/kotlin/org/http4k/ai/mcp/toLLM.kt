@@ -20,7 +20,6 @@ fun McpError.toLLM(): LLMError = when (this) {
     is McpError.Internal -> Internal(cause)
     is Protocol -> Custom(error)
     is McpError.Timeout -> Timeout
-    is McpError.URLElicitationRequired -> Custom(elicitations) // ??? should this be here?
 }
 
 fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
@@ -33,5 +32,5 @@ fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
     )
 
     is Error -> Failure(Protocol(error).toLLM())
-    is org.http4k.ai.mcp.ToolResponse.Task -> Failure(Custom("Task responses cannot be converted to LLM responses"))
+    else -> Failure(Custom("Response cannot be converted to LLM response"))
 }

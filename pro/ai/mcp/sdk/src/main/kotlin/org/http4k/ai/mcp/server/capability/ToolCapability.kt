@@ -4,6 +4,19 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
+import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.ToolHandler
+import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse.ElicitationRequired
+import org.http4k.ai.mcp.ToolResponse.Error
+import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.ToolResponse.Task
+import org.http4k.ai.mcp.model.Content.Text
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.protocol.messages.URLElicitationRequiredError
+import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiBoolean
@@ -17,17 +30,6 @@ import org.http4k.format.MoshiString
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
-import org.http4k.ai.mcp.Client
-import org.http4k.ai.mcp.ToolHandler
-import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse.Error
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.ToolResponse.Task
-import org.http4k.ai.mcp.model.Content.Text
-import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.util.McpJson
 
 interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
@@ -51,9 +53,9 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
             .map {
                 try {
                     this(it)
-                } catch (e: LensFailure) {
+                } catch (_: LensFailure) {
                     throw McpException(InvalidParams)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Error(InternalError)
                 }
             }
@@ -76,6 +78,10 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                     is Task -> McpTool.Call.Response(
                         task = it.task,
                         _meta = it.meta
+                    )
+
+                    is ElicitationRequired -> throw McpException(
+                        URLElicitationRequiredError(it.elicitations, it.message)
                     )
                 }
             }
