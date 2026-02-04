@@ -66,7 +66,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         tools: ServerTools = ServerTools(),
         resources: ServerResources = ServerResources(),
         tasks: ServerTasks = ServerTasks(),
-        test: (McpClient) -> Unit
+        test: McpClient.() -> Unit
     ) {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
@@ -81,7 +81,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
 
         try {
             mcpClient.start(Duration.ofSeconds(1))
-            test(mcpClient)
+            mcpClient.test()
         } finally {
             mcpClient.stop()
             server.stop()
@@ -265,12 +265,12 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        withMcpServer(tools = tools) { mcpClient ->
+        withMcpServer(tools = tools) {
             val prog = AtomicReference<Progress>()
-            mcpClient.progress().onProgress(fn = prog::set)
+            progress().onProgress(fn = prog::set)
 
             assertThat(
-                mcpClient.tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
+                tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
                 equalTo(Success(Ok(Content.Text(""))))
             )
 
@@ -285,8 +285,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             Tool("reverse", "description", toolArg) bind { error("bad things") }
         )
 
-        withMcpServer(tools = tools) { mcpClient ->
-            val actual = mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
+        withMcpServer(tools = tools) {
+            val actual = tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
                 .valueOrNull()
 
             assertThat(actual, present(isA<ToolResponse.Error>()))
@@ -309,13 +309,13 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        withMcpServer(tools = tools) { mcpClient ->
-            mcpClient.tasks().onUpdate { t, _ ->
+        withMcpServer(tools = tools) {
+            tasks().onUpdate { t, _ ->
                 receivedTask.set(t)
                 latch.countDown()
             }
 
-            mcpClient.tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
+            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
 
             assertThat(latch.await(5, SECONDS), equalTo(true))
             assertThat(receivedTask.get().taskId, equalTo(taskId))
@@ -339,8 +339,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             latch.countDown()
         }
 
-        withMcpServer(tasks = serverTasks) { mcpClient ->
-            mcpClient.tasks().update(task, Meta(progressToken = "server-token"))
+        withMcpServer(tasks = serverTasks) {
+            tasks().update(task, Meta(progressToken = "server-token"))
 
             assertThat(latch.await(5, SECONDS), equalTo(true))
             assertThat(receivedTask.get().taskId, equalTo(taskId))
@@ -368,23 +368,23 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        withMcpServer(tools = tools, tasks = serverTasks) { mcpClient ->
-            mcpClient.tools().call(ToolName.of("setup-tasks"), ToolRequest())
+        withMcpServer(tools = tools, tasks = serverTasks) {
+            tools().call(ToolName.of("setup-tasks"), ToolRequest())
 
-            val tasks = mcpClient.tasks().list().orThrow { error("unexpected failure") }
-            assertThat(tasks.size, equalTo(2))
-            assertThat(tasks.map { it.taskId }.toSet(), equalTo(setOf(TaskId.of("task-1"), TaskId.of("task-2"))))
+            val taskList = tasks().list().orThrow { error("unexpected failure") }
+            assertThat(taskList.size, equalTo(2))
+            assertThat(taskList.map { it.taskId }.toSet(), equalTo(setOf(TaskId.of("task-1"), TaskId.of("task-2"))))
 
-            val retrieved = mcpClient.tasks().get(TaskId.of("task-1")).orThrow { error("unexpected failure") }
+            val retrieved = tasks().get(TaskId.of("task-1")).orThrow { error("unexpected failure") }
             assertThat(retrieved.taskId, equalTo(TaskId.of("task-1")))
             assertThat(retrieved.status, equalTo(TaskStatus.working))
             assertThat(retrieved.statusMessage, equalTo("Task 1"))
 
-            val result = mcpClient.tasks().result(TaskId.of("task-2")).orThrow { error("unexpected failure") }
+            val result = tasks().result(TaskId.of("task-2")).orThrow { error("unexpected failure") }
             assertThat(result, equalTo(expectedResult))
 
-            mcpClient.tasks().cancel(TaskId.of("task-1")).orThrow { error("unexpected failure") }
-            assertThat(mcpClient.tasks().list().orThrow { error("unexpected failure") }.size, equalTo(1))
+            tasks().cancel(TaskId.of("task-1")).orThrow { error("unexpected failure") }
+            assertThat(tasks().list().orThrow { error("unexpected failure") }.size, equalTo(1))
         }
     }
 
@@ -411,8 +411,8 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        withMcpServer(tools = tools) { mcpClient ->
-            val call = mcpClient.tools().call(ToolName.of("needs-auth"), ToolRequest())
+        withMcpServer(tools = tools) {
+            val call = tools().call(ToolName.of("needs-auth"), ToolRequest())
             val result = call.valueOrNull()!!
 
             assertThat(result, equalTo(elicitationRequired))
@@ -436,21 +436,21 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        withMcpServer(tools = tools, resources = resources) { mcpClient ->
+        withMcpServer(tools = tools, resources = resources) {
             val latch = CountDownLatch(1)
             val receivedUpdate = AtomicReference<Boolean>(false)
 
-            mcpClient.resources().subscribe(resourceUri) {
+            resources().subscribe(resourceUri) {
                 receivedUpdate.set(true)
                 latch.countDown()
             }
 
-            mcpClient.tools().call(ToolName.of("trigger-update"), ToolRequest())
+            tools().call(ToolName.of("trigger-update"), ToolRequest())
 
             assertThat(latch.await(5, SECONDS), equalTo(true))
             assertThat(receivedUpdate.get(), equalTo(true))
 
-            mcpClient.resources().unsubscribe(resourceUri)
+            resources().unsubscribe(resourceUri)
         }
     }
 }
