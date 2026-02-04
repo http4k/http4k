@@ -1,125 +1,214 @@
-# MCP Draft Spec Implementation Plan
+# MCP Apps Implementation Plan
 
-## Summary
+## Overview
 
-Update http4k MCP implementation to align with the MCP Draft specification (`DRAFT-2026-v1`).
+MCP Apps (SEP-1865) enables servers to deliver interactive user interfaces to hosts through the `io.modelcontextprotocol/ui` extension.
 
-## Current Status
+## Reference Spec
 
-The http4k implementation is **already highly compliant**. Most draft features are implemented:
+Download to `docs/mcp-apps/`:
 
-| Feature                              | Status    |
-|--------------------------------------|-----------|
-| Tasks (full system)                  | ✅         |
-| Elicitation (Form + URL modes)       | ✅         |
-| Roots                                | ✅         |
-| Tool.outputSchema                    | ✅         |
-| ToolExecution (taskSupport)          | ✅         |
-| Tool.icons                           | ✅         |
-| AudioContent                         | ✅         |
-| ToolUseContent / ToolResultContent   | ✅         |
-| ResourceLink                         | ✅         |
-| ToolChoice (auto/none/required)      | ✅         |
-| ModelPreferences                     | ✅         |
-| Annotations.lastModified             | ✅         |
-| Implementation description/icons     | ✅         |
-| Protocol version DRAFT               | ✅         |
-| **extensions field in capabilities** | ❌ Missing |
+- `docs/mcp-apps/2026-01-26/apps.mdx` - Released spec (v2026-01-26)
+- `docs/mcp-apps/draft/apps.mdx` - Draft spec
+
+Source: `https://github.com/modelcontextprotocol/ext-apps/tree/main/specification`
 
 ---
 
-## Gap 1: Extensions Field in Capabilities
+## Core Components
 
-### Requirement
+### 1. UI Resources
 
-The draft spec adds an `extensions` field to both `ClientCapabilities` and `ServerCapabilities` for extension capability negotiation.
-
-### Spec Reference
-
-```typescript
-interface ClientCapabilities {
-  roots?: { listChanged?: boolean };
-  sampling?: { tools?: {}; context?: {} };
-  elicitation?: { form?: {}; url?: {} };
-  tasks?: { ... };
-  experimental?: {};
-  extensions?: Record<string, object>;  // NEW
-}
-
-interface ServerCapabilities {
-  tools?: { listChanged?: boolean };
-  prompts?: { listChanged?: boolean };
-  resources?: { subscribe?: boolean; listChanged?: boolean };
-  completions?: {};
-  logging?: {};
-  tasks?: { ... };
-  experimental?: {};
-  extensions?: Record<string, object>;  // NEW
-}
-```
-
-### Example Usage
-
-```json
-{
-  "capabilities": {
-    "extensions": {
-      "io.modelcontextprotocol/ui": {
-        "mimeTypes": ["text/html;profile=mcp-app"]
-      }
-    }
-  }
-}
-```
-
-### Files to Modify
-
-- `pro/ai/mcp/core/src/main/kotlin/org/http4k/ai/mcp/protocol/ClientCapabilities.kt`
-- `pro/ai/mcp/core/src/main/kotlin/org/http4k/ai/mcp/protocol/ServerCapabilities.kt`
-
-### Implementation
+Resources with `ui://` URI scheme and `text/html;profile=mcp-app` MIME type.
 
 ```kotlin
-// ClientCapabilities.kt - add field
-@JsonSerializable
-@ConsistentCopyVisibility
-data class ClientCapabilities internal constructor(
-    val roots: Roots?,
-    val sampling: SamplingCapability?,
-    val experimental: Unit?,
-    val elicitation: Elicitation?,
-    val tasks: Tasks?,
-    val extensions: Map<String, Any>? = null  // ADD
+data class UIResourceMeta(
+    val csp: McpUiResourceCsp? = null,
+    val permissions: UIPermissions? = null,
+    val domain: String? = null,
+    val prefersBorder: Boolean? = null
 )
 
-// ServerCapabilities.kt - add field
-@JsonSerializable
-@ConsistentCopyVisibility
-data class ServerCapabilities internal constructor(
-    val tools: ToolCapabilities?,
-    val prompts: PromptCapabilities?,
-    val resources: ResourceCapabilities?,
-    val completions: Unit?,
-    val logging: Unit?,
-    val experimental: Unit?,
-    val tasks: Tasks?,
-    val extensions: Map<String, Any>? = null  // ADD
+data class McpUiResourceCsp(
+    val connectDomains: List<String>? = null,
+    val resourceDomains: List<String>? = null,
+    val frameDomains: List<String>? = null,
+    val baseUriDomains: List<String>? = null
+)
+
+data class UIPermissions(
+    val camera: Unit? = null,
+    val microphone: Unit? = null,
+    val geolocation: Unit? = null,
+    val clipboardWrite: Unit? = null
 )
 ```
 
-### Tests
+### 2. Tool-UI Linkage
 
-- [ ] Extensions field serializes correctly to JSON
-- [ ] Extensions field deserializes correctly from JSON
-- [ ] Null extensions field is omitted from JSON output
-- [ ] Can negotiate MCP Apps extension capability
+Tools associate with UI resources through `_meta.ui`:
+
+```kotlin
+data class McpUiToolMeta(
+    val resourceUri: Uri? = null,
+    val visibility: List<UIVisibility>? = null  // ["model", "app"]
+)
+
+enum class UIVisibility { model, app }
+```
+
+### 3. Host Capabilities & Context
+
+```kotlin
+data class HostCapabilities(
+    val experimental: Unit? = null,
+    val openLinks: Unit? = null,
+    val serverTools: ServerToolsCapability? = null,
+    val serverResources: ServerResourcesCapability? = null,
+    val logging: Unit? = null,
+    val sandbox: SandboxCapability? = null
+)
+
+data class HostContext(
+    val toolInfo: ToolInfo? = null,
+    val theme: Theme? = null,           // "light" | "dark"
+    val styles: Styles? = null,
+    val displayMode: DisplayMode? = null,
+    val availableDisplayModes: List<DisplayMode>? = null,
+    val containerDimensions: ContainerDimensions? = null,
+    val locale: String? = null,         // BCP 47
+    val timeZone: String? = null,       // IANA
+    val userAgent: String? = null,
+    val platform: Platform? = null,     // "web" | "desktop" | "mobile"
+    val deviceCapabilities: DeviceCapabilities? = null,
+    val safeAreaInsets: SafeAreaInsets? = null
+)
+
+enum class Theme { light, dark }
+enum class DisplayMode { inline, fullscreen, pip }
+enum class Platform { web, desktop, mobile }
+```
+
+### 4. App Capabilities (View declares)
+
+```kotlin
+data class AppCapabilities(
+    val experimental: Unit? = null,
+    val tools: ToolsCapability? = null,
+    val availableDisplayModes: List<DisplayMode>? = null
+)
+```
+
+---
+
+## Protocol Messages
+
+### View-to-Host Requests
+
+| Method                    | Purpose        | Params                             |
+|---------------------------|----------------|------------------------------------|
+| `ui/initialize`           | Handshake      | `{ appCapabilities }`              |
+| `ui/open-link`            | Open URL       | `{ url: string }`                  |
+| `ui/message`              | Send to chat   | `{ role, content }`                |
+| `ui/request-display-mode` | Change display | `{ mode }`                         |
+| `ui/update-model-context` | Update context | `{ content?, structuredContent? }` |
+
+### Host-to-View Notifications
+
+| Method                                  | Purpose            | Params                 |
+|-----------------------------------------|--------------------|------------------------|
+| `ui/notifications/initialized`          | Handshake complete | `{}`                   |
+| `ui/notifications/tool-input`           | Complete tool args | `{ arguments }`        |
+| `ui/notifications/tool-input-partial`   | Streaming args     | `{ arguments }`        |
+| `ui/notifications/tool-result`          | Tool result        | `CallToolResult`       |
+| `ui/notifications/tool-cancelled`       | Cancelled          | `{ reason }`           |
+| `ui/resource-teardown`                  | Shutdown           | `{ reason }`           |
+| `ui/notifications/size-changed`         | Size changed       | `{ width, height }`    |
+| `ui/notifications/host-context-changed` | Context update     | `Partial<HostContext>` |
+
+### Sandbox Proxy Messages (Web hosts)
+
+| Method                                    | Purpose            |
+|-------------------------------------------|--------------------|
+| `ui/notifications/sandbox-proxy-ready`    | Proxy ready        |
+| `ui/notifications/sandbox-resource-ready` | HTML ready to load |
+
+---
+
+## Files to Create
+
+### Model Types (in `pro/ai/mcp/core/src/main/kotlin/org/http4k/ai/mcp/model/`)
+
+- [ ] `UIResourceMeta.kt`
+- [ ] `McpUiResourceCsp.kt`
+- [ ] `UIPermissions.kt`
+- [ ] `McpUiToolMeta.kt`
+- [ ] `UIVisibility.kt`
+- [ ] `HostCapabilities.kt`
+- [ ] `HostContext.kt`
+- [ ] `AppCapabilities.kt`
+- [ ] `DisplayMode.kt`
+- [ ] `Theme.kt`
+- [ ] `Platform.kt`
+- [ ] `ContainerDimensions.kt`
+- [ ] `Styles.kt`
+- [ ] `DeviceCapabilities.kt`
+- [ ] `SafeAreaInsets.kt`
+
+### Protocol Messages (in `pro/ai/mcp/core/src/main/kotlin/org/http4k/ai/mcp/protocol/messages/`)
+
+- [ ] `McpUiInitialize.kt` - Initialize request/response
+- [ ] `McpUiOpenLink.kt` - Open link request
+- [ ] `McpUiMessage.kt` - Chat message request
+- [ ] `McpUiRequestDisplayMode.kt` - Display mode request
+- [ ] `McpUiUpdateModelContext.kt` - Model context update
+- [ ] `McpUiNotifications.kt` - All host-to-view notifications
+
+### Extension Registration
+
+- [ ] Update `ClientCapabilities` with extensions support (see PLAN.md)
+- [ ] Helper for declaring MCP Apps extension capability
+
+---
+
+## Implementation Phases
+
+### Phase 1: Download Spec & Core Types
+
+1. Download spec files to `docs/mcp-apps/`
+2. Create model types for UI resources
+3. Create model types for host/app capabilities
+
+### Phase 2: Protocol Messages
+
+1. Define all request/response types
+2. Define all notification types
+3. Add JSON serialization annotations
+
+### Phase 3: Server-side Support
+
+1. UI resource declaration helpers
+2. Tool-UI linkage helpers
+3. Extension capability negotiation
+
+### Phase 4: Tests
+
+1. Unit tests for all types
+2. Serialization/deserialization tests
+3. Example MCP server with UI resource
+
+---
+
+## Prerequisites
+
+- PLAN.md Gap 1 (extensions field) must be completed first
 
 ---
 
 ## Verification
 
 ```bash
-./gradlew :http4k-ai-mcp-core:test :http4k-ai-mcp-sdk:test :http4k-ai-mcp-client:test
+./gradlew :http4k-ai-mcp-core:test :http4k-ai-mcp-sdk:test
 ```
 
 ---
