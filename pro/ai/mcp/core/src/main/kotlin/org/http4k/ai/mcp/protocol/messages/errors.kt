@@ -9,8 +9,9 @@ import se.ansman.kotshi.JsonSerializable
 data class URLElicitationRequiredError(
     val elicitations: List<McpElicitations.Request.Url>,
     override val message: String
-) :
-    ErrorMessage(CODE, message) {
+) : ErrorMessage(CODE, message) {
+
+    override fun toString() = "URLElicitationRequiredError(elicitations=$elicitations, message='$message')"
 
     override fun <NODE> data(json: Json<NODE>): NODE = json {
         obj("elicitations" to array(elicitations.map { json.parse(McpJson.asFormatString(it)) }))

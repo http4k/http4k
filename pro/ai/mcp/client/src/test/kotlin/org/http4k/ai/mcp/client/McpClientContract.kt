@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
+import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
@@ -15,15 +16,16 @@ import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Message
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
-import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
@@ -31,6 +33,7 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
@@ -269,6 +272,34 @@ interface McpClientContract<T> : PortBasedTest {
                 .valueOrNull()
 
             assertThat(actual, present(isA<ToolResponse.Error>()))
+        }
+    }
+
+    @Test
+    fun `tool can return ElicitationRequired response`() {
+        val elicitationId = ElicitationId.of("test-elicitation-123")
+        val elicitationUrl = Uri.of("https://example.com/auth")
+
+        val elicitationRequired = ToolResponse.ElicitationRequired(
+            elicitations = listOf(
+                McpElicitations.Request.Url(
+                    message = "Please authorize access",
+                    url = elicitationUrl,
+                    elicitationId = elicitationId
+                )
+            ),
+            message = "Authorization required"
+        )
+
+        val tools = ServerTools(
+            Tool("needs-auth", "tool that requires authorization") bind {
+                elicitationRequired
+            }
+        )
+
+        withMcpServer(tools = tools) {
+            val result = tools().call(ToolName.of("needs-auth"), ToolRequest()).orThrow { Exception(it.toString()) }
+            assertThat(result, equalTo(elicitationRequired))
         }
     }
 

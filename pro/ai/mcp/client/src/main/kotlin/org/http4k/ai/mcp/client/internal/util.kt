@@ -20,6 +20,7 @@ import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
+import se.ansman.kotshi.JsonSerializable
 
 internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) {
     val obj = this@asOrFailure as MoshiObject
@@ -43,7 +44,9 @@ internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) 
     }
 }
 
-class ErrorMessageWithData(code: Int, message: String, val data: McpNodeType? = null) : ErrorMessage(code, message)
+@JsonSerializable
+data class ErrorMessageWithData(override val code: Int, override val message: String, val data: McpNodeType? = null) :
+    ErrorMessage(code, message)
 
 fun toToolResponseOrError(response: McpTool.Call.Response): ToolResponse = when (response.isError) {
     true -> Error(

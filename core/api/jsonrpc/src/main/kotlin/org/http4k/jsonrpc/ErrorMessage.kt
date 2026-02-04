@@ -2,7 +2,7 @@ package org.http4k.jsonrpc
 
 import org.http4k.format.Json
 
-open class ErrorMessage(val code: Int, open val message: String) {
+open class ErrorMessage(open val code: Int, open val message: String) {
     open fun <NODE> data(json: Json<NODE>): NODE? = null
 
     operator fun <NODE> invoke(json: Json<NODE>): NODE = json {
@@ -11,7 +11,7 @@ open class ErrorMessage(val code: Int, open val message: String) {
         json.obj(data?.let { fields + ("data" to it) } ?: fields)
     }
 
-    override fun toString() = "Error($code, $message)"
+    override fun toString() = "ErrorMessage($code, $message)"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -31,7 +31,6 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
@@ -330,35 +329,6 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
             assertThat(receivedTask.get().statusMessage, equalTo("Client processing..."))
             assertThat(receivedMeta.get().progressToken, equalTo("server-token" as Any))
-        }
-    }
-
-    @Test
-    fun `tool can return ElicitationRequired response`() {
-        val elicitationId = ElicitationId.of("test-elicitation-123")
-        val elicitationUrl = Uri.of("https://example.com/auth")
-
-        val elicitationRequired = ToolResponse.ElicitationRequired(
-            elicitations = listOf(
-                McpElicitations.Request.Url(
-                    message = "Please authorize access",
-                    url = elicitationUrl,
-                    elicitationId = elicitationId
-                )
-            ),
-            message = "Authorization required"
-        )
-
-        val tools = ServerTools(
-            Tool("needs-auth", "tool that requires authorization") bind {
-                elicitationRequired
-            }
-        )
-
-        withMcpServer(tools = tools) {
-            val result = tools().call(ToolName.of("needs-auth"), ToolRequest()).valueOrNull()!!
-
-            assertThat(result, equalTo(elicitationRequired))
         }
     }
 
