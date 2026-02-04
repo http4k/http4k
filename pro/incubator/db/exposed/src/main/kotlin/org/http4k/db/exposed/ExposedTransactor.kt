@@ -1,20 +1,20 @@
 package org.http4k.db.exposed
 
 import org.http4k.db.Transactor
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import javax.sql.DataSource
 
 class ExposedTransactor<Resource>(
     dataSource: DataSource,
     private val createResource: (Database) -> Resource
-): Transactor<Resource> {
+) : Transactor<Resource> {
 
-    private val database: Database = Database.Companion.connect(dataSource)
+    private val database: Database = Database.connect(dataSource)
 
     override fun <T> perform(mode: Transactor.Mode, work: (Resource) -> T): T =
         transaction(
-            transactionIsolation = Database.Companion.getDefaultIsolationLevel(database),
+            transactionIsolation = Database.getDefaultIsolationLevel(database),
             readOnly = mode == Transactor.Mode.ReadOnly
         ) {
             work(createResource(database))

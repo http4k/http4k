@@ -1,8 +1,8 @@
 package org.http4k.postbox.storage.exposed
 
-import org.http4k.db.exposed.ExposedTransactor
 import org.http4k.db.Transactor
-import org.jetbrains.exposed.sql.SchemaUtils
+import org.http4k.db.exposed.ExposedTransactor
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import javax.sql.DataSource
 
 object ExposedPostboxSchema {

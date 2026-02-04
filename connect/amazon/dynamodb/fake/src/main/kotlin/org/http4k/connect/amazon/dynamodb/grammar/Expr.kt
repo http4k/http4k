@@ -36,4 +36,4 @@ fun binaryExpr(parser: Parser<Expr>, tokenString: String, f: (Expr, Expr) -> Exp
 fun unaryExpr(parser: Parser<Expr>, tokenString: String, f: (Expr) -> Expr) =
     inOrder(token(tokenString), parser).map { (_, it) -> f(it) }
 
-internal fun ItemWithSubstitutions.comparable(expr: Expr) = expr.eval(this).asString().toString().padStart(200)
+internal fun ItemWithSubstitutions.comparable(expr: Expr) = expr.eval(this) as AttributeValue

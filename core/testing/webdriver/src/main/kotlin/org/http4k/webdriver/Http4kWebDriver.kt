@@ -139,9 +139,11 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
     val status: Status?
         get() = current?.status
 
-    override fun findElements(by: By): List<WebElement> = current?.findElements(by) ?: throw NoSuchElementException()
+    override fun findElements(by: By): List<WebElement> =
+        current?.findElements(by) ?: throw org.openqa.selenium.NoSuchElementException(by.toString())
 
-    override fun findElement(by: By): WebElement = current?.findElements(by)?.first() ?: throw NoSuchElementException()
+    override fun findElement(by: By): WebElement =
+        current?.findElements(by)?.first() ?: throw org.openqa.selenium.NoSuchElementException(by.toString())
 
     override fun getPageSource(): String? = current?.contents
 

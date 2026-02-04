@@ -65,6 +65,8 @@ private fun Response.fromHttp4k(request: HttpRequest): Mono<HttpResponse> = Mono
         override fun getBodyAsString(p0: Charset) = Mono.just(this@fromHttp4k.body.stream.reader(p0).readText())
     })
 
-private fun HttpRequest.toHttp4k() = Request(Method.valueOf(httpMethod.name), url.toExternalForm())
-    .headers(headers.flatMap { h -> h.values.map { h.name to it } })
-    .body(body.toInputStream())
+private fun HttpRequest.toHttp4k(): Request {
+    val req = Request(Method.valueOf(httpMethod.name), url.toExternalForm())
+        .headers(headers.flatMap { h -> h.values.map { h.name to it } })
+    return body?.let { req.body(it.toInputStream()) } ?: req
+}
