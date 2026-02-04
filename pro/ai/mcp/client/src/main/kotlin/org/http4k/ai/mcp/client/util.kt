@@ -16,6 +16,7 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.lens.contentType
 import org.http4k.ai.mcp.McpError.Protocol
+import org.http4k.ai.mcp.client.internal.ErrorMessageWithData
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
@@ -32,7 +33,7 @@ internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, 
 
     when {
         data["method"] != null -> Failure(Protocol(InvalidRequest))
-        data["error"] != null -> Failure(Protocol(convert<MoshiNode, ErrorMessage>(data.attributes["error"]!!)))
+        data["error"] != null -> Failure(Protocol(convert<MoshiNode, ErrorMessageWithData>(data.attributes["error"]!!)))
 
         else -> {
             resultFrom {

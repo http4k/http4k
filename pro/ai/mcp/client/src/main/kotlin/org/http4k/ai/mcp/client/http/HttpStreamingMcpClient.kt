@@ -4,6 +4,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.ai.mcp.CompletionRequest
@@ -11,7 +12,8 @@ import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
-import org.http4k.ai.mcp.model.ElicitationId
+import org.http4k.ai.mcp.ElicitationResponse.Ok
+import org.http4k.ai.mcp.ElicitationResponse.Task
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Http
 import org.http4k.ai.mcp.McpResult
@@ -24,20 +26,20 @@ import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.ToolResponse.Error
-import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
 import org.http4k.ai.mcp.client.internal.McpCallback
+import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
+import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
-import org.http4k.ai.mcp.model.Task
-import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.McpRpcMethod
@@ -66,7 +68,6 @@ import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode
 import org.http4k.client.ReconnectionMode.Immediate
-import org.http4k.sse.chunkedSseSequence
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
@@ -75,13 +76,13 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.chunkedSseSequence
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -194,23 +195,8 @@ class HttpStreamingMcpClient(
                         }
                     }.first().asAOrFailure<McpTool.Call.Response>()
                 }
-                .map {
-                    when (it.isError) {
-                        true -> Error(
-                            ErrorMessage(
-                                -1, it.content?.joinToString()
-                                    ?: it.structuredContent?.let { McpJson.asFormatString(it) }
-                                    ?: "<no message"
-                            )
-                        )
-
-                        else -> Ok(
-                            it.content,
-                            it.structuredContent?.let(McpJson::convert),
-                            it._meta
-                        )
-                    }
-                }
+                .map { toToolResponseOrError(it) }
+                .flatMapFailure { toToolElicitationRequiredOrError(it) }
         }
     }
 
@@ -241,7 +227,16 @@ class HttpStreamingMcpClient(
                 McpCallback(McpElicitations.Request.Form::class) { request, requestId ->
                     if (requestId == null) return@McpCallback
 
-                    val response = with(request) { fn(ElicitationRequest.Form(message, requestedSchema, _meta.progressToken, task)) }
+                    val response = with(request) {
+                        fn(
+                            ElicitationRequest.Form(
+                                message,
+                                requestedSchema,
+                                _meta.progressToken,
+                                task
+                            )
+                        )
+                    }
                     http.send(
                         McpElicitations,
                         response.toProtocol(),
@@ -356,13 +351,15 @@ class HttpStreamingMcpClient(
 
         override fun subscribe(uri: Uri, fn: () -> Unit) {
             callbacks.getOrPut(McpResource.Updated.Method) { mutableListOf() }.add(
-                McpCallback(McpPrompt.List.Changed.Notification::class) { _, _ ->
-                    subscriptions[uri]?.forEach { it() }
+                McpCallback(McpResource.Updated.Notification::class) { notification, _ ->
+                    subscriptions[notification.uri]?.forEach { it() }
                 })
+            http.send(McpResource.Subscribe, McpResource.Subscribe.Request(uri))
             subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
         }
 
         override fun unsubscribe(uri: Uri) {
+            http.send(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(uri))
             subscriptions -= uri
         }
     }
@@ -375,7 +372,7 @@ class HttpStreamingMcpClient(
     }
 
     override fun tasks() = object : McpClient.Tasks {
-        override fun onUpdate(fn: (Task, Meta) -> Unit) {
+        override fun onUpdate(fn: (org.http4k.ai.mcp.model.Task, Meta) -> Unit) {
             callbacks.getOrPut(McpTask.Status.Method) { mutableListOf() }.add(
                 McpCallback(McpTask.Status.Notification::class) { notification, _ ->
                     fn(
@@ -406,7 +403,7 @@ class HttpStreamingMcpClient(
                 .flatMap { it.first().asAOrFailure<McpTask.Result.Response>() }
                 .map { it.result }
 
-        override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) {
+        override fun update(task: org.http4k.ai.mcp.model.Task, meta: Meta, overrideDefaultTimeout: Duration?) {
             http.send(McpTask.Status, McpTask.Status.Notification(task, meta))
         }
     }
@@ -427,7 +424,6 @@ class HttpStreamingMcpClient(
         return when {
             response.status.successful -> {
                 sessionId.set(Header.MCP_SESSION_ID(response))
-
                 Success(response.body.stream.chunkedSseSequence().filterIsInstance<Event>())
             }
 
@@ -437,6 +433,6 @@ class HttpStreamingMcpClient(
 }
 
 private fun ElicitationResponse.toProtocol() = when (this) {
-    is ElicitationResponse.Ok -> McpElicitations.Response(action, content, _meta = _meta)
-    is ElicitationResponse.Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
+    is Ok -> McpElicitations.Response(action, content, _meta = _meta)
+    is Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
 }

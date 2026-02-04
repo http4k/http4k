@@ -2,7 +2,7 @@ package org.http4k.jsonrpc
 
 import org.http4k.format.Json
 
-open class ErrorMessage(val code: Int, val message: String) {
+open class ErrorMessage(val code: Int, open val message: String) {
     open fun <NODE> data(json: Json<NODE>): NODE? = null
 
     operator fun <NODE> invoke(json: Json<NODE>): NODE = json {

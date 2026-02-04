@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
 import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.protocol.SessionId
@@ -13,6 +15,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicReference
 
 class ServerTasksTest {
 
@@ -65,5 +68,34 @@ class ServerTasksTest {
         tasks.remove(session1)
 
         assertThat(tasks.list(session1, McpTask.List.Request(), Client.Companion.NoOp, testRequest).tasks, isEmpty)
+    }
+
+    @Test
+    fun `onUpdate callback is invoked when task is updated`() {
+        val taskId = TaskId.of("test-task")
+        val now = Instant.now()
+
+        val receivedTask = AtomicReference<Task>()
+        val receivedMeta = AtomicReference<Meta>()
+
+        tasks.onUpdate { task, meta ->
+            receivedTask.set(task)
+            receivedMeta.set(meta)
+        }
+
+        val notification = McpTask.Status.Notification(
+            taskId = taskId,
+            status = TaskStatus.working,
+            statusMessage = "Processing...",
+            createdAt = now,
+            lastUpdatedAt = now,
+            _meta = Meta(progressToken = "token")
+        )
+        tasks.update(session1, notification)
+
+        assertThat(receivedTask.get().taskId, equalTo(taskId))
+        assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
+        assertThat(receivedTask.get().statusMessage, equalTo("Processing..."))
+        assertThat(receivedMeta.get().progressToken, equalTo("token" as Any))
     }
 }

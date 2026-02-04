@@ -1,18 +1,18 @@
 package org.http4k.ai.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
-import org.http4k.ai.model.ToolName
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
-import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
+import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
 import org.http4k.ai.mcp.testing.nextNotification
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.model.ToolName
 import java.time.Duration
 
 class TestingTools(
@@ -46,19 +46,7 @@ class TestingTools(
             request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
         )
     ).last()
-        .nextEvent<ToolResponse, McpTool.Call.Response> {
-            when (isError) {
-                true -> {
-                    val input = (content?.first() as Content.Text).text
-                    ToolResponse.Error(McpJson.asA<ErrorMessage>(input))
-                }
-
-                else -> Ok(
-                    content,
-                    structuredContent?.let(McpJson::convert),
-                    _meta
-                )
-
-            }
-        }.map { it.second }
+        .nextEvent<ToolResponse, McpTool.Call.Response> { toToolResponseOrError(this) }
+        .map { it.second }
+        .flatMapFailure { toToolElicitationRequiredOrError(it) }
 }

@@ -187,12 +187,12 @@ interface McpClientContract<T> : PortBasedTest {
 
         val tools = ServerTools(
             Tool("start-task", "starts a task") bind {
-                it.client.tasks().update(workingTask)
+                it.client.updateTask(workingTask)
                 ToolResponse.Ok(Content.Text("started"))
             },
             Tool("complete-task", "completes a task") bind {
-                it.client.tasks().update(completedTask)
-                it.client.tasks().storeResult(taskId, expectedResult)
+                it.client.updateTask(completedTask)
+                it.client.storeTaskResult(taskId, expectedResult)
                 ToolResponse.Ok(Content.Text("completed"))
             }
         )

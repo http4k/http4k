@@ -2,7 +2,6 @@ package org.http4k.ai.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.client.McpClient
@@ -10,6 +9,7 @@ import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Uri
 import java.time.Duration
 import kotlin.random.Random
 
@@ -17,7 +17,7 @@ internal class ClientResources(
     private val queueFor: (McpMessageId) -> Iterable<McpNodeType>,
     private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
-    private val sender: org.http4k.ai.mcp.client.internal.McpRpcSender,
+    private val sender: McpRpcSender,
     private val random: Random,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Resources {
@@ -31,13 +31,25 @@ internal class ClientResources(
     }
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
-        register(McpResource.Updated, McpCallback(McpResource.Updated.Notification::class) { _, _ ->
-            subscriptions[uri]?.forEach { it() }
+        register(McpResource.Updated, McpCallback(McpResource.Updated.Notification::class) { notification, _ ->
+            subscriptions[notification.uri]?.forEach { it() }
         })
+        sender(
+            McpResource.Subscribe,
+            McpResource.Subscribe.Request(uri),
+            defaultTimeout,
+            McpMessageId.random(random)
+        )
         subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
     }
 
     override fun unsubscribe(uri: Uri) {
+        sender(
+            McpResource.Unsubscribe,
+            McpResource.Unsubscribe.Request(uri),
+            defaultTimeout,
+            McpMessageId.random(random)
+        )
         subscriptions -= uri
     }
 

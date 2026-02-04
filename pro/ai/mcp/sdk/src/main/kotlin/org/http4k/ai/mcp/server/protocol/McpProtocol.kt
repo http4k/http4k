@@ -170,9 +170,8 @@ class McpProtocol<Transport>(
                                 is ObservableResources -> {
                                     val subscribeRequest = jsonReq.fromJsonRpc<McpResource.Subscribe.Request>()
                                     resources.subscribe(session, subscribeRequest) {
-                                        sessions.respond(
-                                            transport,
-                                            session,
+                                        sessions.request(
+                                            Subscription(session),
                                             McpResource.Updated.Notification(subscribeRequest.uri)
                                                 .toJsonRpc(McpResource.Updated)
                                         )

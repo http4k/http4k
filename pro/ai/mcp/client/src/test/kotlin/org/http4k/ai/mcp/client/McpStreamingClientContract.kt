@@ -28,6 +28,12 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.messages.McpElicitations
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.ResourceResponse
+import org.http4k.ai.mcp.server.capability.ServerResources
+import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.model.MaxTokens
@@ -35,6 +41,7 @@ import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
+import org.http4k.core.Uri
 import org.http4k.filter.debugMcp
 import org.http4k.format.auto
 import org.http4k.lens.with
@@ -290,7 +297,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
 
         val tools = ServerTools(
             Tool("start-task", "starts a task") bind {
-                it.client.tasks().update(workingTask)
+                it.client.updateTask(workingTask)
                 Ok(Content.Text("started"))
             }
         )
@@ -315,6 +322,137 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
 
         assertThat(latch.await(5, SECONDS), equalTo(true))
         assertThat(receivedTask.get().taskId, equalTo(taskId))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `server Tasks onUpdate callback receives client task updates`() {
+        val taskId = TaskId.of("server-callback-task")
+        val now = Instant.now()
+        val task = Task(taskId, TaskStatus.working, "Client processing...", now, now)
+
+        val receivedTask = AtomicReference<Task>()
+        val receivedMeta = AtomicReference<Meta>()
+        val latch = CountDownLatch(1)
+
+        val serverTasks = ServerTasks()
+        serverTasks.onUpdate { t, m ->
+            receivedTask.set(t)
+            receivedMeta.set(m)
+            latch.countDown()
+        }
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tasks = serverTasks
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start(Duration.ofSeconds(1))
+
+        mcpClient.tasks().update(task, Meta(progressToken = "server-token"))
+
+        assertThat(latch.await(5, SECONDS), equalTo(true))
+        assertThat(receivedTask.get().taskId, equalTo(taskId))
+        assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
+        assertThat(receivedTask.get().statusMessage, equalTo("Client processing..."))
+        assertThat(receivedMeta.get().progressToken, equalTo("server-token" as Any))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `tool returning ElicitationRequired produces JSON-RPC error with code -32042`() {
+        val elicitationId = ElicitationId.of("test-elicitation-123")
+        val elicitationUrl = Uri.of("https://example.com/auth")
+        val elicitationMessage = "Please authorize access"
+
+        val elicitationRequired = ToolResponse.ElicitationRequired(
+            elicitations = listOf(
+                McpElicitations.Request.Url(
+                    message = elicitationMessage,
+                    url = elicitationUrl,
+                    elicitationId = elicitationId
+                )
+            ),
+            message = "Authorization required"
+        )
+
+        val tools = ServerTools(
+            Tool("needs-auth", "tool that requires authorization") bind {
+                elicitationRequired
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start()
+
+        val call = mcpClient.tools().call(ToolName.of("needs-auth"), ToolRequest())
+        val result = call.valueOrNull()!!
+
+        assertThat(result, equalTo(elicitationRequired))
+
+        mcpClient.stop()
+        server.stop()
+    }
+
+    @Test
+    fun `can subscribe to resource updates`() {
+        val resourceUri = Uri.of("test://resource/1")
+
+        val resources = ServerResources(
+            Resource.Static(resourceUri, ResourceName.of("test-resource"), "A test resource") bind {
+                ResourceResponse(listOf(Resource.Content.Text("content", resourceUri)))
+            }
+        )
+
+        val tools = ServerTools(
+            Tool("trigger-update", "triggers a resource update") bind {
+                resources.triggerUpdated(resourceUri)
+                Ok(Content.Text("triggered"))
+            }
+        )
+
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools,
+            resources = resources
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        mcpClient.start()
+
+        val latch = CountDownLatch(1)
+        val receivedUpdate = AtomicReference<Boolean>(false)
+
+        mcpClient.resources().subscribe(resourceUri) {
+            receivedUpdate.set(true)
+            latch.countDown()
+        }
+
+        mcpClient.tools().call(ToolName.of("trigger-update"), ToolRequest())
+
+        assertThat(latch.await(5, SECONDS), equalTo(true))
+        assertThat(receivedUpdate.get(), equalTo(true))
+
+        mcpClient.resources().unsubscribe(resourceUri)
 
         mcpClient.stop()
         server.stop()
