@@ -62,6 +62,32 @@ import java.util.concurrent.atomic.AtomicReference
  */
 interface McpStreamingClientContract<T> : McpClientContract<T> {
 
+    fun withMcpServer(
+        tools: ServerTools = ServerTools(),
+        resources: ServerResources = ServerResources(),
+        tasks: ServerTasks = ServerTasks(),
+        test: (McpClient) -> Unit
+    ) {
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools,
+            resources = resources,
+            tasks = tasks
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        try {
+            mcpClient.start(Duration.ofSeconds(1))
+            test(mcpClient)
+        } finally {
+            mcpClient.stop()
+            server.stop()
+        }
+    }
+
     @Test
     fun `can do sampling`() {
         val model = ModelName.of("my model")
@@ -239,53 +265,32 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools
-        )
+        withMcpServer(tools = tools) { mcpClient ->
+            val prog = AtomicReference<Progress>()
+            mcpClient.progress().onProgress(fn = prog::set)
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            assertThat(
+                mcpClient.tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
+                equalTo(Success(Ok(Content.Text(""))))
+            )
 
-        mcpClient.start(Duration.ofSeconds(1))
-
-        val prog = AtomicReference<Progress>()
-        mcpClient.progress().onProgress(fn = prog::set)
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
-            equalTo(Success(Ok(Content.Text(""))))
-        )
-
-        assertThat(prog.get(), equalTo(Progress("progress", 1, 2.0)))
-
-        mcpClient.stop()
-        server.stop()
+            assertThat(prog.get(), equalTo(Progress("progress", 1, 2.0)))
+        }
     }
 
     @Test
     fun `deals with error`() {
         val toolArg = Tool.Arg.string().required("name")
-
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
+        val tools = ServerTools(
             Tool("reverse", "description", toolArg) bind { error("bad things") }
         )
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+        withMcpServer(tools = tools) { mcpClient ->
+            val actual = mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
+                .valueOrNull()
 
-        mcpClient.start(Duration.ofSeconds(1))
-
-        val actual = mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
-            .valueOrNull()
-
-        assertThat(actual, present(isA<ToolResponse.Error>()))
-
-        mcpClient.stop()
-        server.stop()
+            assertThat(actual, present(isA<ToolResponse.Error>()))
+        }
     }
 
     @Test
@@ -304,29 +309,17 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools
-        )
+        withMcpServer(tools = tools) { mcpClient ->
+            mcpClient.tasks().onUpdate { t, _ ->
+                receivedTask.set(t)
+                latch.countDown()
+            }
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            mcpClient.tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
 
-        mcpClient.start(Duration.ofSeconds(1))
-
-        mcpClient.tasks().onUpdate { t, _ ->
-            receivedTask.set(t)
-            latch.countDown()
+            assertThat(latch.await(5, SECONDS), equalTo(true))
+            assertThat(receivedTask.get().taskId, equalTo(taskId))
         }
-
-        mcpClient.tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
-
-        assertThat(latch.await(5, SECONDS), equalTo(true))
-        assertThat(receivedTask.get().taskId, equalTo(taskId))
-
-        mcpClient.stop()
-        server.stop()
     }
 
     @Test
@@ -346,27 +339,15 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             latch.countDown()
         }
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tasks = serverTasks
-        )
+        withMcpServer(tasks = serverTasks) { mcpClient ->
+            mcpClient.tasks().update(task, Meta(progressToken = "server-token"))
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
-
-        mcpClient.start(Duration.ofSeconds(1))
-
-        mcpClient.tasks().update(task, Meta(progressToken = "server-token"))
-
-        assertThat(latch.await(5, SECONDS), equalTo(true))
-        assertThat(receivedTask.get().taskId, equalTo(taskId))
-        assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
-        assertThat(receivedTask.get().statusMessage, equalTo("Client processing..."))
-        assertThat(receivedMeta.get().progressToken, equalTo("server-token" as Any))
-
-        mcpClient.stop()
-        server.stop()
+            assertThat(latch.await(5, SECONDS), equalTo(true))
+            assertThat(receivedTask.get().taskId, equalTo(taskId))
+            assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
+            assertThat(receivedTask.get().statusMessage, equalTo("Client processing..."))
+            assertThat(receivedMeta.get().progressToken, equalTo("server-token" as Any))
+        }
     }
 
     @Test
@@ -387,41 +368,24 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools,
-            tasks = serverTasks
-        )
+        withMcpServer(tools = tools, tasks = serverTasks) { mcpClient ->
+            mcpClient.tools().call(ToolName.of("setup-tasks"), ToolRequest())
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            val tasks = mcpClient.tasks().list().orThrow { error("unexpected failure") }
+            assertThat(tasks.size, equalTo(2))
+            assertThat(tasks.map { it.taskId }.toSet(), equalTo(setOf(TaskId.of("task-1"), TaskId.of("task-2"))))
 
-        mcpClient.start(Duration.ofSeconds(1))
+            val retrieved = mcpClient.tasks().get(TaskId.of("task-1")).orThrow { error("unexpected failure") }
+            assertThat(retrieved.taskId, equalTo(TaskId.of("task-1")))
+            assertThat(retrieved.status, equalTo(TaskStatus.working))
+            assertThat(retrieved.statusMessage, equalTo("Task 1"))
 
-        mcpClient.tools().call(ToolName.of("setup-tasks"), ToolRequest())
+            val result = mcpClient.tasks().result(TaskId.of("task-2")).orThrow { error("unexpected failure") }
+            assertThat(result, equalTo(expectedResult))
 
-        // list
-        val tasks = mcpClient.tasks().list().orThrow { error("unexpected failure") }
-        assertThat(tasks.size, equalTo(2))
-        assertThat(tasks.map { it.taskId }.toSet(), equalTo(setOf(TaskId.of("task-1"), TaskId.of("task-2"))))
-
-        // get
-        val retrieved = mcpClient.tasks().get(TaskId.of("task-1")).orThrow { error("unexpected failure") }
-        assertThat(retrieved.taskId, equalTo(TaskId.of("task-1")))
-        assertThat(retrieved.status, equalTo(TaskStatus.working))
-        assertThat(retrieved.statusMessage, equalTo("Task 1"))
-
-        // result
-        val result = mcpClient.tasks().result(TaskId.of("task-2")).orThrow { error("unexpected failure") }
-        assertThat(result, equalTo(expectedResult))
-
-        // cancel
-        mcpClient.tasks().cancel(TaskId.of("task-1")).orThrow { error("unexpected failure") }
-        assertThat(mcpClient.tasks().list().orThrow { error("unexpected failure") }.size, equalTo(1))
-
-        mcpClient.stop()
-        server.stop()
+            mcpClient.tasks().cancel(TaskId.of("task-1")).orThrow { error("unexpected failure") }
+            assertThat(mcpClient.tasks().list().orThrow { error("unexpected failure") }.size, equalTo(1))
+        }
     }
 
     @Test
@@ -447,24 +411,12 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools
-        )
+        withMcpServer(tools = tools) { mcpClient ->
+            val call = mcpClient.tools().call(ToolName.of("needs-auth"), ToolRequest())
+            val result = call.valueOrNull()!!
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
-
-        mcpClient.start()
-
-        val call = mcpClient.tools().call(ToolName.of("needs-auth"), ToolRequest())
-        val result = call.valueOrNull()!!
-
-        assertThat(result, equalTo(elicitationRequired))
-
-        mcpClient.stop()
-        server.stop()
+            assertThat(result, equalTo(elicitationRequired))
+        }
     }
 
     @Test
@@ -484,34 +436,21 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools,
-            resources = resources
-        )
+        withMcpServer(tools = tools, resources = resources) { mcpClient ->
+            val latch = CountDownLatch(1)
+            val receivedUpdate = AtomicReference<Boolean>(false)
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            mcpClient.resources().subscribe(resourceUri) {
+                receivedUpdate.set(true)
+                latch.countDown()
+            }
 
-        mcpClient.start()
+            mcpClient.tools().call(ToolName.of("trigger-update"), ToolRequest())
 
-        val latch = CountDownLatch(1)
-        val receivedUpdate = AtomicReference<Boolean>(false)
+            assertThat(latch.await(5, SECONDS), equalTo(true))
+            assertThat(receivedUpdate.get(), equalTo(true))
 
-        mcpClient.resources().subscribe(resourceUri) {
-            receivedUpdate.set(true)
-            latch.countDown()
+            mcpClient.resources().unsubscribe(resourceUri)
         }
-
-        mcpClient.tools().call(ToolName.of("trigger-update"), ToolRequest())
-
-        assertThat(latch.await(5, SECONDS), equalTo(true))
-        assertThat(receivedUpdate.get(), equalTo(true))
-
-        mcpClient.resources().unsubscribe(resourceUri)
-
-        mcpClient.stop()
-        server.stop()
     }
 }
