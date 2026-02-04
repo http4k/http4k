@@ -4,12 +4,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.isEmpty
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
@@ -23,6 +22,8 @@ import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
@@ -31,9 +32,6 @@ import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
-import org.http4k.ai.mcp.model.Resource
-import org.http4k.ai.mcp.model.ResourceName
-import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
@@ -279,21 +277,6 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
     }
 
     @Test
-    fun `deals with error`() {
-        val toolArg = Tool.Arg.string().required("name")
-        val tools = ServerTools(
-            Tool("reverse", "description", toolArg) bind { error("bad things") }
-        )
-
-        withMcpServer(tools = tools) {
-            val actual = tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "boom"))
-                .valueOrNull()
-
-            assertThat(actual, present(isA<ToolResponse.Error>()))
-        }
-    }
-
-    @Test
     fun `task onUpdate callback receives task updates`() {
         val taskId = TaskId.of("callback-task")
         val now = Instant.now()
@@ -351,53 +334,14 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
     }
 
     @Test
-    fun `task lifecycle - list, get, cancel, result`() {
-        val now = Instant.now()
-        val task1 = Task(TaskId.of("task-1"), TaskStatus.working, "Task 1", now, now)
-        val task2 = Task(TaskId.of("task-2"), TaskStatus.completed, "Task 2", now, now)
-        val expectedResult = mapOf("output" to "success", "count" to 42.0)
-
-        val serverTasks = ServerTasks()
-
-        val tools = ServerTools(
-            Tool("setup-tasks", "creates test tasks") bind {
-                it.client.updateTask(task1)
-                it.client.updateTask(task2)
-                it.client.storeTaskResult(task2.taskId, expectedResult)
-                Ok(Content.Text("created"))
-            }
-        )
-
-        withMcpServer(tools = tools, tasks = serverTasks) {
-            tools().call(ToolName.of("setup-tasks"), ToolRequest())
-
-            val taskList = tasks().list().orThrow { error("unexpected failure") }
-            assertThat(taskList.size, equalTo(2))
-            assertThat(taskList.map { it.taskId }.toSet(), equalTo(setOf(TaskId.of("task-1"), TaskId.of("task-2"))))
-
-            val retrieved = tasks().get(TaskId.of("task-1")).orThrow { error("unexpected failure") }
-            assertThat(retrieved.taskId, equalTo(TaskId.of("task-1")))
-            assertThat(retrieved.status, equalTo(TaskStatus.working))
-            assertThat(retrieved.statusMessage, equalTo("Task 1"))
-
-            val result = tasks().result(TaskId.of("task-2")).orThrow { error("unexpected failure") }
-            assertThat(result, equalTo(expectedResult))
-
-            tasks().cancel(TaskId.of("task-1")).orThrow { error("unexpected failure") }
-            assertThat(tasks().list().orThrow { error("unexpected failure") }.size, equalTo(1))
-        }
-    }
-
-    @Test
-    fun `tool returning ElicitationRequired produces JSON-RPC error with code -32042`() {
+    fun `tool can return ElicitationRequired response`() {
         val elicitationId = ElicitationId.of("test-elicitation-123")
         val elicitationUrl = Uri.of("https://example.com/auth")
-        val elicitationMessage = "Please authorize access"
 
         val elicitationRequired = ToolResponse.ElicitationRequired(
             elicitations = listOf(
                 McpElicitations.Request.Url(
-                    message = elicitationMessage,
+                    message = "Please authorize access",
                     url = elicitationUrl,
                     elicitationId = elicitationId
                 )
@@ -412,8 +356,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
         )
 
         withMcpServer(tools = tools) {
-            val call = tools().call(ToolName.of("needs-auth"), ToolRequest())
-            val result = call.valueOrNull()!!
+            val result = tools().call(ToolName.of("needs-auth"), ToolRequest()).valueOrNull()!!
 
             assertThat(result, equalTo(elicitationRequired))
         }

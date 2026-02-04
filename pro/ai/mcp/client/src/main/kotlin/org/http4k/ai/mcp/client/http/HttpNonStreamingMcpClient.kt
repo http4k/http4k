@@ -3,6 +3,7 @@ package org.http4k.ai.mcp.client.http
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
@@ -19,6 +20,8 @@ import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
+import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
+import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
@@ -89,23 +92,8 @@ class HttpNonStreamingMcpClient(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         )
-            .map {
-                when (it.isError) {
-                    true -> Error(
-                        ErrorMessage(
-                            -1, it.content?.joinToString()
-                                ?: it.structuredContent?.let(::asFormatString)
-                                ?: "<no message"
-                        )
-                    )
-
-                    else -> Ok(
-                        it.content,
-                        it.structuredContent?.let(::convert),
-                        it._meta
-                    )
-                }
-            }
+            .map { toToolResponseOrError(it) }
+            .flatMapFailure { toToolElicitationRequiredOrError(it) }
     }
 
     override fun prompts() = object : McpClient.Prompts {

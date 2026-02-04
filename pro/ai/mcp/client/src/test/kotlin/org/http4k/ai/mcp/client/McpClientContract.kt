@@ -2,6 +2,8 @@ package org.http4k.ai.mcp.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
+import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
@@ -60,6 +62,30 @@ interface McpClientContract<T> : PortBasedTest {
     val doesNotifications: Boolean
 
     fun clientSessions(): Sessions<T>
+
+    fun withMcpServer(
+        tools: ServerTools = ServerTools(),
+        resources: ServerResources = ServerResources(),
+        test: McpClient.() -> Unit
+    ) {
+        val protocol = McpProtocol(
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
+            clientSessions(),
+            tools = tools,
+            resources = resources
+        )
+
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        val mcpClient = clientFor(server.port())
+
+        try {
+            mcpClient.start(Duration.ofSeconds(1))
+            mcpClient.test()
+        } finally {
+            mcpClient.stop()
+            server.stop()
+        }
+    }
 
     data class FooBar(val foo: String)
 
@@ -229,6 +255,21 @@ interface McpClientContract<T> : PortBasedTest {
 
         mcpClient.stop()
         server.stop()
+    }
+
+    @Test
+    fun `tool can return error response`() {
+        val toolArg = Tool.Arg.string().required("name")
+        val tools = ServerTools(
+            Tool("failing", "description", toolArg) bind { error("bad things") }
+        )
+
+        withMcpServer(tools = tools) {
+            val actual = tools().call(ToolName.of("failing"), ToolRequest().with(toolArg of "boom"))
+                .valueOrNull()
+
+            assertThat(actual, present(isA<ToolResponse.Error>()))
+        }
     }
 
     fun toPolyHandler(protocol: McpProtocol<T>): PolyHandler
