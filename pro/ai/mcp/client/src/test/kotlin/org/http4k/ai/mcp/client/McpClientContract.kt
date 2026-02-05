@@ -41,7 +41,6 @@ import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Sessions
-import org.http4k.ai.mcp.server.sessions.SessionEventStore
 import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.ai.mcp.server.sessions.SessionEventTracking
 import org.http4k.ai.mcp.server.sessions.SessionProvider
@@ -79,6 +78,8 @@ abstract class McpClientContract<T> : PortBasedTest {
     fun withMcpServer(
         tools: ServerTools = ServerTools(),
         resources: ServerResources = ServerResources(),
+        prompts: ServerPrompts = ServerPrompts(),
+        completions: ServerCompletions = ServerCompletions(),
         tasks: ServerTasks = ServerTasks(),
         test: McpClient.() -> Unit
     ) {
@@ -87,7 +88,9 @@ abstract class McpClientContract<T> : PortBasedTest {
             clientSessions(),
             tools = tools,
             resources = resources,
-            tasks = tasks
+            tasks = tasks,
+            prompts = prompts,
+            completions = completions
         )
 
         val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
@@ -119,103 +122,92 @@ abstract class McpClientContract<T> : PortBasedTest {
             },
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools,
-            ServerResources(
-                Resource.Static(
-                    Uri.of("https://http4k.org"),
-                    ResourceName.of("HTTP4K"),
-                    "description"
-                ) bind {
-                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-                },
-                Resource.Templated(
-                    ResourceUriTemplate.of("https://http4k.org"),
-                    ResourceName.of("HTTP4K"),
-                    "templated resource"
-                ) bind {
-                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
-                }
-            ),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
-                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
-            }),
-            ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
-                CompletionResponse(listOf("1", "2"))
-            }),
+        val resources = ServerResources(
+            Resource.Static(
+                Uri.of("https://http4k.org"),
+                ResourceName.of("HTTP4K"),
+                "description"
+            ) bind {
+                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+            },
+            Resource.Templated(
+                ResourceUriTemplate.of("https://http4k.org"),
+                ResourceName.of("HTTP4K"),
+                "templated resource"
+            ) bind {
+                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+            }
         )
+        val prompts = ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
+            PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
+        })
+        val completions = ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
+            CompletionResponse(listOf("1", "2"))
+        })
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
+        withMcpServer(tools, resources, prompts, completions) {
+            val latch = CountDownLatch(1)
 
-        val mcpClient = clientFor(server.port())
+            if (doesNotifications) {
+                tools().onChange {
+                    latch.countDown()
+                }
+            }
 
-        val latch = CountDownLatch(1)
+            assertThat(prompts().list().valueOrNull()!!.size, equalTo(1))
 
-        if (doesNotifications) {
-            mcpClient.tools().onChange {
-                latch.countDown()
+            assertThat(
+                prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
+                    .valueOrNull()!!.description,
+                equalTo("description")
+            )
+
+            assertThat(
+                resources().list().valueOrNull()!!.size,
+                equalTo(1)
+            )
+
+            assertThat(
+                resources().listTemplates().valueOrNull()!!.size,
+                equalTo(1)
+            )
+
+            assertThat(
+                resources().read(ResourceRequest(Uri.of("https://http4k.org"))).valueOrNull()!!,
+                equalTo(ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of("")))))
+            )
+
+            assertThat(
+                completions()
+                    .complete(
+                        Reference.ResourceTemplate(Uri.of("https://http4k.org")),
+                        CompletionRequest(CompletionArgument("foo", "bar"))
+                    ).valueOrNull()!!,
+                equalTo(CompletionResponse(listOf("1", "2")))
+            )
+
+            assertThat(tools().list().valueOrNull()!!.size, equalTo(2))
+
+            assertThat(
+                tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).valueOrNull()!!,
+                equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
+            )
+
+            assertThat(
+                tools().call(ToolName.of("reverseStructured"), ToolRequest().with(toolArg of "foobar"))
+                    .valueOrNull()!!,
+                equalTo(ToolResponse.Ok(listOf(Content.Text("""{"foo":"raboof"}""")), obj("foo" to string("raboof"))))
+            )
+
+            if (doesNotifications) {
+                tools.items = emptyList()
+
+                require(latch.await(2, SECONDS))
+
+                assertThat(tools().list().valueOrNull()!!.size, equalTo(0))
             }
         }
 
-        mcpClient.start()
-
-        assertThat(mcpClient.prompts().list().valueOrNull()!!.size, equalTo(1))
-
-        assertThat(
-            mcpClient.prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
-                .valueOrNull()!!.description,
-            equalTo("description")
-        )
-
-        assertThat(
-            mcpClient.resources().list().valueOrNull()!!.size,
-            equalTo(1)
-        )
-
-        assertThat(
-            mcpClient.resources().listTemplates().valueOrNull()!!.size,
-            equalTo(1)
-        )
-
-        assertThat(
-            mcpClient.resources().read(ResourceRequest(Uri.of("https://http4k.org"))).valueOrNull()!!,
-            equalTo(ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of("")))))
-        )
-
-        assertThat(
-            mcpClient.completions()
-                .complete(
-                    Reference.ResourceTemplate(Uri.of("https://http4k.org")),
-                    CompletionRequest(CompletionArgument("foo", "bar"))
-                ).valueOrNull()!!,
-            equalTo(CompletionResponse(listOf("1", "2")))
-        )
-
-        assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(2))
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).valueOrNull()!!,
-            equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
-        )
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("reverseStructured"), ToolRequest().with(toolArg of "foobar"))
-                .valueOrNull()!!,
-            equalTo(ToolResponse.Ok(listOf(Content.Text("""{"foo":"raboof"}""")), obj("foo" to string("raboof"))))
-        )
-
-        if (doesNotifications) {
-            tools.items = emptyList()
-
-            require(latch.await(2, SECONDS))
-
-            assertThat(mcpClient.tools().list().valueOrNull()!!.size, equalTo(0))
-        }
-
-        mcpClient.stop()
-        server.stop()
     }
 
     @Test
