@@ -12,14 +12,12 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationAction
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.ElicitationModel
-import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.Resource
@@ -28,25 +26,18 @@ import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.model.string
-import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
-import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Uri
-import org.http4k.filter.debugMcp
 import org.http4k.format.auto
 import org.http4k.lens.with
 import org.http4k.routing.bind
-import org.http4k.server.JettyLoom
-import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -79,31 +70,19 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools,
-        )
+        withMcpServer(tools = tools) {
+            sampling().onSampled { samplingResponses.asSequence() }
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            assertThat(
+                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
+                equalTo(Success(Ok(Content.Text("2"))))
+            )
 
-        mcpClient.start(Duration.ofSeconds(1))
-
-        mcpClient.sampling().onSampled { samplingResponses.asSequence() }
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
-            equalTo(Success(Ok(Content.Text("2"))))
-        )
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
-            equalTo(Success(Ok(Content.Text("2"))))
-        )
-
-        mcpClient.stop()
-        server.stop()
+            assertThat(
+                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
+                equalTo(Success(Ok(Content.Text("2"))))
+            )
+        }
     }
 
     class StreamingFooBar : ElicitationModel() {
@@ -143,43 +122,33 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools,
-        )
+        withMcpServer(tools = tools) {
+            val receivedElicitationId = AtomicReference<ElicitationId>()
+            elicitations().onComplete { receivedElicitationId.set(it) }
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            elicitations().onElicitation {
+                ElicitationResponse.Ok(ElicitationAction.valueOf(it.progressToken!!.toString()))
+                    .with(output of response)
+            }
 
-        mcpClient.start(Duration.ofSeconds(1))
+            assertThat(
+                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
+                equalTo(Success(Ok(Content.Text("accept"))))
+            )
 
-        val receivedElicitationId = AtomicReference<ElicitationId>()
-        mcpClient.elicitations().onComplete { receivedElicitationId.set(it) }
+            assertThat(receivedElicitationId.get(), equalTo(elicitationId))
 
-        mcpClient.elicitations().onElicitation {
-            ElicitationResponse.Ok(ElicitationAction.valueOf(it.progressToken!!.toString())).with(output of response)
+            assertThat(
+                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
+                equalTo(Success(Ok(Content.Text("decline"))))
+            )
+
+            assertThat(
+                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
+                equalTo(Success(Ok(Content.Text("cancel"))))
+            )
         }
 
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
-            equalTo(Success(Ok(Content.Text("accept"))))
-        )
-
-        assertThat(receivedElicitationId.get(), equalTo(elicitationId))
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
-            equalTo(Success(Ok(Content.Text("decline"))))
-        )
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
-            equalTo(Success(Ok(Content.Text("cancel"))))
-        )
-
-        mcpClient.stop()
-        server.stop()
     }
 
     @Test
@@ -203,28 +172,16 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools,
-        )
+        withMcpServer(tools = tools) {
+            elicitations().onElicitation {
+                ElicitationResponse.Task(expectedTask)
+            }
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
-
-        mcpClient.start(Duration.ofSeconds(1))
-
-        mcpClient.elicitations().onElicitation {
-            ElicitationResponse.Task(expectedTask)
+            assertThat(
+                tools().call(ToolName.of("elicit-task"), ToolRequest(meta = Meta("elicit-task"))),
+                equalTo(Success(Ok(Content.Text("done"))))
+            )
         }
-
-        assertThat(
-            mcpClient.tools().call(ToolName.of("elicit-task"), ToolRequest(meta = Meta("elicit-task"))),
-            equalTo(Success(Ok(Content.Text("done"))))
-        )
-
-        mcpClient.stop()
-        server.stop()
     }
 
     @Test
