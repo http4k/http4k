@@ -33,7 +33,7 @@ data class ServerCapabilities internal constructor(
         buildTasks(capabilities.toList())
     )
 
-    fun withExtensions(vararg extensions: Pair<String, Any>) = copy(extensions = extensions.toMap())
+    fun withExtensions(vararg extensions: Pair<String, Any>) = copy(extensions = this.extensions + extensions.toMap())
 
     @JsonSerializable
     data class ToolCapabilities(val listChanged: Boolean? = false)

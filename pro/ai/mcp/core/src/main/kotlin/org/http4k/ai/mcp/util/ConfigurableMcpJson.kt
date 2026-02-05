@@ -18,6 +18,7 @@ import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
+import org.http4k.ai.mcp.model.extension.CspDomain
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
@@ -47,7 +48,6 @@ import org.http4k.format.withStandardMappings
 import org.http4k.lens.Header
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
-import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.sse.SseMessage.Event
 import se.ansman.kotshi.KotshiJsonAdapterFactory
@@ -114,6 +114,7 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     withStandardMappings()
     withAiMappings()
     value(Base64Blob)
+    value(CspDomain)
     value(ElicitationId)
     value(McpEntity)
     value(McpRpcMethod)

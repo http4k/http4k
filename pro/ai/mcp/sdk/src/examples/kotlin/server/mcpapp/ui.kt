@@ -4,17 +4,19 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.model.Resource.Content.Text
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.ResourceName
-import org.http4k.ai.mcp.server.extension.McpApps
+import org.http4k.ai.mcp.model.extension.McpApps
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 
-fun orderFormUi() = Static(
-    uri = Uri.of("ui://order-form"),
-    name = ResourceName.of("Order Form"),
-    description = "Interactive order form",
-    mimeType = McpApps.MIME_TYPE
-) bind {
-    ResourceResponse(Text(ORDER_FORM_HTML, it.uri, McpApps.MIME_TYPE))
+object OrderFormUi {
+    val uri = Uri.of("ui://order-form")
+
+    val resource = Static(
+        uri = uri,
+        name = ResourceName.of("Order Form"),
+        description = "Interactive order form",
+        mimeType = McpApps.MIME_TYPE
+    ) bind { ResourceResponse(Text(ORDER_FORM_HTML, it.uri, McpApps.MIME_TYPE)) }
 }
 
 private val ORDER_FORM_HTML = """

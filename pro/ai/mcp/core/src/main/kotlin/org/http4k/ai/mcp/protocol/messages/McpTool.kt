@@ -23,7 +23,8 @@ data class McpTool(
     val outputSchema: Map<String, Any>?,
     val annotations: ToolAnnotations?,
     val icons: kotlin.collections.List<Icon>? = null,
-    val execution: ToolExecution? = null
+    val execution: ToolExecution? = null,
+    val _meta: Meta? = null
 ) {
     object List : McpRpc {
         override val Method = of("tools/list")

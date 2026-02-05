@@ -25,7 +25,8 @@ data class McpResource internal constructor(
     val mimeType: MimeType?,
     val size: Size?,
     val annotations: Annotations?,
-    val icons: kotlin.collections.List<Icon>? = null
+    val icons: kotlin.collections.List<Icon>? = null,
+    val _meta: Meta? = null
 ) {
     constructor(
         uri: Uri,
@@ -35,8 +36,9 @@ data class McpResource internal constructor(
         size: Size? = null,
         annotations: Annotations? = null,
         title: String? = null,
-        icons: kotlin.collections.List<Icon>? = null
-    ) : this(uri, null, name, description, title, mimeType, size, annotations, icons)
+        icons: kotlin.collections.List<Icon>? = null,
+        _meta: Meta? = null
+    ) : this(uri, null, name, description, title, mimeType, size, annotations, icons, _meta)
 
     constructor(
         uriTemplate: ResourceUriTemplate,
@@ -46,8 +48,9 @@ data class McpResource internal constructor(
         size: Size? = null,
         annotations: Annotations? = null,
         title: String? = null,
-        icons: kotlin.collections.List<Icon>? = null
-    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons)
+        icons: kotlin.collections.List<Icon>? = null,
+        _meta: Meta? = null
+    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons, _meta)
 
     object Read : McpRpc {
         override val Method = of("resources/read")

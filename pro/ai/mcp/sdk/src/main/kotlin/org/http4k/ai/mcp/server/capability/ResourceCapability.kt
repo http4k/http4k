@@ -19,8 +19,8 @@ interface ResourceCapability : ServerCapability, ResourceHandler {
 fun ResourceCapability(resource: Resource, handler: ResourceHandler) = object : ResourceCapability {
     override fun toResource() = with(resource) {
         when (this) {
-            is Static -> McpResource(uri, name, description, mimeType, size, annotations, title, icons)
-            is Templated -> McpResource(uriTemplate, name, description, mimeType, size, annotations, title, icons)
+            is Static -> McpResource(uri, name, description, mimeType, size, annotations, title, icons, meta)
+            is Templated -> McpResource(uriTemplate, name, description, mimeType, size, annotations, title, icons, meta)
         }
     }
 

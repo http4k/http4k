@@ -2,6 +2,8 @@
 
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.model.extension.McpAppCsp
+import org.http4k.ai.mcp.model.extension.McpAppMeta
 import se.ansman.kotshi.ExperimentalKotshiApi
 import se.ansman.kotshi.JsonProperty
 import se.ansman.kotshi.JsonSerializable
@@ -10,9 +12,12 @@ import se.ansman.kotshi.JsonSerializable
 data class Meta(
     val progressToken: ProgressToken? = null,
     @JsonProperty("io.modelcontextprotocol/related-task")
-    val relatedTask: RelatedTaskMetadata? = null
+    val relatedTask: RelatedTaskMetadata? = null,
+    val ui: McpAppMeta? = null,
+    val csp: McpAppCsp? = null
 ) {
     companion object {
         val default = Meta()
     }
 }
+

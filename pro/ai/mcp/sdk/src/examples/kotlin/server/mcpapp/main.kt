@@ -1,8 +1,8 @@
 package server.mcpapp
 
+import org.http4k.ai.mcp.model.extension.McpApps
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.withExtensions
-import org.http4k.ai.mcp.server.extension.McpApps
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.filter.debugMcp
 import org.http4k.routing.mcpHttpStreaming
@@ -33,7 +33,7 @@ fun main() {
     val server = mcpHttpStreaming(
         ServerMetaData("order-app", "1.0.0").withExtensions(McpApps),
         NoMcpSecurity,
-        orderFormUi(),
+        OrderFormUi.resource,
         showOrderFormTool(),
         submitOrderTool()
     ).debugMcp()
