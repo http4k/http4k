@@ -24,7 +24,7 @@ import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
-import org.http4k.ai.mcp.server.http.HttpStreamingSessions
+import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.ai.mcp.server.jsonrpc.JsonRpcSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -51,7 +51,7 @@ import java.util.UUID
  *      /mcp (DELETE) <-- delete a session
  */
 fun mcpHttpStreaming(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
-    HttpStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
+    HttpStreamingMcp(McpProtocol(metadata, HttpSessions().apply { start() }, *capabilities), security)
 
 /**
  * Create an HTTP (non-streaming) MCP app from a set of feature bindings.
@@ -60,7 +60,7 @@ fun mcpHttpStreaming(metadata: ServerMetaData, security: McpSecurity, vararg cap
  *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
  */
 fun mcpHttpNonStreaming(metadata: ServerMetaData, security: McpSecurity, vararg capabilities: ServerCapability) =
-    HttpNonStreamingMcp(McpProtocol(metadata, HttpStreamingSessions().apply { start() }, *capabilities), security)
+    HttpNonStreamingMcp(McpProtocol(metadata, HttpSessions().apply { start() }, *capabilities), security)
 
 /**
  * Create an SSE MCP app from a set of feature bindings.

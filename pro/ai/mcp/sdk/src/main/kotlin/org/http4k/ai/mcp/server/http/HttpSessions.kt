@@ -25,7 +25,7 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class HttpStreamingSessions(
+class HttpSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val eventStore: SessionEventStore = InMemory(100),

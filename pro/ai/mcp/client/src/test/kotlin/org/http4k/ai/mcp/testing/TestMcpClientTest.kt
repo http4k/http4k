@@ -58,7 +58,7 @@ import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
-import org.http4k.ai.mcp.server.http.HttpStreamingSessions
+import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
@@ -117,7 +117,7 @@ class TestMcpClientTest {
         )
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 prompts = serverPrompts, random = random
             ), NoMcpSecurity
         ).testMcpClient()
@@ -171,7 +171,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 resources = serverResources,
                 random = random
             ),
@@ -226,7 +226,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 resources = serverResources,
                 random = random
             ),
@@ -273,7 +273,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 tools = serverTools,
                 random = random
             ),
@@ -344,7 +344,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 completions = serverCompletions,
                 random = random
             ),
@@ -374,7 +374,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 completions = serverCompletions,
                 random = random
             ),
@@ -406,7 +406,7 @@ class TestMcpClientTest {
 
         val model = ModelName.of("name")
 
-        val testTool = org.http4k.ai.mcp.protocol.messages.McpTool(
+        val testTool = McpTool(
             ToolName.of("test_tool"),
             "test tool description",
             null,
@@ -417,7 +417,7 @@ class TestMcpClientTest {
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
-                metadata, HttpStreamingSessions(SessionProvider.Random(random)),
+                metadata, HttpSessions(SessionProvider.Random(random)),
                 tools = ServerTools(
                     Tool("sample", "description") bind {
                         val samplingRequest = it.client.sample(
@@ -425,7 +425,7 @@ class TestMcpClientTest {
                                 messages = listOf(),
                                 maxTokens = MaxTokens.of(1),
                                 tools = listOf(testTool),
-                                toolChoice = org.http4k.ai.mcp.model.ToolChoice(org.http4k.ai.mcp.model.ToolChoiceMode.auto)
+                                toolChoice = ToolChoice(ToolChoiceMode.auto)
                             ),
                             Duration.ofSeconds(1)
                         ).toList()
@@ -440,7 +440,7 @@ class TestMcpClientTest {
         mcp.useClient {
             sampling().onSampled { request ->
                 assertThat(request.tools, equalTo(listOf(testTool)))
-                assertThat(request.toolChoice, equalTo(org.http4k.ai.mcp.model.ToolChoice(org.http4k.ai.mcp.model.ToolChoiceMode.auto)))
+                assertThat(request.toolChoice, equalTo(ToolChoice(ToolChoiceMode.auto)))
 
                 sequenceOf(
                     SamplingResponse.Ok(model, Assistant, listOf(content), null),

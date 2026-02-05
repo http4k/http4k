@@ -27,7 +27,7 @@ import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
-import org.http4k.ai.mcp.server.http.HttpStreamingSessions
+import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
@@ -80,7 +80,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse> {
         notificationSseReconnectionMode = Disconnect,
     )
 
-    override fun clientSessions() = HttpStreamingSessions(
+    override fun clientSessions() = HttpSessions(
         sessionProvider = SessionProvider.Random(Random(0)),
     ).apply { start() }
 
@@ -121,7 +121,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse> {
 
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            HttpStreamingSessions(
+            HttpSessions(
                 sessionProvider = SessionProvider.Random(Random(0)),
             ).apply { start() },
             tools,

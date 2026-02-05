@@ -11,7 +11,7 @@ import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.renderRequest
 import org.http4k.ai.mcp.server.http.HttpNonStreamingMcp
-import org.http4k.ai.mcp.server.http.HttpStreamingSessions
+import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.BasicAuthMcpSecurity
 import org.http4k.ai.mcp.util.McpJson
@@ -33,7 +33,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
 
     override val doesNotifications = false
 
-    override fun clientSessions() = HttpStreamingSessions()
+    override fun clientSessions() = HttpSessions()
 
     private val creds = Credentials("user", "password")
 
@@ -49,7 +49,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
     fun `can handle batched messages`() {
         val response = toPolyHandler(
             McpProtocol(
-                ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")), HttpStreamingSessions(),
+                ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")), clientSessions(),
             )
         ).http!!(
             Request(POST, "/mcp")
