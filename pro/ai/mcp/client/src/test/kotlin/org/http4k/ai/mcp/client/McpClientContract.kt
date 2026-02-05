@@ -230,38 +230,26 @@ abstract class McpClientContract<T> : PortBasedTest {
             }
         )
 
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools
-        )
+        withMcpServer(tools = tools) {
+            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
 
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
+            val tasks = tasks().list().valueOrNull()
+            assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
 
-        mcpClient.start(Duration.ofSeconds(1))
+            val retrieved = tasks().get(taskId).valueOrNull()
+            assertThat(retrieved?.taskId, equalTo(taskId))
+            assertThat(retrieved?.status, equalTo(TaskStatus.working))
 
-        mcpClient.tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
+            tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta("tasks")))
 
-        val tasks = mcpClient.tasks().list().valueOrNull()
-        assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
+            val result = tasks().result(taskId).valueOrNull()
+            assertThat(result, equalTo(expectedResult))
 
-        val retrieved = mcpClient.tasks().get(taskId).valueOrNull()
-        assertThat(retrieved?.taskId, equalTo(taskId))
-        assertThat(retrieved?.status, equalTo(TaskStatus.working))
+            val cancelResult = tasks().cancel(taskId)
+            assertThat(cancelResult.valueOrNull(), equalTo(Unit))
 
-        mcpClient.tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta("tasks")))
-
-        val result = mcpClient.tasks().result(taskId).valueOrNull()
-        assertThat(result, equalTo(expectedResult))
-
-        val cancelResult = mcpClient.tasks().cancel(taskId)
-        assertThat(cancelResult.valueOrNull(), equalTo(Unit))
-
-        assertThat(mcpClient.tasks().get(taskId).valueOrNull(), equalTo(null))
-
-        mcpClient.stop()
-        server.stop()
+            assertThat(tasks().get(taskId).valueOrNull(), equalTo(null))
+        }
     }
 
     @Test
