@@ -235,7 +235,7 @@ interface McpStreamingClientContract<T> : McpClientContract<T> {
             tools = tools,
         )
 
-        val server = toPolyHandler(protocol).debugMcp().asServer(JettyLoom(0)).start()
+        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
         val mcpClient = clientFor(server.port())
 
         mcpClient.start(Duration.ofSeconds(1))
