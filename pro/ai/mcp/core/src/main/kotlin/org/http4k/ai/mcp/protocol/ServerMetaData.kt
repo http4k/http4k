@@ -32,4 +32,13 @@ data class ServerMetaData internal constructor(
         instructions: String? = null,
         protocolVersions: Set<ProtocolVersion> = PUBLISHED,
     ) : this(VersionedMcpEntity(entity, version, title), protocolVersions, ServerCapabilities(*capabilities), instructions)
+
+    constructor(
+        entity: McpEntity,
+        version: Version,
+        capabilities: ServerCapabilities,
+        title: String? = null,
+        instructions: String? = null,
+        protocolVersions: Set<ProtocolVersion> = PUBLISHED,
+    ) : this(VersionedMcpEntity(entity, version, title), protocolVersions, capabilities, instructions)
 }

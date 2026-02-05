@@ -21,7 +21,7 @@ data class ServerCapabilities internal constructor(
     val logging: Unit?,
     val experimental: Unit?,
     val tasks: Tasks?,
-    val extensions: Map<String, Any>? = null,
+    val extensions: Map<String, Any> = emptyMap(),
 ) {
     constructor(vararg capabilities: ServerProtocolCapability = ServerProtocolCapability.entries.toTypedArray()) : this(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
@@ -32,6 +32,8 @@ data class ServerCapabilities internal constructor(
         if (capabilities.contains(Experimental)) Unit else null,
         buildTasks(capabilities.toList())
     )
+
+    fun withExtensions(vararg extensions: Pair<String, Any>) = copy(extensions = extensions.toMap())
 
     @JsonSerializable
     data class ToolCapabilities(val listChanged: Boolean? = false)
