@@ -41,6 +41,10 @@ import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Sessions
+import org.http4k.ai.mcp.server.sessions.SessionEventStore
+import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
+import org.http4k.ai.mcp.server.sessions.SessionEventTracking
+import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.util.McpJson.auto
 import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
@@ -58,6 +62,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.random.Random
 
 abstract class McpClientContract<T> : PortBasedTest {
 
@@ -66,6 +71,10 @@ abstract class McpClientContract<T> : PortBasedTest {
     abstract val doesNotifications: Boolean
 
     abstract fun clientSessions(): Sessions<T>
+
+    val sessionEventStore = InMemory(100)
+    val sessionEventTracking = SessionEventTracking.InMemory()
+    val sessionProvider = SessionProvider.Random(Random(0))
 
     fun withMcpServer(
         tools: ServerTools = ServerTools(),

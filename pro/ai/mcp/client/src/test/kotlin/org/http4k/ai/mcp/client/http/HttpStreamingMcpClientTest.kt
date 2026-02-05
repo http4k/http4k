@@ -26,8 +26,8 @@ import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
-import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.http.HttpSessions
+import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
@@ -81,7 +81,9 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
     )
 
     override fun clientSessions() = HttpSessions(
-        sessionProvider = SessionProvider.Random(Random(0)),
+        sessionProvider,
+        sessionEventTracking,
+        sessionEventStore,
     ).apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =

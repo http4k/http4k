@@ -33,7 +33,11 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse>() {
 
     override val doesNotifications = false
 
-    override fun clientSessions() = HttpSessions()
+    override fun clientSessions() = HttpSessions(
+        sessionProvider,
+        sessionEventTracking,
+        sessionEventStore,
+    )
 
     private val creds = Credentials("user", "password")
 
