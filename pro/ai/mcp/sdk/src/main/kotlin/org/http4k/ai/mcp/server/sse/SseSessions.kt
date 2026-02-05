@@ -24,8 +24,8 @@ import kotlin.random.Random
 
 class SseSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
-    private val eventStore: SessionEventStore = InMemory(100),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
+    private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : Sessions<Sse> {
 

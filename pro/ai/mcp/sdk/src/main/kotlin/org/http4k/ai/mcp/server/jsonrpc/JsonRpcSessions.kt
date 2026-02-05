@@ -1,17 +1,19 @@
 package org.http4k.ai.mcp.server.jsonrpc
 
 import dev.forkhandles.result4k.Success
-import org.http4k.core.Request
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import kotlin.random.Random
 
-class JsonRpcSessions(private val sessionProvider: SessionProvider = SessionProvider.Random(Random)) :
+class JsonRpcSessions(
+    private val sessionProvider: SessionProvider = SessionProvider.Random(Random)
+) :
     Sessions<Unit> {
 
     override fun respond(transport: Unit, session: Session, message: McpNodeType) =

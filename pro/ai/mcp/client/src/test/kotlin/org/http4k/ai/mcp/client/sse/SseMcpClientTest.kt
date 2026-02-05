@@ -3,6 +3,7 @@ package org.http4k.ai.mcp.client.sse
 import org.http4k.ai.mcp.client.McpStreamingClientContract
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.ApiKeyMcpSecurity
 import org.http4k.ai.mcp.server.sse.SseMcp
@@ -28,7 +29,11 @@ class SseMcpClientTest : McpStreamingClientContract<Sse>() {
         ClientCapabilities()
     )
 
-    override fun clientSessions() = SseSessions().apply { start() }
+    override fun clientSessions() = SseSessions(
+        sessionProvider,
+        sessionEventTracking,
+        sessionEventStore,
+    ).apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
         SseMcp(protocol, ApiKeyMcpSecurity(Header.required("KEY"), { it == "123" }))
