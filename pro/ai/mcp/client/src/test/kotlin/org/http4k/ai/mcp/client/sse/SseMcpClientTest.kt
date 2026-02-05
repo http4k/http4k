@@ -17,7 +17,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.lens.Header
 import org.http4k.sse.Sse
 
-class SseMcpClientTest : McpStreamingClientContract<Sse> {
+class SseMcpClientTest : McpStreamingClientContract<Sse>() {
 
     override val doesNotifications = true
 

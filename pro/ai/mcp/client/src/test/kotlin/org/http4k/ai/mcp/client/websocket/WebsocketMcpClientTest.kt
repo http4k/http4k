@@ -14,7 +14,7 @@ import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WebsocketMcpClientTest : McpStreamingClientContract<Websocket> {
+class WebsocketMcpClientTest : McpStreamingClientContract<Websocket>() {
 
     override val doesNotifications = true
 

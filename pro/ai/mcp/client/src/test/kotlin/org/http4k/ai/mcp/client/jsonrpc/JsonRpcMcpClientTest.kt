@@ -11,7 +11,7 @@ import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.BearerAuthMcpSecurity
 import org.http4k.routing.poly
 
-class JsonRpcMcpClientTest : McpClientContract<Unit> {
+class JsonRpcMcpClientTest : McpClientContract<Unit>() {
 
     override val doesNotifications = false
 

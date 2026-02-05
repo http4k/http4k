@@ -29,7 +29,7 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
 
-class HttpNonStreamingMcpClientTest : McpClientContract<Sse> {
+class HttpNonStreamingMcpClientTest : McpClientContract<Sse>() {
 
     override val doesNotifications = false
 

@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
+import org.http4k.ai.mcp.Client.Companion.NoOp.progress
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.ResourceResponse
@@ -38,6 +39,7 @@ import org.http4k.core.Uri
 import org.http4k.format.auto
 import org.http4k.lens.with
 import org.http4k.routing.bind
+import org.http4k.routing.tools
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -48,7 +50,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Contract for MCP clients that support streaming capabilities (sampling, elicitation, progress).
  */
-interface McpStreamingClientContract<T> : McpClientContract<T> {
+abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
 
     @Test
     fun `can do sampling`() {

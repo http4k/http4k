@@ -64,7 +64,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.random.Random
 
 @ExtendWith(JsonApprovalTest::class)
-class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse> {
+class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
 
     override val doesNotifications = true
 

@@ -59,13 +59,13 @@ import java.time.Instant
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 
-interface McpClientContract<T> : PortBasedTest {
+abstract class McpClientContract<T> : PortBasedTest {
 
     val clientName get() = McpEntity.of("foobar")
 
-    val doesNotifications: Boolean
+    abstract val doesNotifications: Boolean
 
-    fun clientSessions(): Sessions<T>
+    abstract fun clientSessions(): Sessions<T>
 
     fun withMcpServer(
         tools: ServerTools = ServerTools(),
@@ -306,7 +306,7 @@ interface McpClientContract<T> : PortBasedTest {
         }
     }
 
-    fun toPolyHandler(protocol: McpProtocol<T>): PolyHandler
+    abstract fun toPolyHandler(protocol: McpProtocol<T>): PolyHandler
 
-    fun clientFor(port: Int): McpClient
+    abstract fun clientFor(port: Int): McpClient
 }
