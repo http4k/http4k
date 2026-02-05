@@ -49,6 +49,8 @@ class TestMcpClient(
     private val completions = TestingCompletions(sender)
     private val tasks = TestingTasks(sender)
 
+    override val sessionId = sender.sessionId.get()
+
     override fun start(overrideDefaultTimeout: Duration?): McpResult<ServerCapabilities> {
         val initResponse = sender(
             McpInitialize, McpInitialize.Request(

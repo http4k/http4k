@@ -20,6 +20,7 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ServerCapabilities
+import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -29,6 +30,9 @@ import java.time.Duration
  * Client for the MCP protocol. Provides access to the various resources and tools on ths MCP Server
  */
 interface McpClient : AutoCloseable {
+
+    val sessionId: SessionId
+
     fun start(overrideDefaultTimeout: Duration? = null): McpResult<ServerCapabilities>
     fun stop() = close()
 

@@ -171,6 +171,8 @@ abstract class McpClientContract<T> : PortBasedTest {
                 equalTo(CompletionResponse(listOf("1", "2")))
             )
         }
+
+        sessionEventTracking
     }
 
     @Test

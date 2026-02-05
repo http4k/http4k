@@ -1,10 +1,13 @@
 package org.http4k.ai.mcp.server.websocket
 
-import org.http4k.core.Request
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.server.sse.sessionId
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.with
 import org.http4k.routing.bindWs
 import org.http4k.sse.SseMessage
 import org.http4k.websocket.Websocket
@@ -28,7 +31,15 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
                     executor.submit { receive(ws, session, req.body(msg.bodyString())) }
                 }
                 ws.onClose { executor.shutdown() }
-                ws.send(WsMessage(SseMessage.Event("endpoint", "").toMessage()))
+                ws.send(
+                    WsMessage(
+                        SseMessage.Event(
+                            "endpoint",
+                            Request(GET, "/message").with(sessionId of session.id).uri.toString()
+                        )
+                            .toMessage()
+                    )
+                )
             }
         }
 

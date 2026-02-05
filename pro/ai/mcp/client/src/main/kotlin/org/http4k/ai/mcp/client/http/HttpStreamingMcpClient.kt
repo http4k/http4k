@@ -104,7 +104,9 @@ class HttpStreamingMcpClient(
 ) : McpClient {
     private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
 
-    private val sessionId = AtomicReference<SessionId>()
+    private val _sessionId = AtomicReference<SessionId>()
+
+    override val sessionId get() = _sessionId.get()
 
     override fun start(overrideDefaultTimeout: Duration?): Result<ServerCapabilities, McpError> = http.send(
         McpInitialize, McpInitialize.Request(
@@ -120,7 +122,7 @@ class HttpStreamingMcpClient(
             thread(isDaemon = true) {
                 Http4kSseClient(
                     Request(GET, baseUri)
-                        .with(Header.MCP_SESSION_ID of sessionId.get())
+                        .with(Header.MCP_SESSION_ID of sessionId)
                         .with(Header.MCP_PROTOCOL_VERSION of protocolVersion),
                     http, notificationSseReconnectionMode, System.err::println
                 )
@@ -418,12 +420,12 @@ class HttpStreamingMcpClient(
         val response = this(
             message.toHttpRequest(protocolVersion, baseUri, rpc, messageId)
                 .accept(TEXT_EVENT_STREAM)
-                .with(Header.MCP_SESSION_ID of sessionId.get())
+                .with(Header.MCP_SESSION_ID of sessionId)
         )
 
         return when {
             response.status.successful -> {
-                sessionId.set(Header.MCP_SESSION_ID(response))
+                _sessionId.set(Header.MCP_SESSION_ID(response))
                 Success(response.body.stream.chunkedSseSequence().filterIsInstance<Event>())
             }
 

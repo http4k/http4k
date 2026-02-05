@@ -27,7 +27,6 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
-import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerCapabilities
@@ -64,7 +63,9 @@ class HttpNonStreamingMcpClient(
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
 
-    private val sessionId = AtomicReference<SessionId>()
+    private val _sessionId = AtomicReference<SessionId>()
+
+    override val sessionId get() = _sessionId.get()
 
     override fun start(overrideDefaultTimeout: Duration?) = Success(ServerCapabilities())
 
@@ -170,11 +171,11 @@ class HttpNonStreamingMcpClient(
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
         val response = this(
             message.toHttpRequest(protocolVersion, baseUri, rpc)
-                .with(Header.MCP_SESSION_ID of sessionId.get())
+                .with(Header.MCP_SESSION_ID of sessionId)
                 .accept(TEXT_EVENT_STREAM)
         )
 
-        sessionId.set(Header.MCP_SESSION_ID(response))
+        _sessionId.set(Header.MCP_SESSION_ID(response))
 
         return when {
             response.status.successful -> resultFrom { SseMessage.parse(response.bodyString()) as Event }

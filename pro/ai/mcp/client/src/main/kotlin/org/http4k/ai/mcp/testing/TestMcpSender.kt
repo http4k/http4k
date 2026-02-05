@@ -53,7 +53,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
 
     private var id = AtomicInteger(0)
 
-    private var sessionId = AtomicReference<SessionId>()
+    var sessionId = AtomicReference<SessionId>()
 
     fun stream() = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
 

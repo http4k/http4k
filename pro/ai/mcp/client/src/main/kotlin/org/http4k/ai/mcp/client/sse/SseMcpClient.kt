@@ -15,6 +15,7 @@ import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
@@ -23,16 +24,13 @@ import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.SetHostFrom
-import org.http4k.filter.debug
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.sse.SseMessage.Event
@@ -106,4 +104,8 @@ class SseMcpClient(
         super.close()
         sseClient.close()
     }
+
+    override val sessionId
+        get() =
+            SessionId.parse(Request(GET, endpoint.get().toString()).query("sessionId") ?: "-")
 }
