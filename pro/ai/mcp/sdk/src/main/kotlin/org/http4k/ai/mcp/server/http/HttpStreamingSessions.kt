@@ -94,7 +94,7 @@ class HttpStreamingSessions(
             .forEach { (session, sse) ->
                 try {
                     sse.send(SseMessage.Event("ping", ""))
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     clientConnections.remove(session)
                     sse.close()
                 }

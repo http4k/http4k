@@ -37,6 +37,7 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
+import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Sessions
@@ -69,13 +70,15 @@ interface McpClientContract<T> : PortBasedTest {
     fun withMcpServer(
         tools: ServerTools = ServerTools(),
         resources: ServerResources = ServerResources(),
+        tasks: ServerTasks = ServerTasks(),
         test: McpClient.() -> Unit
     ) {
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
             tools = tools,
-            resources = resources
+            resources = resources,
+            tasks = tasks
         )
 
         val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()

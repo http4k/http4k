@@ -59,32 +59,6 @@ import java.util.concurrent.atomic.AtomicReference
  */
 interface McpStreamingClientContract<T> : McpClientContract<T> {
 
-    fun withMcpServer(
-        tools: ServerTools = ServerTools(),
-        resources: ServerResources = ServerResources(),
-        tasks: ServerTasks = ServerTasks(),
-        test: McpClient.() -> Unit
-    ) {
-        val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
-            clientSessions(),
-            tools = tools,
-            resources = resources,
-            tasks = tasks
-        )
-
-        val server = toPolyHandler(protocol).asServer(JettyLoom(0)).start()
-        val mcpClient = clientFor(server.port())
-
-        try {
-            mcpClient.start(Duration.ofSeconds(1))
-            mcpClient.test()
-        } finally {
-            mcpClient.stop()
-            server.stop()
-        }
-    }
-
     @Test
     fun `can do sampling`() {
         val model = ModelName.of("my model")
