@@ -40,6 +40,7 @@ import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.ai.mcp.server.sessions.SessionEventTracking
@@ -67,6 +68,8 @@ abstract class McpClientContract<T> : PortBasedTest {
     val clientName get() = McpEntity.of("foobar")
 
     abstract val doesNotifications: Boolean
+
+    open val storesHistory = true
 
     abstract fun clientSessions(): Sessions<T>
 
@@ -105,6 +108,17 @@ abstract class McpClientContract<T> : PortBasedTest {
     }
 
     data class FooBar(val foo: String)
+
+    @Test
+    fun `traffic is stored in the session event store`() {
+        withMcpServer {
+            tools().list()
+            prompts().list()
+            resources().list()
+
+            assertThat(sessionEventStore.read(Session(sessionId), null).toList().isNotEmpty(), equalTo(storesHistory))
+        }
+    }
 
     @Test
     fun `can list and get prompts`() {

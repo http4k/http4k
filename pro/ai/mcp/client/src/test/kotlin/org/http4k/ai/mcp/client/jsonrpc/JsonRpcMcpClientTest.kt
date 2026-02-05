@@ -15,6 +15,7 @@ class JsonRpcMcpClientTest : McpClientContract<Unit>() {
 
     override val doesNotifications = false
 
+    override val storesHistory = false
 
     override fun clientSessions() = JsonRpcSessions()
 
