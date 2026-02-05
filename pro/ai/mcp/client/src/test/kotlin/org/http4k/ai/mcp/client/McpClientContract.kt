@@ -108,20 +108,25 @@ abstract class McpClientContract<T> : PortBasedTest {
     data class FooBar(val foo: String)
 
     @Test
-    fun `can interact with server`() {
-
-        val toolArg = Tool.Arg.string().required("name")
-        val output = Tool.Output.auto(FooBar("bar")).toLens()
-
-        val tools = ServerTools(
-            Tool("reverse", "description", toolArg) bind {
-                ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
-            },
-            Tool("reverseStructured", "description", toolArg) bind {
-                ToolResponse.Ok().with(output of FooBar(toolArg(it).reversed()))
-            },
+    fun `can list and get prompts`() {
+        val prompts = ServerPrompts(
+            Prompt(PromptName.of("prompt"), "description1") bind {
+                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
+            }
         )
 
+        withMcpServer(prompts = prompts) {
+            assertThat(prompts().list().valueOrNull()!!.size, equalTo(1))
+            assertThat(
+                prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
+                    .valueOrNull()!!.description,
+                equalTo("description")
+            )
+        }
+    }
+
+    @Test
+    fun `can list and read resources`() {
         val resources = ServerResources(
             Resource.Static(
                 Uri.of("https://http4k.org"),
@@ -138,45 +143,26 @@ abstract class McpClientContract<T> : PortBasedTest {
                 ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
             }
         )
-        val prompts = ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
-            PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
-        })
-        val completions = ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
-            CompletionResponse(listOf("1", "2"))
-        })
 
-        withMcpServer(tools, resources, prompts, completions) {
-            val latch = CountDownLatch(1)
-
-            if (doesNotifications) {
-                tools().onChange {
-                    latch.countDown()
-                }
-            }
-
-            assertThat(prompts().list().valueOrNull()!!.size, equalTo(1))
-
-            assertThat(
-                prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
-                    .valueOrNull()!!.description,
-                equalTo("description")
-            )
-
-            assertThat(
-                resources().list().valueOrNull()!!.size,
-                equalTo(1)
-            )
-
-            assertThat(
-                resources().listTemplates().valueOrNull()!!.size,
-                equalTo(1)
-            )
-
+        withMcpServer(resources = resources) {
+            assertThat(resources().list().valueOrNull()!!.size, equalTo(1))
+            assertThat(resources().listTemplates().valueOrNull()!!.size, equalTo(1))
             assertThat(
                 resources().read(ResourceRequest(Uri.of("https://http4k.org"))).valueOrNull()!!,
                 equalTo(ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of("")))))
             )
+        }
+    }
 
+    @Test
+    fun `can complete references`() {
+        val completions = ServerCompletions(
+            Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
+                CompletionResponse(listOf("1", "2"))
+            }
+        )
+
+        withMcpServer(completions = completions) {
             assertThat(
                 completions()
                     .complete(
@@ -185,29 +171,63 @@ abstract class McpClientContract<T> : PortBasedTest {
                     ).valueOrNull()!!,
                 equalTo(CompletionResponse(listOf("1", "2")))
             )
+        }
+    }
 
+    @Test
+    fun `can list and call tools`() {
+        val toolArg = Tool.Arg.string().required("name")
+        val output = Tool.Output.auto(FooBar("bar")).toLens()
+
+        val tools = ServerTools(
+            Tool("reverse", "description", toolArg) bind {
+                ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
+            },
+            Tool("reverseStructured", "description", toolArg) bind {
+                ToolResponse.Ok().with(output of FooBar(toolArg(it).reversed()))
+            },
+        )
+
+        withMcpServer(tools = tools) {
             assertThat(tools().list().valueOrNull()!!.size, equalTo(2))
-
             assertThat(
                 tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).valueOrNull()!!,
                 equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
             )
-
             assertThat(
                 tools().call(ToolName.of("reverseStructured"), ToolRequest().with(toolArg of "foobar"))
                     .valueOrNull()!!,
                 equalTo(ToolResponse.Ok(listOf(Content.Text("""{"foo":"raboof"}""")), obj("foo" to string("raboof"))))
             )
-
-            if (doesNotifications) {
-                tools.items = emptyList()
-
-                require(latch.await(2, SECONDS))
-
-                assertThat(tools().list().valueOrNull()!!.size, equalTo(0))
-            }
         }
+    }
 
+    @Test
+    fun `can receive tool change notifications`() {
+        if (!doesNotifications) return
+
+        val toolArg = Tool.Arg.string().required("name")
+        val tools = ServerTools(
+            Tool("reverse", "description", toolArg) bind {
+                ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
+            }
+        )
+
+        withMcpServer(tools = tools) {
+            val latch = CountDownLatch(1)
+
+            tools().onChange {
+                latch.countDown()
+            }
+
+            assertThat(tools().list().valueOrNull()!!.size, equalTo(1))
+
+            tools.items = emptyList()
+
+            require(latch.await(2, SECONDS))
+
+            assertThat(tools().list().valueOrNull()!!.size, equalTo(0))
+        }
     }
 
     @Test
