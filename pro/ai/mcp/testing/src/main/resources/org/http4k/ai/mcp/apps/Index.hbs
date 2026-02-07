@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>http4k MCP Apps</title>
+    <style>
+        body {
+            font-family: system-ui;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        select {
+            padding: 0.5rem;
+            font-size: 1rem;
+            min-width: 300px;
+        }
+
+        iframe {
+            width: 100%;
+            border: 1px solid #ccc;
+            min-height: 400px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+<h1>MCP Apps Test Host</h1>
+
+<label for="tool-select"></label>
+<select id="tool-select">
+    <option value="" disabled selected>Select a tool...</option>
+    {{#tools}}
+    <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
+        {{serverName}}: {{toolName}}
+    </option>
+    {{/tools}}
+</select>
+
+<iframe id="app" sandbox="allow-scripts allow-forms" style="display:none;"></iframe>
+
+<script>
+    const select = document.getElementById('tool-select');
+    let currentServerId = null;
+
+    select.addEventListener('change', async () => {
+        const opt = select.selectedOptions[0];
+        currentServerId = opt.dataset.serverId;
+        const uri = opt.dataset.resourceUri;
+
+        const {html} = await fetch(
+            `/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`
+        ).then(r => r.json());
+
+        const app = document.getElementById('app');
+        app.style.display = 'block';
+        app.srcdoc = html;
+    });
+
+    addEventListener('message', async e => {
+        if (!e.data?.jsonrpc || e.data.id === undefined) return;
+
+        let result;
+        switch (e.data.method) {
+            case 'ui/initialize':
+                result = {
+                    protocolVersion: '2025-11-05',
+                    capabilities: {serverTools: {}, openLinks: {}, updateModelContext: {text: {}}},
+                    hostContext: {theme: 'light', platform: 'web', displayMode: 'inline', availableDisplayModes: ['inline']}
+                };
+                break;
+
+            case 'tools/call':
+                result = await fetch('/api/tools/call', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({serverId: currentServerId, ...e.data.params})
+                }).then(r => r.json());
+                break;
+
+            case 'ui/openLink':
+                window.open(e.data.params.url, '_blank');
+                result = {};
+                break;
+
+            case 'ui/message':
+            case 'ui/updateModelContext':
+            case 'ui/requestDisplayMode':
+                result = {};
+                break;
+
+            default:
+                e.source.postMessage({
+                    jsonrpc: '2.0', id: e.data.id,
+                    error: {code: -32601, message: 'Method not found'}
+                }, '*');
+                return;
+        }
+
+        e.source.postMessage({jsonrpc: '2.0', id: e.data.id, result}, '*');
+    });
+</script>
+</body>
+</html>
