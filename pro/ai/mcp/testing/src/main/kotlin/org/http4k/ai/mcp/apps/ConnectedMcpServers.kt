@@ -12,13 +12,23 @@ import org.http4k.ai.mcp.apps.McpServerResult.Unknown
 import org.http4k.ai.mcp.apps.model.HostToolRequest
 import org.http4k.ai.mcp.apps.model.HostToolResponse
 import org.http4k.ai.mcp.apps.model.ToolOption
-import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
+import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 
 class ConnectedMcpServers(servers: List<Uri>, http: HttpHandler) {
-    private val serverClients = servers.associateWith { HttpNonStreamingMcpClient(it, http) }
+    private val serverClients = servers.associateWith {
+        HttpStreamingMcpClient(
+            McpEntity.of("http4k MCP Testing"),
+            Version.of("0.0.0"),
+            it, http
+        )
+    }
+
+    fun start() = serverClients.values.forEach { it.start() }
 
     fun tools() = serverClients
         .mapNotNull { (serverUri, client) ->
