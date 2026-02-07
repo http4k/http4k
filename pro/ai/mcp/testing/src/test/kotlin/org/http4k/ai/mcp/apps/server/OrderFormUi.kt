@@ -1,8 +1,7 @@
-package org.http4k.ai.mcp.apps
+package org.http4k.ai.mcp.apps.server
 
 import org.http4k.ai.mcp.ResourceResponse
-import org.http4k.ai.mcp.model.Resource.Content.Text
-import org.http4k.ai.mcp.model.Resource.Static
+import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.extension.McpApps
 import org.http4k.core.Uri
@@ -13,12 +12,12 @@ import org.http4k.template.ViewModel
 object OrderFormUi {
     val uri = Uri.of("ui://order-form")
 
-    fun resource(templates: TemplateRenderer) = Static(
+    fun resource(templates: TemplateRenderer) = Resource.Static(
         uri = uri,
         name = ResourceName.of("Order Form"),
         description = "Interactive order form",
         mimeType = McpApps.MIME_TYPE
-    ) bind { ResourceResponse(Text(templates(Form()), it.uri, McpApps.MIME_TYPE)) }
+    ) bind { ResourceResponse(Resource.Content.Text(templates(Form()), it.uri, McpApps.MIME_TYPE)) }
 }
 
 class Form() : ViewModel

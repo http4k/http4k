@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>http4k MCP Apps</title>
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
             font-family: system-ui;
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+        }
+
+        nav {
+            background: #333;
+            padding: 0.75rem 1rem;
         }
 
         select {
@@ -18,24 +27,22 @@
 
         iframe {
             width: 100%;
-            border: 1px solid #ccc;
-            min-height: 400px;
-            margin-top: 1rem;
+            height: calc(100% - 50px);
+            border: none;
         }
     </style>
 </head>
 <body>
-<h1>MCP Apps Test Host</h1>
-
-<label for="tool-select"></label>
-<select id="tool-select">
-    <option value="" disabled selected>Select a tool...</option>
-    {{#tools}}
-    <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
-        {{serverName}}: {{toolName}}
-    </option>
-    {{/tools}}
-</select>
+<nav>
+    <select id="tool-select">
+        <option value="" disabled selected>Select a tool...</option>
+        {{#tools}}
+        <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
+            {{serverName}}: {{toolName}}
+        </option>
+        {{/tools}}
+    </select>
+</nav>
 
 <iframe id="app" sandbox="allow-scripts allow-forms" style="display:none;"></iframe>
 

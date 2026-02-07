@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Order form</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-3" style="max-width: 400px;">
+<h2>Order form</h2>
+
+<form id="form">
+    <div class="mb-3">
+        <label for="product" class="form-label">Product</label>
+        <input type="text" class="form-control" id="product" name="product" placeholder="Enter product name">
+    </div>
+
+    <div class="mb-3">
+        <label for="quantity" class="form-label">Quantity</label>
+        <select class="form-select" id="quantity" name="quantity">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Call tool</button>
+</form>
+
+<div id="status" class="mt-3 text-muted"></div>
+
+<pre id="result" class="mt-3 p-3 bg-light d-none"></pre>
+
+<script type="module">
+    import {App} from 'https://unpkg.com/@modelcontextprotocol/ext-apps@1.0.1/dist/src/app-with-deps.js';
+
+    const app = new App({name: 'Example App', version: '1.0.0'});
+
+    await app.connect();
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const args = Object.fromEntries(new FormData(e.target));
+        const resultDiv = document.getElementById('result');
+        resultDiv.classList.remove('d-none');
+        resultDiv.textContent = (await app.callServerTool({name: 'submit_order', arguments: args})).content[0].text;
+    });
+</script>
+</body>
+</html>
