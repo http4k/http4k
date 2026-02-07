@@ -1,40 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 <head>
     <title>http4k MCP Apps</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            font-family: system-ui;
-        }
-
-        nav {
-            background: #333;
-            padding: 0.75rem 1rem;
-        }
-
-        select {
-            padding: 0.5rem;
-            font-size: 1rem;
-            min-width: 300px;
-        }
-
-        iframe {
-            width: 100%;
-            height: calc(100% - 50px);
-            border: none;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>:root {
+        --bs-primary: #61C0FF;
+        --bs-secondary: #ffa654;
+    }</style>
 </head>
-<body>
-<nav>
-    <select id="tool-select">
+<body class="d-flex flex-column h-100">
+<nav class="navbar navbar-dark px-3 shadow-sm" style="background-color:var(--bs-primary)">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="https://www.http4k.org/images/logo.png" alt="http4k" height="32" class="me-2">
+        <span class="fw-light">MCP Apps</span>
+    </a>
+    <select id="tool-select" class="form-select w-auto">
         <option value="" disabled selected>Select a tool...</option>
         {{#tools}}
         <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
@@ -44,7 +25,7 @@
     </select>
 </nav>
 
-<iframe id="app" sandbox="allow-scripts allow-forms" style="display:none;"></iframe>
+<iframe id="app" class="flex-grow-1 border-0 bg-light d-none"></iframe>
 
 <script>
     const select = document.getElementById('tool-select');
@@ -60,7 +41,7 @@
         ).then(r => r.text());
 
         const app = document.getElementById('app');
-        app.style.display = 'block';
+        app.classList.remove('d-none');
         app.srcdoc = html;
     });
 
