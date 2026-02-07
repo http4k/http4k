@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example MCP App</title>
+    <style>
+        body {
+            font-family: system-ui;
+            padding: 1rem;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin: 1rem 0 0.5rem;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+
+        button {
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 1rem;
+            color: #666;
+        }
+
+        #result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f0f0f0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+<h2>Example MCP App</h2>
+
+<form id="form">
+    <label for="product">Product</label>
+    <input type="text" id="product" name="product" placeholder="Enter product nam">
+
+    <label for="quantity">Quantity</label>
+    <select id="quantity" name="quantity">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+    </select>
+
+    <button type="submit" id="submit">Call tool</button>
+</form>
+
+<div id="status"></div>
+
+<div id="result" style="display:none;"></div>
+
+<script type="module">
+    import {App} from 'https://unpkg.com/@modelcontextprotocol/ext-apps@1.0.1/dist/src/app-with-deps.js';
+
+    const app = new App({name: 'Example App', version: '1.0.0'});
+
+    await app.connect();
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const product = document.getElementById('product').value;
+        const quantity = document.getElementById('quantity').value;
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
+
+        const result = await app.callServerTool({
+            name: 'example-tool',
+            arguments: {product, quantity}
+        });
+
+        resultDiv.textContent = JSON.stringify(result, null, 2);
+    });
+</script>
+</body>
+</html>

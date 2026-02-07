@@ -48,9 +48,9 @@
         currentServerId = opt.dataset.serverId;
         const uri = opt.dataset.resourceUri;
 
-        const {html} = await fetch(
+        const html = await fetch(
             `/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`
-        ).then(r => r.json());
+        ).then(r => r.text());
 
         const app = document.getElementById('app');
         app.style.display = 'block';
@@ -64,8 +64,9 @@
         switch (e.data.method) {
             case 'ui/initialize':
                 result = {
-                    protocolVersion: '2025-11-05',
-                    capabilities: {serverTools: {}, openLinks: {}, updateModelContext: {text: {}}},
+                    protocolVersion: '2025-03-26',
+                    hostInfo: {name: 'http4k-mcp-apps-host', version: '0.0.0'},
+                    hostCapabilities: {serverTools: {}, openLinks: {}, updateModelContext: {text: {}}},
                     hostContext: {theme: 'light', platform: 'web', displayMode: 'inline', availableDisplayModes: ['inline']}
                 };
                 break;
