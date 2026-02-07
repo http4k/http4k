@@ -36,7 +36,8 @@ class ConnectedMcpServers(servers: List<Uri>, http: HttpHandler) {
                 .map {
                     it.mapNotNull { tool -> tool._meta?.ui?.resourceUri?.let { tool.name to it } }
                         .map { ToolOption(serverUri, serverUri.host, it.first, it.second) }
-                }.valueOrNull()
+                }
+                .valueOrNull()
         }.flatten()
 
     fun callTool(request: HostToolRequest): McpServerResult<HostToolResponse> =
