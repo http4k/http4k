@@ -17,7 +17,7 @@ awssdk-bom = "2.41.24"
 azure-core = "1.57.1"
 azure-functions-java-library = "3.2.3"
 # [blocked] on 12.32.0 until azurite upgraded
-azure-storage-blob = "12.33.0"
+azure-storage-blob = "12.33.2"
 base16-encoding = "2.6.0"
 bcprov-jdk18on = "1.83"
 cloudevents-core = "4.0.1"
@@ -111,6 +111,7 @@ spring = "7.0.3"
 strikt = "0.35.1"
 swagger-ui = "5.31.0"
 tencent-scf-java-events = "0.0.4"
+testcontainers-azure = "1.21.4"
 testcontainers-bom = "2.0.3"
 thymeleaf = "3.1.3.RELEASE"
 typeflows = "0.32.0-beta"
@@ -293,7 +294,7 @@ swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "com-google-devtools-ksp" }
 tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
 testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
-testcontainers-azure = "org.testcontainers:azure:1.21.4"
+testcontainers-azure = { module = "org.testcontainers:azure", version.ref = "testcontainers-azure" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
 testcontainers-junit-jupiter = "org.testcontainers:junit-jupiter:1.21.4"
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
