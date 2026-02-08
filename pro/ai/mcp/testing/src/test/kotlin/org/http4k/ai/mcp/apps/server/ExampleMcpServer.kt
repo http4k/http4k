@@ -4,6 +4,7 @@ import org.http4k.ai.mcp.model.extension.McpApps
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.filter.debugMcp
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
@@ -15,4 +16,4 @@ fun ExampleMcpServer(port: Int) = mcpHttpStreaming(
     OrderFormUi.resource(HandlebarsTemplates().CachingClasspath()),
     ShowOrderFormTool(),
     SubmitOrderTool()
-).asServer(Helidon(port))
+).debugMcp().asServer(Helidon(port))
