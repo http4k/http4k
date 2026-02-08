@@ -4,7 +4,6 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.28.0.0 (uncut)
-
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk***: [Pro: Breaking] - Update MCP SDK to support latest MCP specification (2025-11-25), including support for Tasks, expanded Tool support,
   URL Form Elicitations and Sampling upgrades. Plus conformance updates to the latest MCP conformance tests. Also support for MCP Apps spec, allowing the use o.
