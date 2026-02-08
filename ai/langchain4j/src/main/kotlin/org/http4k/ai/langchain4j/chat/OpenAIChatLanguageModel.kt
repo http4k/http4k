@@ -8,6 +8,8 @@ import dev.langchain4j.data.message.ImageContent
 import dev.langchain4j.data.message.ImageContent.DetailLevel.AUTO
 import dev.langchain4j.data.message.ImageContent.DetailLevel.HIGH
 import dev.langchain4j.data.message.ImageContent.DetailLevel.LOW
+import dev.langchain4j.data.message.ImageContent.DetailLevel.MEDIUM
+import dev.langchain4j.data.message.ImageContent.DetailLevel.ULTRA_HIGH
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.TextContent
 import dev.langchain4j.data.message.UserMessage
@@ -156,8 +158,8 @@ private fun ImageContent.toHttp4k() =
         ContentType.image_url, null, ImageUrl(
             Uri.of(image().url().toString()),
             when (detailLevel()) {
-                LOW -> low
-                HIGH -> high
+                LOW, MEDIUM -> low
+                HIGH, ULTRA_HIGH -> high
                 AUTO -> auto
             }
         )
