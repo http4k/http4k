@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.map
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
@@ -76,7 +77,7 @@ class TestMcpClientTest {
 
     @Test
     fun `can use mcp client to connect and get responses`() {
-        val capabilities = mcpHttpStreaming(
+        val response = mcpHttpStreaming(
             ServerMetaData(
                 serverName, Version.of("1"),
                 PromptsChanged,
@@ -87,7 +88,7 @@ class TestMcpClientTest {
             .testMcpClient().start()
 
         assertThat(
-            capabilities, equalTo(
+            response.map { it.capabilities }, equalTo(
                 Success(
                     ServerCapabilities(PromptsChanged, Experimental)
                 )

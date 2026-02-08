@@ -1,7 +1,6 @@
 package org.http4k.ai.mcp.client.http
 
 import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
@@ -21,18 +20,23 @@ import org.http4k.ai.mcp.client.asAOrFailure
 import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
+import org.http4k.ai.mcp.protocol.ClientCapabilities
+import org.http4k.ai.mcp.protocol.ClientProtocolCapability
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
+import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRpc
@@ -67,7 +71,14 @@ class HttpNonStreamingMcpClient(
 
     override val sessionId get() = _sessionId.get()
 
-    override fun start(overrideDefaultTimeout: Duration?) = Success(ServerCapabilities())
+    override fun start(overrideDefaultTimeout: Duration?) =
+        http.send<McpInitialize.Response>(
+            McpInitialize, McpInitialize.Request(
+                VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
+                ClientCapabilities(*listOf<ClientProtocolCapability>().toTypedArray()),
+                protocolVersion
+            )
+        )
 
     override fun progress() = object : McpClient.RequestProgress {
         override fun onProgress(fn: (Progress) -> Unit) =

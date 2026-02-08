@@ -51,7 +51,7 @@ class SseMcpClient(
     http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     capabilities: ClientCapabilities = All,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
-    defaultTimeout: Duration = Duration.ofSeconds(1),
+    defaultTimeout: Duration = Duration.ofMillis(100),
     random: Random = Random
 ) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout, random) {
 

@@ -108,7 +108,7 @@ class HttpStreamingMcpClient(
 
     override val sessionId get() = _sessionId.get()
 
-    override fun start(overrideDefaultTimeout: Duration?): Result<ServerCapabilities, McpError> = http.send(
+    override fun start(overrideDefaultTimeout: Duration?) = http.send(
         McpInitialize, McpInitialize.Request(
             VersionedMcpEntity(name, version),
             capabilities,
@@ -116,7 +116,6 @@ class HttpStreamingMcpClient(
         )
     )
         .flatMap { it.first().asAOrFailure<McpInitialize.Response>() }
-        .map(McpInitialize.Response::capabilities)
         .also {
             val latch = CountDownLatch(1)
             thread(isDaemon = true) {

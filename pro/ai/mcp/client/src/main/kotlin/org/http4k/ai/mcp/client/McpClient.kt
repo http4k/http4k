@@ -21,6 +21,8 @@ import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -33,7 +35,7 @@ interface McpClient : AutoCloseable {
 
     val sessionId: SessionId
 
-    fun start(overrideDefaultTimeout: Duration? = null): McpResult<ServerCapabilities>
+    fun start(overrideDefaultTimeout: Duration? = null): McpResult<McpInitialize.Response>
     fun stop() = close()
 
     fun tools(): Tools

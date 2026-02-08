@@ -7,7 +7,6 @@ import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
@@ -51,7 +50,7 @@ class TestMcpClient(
 
     override val sessionId = sender.sessionId.get()
 
-    override fun start(overrideDefaultTimeout: Duration?): McpResult<ServerCapabilities> {
+    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response> {
         val initResponse = sender(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(McpEntity.of("client"), Version.of("1")),
@@ -61,8 +60,7 @@ class TestMcpClient(
 
         sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).toList()
         return initResponse.first()
-            .nextEvent<ServerCapabilities, McpInitialize.Response> { capabilities }
-            .map { it.second }
+            .nextEvent<McpInitialize.Response, McpInitialize.Response> { this }.map { it.second }
     }
 
     override fun tools() = tools
