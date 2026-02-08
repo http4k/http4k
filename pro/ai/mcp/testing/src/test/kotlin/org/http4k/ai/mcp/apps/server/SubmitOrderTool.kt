@@ -10,6 +10,8 @@ import org.http4k.routing.bind
 fun SubmitOrderTool(): ToolCapability {
     val quantity = Tool.Arg.string().required("quantity", "How many to order")
 
+    val product = Tool.Arg.string().required("product", "The product to order")
+
     return Tool(
         name = "submit_order",
         description = "Submit an order for a product",
@@ -23,5 +25,3 @@ fun SubmitOrderTool(): ToolCapability {
         Ok(listOf(Text("Order confirmed: $qty x $productName")))
     }
 }
-
-val product = Tool.Arg.string().required("product", "The product to order")

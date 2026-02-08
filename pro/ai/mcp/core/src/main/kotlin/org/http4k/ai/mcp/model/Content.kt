@@ -61,7 +61,5 @@ sealed class Content {
     ) : Content()
 
     @JsonSerializable
-    data class Meta(
-        val ui: McpAppResourceMeta? = null
-    )
+    data class Meta(val ui: McpAppResourceMeta? = null)
 }
