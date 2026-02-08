@@ -6,7 +6,7 @@ import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class HostToolRequest(
-    val serverId: Uri,
+    val serverId: String,
     val name: ToolName,
     val arguments: Map<String, String>
 )

@@ -1,6 +1,7 @@
 package org.http4k.ai.mcp.apps
 
 import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.recover
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ResourceRequest
@@ -14,20 +15,28 @@ import org.http4k.ai.mcp.apps.model.HostToolResponse
 import org.http4k.ai.mcp.apps.model.ToolOption
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 
-class ConnectedMcpServers(servers: List<Uri>, mcpClientFactory: McpClientFactory) {
+class ConnectedMcpServers(private val servers: List<PolyHandler>, private val mcpClientFactory: McpClientFactory) {
 
-    private val serverClients = servers.associateWith { mcpClientFactory(it) }
+    private val serverClients = mutableMapOf<VersionedMcpEntity, McpClient>()
 
-    fun start() = serverClients.values.forEach(McpClient::start)
+    fun start() {
+        serverClients += servers.associate {
+            mcpClientFactory(it).let {
+                it.start().onFailure { throw Exception(it.toString()) }.serverInfo to it
+            }
+        }
+    }
 
     fun tools() = serverClients
-        .mapNotNull { (serverUri, client) ->
+        .mapNotNull { (entity, client) ->
             client.tools().list()
                 .map {
                     it.mapNotNull { tool -> tool._meta?.ui?.resourceUri?.let { tool.name to it } }
-                        .map { ToolOption(serverUri, serverUri.host, it.first, it.second) }
+                        .map { ToolOption(entity.name.value, entity.name.value, it.first, it.second) }
                 }
                 .valueOrNull()
         }.flatten()
@@ -44,10 +53,10 @@ class ConnectedMcpServers(servers: List<Uri>, mcpClientFactory: McpClientFactory
             .recover { Failure(it.toString()) }
     }
 
-    private fun findServerFor(serverId: Uri) =
-        serverClients.entries.firstOrNull { it.key == serverId }?.value
+    private fun findServerFor(serverId: String) =
+        serverClients.entries.firstOrNull { it.key.name.value == serverId }?.value
 
-    fun render(serverId: Uri, resourceUri: Uri) = when (val s = findServerFor(serverId)) {
+    fun render(serverId: String, resourceUri: Uri) = when (val s = findServerFor(serverId)) {
         null -> Unknown
         else -> s.resources().read(ResourceRequest(resourceUri))
             .map {

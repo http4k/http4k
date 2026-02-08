@@ -6,13 +6,9 @@ import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.filter.debugMcp
 import org.http4k.routing.mcpHttpStreaming
-import org.http4k.server.JettyLoom
-import org.http4k.server.asServer
 
-fun ExampleMcpServer(port: Int) = mcpHttpStreaming(
+fun ExampleMcpServer() = mcpHttpStreaming(
     ServerMetaData("order server", "0.0.1").withExtensions(McpApps),
     NoMcpSecurity,
     OrderFormMcpApp(),
-)
-    .debugMcp()
-    .asServer(JettyLoom(port))
+).debugMcp()

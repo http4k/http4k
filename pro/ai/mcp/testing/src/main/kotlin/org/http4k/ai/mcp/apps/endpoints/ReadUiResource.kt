@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun ReadUiResource(servers: ConnectedMcpServers) =
     "/api/resources" bind GET to {
-        val serverUri = Query.uri().required("serverId")(it)
+        val serverUri = Query.required("serverId")(it)
         val uiResource = Query.uri().required("uri")(it)
 
         Response(OK)
