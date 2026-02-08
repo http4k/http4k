@@ -15,8 +15,8 @@
         <img src="https://www.http4k.org/images/logo.png" alt="http4k" height="32" class="me-2">
         <span class="fw-light">MCP Apps Test Host</span>
     </a>
-    <select id="tool-select" class="form-select w-auto">
-        <option value="" disabled selected>Select a tool...</option>
+    <select id="mcp-app-select" class="form-select w-auto">
+        <option value="" disabled selected>Select MCP App...</option>
         {{#tools}}
         <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
             {{serverName}}: {{toolName}}
@@ -28,7 +28,7 @@
 <iframe id="app" class="flex-grow-1 border-0 bg-light d-none"></iframe>
 
 <script>
-    const select = document.getElementById('tool-select');
+    const select = document.getElementById('mcp-app-select');
     let currentServerId = null;
 
     select.addEventListener('change', async () => {
