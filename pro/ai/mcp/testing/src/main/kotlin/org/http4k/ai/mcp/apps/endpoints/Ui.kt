@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.apps.endpoints
 
-import org.http4k.ai.mcp.apps.ConnectedMcpServers
+import org.http4k.ai.mcp.apps.McpApps
 import org.http4k.ai.mcp.apps.model.ToolOption
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
@@ -10,7 +10,7 @@ import org.http4k.routing.bind
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 
-fun Ui(servers: ConnectedMcpServers): RoutingHttpHandler {
+fun Ui(servers: McpApps): RoutingHttpHandler {
     val renderer = HandlebarsTemplates().CachingClasspath()
     return "/" bind GET to { Response(OK).body(renderer(Ui(servers.tools()))) }
 }

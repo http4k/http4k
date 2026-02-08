@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.apps.endpoints
 
-import org.http4k.ai.mcp.apps.ConnectedMcpServers
+import org.http4k.ai.mcp.apps.McpApps
 import org.http4k.ai.mcp.apps.model.HostToolRequest
 import org.http4k.ai.mcp.apps.model.HostToolResponse
 import org.http4k.ai.mcp.apps.util.McpAppsJson.auto
@@ -16,7 +16,7 @@ import org.http4k.core.with
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 
-fun ToolCall(servers: ConnectedMcpServers): RoutingHttpHandler =
+fun ToolCall(servers: McpApps): RoutingHttpHandler =
     "/api/tools/call" bind POST to {
         val toolCall = Body.auto<HostToolRequest>().toLens()(it)
 

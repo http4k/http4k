@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.apps.endpoints
 
-import org.http4k.ai.mcp.apps.ConnectedMcpServers
+import org.http4k.ai.mcp.apps.McpApps
 import org.http4k.ai.mcp.apps.McpServerResult.Failure
 import org.http4k.ai.mcp.apps.McpServerResult.Success
 import org.http4k.ai.mcp.apps.McpServerResult.Unknown
@@ -11,7 +11,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 
-fun ReadUiResource(servers: ConnectedMcpServers) =
+fun ReadUiResource(servers: McpApps) =
     "/api/resources" bind GET to {
         val serverUri = Query.required("serverId")(it)
         val uiResource = Query.uri().required("uri")(it)

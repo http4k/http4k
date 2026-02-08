@@ -16,19 +16,17 @@ import org.http4k.ai.mcp.apps.model.ToolOption
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 
-class ConnectedMcpServers(private val servers: List<PolyHandler>, private val mcpClientFactory: McpClientFactory) {
+/**
+ * Facade to interact with MCP apps.
+ */
+class McpApps(private val clients: List<McpClient>) {
 
     private val serverClients = mutableMapOf<VersionedMcpEntity, McpClient>()
 
     fun start() {
-        serverClients += servers.associate {
-            mcpClientFactory(it).let {
-                it.start().onFailure { throw Exception(it.toString()) }.serverInfo to it
-            }
-        }
+        serverClients += clients.associateBy { it.start().onFailure { throw Exception(it.toString()) }.serverInfo }
     }
 
     fun tools() = serverClients

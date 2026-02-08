@@ -8,7 +8,7 @@ import org.http4k.filter.debugMcp
 import org.http4k.routing.mcpHttpStreaming
 
 fun ExampleMcpServer() = mcpHttpStreaming(
-    ServerMetaData("order server", "0.0.1").withExtensions(McpApps),
+    ServerMetaData("order server", "0.0.0").withExtensions(McpApps),
     NoMcpSecurity,
     OrderFormMcpApp(),
 ).debugMcp()
