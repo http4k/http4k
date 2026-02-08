@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.model.extension.McpAppResourceMeta
 import org.http4k.ai.mcp.util.Rfc6570UriTemplateMatcher.matches
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
@@ -82,7 +83,8 @@ sealed class Resource : CapabilitySpec {
         data class Text(
             val text: String,
             override val uri: Uri,
-            override val mimeType: MimeType? = null
+            override val mimeType: MimeType? = null,
+            val _meta: McpAppResourceMeta? = null
         ) : Content()
 
         @JsonSerializable
@@ -91,6 +93,7 @@ sealed class Resource : CapabilitySpec {
             val blob: Base64Blob,
             override val uri: Uri,
             override val mimeType: MimeType? = null,
+            val _meta: McpAppResourceMeta? = null
         ) : Content()
 
         @JsonSerializable

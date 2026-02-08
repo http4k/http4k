@@ -6,6 +6,5 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class McpAppMeta(
     val resourceUri: Uri? = null,
-    val visibility: List<McpAppVisibility>? = null,
-    val permissions: McpAppPermissions? = null
+    val visibility: List<McpAppVisibility>? = null
 )

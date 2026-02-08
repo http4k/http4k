@@ -30,6 +30,6 @@ data class ResourceRequest(
     val connectRequest: Request? = null
 ) : CapabilityRequest
 
-data class ResourceResponse(val list: List<Resource.Content>, val meta: Meta = Meta.default) {
-    constructor(vararg content: Resource.Content, meta: Meta = Meta.default) : this(content.toList(), meta)
+data class ResourceResponse(val list: List<Resource.Content>, val meta: Meta = default) {
+    constructor(vararg content: Resource.Content, meta: Meta = default) : this(content.toList(), meta)
 }

@@ -2,7 +2,11 @@ package org.http4k.ai.mcp.apps.server
 
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.Resource.Content.Text
 import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.model.extension.CspDomain
+import org.http4k.ai.mcp.model.extension.McpAppCsp
+import org.http4k.ai.mcp.model.extension.McpAppResourceMeta
 import org.http4k.ai.mcp.model.extension.McpApps
 import org.http4k.core.Uri
 import org.http4k.routing.bind
@@ -16,8 +20,17 @@ object OrderFormUi {
         uri = uri,
         name = ResourceName.of("Order Form"),
         description = "Interactive order form",
-        mimeType = McpApps.MIME_TYPE
-    ) bind { ResourceResponse(Resource.Content.Text(templates(Form()), it.uri, McpApps.MIME_TYPE)) }
+        mimeType = McpApps.MIME_TYPE,
+    ) bind {
+        ResourceResponse(
+            Text(
+                templates(Form()),
+                it.uri,
+                McpApps.MIME_TYPE,
+                McpAppResourceMeta(McpAppCsp(resourceDomains = listOf(CspDomain.of("https://unpkg.com"))))
+            )
+        )
+    }
 }
 
 class Form() : ViewModel

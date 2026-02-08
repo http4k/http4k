@@ -2,7 +2,6 @@
 
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.model.extension.McpAppCsp
 import org.http4k.ai.mcp.model.extension.McpAppMeta
 import se.ansman.kotshi.ExperimentalKotshiApi
 import se.ansman.kotshi.JsonProperty
@@ -14,7 +13,6 @@ data class Meta(
     @JsonProperty("io.modelcontextprotocol/related-task")
     val relatedTask: RelatedTaskMetadata? = null,
     val ui: McpAppMeta? = null,
-    val csp: McpAppCsp? = null
 ) {
     companion object {
         val default = Meta()
