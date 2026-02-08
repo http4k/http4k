@@ -4,7 +4,6 @@ import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.llm.LLMError
-import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Meta
@@ -32,7 +31,7 @@ class McpLLMTools(private val client: McpClient) : LLMTools {
                         else -> it.toLLM(request)
                     }
 
-                    is Error -> it.toLLM(request)
+                    else -> it.toLLM(request)
                 }
             }
 }

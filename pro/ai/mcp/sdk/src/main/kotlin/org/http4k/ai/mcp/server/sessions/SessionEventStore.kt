@@ -45,6 +45,8 @@ interface SessionEventStore {
                     events.add(message)
                 }
             }
+
+            override fun toString() = "InMemory(sessionEvents=$sessionEvents)"
         }
     }
 }

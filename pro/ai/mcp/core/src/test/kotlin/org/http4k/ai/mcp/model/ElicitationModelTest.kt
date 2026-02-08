@@ -1,7 +1,8 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumNames
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
+import org.http4k.ai.mcp.model.FooEnum.A
+import org.http4k.ai.mcp.model.FooEnum.B
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
@@ -24,16 +25,28 @@ class ElicitationModelTest {
             i = 123
             d = 1.23
             b = true
-            e = FooEnum.A
+            e = A
+            me = listOf(A, B)
         }
-            .toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
+            .toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, me=[A, B], ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
     }
 }
 
 class Foo : ElicitationModel() {
     var s by string("s", "the s", null, MaxLength(10))
     var os by optionalString("os", "the os")
-    var e by enum("e", "the e", EnumNames(FooEnum.entries.associateWith { it.name.lowercase() }))
+    var e by enum(
+        "e",
+        "the e",
+        FooEnum.entries.associateWith { it.name.lowercase() },
+        A
+    )
+    var me by enums(
+        "e",
+        "the e",
+        FooEnum.entries.associateWith { it.name.lowercase() },
+        listOf(A, B)
+    )
     var oe by optionalEnum<FooEnum>("oe", "the oe")
     var l by long("l", "the l")
     var ol by optionalLong("ol", "the ol")

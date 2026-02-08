@@ -4,6 +4,19 @@ import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
+import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.ToolHandler
+import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse.ElicitationRequired
+import org.http4k.ai.mcp.ToolResponse.Error
+import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.ToolResponse.Task
+import org.http4k.ai.mcp.model.Content.Text
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.protocol.messages.URLElicitationRequiredError
+import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiBoolean
@@ -17,16 +30,6 @@ import org.http4k.format.MoshiString
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
-import org.http4k.ai.mcp.Client
-import org.http4k.ai.mcp.ToolHandler
-import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse.Error
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.Content.Text
-import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.util.McpJson
 
 interface ToolCapability : ServerCapability, ToolHandler {
     fun toTool(): McpTool
@@ -39,35 +42,49 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
         tool.title,
         McpJson.convert(tool.toSchema()),
         tool.output?.toSchema()?.let { McpJson.convert(it) },
-        tool.annotations
+        tool.annotations,
+        tool.icons,
+        tool.execution,
+        tool.meta
     )
 
     override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http) }
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
                     this(it)
-                } catch (e: LensFailure) {
+                } catch (_: LensFailure) {
                     throw McpException(InvalidParams)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Error(InternalError)
                 }
             }
             .get()
             .let {
-                McpTool.Call.Response(
-                    when (it) {
-                        is Ok -> it.content
-                        is Error -> listOf(Text("ERROR: " + it.error.code + " " + it.error.message))
-                    },
-                    when (it) {
-                        is Ok -> it.structuredContent?.let(McpJson::convert)
-                        is Error -> null
-                    },
-                    it is Error,
-                    it.meta
-                )
+                when (it) {
+                    is Ok -> McpTool.Call.Response(
+                        content = it.content,
+                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        isError = false,
+                        _meta = it.meta
+                    )
+
+                    is Error -> McpTool.Call.Response(
+                        content = listOf(Text("ERROR: " + it.error.code + " " + it.error.message)),
+                        isError = true,
+                        _meta = it.meta
+                    )
+
+                    is Task -> McpTool.Call.Response(
+                        task = it.task,
+                        _meta = it.meta
+                    )
+
+                    is ElicitationRequired -> throw McpException(
+                        URLElicitationRequiredError(it.elicitations, it.message)
+                    )
+                }
             }
 
     override fun invoke(p1: ToolRequest) = handler(p1)

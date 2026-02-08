@@ -17,12 +17,14 @@ import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.renderRequest
@@ -37,6 +39,7 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
 /**
@@ -65,7 +68,15 @@ class WebsocketMcpClient(
 
     override fun received() = wsClient.received().map { SseMessage.parse(it.bodyString()) }
 
-    override fun endpoint(it: Event) {}
+    override fun endpoint(it: Event) {
+        endpoint.set(it.data)
+    }
+
+    private val endpoint = AtomicReference<String>()
+
+    override val sessionId
+        get() =
+            SessionId.parse(Request(GET, endpoint.get().toString()).query("sessionId") ?: "-")
 
     override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification) = with(McpJson) {
         wsClient.send(WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(mcp), nullNode()))))
@@ -79,7 +90,8 @@ class WebsocketMcpClient(
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean
     ): Result<McpMessageId, McpError> {
-        val latch = CountDownLatch(if (message is ClientMessage.Notification) 0 else 1)
+        val latch =
+            CountDownLatch(if (message is ClientMessage.Notification || message is ClientMessage.Response) 0 else 1)
 
         return resultFrom {
             requests[messageId] = latch

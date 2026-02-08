@@ -32,7 +32,7 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
                     if (content.isNotEmpty()) {
                         try {
                             yield(SseMessage.parse(content))
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             // Invalid message, skip
                         }
                     }
@@ -125,7 +125,7 @@ private suspend fun SequenceScope<SseMessage>.emitMessage(buffer: StringBuilder)
     if (content.isNotEmpty()) {
         try {
             yield(SseMessage.parse(content))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Invalid message, skip
         }
     }

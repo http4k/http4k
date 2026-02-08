@@ -11,6 +11,9 @@ import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.ModelPreferences
 import org.http4k.ai.mcp.model.ProgressToken
 import org.http4k.ai.mcp.model.SamplingIncludeContext
+import org.http4k.ai.mcp.model.ToolChoice
+import org.http4k.ai.mcp.model.ToolChoiceMode
+import org.http4k.ai.mcp.protocol.messages.McpTool
 
 /**
  *  Processes a sampling request from an MCP server to a client
@@ -37,12 +40,18 @@ data class SamplingRequest(
     val stopSequences: List<String>? = null,
     val modelPreferences: ModelPreferences? = null,
     val metadata: Map<String, Any> = emptyMap(),
+    val tools: List<McpTool> = emptyList(),
+    val toolChoice: ToolChoice = ToolChoice(ToolChoiceMode.auto),
     val progressToken: ProgressToken? = null
 )
 
-data class SamplingResponse(
-    val model: ModelName,
-    val role: Role,
-    val content: Content,
-    val stopReason: StopReason? = null
-)
+sealed interface SamplingResponse {
+    data class Ok(
+        val model: ModelName,
+        val role: Role,
+        val content: List<Content>,
+        val stopReason: StopReason? = null
+    ) : SamplingResponse
+
+    data class Task(val task: org.http4k.ai.mcp.model.Task) : SamplingResponse
+}

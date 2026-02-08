@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.ElicitationResponse.Ok
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
@@ -17,9 +17,9 @@ import org.http4k.lens.ParamMeta.ObjectParam
 open class ElicitationLensSpec<OUT : Any?>(
     internal val paramMeta: ParamMeta,
     private val metadata: Map<String, MoshiNode> = emptyMap(),
-    internal val get: LensGet<ElicitationResponse, OUT>,
-    internal val set: LensSet<ElicitationResponse, OUT>,
-    private val toSchema: McpCapabilityLens<ElicitationResponse, *>.(Map<String, MoshiNode>) -> McpNodeType
+    internal val get: LensGet<Ok, OUT>,
+    internal val set: LensSet<Ok, OUT>,
+    private val toSchema: McpCapabilityLens<Ok, *>.(Map<String, MoshiNode>) -> McpNodeType
 ) {
     fun <NEXT> map(
         nextIn: (OUT) -> NEXT,
@@ -38,7 +38,7 @@ open class ElicitationLensSpec<OUT : Any?>(
         title: String,
         description: String,
         vararg metadata: Elicitation.Metadata<OUT, *>
-    ): McpCapabilityLens<ElicitationResponse, OUT> {
+    ): McpCapabilityLens<Ok, OUT> {
         val meta = metaFor(true, name, title, description, metadata)
 
         val getLens = get(name)
@@ -55,7 +55,7 @@ open class ElicitationLensSpec<OUT : Any?>(
         title: String,
         description: String,
         vararg metadata: Elicitation.Metadata<OUT, *>
-    ): McpCapabilityLens<ElicitationResponse, OUT?> {
+    ): McpCapabilityLens<Ok, OUT?> {
         val meta = metaFor(false, name, title, description, metadata)
 
         val getLens = get(name)
@@ -77,11 +77,11 @@ open class ElicitationLensSpec<OUT : Any?>(
 
     fun defaulted(
         name: String,
-        default: LensExtractor<ElicitationResponse, OUT>,
+        default: LensExtractor<Ok, OUT>,
         title: String,
         description: String,
         vararg metadata: Elicitation.Metadata<OUT, *>
-    ): McpCapabilityLens<ElicitationResponse, OUT> {
+    ): McpCapabilityLens<Ok, OUT> {
         val meta = metaFor(false, name, title, description, metadata)
         val getLens = get(name)
         val setLens = set(name)
@@ -93,7 +93,7 @@ open class ElicitationLensSpec<OUT : Any?>(
         )
     }
 
-    private fun Meta.toJsonSchema(): (McpCapabilityLens<ElicitationResponse, *>) -> McpNodeType = {
+    private fun Meta.toJsonSchema(): (McpCapabilityLens<Ok, *>) -> McpNodeType = {
         toSchema(it, metadata.mapValues { it.value as MoshiNode })
     }
 

@@ -1,49 +1,55 @@
 package org.http4k.ai.mcp.client.http
 
 import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.McpError.Http
+import org.http4k.ai.mcp.McpError.Protocol
 import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse.Error
-import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
+import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
+import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
+import org.http4k.ai.mcp.protocol.ClientCapabilities
+import org.http4k.ai.mcp.protocol.ClientProtocolCapability
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
+import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.asFormatString
-import org.http4k.ai.mcp.util.McpJson.convert
 import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
@@ -61,9 +67,18 @@ class HttpNonStreamingMcpClient(
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {
 
-    private val sessionId = AtomicReference<SessionId>()
+    private val _sessionId = AtomicReference<SessionId>()
 
-    override fun start(overrideDefaultTimeout: Duration?) = Success(ServerCapabilities())
+    override val sessionId get() = _sessionId.get()
+
+    override fun start(overrideDefaultTimeout: Duration?) =
+        http.send<McpInitialize.Response>(
+            McpInitialize, McpInitialize.Request(
+                VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
+                ClientCapabilities(*listOf<ClientProtocolCapability>().toTypedArray()),
+                protocolVersion
+            )
+        )
 
     override fun progress() = object : McpClient.RequestProgress {
         override fun onProgress(fn: (Progress) -> Unit) =
@@ -85,23 +100,8 @@ class HttpNonStreamingMcpClient(
             McpTool.Call,
             McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
         )
-            .map {
-                when (it.isError) {
-                    true -> Error(
-                        ErrorMessage(
-                            -1, it.content?.joinToString()
-                                ?: it.structuredContent?.let(::asFormatString)
-                                ?: "<no message"
-                        )
-                    )
-
-                    else -> Ok(
-                        it.content,
-                        it.structuredContent?.let(::convert),
-                        it._meta
-                    )
-                }
-            }
+            .map { toToolResponseOrError(it) }
+            .flatMapFailure { toToolElicitationRequiredOrError(it) }
     }
 
     override fun prompts() = object : McpClient.Prompts {
@@ -154,19 +154,49 @@ class HttpNonStreamingMcpClient(
                 .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
     }
 
+    override fun tasks() = object : McpClient.Tasks {
+        override fun onUpdate(fn: (Task, Meta) -> Unit) = throw UnsupportedOperationException()
+
+        override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.Get.Response>(McpTask.Get, McpTask.Get.Request(taskId))
+                .map { it.task }
+
+        override fun list(overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.List.Response>(McpTask.List, McpTask.List.Request())
+                .map { it.tasks }
+
+        override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.Cancel.Response>(McpTask.Cancel, McpTask.Cancel.Request(taskId))
+                .map { }
+
+        override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+            http.send<McpTask.Result.Response>(McpTask.Result, McpTask.Result.Request(taskId))
+                .map { it.result }
+
+        override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) =
+            throw UnsupportedOperationException()
+    }
+
     override fun close() {}
 
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
-        val response = this(message.toHttpRequest(protocolVersion, baseUri, rpc)
-            .with(Header.MCP_SESSION_ID of sessionId.get())
-            .accept(TEXT_EVENT_STREAM))
+        val response = this(
+            message.toHttpRequest(protocolVersion, baseUri, rpc)
+                .with(Header.MCP_SESSION_ID of sessionId)
+                .accept(TEXT_EVENT_STREAM)
+        )
 
-        sessionId.set(Header.MCP_SESSION_ID(response))
+        _sessionId.set(Header.MCP_SESSION_ID(response))
 
         return when {
             response.status.successful -> resultFrom { SseMessage.parse(response.bodyString()) as Event }
                 .flatMap { it.asAOrFailure<T>() }
-                .mapFailure { Http(response) }
+                .flatMapFailure {
+                    when (it) {
+                        is Protocol -> Failure(it)
+                        else -> Failure(Http(response))
+                    }
+                }
 
             else -> Failure(Http(response))
         }

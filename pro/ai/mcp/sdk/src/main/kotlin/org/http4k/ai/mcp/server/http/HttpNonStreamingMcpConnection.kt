@@ -35,6 +35,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
                         receive(FakeSse(req), session, req).asHttp(OK)
                             .with(Header.MCP_SESSION_ID of session.id)
                     }
+
                     is InvalidSession -> Response(NOT_FOUND)
                 }
             }
@@ -44,6 +45,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
                 when (val session = retrieveSession(req)) {
                     is Session -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
                         .with(Header.MCP_SESSION_ID of session.id)
+
                     is InvalidSession -> Response(NOT_FOUND)
                 }
             }
@@ -56,6 +58,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
                         Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
                             .with(Header.MCP_SESSION_ID of session.id)
                     }
+
                     is InvalidSession -> Response(NOT_FOUND)
                 }
             }

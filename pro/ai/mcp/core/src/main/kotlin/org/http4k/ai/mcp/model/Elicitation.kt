@@ -10,12 +10,14 @@ import org.http4k.ai.mcp.util.McpJson.integer
 import org.http4k.ai.mcp.util.McpJson.string
 import org.http4k.ai.mcp.util.McpJson.text
 import org.http4k.core.Uri
+import org.http4k.format.MoshiArray
 import org.http4k.format.MoshiBoolean
 import org.http4k.format.MoshiDecimal
 import org.http4k.format.MoshiInteger
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiString
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.ParamMeta.IntegerParam
@@ -74,24 +76,49 @@ object Elicitation {
             data class Default(override val value: Boolean) : boolean<Boolean>("default")
         }
 
-        class EnumNames<T : Enum<T>>(mappings: Map<T, String>) :
-            Metadata<T, List<String>>("enum") {
+        class EnumMapping<T : Enum<T>>(
+            mappings: Map<T, String>,
+            private val default: T? = null
+        ) : Metadata<T, MoshiNode>("enum") {
 
             private val sorted = mappings.toList().sortedBy { it.second }
-            override val value = mappings.keys.sortedBy { it.ordinal }.map { it.name }
+            override val value = McpJson.array(mappings.keys.sortedBy { it.ordinal }.map { McpJson.string(it.name) })
 
-            override fun data() = listOf(
-                name to sorted.map { it.first.name },
-                "enumNames" to sorted.map { it.second }
+            override fun data() = listOfNotNull(
+                "oneOf" to McpJson.array(
+                    sorted.map {
+                        McpJson.obj(
+                            "title" to McpJson.string(it.second),
+                            "const" to McpJson.string(it.first.name)
+                        )
+                    }
+                ),
+                default?.let { "default" to McpJson.string(it.name) }
             )
+        }
 
-            companion object {
-                /**
-                 * Create a set of names from an enum class.
-                 */
-                inline operator fun <reified T : Enum<T>> invoke() =
-                    EnumNames(enumValues<T>().associateWith { it.toString() })
-            }
+        class EnumMappings<T : Enum<T>>(
+            mappings: Map<T, String>,
+            private val defaults: List<T> = emptyList(),
+        ) : Metadata<List<T>, MoshiNode>("enum") {
+
+            private val sorted = mappings.toList().sortedBy { it.second }
+            override val value =
+                McpJson.array(mappings.keys.sortedBy { it.ordinal }.map { McpJson.string(it.name) })
+
+            override fun data() = listOfNotNull(
+                "items" to McpJson.obj(
+                    "anyOf" to McpJson.array(
+                        sorted.map {
+                            McpJson.obj(
+                                "title" to McpJson.string(it.second),
+                                "const" to McpJson.string(it.first.name)
+                            )
+                        }
+                    )),
+                defaults.takeIf { it.isNotEmpty() }
+                    ?.let { "default" to McpJson.array(it.map { McpJson.string(it.name) }) }
+            )
         }
     }
 }
@@ -121,6 +148,13 @@ inline fun <reified T : Enum<T>> Elicitation.enum() =
         { enumValueOf<T>(it.toString()) },
         { MoshiString(it.name) },
         EnumParam(T::class)
+    )
+
+inline fun <reified T : Enum<T>> Elicitation.enums(): ElicitationLensSpec<List<T>> =
+    mapWithNewMeta(
+        { (it as MoshiArray).elements.map { enumValueOf<T>(it.toString()) } },
+        { it.map { MoshiString(it.toString()) }.let(::MoshiArray) },
+        ArrayParam(EnumParam(T::class))
     )
 
 /**

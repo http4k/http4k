@@ -79,9 +79,9 @@ open class ToolArgLensSpec<OUT>(
         )
     }
 
-    val multi = ToolRequestOUTBiDiMultiLensSpec()
+    val multi = ToolRequestBiDiMultiLensSpec()
 
-    inner class ToolRequestOUTBiDiMultiLensSpec : BiDiMultiLensSpec<ToolRequest, OUT> {
+    inner class ToolRequestBiDiMultiLensSpec : BiDiMultiLensSpec<ToolRequest, OUT> {
         override fun defaulted(
             name: String,
             default: List<OUT>,

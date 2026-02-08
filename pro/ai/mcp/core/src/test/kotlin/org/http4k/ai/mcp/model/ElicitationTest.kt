@@ -2,9 +2,8 @@ package org.http4k.ai.mcp.model
 
 import dev.forkhandles.values.LocalDateValue
 import dev.forkhandles.values.LocalDateValueFactory
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.ai.mcp.ElicitationResponse
-import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumNames
+import org.http4k.ai.mcp.ElicitationResponse.Ok
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
 import org.http4k.ai.mcp.model.Elicitation.Metadata.boolean.Default
 import org.http4k.ai.mcp.model.Elicitation.Metadata.integer.Max
 import org.http4k.ai.mcp.model.Elicitation.Metadata.integer.Min
@@ -15,9 +14,11 @@ import org.http4k.ai.mcp.model.Elicitation.Metadata.string.Pattern
 import org.http4k.ai.mcp.model.ElicitationTest.FooBar.BAR
 import org.http4k.ai.mcp.model.ElicitationTest.FooBar.FOO
 import org.http4k.ai.mcp.util.McpJson.asFormatString
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
@@ -79,12 +80,25 @@ class ElicitationTest {
         approver.approve(
             Elicitation.enum<FooBar>().required(
                 "name", "title", "description",
-                EnumNames(mapOf(FOO to "Foo description", BAR to "Bar description"))
+                EnumMapping(mapOf(FOO to "Foo description", BAR to "Bar description"), BAR)
             )
         )
     }
 
-    private fun Approver.approve(lens: McpCapabilityLens<ElicitationResponse, *>) {
+    @Test
+    fun `enums to schema`(approver: Approver) {
+        approver.approve(
+            Elicitation.enums<FooBar>().required(
+                "name", "title", "description",
+                Elicitation.Metadata.EnumMappings(
+                    mapOf(FOO to "Foo description", BAR to "Bar description"),
+                    listOf(BAR)
+                )
+            )
+        )
+    }
+
+    private fun Approver.approve(lens: McpCapabilityLens<Ok, *>) {
         assertApproved(asFormatString(lens.toSchema()), APPLICATION_JSON)
     }
 }

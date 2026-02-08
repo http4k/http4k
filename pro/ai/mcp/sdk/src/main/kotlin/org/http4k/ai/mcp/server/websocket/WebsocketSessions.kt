@@ -4,16 +4,19 @@ import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
-import org.http4k.core.Request
-import org.http4k.lens.Header
-import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
+import org.http4k.ai.mcp.server.sessions.SessionEventStore
+import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
+import org.http4k.ai.mcp.server.sessions.SessionEventTracking
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.util.McpJson.compact
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.sse.SseMessage.Event
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
@@ -21,8 +24,11 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
+
 class WebsocketSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
+    private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
+    private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : Sessions<Websocket> {
 
@@ -33,15 +39,22 @@ class WebsocketSessions(
         session: Session,
         message: McpNodeType
     ): Result4k<McpNodeType, McpNodeType> {
-        transport.send(WsMessage(Event("message", compact(message)).toMessage()))
+        transport.sendAndStore(message, session)
         return Success(message)
     }
 
     override fun request(context: ClientRequestContext, message: McpNodeType) =
         when (val ws = sessions[context.session]) {
             null -> Unit
-            else -> ws.send(WsMessage(Event("message", compact(message)).toMessage()))
+            else -> ws.sendAndStore(message, context.session)
         }
+
+    private fun Websocket.sendAndStore(message: McpNodeType, session: Session) {
+        Event("message", compact(message), sessionEventTracking.next(session)).also {
+            send(WsMessage(it.toMessage()))
+            eventStore.write(session, it)
+        }
+    }
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) {
         sessions[context.session]?.also { it.onClose { fn() } }

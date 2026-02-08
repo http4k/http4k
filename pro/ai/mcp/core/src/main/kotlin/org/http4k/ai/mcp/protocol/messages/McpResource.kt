@@ -2,6 +2,7 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Annotations
 import org.http4k.ai.mcp.model.Cursor
+import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
@@ -23,7 +24,9 @@ data class McpResource internal constructor(
     val title: String?,
     val mimeType: MimeType?,
     val size: Size?,
-    val annotations: Annotations?
+    val annotations: Annotations?,
+    val icons: kotlin.collections.List<Icon>? = null,
+    val _meta: Meta? = null
 ) {
     constructor(
         uri: Uri,
@@ -32,8 +35,10 @@ data class McpResource internal constructor(
         mimeType: MimeType? = null,
         size: Size? = null,
         annotations: Annotations? = null,
-        title: String? = null
-    ) : this(uri, null, name, description, title, mimeType, size, annotations)
+        title: String? = null,
+        icons: kotlin.collections.List<Icon>? = null,
+        _meta: Meta? = null
+    ) : this(uri, null, name, description, title, mimeType, size, annotations, icons, _meta)
 
     constructor(
         uriTemplate: ResourceUriTemplate,
@@ -43,7 +48,9 @@ data class McpResource internal constructor(
         size: Size? = null,
         annotations: Annotations? = null,
         title: String? = null,
-    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations)
+        icons: kotlin.collections.List<Icon>? = null,
+        _meta: Meta? = null
+    ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons, _meta)
 
     object Read : McpRpc {
         override val Method = of("resources/read")
@@ -92,7 +99,7 @@ data class McpResource internal constructor(
         data class Request(
             override val cursor: Cursor? = null,
             override val _meta: Meta = Meta.default
-        ) : ClientMessage.Request, PaginatedRequest, HasMeta {}
+        ) : ClientMessage.Request, PaginatedRequest, HasMeta
 
         @JsonSerializable
         data class Response(
@@ -103,7 +110,7 @@ data class McpResource internal constructor(
     }
 
     data object Updated : McpRpc {
-        override val Method: McpRpcMethod = of("notifications/resources/list_changed")
+        override val Method: McpRpcMethod = of("notifications/resources/updated")
 
         @JsonSerializable
         data class Notification(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification,

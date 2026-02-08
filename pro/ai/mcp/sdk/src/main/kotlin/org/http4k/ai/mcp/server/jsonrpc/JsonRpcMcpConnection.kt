@@ -10,6 +10,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.routing.bind
 
 /**
@@ -25,6 +28,7 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: R
                     session
                 )
                 receive(Unit, session, req).asHttp(OK)
+                    .with(Header.MCP_SESSION_ID of session.id)
             }
         }
 

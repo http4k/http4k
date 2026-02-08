@@ -9,10 +9,13 @@ import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
+import org.http4k.ai.mcp.server.sessions.SessionEventStore
+import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.ai.mcp.server.sessions.SessionEventTracking
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.util.McpJson.compact
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.routing.sse
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.time.Duration
@@ -22,6 +25,7 @@ import kotlin.random.Random
 class SseSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
+    private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),
 ) : Sessions<Sse> {
 
@@ -32,14 +36,21 @@ class SseSessions(
         session: Session,
         message: McpNodeType
     ): Result4k<McpNodeType, McpNodeType> {
-        transport.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(session)))
+        transport.sendAndStore(message, session)
         return Success(message)
     }
 
     override fun request(context: ClientRequestContext, message: McpNodeType) {
         when (val sse = sessions[context.session]) {
             null -> {}
-            else -> sse.send(SseMessage.Event("message", compact(message), sessionEventTracking.next(context.session)))
+            else -> sse.sendAndStore(message, context.session)
+        }
+    }
+
+    private fun Sse.sendAndStore(message: McpNodeType, session: Session) {
+        SseMessage.Event("message", compact(message), sessionEventTracking.next(session)).also {
+            send(it)
+            eventStore.write(session, it)
         }
     }
 
@@ -72,7 +83,7 @@ class SseSessions(
         sessions.toList().forEach { (session, sse) ->
             try {
                 sse.send(SseMessage.Event("ping", ""))
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 sessions.remove(session)
                 sse.close()
             }

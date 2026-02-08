@@ -25,6 +25,8 @@ interface SessionEventTracking {
             override fun remove(session: Session) {
                 sessionLastIds.remove(session)
             }
+
+            override fun toString() = "InMemory(sessionLastIds=$sessionLastIds)"
         }
     }
 }

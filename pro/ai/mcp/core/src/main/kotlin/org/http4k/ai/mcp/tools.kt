@@ -1,15 +1,18 @@
 package org.http4k.ai.mcp
 
-import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.lens.McpLensTarget
 import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskMeta
+import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.McpLensTarget
 
 /**
  * A tool handler invokes a tool with an input and returns a response
@@ -30,10 +33,11 @@ fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
 
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
-    val meta: Meta = default,
+    override val meta: Meta = default,
+    val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
-) :
+) : CapabilityRequest,
     McpLensTarget,
     Map<String, Any> by args
 
@@ -53,4 +57,12 @@ sealed interface ToolResponse {
     data class Error(val error: ErrorMessage, override val meta: Meta = default) : ToolResponse {
         constructor(code: Int, message: String, meta: Meta = default) : this(ErrorMessage(code, message), meta)
     }
+
+    data class Task(val task: org.http4k.ai.mcp.model.Task, override val meta: Meta = default) : ToolResponse
+
+    data class ElicitationRequired(
+        val elicitations: List<McpElicitations.Request.Url>,
+        val message: String = "This request requires more information.",
+        override val meta: Meta = default
+    ) : ToolResponse
 }

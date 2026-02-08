@@ -1,6 +1,10 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMapping
+import org.http4k.ai.mcp.model.Elicitation.Metadata.EnumMappings
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.format.MoshiNode
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
@@ -90,30 +94,35 @@ abstract class ElicitationModel {
     inline fun <reified T : Enum<T>> enum(
         title: String,
         description: String,
-        nameOverrides: Elicitation.Metadata.EnumNames<T>,
+        mappings: Map<T, String>? = null,
         default: T? = null,
-    ): ElicitationModelStringReadWriteProperty<T> = enumWithValues(title, description, default, nameOverrides)
+    ): ElicitationModelStringReadWriteProperty<T> = required(
+        title,
+        description,
+        StringParam,
+        default,
+        arrayOf(EnumMapping(mappings ?: enumValues<T>().associateWith { it.toString() }))
+    ) { it }
 
-    fun <T : Enum<T>> enumWithValues(
+    inline fun <reified T : Enum<T>> enums(
         title: String,
         description: String,
-        default: T? = null,
-        nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
-    ): ElicitationModelStringReadWriteProperty<T> {
-        return required(
-            title,
-            description,
-            StringParam,
-            default,
-            nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
-    }
+        mappings: Map<T, String>? = null,
+        defaults: List<T>? = null,
+    ): ElicitationModelStringReadWriteProperty<List<T>> = required<List<T>, List<T>>(
+        title,
+        description,
+        StringParam,
+        defaults,
+        arrayOf(EnumMappings(mappings ?: enumValues<T>().associateWith { it.toString() }, defaults ?: emptyList()))
+    ) { it }
 
     fun <T : Enum<T>> optionalEnum(
         title: String,
         description: String,
         default: T? = null,
-        nameOverrides: Elicitation.Metadata.EnumNames<T>? = null
-    ) = optional(title, description, StringParam, default, nameOverrides?.let { arrayOf(it) } ?: emptyArray()) { it }
+        enums: EnumMapping<T>? = null
+    ) = optional(title, description, StringParam, default, enums?.let { arrayOf(it) } ?: emptyArray()) { it }
 
     fun boolean(
         title: String, description: String,
@@ -127,7 +136,7 @@ abstract class ElicitationModel {
         vararg metadata: Elicitation.Metadata<Boolean, *>
     ) = optional(title, description, BooleanParam, default, metadata) { it }
 
-    private fun <OUT, IN> required(
+    fun <OUT, IN> required(
         title: String,
         description: String,
         meta: ParamMeta,
@@ -183,15 +192,22 @@ abstract class ElicitationModel {
                 "properties" to obj(
                     properties()
                         .map {
+                            val listOf: List<Pair<String, MoshiNode>> = listOf(
+                                "type" to string(it.value.type.description),
+                                "description" to string(it.value.description),
+                                "title" to string(it.value.title),
+                                "default" to (it.value.default?.let { McpJson.asJsonObject(it) }
+                                    ?: McpJson.nullNode()),
+                            )
                             it.key to obj(
-                                listOf(
-                                    "type" to string(it.value.type.description),
-                                    "description" to string(it.value.description),
-                                    "title" to string(it.value.title),
-                                    "default" to (it.value.default?.let { McpJson.asJsonObject(it) }
-                                        ?: McpJson.nullNode()),
-                                ) + it.value.metadata.flatMap {
-                                    it.data().map { it.first to McpJson.asJsonObject(it.second) }
+                                listOf + it.value.metadata.flatMap {
+                                    it.data().map {
+                                        it.first to
+                                            when (it.second) {
+                                                is McpNodeType -> it.second as McpNodeType
+                                                else -> McpJson.asJsonObject(it.second)
+                                            }
+                                    }
                                 },
                             )
                         }

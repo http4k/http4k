@@ -1,24 +1,29 @@
 package org.http4k.ai.mcp.client.websocket
 
-import org.http4k.client.WebsocketClient
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Uri
-import org.http4k.ai.mcp.client.McpClientContract
+import org.http4k.ai.mcp.client.McpStreamingClientContract
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.websocket.WebsocketMcp
 import org.http4k.ai.mcp.server.websocket.WebsocketSessions
+import org.http4k.client.WebsocketClient
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
 import java.time.Duration
 
-class WebsocketMcpClientTest : McpClientContract<Websocket> {
+class WebsocketMcpClientTest : McpStreamingClientContract<Websocket>() {
 
     override val doesNotifications = true
 
-    override fun clientSessions() = WebsocketSessions().apply { start() }
+    override fun clientSessions() = WebsocketSessions(
+        sessionProvider,
+        sessionEventTracking,
+        sessionEventStore,
+    ).apply { start() }
 
     override fun clientFor(port: Int) = WebsocketMcpClient(
         clientName, Version.of("1.0.0"),

@@ -200,7 +200,8 @@ class McpProtocolTest {
     @Test
     fun `deal with prompts`() {
         val intArg = Prompt.Arg.int().required("name", "description", mapOf("title" to "title"))
-        val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title")
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title", icons = icons)
 
         val mcp = SseMcp(
             McpProtocol(
@@ -230,7 +231,8 @@ class McpProtocolTest {
                     listOf(
                         McpPrompt(
                             PromptName.of("prompt"), "description", "title",
-                            listOf(McpPrompt.Argument("name", "description", "title", true))
+                            listOf(McpPrompt.Argument("name", "description", "title", true)),
+                            icons
                         )
                     )
                 )
@@ -253,9 +255,10 @@ class McpProtocolTest {
 
     @Test
     fun `deal with static resources`() {
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
         val resource = Resource.Static(
             Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description",
-            IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0))
+            IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)), null, icons
         )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
@@ -284,7 +287,9 @@ class McpProtocolTest {
                             "description",
                             IMAGE_GIF,
                             Size.of(1),
-                            Annotations(listOf(Assistant), Priority.of(1.0))
+                            Annotations(listOf(Assistant), Priority.of(1.0)),
+                            null,
+                            icons
                         )
                     )
                 )
@@ -317,10 +322,11 @@ class McpProtocolTest {
 
     @Test
     fun `deal with templated resources`() {
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
         val resource =
             Resource.Templated(
                 "https://www.http4k.org/{+template}", "HTTP4K", "description",
-                IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0))
+                IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)), null, icons
             )
 
         val resources = ServerResources(listOf(resource bind {
@@ -358,6 +364,8 @@ class McpProtocolTest {
                             IMAGE_GIF,
                             Size.of(1),
                             Annotations(listOf(Assistant), Priority.of(1.0)),
+                            null,
+                            icons
                         )
                     )
                 )
@@ -393,9 +401,10 @@ class McpProtocolTest {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
         val output = Tool.Output.auto(FooBar("bar")).toLens()
+        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
 
-        val unstructuredTool = Tool("unstructured", "description", stringArg, intArg, title = "title")
-        val structuredTool = Tool("structured", "description", output = output, title = "title")
+        val unstructuredTool = Tool("unstructured", "description", stringArg, intArg, title = "title", icons = icons)
+        val structuredTool = Tool("structured", "description", output = output, title = "title", icons = icons)
 
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
@@ -445,7 +454,8 @@ class McpProtocolTest {
                                 )
                             ),
                             null,
-                            null
+                            null,
+                            icons
                         ),
                         McpTool(
                             ToolName.of("structured"), "description", "title",
@@ -466,7 +476,8 @@ class McpProtocolTest {
                                 "type" to "object",
                                 "required" to listOf("foo")
                             ),
-                            null
+                            null,
+                            icons
                         )
                     )
                 )
@@ -656,7 +667,8 @@ class McpProtocolTest {
             stringValueArg,
             dateValueArg,
             objectValueArg,
-            listObjectValueArg
+            listObjectValueArg,
+            execution = org.http4k.ai.mcp.model.ToolExecution(org.http4k.ai.mcp.model.TaskSupport.optional)
         )
 
         val mcp = SseMcp(
@@ -686,7 +698,13 @@ class McpProtocolTest {
         val objectValueArg = Tool.Arg.auto(example).required("complexValue")
         val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).required("listArg", "description9")
 
-        val tool = Tool("name", "description", objectValueArg, listObjectValueArg)
+        val tool = Tool(
+            "name",
+            "description",
+            objectValueArg,
+            listObjectValueArg,
+            execution = org.http4k.ai.mcp.model.ToolExecution(org.http4k.ai.mcp.model.TaskSupport.required)
+        )
 
         val mcp = SseMcp(
             McpProtocol(
