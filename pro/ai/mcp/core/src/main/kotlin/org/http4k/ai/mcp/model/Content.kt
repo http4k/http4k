@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.model.ToolName
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
@@ -58,4 +59,9 @@ sealed class Content {
         val isError: Boolean? = false,
         val _meta: Meta? = null
     ) : Content()
+
+    @JsonSerializable
+    data class Meta(
+        val ui: McpAppResourceMeta? = null
+    )
 }

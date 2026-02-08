@@ -1,6 +1,6 @@
 package org.http4k.ai.mcp.apps.server
 
-import org.http4k.ai.mcp.model.extension.McpApps
+import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.security.NoMcpSecurity

@@ -18,7 +18,7 @@ import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
-import org.http4k.ai.mcp.model.extension.CspDomain
+import org.http4k.ai.mcp.model.Domain
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
@@ -114,7 +114,7 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     withStandardMappings()
     withAiMappings()
     value(Base64Blob)
-    value(CspDomain)
+    value(Domain)
     value(ElicitationId)
     value(McpEntity)
     value(McpRpcMethod)

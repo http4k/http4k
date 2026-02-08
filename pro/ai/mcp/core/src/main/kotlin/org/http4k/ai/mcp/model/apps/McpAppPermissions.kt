@@ -1,4 +1,4 @@
-package org.http4k.ai.mcp.model.extension
+package org.http4k.ai.mcp.model.apps
 
 import se.ansman.kotshi.JsonSerializable
 

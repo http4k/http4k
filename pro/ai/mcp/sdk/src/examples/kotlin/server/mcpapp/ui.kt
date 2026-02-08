@@ -4,7 +4,7 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.model.Resource.Content.Text
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.ResourceName
-import org.http4k.ai.mcp.model.extension.McpApps
+import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 

@@ -1,3 +1,3 @@
-package org.http4k.ai.mcp.model.extension
+package org.http4k.ai.mcp.model.apps
 
 enum class McpAppVisibility { model, app }

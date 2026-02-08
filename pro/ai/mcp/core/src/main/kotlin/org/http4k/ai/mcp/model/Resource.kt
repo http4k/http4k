@@ -1,6 +1,5 @@
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.model.extension.McpAppResourceMeta
 import org.http4k.ai.mcp.util.Rfc6570UriTemplateMatcher.matches
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
@@ -77,6 +76,7 @@ sealed class Resource : CapabilitySpec {
     sealed class Content {
         abstract val uri: Uri
         abstract val mimeType: MimeType?
+        abstract val _meta: Content.Meta?
 
         @JsonSerializable
         @PolymorphicLabel("text")
@@ -84,7 +84,7 @@ sealed class Resource : CapabilitySpec {
             val text: String,
             override val uri: Uri,
             override val mimeType: MimeType? = null,
-            val _meta: McpAppResourceMeta? = null
+            override val _meta: Content.Meta? = null
         ) : Content()
 
         @JsonSerializable
@@ -93,7 +93,7 @@ sealed class Resource : CapabilitySpec {
             val blob: Base64Blob,
             override val uri: Uri,
             override val mimeType: MimeType? = null,
-            val _meta: McpAppResourceMeta? = null
+            override val _meta: Content.Meta? = null
         ) : Content()
 
         @JsonSerializable
@@ -101,6 +101,7 @@ sealed class Resource : CapabilitySpec {
         data class Unknown(
             override val uri: Uri,
             override val mimeType: MimeType? = null,
+            override val _meta: Content.Meta? = null
         ) : Content()
     }
 }

@@ -4,7 +4,7 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.model.extension.McpAppMeta
+import org.http4k.ai.mcp.model.apps.McpAppMeta
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.ToolCapability

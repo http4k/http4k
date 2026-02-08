@@ -1,13 +1,14 @@
 package org.http4k.ai.mcp.apps.server
 
 import org.http4k.ai.mcp.ResourceResponse
+import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Resource.Content.Text
 import org.http4k.ai.mcp.model.ResourceName
-import org.http4k.ai.mcp.model.extension.CspDomain
-import org.http4k.ai.mcp.model.extension.McpAppCsp
-import org.http4k.ai.mcp.model.extension.McpAppResourceMeta
-import org.http4k.ai.mcp.model.extension.McpApps
+import org.http4k.ai.mcp.model.Domain
+import org.http4k.ai.mcp.model.apps.McpAppCsp
+import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
+import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
@@ -27,7 +28,11 @@ object OrderFormUi {
                 templates(Form()),
                 it.uri,
                 McpApps.MIME_TYPE,
-                McpAppResourceMeta(McpAppCsp(resourceDomains = listOf(CspDomain.of("https://unpkg.com"))))
+                Content.Meta(
+                    ui = McpAppResourceMeta(
+                        csp = McpAppCsp(resourceDomains = listOf(Domain.of("https://unpkg.com")))
+                    )
+                )
             )
         )
     }

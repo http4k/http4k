@@ -2,7 +2,7 @@
 
 package org.http4k.ai.mcp.model
 
-import org.http4k.ai.mcp.model.extension.McpAppMeta
+import org.http4k.ai.mcp.model.apps.McpAppMeta
 import se.ansman.kotshi.ExperimentalKotshiApi
 import se.ansman.kotshi.JsonProperty
 import se.ansman.kotshi.JsonSerializable
