@@ -7,9 +7,8 @@ import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.routing.bind
 
-fun SubmitOrderTool(): ToolCapability {
+fun SubmitOrderTool(list: MutableMap<String, String>): ToolCapability {
     val quantity = Tool.Arg.string().required("quantity", "How many to order")
-
     val product = Tool.Arg.string().required("product", "The product to order")
 
     return Tool(
@@ -20,8 +19,9 @@ fun SubmitOrderTool(): ToolCapability {
         val productName = product(args)
         val qty = quantity(args)
 
-        println("Order received: $qty x $productName")
+        list[productName] = qty
 
         Ok(listOf(Text("Order confirmed: $qty x $productName")))
     }
 }
+

@@ -11,6 +11,7 @@ import org.http4k.template.ViewModel
 
 fun OrderFormMcpApp(): CapabilityPack {
     val templates = HandlebarsTemplates().CachingClasspath()
+    val list = mutableMapOf<String, String>()
     val renderApp = RenderMcpApp(
         name = "show_order_form",
         description = "Display the order form UI",
@@ -18,7 +19,7 @@ fun OrderFormMcpApp(): CapabilityPack {
         meta = McpAppResourceMeta(csp = Csp(resourceDomains = listOf(Domain.of("https://unpkg.com"))))
     ) { templates(Form()) }
 
-    return CapabilityPack(renderApp, SubmitOrderTool())
+    return CapabilityPack(renderApp, SubmitOrderTool(list), GetShoppingList(list))
 }
 
 class Form() : ViewModel
