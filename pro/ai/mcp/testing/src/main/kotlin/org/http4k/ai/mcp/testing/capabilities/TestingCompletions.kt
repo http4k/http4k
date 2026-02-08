@@ -26,5 +26,4 @@ class TestingCompletions(
                 CompletionResponse(completion.values, completion.total, completion.hasMore)
             }
             .map { it.second }
-
 }

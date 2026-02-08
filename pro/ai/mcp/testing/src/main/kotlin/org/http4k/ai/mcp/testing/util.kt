@@ -48,7 +48,7 @@ internal inline fun <reified T : Any> Sequence<SseMessage.Event>.nextNotificatio
     return McpJson.convert<McpNodeType, T>(request.params ?: McpJson.nullNode())
 }
 
-fun org.http4k.ai.mcp.testing.TestMcpClient.useClient(fn: org.http4k.ai.mcp.testing.TestMcpClient.() -> Unit) {
+fun TestMcpClient.useClient(fn: TestMcpClient.() -> Unit) {
     use {
         it.start()
         it.fn()

@@ -12,7 +12,7 @@ import org.http4k.ai.mcp.apps.McpServerResult.Success
 import org.http4k.ai.mcp.apps.McpServerResult.Unknown
 import org.http4k.ai.mcp.apps.model.HostToolRequest
 import org.http4k.ai.mcp.apps.model.HostToolResponse
-import org.http4k.ai.mcp.apps.model.ToolOption
+import org.http4k.ai.mcp.apps.model.AvailableMcpApp
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
@@ -34,7 +34,7 @@ class McpApps(private val clients: List<McpClient>) {
             client.tools().list()
                 .map {
                     it.mapNotNull { tool -> tool._meta?.ui?.resourceUri?.let { tool.name to it } }
-                        .map { ToolOption(entity.name.value, entity.name.value, it.first, it.second) }
+                        .map { AvailableMcpApp(entity.name.value, entity.name.value, it.first, it.second) }
                 }
                 .valueOrNull()
         }.flatten()
