@@ -12,23 +12,15 @@ import org.http4k.ai.mcp.apps.McpServerResult.Unknown
 import org.http4k.ai.mcp.apps.model.HostToolRequest
 import org.http4k.ai.mcp.apps.model.HostToolResponse
 import org.http4k.ai.mcp.apps.model.ToolOption
-import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
-import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
-import org.http4k.ai.mcp.protocol.Version
-import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 
-class ConnectedMcpServers(servers: List<Uri>, http: HttpHandler) {
-    private val serverClients = servers.associateWith {
-        HttpStreamingMcpClient(
-            McpEntity.of("http4k MCP Testing"),
-            Version.of("0.0.0"),
-            it, http
-        )
-    }
+class ConnectedMcpServers(servers: List<Uri>, mcpClientFactory: McpClientFactory) {
 
-    fun start() = serverClients.values.forEach { it.start() }
+    private val serverClients = servers.associateWith { mcpClientFactory(it) }
+
+    fun start() = serverClients.values.forEach(McpClient::start)
 
     fun tools() = serverClients
         .mapNotNull { (serverUri, client) ->
@@ -40,20 +32,22 @@ class ConnectedMcpServers(servers: List<Uri>, http: HttpHandler) {
                 .valueOrNull()
         }.flatten()
 
-    fun callTool(request: HostToolRequest): McpServerResult<HostToolResponse> =
-        when (val s = serverClients[request.serverId]) {
-            null -> Unknown
-            else -> s.tools().call(request.name, ToolRequest(request.arguments))
-                .map {
-                    when (it) {
-                        is Ok -> Success(HostToolResponse(it.content ?: emptyList()))
-                        else -> Failure(it.toString())
-                    }
+    fun callTool(request: HostToolRequest) = when (val s = findServerFor(request.serverId)) {
+        null -> Unknown
+        else -> s.tools().call(request.name, ToolRequest(request.arguments))
+            .map {
+                when (it) {
+                    is Ok -> Success(HostToolResponse(it.content ?: emptyList()))
+                    else -> Failure(it.toString())
                 }
-                .recover { Failure(it.toString()) }
-        }
+            }
+            .recover { Failure(it.toString()) }
+    }
 
-    fun render(serverId: Uri, resourceUri: Uri) = when (val s = serverClients[serverId]) {
+    private fun findServerFor(serverId: Uri) =
+        serverClients.entries.firstOrNull { it.key == serverId }?.value
+
+    fun render(serverId: Uri, resourceUri: Uri) = when (val s = findServerFor(serverId)) {
         null -> Unknown
         else -> s.resources().read(ResourceRequest(resourceUri))
             .map {
