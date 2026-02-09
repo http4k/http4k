@@ -6,11 +6,11 @@ import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.mcp.server.capability.CapabilityPack
 import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.core.Uri
-import org.http4k.template.HandlebarsTemplates
+import org.http4k.template.PebbleTemplates
 import org.http4k.template.ViewModel
 
 fun OrderFormMcpApp(): CapabilityPack {
-    val templates = HandlebarsTemplates().CachingClasspath()
+    val templates = PebbleTemplates().CachingClasspath()
     val list = mutableMapOf<String, String>()
     val renderApp = RenderMcpApp(
         name = "show_order_form",

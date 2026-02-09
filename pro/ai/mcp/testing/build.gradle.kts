@@ -9,7 +9,7 @@ plugins {
 dependencies {
     api(project(":http4k-ai-mcp-sdk"))
     api(project(":http4k-ai-mcp-client"))
-    api(project(":http4k-template-handlebars"))
+    api(project(":http4k-template-pebble"))
 
     ksp(libs.kotshi.compiler)
 

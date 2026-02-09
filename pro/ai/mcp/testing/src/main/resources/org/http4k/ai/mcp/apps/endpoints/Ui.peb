@@ -17,11 +17,11 @@
     </a>
     <select id="mcp-app-select" class="form-select w-auto">
         <option value="" disabled selected>Select MCP App...</option>
-        {{#tools}}
-        <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
-            {{serverName}}: {{uiToolName}}
+        {% for tool in model.tools %}
+        <option data-server-id="{{tool.serverId}}" data-resource-uri="{{tool.resourceUri}}">
+            {{tool.serverName}}: {{tool.uiToolName}}
         </option>
-        {{/tools}}
+        {% endfor %}
     </select>
 </nav>
 
