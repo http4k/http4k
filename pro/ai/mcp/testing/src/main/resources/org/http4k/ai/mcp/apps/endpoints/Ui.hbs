@@ -19,7 +19,7 @@
         <option value="" disabled selected>Select MCP App...</option>
         {{#tools}}
         <option data-server-id="{{serverId}}" data-resource-uri="{{resourceUri}}">
-            {{serverName}}: {{toolName}}
+            {{serverName}}: {{uiToolName}}
         </option>
         {{/tools}}
     </select>
@@ -36,9 +36,7 @@
         currentServerId = opt.dataset.serverId;
         const uri = opt.dataset.resourceUri;
 
-        const html = await fetch(
-            `/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`
-        ).then(r => r.text());
+        const html = await fetch(`/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`).then(r => r.text());
 
         const app = document.getElementById('app');
         app.classList.remove('d-none');
