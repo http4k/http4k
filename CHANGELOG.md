@@ -3,13 +3,19 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.28.0.0
+### v6.28.1.0 (uncut)
+
 - **http4k-***: Upgrade versions
-- **http4k-ai-mcp-sdk***: [Pro: Breaking] - Update MCP SDK to support latest MCP specification (2025-11-25), including support for Tasks, expanded Tool support,
+- **http4k-ai-mcp-testing**: Remove unnecessary server dependency
+
+### v6.28.0.0
+
+- **http4k-***: Upgrade versions, including Kotlin to 2.3.10
+- **http4k-ai-mcp-sdk**: [Pro: Breaking] - Update MCP SDK to support latest MCP specification (2025-11-25), including support for Tasks, expanded Tool support,
   URL Form Elicitations and Sampling upgrades. Plus conformance updates to the latest MCP conformance tests. Also support for MCP Apps spec, allowing UIs to be
   usable inside Claude Code and friends. Small tweaks to the API surface which should be simple to fix.
-- **http4k-ai-mcp-client***: [Pro: Breaking] - Updated client to support MCP 2025-11-25 features.
-- **http4k-ai-mcp-testing***: [Pro: New module!] - Clients for testing MCP servers and a basic MCP Apps host to test out MCP Apps (UIs which can live in Claude
+- **http4k-ai-mcp-client**: [Pro: Breaking] - Updated client to support MCP 2025-11-25 features.
+- **http4k-ai-mcp-testing**: [Pro: New module!] - Clients for testing MCP servers and a basic MCP Apps host to test out MCP Apps (UIs which can live in Claude
   and co)
 
 ### v6.27.0.0

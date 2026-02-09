@@ -11,8 +11,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.server.JettyLoom
-import org.http4k.server.asServer
 
 /**
  * Easy MCP Client creation for testing purposes.
@@ -20,15 +18,6 @@ import org.http4k.server.asServer
 fun interface McpClientFactory : () -> McpClient {
 
     companion object {
-        /**
-         * Starts a local MCP server and returns an McpClient connected to it.
-         */
-        fun Local(mcpServer: PolyHandler, http: HttpHandler = JavaHttpClient(responseBodyMode = BodyMode.Stream)) =
-            McpClientFactory {
-                val server = mcpServer.asServer(JettyLoom(0)).start()
-                Http(Uri.Companion.of("http://localhost:${server.port()}/mcp"), http)()
-            }
-
         /**
          * Returns an McpClient connected to the given remote server.
          */
