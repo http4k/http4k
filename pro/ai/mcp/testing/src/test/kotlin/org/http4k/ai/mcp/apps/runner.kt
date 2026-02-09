@@ -11,7 +11,7 @@ fun main() {
     val server = ExampleMcpServer().asServer(JettyLoom(3001)).start()
 
     val host = McpAppsHost(McpClientFactory.Http(Uri.of("http://localhost:${server.port()}/mcp")))
-        .asServer(SunHttp(9000)).start()
+        .asServer(SunHttp(11000)).start()
 
     println("MCP Apps Host running on http://localhost:${host.port()}")
 }

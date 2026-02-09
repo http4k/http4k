@@ -12,7 +12,7 @@
 <body class="d-flex flex-column h-100">
 <nav class="navbar navbar-dark px-3 shadow-sm" style="background-color:var(--bs-primary)">
     <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="https://www.http4k.org/images/logo.png" alt="http4k" height="32" class="me-2">
+        <img src="https://http4k.org/images/logo.png" alt="http4k" height="32" class="me-2">
         <span class="fw-light">MCP Apps Test Host</span>
     </a>
     <select id="mcp-app-select" class="form-select w-auto">
@@ -26,6 +26,7 @@
 
 <script>
     const select = document.getElementById('mcp-app-select');
+    const basePath = location.pathname.replace(/\/$/, '');
     let currentServerId = null;
 
     select.addEventListener('change', async () => {
@@ -33,7 +34,7 @@
         currentServerId = opt.dataset.serverId;
         const uri = opt.dataset.resourceUri;
 
-        const html = await fetch(`/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`).then(r => r.text());
+        const html = await fetch(`${basePath}/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`).then(r => r.text());
 
         const app = document.getElementById('app');
         app.classList.remove('d-none');
@@ -55,7 +56,7 @@
                 break;
 
             case 'tools/call':
-                result = await fetch('/api/tools/call', {
+                result = await fetch(`${basePath}/api/tools/call`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({serverId: currentServerId, ...e.data.params})
