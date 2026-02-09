@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <title>http4k MCP Apps Test Host</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>:root {
+        --bs-primary: #61C0FF;
+        --bs-secondary: #ffa654;
+    }</style>
+</head>
+<body class="d-flex flex-column h-100">
+<nav class="navbar navbar-dark px-3 shadow-sm" style="background-color:var(--bs-primary)">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="https://www.http4k.org/images/logo.png" alt="http4k" height="32" class="me-2">
+        <span class="fw-light">MCP Apps Test Host</span>
+    </a>
+    <select id="mcp-app-select" class="form-select w-auto">
+        <option value="" disabled selected>Select MCP App...</option>
+                <option data-server-id="mcp app" data-resource-uri="ui://a-ui">
+            mcp app: show_ui        </option>
+            </select>
+</nav>
+
+<iframe id="app" class="flex-grow-1 border-0 bg-light d-none"></iframe>
+
+<script>
+    const select = document.getElementById('mcp-app-select');
+    let currentServerId = null;
+
+    select.addEventListener('change', async () => {
+        const opt = select.selectedOptions[0];
+        currentServerId = opt.dataset.serverId;
+        const uri = opt.dataset.resourceUri;
+
+        const html = await fetch(`/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`).then(r => r.text());
+
+        const app = document.getElementById('app');
+        app.classList.remove('d-none');
+        app.srcdoc = html;
+    });
+
+    addEventListener('message', async e => {
+        if (!e.data?.jsonrpc || e.data.id === undefined) return;
+
+        let result;
+        switch (e.data.method) {
+            case 'ui/initialize':
+                result = {
+                    protocolVersion: '2025-03-26',
+                    hostInfo: {name: 'http4k-mcp-apps-host', version: '0.0.0'},
+                    hostCapabilities: {serverTools: {}, openLinks: {}, updateModelContext: {text: {}}},
+                    hostContext: {theme: 'light', platform: 'web', displayMode: 'inline', availableDisplayModes: ['inline']}
+                };
+                break;
+
+            case 'tools/call':
+                result = await fetch('/api/tools/call', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({serverId: currentServerId, ...e.data.params})
+                }).then(r => r.json());
+                break;
+
+            case 'ui/openLink':
+                window.open(e.data.params.url, '_blank');
+                result = {};
+                break;
+
+            case 'ui/message':
+            case 'ui/updateModelContext':
+            case 'ui/requestDisplayMode':
+                result = {};
+                break;
+
+            default:
+                e.source.postMessage({
+                    jsonrpc: '2.0', id: e.data.id,
+                    error: {code: -32601, message: 'Method not found'}
+                }, '*');
+                return;
+        }
+
+        e.source.postMessage({jsonrpc: '2.0', id: e.data.id, result}, '*');
+    });
+</script>
+</body>
+</html>

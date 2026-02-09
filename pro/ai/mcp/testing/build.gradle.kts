@@ -14,4 +14,6 @@ dependencies {
     ksp(libs.kotshi.compiler)
 
     testImplementation(project(":http4k-server-jetty"))
+    testImplementation(project(":http4k-testing-approval"))
+    testImplementation(project(":http4k-testing-webdriver"))
 }
