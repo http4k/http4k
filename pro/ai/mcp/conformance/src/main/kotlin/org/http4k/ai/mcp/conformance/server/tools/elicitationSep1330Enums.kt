@@ -7,6 +7,7 @@ import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse.Ok
 import org.http4k.ai.mcp.ElicitationResponse.Task
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.Tool
@@ -68,6 +69,6 @@ fun elicitationSep1330Enums() = Tool("test_elicitation_sep1330_enums", "test_eli
                 is Task -> error("Unexpected task response")
             }
         }
-        .mapFailure { ToolResponse.Error(1, "Problem with response") }
+        .mapFailure { Error("Problem with response") }
         .get()
 }

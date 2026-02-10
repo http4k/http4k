@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
+import dev.forkhandles.result4k.failureOrNull
 import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionRequest
@@ -291,12 +292,12 @@ abstract class McpClientContract<T> : PortBasedTest {
     fun `tool can return error response`() {
         val toolArg = Tool.Arg.string().required("name")
         val tools = ServerTools(
-            Tool("failing", "description", toolArg) bind { error("bad things") }
+            Tool("failing", "description", toolArg) bind { ToolResponse.Error("oh no") }
         )
 
         withMcpServer(tools = tools) {
-            val actual = tools().call(ToolName.of("failing"), ToolRequest().with(toolArg of "boom"))
-                .valueOrNull()
+            val call = tools().call(ToolName.of("failing"), ToolRequest().with(toolArg of "boom"))
+            val actual = call.valueOrNull()
 
             assertThat(actual, present(isA<ToolResponse.Error>()))
         }

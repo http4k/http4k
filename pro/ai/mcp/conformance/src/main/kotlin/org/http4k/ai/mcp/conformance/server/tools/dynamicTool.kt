@@ -1,9 +1,9 @@
 package org.http4k.ai.mcp.conformance.server.tools
 
-import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.routing.bind
 
 fun dynamicTool() = Tool("test_dynamic_tool", "test_dynamic_tool") bind {
-    ToolResponse.Error(-1, "Not implemented yet")
+    Error("Not implemented yet")
 }

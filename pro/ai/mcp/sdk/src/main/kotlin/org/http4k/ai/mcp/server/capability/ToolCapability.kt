@@ -57,7 +57,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                 } catch (_: LensFailure) {
                     throw McpException(InvalidParams)
                 } catch (_: Exception) {
-                    Error(InternalError)
+                    throw McpException(InternalError)
                 }
             }
             .get()
@@ -71,7 +71,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
                     )
 
                     is Error -> McpTool.Call.Response(
-                        content = listOf(Text("ERROR: " + it.error.code + " " + it.error.message)),
+                        content = it.content?.let { listOf(Text("Failure")) },
                         isError = true,
                         _meta = it.meta
                     )

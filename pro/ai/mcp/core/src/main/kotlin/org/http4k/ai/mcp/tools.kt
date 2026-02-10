@@ -5,13 +5,11 @@ import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
-import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
 
 /**
@@ -49,13 +47,22 @@ sealed interface ToolResponse {
         val structuredContent: McpNodeType? = null,
         override val meta: Meta = default
     ) : ToolResponse, McpLensTarget {
-        constructor(structuredContent: McpNodeType, meta: Meta = default) : this(listOf(Text(McpJson.asFormatString(structuredContent))), structuredContent, meta)
+        constructor(structuredContent: McpNodeType, meta: Meta = default) : this(
+            listOf(
+                Text(
+                    McpJson.asFormatString(
+                        structuredContent
+                    )
+                )
+            ), structuredContent, meta
+        )
+
         constructor(vararg content: Content, meta: Meta = default) : this(content.toList(), null, meta)
         constructor(vararg content: String, meta: Meta = default) : this(content.map(::Text).toList(), null, meta)
     }
 
-    data class Error(val error: ErrorMessage, override val meta: Meta = default) : ToolResponse {
-        constructor(code: Int, message: String, meta: Meta = default) : this(ErrorMessage(code, message), meta)
+    data class Error(val content: List<Content>? = null, override val meta: Meta = default) : ToolResponse {
+        constructor(message: String, meta: Meta = default) : this(listOf(Text(message)), meta)
     }
 
     data class Task(val task: org.http4k.ai.mcp.model.Task, override val meta: Meta = default) : ToolResponse

@@ -7,6 +7,7 @@ import org.http4k.ai.llm.LLMError.Custom
 import org.http4k.ai.llm.LLMError.Http
 import org.http4k.ai.llm.LLMError.Internal
 import org.http4k.ai.llm.LLMError.Timeout
+import org.http4k.ai.llm.LLMResult
 import org.http4k.ai.llm.model.Message.ToolResult
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.llm.tools.ToolResponse
@@ -22,7 +23,7 @@ fun McpError.toLLM(): LLMError = when (this) {
     is McpError.Timeout -> Timeout
 }
 
-fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
+fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest): LLMResult<ToolResponse> = when (this) {
     is Ok -> Success(
         ToolResponse(
             (content ?: emptyList())
@@ -31,6 +32,6 @@ fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest) = when (this) {
                 .first())
     )
 
-    is Error -> Failure(Protocol(error).toLLM())
+    is Error -> Failure(Custom(content))
     else -> Failure(Custom("Response cannot be converted to LLM response"))
 }

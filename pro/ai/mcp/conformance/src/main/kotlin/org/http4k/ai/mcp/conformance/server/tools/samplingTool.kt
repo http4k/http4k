@@ -38,7 +38,7 @@ fun samplingTool() = Tool("test_sampling", "test_sampling", prompt) bind {
                 is SamplingResponse.Task -> error("Unexpected task response")
             }
         }
-        .mapFailure { Error(1, "Problem with response") }
+        .mapFailure { Error("Problem with response") }
         .get()
 }
 

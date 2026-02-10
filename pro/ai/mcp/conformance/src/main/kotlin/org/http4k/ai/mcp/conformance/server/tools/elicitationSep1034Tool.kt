@@ -40,6 +40,6 @@ fun elicitationSep1034Tool() = Tool("test_elicitation_sep1034_defaults", "test_e
                 is Task -> error("Unexpected task response")
             }
         }
-        .mapFailure { ToolResponse.Error(1, "Problem with response") }
+        .mapFailure { ToolResponse.Error("Problem with response") }
         .get()
 }

@@ -12,6 +12,7 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.int
+import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
@@ -48,7 +49,7 @@ fun getInvoiceForPurchase(): ToolCapability {
     ) bind { req: ToolRequest ->
         when (invoiceId(req)) {
             1 -> ToolResponse.Ok(Content.Text("A receipt for some contact lenses"))
-            else -> ToolResponse.Error(InvalidRequest)
+            else -> throw McpException(InvalidRequest)
         }
     }
 }
