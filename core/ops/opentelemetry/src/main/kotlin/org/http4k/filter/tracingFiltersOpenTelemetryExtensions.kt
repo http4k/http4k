@@ -79,29 +79,13 @@ fun ServerFilters.OpenTelemetryTracing(
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
 ): Filter {
-    val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
+    val context = ServerTracingContext(openTelemetry, spanNamer, error, spanCreationMutator)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
-    val getter = getter<Request>(textMapPropagator)
     val setter = setter<Response>()
 
     return Filter { next ->
         { req ->
-            with(
-                tracer.spanBuilder(spanNamer(req))
-                .setParent(textMapPropagator.extract(Context.current(), req, getter))
-                .setSpanKind(SERVER)
-                .apply {
-                        if (req is RoutedMessage && req.xUriTemplate != null)
-                            setAttribute("http.route", req.xUriTemplate.toString())
-
-                        setAttribute("http.method", req.method.name)
-                        setAttribute("http.url", req.uri.toString())
-
-                        req.header("User-Agent")?.also { setAttribute("http.user_agent", it) }
-                        req.remoteAddress()?.also { setAttribute("http.client_ip", it) }
-                }
-                .let { spanCreationMutator(it, req) }
-                .startSpan()) {
+            with(context.createServerSpan(req)) {
                 makeCurrent().use {
                     try {
                         val ref = AtomicReference(next(req))
@@ -110,11 +94,10 @@ fun ServerFilters.OpenTelemetryTracing(
                         ref.get().also {
                             addStandardDataFrom(it, req)
                             spanCompletionMutator(this, req, it)
-                            if (it.status.serverError) setStatus(ERROR)
-                            else if (it.status.clientError) setStatus(UNSET)
+                            setStatusFromResponse(it.status)
                         }
                     } catch (t: Throwable) {
-                        setStatus(ERROR, error(req, t))
+                        context.setSpanError(this, req, t)
                         throw t
                     } finally {
                         end()
@@ -153,6 +136,44 @@ private fun Span.addStandardDataFrom(resp: Response, req: Request) {
     setAttribute("http.status_code", resp.status.code.toLong())
 }
 
-private fun Request.remoteAddress(): String? =
+internal fun Request.remoteAddress(): String? =
     header("X-Forwarded-For")?.split(",")?.firstOrNull() ?: source?.address
+
+internal fun Span.setStatusFromResponse(status: org.http4k.core.Status) {
+    if (status.serverError) setStatus(ERROR)
+    else if (status.clientError) setStatus(UNSET)
+}
+
+internal class ServerTracingContext(
+    openTelemetry: OpenTelemetry,
+    private val spanNamer: (Request) -> String,
+    private val error: (Request, Throwable) -> String,
+    private val spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder
+) {
+    private val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
+    private val textMapPropagator = openTelemetry.propagators.textMapPropagator
+    internal val getter = getter<Request>(textMapPropagator)
+
+    fun createServerSpan(req: Request): Span =
+        tracer.spanBuilder(spanNamer(req))
+            .setParent(textMapPropagator.extract(Context.current(), req, getter))
+            .setSpanKind(SERVER)
+            .setServerSpanAttributes(req)
+            .let { spanCreationMutator(it, req) }
+            .startSpan()
+
+    fun setSpanError(span: Span, req: Request, t: Throwable) {
+        span.setStatus(ERROR, error(req, t))
+    }
+}
+
+internal fun SpanBuilder.setServerSpanAttributes(req: Request): SpanBuilder = apply {
+    if (req is RoutedMessage && req.xUriTemplate != null) {
+        setAttribute("http.route", req.xUriTemplate.toString())
+    }
+    setAttribute("http.method", req.method.name)
+    setAttribute("http.url", req.uri.toString())
+    req.header("User-Agent")?.also { setAttribute("http.user_agent", it) }
+    req.remoteAddress()?.also { setAttribute("http.client_ip", it) }
+}
 
