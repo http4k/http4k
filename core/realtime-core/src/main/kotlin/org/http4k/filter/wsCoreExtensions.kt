@@ -32,7 +32,7 @@ fun ServerFilters.CatchAllWs(
     }
 }
 
-private fun originalWsBehaviour(e: Throwable): WsResponse {
+internal fun originalWsBehaviour(e: Throwable): WsResponse {
     if (e !is Exception) throw e
     e.printStackTrace()
     return WsResponse { it.close(WsStatus.ABNORMAL_CLOSE) }

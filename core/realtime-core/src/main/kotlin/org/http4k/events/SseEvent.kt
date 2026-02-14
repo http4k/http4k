@@ -4,7 +4,6 @@ import org.http4k.core.Method
 import org.http4k.core.SseTransaction
 import org.http4k.core.Status
 import org.http4k.core.Uri
-import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
 
 object SseEvent {

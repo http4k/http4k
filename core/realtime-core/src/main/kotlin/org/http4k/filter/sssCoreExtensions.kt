@@ -30,7 +30,7 @@ fun ServerFilters.CatchAllSse(
     }
 }
 
-private fun originalSseBehaviour(e: Throwable): SseResponse {
+fun originalSseBehaviour(e: Throwable): SseResponse {
     if (e !is Exception) throw e
     e.printStackTrace()
     return SseResponse(INTERNAL_SERVER_ERROR) { it.close() }
