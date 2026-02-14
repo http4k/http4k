@@ -1,0 +1,6 @@
+{
+  "contextId": "ctx-123",
+  "status": "working",
+  "pageSize": 25,
+  "pageToken": "token-abc"
+}
