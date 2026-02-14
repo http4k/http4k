@@ -100,11 +100,10 @@ class McpProtocol<Transport>(
                     rawPayload.elements
                         .filterIsInstance<MoshiObject>()
                         .map { processMessage(responder, it, session, httpReq) }
-                        .map { it.get() }
                 )
             )
 
-            is MoshiObject -> processMessage(responder, rawPayload, session, httpReq)
+            is MoshiObject -> Success(processMessage(responder, rawPayload, session, httpReq))
             else -> error()
         }
     }
@@ -114,10 +113,10 @@ class McpProtocol<Transport>(
 
     private fun processMessage(
         responder: McpResponder<Transport>,
-        rawPayload: MoshiObject,
+        rawPayload: McpNodeType,
         session: Session,
         httpReq: Request
-    ): Result4k<McpNodeType, McpNodeType> {
+    ): McpNodeType {
         val payload = McpJson.fields(rawPayload).toMap()
         return when {
             payload["method"] != null -> {
@@ -276,7 +275,7 @@ class McpProtocol<Transport>(
                     }
                 }
             }
-        }
+        }.get()
     }
 
     fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
