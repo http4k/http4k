@@ -10,6 +10,7 @@ dependencies {
     api(project(":http4k-ai-mcp-core"))
     api(project(":http4k-ai-mcp-client"))
     api(project(":http4k-security-oauth"))
+    implementation(project(":http4k-ops-opentelemetry"))
 
     testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))
