@@ -4,13 +4,10 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
-import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
@@ -37,7 +34,6 @@ import org.http4k.ai.mcp.server.capability.ServerRoots
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.ToolCapability
-import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
@@ -46,11 +42,7 @@ import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
-import org.http4k.format.MoshiLong
-import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
@@ -346,50 +338,3 @@ class McpProtocol<Transport>(
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
 }
 
-class McpResponder<Transport>(
-    val transport: Transport,
-    val sessions: Sessions<Transport>,
-    val tasks: Tasks,
-    val logger: Logger,
-    val random: Random,
-    val clientTracking: Map<Session, ClientTracking>,
-    val onError: (Throwable) -> Unit
-) {
-
-    inline operator fun <reified IN : ClientMessage.Request> invoke(
-        session: Session,
-        jsonReq: JsonRpcRequest<MoshiNode>,
-        httpReq: Request,
-        fn: (IN, Client) -> ServerMessage.Response
-    ) = sessions.respond(transport, session, jsonReq.runCatching { jsonReq.fromJsonRpc<IN>() }
-        .mapCatching {
-            val progressToken = it._meta.progressToken ?: 0
-            val context = ClientCall(progressToken, session, jsonReq.id ?: MoshiLong(random.nextLong()))
-            try {
-                sessions.assign(context, transport, httpReq)
-                fn(
-                    it,
-                    SessionBasedClient(
-                        progressToken,
-                        context,
-                        sessions,
-                        logger,
-                        random,
-                        tasks
-                    ) { clientTracking[session] })
-            } finally {
-                sessions.end(context)
-            }
-        }
-        .map { it.toJsonRpc(jsonReq.id) }
-        .recover {
-            when (it) {
-                is McpException -> it.error.toJsonRpc(jsonReq.id)
-                else -> {
-                    onError(it)
-                    InternalError.toJsonRpc(jsonReq.id)
-                }
-            }
-        }
-        .getOrElse { InvalidRequest.toJsonRpc(jsonReq.id) })
-}
