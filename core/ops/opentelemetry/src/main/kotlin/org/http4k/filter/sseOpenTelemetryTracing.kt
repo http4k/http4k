@@ -9,6 +9,9 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
 
+/**
+ * Adds OpenTelemetry tracing to SseHandler servers.
+ */
 fun ServerFilters.OpenTelemetrySseTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = defaultSpanNamer,

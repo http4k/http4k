@@ -1,11 +1,14 @@
 package org.http4k.filter
 
+import org.http4k.core.PolyFilter
+import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
+import org.http4k.sse.then
 
 /**
  * Checks for the
@@ -24,4 +27,14 @@ fun ServerFilters.SseRebindProtection(corsPolicy: CorsPolicy): SseFilter = SseFi
             }
         }
     }
+}
+
+/**
+ * Provides combination CORs and rebind protection
+ */
+fun PolyFilters.CorsAndRebindProtection(corsPolicy: CorsPolicy): PolyFilter = PolyFilter { next ->
+    PolyHandler(
+        http = next.http?.let { ServerFilters.Cors(corsPolicy).then(it) },
+        sse = next.sse?.let { ServerFilters.SseRebindProtection(corsPolicy).then(it) }
+    )
 }

@@ -18,13 +18,21 @@ import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_REQUEST
 import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
+import org.http4k.core.PolyFilter
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.then
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
+import org.http4k.sse.SseResponse
+import org.http4k.sse.then
 import java.util.concurrent.atomic.AtomicReference
 
+/**
+ * Adds OpenTelemetry tracing to Http Handler clients.
+ */
 fun ClientFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = defaultSpanNamer,
@@ -40,13 +48,13 @@ fun ClientFilters.OpenTelemetryTracing(
         { req ->
             with(
                 tracer.spanBuilder(spanNamer(req))
-                .setSpanKind(CLIENT)
-                .apply {
-                    setAttribute("http.method", req.method.name)
-                    setAttribute("http.url", req.uri.toString())
-                }
-                .let { spanCreationMutator(it) }
-                .startSpan()) {
+                    .setSpanKind(CLIENT)
+                    .apply {
+                        setAttribute("http.method", req.method.name)
+                        setAttribute("http.url", req.uri.toString())
+                    }
+                    .let { spanCreationMutator(it) }
+                    .startSpan()) {
                 try {
                     makeCurrent().use {
                         val ref = AtomicReference(req)
@@ -72,6 +80,9 @@ fun ClientFilters.OpenTelemetryTracing(
     }
 }
 
+/**
+ * Adds OpenTelemetry tracing to HttpHandler servers.
+ */
 fun ServerFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
     spanNamer: (Request) -> String = defaultSpanNamer,
@@ -106,6 +117,40 @@ fun ServerFilters.OpenTelemetryTracing(
             }
         }
     }
+}
+
+/**
+ * Adds OpenTelemetry tracing to PolyHandler.
+ */
+fun PolyFilters.OpenTelemetryTracing(
+    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
+    spanNamer: (Request) -> String = defaultSpanNamer,
+    error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
+    spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
+    httpSpanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
+    sseSpanCompletionMutator: (Span, Request, SseResponse) -> Unit = { _, _, _ -> },
+) = PolyFilter { next ->
+    PolyHandler(
+        http = next.http?.let {
+            val openTelemetryTracing = ServerFilters.OpenTelemetryTracing(
+                openTelemetry,
+                spanNamer,
+                error,
+                spanCreationMutator,
+                httpSpanCompletionMutator
+            )
+            openTelemetryTracing.then(it)
+        },
+        sse = next.sse?.let {
+            ServerFilters.OpenTelemetrySseTracing(
+                openTelemetry,
+                spanNamer,
+                error,
+                spanCreationMutator,
+                sseSpanCompletionMutator
+            ).then(it)
+        }
+    )
 }
 
 @Suppress("UNCHECKED_CAST")
