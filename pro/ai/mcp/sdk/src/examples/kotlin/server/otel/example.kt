@@ -13,16 +13,18 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.filter.McpFilters
-import org.http4k.filter.PromptFilters
-import org.http4k.filter.ResourceFilters
-import org.http4k.filter.ToolFilters
+import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
+import server.completions
+import server.prompts
+import server.resources
+import server.tools
 
 /**
- * This example demonstrates how to create an MCP server using the draft HTTP Streaming protocol.
+ * This example demonstrates how to create an MCP server with OpenTelemetry tracing enabled.
  */
 fun main() {
 
@@ -33,9 +35,9 @@ fun main() {
                 *ServerProtocolCapability.entries.toTypedArray()
             ),
             HttpSessions().apply { start() },
-            TracedPrompt(PromptFilters::OpenTelemetryTracing),
-            TracedResource(ResourceFilters::OpenTelemetryTracing),
-            TracedTool(ToolFilters::OpenTelemetryTracing),
+            tools(),
+            resources(),
+            prompts(),
             mcpFilter = McpFilters.OpenTelemetryTracing()
         ),
         NoMcpSecurity
