@@ -8,6 +8,7 @@ changes with their rationale when appropriate:
 - **http4k-ai-mcp-client**: [Breaking] Alteration to ToolResponse.Error to have content instead of just a string
 - **http4k-ai-mcp-sdk**: [Breaking] Alteration to ToolResponse.Error to have content instead of just a string
 - **http4k-ops-opentelemetry**: Added SSE filters to capture OTel traces
+- **http4k-ops-opentelemetry**: Add support for OpenTelemetry Semantic Conventions (1.38.0)
 
 ### v6.28.1.0
 - **http4k-***: Upgrade versions
