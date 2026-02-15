@@ -67,7 +67,7 @@ jose4j = "0.9.6"
 json = "20251224"
 jsoup = "1.22.1"
 jte = "3.2.3"
-junit = "6.0.2"
+junit = "6.0.3"
 klaxon = "5.6"
 kondor-core = "3.6.1"
 konsist = "0.17.3"
@@ -220,7 +220,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.0.2"
+junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.0.3"
 klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
 kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
