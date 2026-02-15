@@ -129,7 +129,7 @@ class McpOpenTelemetryTracingTest {
         assertThat(mcpSpan.links.size, equalTo(1))
         assertThat(mcpSpan.links.first().spanContext.traceId, equalTo(transportSpan.spanContext.traceId))
         assertThat(mcpSpan.links.first().spanContext.spanId, equalTo(transportSpan.spanContext.spanId))
-        assertThat(mcpSpan.parentSpanContext.isValid, equalTo(false))
+        assertThat(mcpSpan.parentSpanId, equalTo(transportSpan.spanContext.spanId))
     }
 
     private fun jsonRpcRequest() = JsonRpcRequest(

@@ -5,6 +5,7 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
+import io.opentelemetry.api.trace.StatusCode.*
 import io.opentelemetry.context.Context
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.util.McpJson
@@ -16,6 +17,8 @@ object McpFilters {
 
         return McpFilter { next ->
             { req ->
+                val transportSpan = Span.current()
+
                 val span = tracer.spanBuilder(req.json.method)
                     .setParent(Context.current())
                     .setSpanKind(SpanKind.SERVER)
@@ -23,6 +26,7 @@ object McpFilters {
                     .setAttribute("mcp.session.id", req.session.id.value)
                     .apply {
                         req.json.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
+                        if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
                     }
                     .startSpan()
 
@@ -31,13 +35,13 @@ object McpFilters {
                         .also { resp ->
                             val error = McpJson.fields(resp.json).toMap()["error"]
                             if (error != null) {
-                                span.setStatus(StatusCode.ERROR)
+                                span.setStatus(ERROR)
                                 val code = McpJson.fields(error).toMap()["code"]
                                 if (code != null) span.setAttribute("error.type", McpJson.compact(code))
                             }
                         }
                 } catch (e: Throwable) {
-                    span.setStatus(StatusCode.ERROR)
+                    span.setStatus(ERROR)
                     span.setAttribute("error.type", e.javaClass.name)
                     throw e
                 } finally {
