@@ -1,5 +1,9 @@
 package org.http4k.ai.mcp.server.capability
 
+import dev.forkhandles.result4k.get
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ToolFilter
 import org.http4k.ai.mcp.ToolHandler
@@ -8,6 +12,7 @@ import org.http4k.ai.mcp.ToolResponse.ElicitationRequired
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.ToolResponse.Task
+import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -41,37 +46,43 @@ class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler)
     )
 
     fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
-        try {
-            when (val response = this(
-                ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http)
-            )) {
-                is Ok -> McpTool.Call.Response(
-                    content = response.content,
-                    structuredContent = response.structuredContent?.let(McpJson::convert),
-                    isError = false,
-                    _meta = response.meta
-                )
-
-                is Error -> McpTool.Call.Response(
-                    content = response.content,
-                    isError = true,
-                    _meta = response.meta
-                )
-
-                is Task -> McpTool.Call.Response(
-                    task = response.task,
-                    _meta = response.meta
-                )
-
-                is ElicitationRequired -> throw McpException(
-                    URLElicitationRequiredError(response.elicitations, response.message)
-                )
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
+            .mapFailure { throw McpException(InvalidParams) }
+            .map {
+                try {
+                    this(it)
+                } catch (_: LensFailure) {
+                    throw McpException(InvalidParams)
+                } catch (_: Exception) {
+                    throw McpException(ErrorMessage.Companion.InternalError)
+                }
             }
-        } catch (_: LensFailure) {
-            throw McpException(InvalidParams)
-        } catch (e: Exception) {
-            throw McpException(ErrorMessage.InternalError, e)
-        }
+            .get()
+            .let {
+                when (it) {
+                    is Ok -> McpTool.Call.Response(
+                        content = it.content,
+                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        isError = false,
+                        _meta = it.meta
+                    )
+
+                    is Error -> McpTool.Call.Response(
+                        content = it.content?.let { listOf(Text("Failure")) },
+                        isError = true,
+                        _meta = it.meta
+                    )
+
+                    is Task -> McpTool.Call.Response(
+                        task = it.task,
+                        _meta = it.meta
+                    )
+
+                    is ElicitationRequired -> throw McpException(
+                        URLElicitationRequiredError(it.elicitations, it.message)
+                    )
+                }
+            }
 
     override fun invoke(p1: ToolRequest) = handler(p1)
 }
