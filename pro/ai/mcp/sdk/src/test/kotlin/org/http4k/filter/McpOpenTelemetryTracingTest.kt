@@ -47,7 +47,7 @@ class McpOpenTelemetryTracingTest {
 
     @Test
     fun `creates span with MCP attributes for successful request`() {
-        val filter = McpFilters.OpenTelemetryTracing(openTelemetry)
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         var capturedSpan: SpanData? = null
 
@@ -73,7 +73,7 @@ class McpOpenTelemetryTracingTest {
 
     @Test
     fun `sets error status when handler throws`() {
-        val filter = McpFilters.OpenTelemetryTracing(openTelemetry)
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         val handler = filter.then { throw IllegalStateException("boom") }
 
@@ -92,7 +92,7 @@ class McpOpenTelemetryTracingTest {
 
     @Test
     fun `sets error status when response is JSON-RPC error`() {
-        val filter = McpFilters.OpenTelemetryTracing(openTelemetry)
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         val handler = filter.then {
             McpResponse(McpJson.renderError(ErrorMessage.InternalError, it.json.id))
@@ -110,7 +110,8 @@ class McpOpenTelemetryTracingTest {
 
     @Test
     fun `links to transport span when present`() {
-        val mcpHandler = McpFilters.OpenTelemetryTracing(openTelemetry).then { McpResponse(McpJson.nullNode()) }
+        val mcpHandler =
+            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse(McpJson.nullNode()) }
 
         val poly = PolyFilters.OpenTelemetryTracing(openTelemetry).then(
             PolyHandler(http = { req ->

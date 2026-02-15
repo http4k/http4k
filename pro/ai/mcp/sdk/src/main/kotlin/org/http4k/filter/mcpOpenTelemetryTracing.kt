@@ -83,7 +83,6 @@ object CallToolSpanModifiers : McpOpenTelemetrySpanModifiers {
 
     override fun response(sb: Span, response: McpNodeType) {
         McpJson.fields(response).toMap()["isError"]?.let {
-            sb.setAttribute("gen_ai.task.id", McpJson.text(it))
             sb.setStatus(ERROR)
             sb.setAttribute("error.type", "tool_error")
         }
@@ -117,8 +116,8 @@ object ReadResourceSpanModifiers : McpOpenTelemetrySpanModifiers {
 
     override fun request(sb: Span, request: McpNodeType) {
         sb.setAttribute("gen_ai.operation.name", "read_resource")
-        McpJson.fields(request).toMap()["name"]?.let {
-            sb.setAttribute("gen_ai.resource.name", McpJson.text(it))
+        McpJson.fields(request).toMap()["uri"]?.let {
+            sb.setAttribute("mcp.resource.uri", McpJson.text(it))
         }
     }
 }
