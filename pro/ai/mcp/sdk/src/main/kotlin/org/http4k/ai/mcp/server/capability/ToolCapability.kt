@@ -1,6 +1,7 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.ToolFilter
 import org.http4k.ai.mcp.ToolHandler
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.ElicitationRequired
@@ -11,6 +12,7 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.URLElicitationRequiredError
+import org.http4k.ai.mcp.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.Request
 import org.http4k.format.MoshiArray
@@ -26,13 +28,8 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
 
-interface ToolCapability : ServerCapability, ToolHandler {
-    fun toTool(): McpTool
-    fun call(mcp: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response
-}
-
-fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
-    override fun toTool() = McpTool(
+class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : ServerCapability, ToolHandler {
+    fun toTool() = McpTool(
         tool.name, tool.description,
         tool.title,
         McpJson.convert(tool.toSchema()),
@@ -43,7 +40,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
         tool.meta
     )
 
-    override fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
+    fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
         try {
             when (val response = this(
                 ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http)
@@ -79,6 +76,7 @@ fun ToolCapability(tool: Tool, handler: ToolHandler) = object : ToolCapability {
     override fun invoke(p1: ToolRequest) = handler(p1)
 }
 
+
 private fun Map<String, MoshiNode>.coerceIntoRawTypes() =
     mapNotNull { it.value.asString()?.let { value -> it.key to value } }.toMap()
 
@@ -100,3 +98,5 @@ fun Tool.toSchema() = McpJson {
         "properties" to obj(args.map { it.meta.name to it.toSchema() })
     )
 }
+
+fun ToolFilter.then(capability: ToolCapability) = ToolCapability(capability.tool, then(capability))
