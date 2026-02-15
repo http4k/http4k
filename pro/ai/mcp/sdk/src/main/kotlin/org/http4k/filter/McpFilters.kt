@@ -16,7 +16,6 @@ object McpFilters {
 
         return McpFilter { next ->
             { req ->
-                Span.current()
                 val span = tracer.spanBuilder(req.json.method)
                     .setParent(Context.current())
                     .setSpanKind(SpanKind.INTERNAL)
