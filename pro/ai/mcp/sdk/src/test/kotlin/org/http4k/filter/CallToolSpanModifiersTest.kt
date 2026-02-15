@@ -3,7 +3,6 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey.stringKey
-import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.api.trace.StatusCode.*
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
