@@ -70,7 +70,8 @@ class McpProtocol<Transport>(
     constructor(
         metaData: ServerMetaData,
         sessions: Sessions<Transport>,
-        vararg capabilities: ServerCapability
+        vararg capabilities: ServerCapability,
+        mcpFilter: McpFilter = McpFilter.NoOp,
     ) : this(
         metaData,
         sessions,
@@ -78,6 +79,7 @@ class McpProtocol<Transport>(
         ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         ServerPrompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
         ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        mcpFilter = mcpFilter,
     )
 
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()

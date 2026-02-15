@@ -6,7 +6,7 @@ changes with their rationale when appropriate:
 ### v6.30.0.0 (uncut)
 
 - **http4k-***: Upgrade versions
-- **http4k-ai-mcp-sdk**: [Breaking] Adding support for OpenTelemetry Conventions MCP span naming. API changes to allow for this change.
+- **http4k-ai-mcp-sdk**: [Breaking] Adding support for serverside OpenTelemetry Conventions MCP spans. API changes to allow for this change.
 
 ### v6.29.0.0
 - **http4k-***: Upgrade versions
