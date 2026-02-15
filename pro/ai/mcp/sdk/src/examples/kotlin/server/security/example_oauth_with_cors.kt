@@ -1,21 +1,19 @@
 package server.security
 
+import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.AnyOf
 import org.http4k.filter.CorsAndRebindProtection
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.PolyFilters
 import org.http4k.filter.debug
-import org.http4k.ai.mcp.model.McpEntity
-import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.security.NoMcpSecurity
-import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
@@ -31,7 +29,7 @@ fun main() {
     )
 
     // declare a CORs policy which is used to
-    ServerFilters.CorsAndRebindProtection(
+    PolyFilters.CorsAndRebindProtection(
         CorsPolicy(
             OriginPolicy.AnyOf("foo.com"),
             listOf("allowed-header"), listOf(GET, POST, DELETE)

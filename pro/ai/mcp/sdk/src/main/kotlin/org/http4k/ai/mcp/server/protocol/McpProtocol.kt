@@ -63,15 +63,15 @@ class McpProtocol<Transport>(
     private val roots: Roots = ServerRoots(),
     private val cancellations: Cancellations = ServerCancellations(),
     private val tasks: Tasks = ServerTasks(),
-    private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     private val mcpFilter: McpFilter = McpFilter.NoOp,
+    private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     private val random: Random = Random,
 ) {
     constructor(
         metaData: ServerMetaData,
         sessions: Sessions<Transport>,
-        vararg capabilities: ServerCapability,
         mcpFilter: McpFilter = McpFilter.NoOp,
+        vararg capabilities: ServerCapability,
     ) : this(
         metaData,
         sessions,

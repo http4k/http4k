@@ -16,9 +16,9 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.debug
 import org.http4k.lens.contentType
+import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
-import server.completions
 import server.prompts
 import server.resources
 import server.tools
@@ -28,19 +28,13 @@ import server.tools
  */
 fun main() {
 
-    val mcpServer = HttpStreamingMcp(
-        McpProtocol(
-            ServerMetaData(
-                McpEntity.of("http4k mcp via SSE"), Version.of("0.1.0"),
-                *ServerProtocolCapability.entries.toTypedArray()
-            ),
-            HttpSessions().apply { start() },
-            tools(),
-            resources(),
-            prompts(),
-            mcpFilter = McpFilters.OpenTelemetryTracing()
-        ),
-        NoMcpSecurity
+    val mcpServer = mcpHttpStreaming(
+        ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
+        NoMcpSecurity,
+        tools(),
+        resources(),
+        prompts(),
+        mcpFilter = McpFilters.OpenTelemetryTracing(),
     )
 
     mcpServer.asServer(JettyLoom(4001)).start()

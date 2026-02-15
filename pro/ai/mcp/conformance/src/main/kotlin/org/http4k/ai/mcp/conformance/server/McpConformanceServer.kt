@@ -18,7 +18,7 @@ import org.http4k.filter.AnyOf
 import org.http4k.filter.CorsAndRebindProtection
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.PolyFilters
 import org.http4k.filter.debugMcp
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom
@@ -45,7 +45,7 @@ fun McpConformanceServer(): PolyHandler {
         listOf("allowed-header"), listOf(GET, POST, DELETE)
     )
 
-    val corsAndRebindProtection = ServerFilters.CorsAndRebindProtection(corsPolicy)
+    val corsAndRebindProtection = PolyFilters.CorsAndRebindProtection(corsPolicy)
 
     return if (false) corsAndRebindProtection.then(next) else next
 }
