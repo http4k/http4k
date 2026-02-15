@@ -22,6 +22,7 @@ object OpenTelemetrySemanticConventions : OpenTelemetryAttributesKeys {
     override val statusCode: String = "http.response.status_code"
 }
 
+@Deprecated("To be removed in favour of OTel Semantic Conventions", ReplaceWith("OpenTelemetrySemanticConventions"))
 object LegacyHttp4kConventions : OpenTelemetryAttributesKeys {
     override val method = "http.method"
     override val clientUrl = "http.url"
