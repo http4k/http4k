@@ -49,9 +49,7 @@ class ToolCapabilityTest {
         val task = Task(taskId, TaskStatus.working, "Processing...", now, now)
 
         val tool = Tool("async-tool", "An async tool")
-        val capability = ToolCapability(tool) {
-            ToolResponse.Task(task)
-        }
+        val capability = ToolCapability(tool) { ToolResponse.Task(task) }
 
         val response = capability.call(
             McpTool.Call.Request(tool.name),

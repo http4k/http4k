@@ -54,7 +54,7 @@ class SessionBasedClient<Transport>(
         return when {
             tracking.supportsElicitation -> {
                 tracking.trackRequest(id) {
-                    with(it.fromJsonRpc<McpElicitations.Response>()) {
+                    with(it.fromJsonRpc(McpElicitations.Response::class)) {
                         val t = task
                         val response = when {
                             t != null -> ElicitationResponse.Task(t)
@@ -106,7 +106,7 @@ class SessionBasedClient<Transport>(
         return when {
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
-                    with(it.fromJsonRpc<McpSampling.Response>()) {
+                    with(it.fromJsonRpc(McpSampling.Response::class)) {
                         val t = task
                         val response = when {
                             t != null -> SamplingResponse.Task(t)

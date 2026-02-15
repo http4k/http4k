@@ -1,19 +1,20 @@
 package org.http4k.ai.mcp.protocol.messages
 
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.renderError
 import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
-import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpNodeType
+import kotlin.reflect.KClass
 
-inline fun <reified OUT : Any> JsonRpcRequest<McpNodeType>.fromJsonRpc(): OUT =
-    McpJson.asA<OUT>(McpJson.asFormatString(params ?: McpJson.obj()))
+fun <OUT : Any> JsonRpcRequest<McpNodeType>.fromJsonRpc(clazz: KClass<OUT>): OUT =
+    McpJson.asA(McpJson.asFormatString(params ?: McpJson.obj()), clazz)
 
-inline fun <reified OUT : Any> JsonRpcResult<McpNodeType>.fromJsonRpc(): OUT =
-    McpJson.asA<OUT>(McpJson.compact(result ?: McpJson.nullNode()))
+fun <OUT : Any> JsonRpcResult<McpNodeType>.fromJsonRpc(clazz: KClass<OUT>): OUT =
+    McpJson.asA(McpJson.compact(result ?: McpJson.nullNode()), clazz)
 
 fun McpRequest.toJsonRpc(method: McpRpc, id: McpNodeType) =
     McpJson.renderRequest(method.Method.value, McpJson.asJsonObject(this), id)

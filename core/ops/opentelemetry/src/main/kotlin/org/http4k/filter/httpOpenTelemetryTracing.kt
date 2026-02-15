@@ -18,16 +18,11 @@ import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_REQUEST
 import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
-import org.http4k.core.PolyFilter
-import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.then
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
-import org.http4k.sse.SseResponse
-import org.http4k.sse.then
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -121,58 +116,6 @@ fun ServerFilters.OpenTelemetryTracing(
     }
 }
 
-/**
- * Adds OpenTelemetry tracing to PolyHandler.
- */
-fun PolyFilters.OpenTelemetryTracing(
-    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
-    spanNamer: (Request) -> String = defaultSpanNamer,
-    error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
-    spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
-    httpSpanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
-    sseSpanCompletionMutator: (Span, Request, SseResponse) -> Unit = { _, _, _ -> },
-) = PolyFilter { next ->
-    PolyHandler(
-        http = next.http?.let {
-            val openTelemetryTracing = ServerFilters.OpenTelemetryTracing(
-                openTelemetry,
-                spanNamer,
-                error,
-                spanCreationMutator,
-                httpSpanCompletionMutator
-            )
-            openTelemetryTracing.then(it)
-        },
-        sse = next.sse?.let {
-            ServerFilters.OpenTelemetrySseTracing(
-                openTelemetry,
-                spanNamer,
-                error,
-                spanCreationMutator,
-                sseSpanCompletionMutator
-            ).then(it)
-        }
-    )
-}
-
-@Suppress("UNCHECKED_CAST")
-internal fun <T : HttpMessage> setter() = TextMapSetter<AtomicReference<T>> { ref, name, value ->
-    ref?.run { set(get().header(name, value) as T) }
-}
-
-internal fun <T : HttpMessage> getter(textMapPropagator: TextMapPropagator) = object : TextMapGetter<T> {
-    override fun keys(carrier: T) = textMapPropagator.fields()
-
-    override fun get(carrier: T?, key: String) = carrier?.header(key)
-}
-
-val defaultSpanNamer: (Request) -> String = {
-    when (it) {
-        is RequestWithContext -> it.method.name + it.xUriTemplate?.let { " $it" }
-        else -> it.method.name
-    }
-}
-
 private fun Span.addStandardDataFrom(resp: Response, req: Request, attributeKeys: OpenTelemetryAttributesKeys) {
     resp.body.length?.also {
         setAttribute(HTTP_RESPONSE_BODY_SIZE, it)
@@ -182,46 +125,3 @@ private fun Span.addStandardDataFrom(resp: Response, req: Request, attributeKeys
     req.body.length?.also { setAttribute(HTTP_REQUEST_BODY_SIZE, it) }
     setAttribute(attributeKeys.statusCode, resp.status.code.toLong())
 }
-
-internal fun Request.remoteAddress(): String? =
-    header("X-Forwarded-For")?.split(",")?.firstOrNull() ?: source?.address
-
-internal fun Span.setStatusFromResponse(status: org.http4k.core.Status) {
-    if (status.serverError) setStatus(ERROR)
-    else if (status.clientError) setStatus(UNSET)
-}
-
-internal class ServerTracingContext(
-    openTelemetry: OpenTelemetry,
-    private val spanNamer: (Request) -> String,
-    private val error: (Request, Throwable) -> String,
-    private val spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder,
-    private val attributesKeys: OpenTelemetryAttributesKeys
-) {
-    private val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
-    private val textMapPropagator = openTelemetry.propagators.textMapPropagator
-    internal val getter = getter<Request>(textMapPropagator)
-
-    fun createServerSpan(req: Request): Span =
-        tracer.spanBuilder(spanNamer(req))
-            .setParent(textMapPropagator.extract(Context.current(), req, getter))
-            .setSpanKind(SERVER)
-            .setServerSpanAttributes(req, attributesKeys)
-            .let { spanCreationMutator(it, req) }
-            .startSpan()
-
-    fun setSpanError(span: Span, req: Request, t: Throwable) {
-        span.setStatus(ERROR, error(req, t))
-    }
-}
-
-internal fun SpanBuilder.setServerSpanAttributes(req: Request, attributeKeys: OpenTelemetryAttributesKeys): SpanBuilder = apply {
-    if (req is RoutedMessage && req.xUriTemplate != null) {
-        setAttribute(attributeKeys.httpRoute, req.xUriTemplate.toString())
-    }
-    setAttribute(attributeKeys.method, req.method.name)
-    attributeKeys.serverUrl?.let { setAttribute(it, req.uri.toString()) }
-    req.header("User-Agent")?.also { setAttribute(attributeKeys.userAgent, it) }
-    req.remoteAddress()?.also { setAttribute(attributeKeys.clientAddress, it) }
-}
-

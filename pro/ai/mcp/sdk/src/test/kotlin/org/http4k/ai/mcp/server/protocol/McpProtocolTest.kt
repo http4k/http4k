@@ -1,4 +1,4 @@
-package org.http4k.ai.mcp.server
+package org.http4k.ai.mcp.server.protocol
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.model.Completion
 import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
@@ -24,7 +25,9 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.Root
 import org.http4k.ai.mcp.model.Size
+import org.http4k.ai.mcp.model.TaskSupport
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.instant
 import org.http4k.ai.mcp.model.int
@@ -58,9 +61,6 @@ import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerRoots
 import org.http4k.ai.mcp.server.capability.ServerTools
-import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.ServerLogger
-import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.server.sse.SseMcp
@@ -200,7 +200,7 @@ class McpProtocolTest {
     @Test
     fun `deal with prompts`() {
         val intArg = Prompt.Arg.int().required("name", "description", mapOf("title" to "title"))
-        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val icons = listOf(Icon(Uri.of("https://example.com/icon.png")))
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title", icons = icons)
 
         val mcp = SseMcp(
@@ -255,7 +255,7 @@ class McpProtocolTest {
 
     @Test
     fun `deal with static resources`() {
-        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val icons = listOf(Icon(Uri.of("https://example.com/icon.png")))
         val resource = Resource.Static(
             Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description",
             IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)), null, icons
@@ -322,7 +322,7 @@ class McpProtocolTest {
 
     @Test
     fun `deal with templated resources`() {
-        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val icons = listOf(Icon(Uri.of("https://example.com/icon.png")))
         val resource =
             Resource.Templated(
                 "https://www.http4k.org/{+template}", "HTTP4K", "description",
@@ -401,7 +401,7 @@ class McpProtocolTest {
         val stringArg = Tool.Arg.string().required("foo", "description1")
         val intArg = Tool.Arg.int().optional("bar", "description2")
         val output = Tool.Output.auto(FooBar("bar")).toLens()
-        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val icons = listOf(Icon(Uri.of("https://example.com/icon.png")))
 
         val unstructuredTool = Tool("unstructured", "description", stringArg, intArg, title = "title", icons = icons)
         val structuredTool = Tool("structured", "description", output = output, title = "title", icons = icons)
@@ -668,7 +668,7 @@ class McpProtocolTest {
             dateValueArg,
             objectValueArg,
             listObjectValueArg,
-            execution = org.http4k.ai.mcp.model.ToolExecution(org.http4k.ai.mcp.model.TaskSupport.optional)
+            execution = ToolExecution(TaskSupport.optional)
         )
 
         val mcp = SseMcp(
@@ -703,7 +703,7 @@ class McpProtocolTest {
             "description",
             objectValueArg,
             listObjectValueArg,
-            execution = org.http4k.ai.mcp.model.ToolExecution(org.http4k.ai.mcp.model.TaskSupport.required)
+            execution = ToolExecution(TaskSupport.required)
         )
 
         val mcp = SseMcp(
