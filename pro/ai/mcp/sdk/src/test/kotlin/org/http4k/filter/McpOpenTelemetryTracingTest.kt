@@ -21,8 +21,12 @@ import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
-import org.http4k.core.Method
+import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
@@ -55,11 +59,11 @@ class McpOpenTelemetryTracingTest {
         val session = Session(SessionId.of("test-session-123"))
         val jsonReq = jsonRpcRequest()
 
-        handler(McpRequest(session, jsonReq, Request.Companion(Method.POST, "/mcp")))
+        handler(McpRequest(session, jsonReq, Request.Companion(POST, "/mcp")))
 
         with(capturedSpan!!) {
             assertThat(name, equalTo("tools/call"))
-            assertThat(kind, equalTo(SpanKind.INTERNAL))
+            assertThat(kind, equalTo(SpanKind.SERVER))
             assertThat(attributes.get(AttributeKey.stringKey("mcp.method.name")), equalTo("tools/call"))
             assertThat(attributes.get(AttributeKey.stringKey("mcp.session.id")), equalTo("test-session-123"))
             assertThat(attributes.get(AttributeKey.stringKey("jsonrpc.request.id")), equalTo("1"))
@@ -75,7 +79,7 @@ class McpOpenTelemetryTracingTest {
         val session = Session(SessionId.of("test-session"))
         val jsonReq = jsonRpcRequest()
 
-        runCatching { handler(McpRequest(session, jsonReq, Request.Companion(Method.POST, "/mcp"))) }
+        runCatching { handler(McpRequest(session, jsonReq, Request.Companion(POST, "/mcp"))) }
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
@@ -96,11 +100,36 @@ class McpOpenTelemetryTracingTest {
         val session = Session(SessionId.of("test-session"))
         val jsonReq = jsonRpcRequest()
 
-        handler(McpRequest(session, jsonReq, Request.Companion(Method.POST, "/mcp")))
+        handler(McpRequest(session, jsonReq, Request.Companion(POST, "/mcp")))
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
         assertThat(span.attributes.get(AttributeKey.stringKey("error.type")), equalTo("-32603"))
+    }
+
+    @Test
+    fun `links to transport span when present`() {
+        val mcpHandler = McpFilters.OpenTelemetryTracing(openTelemetry).then { McpResponse(McpJson.nullNode()) }
+
+        val poly = PolyFilters.OpenTelemetryTracing(openTelemetry).then(
+            PolyHandler(http = { req ->
+                mcpHandler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), req))
+                Response(OK)
+            })
+        )
+
+        poly.http!!(Request(POST, "/mcp"))
+
+        val spans = spanExporter.finishedSpanItems
+        assertThat(spans.size, equalTo(2))
+
+        val transportSpan = spans.first { it.kind == SpanKind.SERVER && it.name != "tools/call" }
+        val mcpSpan = spans.first { it.name == "tools/call" }
+
+        assertThat(mcpSpan.links.size, equalTo(1))
+        assertThat(mcpSpan.links.first().spanContext.traceId, equalTo(transportSpan.spanContext.traceId))
+        assertThat(mcpSpan.links.first().spanContext.spanId, equalTo(transportSpan.spanContext.spanId))
+        assertThat(mcpSpan.parentSpanContext.isValid, equalTo(false))
     }
 
     private fun jsonRpcRequest() = JsonRpcRequest(

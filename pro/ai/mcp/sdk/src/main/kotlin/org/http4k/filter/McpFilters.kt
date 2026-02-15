@@ -18,7 +18,7 @@ object McpFilters {
             { req ->
                 val span = tracer.spanBuilder(req.json.method)
                     .setParent(Context.current())
-                    .setSpanKind(SpanKind.INTERNAL)
+                    .setSpanKind(SpanKind.SERVER)
                     .setAttribute("mcp.method.name", req.json.method)
                     .setAttribute("mcp.session.id", req.session.id.value)
                     .apply {
