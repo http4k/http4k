@@ -3,11 +3,11 @@ package org.http4k.filter
 import io.opentelemetry.context.propagation.ContextPropagators
 import io.opentelemetry.extension.trace.propagation.B3Propagator
 import io.opentelemetry.sdk.OpenTelemetrySdk
-import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter.create
+import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 
-val inMemorySpanExporter = create()
+val inMemorySpanExporter = InMemorySpanExporter.create()
 
 fun setupOtelSdk() = OpenTelemetrySdk.builder()
     .setTracerProvider(

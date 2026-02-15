@@ -1,8 +1,8 @@
-package org.http4k.ai.mcp.server.protocol
+package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.api.common.AttributeKey.stringKey
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
@@ -15,9 +15,13 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.server.protocol.McpRequest
+import org.http4k.ai.mcp.server.protocol.McpResponse
+import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
-import org.http4k.core.Method.POST
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage
@@ -43,22 +47,22 @@ class McpOpenTelemetryTracingTest {
 
         var capturedSpan: SpanData? = null
 
-        val handler = filter.then { req ->
+        val handler = filter.then {
             capturedSpan = (Span.current() as ReadableSpan).toSpanData()
             McpResponse(McpJson.nullNode())
         }
 
         val session = Session(SessionId.of("test-session-123"))
-        val jsonReq = jsonRpcRequest("tools/call", "42")
+        val jsonReq = jsonRpcRequest()
 
-        handler(McpRequest(session, jsonReq, Request(POST, "/mcp")))
+        handler(McpRequest(session, jsonReq, Request.Companion(Method.POST, "/mcp")))
 
         with(capturedSpan!!) {
             assertThat(name, equalTo("tools/call"))
             assertThat(kind, equalTo(SpanKind.INTERNAL))
-            assertThat(attributes.get(stringKey("mcp.method.name")), equalTo("tools/call"))
-            assertThat(attributes.get(stringKey("mcp.session.id")), equalTo("test-session-123"))
-            assertThat(attributes.get(stringKey("jsonrpc.request.id")), equalTo("\"42\""))
+            assertThat(attributes.get(AttributeKey.stringKey("mcp.method.name")), equalTo("tools/call"))
+            assertThat(attributes.get(AttributeKey.stringKey("mcp.session.id")), equalTo("test-session-123"))
+            assertThat(attributes.get(AttributeKey.stringKey("jsonrpc.request.id")), equalTo("1"))
         }
     }
 
@@ -69,13 +73,16 @@ class McpOpenTelemetryTracingTest {
         val handler = filter.then { throw IllegalStateException("boom") }
 
         val session = Session(SessionId.of("test-session"))
-        val jsonReq = jsonRpcRequest("tools/call", "1")
+        val jsonReq = jsonRpcRequest()
 
-        runCatching { handler(McpRequest(session, jsonReq, Request(POST, "/mcp"))) }
+        runCatching { handler(McpRequest(session, jsonReq, Request.Companion(Method.POST, "/mcp"))) }
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
-        assertThat(span.attributes.get(stringKey("error.type")), equalTo("java.lang.IllegalStateException"))
+        assertThat(
+            span.attributes.get(AttributeKey.stringKey("error.type")),
+            equalTo("java.lang.IllegalStateException")
+        )
     }
 
     @Test
@@ -87,20 +94,20 @@ class McpOpenTelemetryTracingTest {
         }
 
         val session = Session(SessionId.of("test-session"))
-        val jsonReq = jsonRpcRequest("tools/call", "1")
+        val jsonReq = jsonRpcRequest()
 
-        handler(McpRequest(session, jsonReq, Request(POST, "/mcp")))
+        handler(McpRequest(session, jsonReq, Request.Companion(Method.POST, "/mcp")))
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
-        assertThat(span.attributes.get(stringKey("error.type")), equalTo("-32603"))
+        assertThat(span.attributes.get(AttributeKey.stringKey("error.type")), equalTo("-32603"))
     }
 
-    private fun jsonRpcRequest(method: String, id: String) = JsonRpcRequest(
+    private fun jsonRpcRequest() = JsonRpcRequest(
         McpJson, mapOf(
-            "jsonrpc" to McpJson.asJsonObject("2.0"),
-            "method" to McpJson.asJsonObject(method),
-            "id" to McpJson.asJsonObject(id),
+            "jsonrpc" to asJsonObject("2.0"),
+            "method" to asJsonObject("tools/call"),
+            "id" to asJsonObject(1),
             "params" to asJsonObject(emptyMap<String, Any>())
         )
     )

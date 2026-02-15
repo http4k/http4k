@@ -1,7 +1,7 @@
 package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
-import io.opentelemetry.api.trace.StatusCode
+import io.opentelemetry.api.trace.StatusCode.ERROR
 import org.http4k.ai.mcp.ToolFilter
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.model.ToolName
@@ -16,7 +16,7 @@ object ToolFilters {
             next(it).also { response ->
                 if (response is ToolResponse.Error) {
                     Span.current().apply {
-                        setStatus(StatusCode.ERROR)
+                        setStatus(ERROR)
                         setAttribute("error.type", "tool_error")
                     }
                 }

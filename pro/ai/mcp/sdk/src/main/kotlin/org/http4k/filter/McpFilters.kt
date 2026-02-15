@@ -1,4 +1,4 @@
-package org.http4k.ai.mcp.server.protocol
+package org.http4k.filter
 
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
@@ -6,12 +6,13 @@ import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.context.Context
+import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
+import org.http4k.metrics.Http4kOpenTelemetry
 
 object McpFilters {
     fun OpenTelemetryTracing(openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()): McpFilter {
-        val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
+        val tracer = openTelemetry.tracerProvider.get(Http4kOpenTelemetry.INSTRUMENTATION_NAME)
 
         return McpFilter { next ->
             { req ->
