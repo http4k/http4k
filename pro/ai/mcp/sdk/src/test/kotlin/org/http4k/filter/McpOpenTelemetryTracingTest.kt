@@ -67,6 +67,7 @@ class McpOpenTelemetryTracingTest {
             assertThat(attributes.get(AttributeKey.stringKey("mcp.method.name")), equalTo("tools/call"))
             assertThat(attributes.get(AttributeKey.stringKey("mcp.session.id")), equalTo("test-session-123"))
             assertThat(attributes.get(AttributeKey.stringKey("jsonrpc.request.id")), equalTo("1"))
+            assertThat(attributes.get(AttributeKey.stringKey("mcp.protocol.version")), equalTo("2025-11-25"))
         }
     }
 

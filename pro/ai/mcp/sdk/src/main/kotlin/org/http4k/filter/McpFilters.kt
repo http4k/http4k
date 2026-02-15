@@ -9,6 +9,8 @@ import io.opentelemetry.api.trace.StatusCode.*
 import io.opentelemetry.context.Context
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.metrics.Http4kOpenTelemetry
 
 object McpFilters {
@@ -24,6 +26,7 @@ object McpFilters {
                     .setSpanKind(SpanKind.SERVER)
                     .setAttribute("mcp.method.name", req.json.method)
                     .setAttribute("mcp.session.id", req.session.id.value)
+                    .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
                     .apply {
                         req.json.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
                         if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
