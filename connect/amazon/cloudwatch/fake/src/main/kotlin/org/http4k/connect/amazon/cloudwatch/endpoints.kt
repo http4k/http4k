@@ -31,6 +31,7 @@ import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.storage.Storage
 import org.http4k.connect.storage.getOrPut
+import java.time.Clock
 import kotlin.math.pow
 
 fun AwsJsonFake.deleteAlarms(alarms: Storage<Alarm>) = route<DeleteAlarms> {
@@ -135,32 +136,32 @@ fun AwsJsonFake.enableAlarmActions(alarms: Storage<Alarm>) = route<EnableAlarmAc
         }
 }
 
-fun AwsJsonFake.putCompositeAlarm(alarms: Storage<Alarm>, region: Region, awsAccount: AwsAccount) = route<PutCompositeAlarm> {
+fun AwsJsonFake.putCompositeAlarm(alarms: Storage<Alarm>, region: Region, awsAccount: AwsAccount, clock: Clock) = route<PutCompositeAlarm> {
     if (alarms.keySet().size >= 5000) {
         return@route JsonError(
             "limit exceeded",
             "Region can contain at most 5000 alarms, which has already been reached"
         )
     } else {
-        alarms[it.AlarmName.value] = it.toAlarm(alarms[it.AlarmName.value], region, awsAccount)
+        alarms[it.AlarmName.value] = it.toAlarm(alarms[it.AlarmName.value], region, awsAccount, clock.instant())
     }
 }
 
-fun AwsJsonFake.putMetricAlarm(alarms: Storage<Alarm>, region: Region, awsAccount: AwsAccount) = route<PutMetricAlarm> {
+fun AwsJsonFake.putMetricAlarm(alarms: Storage<Alarm>, region: Region, awsAccount: AwsAccount, clock: Clock) = route<PutMetricAlarm> {
     if (alarms.keySet().size >= 5000) {
         return@route JsonError(
             "limit exceeded",
             "Region can contain at most 5000 alarms, which has already been reached"
         )
     } else {
-        alarms[it.AlarmName.value] = it.toAlarm(alarms[it.AlarmName.value], region, awsAccount)
+        alarms[it.AlarmName.value] = it.toAlarm(alarms[it.AlarmName.value], region, awsAccount, clock.instant())
     }
 }
 
-fun AwsJsonFake.setAlarmState(alarms: Storage<Alarm>) = route<SetAlarmState> {
+fun AwsJsonFake.setAlarmState(alarms: Storage<Alarm>, clock: Clock) = route<SetAlarmState> {
     when (val alarm: Alarm? = alarms[it.AlarmName.value]) {
         null -> JsonError("not found", "${it.AlarmName} not found")
-        else -> alarms[it.AlarmName.value] = alarm.setAlarmState(it)
+        else -> alarms[it.AlarmName.value] = alarm.setAlarmState(it, clock.instant())
     }
 }
 
@@ -257,7 +258,7 @@ fun AwsJsonFake.listMetrics(metrics: Storage<MutableList<MetricDatum>>) = route<
     )
 }
 
-fun AwsJsonFake.putMetricData(metrics: Storage<MutableList<MetricDatum>>) = route<PutMetricData> {
+fun AwsJsonFake.putMetricData(metrics: Storage<MutableList<MetricDatum>>, clock: Clock) = route<PutMetricData> {
     if (it.EntityMetricData != null && it.StrictEntityValidation == null) {
         return@route JsonError("invalid parameter value", "When specifying EntityMetricData, you must also specify StrictEntityValidation")
     }
@@ -267,7 +268,10 @@ fun AwsJsonFake.putMetricData(metrics: Storage<MutableList<MetricDatum>>) = rout
     if (it.MetricData != null && it.MetricData!!.isEmpty()) {
         return@route JsonError("invalid parameter value", "When specifying MetricData, you must specify at least 1 entry. Found None.")
     }
-    val metricData = it.EntityMetricData.orEmpty().flatMap { it.MetricData.orEmpty() } + it.MetricData.orEmpty()
+    val metricData = it.EntityMetricData.orEmpty()
+        .flatMap { it.MetricData.orEmpty() }
+        .plus(it.MetricData.orEmpty())
+        .map { it.copy(Timestamp = it.Timestamp ?: clock.instant()) }
     if (metricData.size !in 1..1000) {
         return@route JsonError("invalid parameter value", "Total metric data size must be between one and 1000. Found ${metricData.size}")
     }
@@ -291,7 +295,7 @@ fun AwsJsonFake.putMetricData(metrics: Storage<MutableList<MetricDatum>>) = rout
             null -> metricList.add(metricDatum)
             else -> {
                 val (index, existingMetric) = existingMetricWithIndex
-                metricList[index] = existingMetric.with(metricDatum)
+                metricList[index] = existingMetric.with(metricDatum, clock.instant())
             }
         }
     }
@@ -306,7 +310,7 @@ fun AwsJsonFake.listTagsForResource(alarms: Storage<Alarm>) = route<ListTagsForR
     }
 }
 
-fun AwsJsonFake.tagResource(alarms: Storage<Alarm>) = route<TagResource> {
+fun AwsJsonFake.tagResource(alarms: Storage<Alarm>, clock: Clock) = route<TagResource> {
     if (it.Tags.size !in 1..50) {
         return@route JsonError("invalid parameter provided", "Invalid number of tags provided: ${it.Tags.size}. Must be between 1 and 50")
     }
@@ -314,17 +318,17 @@ fun AwsJsonFake.tagResource(alarms: Storage<Alarm>) = route<TagResource> {
     when (alarmKey) {
         null -> JsonError("not found", "${it.ResourceARN} not found")
         else -> {
-            val updatedAlarm = alarms[alarmKey]!!.withTags(it.Tags)
+            val updatedAlarm = alarms[alarmKey]!!.withTags(it.Tags, clock.instant())
             if (updatedAlarm.Tags!!.size > 50) return@route JsonError("internal error", "Resource ${it.ResourceARN} would have more than 50 tags")
             alarms[alarmKey] = updatedAlarm
         }
     }
 }
 
-fun AwsJsonFake.untagResource(alarms: Storage<Alarm>) = route<UntagResource> {
+fun AwsJsonFake.untagResource(alarms: Storage<Alarm>, clock: Clock) = route<UntagResource> {
     val alarmKey = alarms.keySet("").firstOrNull { key -> alarms[key]?.AlarmArn == it.ResourceARN }
     when (alarmKey) {
         null -> JsonError("not found", "${it.ResourceARN} not found")
-        else -> alarms[alarmKey] = alarms[alarmKey]!!.withoutTags(it.TagKeys.toSet())
+        else -> alarms[alarmKey] = alarms[alarmKey]!!.withoutTags(it.TagKeys.toSet(), clock.instant())
     }
 }

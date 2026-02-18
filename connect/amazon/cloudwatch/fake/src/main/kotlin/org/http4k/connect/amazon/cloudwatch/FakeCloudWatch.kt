@@ -28,6 +28,7 @@ import org.http4k.connect.storage.Storage
 import org.http4k.core.Method.POST
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import java.time.Clock
 import java.time.Instant
 
 data class Alarm(
@@ -72,6 +73,7 @@ class FakeCloudWatch(
     metrics: Storage<MutableList<MetricDatum>> = Storage.InMemory(),
     awsAccount: AwsAccount = AwsAccount.of("1234567890"),
     private val region: Region = Region.of("ldn-north-1"),
+    clock: Clock = Clock.systemUTC()
 ) : ChaoticHttpHandler() {
 
     private val api = AwsJsonFake(CloudWatchMoshi, AwsService.of("GraniteServiceVersion20100801"))
@@ -87,12 +89,12 @@ class FakeCloudWatch(
             api.getMetricStatistics(metrics),
             api.listMetrics(metrics),
             api.listTagsForResource(alarms),
-            api.putCompositeAlarm(alarms, region, awsAccount),
-            api.putMetricAlarm(alarms, region, awsAccount),
-            api.putMetricData(metrics),
-            api.setAlarmState(alarms),
-            api.tagResource(alarms),
-            api.untagResource(alarms),
+            api.putCompositeAlarm(alarms, region, awsAccount, clock),
+            api.putMetricAlarm(alarms, region, awsAccount, clock),
+            api.putMetricData(metrics, clock),
+            api.setAlarmState(alarms, clock),
+            api.tagResource(alarms, clock),
+            api.untagResource(alarms, clock),
         )
     )
 
