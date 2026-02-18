@@ -25,7 +25,7 @@ import org.junit.jupiter.api.assertNotNull
 import java.time.Instant
 
 interface CloudWatchContract : AwsContract {
-    private val cloudWatch get() = CloudWatch.Http(aws.region, { aws.credentials }, http)
+    val cloudWatch get() = CloudWatch.Http(aws.region, { aws.credentials }, http)
 
     @Test
     fun `metric alarm lifecycle`() {

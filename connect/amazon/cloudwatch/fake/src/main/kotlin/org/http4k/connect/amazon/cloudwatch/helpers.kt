@@ -101,45 +101,42 @@ fun Alarm.toCompositeAlarm(): CompositeAlarm {
     )
 }
 
-fun PutCompositeAlarm.toAlarm(previous: Alarm?, region: Region, awsAccount: AwsAccount): Alarm {
-    val now = Instant.now()
-    return Alarm(
-        AlarmName = AlarmName,
-        AlarmArn = ARN.of(CloudWatch.awsService, region, awsAccount, AlarmName),
-        ComparisonOperator = null,
-        EvaluationPeriods = null,
-        ActionsEnabled = ActionsEnabled,
-        AlarmActions = AlarmActions,
-        AlarmDescription = AlarmDescription,
-        DatapointsToAlarm = null,
-        Dimensions = null,
-        EvaluateLowSampleCountPercentile = null,
-        ExtendedStatistic = null,
-        InsufficientDataActions = InsufficientDataActions,
-        MetricName = null,
-        Metrics = null,
-        Namespace = null,
-        OKActions = OKActions,
-        Period = null,
-        Statistic = null,
-        Tags = Tags,
-        Threshold = null,
-        ThresholdMetricId = null,
-        TreatMissingData = null,
-        Unit = null,
-        AlarmRule = AlarmRule,
-        ActionsSuppressor = ActionsSuppressor,
-        ActionsSuppressorExtensionPeriod = ActionsSuppressorExtensionPeriod,
-        ActionsSuppressorWaitPeriod = ActionsSuppressorWaitPeriod,
-        AlarmType = AlarmType.COMPOSITE_ALARM,
-        LastUpdate = now,
-        LastStateTransitionTimestamp = previous?.LastStateTransitionTimestamp ?: now,
-        LastStateUpdateTimestamp = previous?.LastStateUpdateTimestamp ?: now,
-        State = previous?.State ?: AlarmState.INSUFFICIENT_DATA,
-        StateReason = previous?.StateReason,
-        StateReasonData = previous?.StateReasonData,
-    )
-}
+fun PutCompositeAlarm.toAlarm(previous: Alarm?, region: Region, awsAccount: AwsAccount, now: Instant) = Alarm(
+    AlarmName = AlarmName,
+    AlarmArn = ARN.of(CloudWatch.awsService, region, awsAccount, AlarmName),
+    ComparisonOperator = null,
+    EvaluationPeriods = null,
+    ActionsEnabled = ActionsEnabled,
+    AlarmActions = AlarmActions,
+    AlarmDescription = AlarmDescription,
+    DatapointsToAlarm = null,
+    Dimensions = null,
+    EvaluateLowSampleCountPercentile = null,
+    ExtendedStatistic = null,
+    InsufficientDataActions = InsufficientDataActions,
+    MetricName = null,
+    Metrics = null,
+    Namespace = null,
+    OKActions = OKActions,
+    Period = null,
+    Statistic = null,
+    Tags = Tags,
+    Threshold = null,
+    ThresholdMetricId = null,
+    TreatMissingData = null,
+    Unit = null,
+    AlarmRule = AlarmRule,
+    ActionsSuppressor = ActionsSuppressor,
+    ActionsSuppressorExtensionPeriod = ActionsSuppressorExtensionPeriod,
+    ActionsSuppressorWaitPeriod = ActionsSuppressorWaitPeriod,
+    AlarmType = AlarmType.COMPOSITE_ALARM,
+    LastUpdate = now,
+    LastStateTransitionTimestamp = previous?.LastStateTransitionTimestamp ?: now,
+    LastStateUpdateTimestamp = previous?.LastStateUpdateTimestamp ?: now,
+    State = previous?.State ?: AlarmState.INSUFFICIENT_DATA,
+    StateReason = previous?.StateReason,
+    StateReasonData = previous?.StateReasonData,
+)
 
 fun Alarm.toMetricAlarm(): MetricAlarm {
     return MetricAlarm(
@@ -181,56 +178,50 @@ fun ExtendedStatistic.toPercentileExtendedStatisticOrNull() = try {
     null
 }
 
-fun PutMetricAlarm.toAlarm(previous: Alarm?, region: Region, awsAccount: AwsAccount): Alarm {
-    val now = Instant.now()
-    return Alarm(
-        AlarmName = AlarmName,
-        AlarmArn = ARN.of(CloudWatch.awsService, region, awsAccount, AlarmName),
-        ComparisonOperator = ComparisonOperator,
-        EvaluationPeriods = EvaluationPeriods,
-        ActionsEnabled = ActionsEnabled,
-        AlarmActions = AlarmActions,
-        AlarmDescription = AlarmDescription,
-        DatapointsToAlarm = DatapointsToAlarm,
-        Dimensions = Dimensions,
-        EvaluateLowSampleCountPercentile = EvaluateLowSampleCountPercentile,
-        ExtendedStatistic = ExtendedStatistic,
-        InsufficientDataActions = InsufficientDataActions,
-        MetricName = MetricName,
-        Metrics = Metrics,
-        Namespace = Namespace,
-        OKActions = OKActions,
-        Period = Period,
-        Statistic = Statistic,
-        Tags = Tags,
-        Threshold = Threshold,
-        ThresholdMetricId = ThresholdMetricId,
-        TreatMissingData = TreatMissingData,
-        Unit = Unit,
-        AlarmRule = null,
-        ActionsSuppressor = null,
-        ActionsSuppressorExtensionPeriod = null,
-        ActionsSuppressorWaitPeriod = null,
-        AlarmType = AlarmType.METRIC_ALARM,
-        LastUpdate = now,
-        LastStateTransitionTimestamp = previous?.LastStateTransitionTimestamp ?: now,
-        LastStateUpdateTimestamp = previous?.LastStateUpdateTimestamp ?: now,
-        State = previous?.State ?: AlarmState.INSUFFICIENT_DATA,
-        StateReason = previous?.StateReason,
-        StateReasonData = previous?.StateReasonData,
-    )
-}
+fun PutMetricAlarm.toAlarm(previous: Alarm?, region: Region, awsAccount: AwsAccount, now: Instant) =  Alarm(
+    AlarmName = AlarmName,
+    AlarmArn = ARN.of(CloudWatch.awsService, region, awsAccount, AlarmName),
+    ComparisonOperator = ComparisonOperator,
+    EvaluationPeriods = EvaluationPeriods,
+    ActionsEnabled = ActionsEnabled,
+    AlarmActions = AlarmActions,
+    AlarmDescription = AlarmDescription,
+    DatapointsToAlarm = DatapointsToAlarm,
+    Dimensions = Dimensions,
+    EvaluateLowSampleCountPercentile = EvaluateLowSampleCountPercentile,
+    ExtendedStatistic = ExtendedStatistic,
+    InsufficientDataActions = InsufficientDataActions,
+    MetricName = MetricName,
+    Metrics = Metrics,
+    Namespace = Namespace,
+    OKActions = OKActions,
+    Period = Period,
+    Statistic = Statistic,
+    Tags = Tags,
+    Threshold = Threshold,
+    ThresholdMetricId = ThresholdMetricId,
+    TreatMissingData = TreatMissingData,
+    Unit = Unit,
+    AlarmRule = null,
+    ActionsSuppressor = null,
+    ActionsSuppressorExtensionPeriod = null,
+    ActionsSuppressorWaitPeriod = null,
+    AlarmType = AlarmType.METRIC_ALARM,
+    LastUpdate = now,
+    LastStateTransitionTimestamp = previous?.LastStateTransitionTimestamp ?: now,
+    LastStateUpdateTimestamp = previous?.LastStateUpdateTimestamp ?: now,
+    State = previous?.State ?: AlarmState.INSUFFICIENT_DATA,
+    StateReason = previous?.StateReason,
+    StateReasonData = previous?.StateReasonData,
+)
 
-fun Alarm.setAlarmState(setAlarmState: SetAlarmState): Alarm {
-    val now = Instant.now()
-    return copy(
-        State = setAlarmState.StateValue,
-        StateReason = setAlarmState.StateReason,
-        StateReasonData = setAlarmState.StateReasonData,
-        LastStateUpdateTimestamp = now,
-        LastStateTransitionTimestamp = if (setAlarmState.StateValue == State) LastStateTransitionTimestamp else now,
-    )
-}
+fun Alarm.setAlarmState(setAlarmState: SetAlarmState, now: Instant) = copy(
+    State = setAlarmState.StateValue,
+    StateReason = setAlarmState.StateReason,
+    StateReasonData = setAlarmState.StateReasonData,
+    LastStateUpdateTimestamp = now,
+    LastStateTransitionTimestamp = if (setAlarmState.StateValue == State) LastStateTransitionTimestamp else now,
+)
 
 fun MetricDatum.toMetricDataResult() = MetricDataResult(
     Id = MetricName.value,
@@ -282,7 +273,7 @@ fun MetricDatum.toMetric(namespace: Namespace): Metric {
     )
 }
 
-fun MetricDatum.with(other: MetricDatum): MetricDatum {
+fun MetricDatum.with(other: MetricDatum, now: Instant): MetricDatum {
     val zippedValues = Values?.let { values ->
         (values zip (Counts ?: nCopies(values.size, 1.0))).toMap().toMutableMap()
     }
@@ -304,24 +295,24 @@ fun MetricDatum.with(other: MetricDatum): MetricDatum {
     return copy(
         Counts = newCounts,
         Dimensions = newDimensions.takeIf { it.isNotEmpty() }?.entries?.map { Dimension(it.key, it.value) },
-        Timestamp = Instant.now(),
+        Timestamp = now,
         Value = other.Value,
         Values = newValues,
     )
 }
 
-fun Alarm.withTags(tags: List<Tag>): Alarm {
+fun Alarm.withTags(tags: List<Tag>, now: Instant): Alarm {
     val newTagsMap = Tags.orEmpty().associate { it.Key to it.Value } + tags.associate { it.Key to it.Value }
     val newTags = newTagsMap.entries.map { Tag(it.key, it.value) }
     return copy(
         Tags = newTags,
-        LastUpdate = Instant.now()
+        LastUpdate = now
     )
 }
 
-fun Alarm.withoutTags(tagKeys: Set<String>): Alarm {
+fun Alarm.withoutTags(tagKeys: Set<String>, now: Instant): Alarm {
     return copy(
         Tags = Tags?.filter { it.Key !in tagKeys }?.takeIf { it.isNotEmpty() },
-        LastUpdate = Instant.now(),
+        LastUpdate = now
     )
 }
