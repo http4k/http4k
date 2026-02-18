@@ -11,7 +11,6 @@ import org.http4k.connect.amazon.cloudwatch.model.Namespace
 import org.http4k.connect.storage.InMemory
 import org.http4k.connect.storage.Storage
 import org.http4k.connect.successValue
-import org.http4k.util.TickingClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
