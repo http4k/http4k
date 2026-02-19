@@ -1,0 +1,15 @@
+[     281ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:10000/favicon.ico:0
+[   58574ms] Unexpected identifier 'badge'
+[  179762ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:10000/favicon.ico:0
+[  189162ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:10000/api/tools/call:0
+[  189163ms] SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at http://localhost:10000/:63:32
+    at async http://localhost:10000/:59:26
+[  221529ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:10000/api/tools/call:0
+[  221533ms] SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at http://localhost:10000/:63:32
+    at async http://localhost:10000/:59:26
+[  238186ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:10000/api/tools/call:0
+[  238186ms] SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at http://localhost:10000/:63:32
+    at async http://localhost:10000/:59:26

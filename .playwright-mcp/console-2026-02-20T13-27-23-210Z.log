@@ -1,0 +1,8 @@
+[   56056ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:10000/api/tools/call:0
+[   56057ms] SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at http://localhost:10000/:63:32
+    at async http://localhost:10000/:59:26
+[  102222ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:10000/api/tools/call:0
+[  102224ms] SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at http://localhost:10000/:63:32
+    at async http://localhost:10000/:59:26

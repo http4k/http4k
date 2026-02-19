@@ -25,5 +25,5 @@ fun swaggerUiWebjar(configFn: SwaggerUiConfig.() -> Unit = {}) = routes(
         .toFilter()
         .then(static(Classpath("org/http4k/contract/ui/swagger-config"))),
 
-    static(Classpath("/META-INF/resources/webjars/swagger-ui/5.31.0"))
+    static(Classpath("/META-INF/resources/webjars/swagger-ui/5.31.2"))
 )
