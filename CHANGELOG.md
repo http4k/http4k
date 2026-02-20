@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.30.1.0 (uncut)
+### v6.30.1.0
 - **http4k-***: Upgrade versions
 - **http4k-testing-webdriver**: [Fix] Respect the formaction and formmethod of the used submit input H/T @tamj0rd2
 - **http4k-ai-mcp-testing**: Fixed test MCP Apps host to accept non-string arguments from hosted app.
