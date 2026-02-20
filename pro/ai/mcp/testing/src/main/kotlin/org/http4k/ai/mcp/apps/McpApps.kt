@@ -15,6 +15,7 @@ import org.http4k.ai.mcp.apps.model.HostToolResponse
 import org.http4k.ai.mcp.apps.model.AvailableMcpApp
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.core.Uri
 
@@ -54,18 +55,24 @@ class McpApps(private val clients: List<McpClient>) {
     private fun findServerFor(serverId: String) =
         serverClients.entries.firstOrNull { it.key.name.value == serverId }?.value
 
-    fun render(serverId: String, resourceUri: Uri) = when (val s = findServerFor(serverId)) {
+    fun render(serverId: String, resourceUri: Uri): McpServerResult<ResourceResponse> =
+        when (val s = findServerFor(serverId)) {
         null -> Unknown
         else -> s.resources().read(ResourceRequest(resourceUri))
             .map {
+                val textContents = it.list.filterIsInstance<Resource.Content.Text>()
                 Success(
-                    it.list.filterIsInstance<Resource.Content.Text>()
-                        .joinToString("") { it.text.replace("\"", "'") }
+                    ResourceResponse(
+                        textContents.joinToString("") { it.text.replace("\"", "'") },
+                        textContents.firstNotNullOfOrNull { it._meta?.ui?.csp }
+                    )
                 )
             }
             .recover { Failure(it.toString()) }
     }
 }
+
+data class ResourceResponse(val content: String, val csp: Csp?)
 
 sealed interface McpServerResult<out T> {
     data class Success<T>(val value: T) : McpServerResult<T>

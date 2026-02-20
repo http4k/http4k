@@ -21,30 +21,30 @@ import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 
 @ExtendWith(ApprovalTest::class)
 class McpAppsHostTest {
     private val appName = "mcp app"
     private val uiUrl = Uri.of("ui://a-ui")
 
-    private fun McpApp(): PolyHandler {
-        return mcpHttpStreaming(
-            ServerMetaData("mcp app", "0.0.0").withExtensions(McpApps),
-            NoMcpSecurity,
-            RenderMcpApp(
-                name = "show_ui",
-                description = "shows the UI",
-                uri = uiUrl,
-                meta = McpAppResourceMeta(
-                    csp = Csp(
-                        resourceDomains = listOf(Domain.of("https://resource.com")),
-                        connectDomains = listOf(Domain.of("https://connect.com")),
-                        frameDomains = listOf(Domain.of("https://frame.com"))
-                    )
+    private fun McpApp(): PolyHandler = mcpHttpStreaming(
+        ServerMetaData("mcp app", "0.0.0").withExtensions(McpApps),
+        NoMcpSecurity,
+        RenderMcpApp(
+            name = "show_ui",
+            description = "shows the UI",
+            uri = uiUrl,
+            meta = McpAppResourceMeta(
+                csp = Csp(
+                    resourceDomains = listOf(Domain.of("https://resource.com")),
+                    connectDomains = listOf(Domain.of("https://connect.com")),
+                    frameDomains = listOf(Domain.of("https://frame.com"))
                 )
-            ) { "hello world" },
-        )
-    }
+            )
+        ) { "hello world" },
+    )
 
     private fun NonMcpApp() = mcpHttpStreaming(
         ServerMetaData("mcp server", "0.0.0").withExtensions(McpApps),
@@ -68,6 +68,18 @@ class McpAppsHostTest {
             host(
                 Request(GET, "/api/resources").query("serverId", appName).query("uri", uiUrl.toString())
             )
+        )
+    }
+
+    @Test
+    fun `sets CSP header from resource response`() {
+        val response = host(
+            Request(GET, "/api/resources").query("serverId", appName).query("uri", uiUrl.toString())
+        )
+
+        assertThat(
+            response.header("Content-Security-Policy"),
+            equalTo("default-src https://resource.com; connect-src https://connect.com; frame-src https://frame.com")
         )
     }
 }

@@ -37,7 +37,13 @@
         currentServerId = opt.dataset.serverId;
         const uri = opt.dataset.resourceUri;
 
-        const html = await fetch(`${basePath}/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`).then(r => r.text());
+        const res = await fetch(`${basePath}/api/resources?serverId=${currentServerId}&uri=${encodeURIComponent(uri)}`);
+        const csp = res.headers.get('Content-Security-Policy');
+        let html = await res.text();
+
+        if (csp) {
+            html = `<meta http-equiv="Content-Security-Policy" content="${csp}; style-src * 'unsafe-inline'; script-src * 'unsafe-inline'">` + html;
+        }
 
         const app = document.getElementById('app');
         app.classList.remove('d-none');

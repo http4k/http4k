@@ -33,8 +33,10 @@ fun RenderMcpApp(
         name = name,
         description = description,
         meta = Meta(ui = McpAppMeta(uri, visibility))
-    ) bind { ToolResponse.Ok(listOf()) }, Static(uri, ResourceName.of(name), description, McpApps.MIME_TYPE) bind {
+    ) bind { ToolResponse.Ok(listOf()) },
+    Static(uri, ResourceName.of(name), description, McpApps.MIME_TYPE) bind {
         ResourceResponse(Text(mcpAppHandler(it), it.uri, McpApps.MIME_TYPE, Content.Meta(ui = meta)))
-    })
+    }
+)
 
 typealias McpAppHandler = (ResourceRequest) -> String
