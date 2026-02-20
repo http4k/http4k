@@ -67,7 +67,11 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val enctype = form.getDomAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
 
             val method =
-                runCatching { Method.valueOf(form.element.attr("method").uppercase(getDefault())) }.getOrDefault(POST)
+                runCatching {
+                    val methodAttr =
+                        getDomAttribute("formmethod")?.takeIf { it.isNotEmpty() } ?: form.element.attr("method")
+                    Method.valueOf(methodAttr.uppercase(getDefault()))
+                }.getOrDefault(POST)
 
             val inputs = associatedFormElements(form, "input")
                 .asSequence()
@@ -109,7 +113,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 fileInputs.toNotNullMap()
             )
 
-            val actionString = form.element.attr("action")
+            val actionString = getDomAttribute("formaction")?.takeIf { it.isNotEmpty() } ?: form.element.attr("action")
             val formActionUri = Uri.of(actionString)
             val current = getURL()?.let { Uri.of(it) }
             val formUri = current?.relative(formActionUri) ?: formActionUri
