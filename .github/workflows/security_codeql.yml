@@ -68,7 +68,8 @@ jobs:
 
 
     - name: Build
-      run: ./gradlew build -x test
+      timeout-minutes: 120
+      run: bin/build_ci.sh
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
