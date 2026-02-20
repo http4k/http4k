@@ -151,6 +151,21 @@ class JSoupWebElementTest {
     }
 
     @Test
+    fun `submit uses the formaction and formmethod the submit input`() {
+        val div = JSoupWebElement(navigate, getURL, Jsoup.parse("""
+            <div>
+                <form id="the-form" method="POST" action="/one-we-dont-want">
+                    <input id="checkbox" name="checkedCheckbox" type="checkbox" value="checkedCheckbox" checked/>
+                </form>
+                <input id="submit" type="submit" form="the-form" formaction="/deleted" formmethod="delete" value="Submit"/>
+            </div>
+        """))
+
+        div.findElement(By.id("submit")).submit()
+        assertThat(newLocation, equalTo(DELETE to "/deleted?checkedCheckbox=checkedCheckbox"))
+    }
+
+    @Test
     fun `submit a non-form`() {
         element().submit()
         assertThat(newLocation, absent())
