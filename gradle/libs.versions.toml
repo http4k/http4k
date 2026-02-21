@@ -28,12 +28,13 @@ com-google-devtools-ksp = "2.3.6"
 com-gradleup-shadow = "9.3.2"
 com-vanniktech-gradle-maven-publish-plugin = "0.36.0"
 commons-codec = "1.21.0"
+# Blocked on 2.22.5.0 until Jackson 3 upgrade
+data4k = "2.22.5.0"
 docker-java-core = "3.7.0"
 docker-java-transport-httpclient5 = "3.7.0"
 dokka = "2.1.0"
 failsafe = "3.3.2"
-# Blocked on 2.22.5.0 until Jackson 3 upgrade
-forkhandles-bom = "2.22.5.0"
+forkhandles-bom = "2.25.2.1"
 freemarker = "2.3.34"
 fuel = "2.3.1"
 gcp-functions-framework-api = "2.0.0"
@@ -147,7 +148,7 @@ bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-b
 cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
 cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
-data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
+data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
