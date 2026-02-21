@@ -86,7 +86,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
         with(it.split(";").mapNotNull { it.trim().takeIf(String::isNotEmpty) }) {
             first() to drop(1).map {
                 with(it.split("=")) {
-                    first() to if (size == 1) null else drop(1).joinToString("=")
+                    first() to if (size == 1) null else drop(1).joinToString("=").removeSurrounding("\"")
                 }
             }
         }

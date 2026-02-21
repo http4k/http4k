@@ -213,6 +213,8 @@ class HeaderTest {
         assertThat(Header.parseValueAndDirectives("some value; bob   ;bob2=anotherValue   "),
             equalTo("some value" to
                 listOf("bob" to null, "bob2" to "anotherValue")))
+        assertThat(Header.parseValueAndDirectives("multipart/form-data; boundary=\"abc123\""),
+            equalTo("multipart/form-data" to listOf("boundary" to "abc123")))
     }
 
     @Test
