@@ -6,12 +6,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.routing.thenPoly
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
-import org.http4k.sse.then
 
 /**
- * Checks for the
+ * Provides combination CORs and rebind protection for SSE requests
  */
 fun ServerFilters.SseRebindProtection(corsPolicy: CorsPolicy): SseFilter = SseFilter { next ->
     { req ->
@@ -30,11 +30,11 @@ fun ServerFilters.SseRebindProtection(corsPolicy: CorsPolicy): SseFilter = SseFi
 }
 
 /**
- * Provides combination CORs and rebind protection
+ * Provides combination CORs and rebind protection for HTTP and SSE requests
  */
 fun PolyFilters.CorsAndRebindProtection(corsPolicy: CorsPolicy): PolyFilter = PolyFilter { next ->
     PolyHandler(
-        http = next.http?.let { ServerFilters.Cors(corsPolicy).then(it) },
-        sse = next.sse?.let { ServerFilters.SseRebindProtection(corsPolicy).then(it) }
+        http = next.http?.let { ServerFilters.Cors(corsPolicy).thenPoly(it) },
+        sse = next.sse?.let { ServerFilters.SseRebindProtection(corsPolicy).thenPoly(it) }
     )
 }

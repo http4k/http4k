@@ -7,19 +7,17 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.SseTransaction
 import org.http4k.core.WsTransaction
-import org.http4k.core.then
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent
 import org.http4k.events.SseEvent
 import org.http4k.events.WsEvent
 import org.http4k.filter.ServerFilters.CatchAll.originalBehaviour
+import org.http4k.routing.thenPoly
 import org.http4k.security.Security
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
-import org.http4k.sse.then
 import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsResponse
-import org.http4k.websocket.then
 import java.time.Clock
 
 /**
@@ -35,9 +33,9 @@ object PolyFilters {
         onErrorWs: (Throwable) -> WsResponse = ::originalWsBehaviour
     ) = PolyFilter { next ->
         PolyHandler(
-            http = next.http?.let { ServerFilters.CatchAll(onErrorHttp).then(it) },
-            sse = next.sse?.let { ServerFilters.CatchAllSse(onErrorSse).then(it) },
-            ws = next.ws?.let { ServerFilters.CatchAllWs(onErrorWs).then(it) }
+            http = next.http?.let { ServerFilters.CatchAll(onErrorHttp).thenPoly(it) },
+            sse = next.sse?.let { ServerFilters.CatchAllSse(onErrorSse).thenPoly(it) },
+            ws = next.ws?.let { ServerFilters.CatchAllWs(onErrorWs).thenPoly(it) }
         )
     }
 
@@ -46,9 +44,9 @@ object PolyFilters {
      */
     fun Security(security: Security) = PolyFilter { next ->
         PolyHandler(
-            http = next.http?.let { HttpFilter(security).then(it) },
-            sse = next.sse?.let { SseFilter(security).then(it) },
-            ws = next.ws?.let { WsFilter(security).then(it) }
+            http = next.http?.let { HttpFilter(security).thenPoly(it) },
+            sse = next.sse?.let { SseFilter(security).thenPoly(it) },
+            ws = next.ws?.let { WsFilter(security).thenPoly(it) }
         )
     }
 
@@ -66,13 +64,13 @@ object PolyFilters {
     ) = PolyFilter { next ->
         PolyHandler(
             http = next.http?.let {
-                ResponseFilters.ReportHttpTransaction(clock, httpTransactionLabeler, recordHttpFn).then(it)
+                ResponseFilters.ReportHttpTransaction(clock, httpTransactionLabeler, recordHttpFn).thenPoly(it)
             },
             sse = next.sse?.let {
-                ResponseFilters.ReportSseTransaction(clock, sseTransactionLabeler, recordSseFn).then(it)
+                ResponseFilters.ReportSseTransaction(clock, sseTransactionLabeler, recordSseFn).thenPoly(it)
             },
             ws = next.ws?.let {
-                ResponseFilters.ReportWsTransaction(clock, wsTransactionLabeler, recordWsFn).then(it)
+                ResponseFilters.ReportWsTransaction(clock, wsTransactionLabeler, recordWsFn).thenPoly(it)
             }
         )
     }
@@ -83,13 +81,13 @@ object PolyFilters {
     fun ReportTransaction(events: Events) = PolyFilter { next ->
         PolyHandler(
             http = next.http?.let {
-                ResponseFilters.ReportHttpTransaction { events(HttpEvent.Incoming(it)) }.then(it)
+                ResponseFilters.ReportHttpTransaction { events(HttpEvent.Incoming(it)) }.thenPoly(it)
             },
             sse = next.sse?.let {
-                ResponseFilters.ReportSseTransaction { events(SseEvent.Incoming(it)) }.then(it)
+                ResponseFilters.ReportSseTransaction { events(SseEvent.Incoming(it)) }.thenPoly(it)
             },
             ws = next.ws?.let {
-                ResponseFilters.ReportWsTransaction { events(WsEvent.Incoming(it)) }.then(it)
+                ResponseFilters.ReportWsTransaction { events(WsEvent.Incoming(it)) }.thenPoly(it)
             }
         )
     }

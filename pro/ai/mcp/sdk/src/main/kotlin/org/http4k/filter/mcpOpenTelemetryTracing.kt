@@ -3,7 +3,7 @@ package org.http4k.filter
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.trace.Span
-import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
 import org.http4k.ai.mcp.protocol.McpRpcMethod
@@ -32,7 +32,7 @@ fun McpFilters.OpenTelemetryTracing(
 
             val span = tracer.spanBuilder(req.json.method)
                 .setParent(Context.current())
-                .setSpanKind(SpanKind.SERVER)
+                .setSpanKind(SERVER)
                 .setAttribute("mcp.method.name", req.json.method)
                 .setAttribute("mcp.session.id", req.session.id.value)
                 .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)

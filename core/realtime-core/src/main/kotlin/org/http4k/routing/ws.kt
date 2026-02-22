@@ -5,11 +5,6 @@ import org.http4k.core.UriTemplate
 import org.http4k.routing.RoutedMessage.Companion.X_URI_TEMPLATE
 import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
-import org.http4k.sse.NoOp
-import org.http4k.sse.SseFilter
-import org.http4k.sse.SseHandler
-import org.http4k.sse.SseResponse
-import org.http4k.sse.then
 import org.http4k.websocket.NoOp
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsFilter
