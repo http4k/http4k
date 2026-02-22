@@ -15,7 +15,10 @@ import org.http4k.core.Uri
 class ResourceCapability(
     internal val resource: Resource,
     internal val handler: ResourceHandler
-) : ServerCapability, ResourceHandler {
+) : NamedServerCapability, ResourceHandler {
+
+    override val name = resource.name.value
+
     fun toResource() = with(resource) {
         when (this) {
             is Static -> McpResource(uri, name, description, mimeType, size, annotations, title, icons, meta)

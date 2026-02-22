@@ -33,7 +33,9 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
 
-class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : ServerCapability, ToolHandler {
+class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : NamedServerCapability, ToolHandler {
+    override val name = tool.name.value
+
     fun toTool() = McpTool(
         tool.name, tool.description,
         tool.title,

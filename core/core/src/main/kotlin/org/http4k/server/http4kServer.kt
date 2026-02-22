@@ -2,6 +2,7 @@ package org.http4k.server
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Uri
 import java.time.Duration
 
 interface Http4kServer : AutoCloseable {
@@ -31,6 +32,8 @@ interface ServerConfig {
 
     fun toServer(http: HttpHandler): Http4kServer
 }
+
+fun Http4kServer.uri(baseUri: Uri = Uri.of("http://localhost:${port()}")) = baseUri.port(port())
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 

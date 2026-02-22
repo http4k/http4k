@@ -6,3 +6,4 @@ package org.http4k.ai.mcp.server.capability
 sealed interface ServerCapability : Iterable<ServerCapability> {
     override fun iterator() = listOf(this).iterator()
 }
+
