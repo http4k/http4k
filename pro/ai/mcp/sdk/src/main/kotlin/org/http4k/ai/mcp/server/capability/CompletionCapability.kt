@@ -6,6 +6,8 @@ import org.http4k.ai.mcp.CompletionHandler
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.model.Completion
 import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.Reference.Prompt
+import org.http4k.ai.mcp.model.Reference.ResourceTemplate
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.then
 import org.http4k.core.Request
@@ -13,7 +15,8 @@ import org.http4k.core.Request
 class CompletionCapability(
     internal val ref: Reference,
     internal val handler: CompletionHandler
-) : ServerCapability, CompletionHandler {
+) : NamedServerCapability, CompletionHandler {
+
     fun toReference() = ref
 
     fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
@@ -21,6 +24,11 @@ class CompletionCapability(
             .let { McpCompletion.Response(Completion(it.values, it.total, it.hasMore)) }
 
     override fun invoke(p1: CompletionRequest) = handler(p1)
+
+    override val name = when (ref) {
+        is Prompt -> ref.name
+        is ResourceTemplate -> ref.uri.toString()
+    }
 }
 
 fun CompletionFilter.then(capability: CompletionCapability) = CompletionCapability(capability.ref, then(capability))
