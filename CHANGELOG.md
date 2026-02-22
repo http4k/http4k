@@ -4,9 +4,8 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.31.0.0 (uncut)
-
 - **http4k-core**: [Unlikely break] Header lenses now strip quotes from header values (RFC 2045). H/T @andy-barlow
-- **http4k-multipart**: Default to using `application/octet-stream` for unknown content types. H/T @andy-barlow
+- **http4k-multipart**: [Unlikely break] Default to using `application/octet-stream` for unknown content types. H/T @andy-barlow
 
 ### v6.30.1.0
 - **http4k-***: Upgrade versions
