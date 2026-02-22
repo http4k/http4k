@@ -4,11 +4,13 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.POST
 import org.http4k.lens.Header
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
+import org.http4k.multipart.MultipartFormBuilder
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
@@ -121,6 +123,38 @@ class MultipartFormBodyTest {
 
         assertThat(MultipartFormBody.from(withCharset).boundary, equalTo(boundary))
         assertThat(MultipartFormBody.from(noCharset).boundary, equalTo(boundary))
+    }
+
+    @Test
+    fun `file part without content type defaults to octet stream`() {
+        val boundary = "bob"
+        val body = MultipartFormBuilder(boundary)
+            .part(
+                "file content".byteInputStream(),
+                listOf("Content-Disposition" to """form-data; name="file"; filename="test.bin"""")
+            )
+            .stream()
+        val req = Request(POST, "")
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(boundary))
+            .body(Body(body))
+        val parsed = MultipartFormBody.from(req)
+        assertThat(parsed.file("file")?.contentType, equalTo(OCTET_STREAM))
+    }
+
+    @Test
+    fun `multipartIterator file part without content type defaults to octet stream`() {
+        val boundary = "bob"
+        val body = MultipartFormBuilder(boundary)
+            .part(
+                "file content".byteInputStream(),
+                listOf("Content-Disposition" to """form-data; name="file"; filename="test.bin"""")
+            )
+            .stream()
+        val req = Request(POST, "")
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(boundary))
+            .body(Body(body))
+        val entity = req.multipartIterator().asSequence().first()
+        assertThat((entity as MultipartEntity.File).file.contentType, equalTo(OCTET_STREAM))
     }
 
     private fun List<TestInputStream>.toMultipartForm() =

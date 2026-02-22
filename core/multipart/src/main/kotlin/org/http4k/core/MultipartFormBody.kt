@@ -1,4 +1,5 @@
 package org.http4k.core
+import org.http4k.core.ContentType.Companion.OCTET_STREAM
 
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -62,7 +63,7 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
             if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
             else MultipartEntity.File(
                 it.fieldName!!,
-                MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, TEXT_HTML.directives), it.inputStream),
+                MultipartFormFile(it.fileName!!, it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM, it.inputStream),
                 it.headers.toList()
             )
         }.iterator()
@@ -160,7 +161,7 @@ data class MultipartFormBody private constructor(
                     it.fieldName!!,
                     MultipartFormFile(
                         it.fileName!!,
-                        ContentType(it.contentType!!, TEXT_HTML.directives),
+                        it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM,
                         it.newInputStream,
                         it.headers.mapKeys { it.key.lowercase() }["content-length"]?.toLongOrNull() ?: it.length.toLong(),
                         it,
