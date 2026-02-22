@@ -15,7 +15,7 @@ import org.http4k.core.Uri
 class ResourceCapability(
     internal val resource: Resource,
     internal val handler: ResourceHandler
-) : NamedServerCapability, ResourceHandler {
+) : ServerCapability, ResourceHandler {
 
     override val name = resource.name.value
 

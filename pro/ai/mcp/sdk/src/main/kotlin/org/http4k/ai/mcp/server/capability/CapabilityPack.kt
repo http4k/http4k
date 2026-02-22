@@ -5,4 +5,5 @@ package org.http4k.ai.mcp.server.capability
  */
 class CapabilityPack(private vararg val bindings: ServerCapability) : ServerCapability {
     override fun iterator() = bindings.iterator()
+    override val name = bindings.joinToString("-") { it.name }
 }

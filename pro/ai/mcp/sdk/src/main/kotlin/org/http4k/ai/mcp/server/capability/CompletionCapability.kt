@@ -15,7 +15,7 @@ import org.http4k.core.Request
 class CompletionCapability(
     internal val ref: Reference,
     internal val handler: CompletionHandler
-) : NamedServerCapability, CompletionHandler {
+) : ServerCapability, CompletionHandler {
 
     fun toReference() = ref
 

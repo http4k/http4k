@@ -16,7 +16,7 @@ import org.http4k.lens.LensFailure
 class PromptCapability(
     internal val prompt: Prompt,
     internal val handler: PromptHandler
-) : NamedServerCapability, PromptHandler {
+) : ServerCapability, PromptHandler {
     override val name = prompt.name.value
 
     fun toPrompt() = McpPrompt(prompt.name, prompt.description, prompt.title, prompt.args.map {
