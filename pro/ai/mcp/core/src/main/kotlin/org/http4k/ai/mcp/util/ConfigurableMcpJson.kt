@@ -6,6 +6,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
+import org.http4k.ai.mcp.model.Domain
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
@@ -18,7 +19,6 @@ import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
-import org.http4k.ai.mcp.model.Domain
 import org.http4k.ai.mcp.model.ToolUseId
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
@@ -34,6 +34,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.with
+import org.http4k.format.ArrayItemsJsonAdapterFactory
 import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
@@ -41,6 +42,7 @@ import org.http4k.format.MapAdapter
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiNodeAdapter
 import org.http4k.format.MoshiNull
+import org.http4k.format.SchemaNodeJsonAdapterFactory
 import org.http4k.format.SetAdapter
 import org.http4k.format.ThrowableAdapter
 import org.http4k.format.asConfigurable
@@ -64,6 +66,8 @@ abstract class ConfigurableMcpJson(
 ) : ConfigurableMoshi(
     Moshi.Builder()
         .add(McpJsonFactory)
+        .addLast(SchemaNodeJsonAdapterFactory)
+        .addLast(ArrayItemsJsonAdapterFactory)
         .addLast(ThrowableAdapter)
         .addLast(ListAdapter)
         .addLast(SetAdapter)
