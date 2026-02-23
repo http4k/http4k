@@ -6,6 +6,11 @@ changes with their rationale when appropriate:
 ### v6.31.0.0
 
 - **http4k-***: Upgrade versions
+- **http4k-ai-mcp-sdk**: [Fix] Add missing ToolUseId type to MCP JSON
+
+### v6.31.0.0
+
+- **http4k-***: Upgrade versions
 - **http4k-core**: [Unlikely break] Header lenses now strip quotes from header values (RFC 2045). H/T @andy-barlow
 - **http4k-multipart**: [Unlikely break] Default to using `application/octet-stream` for unknown content types. H/T @andy-barlow
 - **http4k-ai-mcp-sdk**: Add convenience function `asServer()` to convert any singular ServerCapability into a server

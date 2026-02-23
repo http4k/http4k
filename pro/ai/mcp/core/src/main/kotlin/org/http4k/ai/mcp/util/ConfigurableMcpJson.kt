@@ -19,6 +19,7 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
 import org.http4k.ai.mcp.model.Domain
+import org.http4k.ai.mcp.model.ToolUseId
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
@@ -128,6 +129,7 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(Size)
     value(TaskId)
     value(TimeToLive)
+    value(ToolUseId)
     value(Version)
 }
 
