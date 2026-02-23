@@ -14,12 +14,14 @@ import org.http4k.util.PortBasedTest
 import org.http4k.util.assumeDockerDaemonRunning
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.testcontainers.azure.AzuriteContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
+@Disabled("waiting for azurite to be updated to support the newest API version")
 class LocalAzureClientTest : PortBasedTest {
 
     init {
