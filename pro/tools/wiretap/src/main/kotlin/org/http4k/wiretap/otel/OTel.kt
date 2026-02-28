@@ -9,7 +9,6 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TraceStore
 
 fun OTel(
-    templates: TemplateRenderer,
     traceStore: TraceStore
 ) = object : WiretapFunction {
     private val functions = listOf(
@@ -17,8 +16,8 @@ fun OTel(
         GetTrace(traceStore),
     )
 
-    override fun http(renderer: DatastarElementRenderer) =
-        "otel" bind routes(functions.map { it.http(renderer) } + Index(templates))
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
+        "otel" bind routes(functions.map { it.http(elements, html) } + Index(html))
 
     override fun mcp() = CapabilityPack(functions.map { it.mcp() })
 }

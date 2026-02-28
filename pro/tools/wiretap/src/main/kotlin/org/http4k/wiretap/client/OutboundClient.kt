@@ -14,16 +14,15 @@ fun OutboundClient(
     httpClient: HttpHandler,
     clock: Clock,
     transactions: TransactionStore,
-    templates: TemplateRenderer
 ) = object : WiretapFunction {
     private val sendRequest = SendRequest(httpClient, clock, Outbound)
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "outbound" bind routes(
-            sendRequest.http(renderer),
+            sendRequest.http(elements, html),
             FormatBody(),
             HeaderRows(),
-            Index("", templates, transactions, basePath = "/__wiretap/outbound/", pageTitle = "Outbound Client"),
+            Index("", html, transactions, basePath = "/__wiretap/outbound/", pageTitle = "Outbound Client"),
         )
 
     override fun mcp() = sendRequest.mcp()

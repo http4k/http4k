@@ -12,6 +12,7 @@ import org.http4k.lens.Path
 import org.http4k.lens.long
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionFilter
@@ -20,12 +21,12 @@ import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.Json.datastarModel
 
 fun UpdateView(update: (View) -> Unit, list: () -> List<View>) = object : WiretapFunction {
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}" bind PUT to { req ->
             val id = Path.long().of("id")(req)
             val signals = req.datastarModel<ViewSignals>()
             list().find { it.id == id }?.let { update(it.copy(filter = signals.normalizedFilter)) }
-            renderer.renderViewBar(list())
+            elements.renderViewBar(list())
         }
 
     override fun mcp(): ToolCapability {

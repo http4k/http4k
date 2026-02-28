@@ -15,6 +15,7 @@ import org.http4k.lens.enum
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
@@ -28,14 +29,14 @@ fun ChaosDeactivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = obj
         }.disable()
     }
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{direction}/deactivate" bind POST to { req ->
             val direction = Path.enum<Direction>().of("direction")(req)
             deactivate(direction)
 
             val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))
             Response(OK).datastarElements(
-                renderer(view),
+                elements(view),
                 selector = Selector.of("#chaos-status")
             )
         }

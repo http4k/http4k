@@ -13,7 +13,6 @@ import org.http4k.wiretap.domain.traceparent
 fun Traffic(
     transactionStore: TransactionStore,
     viewStore: ViewStore,
-    templates: TemplateRenderer,
 ) = object : WiretapFunction {
     private val functions = listOf(
         ListTransactions(transactionStore),
@@ -25,9 +24,9 @@ fun Traffic(
         GetTransaction(transactionStore),
     )
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "traffic" bind routes(
-            functions.map { it.http(renderer) } + Index(templates) { traceId ->
+            functions.map { it.http(elements, html) } + Index(html) { traceId ->
                 transactionStore.list().find { it.traceparent() == traceId }?.id
             }
         )

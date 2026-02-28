@@ -12,6 +12,7 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.ChaosStatusData
@@ -25,10 +26,10 @@ internal fun chaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) 
 )
 
 fun ChaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
-    override fun http(renderer: DatastarElementRenderer) = "/status" bind GET to {
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/status" bind GET to {
         val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))
         Response(OK).datastarElements(
-            renderer(view),
+            elements(view),
             selector = Selector.of("#chaos-status")
         )
     }

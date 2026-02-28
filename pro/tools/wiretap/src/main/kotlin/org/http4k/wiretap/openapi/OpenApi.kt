@@ -6,7 +6,7 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 
-fun OpenApi(templates: TemplateRenderer) = object : WiretapFunction {
-    override fun http(renderer: DatastarElementRenderer) = "openapi" bind Index(templates)
+fun OpenApi() = object : WiretapFunction {
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "openapi" bind Index(html)
     override fun mcp() = CapabilityPack(emptyList())
 }
