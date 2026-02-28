@@ -25,7 +25,8 @@ fun GetStats(
     transactionStore: TransactionStore,
     traceStore: TraceStore,
     inboundChaos: ChaosEngine,
-    outboundChaos: ChaosEngine
+    outboundChaos: ChaosEngine,
+    mcpCapabilities: McpCapabilities
 ) = object : WiretapFunction {
     val startTime = clock.instant()
 
@@ -44,7 +45,7 @@ fun GetStats(
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/stats" bind GET to {
         Response(OK).datastarElements(
-            elements(StatsView(getStats())),
+            elements(StatsView(getStats(), mcpCapabilities)),
             selector = Selector.of("#overview-stats")
         )
     }
@@ -57,7 +58,14 @@ fun GetStats(
     }
 }
 
-data class StatsView(val stats: WiretapStats) : ViewModel {
+data class McpCapabilities(
+    val security: String,
+    val mcpUrl: String = "/_wiretap/mcp",
+    val toolCount: Int = 0,
+    val promptCount: Int = 0
+)
+
+data class StatsView(val stats: WiretapStats, val mcp: McpCapabilities) : ViewModel {
     val inboundChaosBadgeClass = if (stats.inboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"
     val inboundChaosBadgeText = if (stats.inboundChaosActive) "ACTIVE" else "INACTIVE"
     val outboundChaosBadgeClass = if (stats.outboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"

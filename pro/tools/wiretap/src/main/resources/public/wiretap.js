@@ -178,15 +178,43 @@ function initOverviewCharts() {
     }
 }
 
+function initMcpUrl() {
+    var el = document.querySelector('.mcp-url');
+    if (!el || el.getAttribute('data-resolved') === 'true') return;
+    var path = el.textContent.trim();
+    var fullUrl = window.location.origin + path;
+    el.href = fullUrl;
+    el.setAttribute('data-full-url', fullUrl);
+    el.querySelector('code').textContent = path;
+    el.setAttribute('data-resolved', 'true');
+
+    var btn = document.querySelector('.mcp-copy-btn');
+    if (btn && !btn.getAttribute('data-bound')) {
+        btn.setAttribute('data-bound', 'true');
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            navigator.clipboard.writeText(fullUrl).then(function () {
+                const icon = btn.querySelector('i');
+                icon.className = 'bi bi-check';
+                setTimeout(function () {
+                    icon.className = 'bi bi-clipboard';
+                }, 1500);
+            });
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     initResizableColumns('.list-panel', '.list-header');
     initResizableColumns('.otel-trace-list', '.trace-list-header');
     initResizablePanel();
     initOverviewCharts();
+    initMcpUrl();
 });
 
 var _chartInitTimer = null;
 new MutationObserver(function () {
+    initMcpUrl();
     var dataEl = document.getElementById('overview-chart-data');
     if (!dataEl || dataEl.getAttribute('data-rendered') === 'true') return;
     if (_chartInitTimer) clearTimeout(_chartInitTimer);
