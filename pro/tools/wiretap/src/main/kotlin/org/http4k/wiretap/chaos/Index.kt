@@ -21,6 +21,7 @@ data class ChaosConfigSignals(
     val trigger: String = "Always",
     val percentage: Int = 50,
     val countdown: Int = 5,
+    val delaySeconds: Int = 10,
     val method: String? = null,
     val path: String? = null,
     val host: String? = null
@@ -33,6 +34,7 @@ data class ChaosConfigSignals(
         trigger = trigger,
         percentage = percentage,
         countdown = countdown,
+        delaySeconds = delaySeconds,
         method = method?.takeIf { it.isNotEmpty() }?.let { Method.valueOf(it) },
         path = path,
         host = host

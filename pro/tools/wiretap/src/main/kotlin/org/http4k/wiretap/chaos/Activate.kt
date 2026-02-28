@@ -57,8 +57,13 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
         val statusCode = Tool.Arg.int().map({ Status(it, null) }, Status::code)
             .defaulted("status_code", INTERNAL_SERVER_ERROR, "HTTP status code to return (default: 500)")
         val trigger = Tool.Arg.string()
-            .optional("trigger", "Trigger type: Always, PercentageBased, Once, or Countdown (default: Always)")
+            .optional(
+                "trigger",
+                "Trigger type: Always, MatchRequest, PercentageBased, Once, Countdown, or Delay (default: Always)"
+            )
         val percentage = Tool.Arg.int().optional("percentage", "Percentage for PercentageBased trigger (default: 50)")
+        val delaySeconds = Tool.Arg.int()
+            .optional("delay_seconds", "Seconds to delay before activating chaos for Delay trigger (default: 10)")
         val method =
             Tool.Arg.enum<Method>().optional("method", "Only apply chaos to requests matching this HTTP method")
         val path = Tool.Arg.string().optional("path", "Only apply chaos to requests matching this path substring")
@@ -67,7 +72,7 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
         return Tool(
             "chaos_activate",
             "Enable chaos injection on inbound or outbound traffic",
-            direction, behaviour, statusCode, trigger, percentage, method, path, host
+            direction, behaviour, statusCode, trigger, percentage, delaySeconds, method, path, host
         ) bind { req ->
             val dir = direction(req)
             val config = ChaosConfig(
@@ -75,6 +80,7 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
                 statusCode = statusCode(req),
                 trigger = trigger(req) ?: "Always",
                 percentage = percentage(req) ?: 50,
+                delaySeconds = delaySeconds(req) ?: 10,
                 method = method(req),
                 path = path(req),
                 host = host(req)
