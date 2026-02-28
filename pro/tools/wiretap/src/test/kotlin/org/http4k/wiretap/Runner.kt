@@ -6,9 +6,14 @@ import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 import org.http4k.client.JavaHttpClient
+import org.http4k.contract.bindContract
+import org.http4k.contract.contract
+import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -43,7 +48,14 @@ fun App(
     return ServerFilters.OpenTelemetryTracing(openTelemetry).then(AppRoutes(tracer, client))
 }
 
-private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes("/{name:.*}" bind GET to { req ->
+private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
+    contract {
+        renderer = OpenApi3(ApiInfo("App", "1.0"))
+        descriptionPath = "/openapi"
+        routes += "foo" bindContract GET to { _ -> Response(OK).body("bar") }
+        routes += "bar" bindContract POST to { _ -> Response(OK).body("bar") }
+    },
+    "/{name:.*}" bind GET to { req ->
     Baggage.current()
         .toBuilder()
         .put("user.id", "user-42")

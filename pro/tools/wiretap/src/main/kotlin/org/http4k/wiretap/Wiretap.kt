@@ -23,6 +23,7 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.home.GetStats
 import org.http4k.wiretap.mcp.WiretapMcp
+import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
 import org.http4k.wiretap.traffic.Traffic
 import org.http4k.wiretap.traffic.TrafficStream
@@ -65,7 +66,8 @@ object Wiretap {
             OTel(templates, traceStore),
             InboundClient(clock, transactionStore, templates, proxy),
             OutboundClient(outboundHttp, clock, transactionStore, templates),
-            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos)
+            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos),
+            OpenApi(templates)
         )
 
         val mcpRoutes = "/__wiretap/mcp" bind WiretapMcp("http4k-wiretap", NoMcpSecurity, functions)
