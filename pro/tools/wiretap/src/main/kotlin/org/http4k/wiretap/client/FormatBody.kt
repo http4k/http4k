@@ -9,12 +9,10 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.Json.datastarModel
+import org.http4k.wiretap.util.formatBody
 
 fun FormatBody(): RoutingHttpHandler = "format" bind POST to { req ->
     val model = req.datastarModel<ClientRequest>()
-    val formatted = when (model.contentType) {
-        "application/json" -> runCatching { Json.prettify(model.body) }.getOrDefault(model.body)
-        else -> model.body
-    }
+    val formatted = formatBody(model.body, model.contentType)
     Response(OK).datastarSignals(Signal.of(Json.asFormatString(mapOf("body" to formatted))))
 }
