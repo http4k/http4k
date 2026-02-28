@@ -8,6 +8,7 @@ import io.opentelemetry.api.trace.Tracer
 import org.http4k.client.JavaHttpClient
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
+import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.core.ContentType
@@ -26,6 +27,7 @@ import org.http4k.lens.contentType
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.BasicAuthSecurity
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri
@@ -51,8 +53,14 @@ fun App(
 private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
     contract {
         renderer = OpenApi3(ApiInfo("App", "1.0"))
+        security = BasicAuthSecurity("") { true }
         descriptionPath = "/openapi"
-        routes += "foo" bindContract GET to { _ -> Response(OK).body("bar") }
+        routes += "foo" meta {
+            summary = "bar"
+            description = "isn't this a nice endpoint"
+            returning(OK)
+        } bindContract GET to { _ -> Response(OK).body("bar") }
+
         routes += "bar" bindContract POST to { _ -> Response(OK).body("bar") }
     },
     "/{name:.*}" bind GET to { req ->
