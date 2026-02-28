@@ -13,17 +13,16 @@ import java.time.Clock
 fun InboundClient(
     clock: Clock,
     transactions: TransactionStore,
-    templates: TemplateRenderer,
     proxy: HttpHandler
 ) = object : WiretapFunction {
     private val sendRequest = SendRequest(proxy, clock, Inbound)
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "client" bind routes(
-            sendRequest.http(renderer),
+            sendRequest.http(elements, html),
             FormatBody(),
             HeaderRows(),
-            Index("/", templates, transactions, basePath = "/__wiretap/client/"),
+            Index("/", html, transactions, basePath = "/__wiretap/client/"),
         )
 
     override fun mcp() = sendRequest.mcp()

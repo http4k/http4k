@@ -9,14 +9,14 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.home.Index
 
 fun WiretapUi(
-    templates: TemplateRenderer,
     renderer: DatastarElementRenderer,
+    html: TemplateRenderer,
     functions: List<WiretapFunction>,
 ) = routes(
     "/__wiretap" bind routes(
         listOf(
-            Index(templates),
+            Index(html),
             static(Classpath("public"))
-        ) + functions.map { it.http(renderer) },
+        ) + functions.map { it.http(renderer, html) },
     )
 )

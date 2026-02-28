@@ -15,6 +15,7 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
@@ -30,13 +31,13 @@ fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunct
     private fun list(filter: TransactionFilter, limit: Int) =
         transactionStore.list(filter, limit).map { it.toSummary() }
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/list" bind GET to { req ->
             val filter = req.datastarModel<TransactionFilterSignals>().toFilter()
             val rows = list(filter, 50).map { TransactionRowView(it) }
 
             Response(OK).datastarElements(
-                rows.flatMap { renderer(it) },
+                rows.flatMap { elements(it) },
                 MorphMode.inner,
                 Selector.of("#tx-list")
             )

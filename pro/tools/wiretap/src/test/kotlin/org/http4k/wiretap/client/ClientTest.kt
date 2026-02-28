@@ -31,14 +31,12 @@ class ClientTest {
 
     private val client = InboundClient(
         clock = Clock.systemUTC(), transactions,
-        templates
-    ) { Response(OK).body("proxied") }.http(renderer)
+    ) { Response(OK).body("proxied") }.http(renderer, templates)
 
     private val outbound = OutboundClient(
         httpClient = { Response(OK).body("direct") }, clock = Clock.systemUTC(),
         transactions,
-        templates
-    ).http(renderer)
+    ).http(renderer, templates)
 
     @Test
     fun `inbound client index page returns OK with correct basePath and title`() {
@@ -93,8 +91,7 @@ class ClientTest {
         val recordingOutbound = OutboundClient(
             httpClient = recordingFilter.then { Response(OK).body("recorded") }, clock = clock,
             transactions,
-            templates
-        ).http(renderer)
+        ).http(renderer, templates)
 
         val body = Json.asFormatString(ClientRequest(method = GET, url = Uri.of("http://example.com/test")))
         val response = recordingOutbound(Request(POST, "/outbound/send").body(body))

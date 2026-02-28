@@ -15,6 +15,7 @@ import org.http4k.lens.Path
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.SpanAttribute
@@ -46,13 +47,13 @@ fun GetTrace(traceStore: TraceStore) = object : WiretapFunction {
         )
     }
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{traceId}" bind GET to { req ->
             val traceId = Path.of("traceId")(req)
             when (val detail = lookup(traceId)) {
                 null -> Response(NOT_FOUND)
                 else -> Response(OK).datastarElements(
-                    renderer(TraceDetailView(detail)),
+                    elements(TraceDetailView(detail)),
                     selector = Selector.of("#trace-detail-panel")
                 )
             }

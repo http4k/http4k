@@ -12,6 +12,7 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction.Inbound
@@ -87,9 +88,9 @@ fun GetStats(
         )
     }
 
-    override fun http(renderer: DatastarElementRenderer) = "/stats" bind GET to {
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/stats" bind GET to {
         Response(OK).datastarElements(
-            renderer(StatsView(getStats())),
+            elements(StatsView(getStats())),
             selector = Selector.of("#overview-stats")
         )
     }

@@ -8,11 +8,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TransactionStore
 
 fun ClearTransaction(transactionStore: TransactionStore) = object : WiretapFunction {
-    override fun http(renderer: DatastarElementRenderer) = "/" bind DELETE to {
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/" bind DELETE to {
         transactionStore.clear()
         Response(NO_CONTENT)
     }

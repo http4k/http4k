@@ -9,6 +9,7 @@ import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionFilter
@@ -17,14 +18,14 @@ import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.Json.datastarModel
 
 fun CreateView(viewStore: ViewStore) = object : WiretapFunction {
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views" bind Method.POST to { req ->
             val signals = req.datastarModel<ViewSignals>()
             val name = signals.name?.ifEmpty { null }
             if (name != null) {
                 viewStore.add(name, signals.normalizedFilter)
             }
-            renderer.renderViewBar(viewStore.list())
+            elements.renderViewBar(viewStore.list())
         }
 
     override fun mcp(): ToolCapability {

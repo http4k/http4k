@@ -9,11 +9,11 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toSummary
 
-fun TrafficStream(transactions: TransactionStore, renderer: DatastarElementRenderer) =
+fun TrafficStream(transactions: TransactionStore, elements: DatastarElementRenderer) =
     "/stream" bind sse { sse ->
         val unsubscribe = transactions.subscribe { transaction ->
             sse.sendPatchElements(
-                renderer(TransactionRowView(transaction.toSummary())),
+                elements(TransactionRowView(transaction.toSummary())),
                 prepend,
                 Selector.of("#tx-list")
             )

@@ -61,13 +61,13 @@ object Wiretap {
         )
 
         val functions = listOf(
-            Traffic(transactionStore, viewStore, templates),
-            Chaos(templates, inboundChaos, outboundChaos),
-            OTel(templates, traceStore),
-            InboundClient(clock, transactionStore, templates, proxy),
-            OutboundClient(outboundHttp, clock, transactionStore, templates),
+            Traffic(transactionStore, viewStore),
+            Chaos(inboundChaos, outboundChaos),
+            OTel(traceStore),
+            InboundClient(clock, transactionStore, proxy),
+            OutboundClient(outboundHttp, clock, transactionStore),
             GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos),
-            OpenApi(templates)
+            OpenApi()
         )
 
         val mcpRoutes = "/__wiretap/mcp" bind WiretapMcp("http4k-wiretap", NoMcpSecurity, functions)
@@ -75,7 +75,7 @@ object Wiretap {
         return poly(
             listOf(
                 ServerFilters.CatchAll().then(
-                    routes(WiretapUi(templates, renderer, functions), proxy)
+                    routes(WiretapUi(renderer, templates, functions), proxy)
                 ),
                 "/__wiretap/traffic" bind TrafficStream(transactionStore, renderer)
             ) + mcpRoutes

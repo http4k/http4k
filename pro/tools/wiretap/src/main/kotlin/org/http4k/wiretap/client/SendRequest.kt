@@ -20,6 +20,7 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionDetail
@@ -66,7 +67,7 @@ fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
             ).toDetail()
         }
 
-        override fun http(renderer: DatastarElementRenderer) =
+        override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
             "/send" bind POST to { req ->
                 val model = req.datastarModel<ClientRequest>()
 
@@ -89,7 +90,7 @@ fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
 
                 val view = TransactionDetailView(detail, showImport = false)
                 Response(OK).datastarElements(
-                    renderer(view),
+                    elements(view),
                     selector = Selector.of("#detail-panel")
                 )
             }

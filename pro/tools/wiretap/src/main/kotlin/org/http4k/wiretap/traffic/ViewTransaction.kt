@@ -15,6 +15,7 @@ import org.http4k.lens.datastarElements
 import org.http4k.lens.long
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TransactionDetail
@@ -25,13 +26,13 @@ import org.http4k.wiretap.util.Json
 fun GetTransaction(transactionStore: TransactionStore) = object : WiretapFunction {
     private fun lookup(id: Long) = transactionStore.get(id)?.toDetail()
 
-    override fun http(renderer: DatastarElementRenderer) =
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{id}" bind GET to { req ->
             val id = Path.long().of("id")(req)
             when (val detail = lookup(id)?.let { TransactionDetailView(it) }) {
                 null -> Response(NOT_FOUND)
                 else -> Response(OK).datastarElements(
-                    renderer(detail),
+                    elements(detail),
                     selector = Selector.of("#detail-panel")
                 )
             }
