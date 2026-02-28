@@ -37,7 +37,6 @@ fun HeaderRows(elements: DatastarElementRenderer, basePath: String = "/_wiretap/
         "/reset" bind GET to {
             val newHeaders = mapOf("0" to HeaderEntry())
             Response(OK)
-                .datastarSignals(Signal.of("""{"headers":null}"""))
                 .datastarSignals(Signal.of(Json.asFormatString(mapOf("headers" to newHeaders))))
                 .datastarElements(
                     elements(headerRowsView(newHeaders, basePath)),
@@ -67,7 +66,6 @@ fun HeaderRows(elements: DatastarElementRenderer, basePath: String = "/_wiretap/
                 .associate { (key, entry) -> key to entry }
 
             Response(OK)
-                .datastarSignals(Signal.of("""{"headers":null}"""))
                 .datastarSignals(Signal.of(Json.asFormatString(mapOf("headers" to remaining))))
                 .datastarElements(
                     elements(headerRowsView(remaining, basePath)),

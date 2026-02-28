@@ -73,22 +73,21 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
             "chaos_activate",
             "Enable chaos injection on inbound or outbound traffic",
             direction, behaviour, statusCode, trigger, percentage, delaySeconds, method, path, host
-        ) bind { req ->
-            val dir = direction(req)
-            val config = ChaosConfig(
-                behaviour = behaviour(req) ?: "ReturnStatus",
-                statusCode = statusCode(req),
-                trigger = trigger(req) ?: "Always",
-                percentage = percentage(req) ?: 50,
-                delaySeconds = delaySeconds(req) ?: 10,
-                method = method(req),
-                path = path(req),
-                host = host(req)
+        ) bind {
+            activate(
+                direction(it),
+                ChaosConfig(
+                    behaviour = behaviour(it) ?: "ReturnStatus",
+                    statusCode = statusCode(it),
+                    trigger = trigger(it) ?: "Always",
+                    percentage = percentage(it) ?: 50,
+                    delaySeconds = delaySeconds(it) ?: 10,
+                    method = method(it),
+                    path = path(it),
+                    host = host(it)
+                )
             )
-
-            activate(dir, config)
-            ToolResponse.Ok(listOf(Content.Text("Chaos activated on ${dir.name}: ${config.behaviour} with ${config.trigger} trigger")))
-
+            ToolResponse.Ok(listOf(Content.Text("Chaos activated")))
         }
     }
 }

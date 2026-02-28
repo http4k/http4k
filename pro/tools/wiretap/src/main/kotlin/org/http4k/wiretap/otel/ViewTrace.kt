@@ -1,8 +1,6 @@
 package org.http4k.wiretap.otel
 
 import org.http4k.ai.mcp.ToolResponse.Error
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.ToolCapability
@@ -69,7 +67,7 @@ fun GetTrace(traceStore: TraceStore) = object : WiretapFunction {
         ) bind { req ->
             when (val detail = lookup(traceId(req))) {
                 null -> Error("Trace not found")
-                else -> Ok(listOf(Content.Text(Json.asFormatString(detail))))
+                else -> Json.asToolResponse(detail)
             }
         }
     }

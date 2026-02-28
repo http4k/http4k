@@ -1,7 +1,5 @@
 package org.http4k.wiretap.home
 
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
@@ -55,7 +53,7 @@ fun GetStats(
         "get_stats",
         "Get traffic overview including request counts, latency distribution, top hosts, and chaos engine status"
     ) bind {
-        Ok(listOf(Text(Json.asFormatString(getStats()))))
+        Json.asToolResponse(getStats())
     }
 }
 

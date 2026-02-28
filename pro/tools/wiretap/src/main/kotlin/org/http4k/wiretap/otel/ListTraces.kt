@@ -1,7 +1,5 @@
 package org.http4k.wiretap.otel
 
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method.GET
@@ -56,7 +54,7 @@ fun ListTraces(traceStore: TraceStore) = object : WiretapFunction {
         "list_traces",
         "List OpenTelemetry traces with trace ID, span count, root span name, and duration"
     ) bind {
-        Ok(listOf(Content.Text(Json.asFormatString(list()))))
+        Json.asToolResponse(list())
     }
 }
 

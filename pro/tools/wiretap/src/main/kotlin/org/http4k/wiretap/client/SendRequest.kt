@@ -1,7 +1,5 @@
 package org.http4k.wiretap.client
 
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.string
@@ -111,20 +109,7 @@ fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
                     k to (v.ifEmpty { "" })
                 } ?: emptyList()
 
-                Ok(
-                    listOf(
-                        Text(
-                            Json.asFormatString(
-                                sendRequest(
-                                    method(req),
-                                    url(req),
-                                    headerList,
-                                    body(req)
-                                )
-                            )
-                        )
-                    )
-                )
+                Json.asToolResponse(sendRequest(method(req), url(req), headerList, body(req)))
             }
         }
     }

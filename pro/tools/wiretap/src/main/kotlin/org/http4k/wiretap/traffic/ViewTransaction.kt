@@ -1,7 +1,6 @@
 package org.http4k.wiretap.traffic
 
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.long
 import org.http4k.ai.mcp.server.capability.ToolCapability
@@ -48,7 +47,7 @@ fun GetTransaction(transactionStore: TransactionStore) = object : WiretapFunctio
         ) bind { req ->
             when (val tx = lookup(id(req))) {
                 null -> ToolResponse.Error("Transaction not found")
-                else -> ToolResponse.Ok(listOf(Content.Text(Json.asFormatString(tx))))
+                else -> Json.asToolResponse(tx)
             }
         }
     }
