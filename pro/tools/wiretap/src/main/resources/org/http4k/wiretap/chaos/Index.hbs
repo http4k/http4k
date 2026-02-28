@@ -3,7 +3,7 @@
 <body data-signals="{{{initialSignals}}}">
 {{> org/http4k/wiretap/header}}
 <div class="chaos-page">
-    <div id="chaos-status" class="chaos-status-panel" data-init="@get('/__wiretap/chaos/status')">
+    <div id="chaos-status" class="chaos-status-panel" data-init="@get('/_wiretap/chaos/status')">
     </div>
 
     <div class="chaos-sections">
@@ -86,11 +86,11 @@
                 </div>
                 <div class="chaos-actions">
                     <button class="btn btn-sm btn-danger"
-                            data-on:click="@post(`/__wiretap/chaos/${$direction}/activate`, {signals: {behaviour: $behaviour, latencyMin: $latencyMin, latencyMax: $latencyMax, statusCode: $statusCode, trigger: $trigger, percentage: $percentage, countdown: $countdown, delaySeconds: $delaySeconds, method: $method, path: $path, host: $host}})">
+                            data-on:click="@post(`/_wiretap/chaos/${$direction}/activate`, {signals: {behaviour: $behaviour, latencyMin: $latencyMin, latencyMax: $latencyMax, statusCode: $statusCode, trigger: $trigger, percentage: $percentage, countdown: $countdown, delaySeconds: $delaySeconds, method: $method, path: $path, host: $host}})">
                         Activate
                     </button>
                     <button class="btn btn-sm btn-outline-secondary"
-                            data-on:click="@post(`/__wiretap/chaos/${$direction}/deactivate`)">
+                            data-on:click="@post(`/_wiretap/chaos/${$direction}/deactivate`)">
                         Deactivate
                     </button>
                 </div>

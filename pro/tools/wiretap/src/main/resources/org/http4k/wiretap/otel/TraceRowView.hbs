@@ -1,4 +1,4 @@
-<div class="trace-row" data-trace-id="{{trace.traceId}}" data-class:selected="$selectedTrace==='{{trace.traceId}}'" data-on:click="$selectedTrace='{{trace.traceId}}'; @get('/__wiretap/otel/{{trace.traceId}}')">
+<div class="trace-row" data-trace-id="{{trace.traceId}}" data-class:selected="$selectedTrace==='{{trace.traceId}}'" data-on:click="$selectedTrace='{{trace.traceId}}'; @get('/_wiretap/otel/{{trace.traceId}}')">
     <span class="timestamp">{{trace.timestamp}}</span>
     <span class="trace-id" title="{{trace.traceId}}">{{shortTraceId}}</span>
     <span class="trace-root-name" title="{{trace.rootSpanName}}">{{trace.rootSpanName}}</span>

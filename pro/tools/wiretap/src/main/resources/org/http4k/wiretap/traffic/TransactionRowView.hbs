@@ -1,4 +1,4 @@
-<div id="tx-{{tx.id}}" class="tx-row{{#if tx.isChaos}} tx-row-chaos{{/if}}{{#if tx.isReplay}} tx-row-replay{{/if}}" data-class:selected="$selectedTx==='{{tx.id}}'" data-on:click="$selectedTx='{{tx.id}}'; @get('/__wiretap/traffic/{{tx.id}}')">
+<div id="tx-{{tx.id}}" class="tx-row{{#if tx.isChaos}} tx-row-chaos{{/if}}{{#if tx.isReplay}} tx-row-replay{{/if}}" data-class:selected="$selectedTx==='{{tx.id}}'" data-on:click="$selectedTx='{{tx.id}}'; @get('/_wiretap/traffic/{{tx.id}}')">
     <span class="{{dirClass}}"><span class="filterable" title="Filter by {{tx.direction}}" data-on:click__stop="$direction==='{{tx.direction}}' ? ($direction='') : ($direction='{{tx.direction}}')">{{dirArrow}}</span></span>
     <span class="timestamp">{{tx.timestamp}}</span>
     <span class="badge {{badgeClass}}"><span class="filterable" title="Filter by {{tx.direction}}" data-on:click__stop="$direction==='{{tx.direction}}' ? ($direction='') : ($direction='{{tx.direction}}')">{{badgeText}}</span></span>

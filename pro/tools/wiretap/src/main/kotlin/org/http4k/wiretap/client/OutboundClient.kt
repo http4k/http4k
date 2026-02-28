@@ -21,8 +21,8 @@ fun OutboundClient(
         "outbound" bind routes(
             sendRequest.http(elements, html),
             FormatBody(),
-            HeaderRows(elements, basePath = "/__wiretap/outbound/"),
-            Index("", html, transactions, basePath = "/__wiretap/outbound/", pageTitle = "Outbound Client"),
+            HeaderRows(elements, basePath = "/_wiretap/outbound/"),
+            Index("", html, transactions, basePath = "/_wiretap/outbound/", pageTitle = "Outbound Client"),
         )
 
     override fun mcp() = sendRequest.mcp()

@@ -43,7 +43,7 @@ class ClientTest {
         val response = client(Request(GET, "/client"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/__wiretap/client/"))
+        assertThat(response.bodyString(), containsSubstring("/_wiretap/client/"))
         assertThat(response.bodyString(), containsSubstring("Inbound Client"))
     }
 
@@ -52,7 +52,7 @@ class ClientTest {
         val response = outbound(Request(GET, "/outbound"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/__wiretap/outbound/"))
+        assertThat(response.bodyString(), containsSubstring("/_wiretap/outbound/"))
         assertThat(response.bodyString(), containsSubstring("Outbound Client"))
     }
 
