@@ -107,6 +107,8 @@ object ChaosTriggers {
      * Activates when matching attributes of a single received request are met.
      */
     object MatchRequest {
+        private fun Regex.displayPattern() = pattern.replace("\\Q", "").replace("\\E", "")
+
         operator fun invoke(
             method: String? = null,
             host: Regex? = null,
@@ -117,25 +119,36 @@ object ChaosTriggers {
         ): Trigger {
             val headerMatchers =
                 headers?.map { (k, v) ->
-                    RequestMatcher("header '$k' matches '$v'") {
+                    RequestMatcher("header '$k' matches '${v.displayPattern()}'") {
                         it.headerValues(k).any { v.matches(it ?: "") }
                     }
                 }
                     ?: emptyList()
             val queriesMatchers =
                 queries?.map { (k, v) ->
-                    RequestMatcher("query '$k' matches '$v'") {
+                    RequestMatcher("query '$k' matches '${v.displayPattern()}'") {
                         it.queries(k).any { v.matches(it ?: "") }
                     }
                 }
                     ?: emptyList()
             val pathMatchers =
-                path?.let { p -> listOf(RequestMatcher("path matches '$p'") { it.uri.path.matches(p) }) } ?: emptyList()
+                path?.let { p -> listOf(RequestMatcher("path matches '${p.displayPattern()}'") { it.uri.path.matches(p) }) }
+                    ?: emptyList()
             val hostMatchers =
-                host?.let { p -> listOf(RequestMatcher("host matches '$p'") { it.uri.authority.matches(p) }) }
+                host?.let { p ->
+                    listOf(RequestMatcher("host matches '${p.displayPattern()}'") {
+                        it.uri.authority.matches(
+                            p
+                        )
+                    })
+                }
                     ?: emptyList()
             val bodyMatchers =
-                body?.let { b -> listOf(RequestMatcher("body matches '$b'") { it.bodyString().matches(b) }) }
+                body?.let { b ->
+                    listOf(RequestMatcher("body matches '${b.displayPattern()}'") {
+                        it.bodyString().matches(b)
+                    })
+                }
                     ?: emptyList()
             val methodMatchers =
                 method?.let { m -> listOf(RequestMatcher("method == ${m.uppercase()}") { it.method == Method.valueOf(m.uppercase()) }) }
