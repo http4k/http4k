@@ -584,6 +584,13 @@ body {
     margin-bottom: 16px;
 }
 
+.chaos-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 20px;
+    align-items: start;
+}
+
 .chaos-form {
     display: flex;
     flex-direction: column;
@@ -605,8 +612,9 @@ body {
 
 .chaos-actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
-    margin-top: 8px;
+    align-self: end;
 }
 
 /* Traces page */
