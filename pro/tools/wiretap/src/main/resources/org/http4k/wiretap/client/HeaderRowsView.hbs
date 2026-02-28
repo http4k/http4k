@@ -1,0 +1,14 @@
+{{#each rows}}
+<div class="client-header-row">
+    <input type="text" class="form-control form-control-sm" data-bind="headers.{{key}}.name" placeholder="Header name">
+    <input type="text" class="form-control form-control-sm" data-bind="headers.{{key}}.value" placeholder="Value">
+    <button class="btn btn-sm btn-outline-danger client-remove-header"
+            data-on:click="@get('{{{basePath}}}headers/remove/{{index}}')">×
+    </button>
+</div>
+{{/each}}
+{{#if showAdd}}
+<button class="btn btn-sm btn-outline-secondary client-add-header"
+        data-on:click="@get('{{{basePath}}}headers/add')">+ Add Header
+</button>
+{{/if}}

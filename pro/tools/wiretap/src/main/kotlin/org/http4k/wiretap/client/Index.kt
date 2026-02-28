@@ -23,7 +23,7 @@ data class ClientSignals(
 
 fun Index(
     defaultUrl: String,
-    templates: TemplateRenderer,
+    html: TemplateRenderer,
     transactions: TransactionStore,
     basePath: String = "/__wiretap/client/",
     pageTitle: String = "Inbound Client"
@@ -34,10 +34,11 @@ fun Index(
 
         when (tx) {
             null -> Response(OK).html(
-                templates(
+                html(
                     Index(
                         ClientSignals(url = defaultUrl),
-                        basePath = basePath, pageTitle = pageTitle
+                        basePath = basePath,
+                        pageTitle = pageTitle
                     )
                 )
             )
@@ -64,7 +65,7 @@ fun Index(
                     body = request.bodyString()
                 )
                 Response(OK).html(
-                    templates(
+                    html(
                         Index(
                             signals,
                             basePath,
@@ -82,5 +83,5 @@ data class Index(
     val pageTitle: String = "Inbound Client"
 ) : ViewModel {
     val initialSignals: String = Json.asDatastarSignals(signals)
-    val initialHeaderRows: String = renderHeaderRows(signals.headers)
+    val initialHeaderRows: HeaderRowsView = headerRowsView(signals.headers, basePath)
 }
