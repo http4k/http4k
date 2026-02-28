@@ -35,7 +35,6 @@ interface ViewStore {
                 filter = TransactionFilter(direction = Outbound)
             )
         )
-    }
 
     fun InMemory(initial: List<View> = defaultViews): ViewStore = object : ViewStore {
             private val views = CopyOnWriteArrayList(initial)
@@ -57,4 +56,5 @@ interface ViewStore {
                 views.removeIf { it.id == id && !it.builtIn }
             }
         }
+    }
 }
