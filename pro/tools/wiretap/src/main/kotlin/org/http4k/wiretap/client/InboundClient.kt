@@ -22,7 +22,7 @@ fun InboundClient(
             sendRequest.http(elements, html),
             FormatBody(),
             HeaderRows(elements, "/_wiretap/inbound/"),
-            Index("/", html, transactions, "/_wiretap/inbound/"),
+            Index("/", html, transactions, "/_wiretap/inbound/", "Inbound Client"),
         )
 
     override fun mcp() = sendRequest.mcp()

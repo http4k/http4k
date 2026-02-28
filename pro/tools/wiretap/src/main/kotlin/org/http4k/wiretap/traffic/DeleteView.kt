@@ -12,15 +12,13 @@ import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
-import org.http4k.wiretap.domain.View
-import org.http4k.wiretap.domain.ViewId
+import org.http4k.wiretap.domain.ViewStore
 
-fun DeleteView(remove: (ViewId) -> Unit, list: () -> List<View>) = object : WiretapFunction {
+fun DeleteView(views: ViewStore) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}" bind DELETE to { req ->
-            val id = Path.long().of("id")(req)
-            remove(id)
-            elements.renderViewBar(list())
+            views.remove(Path.long().of("id")(req))
+            elements.renderViewBar(views.list())
         }
 
     override fun mcp(): ToolCapability {
@@ -31,7 +29,7 @@ fun DeleteView(remove: (ViewId) -> Unit, list: () -> List<View>) = object : Wire
             "Delete a transaction filter view",
             id
         ) bind {
-            remove(id(it))
+            views.remove(id(it))
             Ok(listOf(Text("View deleted")))
         }
     }

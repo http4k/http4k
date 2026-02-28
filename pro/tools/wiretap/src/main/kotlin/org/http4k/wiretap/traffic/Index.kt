@@ -14,9 +14,7 @@ import org.http4k.wiretap.util.Json
 
 fun Index(templates: TemplateRenderer, findByTraceId: (String) -> Long?): RoutingHttpHandler =
     "/" bind GET to { req ->
-        val traceId = traceParam(req)
-        val txId = traceId?.let { findByTraceId(it) }
-        Response(OK).html(templates(Index(txId)))
+        Response(OK).html(templates(Index(traceParam(req)?.let { findByTraceId(it) })))
     }
 
 private val traceParam = Query.string().optional("trace")

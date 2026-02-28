@@ -81,8 +81,6 @@ class OpenApi3KondorTest : ContractRendererContract<JsonNode>(
                         acc.replace(original, "generatedDefinitionId${index + 1}")
                     }
 
-                println(scrubbedBody)
-
                 approver.assertApproved(httpMessage.body(scrubbedBody))
             }
 

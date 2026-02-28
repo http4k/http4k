@@ -10,17 +10,14 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.domain.traceparent
 
-fun Traffic(
-    transactionStore: TransactionStore,
-    viewStore: ViewStore,
-) = object : WiretapFunction {
+fun Traffic(transactionStore: TransactionStore, viewStore: ViewStore) = object : WiretapFunction {
     private val functions = listOf(
         ListTransactions(transactionStore),
         ClearTransaction(transactionStore),
-        ListViews(viewStore::list),
+        ListViews(viewStore),
         CreateView(viewStore),
-        UpdateView(viewStore::update, viewStore::list),
-        DeleteView(viewStore::remove, viewStore::list),
+        UpdateView(viewStore),
+        DeleteView(viewStore),
         GetTransaction(transactionStore),
     )
 

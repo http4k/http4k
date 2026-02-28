@@ -58,11 +58,7 @@ class HttpWiretapIntegrationTest {
             client(Request(GET, "http://localhost:${server.port()}/"))
 
             val tx = store.list().first()
-            val traceId = traceparent(tx)
-            println("Request traceparent: ${tx.transaction.request.header("traceparent")}")
-            println("Response traceparent: ${tx.transaction.response.header("traceparent")}")
-            println("Extracted traceId: $traceId")
-            assertThat("traceparent should be extractable", traceId, present())
+            assertThat("traceparent should be extractable", traceparent(tx), present())
         } finally {
             server.stop()
         }
