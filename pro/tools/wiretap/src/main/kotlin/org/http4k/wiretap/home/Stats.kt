@@ -1,7 +1,7 @@
 package org.http4k.wiretap.home
 
-import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
@@ -33,23 +33,14 @@ fun GetStats(
 
     private fun getStats(): WiretapStats {
         val now = clock.instant()
-        val txStats = transactionStore.stats(startTime, now)
-
         return WiretapStats(
             uptime = formatUptime(Duration.between(startTime, now)),
-            totalRequests = txStats.totalRequests,
-            inboundCount = txStats.inboundCount,
-            outboundCount = txStats.outboundCount,
+            transactions = transactionStore.stats(startTime, now),
             traceCount = traceStore.traces().size,
             inboundChaosActive = inboundChaos.isEnabled(),
             inboundChaosDescription = inboundChaos.toString(),
             outboundChaosActive = outboundChaos.isEnabled(),
             outboundChaosDescription = outboundChaos.toString(),
-            statusCounts = txStats.statusCounts,
-            methodCounts = txStats.methodCounts,
-            latencyCounts = txStats.latencyCounts,
-            topHosts = txStats.topHosts,
-            trafficTimeline = txStats.trafficTimeline
         )
     }
 
@@ -64,7 +55,7 @@ fun GetStats(
         "get_stats",
         "Get traffic overview including request counts, latency distribution, top hosts, and chaos engine status"
     ) bind {
-        ToolResponse.Ok(listOf(Content.Text(Json.asFormatString(getStats()))))
+        Ok(listOf(Text(Json.asFormatString(getStats()))))
     }
 }
 
@@ -73,15 +64,18 @@ data class StatsView(val stats: WiretapStats) : ViewModel {
     val inboundChaosBadgeText = if (stats.inboundChaosActive) "ACTIVE" else "INACTIVE"
     val outboundChaosBadgeClass = if (stats.outboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"
     val outboundChaosBadgeText = if (stats.outboundChaosActive) "ACTIVE" else "INACTIVE"
-    val hasHosts = stats.topHosts.isNotEmpty()
+    val hasHosts = stats.transactions.topHosts.isNotEmpty()
     val statusJson = chartJson(
         listOf("2xx", "3xx", "4xx", "5xx"),
-        listOf("2xx", "3xx", "4xx", "5xx").map { stats.statusCounts[it] ?: 0 })
-    val methodJson = chartJson(stats.methodCounts.keys.toList(), stats.methodCounts.values.toList())
+        listOf("2xx", "3xx", "4xx", "5xx").map { stats.transactions.statusCounts[it] ?: 0 })
+    val methodJson =
+        chartJson(stats.transactions.methodCounts.keys.toList(), stats.transactions.methodCounts.values.toList())
     val latencyJson = chartJson(
         listOf("0-10ms", "10-50ms", "50-100ms", "100-500ms", "500ms+"),
-        listOf("0-10ms", "10-50ms", "50-100ms", "100-500ms", "500ms+").map { stats.latencyCounts[it] ?: 0 })
-    val trafficJson = chartJson(stats.trafficTimeline.first, stats.trafficTimeline.second)
+        listOf("0-10ms", "10-50ms", "50-100ms", "100-500ms", "500ms+").map {
+            stats.transactions.latencyCounts[it] ?: 0
+        })
+    val trafficJson = chartJson(stats.transactions.trafficTimeline.first, stats.transactions.trafficTimeline.second)
 }
 
 private fun chartJson(labels: List<String>, data: List<Int>): String =
