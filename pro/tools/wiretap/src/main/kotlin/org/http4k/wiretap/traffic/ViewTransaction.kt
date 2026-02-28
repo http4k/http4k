@@ -58,7 +58,7 @@ data class TransactionDetailView(val tx: TransactionDetail, val showImport: Bool
     val isInbound = tx.direction == "Inbound"
     val dirBadgeClass = if (isInbound) "badge-in" else "badge-out"
     val dirBadgeText = if (isInbound) "INBOUND" else "OUTBOUND"
-    val importPath = if (isInbound) "/_wiretap/client" else "/_wiretap/outbound"
+    val importPath = if (isInbound) "/_wiretap/inbound" else "/_wiretap/outbound"
     val importLabel = if (isInbound) "Inbound Client" else "Outbound Client"
     val statusClass = statusClass(tx.status)
     val shortTraceId = tx.traceId?.takeLast(8)

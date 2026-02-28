@@ -18,11 +18,11 @@ fun InboundClient(
     private val sendRequest = SendRequest(proxy, clock, Inbound)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "client" bind routes(
+        "inbound" bind routes(
             sendRequest.http(elements, html),
             FormatBody(),
-            HeaderRows(elements, basePath = "/_wiretap/client/"),
-            Index("/", html, transactions, basePath = "/_wiretap/client/"),
+            HeaderRows(elements, basePath = "/_wiretap/inbound/"),
+            Index("/", html, transactions, basePath = "/_wiretap/inbound/"),
         )
 
     override fun mcp() = sendRequest.mcp()
