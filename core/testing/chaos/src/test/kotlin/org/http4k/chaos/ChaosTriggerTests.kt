@@ -110,6 +110,15 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     }
 
     @Test
+    fun `matches host`() {
+        assertMatchNoMatch(
+            MatchRequest(host = Regex(".*bill")),
+            Request(GET, "http://bill/whatever"),
+            Request(GET, "/bill")
+        )
+    }
+
+    @Test
     fun `matches header`() {
         assertMatchNoMatch(
             MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
