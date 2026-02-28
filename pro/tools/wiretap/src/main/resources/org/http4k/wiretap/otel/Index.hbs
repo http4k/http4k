@@ -1,0 +1,24 @@
+{{#>org/http4k/wiretap/layout pageTitle="OTel"}}
+{{#partial "body"}}
+<body data-signals="{{{initialSignals}}}">
+{{> org/http4k/wiretap/header}}
+<div class="app-layout otel-layout">
+    <div class="otel-trace-list">
+        <div class="trace-list-header">
+            <span>Time</span><span>Trace ID</span><span>Root Span</span><span>Service</span><span>Spans</span><span class="duration">Duration</span>
+        </div>
+        <div class="list-body" id="trace-list" data-init="@get('/__wiretap/otel/list')"></div>
+    </div>
+    <div class="panel-resize-handle"></div>
+    <div class="otel-detail-panel">
+        {{#if deepLinkTrace}}
+        <div id="trace-detail-panel" data-init="@get('/__wiretap/otel/{{deepLinkTrace}}')">Loading trace...</div>
+        {{else}}
+        <div id="trace-detail-panel" class="empty">Select a trace</div>
+        {{/if}}
+    </div>
+</div>
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

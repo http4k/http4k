@@ -1,0 +1,59 @@
+{{#>org/http4k/wiretap/layout pageTitle="Traffic"}}
+{{#partial "body"}}
+<body data-signals="{{{initialSignals}}}">
+{{> org/http4k/wiretap/header}}
+<div class="top-tabs" id="tab-bar" data-init="@get('/__wiretap/traffic/views')"></div>
+<div class="top-add-tab" data-show="$showAddView">
+    <input type="text" class="form-control form-control-sm" placeholder="Tab name..." data-bind="name">
+    <button class="btn btn-sm btn-primary" data-on:click="@post('/__wiretap/traffic/views'); $showAddView=false; $name=''">Save</button>
+    <button class="btn btn-sm btn-outline-secondary" data-on:click="$showAddView=false; $name=''">Cancel</button>
+</div>
+<div class="top-filters">
+    <select class="form-select form-select-sm" data-bind="direction">
+        <option value="">Select Direction</option>
+        <option value="Inbound">Inbound</option>
+        <option value="Outbound">Outbound</option>
+    </select>
+    <select class="form-select form-select-sm" data-bind="method">
+        <option value="">Select Method</option>
+        <option>GET</option>
+        <option>POST</option>
+        <option>PUT</option>
+        <option>DELETE</option>
+        <option>PATCH</option>
+    </select>
+    <input type="text" class="form-control form-control-sm" placeholder="Filter path..."
+           data-bind="path">
+    <input type="text" class="form-control form-control-sm" placeholder="Filter host..."
+           data-bind="host">
+    <input type="text" class="form-control form-control-sm" placeholder="Filter status..."
+           data-bind="status">
+    <button class="btn btn-sm btn-outline-primary" data-on:click="@get('/__wiretap/traffic/list')">
+        <i class="bi bi-arrow-clockwise"></i>
+    </button>
+    <div class="filter-actions" data-show="$customView">
+        <button class="btn btn-sm btn-primary" data-on:click="@put('/__wiretap/traffic/views/'+$activeView)">Save</button>
+        <button class="btn btn-sm btn-outline-secondary" data-on:click="$showAddView=true; $name=''">Clone</button>
+        <button class="btn btn-sm btn-outline-danger" data-on:click="@delete('/__wiretap/traffic/views/'+$activeView); $activeView='all'; $customView=false; $direction=''; $host=''; $method=''; $status=''; $path=''; @get('/__wiretap/traffic/list')">Delete</button>
+    </div>
+</div>
+<div class="app-layout traffic-layout">
+    <div class="traffic-list">
+        <div class="list-header">
+            <span></span><span class="timestamp">Time</span><span>Direction</span><span>Method</span><span>Host</span><span>Path</span><span>Status</span><span class="duration">Latency</span>
+        </div>
+        <div class="list-body" id="tx-list" data-init="@get('/__wiretap/traffic/list')"></div>
+    </div>
+</div>
+<div class="panel-resize-handle"></div>
+<div class="traffic-detail-panel">
+    {{#if deepLinkTxId}}
+    <div id="detail-panel" data-init="@get('/__wiretap/traffic/{{deepLinkTxId}}')">Loading transaction...</div>
+    {{else}}
+    <div id="detail-panel" class="empty">Select a transaction</div>
+    {{/if}}
+</div>
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

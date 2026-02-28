@@ -1,0 +1,30 @@
+package org.http4k.wiretap.client
+
+import org.http4k.core.HttpHandler
+import org.http4k.routing.bind
+import org.http4k.routing.routes
+import org.http4k.template.DatastarElementRenderer
+import org.http4k.template.TemplateRenderer
+import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.Direction.Outbound
+import org.http4k.wiretap.domain.TransactionStore
+import java.time.Clock
+
+fun OutboundClient(
+    httpClient: HttpHandler,
+    clock: Clock,
+    transactions: TransactionStore,
+    templates: TemplateRenderer
+) = object : WiretapFunction {
+    private val sendRequest = SendRequest(httpClient, clock, Outbound)
+
+    override fun http(renderer: DatastarElementRenderer) =
+        "outbound" bind routes(
+            sendRequest.http(renderer),
+            FormatBody(),
+            HeaderRows(),
+            Index("", templates, transactions, basePath = "/__wiretap/outbound/", pageTitle = "Outbound Client"),
+        )
+
+    override fun mcp() = sendRequest.mcp()
+}

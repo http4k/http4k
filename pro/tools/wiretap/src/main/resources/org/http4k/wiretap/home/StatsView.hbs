@@ -1,0 +1,107 @@
+<div class="overview-metrics">
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.uptime}}</div>
+            <div class="metric-label">Uptime</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-arrow-left-right"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.totalRequests}}</div>
+            <div class="metric-label">Total Requests</div>
+            <div class="metric-sub">
+                <span class="badge badge-in">IN {{stats.inboundCount}}</span>
+                <span class="badge badge-out">OUT {{stats.outboundCount}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-diagram-3"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.traceCount}}</div>
+            <div class="metric-label">Traces</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-lightning"></i></div>
+        <div class="metric-body">
+            <div class="metric-label">Chaos</div>
+            <div class="metric-sub"><span>In: </span><span class="badge {{inboundChaosBadgeClass}}">{{inboundChaosBadgeText}}</span></div>
+            <div class="metric-sub"><span>Out: </span><span class="badge {{outboundChaosBadgeClass}}">{{outboundChaosBadgeText}}</span></div>
+        </div>
+    </div>
+</div>
+
+<div id="overview-chart-data"
+     data-traffic="{{{trafficJson}}}"
+     data-status="{{{statusJson}}}"
+     data-method="{{{methodJson}}}"
+     data-latency="{{{latencyJson}}}"
+     style="display:none"></div>
+
+<div class="overview-traffic-chart">
+    <div class="chart-card chart-card-wide">
+        <h5>Traffic Over Time</h5>
+        <div class="chart-container chart-container-wide">
+            <canvas id="trafficChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="overview-charts">
+    <div class="chart-card">
+        <h5>Status Distribution</h5>
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <h5>Method Distribution</h5>
+        <div class="chart-container">
+            <canvas id="methodChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <h5>Latency Distribution</h5>
+        <div class="chart-container">
+            <canvas id="latencyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{{#if hasHosts}}
+<div class="overview-tables">
+    <div class="hosts-card">
+        <h5>Top Outbound Hosts</h5>
+        <table class="table table-sm hosts-table">
+            <thead>
+            <tr>
+                <th>Host</th>
+                <th>Requests</th>
+                <th>Avg Latency</th>
+                <th class="status-col">2xx</th>
+                <th class="status-col">3xx</th>
+                <th class="status-col">4xx</th>
+                <th class="status-col">5xx</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each stats.topHosts}}
+            <tr>
+                <td class="host-name">{{host}}</td>
+                <td class="host-count">{{count}}</td>
+                <td class="host-latency">{{avgLatencyMs}}ms</td>
+                <td class="host-status status-2xx-text">{{count2xx}}</td>
+                <td class="host-status status-3xx-text">{{count3xx}}</td>
+                <td class="host-status status-4xx-text">{{count4xx}}</td>
+                <td class="host-status status-5xx-text">{{count5xx}}</td>
+            </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
