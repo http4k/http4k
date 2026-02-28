@@ -23,7 +23,12 @@ import org.http4k.wiretap.domain.BodyHydration.All
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
+import org.http4k.ai.mcp.server.capability.PromptCapability
+import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.wiretap.home.GetStats
+import org.http4k.wiretap.home.McpCapabilities
+import org.http4k.wiretap.mcp.AnalyzeTrafficPrompt
+import org.http4k.wiretap.mcp.DebugRequestPrompt
 import org.http4k.wiretap.mcp.WiretapMcp
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
@@ -67,15 +72,25 @@ object Wiretap {
             appBuilder
         )
 
-        val functions = listOf(
+        val baseFunctions = listOf(
             Traffic(transactionStore, viewStore),
             Chaos(inboundChaos, outboundChaos),
             OTel(traceStore),
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
-            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos),
             OpenApi()
         )
+
+        val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())
+        val allCapabilities = prompts + baseFunctions.flatMap { it.mcp() }
+        val mcpCapabilities = McpCapabilities(
+            mcpSecurity.name,
+            toolCount = allCapabilities.count { it is ToolCapability } + 1,
+            promptCount = allCapabilities.count { it is PromptCapability }
+        )
+
+        val functions = baseFunctions +
+            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos, mcpCapabilities)
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 

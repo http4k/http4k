@@ -15,6 +15,9 @@ class OAuthMcpSecurity(
     vararg extraWwwAuthenticateFields: Pair<String, String>,
     private val checkToken: (String) -> Boolean
 ) : McpSecurity {
+
+    override val name = "OAuth"
+
     /**
      * Bare bones MCP Security implementation that uses the OAuth protected resource metadata endpoint
      */

@@ -32,6 +32,17 @@
             <div class="metric-sub"><span>Out: </span><span class="badge {{outboundChaosBadgeClass}}">{{outboundChaosBadgeText}}</span></div>
         </div>
     </div>
+    <div class="metric-card">
+        <div class="metric-icon"><img src="https://www.http4k.org/images/mcp.png" alt="MCP" class="mcp-logo"></div>
+        <div class="metric-body">
+            <div class="metric-label">MCP Server</div>
+            <div class="metric-sub">Tools: {{mcp.toolCount}}</div>
+            <div class="metric-sub">Security: {{mcp.security}}</div>
+            <div class="metric-sub">Copy URL:
+                <button class="mcp-copy-btn" title="Copy URL"><i class="bi bi-clipboard"></i></button>
+                <a class="mcp-url" href="{{mcp.mcpUrl}}"><code>{{mcp.mcpUrl}}</code></a></div>
+        </div>
+    </div>
 </div>
 
 <div id="overview-chart-data"
