@@ -1223,20 +1223,14 @@ body {
     height: 28px;
 }
 
-.metric-icon:has(.mcp-logo) {
-    position: relative;
-}
-
 .mcp-status-dot {
+    display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: #22c55e;
-    flex-shrink: 0;
     animation: mcp-pulse 2s ease-in-out infinite;
-    position: absolute;
-    bottom: 0;
-    right: -2px;
+    vertical-align: middle;
 }
 
 @keyframes mcp-pulse {
