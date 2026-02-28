@@ -3,9 +3,8 @@ package org.http4k.wiretap.domain
 import org.http4k.chaos.Behaviour
 import org.http4k.chaos.ChaosBehaviours
 import org.http4k.chaos.ChaosTriggers
+import org.http4k.chaos.ChaosTriggers.MatchRequest
 import org.http4k.chaos.Stage
-import org.http4k.chaos.Trigger
-import org.http4k.chaos.and
 import org.http4k.chaos.appliedWhen
 import org.http4k.core.Method
 import org.http4k.core.Status
@@ -20,6 +19,7 @@ data class ChaosConfig(
     val trigger: String = "Always",
     val percentage: Int = 50,
     val countdown: Int = 5,
+    val delaySeconds: Int = 10,
     val method: Method? = null,
     val path: String? = null,
     val host: String? = null
@@ -40,36 +40,14 @@ data class ChaosConfig(
         "PercentageBased" -> ChaosTriggers.PercentageBased(percentage)
         "Once" -> ChaosTriggers.Once()
         "Countdown" -> ChaosTriggers.Countdown(countdown)
+        "Delay" -> ChaosTriggers.Delay(Duration.ofSeconds(delaySeconds.toLong()))
+        "MatchRequest" -> MatchRequest(
+            method = method?.name,
+            path = path?.takeIf { it.isNotBlank() }?.let { Regex(".*${Regex.escape(it)}.*", RegexOption.IGNORE_CASE) },
+            host = host?.takeIf { it.isNotBlank() }?.let { Regex(".*${Regex.escape(it)}.*", RegexOption.IGNORE_CASE) }
+        )
         else -> ChaosTriggers.Always()
     }
 
-    fun toFilterTrigger(): Trigger {
-        val matchers = listOfNotNull(
-            method?.let { m -> Trigger { it.method == m } },
-            path?.takeIf { it.isNotBlank() }?.let { p ->
-                Trigger { it.uri.path.contains(p, ignoreCase = true) }
-            },
-            host?.takeIf { it.isNotBlank() }?.let { h ->
-                Trigger { req ->
-                    val requestHost = req.uri.host.takeIf { it.isNotEmpty() } ?: req.header("Host") ?: ""
-                    requestHost.contains(h, ignoreCase = true)
-                }
-            }
-        )
-        return matchers.reduceOrNull { acc, next -> acc and next } ?: ChaosTriggers.Always()
-    }
-
-    fun toStage(): Stage {
-        val hasFilters = listOfNotNull(
-            method,
-            path?.takeIf { it.isNotBlank() },
-            host?.takeIf { it.isNotBlank() }
-        ).isNotEmpty()
-        return toBehaviour().appliedWhen(
-            when {
-                hasFilters -> toFilterTrigger() and toTrigger()
-                else -> toTrigger()
-            }
-        )
-    }
+    fun toStage(): Stage = toBehaviour().appliedWhen(toTrigger())
 }

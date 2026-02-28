@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-api-openapi"))
     api(project(":http4k-format-moshi"))
     api(project(":http4k-ai-mcp-sdk"))
     api(project(":http4k-ops-opentelemetry"))
