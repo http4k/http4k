@@ -11,10 +11,11 @@ import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.ChaosConfig
+import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.util.Json
 
 data class ChaosConfigSignals(
-    val direction: String = "Inbound",
+    val direction: String = Direction.Inbound.name,
     val behaviour: String = "ReturnStatus",
     val latencyMin: Int = 100,
     val latencyMax: Int = 500,

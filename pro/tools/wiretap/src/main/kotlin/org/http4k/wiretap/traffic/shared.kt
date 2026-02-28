@@ -7,7 +7,6 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
-import org.http4k.wiretap.domain.TransactionFilter
 import org.http4k.wiretap.domain.View
 import org.http4k.wiretap.domain.ViewId
 
@@ -19,7 +18,7 @@ data class ViewSignals(
     val status: String? = null,
     val path: String? = null
 ) {
-    val normalizedFilter get() = TransactionFilterSignals(direction, host, method, status, path).toFilter()
+    val normalized get() = TransactionFilterSignals(direction, host, method, status, path).toFilter()
 }
 
 fun DatastarElementRenderer.renderViewBar(views: List<View>) =

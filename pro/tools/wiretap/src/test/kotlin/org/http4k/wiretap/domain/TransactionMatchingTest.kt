@@ -2,6 +2,7 @@ package org.http4k.wiretap.domain
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.junit.jupiter.api.Test
 
@@ -30,23 +31,7 @@ class TransactionMatchingTest {
 
     @Test
     fun `exact status code match`() {
-        assertThat(summary(404).matches(TransactionFilter(status = "404")), equalTo(true))
-        assertThat(summary(200).matches(TransactionFilter(status = "404")), equalTo(false))
-    }
-
-    @Test
-    fun `regex category matches all statuses in range`() {
-        val filter = TransactionFilter(status = "4..")
-        assertThat(summary(400).matches(filter), equalTo(true))
-        assertThat(summary(404).matches(filter), equalTo(true))
-        assertThat(summary(499).matches(filter), equalTo(true))
-        assertThat(summary(200).matches(filter), equalTo(false))
-    }
-
-    @Test
-    fun `invalid regex does not crash and does not match`() {
-        val filter = TransactionFilter(status = "[")
-        assertThat(summary(200).matches(filter), equalTo(false))
-        assertThat(summary(404).matches(filter), equalTo(false))
+        assertThat(summary(404).matches(TransactionFilter(status = NOT_FOUND)), equalTo(true))
+        assertThat(summary(200).matches(TransactionFilter(status = NOT_FOUND)), equalTo(false))
     }
 }

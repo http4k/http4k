@@ -53,12 +53,17 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
         val direction =
             Tool.Arg.enum<Direction>().required("direction", "Direction to apply chaos: Inbound or Outbound")
         val behaviour = Tool.Arg.string()
-            .optional("behaviour", "Chaos behaviour: ReturnStatus, Latency, or NoBody (default: ReturnStatus)")
+            .defaulted(
+                "behaviour",
+                "ReturnStatus",
+                "Chaos behaviour: ReturnStatus, Latency, or NoBody (default: ReturnStatus)"
+            )
         val statusCode = Tool.Arg.int().map({ Status(it, null) }, Status::code)
             .defaulted("status_code", INTERNAL_SERVER_ERROR, "HTTP status code to return (default: 500)")
         val trigger = Tool.Arg.string()
-            .optional(
+            .defaulted(
                 "trigger",
+                "Always",
                 "Trigger type: Always, MatchRequest, PercentageBased, Once, Countdown, or Delay (default: Always)"
             )
         val percentage = Tool.Arg.int().optional("percentage", "Percentage for PercentageBased trigger (default: 50)")
@@ -77,9 +82,9 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
             activate(
                 direction(it),
                 ChaosConfig(
-                    behaviour = behaviour(it) ?: "ReturnStatus",
+                    behaviour = behaviour(it),
                     statusCode = statusCode(it),
-                    trigger = trigger(it) ?: "Always",
+                    trigger = trigger(it),
                     percentage = percentage(it) ?: 50,
                     delaySeconds = delaySeconds(it) ?: 10,
                     method = method(it),

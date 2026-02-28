@@ -66,9 +66,7 @@ internal fun WiretapTransaction.traceparent(): String? =
 
 internal fun TransactionSummary.matches(filter: TransactionFilter) =
     (filter.direction == null || direction == filter.direction) &&
-        (filter.method == null || method == filter.method) &&
-        (filter.status == null || runCatching {
-            filter.status.toRegex().matches(status.toString())
-        }.getOrDefault(false)) &&
+        (filter.method == null || method == filter.method.name) &&
+        (filter.status == null || status == filter.status.code) &&
         (filter.path == null || uri.lowercase().contains(filter.path.lowercase())) &&
         (filter.host == null || host.lowercase().contains(filter.host.lowercase()))
