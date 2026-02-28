@@ -153,6 +153,12 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
             Request(GET, "/abob")
         )
     }
+
+    @Test
+    fun `description strips regex quoting syntax`() {
+        val trigger = MatchRequest(path = Regex(".*${Regex.escape("asd")}.*"))
+        assertThat(trigger.toString(), equalTo("path matches '.*asd.*'"))
+    }
 }
 
 class AlwaysTest : ChaosTriggerContract() {
