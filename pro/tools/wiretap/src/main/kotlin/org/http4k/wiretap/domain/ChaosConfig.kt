@@ -65,7 +65,11 @@ data class ChaosConfig(
             path?.takeIf { it.isNotBlank() },
             host?.takeIf { it.isNotBlank() }
         ).isNotEmpty()
-        val trigger = if (hasFilters) toFilterTrigger() and toTrigger() else toTrigger()
-        return toBehaviour().appliedWhen(trigger)
+        return toBehaviour().appliedWhen(
+            when {
+                hasFilters -> toFilterTrigger() and toTrigger()
+                else -> toTrigger()
+            }
+        )
     }
 }

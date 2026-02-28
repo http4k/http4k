@@ -37,8 +37,9 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
 
     override fun http(renderer: DatastarElementRenderer) =
         "/{direction}/activate" bind POST to { req ->
+            println(req.bodyString())
             val direction = Path.enum<Direction>().of("direction")(req)
-            val config = req.datastarModel<ChaosConfig>()
+            val config = req.datastarModel<ChaosConfigSignals>().toChaosConfig()
             activate(direction, config)
 
             val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))

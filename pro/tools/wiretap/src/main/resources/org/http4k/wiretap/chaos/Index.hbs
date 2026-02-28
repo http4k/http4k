@@ -13,30 +13,30 @@
             <div class="chaos-form">
                 <div class="chaos-form-group">
                     <label>Behaviour</label>
-                    <select class="form-select form-select-sm" data-bind="inBehaviour">
+                    <select class="form-select form-select-sm" data-bind="behaviour">
                         <option value="ReturnStatus">Return Status</option>
                         <option value="Latency">Latency</option>
                         <option value="NoBody">No Body</option>
                     </select>
                 </div>
-                <div class="chaos-form-group" data-show="$inBehaviour==='Latency'">
+                <div class="chaos-form-group" data-show="$behaviour==='Latency'">
                     <label>Min (ms)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="inLatencyMin" value="100">
+                    <input type="number" class="form-control form-control-sm" data-bind="latencyMin" value="100">
                 </div>
-                <div class="chaos-form-group" data-show="$inBehaviour==='Latency'">
+                <div class="chaos-form-group" data-show="$behaviour==='Latency'">
                     <label>Max (ms)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="inLatencyMax" value="500">
+                    <input type="number" class="form-control form-control-sm" data-bind="latencyMax" value="500">
                 </div>
-                <div class="chaos-form-group" data-show="$inBehaviour==='ReturnStatus'">
+                <div class="chaos-form-group" data-show="$behaviour==='ReturnStatus'">
                     <label>Status Code</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="inStatusCode" value="500">
+                    <input type="number" class="form-control form-control-sm" data-bind="statusCode" value="500">
                 </div>
                 <div class="chaos-form-group">
                     <label>Filter</label>
                 </div>
                 <div class="chaos-form-group">
                     <label>Method</label>
-                    <select class="form-select form-select-sm" data-bind="inMethod">
+                    <select class="form-select form-select-sm" data-bind="method">
                         <option value="">Any</option>
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
@@ -47,32 +47,32 @@
                 </div>
                 <div class="chaos-form-group">
                     <label>Path</label>
-                    <input type="text" class="form-control form-control-sm" data-bind="inPath" placeholder="Match path...">
+                    <input type="text" class="form-control form-control-sm" data-bind="path" placeholder="Match path...">
                 </div>
                 <div class="chaos-form-group">
                     <label>Host</label>
-                    <input type="text" class="form-control form-control-sm" data-bind="inHost" placeholder="Match host...">
+                    <input type="text" class="form-control form-control-sm" data-bind="host" placeholder="Match host...">
                 </div>
                 <div class="chaos-form-group">
                     <label>Trigger</label>
-                    <select class="form-select form-select-sm" data-bind="inTrigger">
+                    <select class="form-select form-select-sm" data-bind="trigger">
                         <option value="Always">Always</option>
                         <option value="PercentageBased">Percentage Based</option>
                         <option value="Once">Once</option>
                         <option value="Countdown">Countdown</option>
                     </select>
                 </div>
-                <div class="chaos-form-group" data-show="$inTrigger==='PercentageBased'">
+                <div class="chaos-form-group" data-show="$trigger==='PercentageBased'">
                     <label>Percentage</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="inPercentage" min="0" max="100" value="50">
+                    <input type="number" class="form-control form-control-sm" data-bind="percentage" min="0" max="100" value="50">
                 </div>
-                <div class="chaos-form-group" data-show="$inTrigger==='Countdown'">
+                <div class="chaos-form-group" data-show="$trigger==='Countdown'">
                     <label>Count</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="inCountdown" min="0" value="5">
+                    <input type="number" class="form-control form-control-sm" data-bind="countdown" min="0" value="5">
                 </div>
                 <div class="chaos-actions">
                     <button class="btn btn-sm btn-danger"
-                            data-on:click="@post('/__wiretap/chaos/Inbound/activate', {signals: {behaviour: $inBehaviour, latencyMin: $inLatencyMin, latencyMax: $inLatencyMax, statusCode: $inStatusCode, trigger: $inTrigger, percentage: $inPercentage, countdown: $inCountdown, method: $inMethod, path: $inPath, host: $inHost}})">
+                            data-on:click="@post('/__wiretap/chaos/Inbound/activate', {signals: {behaviour: $behaviour, latencyMin: $latencyMin, latencyMax: $latencyMax, statusCode: $statusCode, trigger: $trigger, percentage: $percentage, countdown: $countdown, method: $method, path: $path, host: $host}})">
                         Activate
                     </button>
                     <button class="btn btn-sm btn-outline-secondary"
@@ -89,30 +89,30 @@
             <div class="chaos-form">
                 <div class="chaos-form-group">
                     <label>Behaviour</label>
-                    <select class="form-select form-select-sm" data-bind="outBehaviour">
+                    <select class="form-select form-select-sm" data-bind="behaviour">
                         <option value="ReturnStatus">Return Status</option>
                         <option value="Latency">Latency</option>
                         <option value="NoBody">No Body</option>
                     </select>
                 </div>
-                <div class="chaos-form-group" data-show="$outBehaviour==='Latency'">
+                <div class="chaos-form-group" data-show="$behaviour==='Latency'">
                     <label>Min (ms)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="outLatencyMin" value="100">
+                    <input type="number" class="form-control form-control-sm" data-bind="latencyMin" value="100">
                 </div>
-                <div class="chaos-form-group" data-show="$outBehaviour==='Latency'">
+                <div class="chaos-form-group" data-show="$behaviour==='Latency'">
                     <label>Max (ms)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="outLatencyMax" value="500">
+                    <input type="number" class="form-control form-control-sm" data-bind="latencyMax" value="500">
                 </div>
-                <div class="chaos-form-group" data-show="$outBehaviour==='ReturnStatus'">
+                <div class="chaos-form-group" data-show="$behaviour==='ReturnStatus'">
                     <label>Status Code</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="outStatusCode" value="500">
+                    <input type="number" class="form-control form-control-sm" data-bind="statusCode" value="500">
                 </div>
                 <div class="chaos-form-group">
                     <label>Filter</label>
                 </div>
                 <div class="chaos-form-group">
                     <label>Method</label>
-                    <select class="form-select form-select-sm" data-bind="outMethod">
+                    <select class="form-select form-select-sm" data-bind="method">
                         <option value="">Any</option>
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
@@ -123,32 +123,32 @@
                 </div>
                 <div class="chaos-form-group">
                     <label>Path</label>
-                    <input type="text" class="form-control form-control-sm" data-bind="outPath" placeholder="Match path...">
+                    <input type="text" class="form-control form-control-sm" data-bind="path" placeholder="Match path...">
                 </div>
                 <div class="chaos-form-group">
                     <label>Host</label>
-                    <input type="text" class="form-control form-control-sm" data-bind="outHost" placeholder="Match host...">
+                    <input type="text" class="form-control form-control-sm" data-bind="host" placeholder="Match host...">
                 </div>
                 <div class="chaos-form-group">
                     <label>Trigger</label>
-                    <select class="form-select form-select-sm" data-bind="outTrigger">
+                    <select class="form-select form-select-sm" data-bind="trigger">
                         <option value="Always">Always</option>
                         <option value="PercentageBased">Percentage Based</option>
                         <option value="Once">Once</option>
                         <option value="Countdown">Countdown</option>
                     </select>
                 </div>
-                <div class="chaos-form-group" data-show="$outTrigger==='PercentageBased'">
+                <div class="chaos-form-group" data-show="$trigger==='PercentageBased'">
                     <label>Percentage</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="outPercentage" min="0" max="100" value="50">
+                    <input type="number" class="form-control form-control-sm" data-bind="percentage" min="0" max="100" value="50">
                 </div>
-                <div class="chaos-form-group" data-show="$outTrigger==='Countdown'">
+                <div class="chaos-form-group" data-show="$trigger==='Countdown'">
                     <label>Count</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="outCountdown" min="0" value="5">
+                    <input type="number" class="form-control form-control-sm" data-bind="countdown" min="0" value="5">
                 </div>
                 <div class="chaos-actions">
                     <button class="btn btn-sm btn-danger"
-                            data-on:click="@post('/__wiretap/chaos/Outbound/activate', {signals: {behaviour: $outBehaviour, latencyMin: $outLatencyMin, latencyMax: $outLatencyMax, statusCode: $outStatusCode, trigger: $outTrigger, percentage: $outPercentage, countdown: $outCountdown, method: $outMethod, path: $outPath, host: $outHost}})">
+                            data-on:click="@post('/__wiretap/chaos/Outbound/activate', {signals: {behaviour: $behaviour, latencyMin: $latencyMin, latencyMax: $latencyMax, statusCode: $statusCode, trigger: $trigger, percentage: $percentage, countdown: $countdown, method: $method, path: $path, host: $host}})">
                         Activate
                     </button>
                     <button class="btn btn-sm btn-outline-secondary"
