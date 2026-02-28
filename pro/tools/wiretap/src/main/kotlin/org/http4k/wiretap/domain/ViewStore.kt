@@ -20,7 +20,24 @@ interface ViewStore {
     fun remove(id: ViewId)
 
     companion object {
-        fun InMemory(initial: List<View> = defaultViews()): ViewStore = object : ViewStore {
+        val defaultViews = listOf(
+            View(id = -3, name = "All", builtIn = true),
+            View(
+                id = -2,
+                name = Inbound.name,
+                builtIn = true,
+                filter = TransactionFilter(direction = Inbound)
+            ),
+            View(
+                id = -1,
+                name = Outbound.name,
+                builtIn = true,
+                filter = TransactionFilter(direction = Outbound)
+            )
+        )
+    }
+
+    fun InMemory(initial: List<View> = defaultViews): ViewStore = object : ViewStore {
             private val views = CopyOnWriteArrayList(initial)
 
             override fun list() = views.toList()
@@ -40,21 +57,4 @@ interface ViewStore {
                 views.removeIf { it.id == id && !it.builtIn }
             }
         }
-
-        private fun defaultViews() = listOf(
-            View(id = -3, name = "All", builtIn = true),
-            View(
-                id = -2,
-                name = Inbound.name,
-                builtIn = true,
-                filter = TransactionFilter(direction = Inbound)
-            ),
-            View(
-                id = -1,
-                name = Outbound.name,
-                builtIn = true,
-                filter = TransactionFilter(direction = Outbound)
-            )
-        )
-    }
 }
