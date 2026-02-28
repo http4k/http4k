@@ -31,6 +31,10 @@ import org.http4k.wiretap.traffic.TrafficStream
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
 
+/**
+ * Wiretap is a tool for debugging http4k applications. It wraps a http4k application and records
+ * all requests and responses, allowing you to monitor what is going on inside the app.
+ */
 object Wiretap {
     fun Http(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
