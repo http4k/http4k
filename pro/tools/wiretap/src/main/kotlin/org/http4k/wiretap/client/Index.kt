@@ -25,7 +25,7 @@ fun Index(
     defaultUrl: String,
     html: TemplateRenderer,
     transactions: TransactionStore,
-    basePath: String = "/__wiretap/client/",
+    basePath: String = "/_wiretap/client/",
     pageTitle: String = "Inbound Client"
 ): RoutingHttpHandler =
     "/" bind GET to { req ->
@@ -79,7 +79,7 @@ fun Index(
 
 data class Index(
     val signals: ClientSignals,
-    val basePath: String = "/__wiretap/client/",
+    val basePath: String = "/_wiretap/client/",
     val pageTitle: String = "Inbound Client"
 ) : ViewModel {
     val initialSignals: String = Json.asDatastarSignals(signals)

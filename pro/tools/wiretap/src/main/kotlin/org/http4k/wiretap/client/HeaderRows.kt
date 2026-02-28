@@ -32,7 +32,7 @@ fun headerRowsView(headers: Map<String, HeaderEntry>, basePath: String) =
         basePath = basePath
     )
 
-fun HeaderRows(elements: DatastarElementRenderer, basePath: String = "/__wiretap/client/"): RoutingHttpHandler =
+fun HeaderRows(elements: DatastarElementRenderer, basePath: String = "/_wiretap/client/"): RoutingHttpHandler =
     "headers" bind routes(
         "/reset" bind GET to {
             val newHeaders = mapOf("0" to HeaderEntry())

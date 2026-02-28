@@ -1,8 +1,8 @@
 {{#each tabs}}
 <div class="tab-btn" data-tab-id="{{id}}" data-class:active="$activeView==='{{id}}'"
-     data-on:click="$direction={{#if filter.direction}}'{{filter.direction}}'{{else}}''{{/if}}; $host={{#if filter.host}}'{{filter.host}}'{{else}}''{{/if}}; $method={{#if filter.method}}'{{filter.method}}'{{else}}''{{/if}}; $status={{#if filter.status}}'{{filter.status}}'{{else}}''{{/if}}; $path={{#if filter.path}}'{{filter.path}}'{{else}}''{{/if}}; $activeView='{{id}}'; $customView={{#if builtIn}}false{{else}}true{{/if}}; @get('/__wiretap/traffic/list')">
+     data-on:click="$direction={{#if filter.direction}}'{{filter.direction}}'{{else}}''{{/if}}; $host={{#if filter.host}}'{{filter.host}}'{{else}}''{{/if}}; $method={{#if filter.method}}'{{filter.method}}'{{else}}''{{/if}}; $status={{#if filter.status}}'{{filter.status}}'{{else}}''{{/if}}; $path={{#if filter.path}}'{{filter.path}}'{{else}}''{{/if}}; $activeView='{{id}}'; $customView={{#if builtIn}}false{{else}}true{{/if}}; @get('/_wiretap/traffic/list')">
     <span>{{name}}</span>
 </div>
 {{/each}}
 <div class="add-tab-btn" data-on:click="$showAddView=!$showAddView; $name=''"><i class="bi bi-plus-lg"></i> Add Tab</div>
-<div class="clear-btn" data-on:click="@delete('/__wiretap/traffic')"><i class="bi bi-trash"></i> Clear</div>
+<div class="clear-btn" data-on:click="@delete('/_wiretap/traffic')"><i class="bi bi-trash"></i> Clear</div>

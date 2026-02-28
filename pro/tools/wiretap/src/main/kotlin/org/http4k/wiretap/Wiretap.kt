@@ -70,14 +70,14 @@ object Wiretap {
             OpenApi()
         )
 
-        val mcpRoutes = "/__wiretap" bind WiretapMcp("http4k-wiretap", NoMcpSecurity, functions)
+        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", NoMcpSecurity, functions)
 
         return poly(
             listOf(
                 ServerFilters.CatchAll().then(
                     routes(WiretapUi(renderer, templates, functions), proxy)
                 ),
-                "/__wiretap/traffic" bind TrafficStream(transactionStore, renderer)
+                "/_wiretap/traffic" bind TrafficStream(transactionStore, renderer)
             ) + mcpRoutes
         )
     }

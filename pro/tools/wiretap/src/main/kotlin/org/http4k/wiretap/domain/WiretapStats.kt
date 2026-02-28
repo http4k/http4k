@@ -17,6 +17,17 @@ data class WiretapStats(
     val trafficTimeline: Pair<List<String>, List<Int>>
 )
 
+data class TransactionStats(
+    val totalRequests: Int,
+    val inboundCount: Int,
+    val outboundCount: Int,
+    val statusCounts: Map<String, Int>,
+    val methodCounts: Map<String, Int>,
+    val latencyCounts: Map<String, Int>,
+    val topHosts: List<HostBucket>,
+    val trafficTimeline: Pair<List<String>, List<Int>>
+)
+
 data class HostBucket(
     val host: String,
     val count: Int,

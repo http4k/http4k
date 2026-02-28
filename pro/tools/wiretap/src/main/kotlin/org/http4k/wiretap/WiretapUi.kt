@@ -13,7 +13,7 @@ fun WiretapUi(
     html: TemplateRenderer,
     functions: List<WiretapFunction>,
 ) = routes(
-    "/__wiretap" bind routes(
+    "/_wiretap" bind routes(
         listOf(
             Index(html),
             static(Classpath("public"))

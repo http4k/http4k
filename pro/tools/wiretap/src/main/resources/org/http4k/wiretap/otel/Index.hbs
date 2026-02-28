@@ -7,12 +7,12 @@
         <div class="trace-list-header">
             <span>Time</span><span>Trace ID</span><span>Root Span</span><span>Service</span><span>Spans</span><span class="duration">Duration</span>
         </div>
-        <div class="list-body" id="trace-list" data-init="@get('/__wiretap/otel/list')"></div>
+        <div class="list-body" id="trace-list" data-init="@get('/_wiretap/otel/list')"></div>
     </div>
     <div class="panel-resize-handle"></div>
     <div class="otel-detail-panel">
         {{#if deepLinkTrace}}
-        <div id="trace-detail-panel" data-init="@get('/__wiretap/otel/{{deepLinkTrace}}')">Loading trace...</div>
+        <div id="trace-detail-panel" data-init="@get('/_wiretap/otel/{{deepLinkTrace}}')">Loading trace...</div>
         {{else}}
         <div id="trace-detail-panel" class="empty">Select a trace</div>
         {{/if}}

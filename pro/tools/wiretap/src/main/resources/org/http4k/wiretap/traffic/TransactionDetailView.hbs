@@ -7,7 +7,7 @@
         <span class="duration">{{tx.durationMs}}ms</span>
         <span class="timestamp">{{tx.timestamp}}</span>
         {{#if tx.traceId}}
-        <a href="/__wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
+        <a href="/_wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
         {{/if}}
         <button class="detail-toolbar-btn"
                 onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.curl-data').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy cURL', 1500) })">
