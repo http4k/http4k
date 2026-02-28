@@ -109,6 +109,7 @@ object ChaosTriggers {
     object MatchRequest {
         operator fun invoke(
             method: String? = null,
+            host: Regex? = null,
             path: Regex? = null,
             queries: Map<String, Regex>? = null,
             headers: Map<String, Regex>? = null,
@@ -130,13 +131,16 @@ object ChaosTriggers {
                     ?: emptyList()
             val pathMatchers =
                 path?.let { p -> listOf(RequestMatcher("path matches '$p'") { it.uri.path.matches(p) }) } ?: emptyList()
+            val hostMatchers =
+                host?.let { p -> listOf(RequestMatcher("host matches '$p'") { it.uri.authority.matches(p) }) }
+                    ?: emptyList()
             val bodyMatchers =
                 body?.let { b -> listOf(RequestMatcher("body matches '$b'") { it.bodyString().matches(b) }) }
                     ?: emptyList()
             val methodMatchers =
                 method?.let { m -> listOf(RequestMatcher("method == ${m.uppercase()}") { it.method == Method.valueOf(m.uppercase()) }) }
                     ?: emptyList()
-            val all = methodMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
+            val all = methodMatchers + hostMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
 
             val matcher = if (all.isEmpty()) RequestMatcher("anything") { true } else
                 all.reduce { acc, next ->
@@ -172,6 +176,7 @@ internal fun JsonNode.asTrigger(clock: Clock): Trigger = when (nonNullable<Strin
     "countdown" -> Countdown(nonNullable("count"))
     "request" -> MatchRequest(
         asNullable("method"),
+        asNullable("host"),
         asNullable("path"),
         toRegexMap("queries"),
         toRegexMap("headers"),
