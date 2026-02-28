@@ -3,8 +3,10 @@ package org.http4k.wiretap.traffic
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.int
+import org.http4k.ai.mcp.model.status
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -43,8 +45,8 @@ fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunct
 
     override fun mcp(): ToolCapability {
         val direction = Tool.Arg.enum<Direction>().optional("direction", "Filter by direction: Inbound or Outbound")
-        val method = Tool.Arg.string().optional("method", "Filter by HTTP method (GET, POST, etc)")
-        val status = Tool.Arg.string().optional("status", "Filter by status code regex (e.g. '404', '4..', '2\\d\\d')")
+        val method = Tool.Arg.enum<Method>().optional("method", "Filter by HTTP method (GET, POST, etc)")
+        val status = Tool.Arg.status().optional("status", "Filter by status code regex (e.g. '404', '4..', '2\\d\\d')")
         val path = Tool.Arg.string().optional("path", "Filter by path substring (case-insensitive)")
         val host = Tool.Arg.string().optional("host", "Filter by host substring (case-insensitive)")
         val limit = Tool.Arg.int().optional("limit", "Maximum number of transactions to return (default 50)")
@@ -54,7 +56,7 @@ fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunct
             "List recent HTTP transactions captured by Wiretap with optional filtering",
             direction, method, status, path, host, limit
         ) bind {
-            val filter = TransactionFilter(direction(it), method(it), status(it), path(it), host(it)).normalize()
+            val filter = TransactionFilter(direction(it), host(it), method(it), status(it), path(it))
 
             Json.asToolResponse(list(filter, limit(it) ?: 50))
         }

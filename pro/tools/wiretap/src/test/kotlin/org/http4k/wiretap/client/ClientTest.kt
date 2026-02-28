@@ -40,10 +40,10 @@ class ClientTest {
 
     @Test
     fun `inbound client index page returns OK with correct basePath and title`() {
-        val response = client(Request(GET, "/client"))
+        val response = client(Request(GET, "/inbound"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/_wiretap/client/"))
+        assertThat(response.bodyString(), containsSubstring("/_wiretap/inbound/"))
         assertThat(response.bodyString(), containsSubstring("Inbound Client"))
     }
 
@@ -72,7 +72,7 @@ class ClientTest {
         )
 
         val txId = transactions.list().first().id
-        val response = client(Request(GET, "/client?import=$txId"))
+        val response = client(Request(GET, "/inbound?import=$txId"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), containsSubstring("POST"))

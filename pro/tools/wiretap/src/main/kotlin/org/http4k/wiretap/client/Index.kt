@@ -15,7 +15,7 @@ data class HeaderEntry(val name: String = "", val value: String = "")
 
 data class ClientSignals(
     val url: String = "",
-    val method: String = "GET",
+    val method: String = GET.name,
     val headers: Map<String, HeaderEntry> = mapOf("0" to HeaderEntry()),
     val contentType: String? = null,
     val body: String? = null

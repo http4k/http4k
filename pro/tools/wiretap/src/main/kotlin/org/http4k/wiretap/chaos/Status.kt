@@ -16,13 +16,6 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.ChaosStatusData
 import org.http4k.wiretap.util.Json
 
-internal fun chaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = ChaosStatusData(
-    inboundActive = inboundChaos.isEnabled(),
-    inboundDescription = inboundChaos.toString(),
-    outboundActive = outboundChaos.isEnabled(),
-    outboundDescription = outboundChaos.toString()
-)
-
 fun ChaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/status" bind GET to {
         val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))
@@ -46,3 +39,10 @@ data class ChaosStatusView(val data: ChaosStatusData) : ViewModel {
     val outboundBadgeClass = if (data.outboundActive) "badge-chaos-active" else "badge-chaos-inactive"
     val outboundBadgeText = if (data.outboundActive) "ACTIVE" else "INACTIVE"
 }
+
+internal fun chaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = ChaosStatusData(
+    inboundActive = inboundChaos.isEnabled(),
+    inboundDescription = inboundChaos.toString(),
+    outboundActive = outboundChaos.isEnabled(),
+    outboundDescription = outboundChaos.toString()
+)

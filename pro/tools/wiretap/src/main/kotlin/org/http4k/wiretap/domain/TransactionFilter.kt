@@ -1,17 +1,12 @@
 package org.http4k.wiretap.domain
 
+import org.http4k.core.Method
+import org.http4k.core.Status
+
 data class TransactionFilter(
     val direction: Direction? = null,
     val host: String? = null,
-    val method: String? = null,
-    val status: String? = null,
+    val method: Method? = null,
+    val status: Status? = null,
     val path: String? = null
-) {
-    fun normalize() = TransactionFilter(
-        direction = direction,
-        host = host?.ifEmpty { null },
-        method = method?.ifEmpty { null },
-        status = status?.ifEmpty { null },
-        path = path?.ifEmpty { null }
-    )
-}
+)

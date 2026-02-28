@@ -56,10 +56,11 @@ fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
             return WiretapTransaction(
                 id = 0,
                 transaction = HttpTransaction(
-                    request = request,
-                    response = response,
-                    duration = duration,
-                    start = start
+                    request,
+                    response,
+                    duration,
+                    emptyMap(),
+                    start
                 ),
                 direction = direction
             ).toDetail()

@@ -9,7 +9,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
@@ -71,18 +70,7 @@ class TransactionStoreTest {
         record(method = POST)
 
         assertThat(
-            store.list(TransactionFilter(method = "GET")).size,
-            equalTo(1)
-        )
-    }
-
-    @Test
-    fun `list filters by status regex`() {
-        record(status = OK)
-        record(status = NOT_FOUND)
-
-        assertThat(
-            store.list(TransactionFilter(status = "4..")).size,
+            store.list(TransactionFilter(method = GET)).size,
             equalTo(1)
         )
     }
@@ -114,7 +102,7 @@ class TransactionStoreTest {
         repeat(5) { record(method = POST) }
 
         assertThat(
-            store.list(TransactionFilter(method = "GET"), limit = 2).size,
+            store.list(TransactionFilter(method = GET), limit = 2).size,
             equalTo(2)
         )
     }
