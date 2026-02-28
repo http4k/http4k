@@ -9,11 +9,11 @@
     <div class="metric-card">
         <div class="metric-icon"><i class="bi bi-arrow-left-right"></i></div>
         <div class="metric-body">
-            <div class="metric-value">{{stats.totalRequests}}</div>
+            <div class="metric-value">{{stats.transactions.totalRequests}}</div>
             <div class="metric-label">Total Requests</div>
             <div class="metric-sub">
-                <span class="badge badge-in">IN {{stats.inboundCount}}</span>
-                <span class="badge badge-out">OUT {{stats.outboundCount}}</span>
+                <span class="badge badge-in">IN {{stats.transactions.inboundCount}}</span>
+                <span class="badge badge-out">OUT {{stats.transactions.outboundCount}}</span>
             </div>
         </div>
     </div>
@@ -88,7 +88,7 @@
             </tr>
             </thead>
             <tbody>
-            {{#each stats.topHosts}}
+            {{#each stats.transactions.topHosts}}
             <tr>
                 <td class="host-name">{{host}}</td>
                 <td class="host-count">{{count}}</td>
