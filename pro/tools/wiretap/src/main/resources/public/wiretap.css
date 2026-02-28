@@ -1388,18 +1388,24 @@ body {
     color: #dc3545;
 }
 
-.schemes > div > div {
-    display: none;
-}
+#swagger-ui {
+    .schemes-server-container {
+        display: none;
+    }
 
-.title > span {
-    display: none;
-}
+    .title > span {
+        display: none;
+    }
 
-.main > a {
-    display: none;
-}
+    .main > a {
+        display: none;
+    }
 
-.main.title {
-    display: none;
+    .main.title {
+        display: none;
+    }
+
+    .expand-operation {
+        display: none;
+    }
 }
