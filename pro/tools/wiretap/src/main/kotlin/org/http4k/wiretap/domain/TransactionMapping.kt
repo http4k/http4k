@@ -3,7 +3,8 @@ package org.http4k.wiretap.domain
 import org.http4k.core.HttpMessage
 import org.http4k.core.queries
 import org.http4k.core.toCurl
-import org.http4k.wiretap.util.Json
+import org.http4k.lens.contentType
+import org.http4k.wiretap.util.formatBody
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -47,8 +48,8 @@ internal fun WiretapTransaction.toDetail(): TransactionDetail {
         queryParams = req.uri.queries().map { HeaderEntry(it.first, it.second ?: "") },
         requestHeaders = req.headers.map { HeaderEntry(it.first, it.second ?: "") },
         responseHeaders = resp.headers.map { HeaderEntry(it.first, it.second ?: "") },
-        requestBody = req.prettifyJson(),
-        responseBody = resp.prettifyJson(),
+        requestBody = req.prettifyBody(),
+        responseBody = resp.prettifyBody(),
         curl = req.toCurl(),
         traceId = traceparent(),
         isChaos = resp.headerValues("x-http4k-chaos").firstOrNull() != null,
@@ -56,8 +57,8 @@ internal fun WiretapTransaction.toDetail(): TransactionDetail {
     )
 }
 
-private fun HttpMessage.prettifyJson() =
-    runCatching { Json.prettify(bodyString()) }.getOrNull() ?: bodyString()
+private fun HttpMessage.prettifyBody() =
+    formatBody(bodyString(), contentType()?.value ?: "")
 
 internal fun WiretapTransaction.traceparent(): String? =
     (transaction.request.header("traceparent") ?: transaction.response.header("traceparent"))
