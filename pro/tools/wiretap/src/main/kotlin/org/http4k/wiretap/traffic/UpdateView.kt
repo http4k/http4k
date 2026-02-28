@@ -21,11 +21,14 @@ import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.Json.datastarModel
 
 fun UpdateView(viewStore: ViewStore) = object : WiretapFunction {
+
+    private fun update(id: Long, filter: TransactionFilter) {
+        viewStore.list().find { it.id == id }?.let { viewStore.update(it.copy(filter = filter)) }
+    }
+
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}" bind PUT to { req ->
-            val id = Path.long().of("id")(req)
-            val signals = req.datastarModel<ViewSignals>()
-            viewStore.list().find { it.id == id }?.let { viewStore.update(it.copy(filter = signals.normalized)) }
+            update(Path.long().of("id")(req), req.datastarModel<ViewSignals>().normalized)
             elements.renderViewBar(viewStore.list())
         }
 
@@ -47,20 +50,7 @@ fun UpdateView(viewStore: ViewStore) = object : WiretapFunction {
             path,
             host
         ) bind { req ->
-            viewStore.list().find { v -> v.id == id(req) }
-                ?.let {
-                    viewStore.update(
-                        it.copy(
-                            filter = TransactionFilter(
-                                direction(req),
-                                host(req),
-                                method(req),
-                                status(req),
-                                path(req)
-                            )
-                        )
-                    )
-                }
+            update(id(req), TransactionFilter(direction(req), host(req), method(req), status(req), path(req)))
             Json.asToolResponse(viewStore.list())
         }
     }
