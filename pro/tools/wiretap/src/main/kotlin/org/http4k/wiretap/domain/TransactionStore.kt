@@ -88,7 +88,7 @@ interface TransactionStore {
                     methodCounts = methodCounts,
                     latencyCounts = latencyCounts,
                     topHosts = hosts,
-                    trafficTimeline = trafficOverTime(txs, startTime, uptime, now)
+                    trafficTimeline = trafficOverTime(txs, uptime, now)
                 )
             }
 
@@ -124,7 +124,6 @@ private fun latencyBucket(duration: Duration): String {
 
 private fun trafficOverTime(
     txs: List<WiretapTransaction>,
-    startTime: Instant,
     uptime: Duration,
     now: Instant
 ): Pair<List<String>, List<Int>> {

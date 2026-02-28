@@ -74,22 +74,19 @@ fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
                     .filter { it.name.isNotBlank() }
                     .map { it.name to it.value }
                     .let { list ->
-                        if (model.contentType.isNotBlank() && list.none {
-                                it.first.equals(
-                                    "Content-Type",
-                                    ignoreCase = true
-                                )
-                            })
-                            list + ("Content-Type" to model.contentType)
-                        else list
+                        when {
+                            model.contentType.isNotBlank() &&
+                                list.none { it.first.equals("Content-Type", ignoreCase = true) }
+                                -> list + ("Content-Type" to model.contentType)
+
+                            else -> list
+                        }
                     }
 
-                val body = model.body.ifBlank { null }
-                val detail = sendRequest(model.method, model.url, headers, body)
+                val detail = sendRequest(model.method, model.url, headers, model.body)
 
-                val view = TransactionDetailView(detail, showImport = false)
                 Response(OK).datastarElements(
-                    elements(view),
+                    elements(TransactionDetailView(detail, showImport = false)),
                     selector = Selector.of("#detail-panel")
                 )
             }

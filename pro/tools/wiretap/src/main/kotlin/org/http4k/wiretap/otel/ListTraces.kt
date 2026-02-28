@@ -42,9 +42,8 @@ fun ListTraces(traceStore: TraceStore) = object : WiretapFunction {
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/list" bind GET to {
-            val rows = list().map { TraceRowView(it) }
             Response(OK).datastarElements(
-                rows.flatMap { elements(it) },
+                list().map { TraceRowView(it) }.flatMap { elements(it) },
                 MorphMode.inner,
                 Selector.of("#trace-list")
             )

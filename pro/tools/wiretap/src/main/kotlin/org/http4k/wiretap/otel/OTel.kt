@@ -8,9 +8,7 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TraceStore
 
-fun OTel(
-    traceStore: TraceStore
-) = object : WiretapFunction {
+fun OTel(traceStore: TraceStore) = object : WiretapFunction {
     private val functions = listOf(
         ListTraces(traceStore),
         GetTrace(traceStore),

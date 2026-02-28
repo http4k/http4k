@@ -1,5 +1,7 @@
 package org.http4k.wiretap.otel
 
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.sdk.trace.data.SpanData
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
@@ -22,8 +24,6 @@ import org.http4k.wiretap.domain.SpanEvent
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.util.Json
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.sdk.trace.data.SpanData
 import kotlin.math.max
 
 fun GetTrace(traceStore: TraceStore) = object : WiretapFunction {
@@ -38,17 +38,12 @@ fun GetTrace(traceStore: TraceStore) = object : WiretapFunction {
         val byParent = spans.groupBy { it.parentSpanId }
         val flatSpans = buildSpanTree(spans, byParent, traceStartNanos, traceDurationNanos)
 
-        return TraceDetail(
-            traceId = traceId,
-            totalDurationMs = flatSpans.maxOfOrNull { it.durationMs } ?: 0L,
-            spans = flatSpans
-        )
+        return TraceDetail(traceId, flatSpans.maxOfOrNull { it.durationMs } ?: 0L, flatSpans)
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{traceId}" bind GET to { req ->
-            val traceId = Path.of("traceId")(req)
-            when (val detail = lookup(traceId)) {
+            when (val detail = lookup(Path.of("traceId")(req))) {
                 null -> Response(NOT_FOUND)
                 else -> Response(OK).datastarElements(
                     elements(TraceDetailView(detail)),
@@ -92,6 +87,7 @@ private fun buildSpanTree(
 
     val allSpanIds = spans.map { it.spanId }.toSet()
     val orphanRoots = spans.filter { it.parentSpanId !in allSpanIds }
+
     return orphanRoots.sortedBy { it.startEpochNanos }.flatMap {
         flattenSpan(it, 0, byParent, traceStartNanos, traceDurationNanos)
     }

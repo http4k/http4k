@@ -25,8 +25,8 @@ fun Index(
     defaultUrl: String,
     html: TemplateRenderer,
     transactions: TransactionStore,
-    basePath: String = "/_wiretap/inbound/",
-    pageTitle: String = "Inbound Client"
+    basePath: String,
+    pageTitle: String
 ): RoutingHttpHandler =
     "/" bind GET to { req ->
         val importId = req.query("import")?.toLongOrNull()
@@ -45,14 +45,13 @@ fun Index(
 
             else -> {
                 val request = tx.transaction.request
-                val importedHeaders = request.headers.take(10)
                 val ct = request.headers
                     .firstOrNull { it.first.equals("Content-Type", ignoreCase = true) }
                     ?.second ?: ""
 
                 val headers = when {
-                    importedHeaders.isEmpty() -> mapOf("0" to HeaderEntry())
-                    else -> importedHeaders.mapIndexed { index, (name, value) ->
+                    request.headers.isEmpty() -> mapOf("0" to HeaderEntry())
+                    else -> request.headers.mapIndexed { index, (name, value) ->
                         index.toString() to HeaderEntry(name, value ?: "")
                     }.toMap()
                 }

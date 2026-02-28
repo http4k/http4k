@@ -1,10 +1,7 @@
 package org.http4k.wiretap.domain
 
-import org.http4k.format.Moshi
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
-import java.io.File
-import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 
 data class View(
@@ -48,13 +45,13 @@ interface ViewStore {
             View(id = -3, name = "All", builtIn = true),
             View(
                 id = -2,
-                name = "Inbound",
+                name = Inbound.name,
                 builtIn = true,
                 filter = TransactionFilter(direction = Inbound)
             ),
             View(
                 id = -1,
-                name = "Outbound",
+                name = Outbound.name,
                 builtIn = true,
                 filter = TransactionFilter(direction = Outbound)
             )
