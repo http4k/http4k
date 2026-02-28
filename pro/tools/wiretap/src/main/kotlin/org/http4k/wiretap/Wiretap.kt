@@ -1,5 +1,6 @@
 package org.http4k.wiretap
 
+import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
@@ -36,6 +37,7 @@ object Wiretap {
         traceStore: TraceStore = TraceStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
         httpClient: HttpHandler = JavaHttpClient(),
+        mcpSecurity: McpSecurity = NoMcpSecurity,
         clock: Clock = Clock.systemUTC(),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
         bodyHydration: BodyHydration = All,
@@ -70,7 +72,7 @@ object Wiretap {
             OpenApi()
         )
 
-        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", NoMcpSecurity, functions)
+        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 
         return poly(
             listOf(
