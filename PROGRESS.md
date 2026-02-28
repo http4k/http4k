@@ -74,6 +74,14 @@ direction styling classes, status class, chaos info.
 - **`TraceDetailView`**: traceId, flattened spans, shortTraceId, totalDurationMs
 - Deep linking: traffic detail has OTel button (`/__wiretap/otel?trace=`), OTel detail has Traffic button (`/__wiretap?trace=`)
 
+### OpenAPI Panel
+
+- **`OpenApi.kt`**: `WiretapFunction` that routes to Swagger UI index page; exports empty MCP capability pack
+- **`Index.kt`**: GET handler for `/__wiretap/openapi` — renders `Index` ViewModel via TemplateRenderer
+- **`Index.hbs`**: Handlebars template loading Swagger UI v5.32.0 from CDN (unpkg), points SwaggerUIBundle at `/openapi`
+- Minimal implementation (~30 lines Kotlin total) — all UI comes from CDN-hosted Swagger UI
+- Nav link placed between OTel and Inbound Client in header
+
 ### Client Panel
 
 - **`Index`**: GET `/client/` — renders request builder page with Datastar signals for method, URL, 5 header pairs, body
@@ -97,7 +105,7 @@ direction styling classes, status class, chaos info.
 **Templates** (Handlebars, `.hbs`):
 
 - `layout.hbs` — HTML shell with Bootstrap 5.1.3 CSS, Bootstrap Icons, Datastar 1.0.0-RC.7, wiretap.css
-- `Header.hbs` — App header with logo, nav (Traffic, OTel, Client, Chaos), active link highlighting
+- `Header.hbs` — App header with logo, nav (Overview, Traffic, OTel, OpenAPI, Inbound Client, Outbound Client, Chaos), active link highlighting
 - `traffic/Index.hbs` — Full traffic page with tabs, filters, list+detail panels, deep-link support
 - `traffic/TabBarView.hbs` — Tab buttons with filter signals, add/clear buttons
 - `traffic/TransactionRowView.hbs` — Row with clickable filter cells, view button
@@ -107,9 +115,10 @@ direction styling classes, status class, chaos info.
 - `otel/Index.hbs` — Trace list + detail layout with deep-link support
 - `otel/TraceRowView.hbs` — Trace summary row
 - `otel/TraceDetailView.hbs` — Gantt chart with timeline, span bars, expandable detail sections
+- `openapi/Index.hbs` — Swagger UI via CDN (v5.32.0), points at `/openapi` endpoint
 - `client/Index.hbs` — Request builder with method/URL/headers/body form, response panel, import dropdown
 
-**CSS** (`wiretap.css`, ~1180 lines):
+**CSS** (`wiretap.css`, ~1412 lines):
 
 - Blue gradient header with http4k pipes SVG background
 - 9-column grid for transaction rows (direction, time, badge, method, host, path, status, latency, view)
@@ -120,6 +129,7 @@ direction styling classes, status class, chaos info.
 - Resizable panels with drag handles
 - Client page: toolbar, two-column form/response layout, import dropdown, header rows
 - Replay badge: blue circle "R" indicator, light blue row highlight
+- Swagger UI overrides: hides server selector, version/title, expand controls
 
 **JS** (`wiretap.js`, ~80 lines):
 

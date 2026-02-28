@@ -13,7 +13,7 @@ Wiretap.Http { http, oTel, clock -> MyApp(http, oTel) }.asServer(Jetty(8080)).st
 
 ## The Product
 
-The console has **six panels**, each building on existing http4k infrastructure:
+The console has **seven panels**, each building on existing http4k infrastructure:
 
 ### 1. Traffic — See Everything [BUILT]
 
@@ -144,7 +144,25 @@ Monitor and test MCP (Model Context Protocol) traffic specifically.
 
 **Status:** Not started.
 
-### 6. OTel Traces — Span Visualisation [BUILT]
+### 6. OpenAPI — Swagger UI Panel [BUILT]
+
+Embedded Swagger UI for exploring the app's OpenAPI spec.
+
+**What exists in http4k:**
+
+- Full OpenAPI contract support via `http4k-contract`
+- OpenAPI spec generation from route definitions
+
+**What we built:**
+
+- `OpenApi` WiretapFunction — routes to Swagger UI index, exports empty MCP capability
+- Handlebars template (`Index.hbs`) loads Swagger UI v5.32.0 via CDN (unpkg)
+- Points SwaggerUIBundle at `/openapi` endpoint
+- Custom CSS hides server selector (`.schemes-server-container`), version/title (`.title > span`, `.main > a`, `.main.title`), and expand controls (
+  `.expand-operation`)
+- Nav link placed between OTel and Inbound Client in header
+
+### 7. OTel Traces — Span Visualisation [BUILT]
 
 Visualise how requests flow through your system via OpenTelemetry spans.
 
@@ -231,6 +249,7 @@ Wiretap.Http(appBuilder) : PolyHandler
 |   +-- Traffic: Index, ListTransactions, ViewTransaction, ClearTransactions, Tabs, TrafficStream(SSE)
 |   +-- Chaos: Index, Status, Activate, Deactivate
 |   +-- OTel: Index, ListTraces, ViewTrace
+|   +-- OpenAPI: Index (Swagger UI via CDN)
 |   +-- Client: Index, SendRequest, ImportTransaction, ImportList
 |   +-- static(Classpath("public")) -> wiretap.css, wiretap.js
 |
@@ -285,11 +304,12 @@ Wiretap.Http { http, oTel, clock -> MyApp(http, oTel) }.asServer(Jetty(8080)).st
 - Deep linking between traffic and traces (bidirectional)
 - Named filter tabs with persistence
 
-### Phase 3: Client Panel [IN PROGRESS]
+### Phase 3: Client Panel + OpenAPI [IN PROGRESS]
 
 - Request builder [COMPLETE]
 - Import from traffic panel [COMPLETE]
 - Replay identification in traffic panel [COMPLETE]
+- OpenAPI / Swagger UI panel [COMPLETE]
 - Collections (save/load)
 - Collection runner with assertions
 
@@ -322,6 +342,7 @@ Wiretap.Http { http, oTel, clock -> MyApp(http, oTel) }.asServer(Jetty(8080)).st
 | HTTP traffic capture     | `ReportHttpTransaction`                       | TransactionStore, dashboard UI, SSE push           | Done    |
 | Chaos injection          | `ChaosEngine`, 11 behaviours, triggers        | Dashboard UI with inbound/outbound control         | Done    |
 | OTel trace visualisation | OTel SDK, `OpenTelemetryTracing` filter       | WiretapSpanExporter, Gantt chart viewer            | Done    |
+| OpenAPI / Swagger UI     | `http4k-contract`, OpenAPI spec generation    | Embedded Swagger UI via CDN, custom CSS            | Done    |
 | Traffic recording/replay | `Sink`/`Source`/`Replay`, Servirtium          | Request builder, import from traffic, replay badge | Partial |
 | SSE/WS traffic capture   | `ReportSseTransaction`, `ReportWsTransaction` | Dashboard panel                                    | Planned |
 | Tracing diagrams         | `TracerBullet`, 8 renderers                   | Mermaid sequence diagrams                          | Planned |
