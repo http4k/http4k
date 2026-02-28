@@ -1,7 +1,5 @@
 package org.http4k.wiretap.chaos
 
-import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
@@ -38,7 +36,7 @@ fun ChaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object 
         "chaos_status",
         "Get the current status of inbound and outbound chaos engines"
     ) bind {
-        ToolResponse.Ok(listOf(Content.Text(Json.asFormatString(chaosStatus(inboundChaos, outboundChaos)))))
+        Json.asToolResponse(chaosStatus(inboundChaos, outboundChaos))
     }
 }
 

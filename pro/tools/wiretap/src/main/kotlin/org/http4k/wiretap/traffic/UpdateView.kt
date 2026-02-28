@@ -1,7 +1,5 @@
 package org.http4k.wiretap.traffic
 
-import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.long
@@ -61,7 +59,7 @@ fun UpdateView(update: (View) -> Unit, list: () -> List<View>) = object : Wireta
                         )
                     )
                 }
-            ToolResponse.Ok(listOf(Content.Text(Json.asFormatString(list()))))
+            Json.asToolResponse(list())
         }
     }
 }

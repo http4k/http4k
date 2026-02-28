@@ -49,10 +49,9 @@ fun ChaosDeactivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = obj
             "chaos_deactivate",
             "Disable chaos injection on inbound or outbound traffic",
             direction
-        ) bind { req ->
-            val dir = direction(req)
-            deactivate(dir)
-            ToolResponse.Ok(listOf(Content.Text("Chaos deactivated on ${dir.name}")))
+        ) bind {
+            deactivate(direction(it))
+            ToolResponse.Ok(listOf(Content.Text("Chaos deactivated")))
         }
     }
 }

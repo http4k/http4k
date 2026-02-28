@@ -1,7 +1,5 @@
 package org.http4k.wiretap.traffic
 
-import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.int
@@ -58,7 +56,7 @@ fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunct
         ) bind {
             val filter = TransactionFilter(direction(it), method(it), status(it), path(it), host(it)).normalize()
 
-            Ok(listOf(Text(Json.asFormatString(list(filter, limit(it) ?: 50)))))
+            Json.asToolResponse(list(filter, limit(it) ?: 50))
         }
     }
 }

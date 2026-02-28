@@ -1,7 +1,5 @@
 package org.http4k.wiretap.traffic
 
-import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.string
@@ -45,7 +43,7 @@ fun CreateView(viewStore: ViewStore) = object : WiretapFunction {
                 name(it),
                 TransactionFilter(direction(it), host(it), method(it), status(it), path(it)).normalize()
             )
-            ToolResponse.Ok(listOf(Content.Text(Json.asFormatString(viewStore.list()))))
+            Json.asToolResponse(viewStore.list())
         }
     }
 }
