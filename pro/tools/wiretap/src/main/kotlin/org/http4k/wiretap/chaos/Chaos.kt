@@ -19,7 +19,6 @@ fun Chaos(templates: TemplateRenderer, inboundChaos: ChaosEngine, outboundChaos:
 
         override fun http(renderer: DatastarElementRenderer) =
             "chaos" bind routes(functions.map { it.http(renderer) } + Index(templates))
-                .debug()
 
         override fun mcp() = CapabilityPack(functions.map { it.mcp() })
     }
