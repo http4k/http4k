@@ -2,7 +2,11 @@ package org.http4k.ai.mcp.model
 
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
+import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
 import org.http4k.ai.model.ToolName
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ParamMeta
@@ -14,10 +18,6 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.nonBlank
 import org.http4k.lens.StringBiDiMappings.nonEmpty
-import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
-import org.http4k.ai.mcp.util.McpNodeType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -110,6 +110,8 @@ fun Tool.Arg.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME)
 fun Tool.Arg.zoneId() = string().map(StringBiDiMappings.zoneId())
 fun Tool.Arg.zoneOffset() = string().map(StringBiDiMappings.zoneOffset())
 fun Tool.Arg.locale() = string().map(StringBiDiMappings.locale())
+
+fun Tool.Arg.status() = int().map(BiDiMapping<Int, Status>({ Status(it, null) }, { it.code }))
 
 inline fun <reified T : Enum<T>> Tool.Arg.enum() =
     mapWithNewMeta({ enumValueOf<T>(it.toString()) }, { it }, ParamMeta.EnumParam(T::class))

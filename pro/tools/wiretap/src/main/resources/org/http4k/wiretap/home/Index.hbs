@@ -1,0 +1,17 @@
+{{#>org/http4k/wiretap/layout pageTitle="Overview"}}
+{{#partial "body"}}
+<body>
+{{> org/http4k/wiretap/header}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="app-layout">
+    <div class="overview-page">
+        <div id="overview-stats"
+             data-init="@get('/__wiretap/stats')"
+             data-on-interval__duration.10s="@get('/__wiretap/stats')"
+    </div>
+</div>
+</div>
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

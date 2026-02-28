@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader
 import com.github.jknack.handlebars.io.CompositeTemplateLoader
 import com.github.jknack.handlebars.io.FileTemplateLoader
+import com.github.jknack.handlebars.io.TemplateLoader.DEFAULT_SUFFIX
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap
@@ -12,10 +13,20 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Handlebars templating support. Use the function in the constructor to configure the instance.
  */
-class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { it }) : Templates {
+class HandlebarsTemplates(
+    private val configure: (Handlebars) -> Handlebars = { it },
+    private val templateSuffix: String? = null
+) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Pair<Class<*>, String>, Template>()
-        private val handlebars = configure(Handlebars(ClassPathTemplateLoader("/" + baseClasspathPackage.replace('.', File.separatorChar))))
+        private val handlebars = configure(
+            Handlebars(
+                ClassPathTemplateLoader(
+                    "/" + baseClasspathPackage.replace('.', File.separatorChar),
+                    templateSuffix ?: DEFAULT_SUFFIX
+                )
+            )
+        )
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
@@ -25,7 +36,8 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
 
     override fun Caching(baseTemplateDir: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Pair<Class<*>, String>, Template>()
-        private val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
+        private val handlebars =
+            configure(Handlebars(FileTemplateLoader(File(baseTemplateDir), templateSuffix ?: DEFAULT_SUFFIX)))
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
@@ -34,7 +46,8 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
-        val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
+        val handlebars =
+            configure(Handlebars(FileTemplateLoader(File(baseTemplateDir), templateSuffix ?: DEFAULT_SUFFIX)))
         override fun invoke(viewModel: ViewModel): String =
             safeRender {
                 handlebars.compile(it.template()).apply(it)

@@ -1,0 +1,14 @@
+<div id="tx-{{tx.id}}" class="tx-row{{#if tx.isChaos}} tx-row-chaos{{/if}}{{#if tx.isReplay}} tx-row-replay{{/if}}" data-class:selected="$selectedTx==='{{tx.id}}'" data-on:click="$selectedTx='{{tx.id}}'; @get('/__wiretap/traffic/{{tx.id}}')">
+    <span class="{{dirClass}}"><span class="filterable" title="Filter by {{tx.direction}}" data-on:click__stop="$direction==='{{tx.direction}}' ? ($direction='') : ($direction='{{tx.direction}}')">{{dirArrow}}</span></span>
+    <span class="timestamp">{{tx.timestamp}}</span>
+    <span class="badge {{badgeClass}}"><span class="filterable" title="Filter by {{tx.direction}}" data-on:click__stop="$direction==='{{tx.direction}}' ? ($direction='') : ($direction='{{tx.direction}}')">{{badgeText}}</span></span>
+    <span class="method"><span class="filterable" title="Filter by {{tx.method}}" data-on:click__stop="$method==='{{tx.method}}' ? ($method='') : ($method='{{tx.method}}')">{{tx.method}}</span></span>
+    {{#if tx.host}}
+    <span class="uri-cell"><span class="filterable" title="Filter by {{tx.host}}" data-on:click__stop="$host==='{{tx.host}}' ? ($host='') : ($host='{{tx.host}}')">{{tx.host}}</span></span>
+    {{else}}
+    <span class="uri-cell"></span>
+    {{/if}}
+    <span class="uri-cell"><span class="filterable" title="Filter by {{tx.path}}" data-on:click__stop="$path==='{{tx.path}}' ? ($path='') : ($path='{{tx.path}}')">{{tx.path}}</span></span>
+    <span class="{{statusClass}}"><span class="filterable" title="Filter by {{tx.status}}" data-on:click__stop="$status==='{{tx.status}}' ? ($status='') : ($status='{{tx.status}}')">{{tx.status}}</span>{{#if tx.isChaos}} <span class="badge-chaos" title="{{tx.chaosInfo}}">!</span>{{/if}}{{#if tx.isReplay}} <span class="badge-replay" title="Replay">R</span>{{/if}}</span>
+    <span class="duration">{{tx.durationMs}}ms</span>
+</div>

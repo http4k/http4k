@@ -81,7 +81,7 @@ fun Response.datastarElements(
 @JvmName("datastarElements")
 fun Response.datastarElements(
     elements: List<Element>,
-    morphMode: MorphMode = MorphMode.outer,
+    morphMode: MorphMode = outer,
     selector: Selector? = null,
     useViewTransition: Boolean = false,
     id: SseEventId? = null,

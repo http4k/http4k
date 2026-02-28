@@ -1,0 +1,156 @@
+<div id="trace-detail-panel" class="detail-content">
+    <div class="detail-toolbar">
+        <span class="badge badge-trace">TRACE</span>
+        <span class="trace-id-detail" title="{{detail.traceId}}">{{shortTraceId}}</span>
+        <span class="gantt-total-duration">{{detail.totalDurationMs}}ms</span>
+        <a href="/__wiretap/traffic?trace={{detail.traceId}}" class="trace-link-btn">Traffic</a>
+    </div>
+    <div class="gantt-chart">
+        <div class="gantt-timeline-header">
+            <div class="gantt-label-col"></div>
+            <div class="gantt-timeline-col">
+                <span class="gantt-tick" style="left: 0%">0%</span>
+                <span class="gantt-tick" style="left: 25%">25%</span>
+                <span class="gantt-tick" style="left: 50%">50%</span>
+                <span class="gantt-tick" style="left: 75%">75%</span>
+                <span class="gantt-tick" style="left: 100%">100%</span>
+            </div>
+        </div>
+        {{#each spans}}
+        <div class="gantt-row" onclick="toggleSpanDetail('{{span.spanId}}')">
+            <div class="gantt-label-col" style="padding-left: {{span.depth}}em;">
+                <span class="span-kind badge-span-{{span.kind}}">{{span.kind}}</span>
+                <span class="gantt-span-name">{{span.name}}</span>
+                <span class="duration">{{span.durationMs}}ms</span>
+            </div>
+            <div class="gantt-timeline-col">
+                <div class="gantt-gridlines">
+                    <div class="gantt-gridline" style="left: 25%"></div>
+                    <div class="gantt-gridline" style="left: 50%"></div>
+                    <div class="gantt-gridline" style="left: 75%"></div>
+                </div>
+                <div class="gantt-bar gantt-bar-{{span.kind}}" style="left: {{span.startOffsetPercent}}%; width: {{span.widthPercent}}%;" title="{{span.name}} ({{span.durationMs}}ms)"></div>
+            </div>
+        </div>
+        <div id="span-detail-{{span.spanId}}" class="gantt-detail" style="display: none;">
+            <div class="gantt-detail-columns">
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Span Info</h4>
+                        <table class="span-detail-table">
+                            <tr>
+                                <td>Name</td>
+                                <td>{{span.name}}</td>
+                            </tr>
+                            <tr>
+                                <td>Span ID</td>
+                                <td><code>{{span.spanId}}</code></td>
+                            </tr>
+                            {{#if span.parentSpanId}}
+                            <tr>
+                                <td>Parent Span ID</td>
+                                <td><code>{{span.parentSpanId}}</code></td>
+                            </tr>
+                            {{/if}}
+                            <tr>
+                                <td>Kind</td>
+                                <td>{{span.kind}}</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>{{span.statusCode}}{{#if span.statusDescription}} — {{span.statusDescription}}{{/if}}</td>
+                            </tr>
+                            <tr>
+                                <td>Duration</td>
+                                <td>{{span.durationMs}}ms</td>
+                            </tr>
+                            {{#if span.serviceName}}
+                            <tr>
+                                <td>Service</td>
+                                <td>{{span.serviceName}}</td>
+                            </tr>
+                            {{/if}}
+                        </table>
+                    </div>
+                </div>
+                {{#if span.attributes}}
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Attributes</h4>
+                        <table class="span-detail-table">
+                            {{#each span.attributes}}
+                            <tr>
+                                <td>{{key}}</td>
+                                <td>{{value}}</td>
+                            </tr>
+                            {{/each}}
+                        </table>
+                    </div>
+                </div>
+                {{/if}}
+                {{#if span.baggageAttributes}}
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Baggage</h4>
+                        <table class="span-detail-table">
+                            {{#each span.baggageAttributes}}
+                            <tr>
+                                <td>{{key}}</td>
+                                <td>{{value}}</td>
+                            </tr>
+                            {{/each}}
+                        </table>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+            <div class="gantt-detail-columns">
+                {{#if span.events}}
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Events</h4>
+                        {{#each span.events}}
+                        <div class="span-event">
+                            <span class="span-event-name">{{name}}</span>
+                            <span class="span-event-time">+{{timestampMs}}ms</span>
+                            {{#if attributes}}
+                            <table class="span-detail-table span-event-attrs">
+                                {{#each attributes}}
+                                <tr>
+                                    <td>{{key}}</td>
+                                    <td>{{value}}</td>
+                                </tr>
+                                {{/each}}
+                            </table>
+                            {{/if}}
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/if}}
+                {{#if span.resourceAttributes}}
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Resource Attributes</h4>
+                        <table class="span-detail-table">
+                            {{#each span.resourceAttributes}}
+                            <tr>
+                                <td>{{key}}</td>
+                                <td>{{value}}</td>
+                            </tr>
+                            {{/each}}
+                        </table>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    <script>
+        function toggleSpanDetail(spanId) {
+            var el = document.getElementById('span-detail-' + spanId);
+            if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</div>

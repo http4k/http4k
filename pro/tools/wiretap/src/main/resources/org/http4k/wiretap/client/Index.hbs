@@ -1,0 +1,60 @@
+{{#>org/http4k/wiretap/layout pageTitle=pageTitle}}
+{{#partial "body"}}
+<body data-signals="{{{initialSignals}}}">
+{{> org/http4k/wiretap/header}}
+<div class="client-page">
+    <div class="client-request-section">
+        <form class="client-toolbar" data-on:submit__prevent="@post('{{{basePath}}}send')">
+            <select class="form-select form-select-sm client-method" data-bind="method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+                <option value="HEAD">HEAD</option>
+                <option value="OPTIONS">OPTIONS</option>
+            </select>
+            <input type="text" class="form-control form-control-sm client-url" data-bind="url" placeholder="{url}" required>
+            <button type="submit" class="btn btn-sm btn-primary">
+                Send
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    data-on:click="$method='GET'; $url='/'; $contentType=''; $body=''; @get('{{{basePath}}}headers/reset')">
+                Clear
+            </button>
+        </form>
+        <div class="client-form">
+            <div class="client-form-columns">
+                <div class="client-section">
+                    <h4>Headers</h4>
+                    <div id="client-headers" class="client-headers">
+                        {{{initialHeaderRows}}}
+                    </div>
+                </div>
+                <div class="client-section">
+                    <div class="client-section-header">
+                        <h4>Body</h4>
+                        <select data-bind="contentType" class="form-select form-select-sm client-content-type">
+                            <option value="">No Content-Type</option>
+                            <option value="application/json">application/json</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-secondary"
+                                data-on:click="@post('{{{basePath}}}format')"
+                                data-show="$contentType === 'application/json'">
+                            Format
+                        </button>
+                    </div>
+                    <textarea class="form-control form-control-sm client-body" data-bind="body" rows="6" placeholder="Request body..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-resize-handle"></div>
+    <div class="client-detail-panel">
+        <div id="detail-panel" class="empty">Send a request to see the response</div>
+    </div>
+</div>
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

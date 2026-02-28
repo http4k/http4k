@@ -1,0 +1,79 @@
+<div id="detail-panel" class="detail-content">
+    <div class="detail-toolbar">
+        <span class="badge {{dirBadgeClass}}">{{dirBadgeText}}</span>
+        <span class="method">{{tx.method}}</span>
+        <span class="{{statusClass}} status">{{tx.status}}</span>
+        <span class="uri" title="{{tx.uri}}">{{tx.uri}}</span>
+        <span class="duration">{{tx.durationMs}}ms</span>
+        <span class="timestamp">{{tx.timestamp}}</span>
+        {{#if tx.traceId}}
+        <a href="/__wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
+        {{/if}}
+        <button class="detail-toolbar-btn"
+                onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.curl-data').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy cURL', 1500) })">
+            Copy cURL
+        </button>
+        {{#if showImport}}
+        <button class="detail-toolbar-btn"
+                onclick="window.location.href='{{importPath}}?import={{tx.id}}'">
+            Import to {{importLabel}}
+        </button>
+        {{/if}}
+        <pre class="curl-data" hidden>{{tx.curl}}</pre>
+    </div>
+    <div class="detail-req-resp">
+        <div class="detail-req-resp-col">
+            <h3 class="detail-col-title">Request</h3>
+            {{#if tx.queryParams}}
+            <div class="detail-section">
+                <h3>Query Parameters</h3>
+                <table class="header-table">
+                    {{#each tx.queryParams}}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>{{value}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            {{/if}}
+            <div class="detail-section">
+                <h3>Headers</h3>
+                <table class="header-table">
+                    {{#each tx.requestHeaders}}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>{{value}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            {{#if tx.requestBody}}
+            <div class="detail-section">
+                <h3>Body</h3>
+                <pre>{{tx.requestBody}}</pre>
+            </div>
+            {{/if}}
+        </div>
+        <div class="detail-req-resp-col">
+            <h3 class="detail-col-title">Response</h3>
+            <div class="detail-section">
+                <h3>Headers</h3>
+                <table class="header-table">
+                    {{#each tx.responseHeaders}}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>{{value}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            {{#if tx.responseBody}}
+            <div class="detail-section">
+                <h3>Body</h3>
+                <pre>{{tx.responseBody}}</pre>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
