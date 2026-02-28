@@ -7,16 +7,17 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.View
+import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.util.Json
 
-fun ListViews(list: () -> List<View>) = object : WiretapFunction {
+fun ListViews(views: ViewStore) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "/views" bind Method.GET to { elements.renderViewBar(list()) }
+        "/views" bind Method.GET to { elements.renderViewBar(views.list()) }
 
     override fun mcp() = Tool(
         "list_views",
         "List all transaction filter views"
     ) bind {
-        Json.asToolResponse(list())
+        Json.asToolResponse(views.list())
     }
 }

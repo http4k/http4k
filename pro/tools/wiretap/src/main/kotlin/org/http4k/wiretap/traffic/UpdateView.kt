@@ -16,17 +16,17 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionFilter
-import org.http4k.wiretap.domain.View
+import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.Json.datastarModel
 
-fun UpdateView(update: (View) -> Unit, list: () -> List<View>) = object : WiretapFunction {
+fun UpdateView(viewStore: ViewStore) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}" bind PUT to { req ->
             val id = Path.long().of("id")(req)
             val signals = req.datastarModel<ViewSignals>()
-            list().find { it.id == id }?.let { update(it.copy(filter = signals.normalized)) }
-            elements.renderViewBar(list())
+            viewStore.list().find { it.id == id }?.let { viewStore.update(it.copy(filter = signals.normalized)) }
+            elements.renderViewBar(viewStore.list())
         }
 
     override fun mcp(): ToolCapability {
@@ -47,9 +47,9 @@ fun UpdateView(update: (View) -> Unit, list: () -> List<View>) = object : Wireta
             path,
             host
         ) bind { req ->
-            list().find { v -> v.id == id(req) }
+            viewStore.list().find { v -> v.id == id(req) }
                 ?.let {
-                    update(
+                    viewStore.update(
                         it.copy(
                             filter = TransactionFilter(
                                 direction(req),
@@ -61,7 +61,7 @@ fun UpdateView(update: (View) -> Unit, list: () -> List<View>) = object : Wireta
                         )
                     )
                 }
-            Json.asToolResponse(list())
+            Json.asToolResponse(viewStore.list())
         }
     }
 }

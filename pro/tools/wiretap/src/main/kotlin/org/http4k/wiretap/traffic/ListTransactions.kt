@@ -57,7 +57,6 @@ fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunct
             direction, method, status, path, host, limit
         ) bind {
             val filter = TransactionFilter(direction(it), host(it), method(it), status(it), path(it))
-
             Json.asToolResponse(list(filter, limit(it) ?: 50))
         }
     }

@@ -1,11 +1,12 @@
 package org.http4k.wiretap.otel
 
+import io.opentelemetry.api.common.AttributeKey
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.datastar.MorphMode
+import org.http4k.datastar.MorphMode.inner
 import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
@@ -16,7 +17,6 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TraceSummary
 import org.http4k.wiretap.util.Json
-import io.opentelemetry.api.common.AttributeKey
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -31,12 +31,12 @@ fun ListTraces(traceStore: TraceStore) = object : WiretapFunction {
             val earliest = spans.minOfOrNull { it.startEpochNanos } ?: 0L
             val latest = spans.maxOfOrNull { it.endEpochNanos } ?: 0L
             TraceSummary(
-                traceId = traceId,
-                spanCount = spans.size,
-                rootSpanName = rootSpan?.name ?: "unknown",
-                serviceName = rootSpan?.resource?.attributes?.get(AttributeKey.stringKey("service.name")) ?: "",
-                totalDurationMs = (latest - earliest) / 1_000_000,
-                timestamp = traceTimestampFormat.format(Instant.ofEpochSecond(0, earliest))
+                traceId,
+                spans.size,
+                rootSpan?.name ?: "unknown",
+                rootSpan?.resource?.attributes?.get(AttributeKey.stringKey("service.name")) ?: "",
+                (latest - earliest) / 1_000_000,
+                traceTimestampFormat.format(Instant.ofEpochSecond(0, earliest))
             )
         }
 
@@ -44,7 +44,7 @@ fun ListTraces(traceStore: TraceStore) = object : WiretapFunction {
         "/list" bind GET to {
             Response(OK).datastarElements(
                 list().map { TraceRowView(it) }.flatMap { elements(it) },
-                MorphMode.inner,
+                inner,
                 Selector.of("#trace-list")
             )
         }
