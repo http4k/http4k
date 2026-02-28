@@ -14,6 +14,7 @@ import org.http4k.wiretap.domain.ChaosConfig
 import org.http4k.wiretap.util.Json
 
 data class ChaosConfigSignals(
+    val direction: String = "Inbound",
     val behaviour: String = "ReturnStatus",
     val latencyMin: Int = 100,
     val latencyMax: Int = 500,

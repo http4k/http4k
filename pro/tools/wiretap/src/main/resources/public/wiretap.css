@@ -497,7 +497,8 @@ body {
 
 .chaos-status-panel {
     display: flex;
-    gap: 24px;
+    flex-direction: column;
+    gap: 8px;
     margin-bottom: 24px;
     padding: 16px;
     background: #f8f9fa;
