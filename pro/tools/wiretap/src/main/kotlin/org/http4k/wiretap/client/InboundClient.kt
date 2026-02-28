@@ -21,7 +21,7 @@ fun InboundClient(
         "client" bind routes(
             sendRequest.http(elements, html),
             FormatBody(),
-            HeaderRows(),
+            HeaderRows(elements, basePath = "/__wiretap/client/"),
             Index("/", html, transactions, basePath = "/__wiretap/client/"),
         )
 

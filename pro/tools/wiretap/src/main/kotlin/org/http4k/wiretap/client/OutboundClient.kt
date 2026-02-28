@@ -21,7 +21,7 @@ fun OutboundClient(
         "outbound" bind routes(
             sendRequest.http(elements, html),
             FormatBody(),
-            HeaderRows(),
+            HeaderRows(elements, basePath = "/__wiretap/outbound/"),
             Index("", html, transactions, basePath = "/__wiretap/outbound/", pageTitle = "Outbound Client"),
         )
 
