@@ -1,0 +1,20 @@
+{{#>org/http4k/wiretap/layout pageTitle="OpenAPI"}}
+{{#partial "body"}}
+<body>
+{{> org/http4k/wiretap/header}}
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.32.0/swagger-ui.css"/>
+
+<div id="swagger-ui"></div>
+{{> org/http4k/wiretap/footer}}
+<script src="https://unpkg.com/swagger-ui-dist@5.32.0/swagger-ui-bundle.js" crossorigin></script>
+<script>
+    window.onload = () => {
+        window.ui = SwaggerUIBundle({
+            url: '/openapi',
+            dom_id: '#swagger-ui',
+        });
+    };
+</script>
+</body>
+{{/partial}}
+{{/layout}}
