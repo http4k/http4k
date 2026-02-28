@@ -8,75 +8,81 @@
 
     <div class="chaos-sections">
         <div class="chaos-section">
-            <div class="chaos-form">
-                <div class="chaos-form-group">
-                    <label>Direction</label>
-                    <select class="form-select form-select-sm" data-bind="direction">
-                        <option value="Inbound">Inbound</option>
-                        <option value="Outbound">Outbound</option>
-                    </select>
+            <div class="chaos-columns">
+                <div class="chaos-form">
+                    <div class="chaos-form-group">
+                        <label>Direction</label>
+                        <select class="form-select form-select-sm" data-bind="direction">
+                            <option value="Inbound">Inbound</option>
+                            <option value="Outbound">Outbound</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="chaos-form-group">
-                    <label>Behaviour</label>
-                    <select class="form-select form-select-sm" data-bind="behaviour">
-                        <option value="ReturnStatus">Return Status</option>
-                        <option value="Latency">Latency</option>
-                        <option value="NoBody">No Body</option>
-                    </select>
+                <div class="chaos-form">
+                    <div class="chaos-form-group">
+                        <label>Behaviour</label>
+                        <select class="form-select form-select-sm" data-bind="behaviour">
+                            <option value="ReturnStatus">Return Status</option>
+                            <option value="Latency">Latency</option>
+                            <option value="NoBody">No Body</option>
+                        </select>
+                    </div>
+                    <div class="chaos-form-group" data-show="$behaviour==='Latency'">
+                        <label>Min (ms)</label>
+                        <input type="number" class="form-control form-control-sm" data-bind="latencyMin" value="100">
+                    </div>
+                    <div class="chaos-form-group" data-show="$behaviour==='Latency'">
+                        <label>Max (ms)</label>
+                        <input type="number" class="form-control form-control-sm" data-bind="latencyMax" value="500">
+                    </div>
+                    <div class="chaos-form-group" data-show="$behaviour==='ReturnStatus'">
+                        <label>Status Code</label>
+                        <input type="number" class="form-control form-control-sm" data-bind="statusCode" value="500">
+                    </div>
                 </div>
-                <div class="chaos-form-group" data-show="$behaviour==='Latency'">
-                    <label>Min (ms)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="latencyMin" value="100">
-                </div>
-                <div class="chaos-form-group" data-show="$behaviour==='Latency'">
-                    <label>Max (ms)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="latencyMax" value="500">
-                </div>
-                <div class="chaos-form-group" data-show="$behaviour==='ReturnStatus'">
-                    <label>Status Code</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="statusCode" value="500">
-                </div>
-                <div class="chaos-form-group">
-                    <label>Trigger</label>
-                    <select class="form-select form-select-sm" data-bind="trigger">
-                        <option value="Always">Always</option>
-                        <option value="MatchRequest">Match Request</option>
-                        <option value="PercentageBased">Percentage Based</option>
-                        <option value="Once">Once</option>
-                        <option value="Countdown">Countdown</option>
-                        <option value="Delay">Delay</option>
-                    </select>
-                </div>
-                <div class="chaos-form-group" data-show="$trigger==='MatchRequest'">
-                    <label>Method</label>
-                    <select class="form-select form-select-sm" data-bind="method">
-                        <option value="">Any</option>
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="PATCH">PATCH</option>
-                    </select>
-                </div>
-                <div class="chaos-form-group" data-show="$trigger==='MatchRequest' && $direction==='Outbound'">
-                    <label>Host</label>
-                    <input type="text" class="form-control form-control-sm" data-bind="host" placeholder="Match host...">
-                </div>
-                <div class="chaos-form-group" data-show="$trigger==='MatchRequest'">
-                    <label>Path</label>
-                    <input type="text" class="form-control form-control-sm" data-bind="path" placeholder="Match path...">
-                </div>
-                <div class="chaos-form-group" data-show="$trigger==='PercentageBased'">
-                    <label>Percentage</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="percentage" min="0" max="100" value="50">
-                </div>
-                <div class="chaos-form-group" data-show="$trigger==='Countdown'">
-                    <label>Count</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="countdown" min="0" value="5">
-                </div>
-                <div class="chaos-form-group" data-show="$trigger==='Delay'">
-                    <label>Delay (s)</label>
-                    <input type="number" class="form-control form-control-sm" data-bind="delaySeconds" min="1" value="10">
+                <div class="chaos-form">
+                    <div class="chaos-form-group">
+                        <label>Trigger</label>
+                        <select class="form-select form-select-sm" data-bind="trigger">
+                            <option value="Always">Always</option>
+                            <option value="MatchRequest">Match Request</option>
+                            <option value="PercentageBased">Percentage Based</option>
+                            <option value="Once">Once</option>
+                            <option value="Countdown">Countdown</option>
+                            <option value="Delay">Delay</option>
+                        </select>
+                    </div>
+                    <div class="chaos-form-group" data-show="$trigger==='MatchRequest'">
+                        <label>Method</label>
+                        <select class="form-select form-select-sm" data-bind="method">
+                            <option value="">Any</option>
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="PATCH">PATCH</option>
+                        </select>
+                    </div>
+                    <div class="chaos-form-group" data-show="$trigger==='MatchRequest' && $direction==='Outbound'">
+                        <label>Host</label>
+                        <input type="text" class="form-control form-control-sm" data-bind="host" placeholder="Match host...">
+                    </div>
+                    <div class="chaos-form-group" data-show="$trigger==='MatchRequest'">
+                        <label>Path</label>
+                        <input type="text" class="form-control form-control-sm" data-bind="path" placeholder="Match path...">
+                    </div>
+                    <div class="chaos-form-group" data-show="$trigger==='PercentageBased'">
+                        <label>Percentage</label>
+                        <input type="number" class="form-control form-control-sm" data-bind="percentage" min="0" max="100" value="50">
+                    </div>
+                    <div class="chaos-form-group" data-show="$trigger==='Countdown'">
+                        <label>Count</label>
+                        <input type="number" class="form-control form-control-sm" data-bind="countdown" min="0" value="5">
+                    </div>
+                    <div class="chaos-form-group" data-show="$trigger==='Delay'">
+                        <label>Delay (s)</label>
+                        <input type="number" class="form-control form-control-sm" data-bind="delaySeconds" min="1" value="10">
+                    </div>
                 </div>
                 <div class="chaos-actions">
                     <button class="btn btn-sm btn-danger"
