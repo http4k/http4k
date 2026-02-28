@@ -13,6 +13,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse.bind
+import org.http4k.security.oauth.client.InMemory
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.wiretap.chaos.Chaos
 import org.http4k.wiretap.client.InboundClient
