@@ -25,5 +25,5 @@ data class OtelSignals(
 )
 
 data class Index(val deepLinkTrace: String? = null) : ViewModel {
-    val initialSignals = Json.asDatastarSignals(OtelSignals(selectedTrace = deepLinkTrace))
+    val initialSignals = Json.asFormatString(OtelSignals(selectedTrace = deepLinkTrace))
 }

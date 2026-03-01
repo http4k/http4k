@@ -18,7 +18,7 @@ fun Traffic(transactionStore: TransactionStore, viewStore: ViewStore) = object :
         CreateView(viewStore),
         UpdateView(viewStore),
         DeleteView(viewStore),
-        GetTransaction(transactionStore),
+        ViewTransaction(transactionStore),
     )
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

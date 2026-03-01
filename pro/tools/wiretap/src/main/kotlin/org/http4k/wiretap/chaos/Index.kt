@@ -46,4 +46,4 @@ data class ChaosConfigSignals(
 fun Index(templates: TemplateRenderer): RoutingHttpHandler =
     "/" bind GET to { Response(OK).html(templates(Index())) }
 
-data class Index(val initialSignals: String = Json.asDatastarSignals(ChaosConfigSignals())) : ViewModel
+data class Index(val initialSignals: String = Json.asFormatString(ChaosConfigSignals())) : ViewModel

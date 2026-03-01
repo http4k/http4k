@@ -81,6 +81,6 @@ data class Index(
     val basePath: String = "/_wiretap/inbound/",
     val pageTitle: String = "Inbound Client"
 ) : ViewModel {
-    val initialSignals: String = Json.asDatastarSignals(signals)
+    val initialSignals: String = Json.asFormatString(signals)
     val initialHeaderRows: HeaderRowsView = headerRowsView(signals.headers, basePath)
 }

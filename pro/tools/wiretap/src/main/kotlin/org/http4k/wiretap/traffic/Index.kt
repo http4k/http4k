@@ -33,5 +33,5 @@ data class TrafficSignals(
 )
 
 data class Index(val deepLinkTxId: Long? = null) : ViewModel {
-    val initialSignals = Json.asDatastarSignals(TrafficSignals(selectedTx = deepLinkTxId))
+    val initialSignals = Json.asFormatString(TrafficSignals(selectedTx = deepLinkTxId))
 }

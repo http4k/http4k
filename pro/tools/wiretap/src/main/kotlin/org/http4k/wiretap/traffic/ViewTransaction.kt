@@ -22,7 +22,7 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.util.Json
 
-fun GetTransaction(transactionStore: TransactionStore) = object : WiretapFunction {
+fun ViewTransaction(transactionStore: TransactionStore) = object : WiretapFunction {
     private fun lookup(id: Long) = transactionStore.get(id)?.toDetail()
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

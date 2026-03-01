@@ -1,6 +1,6 @@
 {{#>org/http4k/wiretap/layout pageTitle="Chaos"}}
 {{#partial "body"}}
-<body data-signals="{{{initialSignals}}}">
+<body data-signals="{{initialSignals}}">
 {{> org/http4k/wiretap/header}}
 <div class="chaos-page">
     <div id="chaos-status" class="chaos-status-panel" data-init="@get('/_wiretap/chaos/status')">

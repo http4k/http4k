@@ -1,6 +1,6 @@
 {{#>org/http4k/wiretap/layout pageTitle="Traffic"}}
 {{#partial "body"}}
-<body data-signals="{{{initialSignals}}}">
+<body data-signals="{{initialSignals}}">
 {{> org/http4k/wiretap/header}}
 <div class="top-tabs" id="tab-bar" data-init="@get('/_wiretap/traffic/views')"></div>
 <div class="top-add-tab" data-show="$showAddView">

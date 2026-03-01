@@ -37,7 +37,7 @@ fun App2() = { request: Request ->
         .contentType(ContentType.APPLICATION_JSON).body("""{"hello":"world"}""")
 }
 
-fun App(
+fun ServerApp(
     uri: Uri,
     http: HttpHandler,
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
@@ -52,7 +52,7 @@ fun App(
 
 private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
     contract {
-        renderer = OpenApi3(ApiInfo("App", "1.0"))
+        renderer = OpenApi3(ApiInfo("My Great App", "1.0"))
         security = BasicAuthSecurity("") { true }
         descriptionPath = "/openapi"
         routes += "foo" meta {
@@ -111,8 +111,9 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
 })
 
 fun main() {
-    val app2 = App2().asServer(Jetty(0)).start()
-    val server = Wiretap.Http { http, oTel, _ -> App(app2.uri(), http, oTel) }
+    val clientApp = App2().asServer(Jetty(0)).start()
+
+    val server = Wiretap.Http { http, oTel, _ -> ServerApp(clientApp.uri(), http, oTel) }
         .asServer(Jetty(21000)).start()
 
     println("started ${server.uri().path("_wiretap")}")

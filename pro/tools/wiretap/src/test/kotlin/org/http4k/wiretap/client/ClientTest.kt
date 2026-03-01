@@ -78,6 +78,14 @@ class ClientTest {
         assertThat(response.bodyString(), containsSubstring("POST"))
         assertThat(response.bodyString(), containsSubstring("http://example.com/api"))
         assertThat(response.bodyString(), containsSubstring("application/json"))
+
+        val signalsJson = Regex("""data-signals="([^"]*?)"""").find(response.bodyString())!!.groupValues[1]
+            .replace("&quot;", "\"")
+            .replace("&amp;", "&")
+        val parsed = Json.parse(signalsJson)
+        assertThat(Json.textValueOf(parsed, "method")!!, equalTo("POST"))
+        assertThat(Json.textValueOf(parsed, "url")!!, equalTo("http://example.com/api"))
+        assertThat(Json.textValueOf(parsed, "body")!!, equalTo("""{"key":"value"}"""))
     }
 
     @Test
