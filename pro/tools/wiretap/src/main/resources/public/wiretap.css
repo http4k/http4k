@@ -9,7 +9,7 @@ body {
     font-size: 13px;
     background: #fff;
     color: #212529;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -23,6 +23,9 @@ body {
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .app-header-right {
@@ -122,7 +125,6 @@ body {
 
 .app-layout {
     flex: 1;
-    overflow: hidden;
 }
 
 .tab-btn {
@@ -491,8 +493,6 @@ body {
     padding: 24px;
     max-width: 900px;
     margin: 0 auto;
-    overflow-y: auto;
-    flex: 1;
 }
 
 .chaos-status-panel {
