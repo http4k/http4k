@@ -14,6 +14,7 @@ import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.mcp.model.apps.McpAppVisibility
 import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.ai.mcp.server.capability.CapabilityPack
+import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 
@@ -27,6 +28,7 @@ fun RenderMcpApp(
     uri: Uri,
     meta: McpAppResourceMeta = McpAppResourceMeta(),
     visibility: List<McpAppVisibility>? = null,
+    mimeType: MimeType = McpApps.MIME_TYPE,
     mcpAppHandler: McpAppHandler
 ) = CapabilityPack(
     Tool(
@@ -34,8 +36,8 @@ fun RenderMcpApp(
         description = description,
         meta = Meta(ui = McpAppMeta(uri, visibility))
     ) bind { ToolResponse.Ok(listOf()) },
-    Static(uri, ResourceName.of(name), description, McpApps.MIME_TYPE) bind {
-        ResourceResponse(Text(mcpAppHandler(it), it.uri, McpApps.MIME_TYPE, Content.Meta(ui = meta)))
+    Static(uri, ResourceName.of(name), description, mimeType) bind {
+        ResourceResponse(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))
     }
 )
 
