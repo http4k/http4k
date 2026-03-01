@@ -1,5 +1,6 @@
 package org.http4k.wiretap.home
 
+import io.micrometer.core.instrument.MeterRegistry
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
@@ -18,7 +19,6 @@ import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.WiretapStats
 import org.http4k.wiretap.util.Json
-import io.micrometer.core.instrument.MeterRegistry
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -88,10 +88,11 @@ fun GetStats(
 
 data class McpCapabilities(
     val security: String,
-    val mcpUrl: String = "/_wiretap/mcp",
     val toolCount: Int = 0,
     val promptCount: Int = 0
-)
+) {
+    val mcpUrl = "/_wiretap/mcp"
+}
 
 data class StatsView(val stats: WiretapStats, val mcp: McpCapabilities) : ViewModel {
     val inboundChaosBadgeClass = if (stats.inboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"
