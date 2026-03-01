@@ -22,7 +22,7 @@ import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import java.time.Clock
 
 data class ProxyHandlers(
-    val routing: RoutingHttpHandler,
+    val routing: HttpHandler,
     val outboundHttp: HttpHandler
 )
 

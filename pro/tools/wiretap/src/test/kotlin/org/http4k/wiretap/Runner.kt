@@ -113,18 +113,17 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
 fun main() {
     val clientApp = App2().asServer(Jetty(0)).start()
 
-//    val wiretap =
-//        Wiretap { http, oTel, _ ->
-//            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
-//        }
-//        .asServer(Jetty(21000)).start()
-    val wiretap = Wiretap(Uri.of("https://http4k.org")).asServer(Jetty(21000)).start()
-
-    println("started ${wiretap.uri().path("_wiretap")}")
+    val wiretap =
+        Wiretap { http, oTel, _ ->
+            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
+        }
+//    val wiretap = Wiretap(Uri.of("https://http4k.org"))
+    val server = wiretap.asServer(Jetty(21000)).start()
+    println("started ${server.uri().path("_wiretap")}")
 
     val client = JavaHttpClient()
 
-    client(Request(GET, wiretap.uri()))
-    client(Request(GET, wiretap.uri()))
-    client(Request(GET, wiretap.uri()))
+    client(Request(GET, server.uri()))
+    client(Request(GET, server.uri()))
+    client(Request(GET, server.uri()))
 }

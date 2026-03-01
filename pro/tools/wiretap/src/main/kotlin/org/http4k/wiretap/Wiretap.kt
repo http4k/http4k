@@ -13,6 +13,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
+import org.http4k.routing.orElse
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.routing.sse.bind
@@ -111,9 +112,8 @@ object Wiretap {
 
         return poly(
             listOf(
-                ServerFilters.CatchAll().then(
-                    routes(WiretapUi(renderer, templates, functions), proxy)
-                ),
+                ServerFilters.CatchAll()
+                    .then(routes(WiretapUi(renderer, templates, functions), orElse bind proxy)),
                 "/_wiretap/traffic" bind TrafficStream(transactionStore, renderer)
             ) + mcpRoutes
         )
