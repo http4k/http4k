@@ -1,5 +1,7 @@
 package org.http4k.wiretap
 
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -12,11 +14,14 @@ fun WiretapUi(
     renderer: DatastarElementRenderer,
     html: TemplateRenderer,
     functions: List<WiretapFunction>,
-) = routes(
-    "/_wiretap" bind routes(
-        listOf(
-            Index(html),
-            static(Classpath("public"))
-        ) + functions.map { it.http(renderer, html) },
+) = ServerFilters.CatchLensFailure()
+    .then(
+        routes(
+            "/_wiretap" bind routes(
+                listOf(
+                    Index(html),
+                    static(Classpath("public"))
+                ) + functions.map { it.http(renderer, html) },
+            )
+        )
     )
-)

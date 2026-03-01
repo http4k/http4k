@@ -114,7 +114,9 @@ fun main() {
     val clientApp = App2().asServer(Jetty(0)).start()
 
     val server =
-        Wiretap.Http { http, oTel, _ -> ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri() }
+        Wiretap.Http { http, oTel, _ ->
+            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri().also { println(it) }
+        }
         .asServer(Jetty(21000)).start()
 
     println("started ${server.uri().path("_wiretap")}")

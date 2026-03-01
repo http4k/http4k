@@ -71,7 +71,7 @@ fun Proxy(
         routing = routes(
             orElse bind recordTransaction(Direction.Inbound)
                 .then(inboundChaos)
-                .then(ClientFilters.SetBaseUriFrom(uri).then(outboundHttp))
+                .then(ClientFilters.SetBaseUriFrom(uri).then(httpClient))
         ),
         outboundHttp = outboundHttp
     )
