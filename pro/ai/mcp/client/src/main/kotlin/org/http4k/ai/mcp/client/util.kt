@@ -32,6 +32,7 @@ import org.http4k.sse.SseMessage.Event
 internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, McpError> = with(McpJson) {
     val data = parse(data) as MoshiObject
 
+    println(data)
     when {
         data["method"] != null -> Failure(Protocol(InvalidRequest))
         data["error"] != null ->

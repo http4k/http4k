@@ -6,6 +6,7 @@ import org.http4k.ai.mcp.client.McpClientContract
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -42,6 +43,7 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse>() {
     private val creds = Credentials("user", "password")
 
     override fun clientFor(port: Int) = HttpNonStreamingMcpClient(
+        McpEntity.of("http4k MCP client"), Version.of("0.0.0"),
         Uri.of("http://localhost:${port}/mcp"),
         ClientFilters.BasicAuth(creds).then(JavaHttpClient()),
     )

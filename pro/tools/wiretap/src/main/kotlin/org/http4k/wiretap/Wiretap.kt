@@ -31,6 +31,7 @@ import org.http4k.wiretap.home.McpCapabilities
 import org.http4k.wiretap.mcp.AnalyzeTrafficPrompt
 import org.http4k.wiretap.mcp.DebugRequestPrompt
 import org.http4k.wiretap.mcp.WiretapMcp
+import org.http4k.wiretap.mcp_app.McpApps
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
 import org.http4k.wiretap.traffic.Traffic
@@ -72,7 +73,7 @@ object Wiretap {
             trafficMetrics.snapshot()
         }
 
-        val (proxy, outboundHttp) = Proxy(
+        val (uri, proxy, outboundHttp) = Proxy(
             bodyHydration,
             httpClient,
             clock,
@@ -91,7 +92,8 @@ object Wiretap {
             OTel(traceStore),
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
-            OpenApi()
+            OpenApi(),
+            McpApps(uri, httpClient)
         )
 
         val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())
@@ -108,12 +110,19 @@ object Wiretap {
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 
+        val listOf = listOf(
+            ServerFilters.CatchAll()
+                .then(
+                    routes(
+                        WiretapUi(renderer, templates, functions),
+                        orElse bind proxy
+                    )
+                ),
+            "/_wiretap/traffic" bind TrafficStream(transactionStore, renderer),
+        )
         return poly(
-            listOf(
-                ServerFilters.CatchAll()
-                    .then(routes(WiretapUi(renderer, templates, functions), orElse bind proxy)),
-                "/_wiretap/traffic" bind TrafficStream(transactionStore, renderer)
-            ) + mcpRoutes
+            listOf + mcpRoutes
         )
     }
 }
+

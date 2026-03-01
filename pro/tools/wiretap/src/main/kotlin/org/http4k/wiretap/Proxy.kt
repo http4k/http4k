@@ -4,6 +4,7 @@ import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ResponseFilters
@@ -22,6 +23,7 @@ import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import java.time.Clock
 
 data class ProxyHandlers(
+    val uri: Uri,
     val routing: HttpHandler,
     val outboundHttp: HttpHandler
 )
@@ -68,6 +70,7 @@ fun Proxy(
     val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces), clock)
 
     return ProxyHandlers(
+        uri,
         routing = routes(
             orElse bind
                 recordTransaction(Inbound)

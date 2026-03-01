@@ -62,6 +62,8 @@ import java.util.concurrent.atomic.AtomicReference
  * JSON Rpc connection MCP client.
  */
 class HttpNonStreamingMcpClient(
+    private val entity: McpEntity,
+    private val version: Version,
     private val baseUri: Uri,
     private val http: HttpHandler = JavaHttpClient(),
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
@@ -74,7 +76,7 @@ class HttpNonStreamingMcpClient(
     override fun start(overrideDefaultTimeout: Duration?) =
         http.send<McpInitialize.Response>(
             McpInitialize, McpInitialize.Request(
-                VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
+                VersionedMcpEntity(entity, version),
                 ClientCapabilities(*listOf<ClientProtocolCapability>().toTypedArray()),
                 protocolVersion
             )

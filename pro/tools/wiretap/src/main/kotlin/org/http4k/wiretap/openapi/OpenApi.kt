@@ -8,5 +8,5 @@ import org.http4k.wiretap.WiretapFunction
 
 fun OpenApi() = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "openapi" bind Index(html)
-    override fun mcp() = CapabilityPack(emptyList())
+    override fun mcp() = CapabilityPack()
 }
