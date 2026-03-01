@@ -5,6 +5,16 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
+import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.model.Domain
+import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.model.apps.Csp
+import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
+import org.http4k.ai.mcp.model.apps.McpApps
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.withExtensions
+import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
+import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.client.JavaHttpClient
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
@@ -15,17 +25,21 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
+import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.contentType
-import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
+import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.security.BasicAuthSecurity
 import org.http4k.server.Jetty
@@ -41,14 +55,39 @@ fun ServerApp(
     uri: Uri,
     http: HttpHandler,
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
-): RoutingHttpHandler {
+): PolyHandler {
     val tracer = openTelemetry.tracerProvider.get("demo-app")
 
     val client = ClientFilters.SetBaseUriFrom(uri)
         .then(ClientFilters.OpenTelemetryTracing(openTelemetry)).then(http)
 
-    return ServerFilters.OpenTelemetryTracing(openTelemetry).then(AppRoutes(tracer, client))
+    return poly(
+        ServerFilters.OpenTelemetryTracing(openTelemetry).then(AppRoutes(tracer, client))
+    )
 }
+
+fun McpApp(otel: OpenTelemetry) = PolyFilters.OpenTelemetryTracing(otel).then(
+    mcpHttpStreaming(
+        ServerMetaData("test mcp app", "0.0.0").withExtensions(McpApps),
+        NoMcpSecurity,
+        RenderMcpApp(
+            name = "show_ui",
+            description = "shows the UI",
+            uri = Uri.of("ui://a-ui"),
+            meta = McpAppResourceMeta(
+                csp = Csp(
+                    resourceDomains = listOf(Domain.of("https://resource.com")),
+                    connectDomains = listOf(Domain.of("https://connect.com")),
+                    frameDomains = listOf(Domain.of("https://frame.com"))
+                )
+            )
+        ) { "hello world" },
+        Tool("non_app", "") bind { Ok("hello") },
+        mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
+    )
+
+)
+
 
 private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
     contract {
@@ -88,7 +127,6 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
             cacheSpan.setAttribute("cache.type", "redis")
             cacheSpan.setAttribute("cache.hit", false)
             baggage.forEach { key, value -> cacheSpan.setAttribute("baggage.$key", value.value) }
-            Thread.sleep(2)
             cacheSpan.addEvent("cache-miss")
             cacheSpan.end()
 
@@ -102,7 +140,6 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
             transformSpan.setAttribute("transform.format", "json")
             transformSpan.setAttribute("transform.fields", 3)
             baggage.forEach { key, value -> transformSpan.setAttribute("baggage.$key", value.value) }
-            Thread.sleep(3)
             transformSpan.addEvent("transform-complete")
             transformSpan.end()
 
@@ -114,9 +151,13 @@ fun main() {
     val clientApp = App2().asServer(Jetty(0)).start()
 
     val wiretap =
-        Wiretap { http, oTel, _ ->
-            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
+        Wiretap { _, oTel, _ ->
+            McpApp(oTel).asServer(Jetty(0)).start().uri()
         }
+//    val wiretap =
+//        Wiretap { http, oTel, _ ->
+//            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
+//        }
 //    val wiretap = Wiretap(Uri.of("https://http4k.org"))
     val server = wiretap.asServer(Jetty(21000)).start()
     println("started ${server.uri().path("_wiretap")}")
