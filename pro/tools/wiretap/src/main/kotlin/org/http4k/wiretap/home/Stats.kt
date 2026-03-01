@@ -37,7 +37,7 @@ fun GetStats(
 
     private fun getStats(): WiretapStats {
         val uptimeSeconds = gauge("process.uptime").toLong()
-        val startTime = Instant.ofEpochMilli(gauge("process.start.time").toLong())
+        val startTime = Instant.ofEpochSecond(gauge("process.start.time").toLong())
         val now = startTime.plusSeconds(uptimeSeconds)
         return WiretapStats(
             uptime = formatUptime(Duration.ofSeconds(uptimeSeconds)),
