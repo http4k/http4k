@@ -90,7 +90,7 @@ object Wiretap {
         )
 
         val functions = baseFunctions +
-            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos, mcpCapabilities, Metrics())
+            GetStats(transactionStore, traceStore, inboundChaos, outboundChaos, mcpCapabilities, Metrics())
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 

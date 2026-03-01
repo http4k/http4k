@@ -19,12 +19,11 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.WiretapStats
 import org.http4k.wiretap.util.Json
 import io.micrometer.core.instrument.MeterRegistry
-import java.time.Clock
 import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 fun GetStats(
-    clock: Clock,
     transactionStore: TransactionStore,
     traceStore: TraceStore,
     inboundChaos: ChaosEngine,
@@ -32,12 +31,16 @@ fun GetStats(
     mcpCapabilities: McpCapabilities,
     meterRegistry: MeterRegistry
 ) = object : WiretapFunction {
-    val startTime = clock.instant()
+
+    private fun gauge(name: String, vararg tags: String): Double =
+        meterRegistry.find(name).tags(*tags).gauge()?.value() ?: 0.0
 
     private fun getStats(): WiretapStats {
-        val now = clock.instant()
+        val uptimeSeconds = gauge("process.uptime").toLong()
+        val startTime = Instant.ofEpochMilli(gauge("process.start.time").toLong())
+        val now = startTime.plusSeconds(uptimeSeconds)
         return WiretapStats(
-            uptime = formatUptime(Duration.between(startTime, now)),
+            uptime = formatUptime(Duration.ofSeconds(uptimeSeconds)),
             transactions = transactionStore.stats(startTime, now),
             traceCount = traceStore.traces().size,
             inboundChaosActive = inboundChaos.isEnabled(),
@@ -49,9 +52,6 @@ fun GetStats(
     }
 
     private fun jvmMetrics(): JvmMetrics {
-        fun gauge(name: String, vararg tags: String): Double =
-            meterRegistry.find(name).tags(*tags).gauge()?.value() ?: 0.0
-
         val gcTimer = meterRegistry.find("jvm.gc.pause").timer()
 
         return JvmMetrics(
