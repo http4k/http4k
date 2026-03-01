@@ -5,10 +5,8 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 interface TraceStore {
     fun record(span: SpanData)
-    fun list(): List<SpanData>
     fun traces(): Map<String, List<SpanData>>
     fun get(traceId: String): List<SpanData>
-    fun clear()
 
     companion object {
         fun InMemory(maxSpans: Int = 5000) = object : TraceStore {
@@ -21,17 +19,12 @@ interface TraceStore {
                 }
             }
 
-            override fun list(): List<SpanData> = spans.toList()
-
             override fun traces(): Map<String, List<SpanData>> =
                 spans.groupBy { it.traceId }
 
             override fun get(traceId: String): List<SpanData> =
                 spans.filter { it.traceId == traceId }
 
-            override fun clear() {
-                spans.clear()
-            }
         }
     }
 }

@@ -451,34 +451,6 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-.detail-tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 2px solid #dee2e6;
-    margin-bottom: 16px;
-}
-
-.detail-tab-btn {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #6c757d;
-    cursor: pointer;
-}
-
-.detail-tab-btn:hover {
-    color: #212529;
-}
-
-.detail-tab-btn.active {
-    color: #0d6efd;
-    border-bottom-color: #0d6efd;
-}
-
 /* Chaos row highlight */
 .tx-row-chaos {
     background: #fffde7;
@@ -1076,11 +1048,6 @@ body {
     font-family: monospace;
 }
 
-.client-import-wrapper {
-    position: relative;
-    margin-left: auto;
-}
-
 .client-request-section {
     height: 280px;
     min-height: 120px;
@@ -1178,44 +1145,6 @@ body {
     font-size: 13px;
 }
 
-.client-import-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-height: 300px;
-    overflow-y: auto;
-    min-width: 400px;
-    z-index: 100;
-}
-
-.client-import-item {
-    display: flex;
-    gap: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 13px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.client-import-item:hover {
-    background: #f8f9fa;
-}
-
-.client-import-item:last-child {
-    border-bottom: none;
-}
-
-.client-import-empty {
-    padding: 16px;
-    text-align: center;
-    color: #adb5bd;
-    font-size: 13px;
-}
-
 /* ── Overview page ── */
 
 .mcp-logo {
@@ -1272,11 +1201,6 @@ body {
 .mcp-copy-btn:hover {
     color: #212529;
     background: #e9ecef;
-}
-
-.badge-mcp {
-    background: #dcfce7;
-    color: #166534;
 }
 
 .overview-page {
@@ -1372,81 +1296,6 @@ body {
 
 .chart-container-wide {
     height: 180px;
-}
-
-.overview-tables {
-    margin-bottom: 24px;
-}
-
-.hosts-card {
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 800px;
-}
-
-.hosts-card h5 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 12px;
-}
-
-.hosts-table {
-    margin-bottom: 0;
-}
-
-.hosts-table th {
-    font-size: 11px;
-    text-transform: uppercase;
-    color: #6c757d;
-    border-top: none;
-}
-
-.hosts-table .host-name {
-    font-family: monospace;
-    font-size: 13px;
-}
-
-.hosts-table .host-count {
-    text-align: right;
-    font-weight: 600;
-    width: 80px;
-}
-
-.hosts-table .host-latency {
-    text-align: right;
-    font-family: monospace;
-    font-size: 13px;
-    width: 90px;
-}
-
-.hosts-table .status-col {
-    text-align: center;
-    width: 50px;
-}
-
-.hosts-table .host-status {
-    text-align: center;
-    font-weight: 600;
-    font-size: 13px;
-}
-
-.hosts-table .status-2xx-text {
-    color: #198754;
-}
-
-.hosts-table .status-3xx-text {
-    color: #0dcaf0;
-}
-
-.hosts-table .status-4xx-text {
-    color: #ffc107;
-}
-
-.hosts-table .status-5xx-text {
-    color: #dc3545;
 }
 
 #swagger-ui {

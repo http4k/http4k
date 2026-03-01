@@ -91,8 +91,7 @@ fun GetStats(
 
 data class McpCapabilities(
     val security: String,
-    val toolCount: Int = 0,
-    val promptCount: Int = 0
+    val toolCount: Int = 0
 ) {
     val mcpUrl = "/_wiretap/mcp"
 }

@@ -1,6 +1,5 @@
 package org.http4k.wiretap
 
-import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
@@ -101,8 +100,7 @@ object Wiretap {
 
         val mcpCapabilities = McpCapabilities(
             mcpSecurity.name,
-            allCapabilities.count { it is ToolCapability } + 1,
-            allCapabilities.count { it is PromptCapability }
+            allCapabilities.count { it is ToolCapability } + 1
         )
 
         val functions = baseFunctions +
