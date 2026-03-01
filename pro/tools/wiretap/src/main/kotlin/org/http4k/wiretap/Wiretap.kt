@@ -22,6 +22,7 @@ import org.http4k.wiretap.client.OutboundClient
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.BodyHydration.All
 import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.home.GetStats
@@ -36,6 +37,7 @@ import org.http4k.wiretap.traffic.TrafficStream
 import org.http4k.wiretap.util.Metrics
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
+import kotlin.concurrent.fixedRateTimer
 
 /**
  * Wiretap is a tool for debugging http4k applications. It wraps a http4k application and records
@@ -60,12 +62,20 @@ object Wiretap {
         val inboundChaos = ChaosEngine()
         val outboundChaos = ChaosEngine()
 
+        val meterRegistry = Metrics()
+        val trafficMetrics = TrafficMetrics(meterRegistry, clock = clock)
+
+        fixedRateTimer("wiretap-snapshot", daemon = true, period = 10_000L) {
+            trafficMetrics.snapshot()
+        }
+
         val (proxy, outboundHttp) = Proxy(
             bodyHydration,
             httpClient,
             clock,
             traceStore,
             transactionStore,
+            trafficMetrics,
             inboundChaos,
             outboundChaos,
             sanitise,
@@ -92,7 +102,7 @@ object Wiretap {
         )
 
         val functions = baseFunctions +
-            GetStats(transactionStore, traceStore, inboundChaos, outboundChaos, mcpCapabilities, Metrics())
+            GetStats(trafficMetrics, traceStore, inboundChaos, outboundChaos, mcpCapabilities, meterRegistry)
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 
@@ -106,4 +116,3 @@ object Wiretap {
         )
     }
 }
-

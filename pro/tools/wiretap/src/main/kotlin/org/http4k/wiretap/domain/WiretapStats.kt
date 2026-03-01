@@ -18,24 +18,19 @@ data class JvmMetrics(
 
 data class WiretapStats(
     val uptime: String,
-    val transactions: TransactionStats,
+    val totalRequests: Long,
+    val inboundCount: Long,
+    val outboundCount: Long,
+    val latencyCounts: Map<String, Int>,
+    val topHosts: List<HostBucket>,
+    val trafficTimeline: TrafficTimeline,
+    val hostTimelines: Map<String, TrafficTimeline>,
     val traceCount: Int,
     val inboundChaosActive: Boolean,
     val inboundChaosDescription: String,
     val outboundChaosActive: Boolean,
     val outboundChaosDescription: String,
     val jvm: JvmMetrics
-)
-
-data class TransactionStats(
-    val totalRequests: Int,
-    val inboundCount: Int,
-    val outboundCount: Int,
-    val statusCounts: Map<String, Int>,
-    val methodCounts: Map<String, Int>,
-    val latencyCounts: Map<String, Int>,
-    val topHosts: List<HostBucket>,
-    val trafficTimeline: Pair<List<String>, List<Int>>
 )
 
 data class HostBucket(

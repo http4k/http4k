@@ -89,6 +89,72 @@ function _createChart(id, config) {
     _chartInstances[id] = new Chart(el, config);
 }
 
+function _createChartOnCanvas(canvas, config) {
+    var key = canvas.getAttribute('data-chart-key');
+    if (key && _chartInstances[key]) {
+        _chartInstances[key].destroy();
+        delete _chartInstances[key];
+    }
+    key = 'host-' + Math.random();
+    canvas.setAttribute('data-chart-key', key);
+    _chartInstances[key] = new Chart(canvas, config);
+}
+
+var _statusColors = {
+    '2xx': 'rgba(25, 135, 84, 0.7)',
+    '3xx': 'rgba(13, 202, 240, 0.7)',
+    '4xx': 'rgba(255, 193, 7, 0.7)',
+    '5xx': 'rgba(220, 53, 69, 0.7)'
+};
+
+var _statusBorders = {
+    '2xx': '#198754',
+    '3xx': '#0dcaf0',
+    '4xx': '#ffc107',
+    '5xx': '#dc3545'
+};
+
+function _stackedChartConfig(data) {
+    var buckets = ['2xx', '3xx', '4xx', '5xx'];
+    var datasets = buckets.map(function (bucket) {
+        return {
+            label: bucket,
+            data: data.datasets[bucket] || [],
+            backgroundColor: _statusColors[bucket],
+            borderColor: _statusBorders[bucket],
+            borderWidth: 1,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 1
+        };
+    });
+
+    return {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {position: 'bottom', labels: {usePointStyle: true, boxWidth: 8}},
+                tooltip: {mode: 'index', intersect: false}
+            },
+            scales: {
+                x: {title: {display: true, text: 'Time ago'}},
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: {stepSize: 1},
+                    title: {display: true, text: 'Requests'}
+                }
+            }
+        }
+    };
+}
+
 function initOverviewCharts() {
     if (typeof Chart === 'undefined') return;
 
@@ -98,65 +164,12 @@ function initOverviewCharts() {
     dataEl.setAttribute('data-rendered', 'true');
 
     var trafficData = JSON.parse(dataEl.getAttribute('data-traffic'));
-    var statusData = JSON.parse(dataEl.getAttribute('data-status'));
-    var methodData = JSON.parse(dataEl.getAttribute('data-method'));
     var latencyData = JSON.parse(dataEl.getAttribute('data-latency'));
 
-    var statusColors = ['#198754', '#0dcaf0', '#ffc107', '#dc3545'];
-    var methodColors = ['#0d6efd', '#6610f2', '#198754', '#dc3545', '#fd7e14', '#20c997', '#6c757d'];
     var latencyColors = ['#198754', '#20c997', '#ffc107', '#fd7e14', '#dc3545'];
 
     if (trafficData.labels.length > 0) {
-        _createChart('trafficChart', {
-            type: 'line',
-            data: {
-                labels: trafficData.labels,
-                datasets: [{
-                    label: 'Requests',
-                    data: trafficData.data,
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {legend: {display: false}},
-                scales: {
-                    x: {title: {display: true, text: 'Time ago'}},
-                    y: {beginAtZero: true, ticks: {stepSize: 1}, title: {display: true, text: 'Requests'}}
-                }
-            }
-        });
-    }
-
-    if (statusData.data.some(function (v) {
-        return v > 0;
-    })) {
-        _createChart('statusChart', {
-            type: 'doughnut',
-            data: {
-                labels: statusData.labels,
-                datasets: [{data: statusData.data, backgroundColor: statusColors}]
-            },
-            options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
-        });
-    }
-
-    if (methodData.data.some(function (v) {
-        return v > 0;
-    })) {
-        _createChart('methodChart', {
-            type: 'doughnut',
-            data: {
-                labels: methodData.labels,
-                datasets: [{data: methodData.data, backgroundColor: methodColors.slice(0, methodData.labels.length)}]
-            },
-            options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
-        });
+        _createChart('trafficChart', _stackedChartConfig(trafficData));
     }
 
     if (latencyData.data.some(function (v) {
@@ -176,6 +189,15 @@ function initOverviewCharts() {
             }
         });
     }
+
+    var hostCards = document.querySelectorAll('[data-host-chart]');
+    hostCards.forEach(function (card) {
+        var hostData = JSON.parse(card.getAttribute('data-host-chart'));
+        var canvas = card.querySelector('.hostChart');
+        if (canvas && hostData.labels.length > 0) {
+            _createChartOnCanvas(canvas, _stackedChartConfig(hostData));
+        }
+    });
 }
 
 function initMcpUrl() {

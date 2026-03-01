@@ -3,13 +3,14 @@ package org.http4k.wiretap.home
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.wiretap.domain.TraceStore
-import org.http4k.wiretap.domain.TransactionStore
+import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.util.Metrics
 import org.http4k.wiretap.util.Templates
 import org.junit.jupiter.api.Test
@@ -18,14 +19,15 @@ class StatsTest {
 
     private val templates = Templates()
     private val renderer = DatastarElementRenderer(templates)
+    private val meterRegistry = Metrics()
 
     private val stats = GetStats(
-        transactionStore = TransactionStore.InMemory(),
+        trafficMetrics = TrafficMetrics(SimpleMeterRegistry()),
         traceStore = TraceStore.InMemory(),
         inboundChaos = ChaosEngine(),
         outboundChaos = ChaosEngine(),
         mcpCapabilities = McpCapabilities("none"),
-        meterRegistry = Metrics()
+        meterRegistry = meterRegistry
     )
 
     @Test

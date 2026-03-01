@@ -16,15 +16,15 @@ import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.JvmMetrics
 import org.http4k.wiretap.domain.TraceStore
-import org.http4k.wiretap.domain.TransactionStore
+import org.http4k.wiretap.domain.TrafficMetrics
+import org.http4k.wiretap.domain.TrafficTimeline
 import org.http4k.wiretap.domain.WiretapStats
 import org.http4k.wiretap.util.Json
 import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 fun GetStats(
-    transactionStore: TransactionStore,
+    trafficMetrics: TrafficMetrics,
     traceStore: TraceStore,
     inboundChaos: ChaosEngine,
     outboundChaos: ChaosEngine,
@@ -37,11 +37,15 @@ fun GetStats(
 
     private fun getStats(): WiretapStats {
         val uptimeSeconds = gauge("process.uptime").toLong()
-        val startTime = Instant.ofEpochSecond(gauge("process.start.time").toLong())
-        val now = startTime.plusSeconds(uptimeSeconds)
         return WiretapStats(
             uptime = formatUptime(Duration.ofSeconds(uptimeSeconds)),
-            transactions = transactionStore.stats(startTime, now),
+            totalRequests = trafficMetrics.totalRequests(),
+            inboundCount = trafficMetrics.inboundCount(),
+            outboundCount = trafficMetrics.outboundCount(),
+            latencyCounts = trafficMetrics.latencyCounts(),
+            topHosts = trafficMetrics.topHosts(),
+            trafficTimeline = trafficMetrics.trafficTimeline(),
+            hostTimelines = trafficMetrics.hostTimelines(),
             traceCount = traceStore.traces().size,
             inboundChaosActive = inboundChaos.isEnabled(),
             inboundChaosDescription = inboundChaos.toString(),
@@ -99,27 +103,32 @@ data class StatsView(val stats: WiretapStats, val mcp: McpCapabilities) : ViewMo
     val inboundChaosBadgeText = if (stats.inboundChaosActive) "ACTIVE" else "INACTIVE"
     val outboundChaosBadgeClass = if (stats.outboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"
     val outboundChaosBadgeText = if (stats.outboundChaosActive) "ACTIVE" else "INACTIVE"
-    val hasHosts = stats.transactions.topHosts.isNotEmpty()
+    val hasHosts = stats.topHosts.isNotEmpty()
     val heapPercent = if (stats.jvm.heapMaxMb > 0) (stats.jvm.heapUsedMb * 100 / stats.jvm.heapMaxMb).toInt() else 0
     val cpuPercent = "%.1f%%".format(stats.jvm.cpuUsage * 100)
     val systemCpuPercent = "%.1f%%".format(stats.jvm.systemCpuUsage * 100)
     val gcPauseTotalFormatted =
         if (stats.jvm.gcPauseTotalMs < 1000) "${stats.jvm.gcPauseTotalMs}ms" else "%.1fs".format(stats.jvm.gcPauseTotalMs / 1000.0)
-    val statusJson = chartJson(
-        listOf("2xx", "3xx", "4xx", "5xx"),
-        listOf("2xx", "3xx", "4xx", "5xx").map { stats.transactions.statusCounts[it] ?: 0 })
-    val methodJson =
-        chartJson(stats.transactions.methodCounts.keys.toList(), stats.transactions.methodCounts.values.toList())
     val latencyJson = chartJson(
         listOf("0-10ms", "10-50ms", "50-100ms", "100-500ms", "500ms+"),
         listOf("0-10ms", "10-50ms", "50-100ms", "100-500ms", "500ms+").map {
-            stats.transactions.latencyCounts[it] ?: 0
+            stats.latencyCounts[it] ?: 0
         })
-    val trafficJson = chartJson(stats.transactions.trafficTimeline.first, stats.transactions.trafficTimeline.second)
+    val trafficJson = stackedChartJson(stats.trafficTimeline)
+    val hostTimelinesJson = stats.hostTimelines.map { (host, timeline) ->
+        HostTimelineEntry(host, stackedChartJson(timeline))
+    }
+    val hasHostTimelines = hostTimelinesJson.isNotEmpty()
 }
+
+data class HostTimelineEntry(val host: String, val json: String)
 
 private fun chartJson(labels: List<String>, data: List<Int>): String =
     Json.asFormatString(mapOf("labels" to labels, "data" to data))
+        .replace("\"", "&quot;")
+
+private fun stackedChartJson(timeline: TrafficTimeline): String =
+    Json.asFormatString(mapOf("labels" to timeline.labels, "datasets" to timeline.datasets))
         .replace("\"", "&quot;")
 
 private fun formatUptime(duration: Duration): String {

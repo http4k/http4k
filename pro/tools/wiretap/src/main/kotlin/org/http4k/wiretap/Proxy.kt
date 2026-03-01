@@ -16,6 +16,7 @@ import org.http4k.routing.routes
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import java.time.Clock
@@ -31,6 +32,7 @@ fun Proxy(
     clock: Clock,
     traces: TraceStore,
     transactions: TransactionStore,
+    trafficMetrics: TrafficMetrics,
     inboundChaos: ChaosEngine,
     outboundChaos: ChaosEngine,
     sanitise: (HttpTransaction) -> HttpTransaction?,
@@ -54,7 +56,10 @@ fun Proxy(
     fun recordTransaction(direction: Direction) = bufferRequest
         .then(
             ResponseFilters.ReportHttpTransaction(clock) { tx ->
-                sanitise(tx)?.let { transactions.record(it, direction) }
+                sanitise(tx)?.let {
+                    transactions.record(it, direction)
+                    trafficMetrics.record(it, direction)
+                }
             })
         .then(bufferResponse)
 

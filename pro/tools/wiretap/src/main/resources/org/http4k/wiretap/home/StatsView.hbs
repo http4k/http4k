@@ -9,11 +9,11 @@
     <div class="metric-card">
         <div class="metric-icon"><i class="bi bi-arrow-left-right"></i></div>
         <div class="metric-body">
-            <div class="metric-value">{{stats.transactions.totalRequests}}</div>
+            <div class="metric-value">{{stats.totalRequests}}</div>
             <div class="metric-label">Total Requests</div>
             <div class="metric-sub">
-                <span class="badge badge-in">IN {{stats.transactions.inboundCount}}</span>
-                <span class="badge badge-out">OUT {{stats.transactions.outboundCount}}</span>
+                <span class="badge badge-in">IN {{stats.inboundCount}}</span>
+                <span class="badge badge-out">OUT {{stats.outboundCount}}</span>
             </div>
         </div>
     </div>
@@ -92,8 +92,6 @@
 
 <div id="overview-chart-data"
      data-traffic="{{{trafficJson}}}"
-     data-status="{{{statusJson}}}"
-     data-method="{{{methodJson}}}"
      data-latency="{{{latencyJson}}}"
      style="display:none"></div>
 
@@ -108,24 +106,25 @@
 
 <div class="overview-charts">
     <div class="chart-card">
-        <h5>Status Distribution</h5>
-        <div class="chart-container">
-            <canvas id="statusChart"></canvas>
-        </div>
-    </div>
-    <div class="chart-card">
-        <h5>Method Distribution</h5>
-        <div class="chart-container">
-            <canvas id="methodChart"></canvas>
-        </div>
-    </div>
-    <div class="chart-card">
         <h5>Latency Distribution</h5>
         <div class="chart-container">
             <canvas id="latencyChart"></canvas>
         </div>
     </div>
 </div>
+
+{{#if hasHostTimelines}}
+<div class="overview-traffic-chart">
+    {{#each hostTimelinesJson}}
+    <div class="chart-card chart-card-wide" data-host-chart="{{{json}}}">
+        <h5>{{host}}</h5>
+        <div class="chart-container chart-container-wide">
+            <canvas class="hostChart"></canvas>
+        </div>
+    </div>
+    {{/each}}
+</div>
+{{/if}}
 
 {{#if hasHosts}}
 <div class="overview-tables">
@@ -144,7 +143,7 @@
             </tr>
             </thead>
             <tbody>
-            {{#each stats.transactions.topHosts}}
+            {{#each stats.topHosts}}
             <tr>
                 <td class="host-name">{{host}}</td>
                 <td class="host-count">{{count}}</td>
@@ -160,4 +159,3 @@
     </div>
 </div>
 {{/if}}
-
