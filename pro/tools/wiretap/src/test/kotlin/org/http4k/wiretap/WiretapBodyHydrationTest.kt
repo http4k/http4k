@@ -8,6 +8,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.server.SunHttp
+import org.http4k.server.asServer
+import org.http4k.server.uri
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.BodyHydration.All
 import org.http4k.wiretap.domain.BodyHydration.None
@@ -24,7 +27,12 @@ class HttpWiretapBodyHydrationTest {
         val poly = Wiretap.Http(
             transactionStore = store,
             bodyHydration = bodyHydration
-        ) { _, _, _ -> { Response(OK).body(Body("response-body".byteInputStream())) } }
+        ) { _, _, _ ->
+            { _: Request ->
+                Response(OK).body(Body("response-body".byteInputStream()))
+            }.asServer(SunHttp(0)).start()
+                .uri()
+        }
         return poly.http!!
     }
 

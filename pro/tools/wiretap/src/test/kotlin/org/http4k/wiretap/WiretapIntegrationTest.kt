@@ -15,7 +15,9 @@ import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
+import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.server.uri
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.WiretapTransaction
 import org.junit.jupiter.api.Test
@@ -31,7 +33,7 @@ class HttpWiretapIntegrationTest {
     @Test
     fun `records transactions via real server`() {
         val poly = Wiretap.Http(transactionStore = store) { _, _, _ ->
-            routes("/" bind GET to { Response(OK).body("hello") })
+            routes("/" bind GET to { Response(OK).body("hello") }).asServer(SunHttp(0)).start().uri()
         }
 
         val server = poly.asServer(Jetty(0)).start()
@@ -50,6 +52,7 @@ class HttpWiretapIntegrationTest {
         val poly = Wiretap.Http(transactionStore = store) { http, oTel, _ ->
             ServerFilters.OpenTelemetryTracing(oTel)
                 .then(routes("/" bind GET to { Response(OK).body("hello") }))
+                .asServer(SunHttp(0)).start().uri()
         }
 
         val server = poly.asServer(Jetty(0)).start()

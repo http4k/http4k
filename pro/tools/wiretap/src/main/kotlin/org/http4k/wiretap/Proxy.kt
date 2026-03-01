@@ -4,7 +4,9 @@ import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
+import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction.invoke
 import org.http4k.routing.RoutingHttpHandler
@@ -58,11 +60,13 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Direction.Outbound).then(outboundChaos).then(httpClient)
 
+    val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces), clock)
+
     return ProxyHandlers(
         routing = routes(
             orElse bind recordTransaction(Direction.Inbound)
                 .then(inboundChaos)
-                .then(appBuilder(outboundHttp, WiretapOpenTelemetry(traces), clock))
+                .then(ClientFilters.SetBaseUriFrom(uri).then(outboundHttp))
         ),
         outboundHttp = outboundHttp
     )

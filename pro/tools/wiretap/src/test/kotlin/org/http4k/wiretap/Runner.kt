@@ -113,7 +113,8 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
 fun main() {
     val clientApp = App2().asServer(Jetty(0)).start()
 
-    val server = Wiretap.Http { http, oTel, _ -> ServerApp(clientApp.uri(), http, oTel) }
+    val server =
+        Wiretap.Http { http, oTel, _ -> ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri() }
         .asServer(Jetty(21000)).start()
 
     println("started ${server.uri().path("_wiretap")}")
