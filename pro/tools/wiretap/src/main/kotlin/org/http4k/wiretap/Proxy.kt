@@ -4,17 +4,17 @@ import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ResponseFilters
-import org.http4k.filter.ResponseFilters.ReportHttpTransaction.invoke
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
+import org.http4k.wiretap.domain.Direction.Inbound
+import org.http4k.wiretap.domain.Direction.Outbound
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
@@ -63,16 +63,20 @@ fun Proxy(
             })
         .then(bufferResponse)
 
-    val outboundHttp = recordTransaction(Direction.Outbound).then(outboundChaos).then(httpClient)
+    val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
     val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces), clock)
 
+
     return ProxyHandlers(
         routing = routes(
-            orElse bind recordTransaction(Direction.Inbound)
-                .then(inboundChaos)
-                .then(ClientFilters.SetBaseUriFrom(uri).then(httpClient))
+            orElse bind
+                recordTransaction(Inbound)
+                    .then(inboundChaos)
+                    .then(ClientFilters.SetBaseUriFrom(uri))
+                    .then(ClientFilters.FollowRedirects())
+                    .then(httpClient)
         ),
-        outboundHttp = outboundHttp
+        outboundHttp = ClientFilters.FollowRedirects().then(outboundHttp)
     )
 }
