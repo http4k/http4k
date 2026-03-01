@@ -43,7 +43,6 @@ fun GetStats(
             inboundCount = trafficMetrics.inboundCount(),
             outboundCount = trafficMetrics.outboundCount(),
             latencyCounts = trafficMetrics.latencyCounts(),
-            topHosts = trafficMetrics.topHosts(),
             trafficTimeline = trafficMetrics.trafficTimeline(),
             hostTimelines = trafficMetrics.hostTimelines(),
             traceCount = traceStore.traces().size,
@@ -84,7 +83,7 @@ fun GetStats(
 
     override fun mcp(): ToolCapability = Tool(
         "get_stats",
-        "Get traffic overview including request counts, latency distribution, top hosts, and chaos engine status"
+        "Get traffic overview including request counts, latency distribution, and chaos engine status"
     ) bind {
         Json.asToolResponse(getStats())
     }
@@ -103,7 +102,6 @@ data class StatsView(val stats: WiretapStats, val mcp: McpCapabilities) : ViewMo
     val inboundChaosBadgeText = if (stats.inboundChaosActive) "ACTIVE" else "INACTIVE"
     val outboundChaosBadgeClass = if (stats.outboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"
     val outboundChaosBadgeText = if (stats.outboundChaosActive) "ACTIVE" else "INACTIVE"
-    val hasHosts = stats.topHosts.isNotEmpty()
     val heapPercent = if (stats.jvm.heapMaxMb > 0) (stats.jvm.heapUsedMb * 100 / stats.jvm.heapMaxMb).toInt() else 0
     val cpuPercent = "%.1f%%".format(stats.jvm.cpuUsage * 100)
     val systemCpuPercent = "%.1f%%".format(stats.jvm.systemCpuUsage * 100)

@@ -22,7 +22,6 @@ data class WiretapStats(
     val inboundCount: Long,
     val outboundCount: Long,
     val latencyCounts: Map<String, Int>,
-    val topHosts: List<HostBucket>,
     val trafficTimeline: TrafficTimeline,
     val hostTimelines: Map<String, TrafficTimeline>,
     val traceCount: Int,
@@ -33,12 +32,3 @@ data class WiretapStats(
     val jvm: JvmMetrics
 )
 
-data class HostBucket(
-    val host: String,
-    val count: Int,
-    val avgLatencyMs: Long,
-    val count2xx: Int,
-    val count3xx: Int,
-    val count4xx: Int,
-    val count5xx: Int,
-)

@@ -42,9 +42,6 @@ class TrafficMetrics(
             val host = hostKey(transaction.request.uri)
             if (host.isNotEmpty()) {
                 hostCounter(host, bucket).increment()
-                counter("wiretap.host.latency", "host", host).increment()
-                meterRegistry.counter("wiretap.host.latency.total", "host", host)
-                    .increment(transaction.duration.toMillis().toDouble())
             }
         }
     }
@@ -113,26 +110,6 @@ class TrafficMetrics(
         val buckets = listOf("0-10ms", "10-50ms", "50-100ms", "100-500ms", "500ms+")
         return buckets.associateWith { counter("wiretap.latency", "bucket", it).count().toInt() }
     }
-
-    fun topHosts(limit: Int = 10): List<HostBucket> =
-        hostCounters.keys.map { host ->
-            val statusCounts = statusBuckets.associateWith { bucket ->
-                hostCounters[host]?.get(bucket)?.count()?.toInt() ?: 0
-            }
-            val totalCount = statusCounts.values.sum()
-            val totalLatencyMs = meterRegistry.counter("wiretap.host.latency.total", "host", host).count().toLong()
-            val avgLatency = if (totalCount > 0) totalLatencyMs / totalCount else 0L
-
-            HostBucket(
-                host = host,
-                count = totalCount,
-                avgLatencyMs = avgLatency,
-                count2xx = statusCounts["2xx"] ?: 0,
-                count3xx = statusCounts["3xx"] ?: 0,
-                count4xx = statusCounts["4xx"] ?: 0,
-                count5xx = statusCounts["5xx"] ?: 0
-            )
-        }.sortedByDescending { it.count }.take(limit)
 
     fun totalRequests(): Long =
         counter("wiretap.traffic.total", "direction", Direction.Inbound.name).count().toLong() +
