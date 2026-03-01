@@ -31,7 +31,7 @@ class TrafficMetricsTest {
     }
 
     private val registry = SimpleMeterRegistry()
-    private val metrics = TrafficMetrics(registry, bucketSeconds = 10, maxBuckets = 6, clock = clock)
+    private val metrics = TrafficMetrics(registry, maxBuckets = 6, clock = clock)
 
     private fun transaction(
         uri: String = "/test",

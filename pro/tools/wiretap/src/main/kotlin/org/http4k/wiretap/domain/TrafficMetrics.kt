@@ -15,7 +15,6 @@ data class TrafficTimeline(
 
 class TrafficMetrics(
     private val meterRegistry: MeterRegistry,
-    private val bucketSeconds: Long = 10L,
     private val maxBuckets: Int = 60,
     private val clock: Clock = Clock.systemUTC()
 ) {
