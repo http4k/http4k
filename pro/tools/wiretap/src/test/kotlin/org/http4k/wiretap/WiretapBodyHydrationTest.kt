@@ -24,7 +24,7 @@ class HttpWiretapBodyHydrationTest {
     private val store = TransactionStore.InMemory()
 
     private fun monitorWith(bodyHydration: BodyHydration): (Request) -> Response {
-        val poly = Wiretap.Http(
+        val poly = Wiretap(
             transactionStore = store,
             bodyHydration = bodyHydration
         ) { _, _, _ ->

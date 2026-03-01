@@ -32,7 +32,7 @@ class HttpWiretapIntegrationTest {
 
     @Test
     fun `records transactions via real server`() {
-        val poly = Wiretap.Http(transactionStore = store) { _, _, _ ->
+        val poly = Wiretap(transactionStore = store) { _, _, _ ->
             routes("/" bind GET to { Response(OK).body("hello") }).asServer(SunHttp(0)).start().uri()
         }
 
@@ -49,7 +49,7 @@ class HttpWiretapIntegrationTest {
 
     @Test
     fun `recorded transactions contain traceparent from OTel tracing`() {
-        val poly = Wiretap.Http(transactionStore = store) { http, oTel, _ ->
+        val poly = Wiretap(transactionStore = store) { _, oTel, _ ->
             ServerFilters.OpenTelemetryTracing(oTel)
                 .then(routes("/" bind GET to { Response(OK).body("hello") }))
                 .asServer(SunHttp(0)).start().uri()

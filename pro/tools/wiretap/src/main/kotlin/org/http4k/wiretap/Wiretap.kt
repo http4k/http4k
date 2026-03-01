@@ -9,6 +9,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyHandler
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
@@ -44,7 +45,9 @@ import kotlin.concurrent.fixedRateTimer
  * all requests and responses, allowing you to monitor what is going on inside the app.
  */
 object Wiretap {
-    fun Http(
+    operator fun invoke(uri: Uri): PolyHandler = this(appBuilder = { _, _, _ -> uri })
+
+    operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
