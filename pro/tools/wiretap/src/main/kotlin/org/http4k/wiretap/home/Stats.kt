@@ -13,12 +13,15 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.JvmMetrics
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.WiretapStats
 import org.http4k.wiretap.util.Json
+import io.micrometer.core.instrument.MeterRegistry
 import java.time.Clock
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 fun GetStats(
     clock: Clock,
@@ -26,7 +29,8 @@ fun GetStats(
     traceStore: TraceStore,
     inboundChaos: ChaosEngine,
     outboundChaos: ChaosEngine,
-    mcpCapabilities: McpCapabilities
+    mcpCapabilities: McpCapabilities,
+    meterRegistry: MeterRegistry
 ) = object : WiretapFunction {
     val startTime = clock.instant()
 
@@ -40,6 +44,30 @@ fun GetStats(
             inboundChaosDescription = inboundChaos.toString(),
             outboundChaosActive = outboundChaos.isEnabled(),
             outboundChaosDescription = outboundChaos.toString(),
+            jvm = jvmMetrics()
+        )
+    }
+
+    private fun jvmMetrics(): JvmMetrics {
+        fun gauge(name: String, vararg tags: String): Double =
+            meterRegistry.find(name).tags(*tags).gauge()?.value() ?: 0.0
+
+        val gcTimer = meterRegistry.find("jvm.gc.pause").timer()
+
+        return JvmMetrics(
+            heapUsedMb = (gauge("jvm.memory.used", "area", "heap") / 1_048_576).toLong(),
+            heapMaxMb = (gauge("jvm.memory.max", "area", "heap") / 1_048_576).toLong(),
+            heapCommittedMb = (gauge("jvm.memory.committed", "area", "heap") / 1_048_576).toLong(),
+            nonHeapUsedMb = (gauge("jvm.memory.used", "area", "nonheap") / 1_048_576).toLong(),
+            threadCount = gauge("jvm.threads.live").toInt(),
+            daemonThreadCount = gauge("jvm.threads.daemon").toInt(),
+            peakThreadCount = gauge("jvm.threads.peak").toInt(),
+            gcPauseCount = gcTimer?.count() ?: 0,
+            gcPauseTotalMs = gcTimer?.totalTime(TimeUnit.MILLISECONDS)?.toLong() ?: 0,
+            cpuUsage = gauge("process.cpu.usage"),
+            systemCpuUsage = gauge("system.cpu.usage"),
+            classesLoaded = gauge("jvm.classes.loaded").toInt(),
+            classesUnloaded = gauge("jvm.classes.unloaded").toLong()
         )
     }
 
@@ -71,6 +99,11 @@ data class StatsView(val stats: WiretapStats, val mcp: McpCapabilities) : ViewMo
     val outboundChaosBadgeClass = if (stats.outboundChaosActive) "badge-chaos-active" else "badge-chaos-inactive"
     val outboundChaosBadgeText = if (stats.outboundChaosActive) "ACTIVE" else "INACTIVE"
     val hasHosts = stats.transactions.topHosts.isNotEmpty()
+    val heapPercent = if (stats.jvm.heapMaxMb > 0) (stats.jvm.heapUsedMb * 100 / stats.jvm.heapMaxMb).toInt() else 0
+    val cpuPercent = "%.1f%%".format(stats.jvm.cpuUsage * 100)
+    val systemCpuPercent = "%.1f%%".format(stats.jvm.systemCpuUsage * 100)
+    val gcPauseTotalFormatted =
+        if (stats.jvm.gcPauseTotalMs < 1000) "${stats.jvm.gcPauseTotalMs}ms" else "%.1fs".format(stats.jvm.gcPauseTotalMs / 1000.0)
     val statusJson = chartJson(
         listOf("2xx", "3xx", "4xx", "5xx"),
         listOf("2xx", "3xx", "4xx", "5xx").map { stats.transactions.statusCounts[it] ?: 0 })

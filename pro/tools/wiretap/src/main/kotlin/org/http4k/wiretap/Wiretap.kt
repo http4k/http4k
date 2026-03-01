@@ -35,6 +35,12 @@ import org.http4k.wiretap.otel.OTel
 import org.http4k.wiretap.traffic.Traffic
 import org.http4k.wiretap.traffic.TrafficStream
 import org.http4k.wiretap.util.Templates
+import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import java.time.Clock
 
 /**
@@ -56,6 +62,14 @@ object Wiretap {
 
         val templates = Templates()
         val renderer = DatastarElementRenderer(templates)
+
+        val meterRegistry = SimpleMeterRegistry().apply {
+            JvmMemoryMetrics().bindTo(this)
+            JvmThreadMetrics().bindTo(this)
+            JvmGcMetrics().bindTo(this)
+            ProcessorMetrics().bindTo(this)
+            ClassLoaderMetrics().bindTo(this)
+        }
 
         val inboundChaos = ChaosEngine()
         val outboundChaos = ChaosEngine()
@@ -90,7 +104,7 @@ object Wiretap {
         )
 
         val functions = baseFunctions +
-            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos, mcpCapabilities)
+            GetStats(clock, transactionStore, traceStore, inboundChaos, outboundChaos, mcpCapabilities, meterRegistry)
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 

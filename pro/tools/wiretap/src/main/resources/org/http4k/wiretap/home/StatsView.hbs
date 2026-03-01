@@ -45,6 +45,51 @@
     </div>
 </div>
 
+<div class="overview-metrics">
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-memory"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.jvm.heapUsedMb}} / {{stats.jvm.heapMaxMb}} MB</div>
+            <div class="metric-label">Heap Memory</div>
+            <div class="metric-sub">Committed: {{stats.jvm.heapCommittedMb}} MB ({{heapPercent}}% used)</div>
+            <div class="metric-sub">Non-Heap: {{stats.jvm.nonHeapUsedMb}} MB</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-cpu"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{cpuPercent}}</div>
+            <div class="metric-label">Process CPU</div>
+            <div class="metric-sub">System: {{systemCpuPercent}}</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-layers"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.jvm.threadCount}}</div>
+            <div class="metric-label">Threads</div>
+            <div class="metric-sub">Daemon: {{stats.jvm.daemonThreadCount}}</div>
+            <div class="metric-sub">Peak: {{stats.jvm.peakThreadCount}}</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-recycle"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.jvm.gcPauseCount}}</div>
+            <div class="metric-label">GC Pauses</div>
+            <div class="metric-sub">Total: {{gcPauseTotalFormatted}}</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-box"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">{{stats.jvm.classesLoaded}}</div>
+            <div class="metric-label">Classes Loaded</div>
+            <div class="metric-sub">Unloaded: {{stats.jvm.classesUnloaded}}</div>
+        </div>
+    </div>
+</div>
+
 <div id="overview-chart-data"
      data-traffic="{{{trafficJson}}}"
      data-status="{{{statusJson}}}"
