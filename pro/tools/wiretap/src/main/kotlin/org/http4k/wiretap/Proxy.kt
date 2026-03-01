@@ -67,7 +67,6 @@ fun Proxy(
 
     val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces), clock)
 
-
     return ProxyHandlers(
         routing = routes(
             orElse bind
