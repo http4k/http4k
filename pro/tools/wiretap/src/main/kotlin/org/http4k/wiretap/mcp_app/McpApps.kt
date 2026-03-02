@@ -9,7 +9,6 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.capability.CapabilityPack
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
-import org.http4k.filter.debug
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.template.DatastarElementRenderer
@@ -23,7 +22,7 @@ class McpApps(uri: Uri, client: HttpHandler) : WiretapFunction {
                 McpEntity.of("http4k Wiretap"), Version.of("0.0.0"),
                 uri.path("/mcp"), client
             )
-                .apply { start() })
+        )
     ).apply { start() }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
