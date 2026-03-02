@@ -45,6 +45,7 @@ data class Index(
     val resources: List<McpResourceView>,
     val templates: List<McpResourceTemplateView>
 ) : ViewModel {
+    val resourcesActive = true
     val initialSignals: String = Json.asFormatString(McpClientResourcesSignals())
 }
 

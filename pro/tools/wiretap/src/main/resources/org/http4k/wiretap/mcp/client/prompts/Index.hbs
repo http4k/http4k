@@ -3,11 +3,7 @@
 <body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
 {{> org/http4k/wiretap/header}}
 
-<div class="mcp-client-subnav">
-    <a href="/_wiretap/mcp/inbound/" class="mcp-client-tab">Tools</a>
-    <a href="/_wiretap/mcp/inbound/prompts" class="mcp-client-tab mcp-client-tab-active">Prompts</a>
-    <a href="/_wiretap/mcp/inbound/resources" class="mcp-client-tab">Resources</a>
-</div>
+{{> org/http4k/wiretap/mcp/client/McpClientSubnav}}
 
 <div class="app-layout mcp-client-layout">
     <div class="mcp-client-list">

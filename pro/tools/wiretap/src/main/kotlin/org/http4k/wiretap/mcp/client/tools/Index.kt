@@ -26,6 +26,7 @@ fun Index(mcpClient: McpClient, html: TemplateRenderer) = "/" bind GET to {
 }
 
 data class Index(val tools: List<McpToolView>) : ViewModel {
+    val toolsActive = true
     val initialSignals: String = Json.asFormatString(McpClientToolsSignals())
 }
 

@@ -36,6 +36,7 @@ fun Index(mcpClient: McpClient, html: TemplateRenderer) = "/prompts" bind GET to
 }
 
 data class Index(val prompts: List<McpPromptView>) : ViewModel {
+    val promptsActive = true
     val initialSignals: String = Json.asFormatString(McpClientPromptsSignals())
 }
 

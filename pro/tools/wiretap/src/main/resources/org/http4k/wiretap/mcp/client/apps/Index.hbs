@@ -1,37 +1,34 @@
-{{#>org/http4k/wiretap/layout pageTitle="MCP Apps"}}
+{{#>org/http4k/wiretap/layout pageTitle="MCP Client - Apps"}}
 {{#partial "body"}}
-<body data-signals="{{initialSignals}}">
+<body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
 {{> org/http4k/wiretap/header}}
 
-<div class="app-layout">
-    <div class="mcp-app-page">
-        <div class="mcp-app-heading">
-            <h2>MCP Apps</h2>
-            <p class="mcp-app-subtitle">Select an app to launch</p>
-        </div>
+{{> org/http4k/wiretap/mcp/client/McpClientSubnav}}
 
-        <div class="mcp-app-grid">
-            {{#each tools}}
-            <div class="mcp-app-card"
-                 data-class-mcp-app-card-active="$selectedServerId==='{{this.serverId}}'"
-                 data-on:click="$selectedServerId='{{this.serverId}}'; $iframeVisible=true; loadMcpApp('{{this.serverId}}', '{{this.resourceUri}}')">
-                <div class="mcp-app-icon"><i class="bi bi-puzzle"></i></div>
-                <div class="mcp-app-info">
-                    <div class="mcp-app-tool">{{this.uiToolName}}</div>
-                    <div class="mcp-app-server">{{this.serverName}}</div>
-                </div>
-            </div>
-            {{/each}}
+<div class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        <div class="mcp-client-list-header">Apps ({{tools.length}})</div>
+        {{#each tools}}
+        <div class="mcp-client-item"
+             data-class-mcp-client-item-active="$selectedServerId==='{{this.serverId}}'"
+             data-on:click="$selectedServerId='{{this.serverId}}'; $iframeVisible=true; loadMcpApp('{{this.serverId}}', '{{this.resourceUri}}')">
+            <div class="mcp-client-item-name">{{this.uiToolName}}</div>
+            <div class="mcp-client-item-desc">{{this.serverName}}</div>
         </div>
+        {{/each}}
+        {{#unless tools}}
+        <div class="mcp-client-empty">No apps available</div>
+        {{/unless}}
     </div>
 
-    <div class="mcp-app-iframe-container" data-show="$iframeVisible" id="iframe-container">
-        <iframe id="app" class="mcp-app-iframe"></iframe>
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="mcp-client-placeholder" data-show="!$iframeVisible">Select an app to launch</div>
+        <iframe id="app" class="mcp-app-iframe" data-show="$iframeVisible" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 </div>
 
 <script>
-    const basePath = location.pathname.replace(/\/$/, '');
+    const basePath = '/_wiretap/mcp/inbound/apps';
     let currentServerId = null;
 
     async function loadMcpApp(serverId, uri) {

@@ -1,4 +1,4 @@
-package org.http4k.wiretap.mcp.apps
+package org.http4k.wiretap.mcp.client.apps
 
 import org.http4k.ai.mcp.apps.model.AvailableMcpApp
 import org.http4k.core.Method.GET
@@ -15,6 +15,7 @@ fun Index(html: TemplateRenderer, mcpApps: List<AvailableMcpApp>): RoutingHttpHa
     "/" bind GET to { Response(OK).html(html(Index(mcpApps))) }
 
 data class Index(val tools: List<AvailableMcpApp>) : ViewModel {
+    val appsActive = true
     val initialSignals: String = Json.asFormatString(McpAppSignals())
 }
 
