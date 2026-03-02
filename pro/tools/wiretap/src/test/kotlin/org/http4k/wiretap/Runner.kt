@@ -66,28 +66,33 @@ fun ServerApp(
     )
 }
 
-fun McpApp(otel: OpenTelemetry) = PolyFilters.OpenTelemetryTracing(otel).then(
-    mcpHttpStreaming(
-        ServerMetaData("test mcp app", "0.0.0").withExtensions(McpApps),
-        NoMcpSecurity,
-        RenderMcpApp(
-            name = "show_ui",
-            description = "shows the UI",
-            uri = Uri.of("ui://a-ui"),
-            meta = McpAppResourceMeta(
-                csp = Csp(
-                    resourceDomains = listOf(Domain.of("https://resource.com")),
-                    connectDomains = listOf(Domain.of("https://connect.com")),
-                    frameDomains = listOf(Domain.of("https://frame.com"))
+fun ExampleMcpApp(otel: OpenTelemetry, client: HttpHandler) = PolyFilters.OpenTelemetryTracing(otel)
+    .then(
+        mcpHttpStreaming(
+            ServerMetaData("test mcp app", "0.0.0").withExtensions(McpApps),
+            NoMcpSecurity,
+            RenderMcpApp(
+                name = "show_ui",
+                description = "shows the UI",
+                uri = Uri.of("ui://a-ui"),
+                meta = McpAppResourceMeta(
+                    csp = Csp(
+                        resourceDomains = listOf(Domain.of("https://resource.com")),
+                        connectDomains = listOf(Domain.of("https://connect.com")),
+                        frameDomains = listOf(Domain.of("https://frame.com"))
+                    )
                 )
-            )
-        ) { "hello world" },
-        Tool("non_app", "") bind { Ok("hello") },
-        mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
+            ) {
+                runCatching {
+                    ClientFilters.OpenTelemetryTracing(otel).then(client)(Request(GET, "https://http4k.org/"))
+                }
+
+                "hello world"
+            },
+            Tool("non_app", "") bind { Ok("hello") },
+            mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
+        )
     )
-
-)
-
 
 private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
     contract {
@@ -151,8 +156,8 @@ fun main() {
     val clientApp = App2().asServer(Jetty(0)).start()
 
     val wiretap =
-        Wiretap { _, oTel, _ ->
-            McpApp(oTel).asServer(Jetty(0)).start().uri()
+        Wiretap { client, oTel, _ ->
+            ExampleMcpApp(oTel, client).asServer(Jetty(0)).start().uri()
         }
 //    val wiretap =
 //        Wiretap { http, oTel, _ ->

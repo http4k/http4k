@@ -1,0 +1,13 @@
+<div id="detail-panel" data-signals="{resourceUri: '{{uri}}'}">
+    <div class="mcp-client-detail-header">
+        <h3>{{name}}</h3>
+        <p>{{description}}</p>
+    </div>
+    <div class="mcp-client-detail-section">
+        <label>URI</label>
+        <code>{{uri}}</code>
+        {{#if mimeType}}<br><label>MIME Type</label><code>{{mimeType}}</code>{{/if}}
+    </div>
+    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/inbound/api/resources/read')">Read Resource</button>
+    <div id="resource-result" class="mcp-client-result"></div>
+</div>

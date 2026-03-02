@@ -1,0 +1,53 @@
+{{#>org/http4k/wiretap/layout pageTitle="MCP Client - Resources"}}
+{{#partial "body"}}
+<body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
+{{> org/http4k/wiretap/header}}
+
+<div class="mcp-client-subnav">
+    <a href="/_wiretap/mcp/inbound/" class="mcp-client-tab">Tools</a>
+    <a href="/_wiretap/mcp/inbound/prompts" class="mcp-client-tab">Prompts</a>
+    <a href="/_wiretap/mcp/inbound/resources" class="mcp-client-tab mcp-client-tab-active">Resources</a>
+</div>
+
+<div class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        {{#if resources}}
+        <div class="mcp-client-list-header">Resources ({{resources.length}})</div>
+        {{#each resources}}
+        <div class="mcp-client-item mcp-client-resource"
+             data-class-mcp-client-item-active="$selectedItem==='resource:{{this.name}}'"
+             data-on:click="$selectedItem='resource:{{this.name}}'; @get('/_wiretap/mcp/inbound/detail/resources/{{this.name}}')">
+            <div class="mcp-client-item-name"><i class="bi bi-file-earmark"></i> {{this.name}}</div>
+            <div class="mcp-client-item-desc">{{this.description}}</div>
+            <div class="mcp-client-item-uri">{{this.uri}}</div>
+        </div>
+        {{/each}}
+        {{/if}}
+
+        {{#if templates}}
+        <div class="mcp-client-list-header">Templates ({{templates.length}})</div>
+        {{#each templates}}
+        <div class="mcp-client-item mcp-client-template"
+             data-class-mcp-client-item-active="$selectedItem==='template:{{this.name}}'"
+             data-on:click="$selectedItem='template:{{this.name}}'; @get('/_wiretap/mcp/inbound/detail/templates/{{this.name}}')">
+            <div class="mcp-client-item-name"><i class="bi bi-braces"></i> {{this.name}}</div>
+            <div class="mcp-client-item-desc">{{this.description}}</div>
+            <div class="mcp-client-item-uri">{{this.uriTemplate}}</div>
+        </div>
+        {{/each}}
+        {{/if}}
+
+        {{#unless resources}}{{#unless templates}}
+        <div class="mcp-client-empty">No resources or templates available</div>
+        {{/unless}}{{/unless}}
+    </div>
+
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="mcp-client-placeholder">Select a resource or template to read it</div>
+    </div>
+</div>
+
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

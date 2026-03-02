@@ -4,6 +4,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanBuilder
+import io.opentelemetry.context.Context
 import org.http4k.core.Request
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
@@ -29,19 +30,22 @@ fun ServerFilters.OpenTelemetrySseTracing(
             try {
                 span.makeCurrent().use {
                     val response = next(req)
+                    val capturedContext = Context.current()
 
                     response.withConsumer { sse ->
-                        response.consumer(object : Sse by sse {
-                            override fun close() {
-                                try {
-                                    spanCompletionMutator(span, req, response)
-                                    span.setStatusFromResponse(response.status)
-                                    sse.close()
-                                } finally {
-                                    span.end()
+                        capturedContext.makeCurrent().use {
+                            response.consumer(object : Sse by sse {
+                                override fun close() {
+                                    try {
+                                        spanCompletionMutator(span, req, response)
+                                        span.setStatusFromResponse(response.status)
+                                        sse.close()
+                                    } finally {
+                                        span.end()
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             } catch (t: Throwable) {

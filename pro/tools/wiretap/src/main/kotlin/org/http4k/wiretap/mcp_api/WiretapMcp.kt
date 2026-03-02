@@ -1,4 +1,4 @@
-package org.http4k.wiretap.mcp
+package org.http4k.wiretap.mcp_api
 
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.server.security.McpSecurity

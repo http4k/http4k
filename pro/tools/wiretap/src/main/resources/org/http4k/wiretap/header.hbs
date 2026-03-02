@@ -12,12 +12,16 @@
             <a href="/_wiretap/inbound" class="nav-link">Inbound Client</a>
             <a href="/_wiretap/outbound" class="nav-link">Outbound Client</a>
             <a href="/_wiretap/chaos" class="nav-link">Chaos</a>
-            <a href="/_wiretap/mcp-app" class="nav-link">MCP App</a>
+            <a href="/_wiretap/mcp/app" class="nav-link">MCP App</a>
+            <a href="/_wiretap/mcp/inbound/" class="nav-link">MCP Client</a>
         </nav>
     </div>
 </header>
 <script>
     document.querySelectorAll('#app-nav .nav-link').forEach(function (a) {
-        if (a.getAttribute('href') === location.pathname) a.classList.add('nav-link-active');
+        var href = a.getAttribute('href');
+        if (href === location.pathname || (href !== '/_wiretap' && location.pathname.startsWith(href))) {
+            a.classList.add('nav-link-active');
+        }
     });
 </script>

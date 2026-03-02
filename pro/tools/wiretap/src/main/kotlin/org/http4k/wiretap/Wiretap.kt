@@ -28,10 +28,10 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.home.GetStats
 import org.http4k.wiretap.home.McpCapabilities
-import org.http4k.wiretap.mcp.AnalyzeTrafficPrompt
-import org.http4k.wiretap.mcp.DebugRequestPrompt
-import org.http4k.wiretap.mcp.WiretapMcp
-import org.http4k.wiretap.mcp_app.McpApps
+import org.http4k.wiretap.mcp_api.AnalyzeTrafficPrompt
+import org.http4k.wiretap.mcp_api.DebugRequestPrompt
+import org.http4k.wiretap.mcp_api.WiretapMcp
+import org.http4k.wiretap.mcp.Mcp
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
 import org.http4k.wiretap.traffic.Traffic
@@ -69,9 +69,7 @@ object Wiretap {
         val meterRegistry = Metrics()
         val trafficMetrics = TrafficMetrics(meterRegistry, clock = clock)
 
-        fixedRateTimer("wiretap-snapshot", daemon = true, period = 10_000L) {
-            trafficMetrics.snapshot()
-        }
+        fixedRateTimer("wiretap-snapshot", daemon = true, period = 10_000L) { trafficMetrics.snapshot() }
 
         val (uri, proxy, outboundHttp) = Proxy(
             bodyHydration,
@@ -86,6 +84,8 @@ object Wiretap {
             appBuilder
         )
 
+        val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())
+
         val baseFunctions = listOf(
             Traffic(transactionStore, viewStore),
             Chaos(inboundChaos, outboundChaos),
@@ -93,10 +93,8 @@ object Wiretap {
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),
-            McpApps(uri, httpClient)
+            Mcp(uri, httpClient, proxy)
         )
-
-        val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())
 
         val allCapabilities = prompts + baseFunctions.flatMap { it.mcp() }
 

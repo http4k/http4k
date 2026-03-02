@@ -21,6 +21,7 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.SpanAttribute
 import org.http4k.wiretap.domain.SpanDetail
 import org.http4k.wiretap.domain.SpanEvent
+import org.http4k.wiretap.domain.SpanLink
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.util.Json
@@ -134,6 +135,13 @@ private fun flattenSpan(
                 name = event.name,
                 timestampMs = (event.epochNanos - traceStartNanos) / 1_000_000,
                 attributes = event.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
+            )
+        },
+        links = span.links.map { link ->
+            SpanLink(
+                traceId = link.spanContext.traceId,
+                spanId = link.spanContext.spanId,
+                attributes = link.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
             )
         }
     )

@@ -1,0 +1,23 @@
+<div id="detail-panel" data-signals="{promptName: '{{name}}', promptArgs: '{}'}">
+    <div class="mcp-client-detail-header">
+        <h3>{{name}}</h3>
+        <p>{{description}}</p>
+    </div>
+    {{#if arguments}}
+    <div class="mcp-client-detail-section">
+        <label>Arguments</label>
+        {{#each arguments}}
+        <div class="mcp-client-field">
+            <label>{{this.name}}{{#if this.required}} *{{/if}}</label>
+            {{#if this.description}}<small>{{this.description}}</small>{{/if}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+    <div class="mcp-client-detail-section">
+        <label>Arguments (JSON)</label>
+        <textarea class="mcp-client-textarea" rows="6" data-bind="promptArgs" placeholder="{}">{}</textarea>
+    </div>
+    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/inbound/api/prompts/get')">Get Prompt</button>
+    <div id="prompt-result" class="mcp-client-result"></div>
+</div>

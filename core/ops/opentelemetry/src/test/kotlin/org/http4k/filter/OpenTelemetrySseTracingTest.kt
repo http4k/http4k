@@ -165,6 +165,25 @@ class OpenTelemetrySseTracingTest {
     }
 
     @Test
+    fun `span context is current inside SSE consumer`() {
+        var spanCurrentInConsumer: Boolean = false
+
+        val app = ServerFilters.OpenTelemetrySseTracing()
+            .then(sse("/foo" bind {
+                SseResponse { sse ->
+                    spanCurrentInConsumer = Span.current().spanContext.isValid
+                    sse.close()
+                }
+            }))
+
+        val response = app(Request(GET, "http://localhost:8080/foo"))
+
+        response.consumer.invoke(testSse())
+
+        assertThat("span should be current inside SSE consumer", spanCurrentInConsumer, equalTo(true))
+    }
+
+    @Test
     fun `span ends when SSE connection closes`() {
         var spanEndedBeforeClose = true
         var spanEndedAfterClose = false

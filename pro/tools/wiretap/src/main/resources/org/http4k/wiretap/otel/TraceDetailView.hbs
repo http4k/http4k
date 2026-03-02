@@ -128,6 +128,29 @@
                     </div>
                 </div>
                 {{/if}}
+                {{#if span.links}}
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Links</h4>
+                        {{#each span.links}}
+                        <div class="span-event">
+                            <span class="span-event-name">{{traceId}}</span>
+                            <code>{{spanId}}</code>
+                            {{#if attributes}}
+                            <table class="span-detail-table span-event-attrs">
+                                {{#each attributes}}
+                                <tr>
+                                    <td>{{key}}</td>
+                                    <td>{{value}}</td>
+                                </tr>
+                                {{/each}}
+                            </table>
+                            {{/if}}
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/if}}
                 {{#if span.resourceAttributes}}
                 <div class="gantt-detail-col">
                     <div class="span-detail-section">

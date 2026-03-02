@@ -6,9 +6,11 @@ import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
+import io.opentelemetry.context.propagation.TextMapGetter
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
@@ -21,6 +23,7 @@ fun McpFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
 ): McpFilter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
+    val textMapPropagator = openTelemetry.propagators.textMapPropagator
 
     val spanModifierMap = spanModifiers.associateBy { it.method }
 
@@ -30,8 +33,15 @@ fun McpFilters.OpenTelemetryTracing(
 
             val transportSpan = Span.current()
 
+            val metaFields = req.json.params
+                ?.let { McpJson.fields(it).toMap()["_meta"] }
+                ?.let { McpJson.fields(it).toMap() }
+                ?: emptyMap()
+
+            val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
+
             val span = tracer.spanBuilder(req.json.method)
-                .setParent(Context.current())
+                .setParent(parentContext)
                 .setSpanKind(SERVER)
                 .setAttribute("mcp.method.name", req.json.method)
                 .setAttribute("mcp.session.id", req.session.id.value)
@@ -72,4 +82,10 @@ val defaultMcpOtelSpanModifiers = listOf(
     GetPromptSpanModifiers,
     ReadResourceSpanModifiers
 )
+
+private val metaTextMapGetter = object : TextMapGetter<Map<String, McpNodeType>> {
+    override fun keys(carrier: Map<String, McpNodeType>) = carrier.keys
+    override fun get(carrier: Map<String, McpNodeType>?, key: String) =
+        carrier?.get(key)?.let { McpJson.text(it) }
+}
 

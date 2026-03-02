@@ -1,0 +1,36 @@
+{{#>org/http4k/wiretap/layout pageTitle="MCP Client - Prompts"}}
+{{#partial "body"}}
+<body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
+{{> org/http4k/wiretap/header}}
+
+<div class="mcp-client-subnav">
+    <a href="/_wiretap/mcp/inbound/" class="mcp-client-tab">Tools</a>
+    <a href="/_wiretap/mcp/inbound/prompts" class="mcp-client-tab mcp-client-tab-active">Prompts</a>
+    <a href="/_wiretap/mcp/inbound/resources" class="mcp-client-tab">Resources</a>
+</div>
+
+<div class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        <div class="mcp-client-list-header">Prompts ({{prompts.length}})</div>
+        {{#each prompts}}
+        <div class="mcp-client-item"
+             data-class-mcp-client-item-active="$selectedItem==='{{this.name}}'"
+             data-on:click="$selectedItem='{{this.name}}'; @get('/_wiretap/mcp/inbound/detail/prompts/{{this.name}}')">
+            <div class="mcp-client-item-name">{{this.name}}</div>
+            <div class="mcp-client-item-desc">{{this.description}}</div>
+        </div>
+        {{/each}}
+        {{#unless prompts}}
+        <div class="mcp-client-empty">No prompts available</div>
+        {{/unless}}
+    </div>
+
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="mcp-client-placeholder">Select a prompt to view details and get it</div>
+    </div>
+</div>
+
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

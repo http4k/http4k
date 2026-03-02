@@ -30,7 +30,8 @@ data class SpanDetail(
     val attributes: List<SpanAttribute>,
     val baggageAttributes: List<SpanAttribute>,
     val resourceAttributes: List<SpanAttribute>,
-    val events: List<SpanEvent>
+    val events: List<SpanEvent>,
+    val links: List<SpanLink>
 )
 
 data class SpanAttribute(val key: String, val value: String)
@@ -38,5 +39,11 @@ data class SpanAttribute(val key: String, val value: String)
 data class SpanEvent(
     val name: String,
     val timestampMs: Long,
+    val attributes: List<SpanAttribute>
+)
+
+data class SpanLink(
+    val traceId: String,
+    val spanId: String,
     val attributes: List<SpanAttribute>
 )

@@ -1298,6 +1298,382 @@ body {
     height: 180px;
 }
 
+/* ── MCP App page ── */
+
+.mcp-app-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.mcp-app-heading h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 2px;
+}
+
+.mcp-app-subtitle {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.mcp-app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.mcp-app-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.mcp-app-card:hover {
+    border-color: #adb5bd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.mcp-app-card-active {
+    border-color: #0d6efd;
+    border-left: 4px solid #0d6efd;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
+}
+
+.mcp-app-icon {
+    font-size: 28px;
+    color: #6c757d;
+    flex-shrink: 0;
+}
+
+.mcp-app-card-active .mcp-app-icon {
+    color: #0d6efd;
+}
+
+.mcp-app-info {
+    min-width: 0;
+}
+
+.mcp-app-tool {
+    font-size: 15px;
+    font-weight: 600;
+    color: #212529;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mcp-app-server {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mcp-app-iframe-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.mcp-app-iframe {
+    flex: 1;
+    border: none;
+    background: #f8f9fa;
+    width: 100%;
+}
+
+/* ── MCP Client panel ── */
+
+.mcp-client-subnav {
+    display: flex;
+    gap: 2px;
+    padding: 8px 16px;
+    background: #f0f4f8;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.mcp-client-tab {
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.mcp-client-tab:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.mcp-client-tab-active {
+    background: #0d6efd;
+    color: #fff !important;
+}
+
+.mcp-client-tab-active:hover {
+    background: #0b5ed7;
+}
+
+.mcp-client-unavailable {
+    text-align: center;
+    padding: 60px 24px;
+    color: #6c757d;
+}
+
+.mcp-client-unavailable i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.mcp-client-unavailable h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.mcp-client-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.mcp-client-list {
+    width: 320px;
+    min-width: 280px;
+    border-right: 1px solid #dee2e6;
+    overflow-y: auto;
+    background: #fafbfc;
+}
+
+.mcp-client-list-header {
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    background: #f0f4f8;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.mcp-client-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.mcp-client-item:hover {
+    background: #f0f4f8;
+}
+
+.mcp-client-item-active {
+    background: #e7f0ff;
+    border-left: 3px solid #0d6efd;
+}
+
+.mcp-client-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.mcp-client-item-desc {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mcp-client-item-uri {
+    font-size: 11px;
+    color: #adb5bd;
+    margin-top: 2px;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mcp-client-detail {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.mcp-client-placeholder {
+    color: #adb5bd;
+    text-align: center;
+    padding: 60px 0;
+    font-size: 14px;
+}
+
+.mcp-client-empty {
+    color: #adb5bd;
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+}
+
+.mcp-client-detail-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.mcp-client-detail-header p {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 16px;
+}
+
+.mcp-client-detail-section {
+    margin-bottom: 16px;
+}
+
+.mcp-client-detail-section > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.mcp-client-schema {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.mcp-client-textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.mcp-client-input {
+    width: 100%;
+    font-size: 13px;
+    padding: 6px 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+.mcp-client-field {
+    margin-bottom: 10px;
+}
+
+.mcp-client-field small {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.mcp-client-btn {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.mcp-client-btn:hover {
+    background: #0b5ed7;
+}
+
+.mcp-client-result {
+    margin-top: 16px;
+}
+
+.mcp-client-result > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.mcp-client-result-content {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.mcp-client-loading {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.mcp-client-error {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.mcp-client-message {
+    margin-bottom: 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.mcp-client-message pre {
+    padding: 10px;
+    font-size: 12px;
+    background: #f8f9fa;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+}
+
+.mcp-client-role {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #e9ecef;
+    color: #495057;
+}
+
 #swagger-ui {
     .schemes-server-container {
         display: none;

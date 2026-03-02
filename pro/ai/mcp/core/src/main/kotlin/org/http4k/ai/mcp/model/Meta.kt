@@ -13,6 +13,9 @@ data class Meta(
     @JsonProperty("io.modelcontextprotocol/related-task")
     val relatedTask: RelatedTaskMetadata? = null,
     val ui: McpAppMeta? = null,
+    val traceparent: String? = null,
+    val tracestate: String? = null,
+    val baggage: String? = null,
 ) {
     companion object {
         val default = Meta()

@@ -1,0 +1,16 @@
+<div id="detail-panel" data-signals="{toolName: '{{name}}', toolArgs: '{}'}">
+    <div class="mcp-client-detail-header">
+        <h3>{{name}}</h3>
+        <p>{{description}}</p>
+    </div>
+    <div class="mcp-client-detail-section">
+        <label>Input Schema</label>
+        <pre class="mcp-client-schema">{{inputSchema}}</pre>
+    </div>
+    <div class="mcp-client-detail-section">
+        <label>Arguments (JSON)</label>
+        <textarea class="mcp-client-textarea" rows="6" data-bind="toolArgs" placeholder="{}">{}</textarea>
+    </div>
+    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/inbound/api/tools/call')">Call Tool</button>
+    <div id="tool-result" class="mcp-client-result"></div>
+</div>
