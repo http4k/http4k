@@ -15,12 +15,7 @@ fun Index(html: TemplateRenderer, mcpApps: List<AvailableMcpApp>): RoutingHttpHa
     "/" bind GET to { Response(OK).html(html(Index(mcpApps))) }
 
 data class Index(val tools: List<AvailableMcpApp>) : ViewModel {
-    val initialSignals: String = Json.asFormatString(
-        McpAppSignals()
-    )
+    val initialSignals: String = Json.asFormatString(McpAppSignals())
 }
 
-data class McpAppSignals(
-    val selectedServerId: String = "",
-    val iframeVisible: Boolean = false
-)
+data class McpAppSignals(val selectedServerId: String = "", val iframeVisible: Boolean = false)
