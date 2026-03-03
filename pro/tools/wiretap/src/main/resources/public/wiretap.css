@@ -1381,6 +1381,8 @@ body {
 
 .mcp-client-detail-form {
     padding: 20px;
+    height: auto;
+    overflow-y: visible;
 }
 
 .mcp-app-iframe {
