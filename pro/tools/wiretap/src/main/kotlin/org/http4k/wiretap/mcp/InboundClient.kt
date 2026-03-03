@@ -21,8 +21,8 @@ fun InboundClient(mcpClient: McpClient) = object : WiretapFunction {
         val functions = listOf(Tools(mcpClient), Prompts(mcpClient), Resources(mcpClient), Apps(mcpApps))
 
         return routes(
-            Index(html),
             *functions.map { it.http(elements, html) }.toTypedArray(),
+            Index(html),
         )
     }
 
