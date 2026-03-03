@@ -70,18 +70,20 @@ EditHeaders, FormatBody, TrafficStream, and all `Index` functions.
 
 ## 2. WiretapFunction Tests — Chaos
 
-All follow the ActivateTest pattern: implement `HttpWiretapFunctionContract` + `McpWiretapFunctionContract`, approval-tested.
+All follow the ActivateTest pattern: implement `HttpWiretapFunctionContract` + `McpWiretapFunctionContract`, approval-tested. HTTP and MCP tests mirror each
+other — same behaviour, different face.
 
 ### DeactivateTest (new file)
 
-- [ ] `http default response` — POST `/{direction}/deactivate`, verify chaos disabled
-- [ ] `mcp default response`
+- [ ] `http disables inbound chaos` — POST `/Inbound/deactivate`, assert engine disabled + status rendered
+- [ ] `mcp disables inbound chaos` — call tool with direction=Inbound, assert engine disabled
 
 ### StatusTest (new file)
 
-- [ ] `http default response` — GET `/status`, verify status rendered
-- [ ] `http returns active status after chaos enabled`
-- [ ] `mcp default response`
+- [ ] `http returns inactive status` — GET `/status` with both engines off
+- [ ] `http returns active status` — enable chaos first, then GET `/status`
+- [ ] `mcp returns inactive status` — call tool, verify both engines inactive
+- [ ] `mcp returns active status` — enable chaos first, call tool
 
 ---
 
@@ -89,51 +91,54 @@ All follow the ActivateTest pattern: implement `HttpWiretapFunctionContract` + `
 
 ### ClearTransactionsTest (new file)
 
-- [ ] `http default response` — DELETE `/`, verify store cleared
-- [ ] `mcp default response`
+- [ ] `http clears all transactions` — record some, DELETE `/`, assert store empty
+- [ ] `mcp clears all transactions` — record some, call tool, assert store empty
 
 ### ListTransactionsTest (new file)
 
-- [ ] `http default response` — POST `/list` with empty filter
-- [ ] `http filters by direction`
-- [ ] `mcp default response`
+- [ ] `http lists recorded transactions` — record transactions, POST `/list`, verify rows rendered
+- [ ] `http returns empty list when no transactions` — POST `/list` on empty store
+- [ ] `mcp lists recorded transactions` — record transactions, call tool, verify JSON
+- [ ] `mcp returns empty list when no transactions`
 
 ### ViewTransactionTest (new file)
 
-- [ ] `http default response` — GET `/{id}`, verify detail rendered
-- [ ] `http returns 404 for unknown id`
-- [ ] `mcp default response`
-- [ ] `mcp returns error for unknown id`
+- [ ] `http renders transaction detail` — record transaction, GET `/{id}`, verify detail
+- [ ] `http returns 404 for unknown id` — GET `/{unknownId}`, assert NOT_FOUND
+- [ ] `mcp returns transaction detail` — record transaction, call tool with id
+- [ ] `mcp returns error for unknown id` — call tool with nonexistent id
 
 ### ExportHarTest (new file)
 
-- [ ] `http default response` — GET `/{id}/har`, verify HAR JSON
+- [ ] `http exports transaction as HAR JSON` — record transaction, GET `/{id}/har`, verify HAR structure
 - [ ] `http returns 404 for unknown id`
-- [ ] `mcp default response`
+- [ ] `mcp exports transaction as HAR JSON` — call tool with id
+- [ ] `mcp returns error for unknown id`
 
 ### ListViewsTest (new file)
 
-- [ ] `http default response` — GET `/views`
-- [ ] `mcp default response`
+- [ ] `http renders view bar` — GET `/views`, verify default views rendered
+- [ ] `mcp lists all views` — call tool, verify default views in JSON
 
 ### CreateViewTest (new file)
 
-- [ ] `http default response` — POST `/views`, verify view added
-- [ ] `mcp default response`
+- [ ] `http creates view and renders updated bar` — POST `/views` with name+filter, verify view added
+- [ ] `mcp creates view and returns updated list` — call tool with name+filter
 
 ### UpdateViewTest (new file)
 
-- [ ] `http default response` — PUT `/views/{id}`, verify view updated
-- [ ] `mcp default response`
+- [ ] `http updates view filter` — create view, PUT `/views/{id}` with new filter, verify updated
+- [ ] `mcp updates view filter` — create view, call tool with id + new filter
 
 ### DeleteViewTest (new file)
 
-- [ ] `http default response` — DELETE `/views/{id}`, verify view removed
-- [ ] `mcp default response`
+- [ ] `http removes view and renders updated bar` — create view, DELETE `/views/{id}`, verify removed
+- [ ] `mcp removes view` — create view, call tool with id, verify removed
 
 ### ActivateViewTest (new file — http-only, no MCP face)
 
-- [ ] `http default response` — POST `/views/{id}/activate`, verify filter applied
+- [ ] `http applies view filter and renders filtered transactions` — create view with filter, record matching+non-matching transactions, POST
+  `/views/{id}/activate`, verify only matching shown
 
 ---
 
@@ -141,7 +146,7 @@ All follow the ActivateTest pattern: implement `HttpWiretapFunctionContract` + `
 
 ### StatsTest (add MCP test to existing file)
 
-- [ ] `mcp default response` — verify `get_stats` tool returns JSON
+- [ ] `mcp returns stats as JSON` — call `get_stats` tool, verify stats structure
 
 ---
 
@@ -149,16 +154,17 @@ All follow the ActivateTest pattern: implement `HttpWiretapFunctionContract` + `
 
 ### ListTracesTest (new file)
 
-- [ ] `http default response` — GET `/list` when empty
-- [ ] `http lists traces with data`
-- [ ] `mcp default response`
+- [ ] `http renders empty trace list` — GET `/list` with no spans
+- [ ] `http renders traces after recording spans` — record spans, GET `/list`
+- [ ] `mcp returns empty list when no traces` — call tool
+- [ ] `mcp returns traces after recording spans` — record spans, call tool
 
 ### GetTraceTest (new file)
 
-- [ ] `http default response` — GET `/{traceId}`, verify span tree rendered
-- [ ] `http returns 404 for unknown trace`
-- [ ] `mcp default response`
-- [ ] `mcp returns error for unknown trace`
+- [ ] `http renders trace detail with span tree` — record spans, GET `/{traceId}`
+- [ ] `http returns 404 for unknown trace` — GET `/{unknownId}`
+- [ ] `mcp returns trace detail` — record spans, call tool with trace_id
+- [ ] `mcp returns error for unknown trace` — call tool with nonexistent trace_id
 
 ---
 
@@ -166,8 +172,8 @@ All follow the ActivateTest pattern: implement `HttpWiretapFunctionContract` + `
 
 ### SendRequestTest (new file)
 
-- [ ] `http default response` — POST `/send`, verify request proxied and detail rendered
-- [ ] `mcp default response`
+- [ ] `http sends request through proxy and renders response detail` — POST `/send` with method+url, verify proxy called and detail rendered
+- [ ] `mcp sends request and returns response detail` — call tool with method+url
 
 ---
 
