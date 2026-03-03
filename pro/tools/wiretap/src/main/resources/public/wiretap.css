@@ -1451,6 +1451,7 @@ body {
 
 .mcp-client-detail-form > .action-btn {
     margin-top: 12px;
+    align-self: flex-start;
 }
 
 .mcp-client-detail-form code {
