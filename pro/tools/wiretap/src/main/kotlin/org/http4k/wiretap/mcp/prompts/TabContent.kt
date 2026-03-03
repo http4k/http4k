@@ -1,4 +1,4 @@
-package org.http4k.wiretap.mcp.client.prompts
+package org.http4k.wiretap.mcp.prompts
 
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
@@ -7,13 +7,11 @@ import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.lens.html
+import org.http4k.datastar.Selector
+import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
-import org.http4k.template.TemplateRenderer
+import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
-import org.http4k.wiretap.util.Json
-
-data class McpClientPromptsSignals(val selectedItem: String = "")
 
 data class McpPromptView(
     val name: String,
@@ -27,20 +25,7 @@ data class McpPromptArgView(
     val required: Boolean
 )
 
-fun Index(mcpClient: McpClient, html: TemplateRenderer) = "/prompts" bind GET to {
-    val prompts = mcpClient.prompts().list()
-        .map { list -> list.map { prompt -> prompt.toView() } }
-        .valueOrNull() ?: emptyList()
-
-    Response(OK).html(html(Index(prompts)))
-}
-
-data class Index(val prompts: List<McpPromptView>) : ViewModel {
-    val promptsActive = true
-    val initialSignals: String = Json.asFormatString(McpClientPromptsSignals())
-}
-
-private fun McpPrompt.toView() = McpPromptView(
+fun McpPrompt.toView() = McpPromptView(
     name = name.value,
     description = description ?: "",
     arguments = arguments.map { arg ->
@@ -51,3 +36,17 @@ private fun McpPrompt.toView() = McpPromptView(
         )
     }
 )
+
+data class TabContent(val prompts: List<McpPromptView>) : ViewModel
+
+fun PromptsTabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
+    "/tab/prompts" bind GET to {
+        val prompts = mcpClient.prompts().list()
+            .map { list -> list.map { prompt -> prompt.toView() } }
+            .valueOrNull() ?: emptyList()
+
+        Response(OK).datastarElements(
+            elements(TabContent(prompts)),
+            selector = Selector.of("#mcp-content")
+        )
+    }

@@ -1,25 +1,40 @@
 package org.http4k.wiretap.mcp.client
 
+import org.http4k.ai.mcp.apps.McpApps
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.server.capability.CapabilityPack
+import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.mcp.McpIndex
+import org.http4k.wiretap.mcp.apps.AppsTabContent
 import org.http4k.wiretap.mcp.client.apps.Apps
 import org.http4k.wiretap.mcp.client.prompts.Prompts
 import org.http4k.wiretap.mcp.client.resources.Resources
 import org.http4k.wiretap.mcp.client.tools.Tools
+import org.http4k.wiretap.mcp.prompts.PromptsTabContent
+import org.http4k.wiretap.mcp.resources.ResourcesTabContent
+import org.http4k.wiretap.mcp.tools.ToolsTabContent
 
 fun InboundClient(mcpClient: McpClient) = object : WiretapFunction {
     private val functions = listOf(Tools(mcpClient), Prompts(mcpClient), Resources(mcpClient))
 
-    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "/inbound" bind routes(
-            functions.map { it.http(elements, html) } +
-                ("/apps" bind Apps(mcpClient).http(elements, html))
+    override fun http(elements: DatastarElementRenderer, html: TemplateRenderer): RoutingHttpHandler {
+        val mcpApps = McpApps(listOf(mcpClient)).apply { runCatching { start() } }
+
+        return routes(
+            McpIndex(html),
+            ToolsTabContent(mcpClient, elements),
+            PromptsTabContent(mcpClient, elements),
+            ResourcesTabContent(mcpClient, elements),
+            AppsTabContent(mcpApps.tools(), elements),
+            *functions.map { it.http(elements, html) }.toTypedArray(),
+            "/apps" bind Apps(mcpApps).http(elements, html)
         )
+    }
 
     override fun mcp() = CapabilityPack()
 }

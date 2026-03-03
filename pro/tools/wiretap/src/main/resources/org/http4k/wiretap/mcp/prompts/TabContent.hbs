@@ -1,17 +1,10 @@
-{{#>org/http4k/wiretap/layout pageTitle="MCP Client - Prompts"}}
-{{#partial "body"}}
-<body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
-{{> org/http4k/wiretap/header}}
-
-{{> org/http4k/wiretap/mcp/client/McpClientSubnav}}
-
-<div class="app-layout mcp-client-layout">
+<div id="mcp-content" class="app-layout mcp-client-layout">
     <div class="mcp-client-list">
         <div class="mcp-client-list-header">Prompts ({{prompts.length}})</div>
         {{#each prompts}}
         <div class="mcp-client-item"
              data-class-mcp-client-item-active="$selectedItem==='{{this.name}}'"
-             data-on:click="$selectedItem='{{this.name}}'; @get('/_wiretap/mcp/inbound/detail/prompts/{{this.name}}')">
+             data-on:click="$selectedItem='{{this.name}}'; @get('/_wiretap/mcp/detail/prompts/{{this.name}}')">
             <div class="mcp-client-item-name">{{this.name}}</div>
             <div class="mcp-client-item-desc">{{this.description}}</div>
         </div>
@@ -25,8 +18,3 @@
         <div class="mcp-client-placeholder">Select a prompt to view details and get it</div>
     </div>
 </div>
-
-{{> org/http4k/wiretap/footer}}
-</body>
-{{/partial}}
-{{/layout}}

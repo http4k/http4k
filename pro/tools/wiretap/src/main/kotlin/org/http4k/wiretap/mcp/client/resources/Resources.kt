@@ -11,8 +11,7 @@ fun Resources(mcpClient: McpClient) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = routes(
         InspectResource(mcpClient, elements),
         InspectTemplate(mcpClient, elements),
-        ReadResource(mcpClient, elements),
-        Index(mcpClient, html)
+        ReadResource(mcpClient, elements)
     )
 
     override fun mcp() = CapabilityPack()

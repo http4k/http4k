@@ -18,6 +18,6 @@
         <label>Arguments (JSON)</label>
         <textarea class="mcp-client-textarea" rows="6" data-bind="promptArgs" placeholder="{}">{}</textarea>
     </div>
-    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/inbound/api/prompts/get')">Get Prompt</button>
+    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/api/prompts/get')">Get Prompt</button>
     <div id="prompt-result" class="mcp-client-result"></div>
 </div>

@@ -13,6 +13,7 @@ import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.mcp.prompts.McpPromptArgView
 
 data class PromptDetailView(
     val name: String,

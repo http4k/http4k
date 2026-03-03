@@ -10,8 +10,7 @@ import org.http4k.wiretap.WiretapFunction
 fun Tools(mcpClient: McpClient) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = routes(
         InspectTool(mcpClient, elements),
-        CallTool(mcpClient, elements),
-        Index(mcpClient, html)
+        CallTool(mcpClient, elements)
     )
 
     override fun mcp() = CapabilityPack()
