@@ -14,7 +14,6 @@ import org.http4k.routing.routes
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
-import org.http4k.wiretap.mcp.client.InboundClient
 
 fun Mcp(uri: Uri, rawClient: HttpHandler, proxy: HttpHandler) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer): RoutingHttpHandler {

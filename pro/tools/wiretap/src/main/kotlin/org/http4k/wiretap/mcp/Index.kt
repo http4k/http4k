@@ -8,18 +8,19 @@ import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.SignalModel
+
+fun Index(html: TemplateRenderer) = "/" bind GET to {
+    Response(OK).html(html(Index()))
+}
+
+data class Index(val dummy: Boolean = true) : ViewModel {
+    val initialSignals: String = Json.asFormatString(McpClientSignals())
+}
 
 data class McpClientSignals(
     val activeTab: String = "tools",
     val selectedItem: String = "",
     val selectedServerId: String = "",
     val iframeVisible: Boolean = false
-)
-
-data class Index(val dummy: Boolean = true) : ViewModel {
-    val initialSignals: String = Json.asFormatString(McpClientSignals())
-}
-
-fun McpIndex(html: TemplateRenderer) = "/" bind GET to {
-    Response(OK).html(html(Index()))
-}
+) : SignalModel

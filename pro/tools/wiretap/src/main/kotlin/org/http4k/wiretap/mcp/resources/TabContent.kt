@@ -5,13 +5,11 @@ import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.core.Method.GET
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.datastar.Selector
-import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.mcp.McpTabResetSignals
+import org.http4k.wiretap.mcp.mcpTabResponse
 
 data class McpResourceView(
     val uri: String,
@@ -46,8 +44,8 @@ data class TabContent(
     val templates: List<McpResourceTemplateView>
 ) : ViewModel
 
-fun ResourcesTabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/tab/resources" bind GET to {
+fun TabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
+    "/resources" bind GET to {
         val resources = mcpClient.resources().list()
             .map { list -> list.map { r -> r.toResourceView() } }
             .valueOrNull() ?: emptyList()
@@ -56,8 +54,5 @@ fun ResourcesTabContent(mcpClient: McpClient, elements: DatastarElementRenderer)
             .map { list -> list.map { r -> r.toTemplateView() } }
             .valueOrNull() ?: emptyList()
 
-        Response(OK).datastarElements(
-            elements(TabContent(resources, templates)),
-            selector = Selector.of("#mcp-content")
-        )
+        elements.mcpTabResponse(TabContent(resources, templates), McpTabResetSignals())
     }

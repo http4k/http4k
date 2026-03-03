@@ -13,6 +13,7 @@ import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.ChaosConfig
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.SignalModel
 
 data class ChaosConfigSignals(
     val direction: String = Direction.Inbound.name,
@@ -27,7 +28,7 @@ data class ChaosConfigSignals(
     val method: String? = null,
     val path: String? = null,
     val host: String? = null
-) {
+) : SignalModel {
     fun toChaosConfig() = ChaosConfig(
         behaviour = behaviour,
         latencyMin = latencyMin,

@@ -17,6 +17,7 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionDetail
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
@@ -54,7 +55,7 @@ fun ViewTransaction(transactionStore: TransactionStore) = object : WiretapFuncti
 }
 
 data class TransactionDetailView(val tx: TransactionDetail, val showImport: Boolean = true) : ViewModel {
-    val isInbound = tx.direction == "Inbound"
+    val isInbound = tx.direction == Direction.Inbound
     val dirBadgeClass = if (isInbound) "badge-in" else "badge-out"
     val dirBadgeText = if (isInbound) "INBOUND" else "OUTBOUND"
     val importPath = if (isInbound) "/_wiretap/inbound" else "/_wiretap/outbound"

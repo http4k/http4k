@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
+import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
@@ -26,7 +27,9 @@ import org.http4k.wiretap.domain.ChaosConfig
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
-import org.http4k.wiretap.util.Json.datastarModel
+import org.http4k.wiretap.util.Json
+
+val chaosConfigLens = with(Json) { Body.auto<ChaosConfigSignals>().toLens() }
 
 fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
     private fun activate(direction: Direction, config: ChaosConfig) {
@@ -39,7 +42,7 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{direction}/activate" bind POST to { req ->
             val direction = Path.enum<Direction>().of("direction")(req)
-            val config = req.datastarModel<ChaosConfigSignals>().toChaosConfig()
+            val config = chaosConfigLens(req).toChaosConfig()
             activate(direction, config)
 
             val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))

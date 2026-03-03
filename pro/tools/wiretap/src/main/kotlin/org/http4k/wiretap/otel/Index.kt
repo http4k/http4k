@@ -11,6 +11,7 @@ import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.SignalModel
 
 fun Index(templates: TemplateRenderer): RoutingHttpHandler =
     "/" bind GET to { req ->
@@ -22,7 +23,7 @@ private val traceParam = Query.string().optional("trace")
 
 data class OtelSignals(
     val selectedTrace: String? = null
-)
+) : SignalModel
 
 data class Index(val deepLinkTrace: String? = null) : ViewModel {
     val initialSignals = Json.asFormatString(OtelSignals(selectedTrace = deepLinkTrace))

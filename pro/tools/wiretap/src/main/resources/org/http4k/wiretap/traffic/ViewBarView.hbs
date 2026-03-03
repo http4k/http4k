@@ -1,6 +1,6 @@
 {{#each tabs}}
 <div class="tab-btn" data-tab-id="{{id}}" data-class:active="$activeView==='{{id}}'"
-     data-on:click="$direction={{#if filter.direction}}'{{filter.direction}}'{{else}}''{{/if}}; $host={{#if filter.host}}'{{filter.host}}'{{else}}''{{/if}}; $method={{#if filter.method}}'{{filter.method}}'{{else}}''{{/if}}; $status={{#if filter.status}}'{{filter.status}}'{{else}}''{{/if}}; $path={{#if filter.path}}'{{filter.path}}'{{else}}''{{/if}}; $activeView='{{id}}'; $customView={{#if builtIn}}false{{else}}true{{/if}}; @get('/_wiretap/traffic/list')">
+     data-on:click="@post('/_wiretap/traffic/views/{{id}}/activate')">
     <span>{{name}}</span>
 </div>
 {{/each}}

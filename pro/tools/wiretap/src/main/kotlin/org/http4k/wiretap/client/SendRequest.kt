@@ -15,6 +15,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.datastar.Selector
+import org.http4k.core.Body
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
@@ -26,7 +27,6 @@ import org.http4k.wiretap.domain.WiretapTransaction
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.traffic.TransactionDetailView
 import org.http4k.wiretap.util.Json
-import org.http4k.wiretap.util.Json.datastarModel
 import java.time.Clock
 import java.time.Duration
 
@@ -37,6 +37,8 @@ data class ClientRequest(
     val contentType: String = "",
     val body: String = ""
 )
+
+val clientRequestLens = with(Json) { Body.auto<ClientRequest>().toLens() }
 
 fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
     object : WiretapFunction {
@@ -68,7 +70,7 @@ fun SendRequest(proxy: HttpHandler, clock: Clock, direction: Direction) =
 
         override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
             "/send" bind POST to { req ->
-                val model = req.datastarModel<ClientRequest>()
+                val model = clientRequestLens(req)
 
                 val headers = model.headers.values
                     .filter { it.name.isNotBlank() }

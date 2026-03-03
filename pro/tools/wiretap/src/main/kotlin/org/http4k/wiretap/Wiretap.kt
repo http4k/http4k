@@ -108,7 +108,7 @@ object Wiretap {
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
 
-        val listOf = listOf(
+        val httpRoutes = listOf(
             ServerFilters.CatchAll()
                 .then(
                     routes(
@@ -119,7 +119,7 @@ object Wiretap {
             "/_wiretap/traffic" bind TrafficStream(transactionStore, renderer),
         )
         return poly(
-            listOf + mcpRoutes
+            httpRoutes + mcpRoutes
         )
     }
 }

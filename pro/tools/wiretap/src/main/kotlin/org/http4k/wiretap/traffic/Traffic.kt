@@ -18,6 +18,7 @@ fun Traffic(transactionStore: TransactionStore, viewStore: ViewStore) = object :
         CreateView(viewStore),
         UpdateView(viewStore),
         DeleteView(viewStore),
+        ActivateView(viewStore, transactionStore),
         ViewTransaction(transactionStore),
     )
 

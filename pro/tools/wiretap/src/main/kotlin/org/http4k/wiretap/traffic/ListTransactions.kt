@@ -7,7 +7,7 @@ import org.http4k.ai.mcp.model.status
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method
-import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.datastar.MorphMode
@@ -25,15 +25,14 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.TransactionSummary
 import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.util.Json
-import org.http4k.wiretap.util.Json.datastarModel
 
 fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunction {
     private fun list(filter: TransactionFilter, limit: Int) =
         transactionStore.list(filter, limit).map { it.toSummary() }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "/list" bind GET to { req ->
-            val filter = req.datastarModel<TransactionFilterSignals>().toFilter()
+        "/list" bind POST to { req ->
+            val filter = filterLens(req).toFilter()
             val rows = list(filter, 50).map { TransactionRowView(it) }
 
             Response(OK).datastarElements(

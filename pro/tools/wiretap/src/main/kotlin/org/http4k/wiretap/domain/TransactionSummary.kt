@@ -19,7 +19,7 @@ data class HeaderEntry(val name: String, val value: String)
 
 data class TransactionDetail(
     val id: Long,
-    val direction: String,
+    val direction: Direction,
     val method: String,
     val uri: String,
     val status: Int,

@@ -13,12 +13,14 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.ViewStore
+import org.http4k.wiretap.util.datastarSignal
 
 fun DeleteView(views: ViewStore) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}" bind DELETE to { req ->
             views.remove(Path.long().of("id")(req))
             elements.renderViewBar(views.list())
+                .datastarSignal(ViewActivationSignals.Reset)
         }
 
     override fun mcp(): ToolCapability {

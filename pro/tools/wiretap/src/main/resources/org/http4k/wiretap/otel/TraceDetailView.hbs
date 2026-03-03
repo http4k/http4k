@@ -17,7 +17,7 @@
             </div>
         </div>
         {{#each spans}}
-        <div class="gantt-row" onclick="toggleSpanDetail('{{span.spanId}}')">
+        <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
             <div class="gantt-label-col" style="padding-left: {{span.depth}}em;">
                 <span class="span-kind badge-span-{{span.kind}}">{{span.kind}}</span>
                 <span class="gantt-span-name">{{span.name}}</span>
@@ -32,12 +32,12 @@
                 <div class="gantt-bar gantt-bar-{{span.kind}}" style="left: {{span.startOffsetPercent}}%; width: {{span.widthPercent}}%;" title="{{span.name}} ({{span.durationMs}}ms)"></div>
             </div>
         </div>
-        <div id="span-detail-{{span.spanId}}" class="gantt-detail" style="display: none;">
+        <div id="span-detail-{{span.spanId}}" class="gantt-detail">
             <div class="gantt-detail-columns">
                 <div class="gantt-detail-col">
                     <div class="span-detail-section">
                         <h4>Span Info</h4>
-                        <table class="span-detail-table">
+                        <table class="data-table span-detail-table">
                             <tr>
                                 <td>Name</td>
                                 <td>{{span.name}}</td>
@@ -77,7 +77,7 @@
                 <div class="gantt-detail-col">
                     <div class="span-detail-section">
                         <h4>Attributes</h4>
-                        <table class="span-detail-table">
+                        <table class="data-table span-detail-table">
                             {{#each span.attributes}}
                             <tr>
                                 <td>{{key}}</td>
@@ -92,7 +92,7 @@
                 <div class="gantt-detail-col">
                     <div class="span-detail-section">
                         <h4>Baggage</h4>
-                        <table class="span-detail-table">
+                        <table class="data-table span-detail-table">
                             {{#each span.baggageAttributes}}
                             <tr>
                                 <td>{{key}}</td>
@@ -114,7 +114,7 @@
                             <span class="span-event-name">{{name}}</span>
                             <span class="span-event-time">+{{timestampMs}}ms</span>
                             {{#if attributes}}
-                            <table class="span-detail-table span-event-attrs">
+                            <table class="data-table span-detail-table span-event-attrs">
                                 {{#each attributes}}
                                 <tr>
                                     <td>{{key}}</td>
@@ -137,7 +137,7 @@
                             <span class="span-event-name">{{traceId}}</span>
                             <code>{{spanId}}</code>
                             {{#if attributes}}
-                            <table class="span-detail-table span-event-attrs">
+                            <table class="data-table span-detail-table span-event-attrs">
                                 {{#each attributes}}
                                 <tr>
                                     <td>{{key}}</td>
@@ -155,7 +155,7 @@
                 <div class="gantt-detail-col">
                     <div class="span-detail-section">
                         <h4>Resource Attributes</h4>
-                        <table class="span-detail-table">
+                        <table class="data-table span-detail-table">
                             {{#each span.resourceAttributes}}
                             <tr>
                                 <td>{{key}}</td>
@@ -170,10 +170,4 @@
         </div>
         {{/each}}
     </div>
-    <script>
-        function toggleSpanDetail(spanId) {
-            var el = document.getElementById('span-detail-' + spanId);
-            if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-        }
-    </script>
 </div>

@@ -10,6 +10,7 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.SignalModel
 
 data class HeaderEntry(val name: String = "", val value: String = "")
 
@@ -19,7 +20,7 @@ data class ClientSignals(
     val headers: Map<String, HeaderEntry> = mapOf("0" to HeaderEntry()),
     val contentType: String? = null,
     val body: String? = null
-)
+) : SignalModel
 
 fun Index(
     defaultUrl: String,
@@ -83,4 +84,6 @@ data class Index(
 ) : ViewModel {
     val initialSignals: String = Json.asFormatString(signals)
     val initialHeaderRows: HeaderRowsView = headerRowsView(signals.headers, basePath)
+    val navInbound = basePath.contains("inbound")
+    val navOutbound = basePath.contains("outbound")
 }

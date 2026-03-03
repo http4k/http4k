@@ -1,4 +1,4 @@
-package org.http4k.wiretap.mcp.client.resources
+package org.http4k.wiretap.mcp.resources
 
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
@@ -22,7 +22,7 @@ data class TemplateDetailView(
 ) : ViewModel
 
 fun InspectTemplate(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/detail/templates/{name}" bind GET to { req ->
+    "/templates/{name}" bind GET to { req ->
         val name = Path.of("name")(req)
         val template = mcpClient.resources().listTemplates()
             .map { list -> list.first { it.name.value == name } }

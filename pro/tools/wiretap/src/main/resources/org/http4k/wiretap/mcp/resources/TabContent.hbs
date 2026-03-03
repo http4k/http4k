@@ -5,7 +5,7 @@
         {{#each resources}}
         <div class="mcp-client-item mcp-client-resource"
              data-class-mcp-client-item-active="$selectedItem==='resource:{{this.name}}'"
-             data-on:click="$selectedItem='resource:{{this.name}}'; @get('/_wiretap/mcp/detail/resources/{{this.name}}')">
+             data-on:click="$selectedItem='resource:{{this.name}}'; @get('/_wiretap/mcp/resources/{{this.name}}')">
             <div class="mcp-client-item-name"><i class="bi bi-file-earmark"></i> {{this.name}}</div>
             <div class="mcp-client-item-desc">{{this.description}}</div>
             <div class="mcp-client-item-uri">{{this.uri}}</div>
@@ -18,7 +18,7 @@
         {{#each templates}}
         <div class="mcp-client-item mcp-client-template"
              data-class-mcp-client-item-active="$selectedItem==='template:{{this.name}}'"
-             data-on:click="$selectedItem='template:{{this.name}}'; @get('/_wiretap/mcp/detail/templates/{{this.name}}')">
+             data-on:click="$selectedItem='template:{{this.name}}'; @get('/_wiretap/mcp/templates/{{this.name}}')">
             <div class="mcp-client-item-name"><i class="bi bi-braces"></i> {{this.name}}</div>
             <div class="mcp-client-item-desc">{{this.description}}</div>
             <div class="mcp-client-item-uri">{{this.uriTemplate}}</div>

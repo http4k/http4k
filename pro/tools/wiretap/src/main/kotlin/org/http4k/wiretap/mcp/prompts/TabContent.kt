@@ -5,13 +5,12 @@ import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.core.Method.GET
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.datastar.Selector
-import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
-import org.http4k.template.ViewModel
+import org.http4k.wiretap.mcp.McpListItem
+import org.http4k.wiretap.mcp.McpListTabContent
+import org.http4k.wiretap.mcp.McpTabResetSignals
+import org.http4k.wiretap.mcp.mcpTabResponse
 
 data class McpPromptView(
     val name: String,
@@ -37,16 +36,18 @@ fun McpPrompt.toView() = McpPromptView(
     }
 )
 
-data class TabContent(val prompts: List<McpPromptView>) : ViewModel
-
-fun PromptsTabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/tab/prompts" bind GET to {
+fun TabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
+    "/prompts" bind GET to {
         val prompts = mcpClient.prompts().list()
             .map { list -> list.map { prompt -> prompt.toView() } }
             .valueOrNull() ?: emptyList()
 
-        Response(OK).datastarElements(
-            elements(TabContent(prompts)),
-            selector = Selector.of("#mcp-content")
+        elements.mcpTabResponse(
+            McpListTabContent(
+                items = prompts.map { McpListItem(it.name, it.description) },
+                typeName = "Prompts",
+                placeholderText = "Select a prompt to view details and get it"
+            ),
+            McpTabResetSignals()
         )
     }

@@ -1,4 +1,4 @@
-package org.http4k.wiretap.mcp.client.apps
+package org.http4k.wiretap.mcp.apps
 
 import org.http4k.ai.mcp.apps.McpApps
 import org.http4k.ai.mcp.apps.endpoints.ReadUiResource

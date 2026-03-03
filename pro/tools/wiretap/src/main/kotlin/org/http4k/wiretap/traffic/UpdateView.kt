@@ -18,7 +18,6 @@ import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionFilter
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.util.Json
-import org.http4k.wiretap.util.Json.datastarModel
 
 fun UpdateView(viewStore: ViewStore) = object : WiretapFunction {
 
@@ -28,7 +27,7 @@ fun UpdateView(viewStore: ViewStore) = object : WiretapFunction {
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}" bind PUT to { req ->
-            update(Path.long().of("id")(req), req.datastarModel<ViewSignals>().normalized)
+            update(Path.long().of("id")(req), viewSignalsLens(req).normalized)
             elements.renderViewBar(viewStore.list())
         }
 

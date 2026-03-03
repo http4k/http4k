@@ -1,7 +1,7 @@
 {{#>org/http4k/wiretap/layout pageTitle="Chaos"}}
 {{#partial "body"}}
 <body data-signals="{{initialSignals}}">
-{{> org/http4k/wiretap/header}}
+{{> org/http4k/wiretap/header navChaos=true}}
 <div class="chaos-page">
     <div id="chaos-status" class="chaos-status-panel" data-init="@get('/_wiretap/chaos/status')">
     </div>
@@ -86,7 +86,7 @@
                 </div>
                 <div class="chaos-actions">
                     <button class="btn btn-sm btn-danger"
-                            data-on:click="@post(`/_wiretap/chaos/${$direction}/activate`, {signals: {behaviour: $behaviour, latencyMin: $latencyMin, latencyMax: $latencyMax, statusCode: $statusCode, trigger: $trigger, percentage: $percentage, countdown: $countdown, delaySeconds: $delaySeconds, method: $method, path: $path, host: $host}})">
+                            data-on:click="@post(`/_wiretap/chaos/${$direction}/activate`)">
                         Activate
                     </button>
                     <button class="btn btn-sm btn-outline-secondary"

@@ -1,7 +1,7 @@
 {{#>org/http4k/wiretap/layout pageTitle=pageTitle}}
 {{#partial "body"}}
 <body data-signals="{{initialSignals}}">
-{{> org/http4k/wiretap/header}}
+{{> org/http4k/wiretap/header navInbound=navInbound navOutbound=navOutbound}}
 <div class="client-page">
     <div class="client-request-section">
         <form class="client-toolbar" data-on:submit__prevent="@post('{{{basePath}}}send')">
@@ -19,7 +19,7 @@
                 Send
             </button>
             <button type="button" class="btn btn-sm btn-outline-secondary"
-                    data-on:click="$method='GET'; $url='/'; $contentType=''; $body=''; @get('{{{basePath}}}headers/reset')">
+                    data-on:click="@post('{{{basePath}}}headers/reset')">
                 Clear
             </button>
         </form>

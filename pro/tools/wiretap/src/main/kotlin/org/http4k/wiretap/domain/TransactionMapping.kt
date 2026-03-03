@@ -39,7 +39,7 @@ internal fun WiretapTransaction.toDetail(): TransactionDetail {
     val resp = transaction.response
     return TransactionDetail(
         id = id,
-        direction = direction.name,
+        direction = direction,
         method = req.method.name,
         uri = req.uri.toString(),
         status = resp.status.code,

@@ -10,14 +10,13 @@
         <a href="/_wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
         {{/if}}
         <button class="detail-toolbar-btn"
-                onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.curl-data').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy cURL', 1500) })">
+                data-on:click="navigator.clipboard.writeText(this.parentElement.querySelector('.curl-data').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy cURL', 1500) })">
             Copy cURL
         </button>
         {{#if showImport}}
-        <button class="detail-toolbar-btn"
-                onclick="window.location.href='{{importPath}}?import={{tx.id}}'">
+        <a href="{{importPath}}?import={{tx.id}}" class="detail-toolbar-btn">
             Import to {{importLabel}}
-        </button>
+        </a>
         {{/if}}
         <pre class="curl-data" hidden>{{tx.curl}}</pre>
     </div>
@@ -27,7 +26,7 @@
             {{#if tx.queryParams}}
             <div class="detail-section">
                 <h3>Query Parameters</h3>
-                <table class="header-table">
+                <table class="data-table header-table">
                     {{#each tx.queryParams}}
                     <tr>
                         <td>{{name}}</td>
@@ -39,7 +38,7 @@
             {{/if}}
             <div class="detail-section">
                 <h3>Headers</h3>
-                <table class="header-table">
+                <table class="data-table header-table">
                     {{#each tx.requestHeaders}}
                     <tr>
                         <td>{{name}}</td>
@@ -59,7 +58,7 @@
             <h3 class="detail-col-title">Response</h3>
             <div class="detail-section">
                 <h3>Headers</h3>
-                <table class="header-table">
+                <table class="data-table header-table">
                     {{#each tx.responseHeaders}}
                     <tr>
                         <td>{{name}}</td>

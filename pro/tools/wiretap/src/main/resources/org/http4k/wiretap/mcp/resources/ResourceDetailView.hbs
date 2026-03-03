@@ -8,6 +8,6 @@
         <code>{{uri}}</code>
         {{#if mimeType}}<br><label>MIME Type</label><code>{{mimeType}}</code>{{/if}}
     </div>
-    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/api/resources/read')">Read Resource</button>
+    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/resources/read')">Read Resource</button>
     <div id="resource-result" class="mcp-client-result"></div>
 </div>

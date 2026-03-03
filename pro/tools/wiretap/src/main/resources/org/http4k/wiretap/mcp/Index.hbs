@@ -1,87 +1,25 @@
 {{#>org/http4k/wiretap/layout pageTitle="MCP Client"}}
 {{#partial "body"}}
 <body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
-{{> org/http4k/wiretap/header}}
+{{> org/http4k/wiretap/header navMCP=true}}
 
 <div class="mcp-client-subnav">
     <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='tools'"
-         data-on:click="$activeTab='tools'; $selectedItem=''; $iframeVisible=false; @get('/_wiretap/mcp/tab/tools')">Tools
+         data-on:click="$activeTab='tools'; @get('/_wiretap/mcp/tools')">Tools
     </div>
     <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='prompts'"
-         data-on:click="$activeTab='prompts'; $selectedItem=''; $iframeVisible=false; @get('/_wiretap/mcp/tab/prompts')">Prompts
+         data-on:click="$activeTab='prompts'; @get('/_wiretap/mcp/prompts')">Prompts
     </div>
     <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='resources'"
-         data-on:click="$activeTab='resources'; $selectedItem=''; $iframeVisible=false; @get('/_wiretap/mcp/tab/resources')">Resources
+         data-on:click="$activeTab='resources'; @get('/_wiretap/mcp/resources')">Resources
     </div>
     <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='apps'"
-         data-on:click="$activeTab='apps'; $selectedServerId=''; $iframeVisible=false; @get('/_wiretap/mcp/tab/apps')">Apps
+         data-on:click="$activeTab='apps'; @get('/_wiretap/mcp/apps')">Apps
     </div>
 </div>
 
-<div class="app-layout mcp-client-layout" id="mcp-content" data-init="@get('/_wiretap/mcp/tab/tools')">
+<div class="app-layout mcp-client-layout" id="mcp-content" data-init="@get('/_wiretap/mcp/tools')">
 </div>
-
-<script>
-    const basePath = '/_wiretap/mcp/apps';
-    let currentServerId = null;
-
-    async function loadMcpApp(serverId, uri) {
-        currentServerId = serverId;
-        const res = await fetch(`${basePath}/api/resources?serverId=${serverId}&uri=${encodeURIComponent(uri)}`);
-        const csp = res.headers.get('Content-Security-Policy');
-        let html = await res.text();
-
-        if (csp) {
-            html = `<meta http-equiv="Content-Security-Policy" content="${csp}; style-src * 'unsafe-inline'; script-src * 'unsafe-inline'">` + html;
-        }
-
-        document.getElementById('app').srcdoc = html;
-    }
-
-    addEventListener('message', async e => {
-        if (!e.data?.jsonrpc || e.data.id === undefined) return;
-
-        let result;
-        switch (e.data.method) {
-            case 'ui/initialize':
-                result = {
-                    protocolVersion: '2025-03-26',
-                    hostInfo: {name: 'http4k-mcp-apps-host', version: '0.0.0'},
-                    hostCapabilities: {serverTools: {}, openLinks: {}, updateModelContext: {text: {}}},
-                    hostContext: {theme: 'light', platform: 'web', displayMode: 'inline', availableDisplayModes: ['inline']}
-                };
-                break;
-
-            case 'tools/call':
-                result = await fetch(`${basePath}/api/tools/call`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({serverId: currentServerId, ...e.data.params})
-                }).then(r => r.json());
-                break;
-
-            case 'ui/openLink':
-                window.open(e.data.params.url, '_blank');
-                result = {};
-                break;
-
-            case 'ui/message':
-            case 'ui/updateModelContext':
-            case 'ui/requestDisplayMode':
-                result = {};
-                break;
-
-            default:
-                e.source.postMessage({
-                    jsonrpc: '2.0', id: e.data.id,
-                    error: {code: -32601, message: 'Method not found'}
-                }, '*');
-                return;
-        }
-
-        e.source.postMessage({jsonrpc: '2.0', id: e.data.id, result}, '*');
-    });
-</script>
 
 {{> org/http4k/wiretap/footer}}
 </body>

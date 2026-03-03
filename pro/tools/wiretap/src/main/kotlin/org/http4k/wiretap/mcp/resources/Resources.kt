@@ -1,4 +1,4 @@
-package org.http4k.wiretap.mcp.client.resources
+package org.http4k.wiretap.mcp.resources
 
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.server.capability.CapabilityPack
