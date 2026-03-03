@@ -57,18 +57,20 @@ function initResizableColumns(panelSelector, headerSelector) {
 }
 
 function initResizablePanel() {
-    const handle = document.querySelector('.panel-resize-handle');
-    if (!handle) return;
+    document.querySelectorAll('.panel-resize-handle').forEach(function (handle) {
+        if (handle.dataset.resizeInit) return;
+        handle.dataset.resizeInit = 'true';
 
-    const prev = handle.previousElementSibling;
-    const top = prev.querySelector('.traffic-list') || prev.querySelector('.otel-trace-list') || prev.querySelector('.client-request-section') || prev;
+        const prev = handle.previousElementSibling;
+        const top = prev.querySelector('.traffic-list') || prev.querySelector('.otel-trace-list') || prev.querySelector('.client-request-section') || prev.querySelector('.mcp-client-detail-form') || prev;
 
-    makeDraggable(handle, function (e, state) {
-        if (!state.startH) {
-            state.startH = top.getBoundingClientRect().height;
-        }
-        const h = Math.max(80, state.startH + (e.clientY - state.startY));
-        top.style.height = h + 'px';
+        makeDraggable(handle, function (e, state) {
+            if (!state.startH) {
+                state.startH = top.getBoundingClientRect().height;
+            }
+            const h = Math.max(80, state.startH + (e.clientY - state.startY));
+            top.style.height = h + 'px';
+        });
     });
 }
 
@@ -313,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let _chartInitTimer = null;
 new MutationObserver(function () {
+    initResizablePanel();
     initMcpUrl();
     initSwaggerUI();
     const dataEl = document.getElementById('overview-chart-data');

@@ -1,17 +1,22 @@
-<div id="detail-panel" data-signals="{resourceUri: '{{uriTemplate}}'}">
-    <div class="mcp-client-detail-header">
-        <h3>{{name}}</h3>
-        <p>{{description}}</p>
+<div id="detail-panel" class="mcp-client-detail" data-signals="{resourceUri: '{{uriTemplate}}'}">
+    <div class="client-request-section mcp-client-detail-form">
+        <div class="mcp-client-detail-header">
+            <h3>{{name}}</h3>
+            <p>{{description}}</p>
+        </div>
+        <div class="client-section">
+            <h4>URI Template</h4>
+            <code>{{uriTemplate}}</code>
+            {{#if mimeType}}<br><h4 style="margin-top: 8px">MIME Type</h4><code>{{mimeType}}</code>{{/if}}
+        </div>
+        <div class="client-section">
+            <h4>Resource URI</h4>
+            <input type="text" class="form-control form-control-sm" data-bind="resourceUri" placeholder="Enter resolved URI" value="{{uriTemplate}}">
+        </div>
+        <button class="action-btn action-btn-primary" data-on:click="@post('/_wiretap/mcp/resources/read')">Read Resource</button>
     </div>
-    <div class="mcp-client-detail-section">
-        <label>URI Template</label>
-        <code>{{uriTemplate}}</code>
-        {{#if mimeType}}<br><label>MIME Type</label><code>{{mimeType}}</code>{{/if}}
+    <div class="panel-resize-handle"></div>
+    <div class="client-detail-panel">
+        <div id="resource-result" class="mcp-client-result"></div>
     </div>
-    <div class="mcp-client-detail-section">
-        <label>Resource URI</label>
-        <input type="text" class="form-control form-control-sm" data-bind="resourceUri" placeholder="Enter resolved URI" value="{{uriTemplate}}">
-    </div>
-    <button class="action-btn action-btn-primary" data-on:click="@post('/_wiretap/mcp/resources/read')">Read Resource</button>
-    <div id="resource-result" class="mcp-client-result"></div>
 </div>
