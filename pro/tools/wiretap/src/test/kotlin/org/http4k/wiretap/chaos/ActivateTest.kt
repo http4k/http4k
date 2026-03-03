@@ -1,16 +1,15 @@
 package org.http4k.wiretap.chaos
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.apps.util.McpAppsJson.json
 import org.http4k.chaos.ChaosEngine
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.filter.debug
 import org.http4k.testing.Approver
 import org.http4k.wiretap.HttpWiretapFunctionContract
 import org.http4k.wiretap.McpWiretapFunctionContract
 import org.junit.jupiter.api.Test
-import kotlin.collections.mapOf
 
 class ActivateTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
@@ -23,12 +22,19 @@ class ActivateTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
     @Test
     fun `http default response`(approver: Approver) {
+        // setup
+        assertThat(inboundChaos.isEnabled(), equalTo(false))
+
+        // make call and assert response
         approver.assertApproved(
             httpClient()(
                 Request(POST, "/Inbound/activate")
                     .json(mapOf("direction" to "Inbound"))
             )
         )
+
+        // check collaborators
+        assertThat(inboundChaos.isEnabled(), equalTo(true))
     }
 
     @Test

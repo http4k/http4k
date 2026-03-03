@@ -7,16 +7,13 @@ import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.ai.mcp.model.Domain
-import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
@@ -42,7 +39,6 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters
-import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
@@ -52,6 +48,10 @@ import org.http4k.security.BasicAuthSecurity
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri
+import org.http4k.wiretap.Option.app
+import org.http4k.wiretap.Option.externalMcpAppUrl
+import org.http4k.wiretap.Option.mcpApp
+import org.http4k.wiretap.Option.website
 
 fun App2() = { request: Request ->
     Response(OK).headers(request.headers)
@@ -160,18 +160,13 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
         }
 })
 
-fun main() {
-    val clientApp = App2().asServer(Jetty(0)).start()
+enum class Option {
+    mcpApp, app, website, externalMcpAppUrl
+}
 
-    val wiretap =
-        Wiretap { client, oTel, _ ->
-            ExampleMcpApp(oTel, client).asServer(Jetty(0)).start().uri()
-        }
-//    val wiretap =
-//        Wiretap { http, oTel, _ ->
-//            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
-//        }
-//    val wiretap = Wiretap(Uri.of("https://http4k.org"))
+fun main() {
+    val wiretap = wiretapFor(mcpApp)
+
     val server = wiretap.asServer(Jetty(21000)).start()
     println("started ${server.uri().path("_wiretap")}")
 
@@ -180,4 +175,22 @@ fun main() {
     client(Request(GET, server.uri()))
     client(Request(GET, server.uri()))
     client(Request(GET, server.uri()))
+}
+
+private fun wiretapFor(option: Option): PolyHandler = when (option) {
+    mcpApp ->
+        Wiretap { client, oTel, _ ->
+            ExampleMcpApp(oTel, client).asServer(Jetty(0)).start().uri()
+        }
+
+    app -> {
+        val clientApp = App2().asServer(Jetty(0)).start()
+
+        Wiretap { http, oTel, _ ->
+            ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
+        }
+    }
+
+    website -> Wiretap(Uri.of("https://http4k.org"))
+    externalMcpAppUrl -> Wiretap(Uri.of("https://demo.http4k.org/mcp-app/"))
 }
