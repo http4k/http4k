@@ -1,7 +1,7 @@
 package org.http4k.contract.ui
 
 import org.http4k.core.then
-import org.http4k.routing.ResourceLoader
+import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.routes
 import org.http4k.routing.static
 
@@ -12,6 +12,6 @@ fun swaggerUiLite(configFn: SwaggerUiConfig.() -> Unit = {}) = SwaggerUiConfig()
     .also(configFn)
     .toFilter()
     .then(routes(
-        static(ResourceLoader.Classpath("org/http4k/contract/ui/swagger-config/")),
-        static(ResourceLoader.Classpath("org/http4k/contract/ui/swagger"))
+        static(Classpath("org/http4k/contract/ui/swagger-config/")),
+        static(Classpath("org/http4k/contract/ui/swagger"))
     ))
