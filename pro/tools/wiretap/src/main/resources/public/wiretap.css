@@ -192,7 +192,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: transparent;
+    background: var(--color-bg-light);
     color: var(--color-text-muted);
     border: none;
     padding: 6px 10px;
@@ -208,36 +208,12 @@ body {
     background: var(--color-bg-hover);
 }
 
-.action-btn-primary {
-    color: var(--color-primary);
-}
-
 .action-btn-primary:hover {
     color: #0b5ed7;
     background: #e7f0ff;
 }
 
 .action-btn-danger:hover {
-    color: var(--color-danger);
-    background: #fee2e2;
-}
-
-.clear-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: auto;
-    background: transparent;
-    color: var(--color-text-muted);
-    border: none;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.clear-btn:hover {
     color: var(--color-danger);
     background: #fee2e2;
 }

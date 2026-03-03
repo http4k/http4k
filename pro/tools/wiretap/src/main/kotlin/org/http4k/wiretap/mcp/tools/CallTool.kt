@@ -19,7 +19,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.datastar.Selector
-import org.http4k.filter.debug
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
@@ -63,4 +62,4 @@ fun CallTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
             elements(view),
             selector = Selector.of("#tool-result")
         )
-    }.debug()
+    }
