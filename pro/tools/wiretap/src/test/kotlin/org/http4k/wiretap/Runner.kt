@@ -5,8 +5,10 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
+import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Domain
+import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
@@ -15,6 +17,7 @@ import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.ai.model.Role
 import org.http4k.client.JavaHttpClient
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
@@ -90,6 +93,7 @@ fun ExampleMcpApp(otel: OpenTelemetry, client: HttpHandler) = PolyFilters.OpenTe
                 "hello world"
             },
             Tool("non_app", "") bind { Ok("hello") },
+            Prompt("prompt", "") bind { PromptResponse(Role.Assistant, "hello") },
             mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
         )
     )
