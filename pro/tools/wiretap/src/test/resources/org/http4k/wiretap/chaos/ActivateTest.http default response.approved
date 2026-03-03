@@ -1,0 +1,4 @@
+event: datastar-patch-elements
+data: elements <div id="chaos-status" class="chaos-status-panel">    <div class="chaos-engine-status">        <h4>Inbound</h4>        <span class="badge badge-chaos-active">ACTIVE</span>        <span class="chaos-description">Always ReturnStatus (500)</span>    </div>    <div class="chaos-engine-status">        <h4>Outbound</h4>        <span class="badge badge-chaos-inactive">INACTIVE</span>            </div></div>
+data: selector #chaos-status
+

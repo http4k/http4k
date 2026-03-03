@@ -1,5 +1,6 @@
 package org.http4k.wiretap
 
+import org.http4k.filter.debug
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.testing.ApprovalTest
 import org.http4k.wiretap.util.Templates
