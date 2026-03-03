@@ -47,7 +47,11 @@ import kotlin.concurrent.fixedRateTimer
  * all requests and responses, allowing you to monitor what is going on inside the app.
  */
 object Wiretap {
-    operator fun invoke(uri: Uri) = this(appBuilder = { _, _, _ -> uri })
+    operator fun invoke(
+        uri: Uri,
+        httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
+    ) =
+        this(httpClient = httpClient, appBuilder = { _, _, _ -> uri })
 
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),

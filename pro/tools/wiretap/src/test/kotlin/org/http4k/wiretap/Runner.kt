@@ -39,6 +39,7 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
@@ -52,6 +53,23 @@ import org.http4k.wiretap.Option.app
 import org.http4k.wiretap.Option.externalMcpAppUrl
 import org.http4k.wiretap.Option.mcpApp
 import org.http4k.wiretap.Option.website
+
+enum class Option {
+    mcpApp, app, website, externalMcpAppUrl
+}
+
+fun main() {
+    val wiretap = wiretapFor(app)
+
+    val server = wiretap.asServer(Jetty(21000)).start()
+    println("started ${server.uri().path("_wiretap")}")
+
+    val client = JavaHttpClient()
+
+    client(Request(GET, server.uri()))
+    client(Request(GET, server.uri()))
+    client(Request(GET, server.uri()))
+}
 
 fun App2() = { request: Request ->
     Response(OK).headers(request.headers)
@@ -160,22 +178,6 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
         }
 })
 
-enum class Option {
-    mcpApp, app, website, externalMcpAppUrl
-}
-
-fun main() {
-    val wiretap = wiretapFor(mcpApp)
-
-    val server = wiretap.asServer(Jetty(21000)).start()
-    println("started ${server.uri().path("_wiretap")}")
-
-    val client = JavaHttpClient()
-
-    client(Request(GET, server.uri()))
-    client(Request(GET, server.uri()))
-    client(Request(GET, server.uri()))
-}
 
 private fun wiretapFor(option: Option): PolyHandler = when (option) {
     mcpApp ->
@@ -192,5 +194,8 @@ private fun wiretapFor(option: Option): PolyHandler = when (option) {
     }
 
     website -> Wiretap(Uri.of("https://http4k.org"))
-    externalMcpAppUrl -> Wiretap(Uri.of("https://demo.http4k.org/mcp-app/"))
+    externalMcpAppUrl -> Wiretap(
+        Uri.of("https://demo.http4k.org/mcp-app/"),
+        JavaHttpClient()
+    )
 }
