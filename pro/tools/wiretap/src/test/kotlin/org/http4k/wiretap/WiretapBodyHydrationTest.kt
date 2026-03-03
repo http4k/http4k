@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.BodyHydration.All
 import org.http4k.wiretap.domain.BodyHydration.None
@@ -20,7 +21,7 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class HttpWiretapBodyHydrationTest {
+class HttpWiretapBodyHydrationTest : PortBasedTest {
 
     private val store = TransactionStore.InMemory()
 

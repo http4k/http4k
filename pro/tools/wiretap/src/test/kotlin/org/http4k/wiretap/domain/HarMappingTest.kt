@@ -82,7 +82,7 @@ class HarMappingTest {
     @Test
     fun `har request has post data for non-empty body`() {
         val req = tx().toHar().log.entries.first().request
-        assertThat(req.postData?.text, equalTo("""{"key":"value"}"""))
+        assertThat(req.postData?.text, equalTo("{\n    \"key\": \"value\"\n}"))
         assertThat(req.postData?.mimeType, equalTo("application/json"))
     }
 

@@ -1,5 +1,6 @@
 package org.http4k.wiretap.util
 
+import org.jsoup.Jsoup
 import java.io.StringReader
 import java.io.StringWriter
 import javax.xml.transform.OutputKeys
@@ -11,11 +12,17 @@ fun formatBody(body: String, contentType: String): String {
     if (body.isBlank()) return body
     val ct = contentType.lowercase()
     return when {
-        ct.contains("json") -> runCatching { Json.prettify(body) }.getOrDefault(body)
-        ct.contains("xml") || ct.contains("html") -> runCatching { prettyPrintXml(body) }.getOrDefault(body)
-        else -> body
+        ct.contains("json") -> runCatching { Json.prettify(body) }.getOrDefault(body).normalizeLineEndings()
+        ct.contains("html") -> runCatching { Jsoup.parse(body).html() }.getOrDefault(body).normalizeLineEndings()
+        ct.contains("xml") -> runCatching { prettyPrintXml(body) }.getOrDefault(body).normalizeLineEndings()
+        ct.contains("event-stream") -> body.normalizeLineEndings()
+        ct.startsWith("text/") -> body
+        ct.isBlank() -> body
+        else -> "<<stream>>"
     }
 }
+
+private fun String.normalizeLineEndings() = replace("\r\n", "\n").replace("\r", "\n")
 
 private fun prettyPrintXml(input: String): String {
     val transformer = TransformerFactory.newInstance().newTransformer()

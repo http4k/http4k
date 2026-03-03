@@ -16,7 +16,11 @@ dependencies {
     api(project(":http4k-template-handlebars"))
     api(project(":http4k-testing-chaos"))
     api(project(":http4k-web-datastar"))
+    api(libs.jsoup)
+
     testImplementation(project(":http4k-testing-approval"))
     testImplementation(project(":http4k-testing-hamkrest"))
     testImplementation(project(":http4k-server-jetty"))
+
+    testImplementation(testFixtures(project(":http4k-core")))
 }

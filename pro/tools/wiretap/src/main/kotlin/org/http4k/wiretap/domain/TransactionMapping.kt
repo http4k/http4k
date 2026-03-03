@@ -58,7 +58,7 @@ internal fun WiretapTransaction.toDetail(): TransactionDetail {
     )
 }
 
-private fun HttpMessage.prettifyBody() =
+internal fun HttpMessage.prettifyBody() =
     formatBody(bodyString(), contentType()?.value ?: "")
 
 internal fun WiretapTransaction.traceparent(): String? =
@@ -68,8 +68,8 @@ internal fun WiretapTransaction.traceparent(): String? =
 internal fun WiretapTransaction.toHar(): Har {
     val req = transaction.request
     val resp = transaction.response
-    val bodyText = req.bodyString()
-    val respBodyText = resp.bodyString()
+    val bodyText = req.prettifyBody()
+    val respBodyText = resp.prettifyBody()
     val headersRaw = req.headers.sumOf { "${it.first}: ${it.second}\r\n".length } + 2
     val respHeadersRaw = resp.headers.sumOf { "${it.first}: ${it.second}\r\n".length } + 2
 

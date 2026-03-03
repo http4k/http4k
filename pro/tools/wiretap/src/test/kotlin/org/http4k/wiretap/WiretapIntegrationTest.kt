@@ -18,12 +18,13 @@ import org.http4k.server.Jetty
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.WiretapTransaction
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class HttpWiretapIntegrationTest {
+class HttpWiretapIntegrationTest : PortBasedTest {
 
     fun traceparent(tx: WiretapTransaction): String? =
         (tx.transaction.request.header("traceparent") ?: tx.transaction.response.header("traceparent"))
