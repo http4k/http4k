@@ -24,13 +24,14 @@ import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.auto
 import org.http4k.wiretap.util.SignalModel
 
 data class CallToolSignals(val toolName: String = "", val toolArgs: String = "{}") : SignalModel
 
 data class ToolResultView(val result: String) : ViewModel
 
-private val callToolSignalsLens = with(Json) { Body.auto<CallToolSignals>().toLens() }
+private val callToolSignalsLens = Body.auto<CallToolSignals>()
 
 fun CallTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/call" bind POST to { req: Request ->

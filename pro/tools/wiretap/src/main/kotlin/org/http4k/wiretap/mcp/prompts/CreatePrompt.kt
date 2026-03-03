@@ -17,6 +17,7 @@ import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.util.auto
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.SignalModel
 
@@ -26,7 +27,7 @@ data class PromptMessageView(val role: String, val content: String)
 
 data class PromptResultView(val messages: List<PromptMessageView>) : ViewModel
 
-private val getPromptSignalsLens = with(Json) { Body.auto<GetPromptSignals>().toLens() }
+private val getPromptSignalsLens = Body.auto<GetPromptSignals>()
 
 fun CreatePrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/create" bind POST to { req ->

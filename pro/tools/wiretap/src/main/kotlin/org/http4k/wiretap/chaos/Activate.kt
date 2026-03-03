@@ -27,9 +27,9 @@ import org.http4k.wiretap.domain.ChaosConfig
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
-import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.auto
 
-val chaosConfigLens = with(Json) { Body.auto<ChaosConfigSignals>().toLens() }
+val chaosConfigLens = Body.auto<ChaosConfigSignals>()
 
 fun Activate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
     private fun chaos(direction: Direction) =

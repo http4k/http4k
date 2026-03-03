@@ -10,11 +10,11 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.View
 import org.http4k.wiretap.domain.ViewId
-import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.auto
 import org.http4k.wiretap.util.SignalModel
 
-val filterLens = with(Json) { Body.auto<TransactionFilterSignals>().toLens() }
-val viewSignalsLens = with(Json) { Body.auto<ViewSignals>().toLens() }
+val filterLens = Body.auto<TransactionFilterSignals>()
+val viewSignalsLens = Body.auto<ViewSignals>()
 
 data class ViewSignals(
     val name: String? = null,

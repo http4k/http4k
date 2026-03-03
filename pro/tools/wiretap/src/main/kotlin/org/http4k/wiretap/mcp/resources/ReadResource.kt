@@ -7,17 +7,17 @@ import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource.Content.Blob
 import org.http4k.ai.mcp.model.Resource.Content.Text
 import org.http4k.ai.mcp.model.Resource.Content.Unknown
+import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.datastar.Selector
-import org.http4k.core.Body
 import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
-import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.auto
 import org.http4k.wiretap.util.SignalModel
 
 data class ReadResourceSignals(val resourceUri: String = "") : SignalModel
@@ -26,7 +26,7 @@ data class ResourceContentView(val uri: String, val mimeType: String, val text: 
 
 data class ResourceResultView(val contents: List<ResourceContentView>) : ViewModel
 
-private val readResourceSignalsLens = with(Json) { Body.auto<ReadResourceSignals>().toLens() }
+private val readResourceSignalsLens = Body.auto<ReadResourceSignals>()
 
 fun ReadResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/read" bind POST to { req ->
