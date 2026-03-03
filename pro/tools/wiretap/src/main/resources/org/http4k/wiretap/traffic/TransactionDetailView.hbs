@@ -13,6 +13,9 @@
                 data-on:click="copyCurl(evt.currentTarget)">
             Copy cURL
         </button>
+        <a href="/_wiretap/traffic/{{tx.id}}/har" class="action-btn" download="transaction-{{tx.id}}.har">
+            Download HAR
+        </a>
         {{#if showImport}}
         <a href="{{importPath}}?import={{tx.id}}" class="action-btn">
             Import to {{importLabel}}
