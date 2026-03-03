@@ -12,16 +12,6 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.SignalModel
 
-data class HeaderEntry(val name: String = "", val value: String = "")
-
-data class ClientSignals(
-    val url: String = "",
-    val method: String = GET.name,
-    val headers: Map<String, HeaderEntry> = mapOf("0" to HeaderEntry()),
-    val contentType: String? = null,
-    val body: String? = null
-) : SignalModel
-
 fun Index(
     defaultUrl: String,
     html: TemplateRenderer,
@@ -77,13 +67,23 @@ fun Index(
         }
     }
 
+data class HeaderEntry(val name: String = "", val value: String = "")
+
+data class ClientSignals(
+    val url: String = "",
+    val method: String = GET.name,
+    val headers: Map<String, HeaderEntry> = mapOf("0" to HeaderEntry()),
+    val contentType: String? = null,
+    val body: String? = null
+) : SignalModel
+
 data class Index(
     val signals: ClientSignals,
     val basePath: String = "/_wiretap/inbound/",
     val pageTitle: String = "Inbound Client"
 ) : ViewModel {
-    val initialSignals: String = Json.asFormatString(signals)
-    val initialHeaderRows: HeaderRowsView = headerRowsView(signals.headers, basePath)
+    val initialSignals = Json.asFormatString(signals)
+    val initialHeaderRows = headerRowsView(signals.headers, basePath)
     val navInbound = basePath.contains("inbound")
     val navOutbound = basePath.contains("outbound")
 }

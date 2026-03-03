@@ -7,13 +7,16 @@ import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.ai.mcp.model.Domain
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
@@ -39,6 +42,7 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming

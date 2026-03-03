@@ -16,7 +16,7 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.ChaosStatusData
 import org.http4k.wiretap.util.Json
 
-fun ChaosStatus(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
+fun Status(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/status" bind GET to {
         val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))
         Response(OK).datastarElements(

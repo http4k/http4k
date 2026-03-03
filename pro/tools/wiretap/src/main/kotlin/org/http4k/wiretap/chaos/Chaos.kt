@@ -11,9 +11,9 @@ import org.http4k.wiretap.WiretapFunction
 fun Chaos(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) =
     object : WiretapFunction {
         private val functions = listOf(
-            ChaosStatus(inboundChaos, outboundChaos),
-            ChaosActivate(inboundChaos, outboundChaos),
-            ChaosDeactivate(inboundChaos, outboundChaos)
+            Status(inboundChaos, outboundChaos),
+            Activate(inboundChaos, outboundChaos),
+            Deactivate(inboundChaos, outboundChaos)
         )
 
         override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

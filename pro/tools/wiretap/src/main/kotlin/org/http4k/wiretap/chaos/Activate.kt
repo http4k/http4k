@@ -31,19 +31,18 @@ import org.http4k.wiretap.util.Json
 
 val chaosConfigLens = with(Json) { Body.auto<ChaosConfigSignals>().toLens() }
 
-fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
-    private fun activate(direction: Direction, config: ChaosConfig) {
+fun Activate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
+    private fun chaos(direction: Direction) =
         when (direction) {
             Inbound -> inboundChaos
             Outbound -> outboundChaos
-        }.enable(config.toStage())
-    }
+        }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{direction}/activate" bind POST to { req ->
             val direction = Path.enum<Direction>().of("direction")(req)
             val config = chaosConfigLens(req).toChaosConfig()
-            activate(direction, config)
+            chaos(direction).enable(config.toStage())
 
             val view = ChaosStatusView(chaosStatus(inboundChaos, outboundChaos))
             Response(OK).datastarElements(
@@ -82,8 +81,8 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
             "Enable chaos injection on inbound or outbound traffic",
             direction, behaviour, statusCode, trigger, percentage, delaySeconds, method, path, host
         ) bind {
-            activate(
-                direction(it),
+            val chaos = chaos(direction(it))
+            chaos.enable(
                 ChaosConfig(
                     behaviour = behaviour(it),
                     statusCode = statusCode(it),
@@ -93,9 +92,9 @@ fun ChaosActivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = objec
                     method = method(it),
                     path = path(it),
                     host = host(it)
-                )
+                ).toStage()
             )
-            ToolResponse.Ok(listOf(Content.Text("Chaos activated")))
+            ToolResponse.Ok(listOf(Content.Text(chaos.toString())))
         }
     }
 }

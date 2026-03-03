@@ -21,7 +21,7 @@ fun InboundClient(
         "inbound" bind routes(
             sendRequest.http(elements, html),
             FormatBody(),
-            HeaderRows(elements, "/_wiretap/inbound/", "/"),
+            EditHeaders(elements, "/_wiretap/inbound/", "/"),
             Index("/", html, transactions, "/_wiretap/inbound/", "Inbound Client"),
         )
 

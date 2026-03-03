@@ -21,7 +21,7 @@ import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
 
-fun ChaosDeactivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
+fun Deactivate(inboundChaos: ChaosEngine, outboundChaos: ChaosEngine) = object : WiretapFunction {
     private fun deactivate(direction: Direction) {
         when (direction) {
             Inbound -> inboundChaos

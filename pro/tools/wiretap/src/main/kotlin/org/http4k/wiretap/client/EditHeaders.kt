@@ -17,6 +17,7 @@ import org.http4k.wiretap.util.SignalModel
 import org.http4k.wiretap.util.datastarSignal
 
 data class HeaderRowView(val key: String, val index: Int, val basePath: String)
+
 data class HeaderRowsView(
     val rows: List<HeaderRowView>,
     val showAdd: Boolean,
@@ -32,7 +33,7 @@ fun headerRowsView(headers: Map<String, HeaderEntry>, basePath: String) =
 
 data class HeadersSignals(val headers: Map<String, HeaderEntry>) : SignalModel
 
-fun HeaderRows(
+fun EditHeaders(
     elements: DatastarElementRenderer,
     basePath: String = "/_wiretap/inbound/",
     defaultUrl: String = "/"
@@ -48,8 +49,7 @@ fun HeaderRows(
 
     return "headers" bind routes(
         "/reset" bind POST to {
-            val defaults = ClientSignals(url = defaultUrl)
-            headerResponse(defaults.headers, defaults)
+            headerResponse(ClientSignals(url = defaultUrl).headers, ClientSignals(url = defaultUrl))
         },
         "/add" bind POST to { req ->
             val model = clientRequestLens(req)
