@@ -10,12 +10,12 @@
         </div>
         {{/each}}
         {{#unless apps}}
-        <div class="mcp-client-empty">No apps available</div>
+        <div class="empty">No apps available</div>
         {{/unless}}
     </div>
 
     <div class="mcp-client-detail" id="detail-panel">
-        <div class="mcp-client-placeholder" data-show="!$iframeVisible">Select an app to launch</div>
+        <div class="empty" data-show="!$iframeVisible">Select an app to launch</div>
         <iframe id="app" class="mcp-app-iframe" data-show="$iframeVisible"></iframe>
     </div>
 </div>

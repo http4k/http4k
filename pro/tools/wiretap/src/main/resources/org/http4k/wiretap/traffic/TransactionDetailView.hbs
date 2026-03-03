@@ -9,12 +9,12 @@
         {{#if tx.traceId}}
         <a href="/_wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
         {{/if}}
-        <button class="detail-toolbar-btn"
+        <button class="action-btn"
                 data-on:click="navigator.clipboard.writeText(this.parentElement.querySelector('.curl-data').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy cURL', 1500) })">
             Copy cURL
         </button>
         {{#if showImport}}
-        <a href="{{importPath}}?import={{tx.id}}" class="detail-toolbar-btn">
+        <a href="{{importPath}}?import={{tx.id}}" class="action-btn">
             Import to {{importLabel}}
         </a>
         {{/if}}

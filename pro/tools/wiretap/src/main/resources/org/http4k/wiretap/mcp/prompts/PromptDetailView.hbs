@@ -16,8 +16,8 @@
     {{/if}}
     <div class="mcp-client-detail-section">
         <label>Arguments (JSON)</label>
-        <textarea class="mcp-client-textarea" rows="6" data-bind="promptArgs" placeholder="{}">{}</textarea>
+        <textarea class="form-control form-control-sm" style="font-family: monospace" rows="6" data-bind="promptArgs" placeholder="{}">{}</textarea>
     </div>
-    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/prompts/create')">Get Prompt</button>
+    <button class="action-btn action-btn-primary" data-on:click="@post('/_wiretap/mcp/prompts/create')">Get Prompt</button>
     <div id="prompt-result" class="mcp-client-result"></div>
 </div>

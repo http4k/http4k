@@ -10,8 +10,8 @@
     </div>
     <div class="mcp-client-detail-section">
         <label>Resource URI</label>
-        <input type="text" class="mcp-client-input" data-bind="resourceUri" placeholder="Enter resolved URI" value="{{uriTemplate}}">
+        <input type="text" class="form-control form-control-sm" data-bind="resourceUri" placeholder="Enter resolved URI" value="{{uriTemplate}}">
     </div>
-    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/resources/read')">Read Resource</button>
+    <button class="action-btn action-btn-primary" data-on:click="@post('/_wiretap/mcp/resources/read')">Read Resource</button>
     <div id="resource-result" class="mcp-client-result"></div>
 </div>

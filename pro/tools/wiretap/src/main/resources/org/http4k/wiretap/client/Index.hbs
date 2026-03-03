@@ -15,10 +15,10 @@
                 <option value="OPTIONS">OPTIONS</option>
             </select>
             <input type="text" class="form-control form-control-sm client-url" data-bind="url" placeholder="{url}" required>
-            <button type="submit" class="btn btn-sm btn-primary">
+            <button type="submit" class="action-btn action-btn-primary">
                 Send
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary"
+            <button type="button" class="action-btn"
                     data-on:click="@post('{{{basePath}}}headers/reset')">
                 Clear
             </button>
@@ -38,7 +38,7 @@
                             <option value="">No Content-Type</option>
                             <option value="application/json">application/json</option>
                         </select>
-                        <button class="btn btn-sm btn-outline-secondary"
+                        <button class="action-btn"
                                 data-on:click="@post('{{{basePath}}}format')"
                                 data-show="$contentType === 'application/json'">
                             Format

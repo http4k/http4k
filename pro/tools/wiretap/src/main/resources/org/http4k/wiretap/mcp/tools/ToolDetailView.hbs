@@ -5,12 +5,12 @@
     </div>
     <div class="mcp-client-detail-section">
         <label>Input Schema</label>
-        <pre class="mcp-client-schema">{{inputSchema}}</pre>
+        <pre class="code-block">{{inputSchema}}</pre>
     </div>
     <div class="mcp-client-detail-section">
         <label>Arguments (JSON)</label>
-        <textarea class="mcp-client-textarea" rows="6" data-bind="toolArgs" placeholder="{}">{}</textarea>
+        <textarea class="form-control form-control-sm" style="font-family: monospace" rows="6" data-bind="toolArgs" placeholder="{}">{}</textarea>
     </div>
-    <button class="mcp-client-btn" data-on:click="@post('/_wiretap/mcp/tools/call')">Call Tool</button>
+    <button class="action-btn action-btn-primary" data-on:click="@post('/_wiretap/mcp/tools/call')">Call Tool</button>
     <div id="tool-result" class="mcp-client-result"></div>
 </div>
