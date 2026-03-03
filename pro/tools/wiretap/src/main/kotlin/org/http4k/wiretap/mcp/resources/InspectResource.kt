@@ -20,7 +20,7 @@ data class ResourceDetailView(
 ) : ViewModel
 
 fun InspectResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/resources/{name}" bind GET to { req ->
+    "/{name}" bind GET to { req ->
         val name = Path.of("name")(req)
         val resource = mcpClient.resources().list()
             .map { list -> list.first { it.name.value == name } }

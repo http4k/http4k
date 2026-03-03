@@ -11,6 +11,6 @@ import org.http4k.wiretap.mcp.mcpTabResponse
 data class TabContent(val apps: List<AvailableMcpApp>) : ViewModel
 
 fun TabContent(mcpApps: List<AvailableMcpApp>, elements: DatastarElementRenderer) =
-    "/apps" bind GET to {
+    "/" bind GET to {
         elements.mcpTabResponse(TabContent(mcpApps), McpAppsTabResetSignals())
     }

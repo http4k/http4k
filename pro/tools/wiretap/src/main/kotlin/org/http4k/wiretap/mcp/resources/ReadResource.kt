@@ -29,7 +29,7 @@ data class ResourceResultView(val contents: List<ResourceContentView>) : ViewMod
 private val readResourceSignalsLens = with(Json) { Body.auto<ReadResourceSignals>().toLens() }
 
 fun ReadResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/resources/read" bind POST to { req ->
+    "/read" bind POST to { req ->
         val signals = readResourceSignalsLens(req)
         val uri = Uri.of(signals.resourceUri)
 

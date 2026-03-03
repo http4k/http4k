@@ -45,7 +45,7 @@ data class TabContent(
 ) : ViewModel
 
 fun TabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/resources" bind GET to {
+    "/" bind GET to {
         val resources = mcpClient.resources().list()
             .map { list -> list.map { r -> r.toResourceView() } }
             .valueOrNull() ?: emptyList()

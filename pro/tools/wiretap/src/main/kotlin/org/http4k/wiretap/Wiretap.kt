@@ -69,7 +69,7 @@ object Wiretap {
         val meterRegistry = Metrics()
         val trafficMetrics = TrafficMetrics(meterRegistry, clock = clock)
 
-        fixedRateTimer("wiretap-snapshot", daemon = true, period = 10_000L) { trafficMetrics.snapshot() }
+        fixedRateTimer("wiretap-snapshot", daemon = true, period = 5_000L) { trafficMetrics.snapshot() }
 
         val (uri, proxy, outboundHttp) = Proxy(
             bodyHydration,

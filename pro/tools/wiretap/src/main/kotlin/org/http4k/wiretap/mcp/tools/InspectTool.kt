@@ -16,7 +16,7 @@ import org.http4k.wiretap.util.Json
 data class ToolDetailView(val name: String, val description: String, val inputSchema: String) : ViewModel
 
 fun InspectTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/tools/{name}" bind GET to { req ->
+    "/{name}" bind GET to { req ->
         val name = Path.of("name")(req)
         val tool = mcpClient.tools().list()
             .map { list -> list.first { it.name.value == name } }

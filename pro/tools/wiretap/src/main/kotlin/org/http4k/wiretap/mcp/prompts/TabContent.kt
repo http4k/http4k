@@ -37,7 +37,7 @@ fun McpPrompt.toView() = McpPromptView(
 )
 
 fun TabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/prompts" bind GET to {
+    "/" bind GET to {
         val prompts = mcpClient.prompts().list()
             .map { list -> list.map { prompt -> prompt.toView() } }
             .valueOrNull() ?: emptyList()

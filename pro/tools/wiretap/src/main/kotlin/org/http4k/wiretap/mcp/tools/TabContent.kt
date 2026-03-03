@@ -22,7 +22,7 @@ fun McpTool.toView() = McpToolView(
 )
 
 fun TabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/tools" bind GET to {
+    "/" bind GET to {
         val tools = mcpClient.tools().list()
             .map { list -> list.map { tool -> tool.toView() } }
             .valueOrNull() ?: emptyList()

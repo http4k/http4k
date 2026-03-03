@@ -24,7 +24,7 @@ data class ToolResultView(val result: String) : ViewModel
 private val callToolSignalsLens = with(Json) { Body.auto<CallToolSignals>().toLens() }
 
 fun CallTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
-    "/tools/call" bind POST to { req ->
+    "/call" bind POST to { req ->
         val signals = callToolSignalsLens(req)
         val name = ToolName.of(signals.toolName)
 
