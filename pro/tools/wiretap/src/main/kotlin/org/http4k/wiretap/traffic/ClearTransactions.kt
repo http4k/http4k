@@ -5,7 +5,10 @@ import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NO_CONTENT
+import org.http4k.core.Status.Companion.OK
+import org.http4k.datastar.MorphMode
+import org.http4k.datastar.Selector
+import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
@@ -15,7 +18,11 @@ import org.http4k.wiretap.domain.TransactionStore
 fun ClearTransaction(transactionStore: TransactionStore) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) = "/" bind DELETE to {
         transactionStore.clear()
-        Response(NO_CONTENT)
+        Response(OK).datastarElements(
+            emptyList<String>(),
+            MorphMode.inner,
+            Selector.of("#tx-list")
+        )
     }
 
     override fun mcp() = Tool(
