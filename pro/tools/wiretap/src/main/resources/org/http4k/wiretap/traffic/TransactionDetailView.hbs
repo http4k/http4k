@@ -10,7 +10,7 @@
         <a href="/_wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
         {{/if}}
         <button class="action-btn"
-                data-on:click="navigator.clipboard.writeText(this.parentElement.querySelector('.curl-data').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy cURL', 1500) })">
+                data-on:click="copyCurl(evt.currentTarget)">
             Copy cURL
         </button>
         {{#if showImport}}

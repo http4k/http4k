@@ -201,6 +201,16 @@ function initOverviewCharts() {
     });
 }
 
+function copyCurl(btn) {
+    var text = btn.parentElement.querySelector('.curl-data').textContent;
+    navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () {
+            btn.textContent = 'Copy cURL';
+        }, 1500);
+    });
+}
+
 function initMcpUrl() {
     const el = document.querySelector('.mcp-url');
     if (!el || el.getAttribute('data-resolved') === 'true') return;
