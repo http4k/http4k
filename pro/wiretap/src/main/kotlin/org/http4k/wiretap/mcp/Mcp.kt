@@ -11,7 +11,6 @@ import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import org.http4k.routing.routes
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
@@ -25,16 +24,15 @@ fun Mcp(uri: Uri, rawClient: HttpHandler, proxy: HttpHandler) = object : Wiretap
             mcpServerUri, proxy
         )
 
-        val functions = when {
-            rawClient.mcpAvailable(mcpServerUri) -> listOf(InboundClient(mcpClient))
-            else -> emptyList()
+        return "/mcp" bind when {
+            rawClient.mcpAvailable(mcpServerUri) -> InboundClient(mcpClient).http(elements, html)
+            else -> Index(html, NoMcpServerFound)
         }
-
-        return "/mcp" bind routes(functions.map { it.http(elements, html) })
     }
 
     override fun mcp() = CapabilityPack()
 }
+
 
 private fun HttpHandler.mcpAvailable(baseUri: Uri): Boolean =
     this(Request(GET, baseUri)).status.successful

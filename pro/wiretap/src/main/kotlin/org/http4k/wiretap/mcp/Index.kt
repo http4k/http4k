@@ -10,12 +10,16 @@ import org.http4k.template.ViewModel
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.SignalModel
 
-fun Index(html: TemplateRenderer) = "/" bind GET to {
-    Response(OK).html(html(Index()))
+fun Index(html: TemplateRenderer, model: ViewModel) = "/" bind GET to {
+    Response(OK).html(html(model))
 }
 
-data class Index(val dummy: Boolean = true) : ViewModel {
-    val initialSignals: String = Json.asFormatString(McpClientSignals())
+data object Index : ViewModel {
+    val initialSignals = Json.asFormatString(McpClientSignals())
+}
+
+data object NoMcpServerFound : ViewModel {
+    val initialSignals = Json.asFormatString(McpClientSignals())
 }
 
 data class McpClientSignals(

@@ -22,7 +22,7 @@ fun InboundClient(mcpClient: McpClient) = object : WiretapFunction {
 
         return routes(
             *functions.map { it.http(elements, html) }.toTypedArray(),
-            Index(html),
+            Index(html, Index),
         )
     }
 
