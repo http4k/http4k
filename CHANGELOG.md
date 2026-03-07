@@ -3,8 +3,16 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.31.2.0 (uncut)
+### v6.32.0.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-ai-mcp-sdk**: [Fix] Improve lens support for Tool arguments which are not strings.
+- **http4k-ai-mcp-sdk**: [Fix] Improve lens support for Tool arguments which are not strings.
+- **http4k-ai-mcp-sdk**: Improve support for OpenTelemetry tracing as per the OTel specification.
+- **http4k-template-handlebars**: Support for template suffixes.
+- **http4k-ops-opentelemetry**: Fix up SSE tracing propagation.
+- **http4k-realtime-core**: SSE security filters now support modification of the incoming request - this allows attachment of request context to be passed
+  through the filter chain.
+- **http4k-testing-playwright**: Add support for Polyhandlers as well as HttpHandlers.
 
 ### v6.31.1.0
 
