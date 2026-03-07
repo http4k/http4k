@@ -13,6 +13,7 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-incubator-db-core"))
     api(project(":http4k-incubator-db-exposed"))
+    api(project(":http4k-incubator-db-jdbc"))
     testImplementation(testFixtures(project(":http4k-core")))
 
     testImplementation(project(":http4k-testing-strikt"))
