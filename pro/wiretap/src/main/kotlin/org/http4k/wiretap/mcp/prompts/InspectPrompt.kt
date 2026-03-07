@@ -12,12 +12,14 @@ import org.http4k.lens.value
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.mcp.McpFieldView
 import org.http4k.wiretap.mcp.mcpDetailResponse
+import org.http4k.wiretap.mcp.toFieldView
 
 data class PromptDetailView(
     val name: String,
     val description: String,
-    val arguments: List<McpPromptArgView>
+    val fields: List<McpFieldView>
 ) : ViewModel
 
 fun InspectPrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
@@ -33,9 +35,7 @@ fun InspectPrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
                 PromptDetailView(
                     prompt.name.value,
                     prompt.description ?: "",
-                    prompt.arguments.map { arg ->
-                        McpPromptArgView(arg.name, arg.description ?: "", arg.required ?: false)
-                    }
+                    prompt.arguments.map { it.toFieldView() }
                 )
             )
         }

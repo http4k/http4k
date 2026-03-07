@@ -14,26 +14,12 @@ import org.http4k.wiretap.mcp.mcpTabResponse
 
 data class McpPromptView(
     val name: String,
-    val description: String,
-    val arguments: List<McpPromptArgView>
-)
-
-data class McpPromptArgView(
-    val name: String,
-    val description: String,
-    val required: Boolean
+    val description: String
 )
 
 fun McpPrompt.toView() = McpPromptView(
     name = name.value,
-    description = description ?: "",
-    arguments = arguments.map { arg ->
-        McpPromptArgView(
-            name = arg.name,
-            description = arg.description ?: "",
-            required = arg.required ?: false
-        )
-    }
+    description = description ?: ""
 )
 
 fun TabContent(mcpClient: McpClient, elements: DatastarElementRenderer) =

@@ -10,10 +10,15 @@ import org.http4k.lens.Path
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.mcp.McpFieldView
 import org.http4k.wiretap.mcp.mcpDetailResponse
-import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.mcp.toFieldViews
 
-data class ToolDetailView(val name: String, val description: String, val inputSchema: String) : ViewModel
+data class ToolDetailView(
+    val name: String,
+    val description: String,
+    val fields: List<McpFieldView>
+) : ViewModel
 
 fun InspectTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/{name}" bind GET to { req ->
@@ -25,7 +30,11 @@ fun InspectTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
         when (tool) {
             null -> Response(NOT_FOUND)
             else -> elements.mcpDetailResponse(
-                ToolDetailView(tool.name.value, tool.description, Json.asFormatString(tool.inputSchema))
+                ToolDetailView(
+                    tool.name.value,
+                    tool.description,
+                    tool.inputSchema.toFieldViews()
+                )
             )
         }
     }

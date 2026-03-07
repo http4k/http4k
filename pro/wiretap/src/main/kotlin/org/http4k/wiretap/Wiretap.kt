@@ -5,13 +5,11 @@ import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.poly
@@ -36,6 +34,7 @@ import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
 import org.http4k.wiretap.proxy.Proxy
 import org.http4k.wiretap.traffic.Traffic
+import org.http4k.wiretap.util.CatchAndReportErrors
 import org.http4k.wiretap.util.Metrics
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
@@ -48,23 +47,24 @@ import kotlin.concurrent.fixedRateTimer
 object Wiretap {
     operator fun invoke(
         uri: Uri,
-        httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
-    ) = this(httpClient = httpClient, appBuilder = { _, _ -> uri })
+        mcpSecurity: McpSecurity = NoMcpSecurity,
+        httpClient: HttpHandler = JavaHttpClient()
+    ) = this(httpClient = httpClient) { _, _ -> uri }
 
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
-        httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
         mcpSecurity: McpSecurity = NoMcpSecurity,
-        clock: Clock = Clock.systemUTC(),
+        httpClient: HttpHandler = JavaHttpClient(),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
+        clock: Clock = Clock.systemUTC(),
         bodyHydration: BodyHydration = All,
         appBuilder: WiretapAppBuilder
     ): PolyHandler {
 
-        val templates = Templates()
-        val renderer = DatastarElementRenderer(templates)
+        val html = Templates()
+        val renderer = DatastarElementRenderer(html)
 
         val inboundChaos = ChaosEngine()
         val outboundChaos = ChaosEngine()
@@ -111,15 +111,16 @@ object Wiretap {
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, allFunctions)
 
-        val http = ServerFilters.CatchAll()
+        val http = CatchAndReportErrors()
             .then(
                 routes(
-                    WiretapUi(renderer, templates, allFunctions),
+                    WiretapUi(renderer, html, allFunctions),
                     orElse bind proxy
                 )
             )
 
         return poly(listOf(http) + mcpRoutes)
     }
+
 }
 

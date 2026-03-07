@@ -11,10 +11,10 @@ fun main() {
 //    val wiretap = HttpApp()
 //    val wiretap = HttpAppWithOtelTracing()
 //    val wiretap = McpApp()
-//    val wiretap = McpServer()
+    val wiretap = McpServer()
 //    val wiretap = McpServerWithOtel()
 //    val wiretap = OpenApiApp()
-    val wiretap = ExternalMcpServer()
+//    val wiretap = ExternalMcpServer()
 //    val wiretap = ExternalMcpApp()
 //    val wiretap = ExternalWebsite()
 
@@ -22,9 +22,9 @@ fun main() {
 
     println("started ${server.uri().path("_wiretap")}")
 
-    (0..5).forEach {
-        JavaHttpClient()(Request(GET, server.uri().path(it.toString())))
-    }
+//    (0..5).forEach {
+//        JavaHttpClient()(Request(GET, server.uri().path(it.toString())))
+//    }
 
 }
 

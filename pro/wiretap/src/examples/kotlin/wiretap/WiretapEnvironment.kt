@@ -1,7 +1,9 @@
 package wiretap
 
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.filter.debug
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri
@@ -47,7 +49,7 @@ object OpenApiApp : WiretapEnvironment() {
 }
 
 object ExternalMcpServer : WiretapEnvironment() {
-    override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org"))
+    override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org/mcp-sdk"), httpClient = JavaHttpClient().debug())
 }
 
 object ExternalMcpApp : WiretapEnvironment() {
