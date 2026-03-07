@@ -7,10 +7,11 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TraceStore
+import java.time.Clock
 
-fun OTel(traceStore: TraceStore) = object : WiretapFunction {
+fun OTel(traceStore: TraceStore, clock: Clock) = object : WiretapFunction {
     private val functions = listOf(
-        ListTraces(traceStore),
+        ListTraces(traceStore, clock),
         GetTrace(traceStore),
     )
 

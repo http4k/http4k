@@ -17,14 +17,12 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TraceSummary
 import org.http4k.wiretap.util.Json
+import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.time.ZoneId.systemDefault
+import java.time.format.DateTimeFormatter.ofPattern
 
-private val traceTimestampFormat: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault())
-
-fun ListTraces(traceStore: TraceStore) = object : WiretapFunction {
+fun ListTraces(traceStore: TraceStore, clock: Clock) = object : WiretapFunction {
     private fun list(): List<TraceSummary> =
         traceStore.traces().map { (traceId, spans) ->
             val rootSpan = spans.find { it.parentSpanId == "0000000000000000" } ?: spans.firstOrNull()
@@ -36,7 +34,7 @@ fun ListTraces(traceStore: TraceStore) = object : WiretapFunction {
                 rootSpan?.name ?: "unknown",
                 rootSpan?.resource?.attributes?.get(AttributeKey.stringKey("service.name")) ?: "",
                 (latest - earliest) / 1_000_000,
-                traceTimestampFormat.format(Instant.ofEpochSecond(0, earliest))
+                ofPattern("HH:mm:ss.SSS").withZone(clock.zone).format(Instant.ofEpochSecond(0, earliest))
             )
         }
 

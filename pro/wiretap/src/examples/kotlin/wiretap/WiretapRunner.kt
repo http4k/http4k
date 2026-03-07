@@ -14,9 +14,9 @@ fun main() {
 //    val wiretap = McpApp()
 //    val wiretap = McpServer()
 //    val wiretap = McpServerWithOtel()
-    val wiretap = OpenApiApp()
+//    val wiretap = OpenApiApp()
 //    val wiretap = ExternalMcpAppUrl()
-//    val wiretap = ExternalWebsite()
+    val wiretap = ExternalWebsite()
 
     val server = wiretap.asServer(Jetty(21000)).start()
 

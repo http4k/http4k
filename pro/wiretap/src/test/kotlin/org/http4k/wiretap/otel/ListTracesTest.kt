@@ -13,6 +13,7 @@ import org.http4k.wiretap.HttpWiretapFunctionContract
 import org.http4k.wiretap.McpWiretapFunctionContract
 import org.http4k.wiretap.domain.TraceStore
 import org.junit.jupiter.api.Test
+import java.time.Clock
 
 class ListTracesTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
@@ -20,7 +21,7 @@ class ListTracesTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
     private val traceStore = TraceStore.InMemory()
 
-    override val function = ListTraces(traceStore)
+    override val function = ListTraces(traceStore, Clock.systemUTC())
 
     private fun recordSpan(traceId: String, spanId: String = "1234567890abcdef", name: String = "test") {
         traceStore.record(
