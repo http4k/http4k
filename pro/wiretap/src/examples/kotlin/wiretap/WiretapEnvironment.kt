@@ -57,5 +57,5 @@ object ExternalMcpApp : WiretapEnvironment {
 }
 
 object ExternalWebsite : WiretapEnvironment {
-    override fun invoke() = Wiretap(Uri.of("https://http4k.org"))
+    override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org"))
 }
