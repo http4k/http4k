@@ -1,0 +1,4 @@
+event: datastar-patch-elements
+data: selector #tx-list
+data: mode inner
+

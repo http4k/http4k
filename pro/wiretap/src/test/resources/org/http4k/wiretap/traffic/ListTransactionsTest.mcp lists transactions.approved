@@ -1,0 +1,15 @@
+{
+  "content" : [ {
+    "text" : "[{\"id\":1,\"direction\":\"Inbound\",\"method\":\"GET\",\"uri\":\"/test\",\"path\":\"/test\",\"host\":\"\",\"status\":200,\"durationMs\":10,\"timestamp\":\"01:00:00.000\",\"isChaos\":false,\"isReplay\":false}]",
+    "annotations" : null
+  } ],
+  "structuredContent" : null,
+  "meta" : {
+    "progressToken" : null,
+    "relatedTask" : null,
+    "ui" : null,
+    "traceparent" : null,
+    "tracestate" : null,
+    "baggage" : null
+  }
+}

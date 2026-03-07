@@ -27,7 +27,9 @@ class McpApps(private val clients: List<McpClient>) {
     private val serverClients = mutableMapOf<VersionedMcpEntity, McpClient>()
 
     fun start() {
-        serverClients += clients.associateBy { it.start().onFailure { throw Exception(it.toString()) }.serverInfo }
+        serverClients += clients.associateBy {
+            it.start().onFailure { throw Exception(it.toString()) }.serverInfo
+        }
     }
 
     fun tools() = serverClients

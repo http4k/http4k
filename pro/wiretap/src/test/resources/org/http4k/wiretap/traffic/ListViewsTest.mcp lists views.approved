@@ -1,0 +1,15 @@
+{
+  "content" : [ {
+    "text" : "[{\"id\":-3,\"name\":\"All\",\"builtIn\":true,\"filter\":{}},{\"id\":-2,\"name\":\"Inbound\",\"builtIn\":true,\"filter\":{\"direction\":\"Inbound\"}},{\"id\":-1,\"name\":\"Outbound\",\"builtIn\":true,\"filter\":{\"direction\":\"Outbound\"}}]",
+    "annotations" : null
+  } ],
+  "structuredContent" : null,
+  "meta" : {
+    "progressToken" : null,
+    "relatedTask" : null,
+    "ui" : null,
+    "traceparent" : null,
+    "tracestate" : null,
+    "baggage" : null
+  }
+}

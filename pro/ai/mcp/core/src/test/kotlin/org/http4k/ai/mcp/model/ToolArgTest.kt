@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.model
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -76,7 +77,7 @@ class ToolArgTest {
         val optionalInjected = ToolRequest().with(optionalLens of value)
         assertThat(optionalInjected.args, equalTo(mapOf("foo" to mapValue)))
         assertThat(optionalLens(optionalInjected), equalTo(value))
-        assertThat(optionalLens(ToolRequest()), equalTo(null))
+        assertThat(optionalLens(ToolRequest()), absent())
 
         val requiredLens = spec.required("foo", "bar")
         val requiredInjected = ToolRequest().with(requiredLens of value)

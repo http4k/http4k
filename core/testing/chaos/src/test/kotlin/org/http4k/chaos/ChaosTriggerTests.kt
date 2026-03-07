@@ -110,6 +110,15 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     }
 
     @Test
+    fun `matches host`() {
+        assertMatchNoMatch(
+            MatchRequest(host = Regex(".*bill")),
+            Request(GET, "http://bill/whatever"),
+            Request(GET, "/bill")
+        )
+    }
+
+    @Test
     fun `matches header`() {
         assertMatchNoMatch(
             MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
@@ -143,6 +152,12 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
             Request(PUT, "/abob"),
             Request(GET, "/abob")
         )
+    }
+
+    @Test
+    fun `description strips regex quoting syntax`() {
+        val trigger = MatchRequest(path = Regex(".*${Regex.escape("asd")}.*"))
+        assertThat(trigger.toString(), equalTo("path matches '.*asd.*'"))
     }
 }
 

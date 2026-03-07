@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-realtime-core"))
     api(libs.playwright)
     api(platform(libs.junit.bom))
     api(libs.junit.jupiter.api)

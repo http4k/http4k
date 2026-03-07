@@ -21,7 +21,10 @@ fun interface McpClientFactory : () -> McpClient {
         /**
          * Returns an McpClient connected to the given remote server.
          */
-        fun Http(serverUri: Uri, http: HttpHandler = JavaHttpClient(responseBodyMode = BodyMode.Stream)) =
+        fun Http(
+            serverUri: Uri,
+            http: HttpHandler = JavaHttpClient(responseBodyMode = BodyMode.Stream)
+        ) =
             McpClientFactory {
                 HttpStreamingMcpClient(
                     McpEntity.of("http4k MCP Testing"),

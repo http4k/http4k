@@ -2,7 +2,11 @@ package org.http4k.ai.mcp.model
 
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
+import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
 import org.http4k.ai.model.ToolName
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ParamMeta
@@ -14,10 +18,6 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.StringBiDiMappings.nonBlank
 import org.http4k.lens.StringBiDiMappings.nonEmpty
-import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.ToolArgLensSpec.Companion.mapWithNewMeta
-import org.http4k.ai.mcp.util.McpNodeType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -74,12 +74,12 @@ class Tool private constructor(
 fun Tool.Arg.string() = mapWithNewMeta({ it.toString() }, { it }, StringParam)
 fun Tool.Arg.nonEmptyString() = string().map(nonEmpty())
 fun Tool.Arg.nonBlankString() = string().map(nonBlank())
-fun Tool.Arg.boolean() = mapWithNewMeta({ it as Boolean }, { it }, BooleanParam)
-fun Tool.Arg.double() = mapWithNewMeta({ it as Double }, { it }, NumberParam)
-fun Tool.Arg.float() = mapWithNewMeta({ it as Float }, { it }, NumberParam)
-fun Tool.Arg.int() = mapWithNewMeta({ it as Int }, { it }, IntegerParam)
-fun Tool.Arg.value() = mapWithNewMeta({ it as Int }, { it }, IntegerParam)
-fun Tool.Arg.long() = mapWithNewMeta({ it as Long }, { it }, IntegerParam)
+fun Tool.Arg.boolean() = mapWithNewMeta({ it.toString().toBoolean() }, { it }, BooleanParam)
+fun Tool.Arg.double() = mapWithNewMeta({ it.toString().toDouble() }, { it }, NumberParam)
+fun Tool.Arg.float() = mapWithNewMeta({ it.toString().toFloat() }, { it }, NumberParam)
+fun Tool.Arg.int() = mapWithNewMeta({ it.toString().toInt() }, { it }, IntegerParam)
+fun Tool.Arg.value() = mapWithNewMeta({ it.toString().toInt() }, { it }, IntegerParam)
+fun Tool.Arg.long() = mapWithNewMeta({ it.toString().toLong() }, { it }, IntegerParam)
 fun Tool.Arg.uuid() = string().map(StringBiDiMappings.uuid())
 fun Tool.Arg.uri() = string().map(StringBiDiMappings.uri())
 fun Tool.Arg.urlEncoded() = string().map(StringBiDiMappings.urlEncoded())
@@ -110,6 +110,8 @@ fun Tool.Arg.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME)
 fun Tool.Arg.zoneId() = string().map(StringBiDiMappings.zoneId())
 fun Tool.Arg.zoneOffset() = string().map(StringBiDiMappings.zoneOffset())
 fun Tool.Arg.locale() = string().map(StringBiDiMappings.locale())
+
+fun Tool.Arg.status() = int().map(BiDiMapping<Int, Status>({ Status(it, null) }, { it.code }))
 
 inline fun <reified T : Enum<T>> Tool.Arg.enum() =
     mapWithNewMeta({ enumValueOf<T>(it.toString()) }, { it }, ParamMeta.EnumParam(T::class))

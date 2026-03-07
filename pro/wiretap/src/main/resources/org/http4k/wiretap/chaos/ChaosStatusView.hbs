@@ -1,0 +1,12 @@
+<div id="chaos-status" class="chaos-status-panel">
+    <div class="chaos-engine-status">
+        <h4>Inbound</h4>
+        <span class="badge {{inboundBadgeClass}}">{{inboundBadgeText}}</span>
+        {{#if data.inboundActive}}<span class="chaos-description">{{data.inboundDescription}}</span>{{/if}}
+    </div>
+    <div class="chaos-engine-status">
+        <h4>Outbound</h4>
+        <span class="badge {{outboundBadgeClass}}">{{outboundBadgeText}}</span>
+        {{#if data.outboundActive}}<span class="chaos-description">{{data.outboundDescription}}</span>{{/if}}
+    </div>
+</div>

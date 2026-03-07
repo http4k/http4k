@@ -27,7 +27,6 @@ class AwsRestJsonFake(
         },
         crossinline errorFn: (Any) -> Response = {
             Response(BAD_REQUEST).body(autoMarshalling.asFormatString(it))
-                .also { println(it) }
         },
         crossinline fn: Request.(RequestBody) -> Result<Any, Any>,
     ): HttpHandler = { req ->

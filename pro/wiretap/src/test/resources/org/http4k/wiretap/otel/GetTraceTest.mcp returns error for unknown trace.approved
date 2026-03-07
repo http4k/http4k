@@ -1,0 +1,14 @@
+{
+  "content" : [ {
+    "text" : "Failure",
+    "annotations" : null
+  } ],
+  "meta" : {
+    "progressToken" : null,
+    "relatedTask" : null,
+    "ui" : null,
+    "traceparent" : null,
+    "tracestate" : null,
+    "baggage" : null
+  }
+}

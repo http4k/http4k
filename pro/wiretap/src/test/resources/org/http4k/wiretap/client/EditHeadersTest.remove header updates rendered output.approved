@@ -1,0 +1,9 @@
+event: datastar-patch-signals
+data: signals {"headers":{"1":{"name":"Authorization","value":"Bearer token"}}}
+data: onlyIfMissing false
+
+event: datastar-patch-elements
+data: elements <div class="client-header-row">    <input type="text" class="form-control form-control-sm" data-bind="headers.1.name" placeholder="Header name">    <input type="text" class="form-control form-control-sm" data-bind="headers.1.value" placeholder="Value">    <button class="action-btn action-btn-danger client-remove-header"            data-on:click="@post('/_wiretap/inbound/headers/remove/0')">×    </button></div><button class="action-btn client-add-header"        data-on:click="@post('/_wiretap/inbound/headers/add')">+ Add Header</button>
+data: selector #client-headers
+data: mode inner
+

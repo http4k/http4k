@@ -215,7 +215,6 @@ class OpenTelemetryMetricsServerTest {
                         ?.doubleGaugeData
                         ?.points
                         ?.any {
-                            println(it.attributes)
                             Attributes.of(
                                 stringKey("path"),
                                 path,

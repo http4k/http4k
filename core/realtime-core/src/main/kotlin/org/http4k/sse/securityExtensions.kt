@@ -7,9 +7,13 @@ import org.http4k.security.Security
 
 fun SseFilter(security: Security) = SseFilter { next ->
     {
-        val authResponse = security.filter.then { Response(OK) }(it)
+        var targetRequest = it
+        val authResponse = security.filter.then {
+            targetRequest = it
+            Response(OK)
+        }(it)
         when {
-            authResponse.status.successful -> next(it)
+            authResponse.status.successful -> next(targetRequest)
             else -> SseResponse(authResponse.status, authResponse.headers, true) { it.close() }
         }
     }

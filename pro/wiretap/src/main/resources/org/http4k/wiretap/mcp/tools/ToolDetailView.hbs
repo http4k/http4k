@@ -1,0 +1,21 @@
+<div id="detail-panel" class="mcp-client-detail" data-signals="{toolName: '{{name}}', toolArgs: '{}'}">
+    <div class="client-request-section mcp-client-detail-form">
+        <div class="mcp-client-detail-header">
+            <h3>{{name}}</h3>
+            <p>{{description}}</p>
+        </div>
+        <div class="client-section">
+            <h4>Input Schema</h4>
+            <pre class="code-block">{{inputSchema}}</pre>
+        </div>
+        <div class="client-section">
+            <h4>Arguments (JSON)</h4>
+            <textarea class="form-control form-control-sm" style="font-family: monospace" rows="6" data-bind="toolArgs" placeholder="{}">{}</textarea>
+        </div>
+        <button class="action-btn action-btn-primary" data-on:click="@post('/_wiretap/mcp/tools/call')">Call Tool</button>
+    </div>
+    <div class="panel-resize-handle"></div>
+    <div class="client-detail-panel">
+        <div id="tool-result" class="mcp-client-result"></div>
+    </div>
+</div>

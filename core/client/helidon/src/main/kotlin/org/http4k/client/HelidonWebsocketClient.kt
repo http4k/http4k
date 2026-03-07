@@ -92,7 +92,6 @@ private fun createWebsocket(onOpen: WsConsumer): Pair<WsListener, PushPullAdapti
         }
 
         override fun onMessage(session: WsSession, text: String, last: Boolean) {
-            System.err.println("SENDING $text")
             ws.triggerMessage(WsMessage(text))
         }
 

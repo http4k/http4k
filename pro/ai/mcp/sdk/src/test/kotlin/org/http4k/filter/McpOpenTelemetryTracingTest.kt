@@ -5,8 +5,12 @@ import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.api.trace.SpanId
 import io.opentelemetry.api.trace.StatusCode
+import io.opentelemetry.api.trace.TraceId
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
 import io.opentelemetry.context.propagation.ContextPropagators
+import io.opentelemetry.context.propagation.TextMapPropagator
 import io.opentelemetry.extension.trace.propagation.B3Propagator
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter
@@ -131,7 +135,69 @@ class McpOpenTelemetryTracingTest {
         assertThat(mcpSpan.links.size, equalTo(1))
         assertThat(mcpSpan.links.first().spanContext.traceId, equalTo(transportSpan.spanContext.traceId))
         assertThat(mcpSpan.links.first().spanContext.spanId, equalTo(transportSpan.spanContext.spanId))
-        assertThat(mcpSpan.parentSpanId, equalTo(transportSpan.spanContext.spanId))
+        assertThat(mcpSpan.parentSpanId, equalTo(SpanId.getInvalid()))
+    }
+
+    @Test
+    fun `extracts trace context from _meta`() {
+        val w3cOpenTelemetry = OpenTelemetrySdk.builder()
+            .setTracerProvider(
+                SdkTracerProvider.builder()
+                    .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))
+                    .build()
+            )
+            .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
+            .build()
+
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
+
+        val handler = filter.then { McpResponse(McpJson.nullNode()) }
+
+        val parentTraceId = "0af7651916cd43dd8448eb211c80319c"
+        val parentSpanId = "b7ad6b7169203331"
+
+        val jsonReq = JsonRpcRequest(
+            McpJson, mapOf(
+                "jsonrpc" to asJsonObject("2.0"),
+                "method" to asJsonObject("tools/call"),
+                "id" to asJsonObject(1),
+                "params" to asJsonObject(
+                    mapOf(
+                        "_meta" to mapOf(
+                            "traceparent" to "00-$parentTraceId-$parentSpanId-01",
+                            "tracestate" to "congo=t61rcWkgMzE"
+                        )
+                    )
+                )
+            )
+        )
+
+        handler(McpRequest(Session(SessionId.of("test-session")), jsonReq, Request.Companion(POST, "/mcp")))
+
+        val span = spanExporter.finishedSpanItems.single()
+        assertThat(span.spanContext.traceId, equalTo(parentTraceId))
+        assertThat(span.parentSpanId, equalTo(parentSpanId))
+    }
+
+    @Test
+    fun `has no parent when _meta has no trace context`() {
+        val w3cOpenTelemetry = OpenTelemetrySdk.builder()
+            .setTracerProvider(
+                SdkTracerProvider.builder()
+                    .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))
+                    .build()
+            )
+            .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
+            .build()
+
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
+
+        val handler = filter.then { McpResponse(McpJson.nullNode()) }
+
+        handler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), Request.Companion(POST, "/mcp")))
+
+        val span = spanExporter.finishedSpanItems.single()
+        assertThat(span.parentSpanId, equalTo(SpanId.getInvalid()))
     }
 
     private fun jsonRpcRequest() = JsonRpcRequest(

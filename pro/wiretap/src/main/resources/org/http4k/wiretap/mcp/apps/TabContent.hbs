@@ -1,0 +1,21 @@
+<div id="mcp-content" class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        <div class="mcp-client-list-header">Apps ({{apps.length}})</div>
+        {{#each apps}}
+        <div class="mcp-client-item"
+             data-class-mcp-client-item-active="$selectedServerId==='{{this.serverId}}'"
+             data-on:click="$selectedServerId='{{this.serverId}}'; $iframeVisible=true; loadMcpApp('{{this.serverId}}', '{{this.resourceUri}}')">
+            <div class="mcp-client-item-name">{{this.uiToolName}}</div>
+            <div class="mcp-client-item-desc">{{this.serverName}}</div>
+        </div>
+        {{/each}}
+        {{#unless apps}}
+        <div class="empty">No apps available</div>
+        {{/unless}}
+    </div>
+
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="empty" data-show="!$iframeVisible">Select an app to launch</div>
+        <iframe id="app" class="mcp-app-iframe" data-show="$iframeVisible"></iframe>
+    </div>
+</div>

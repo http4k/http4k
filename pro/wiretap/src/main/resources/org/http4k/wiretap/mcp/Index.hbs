@@ -1,0 +1,27 @@
+{{#>org/http4k/wiretap/layout pageTitle="MCP"}}
+{{#partial "body"}}
+<body class="d-flex flex-column h-100" data-signals="{{initialSignals}}">
+{{> org/http4k/wiretap/header navMCP=true}}
+
+<div class="mcp-client-subnav">
+    <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='tools'"
+         data-on:click="$activeTab='tools'; @get('/_wiretap/mcp/tools')">Tools
+    </div>
+    <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='prompts'"
+         data-on:click="$activeTab='prompts'; @get('/_wiretap/mcp/prompts')">Prompts
+    </div>
+    <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='resources'"
+         data-on:click="$activeTab='resources'; @get('/_wiretap/mcp/resources')">Resources
+    </div>
+    <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='apps'"
+         data-on:click="$activeTab='apps'; @get('/_wiretap/mcp/apps')">Apps
+    </div>
+</div>
+
+<div class="app-layout mcp-client-layout" id="mcp-content" data-init="@get('/_wiretap/mcp/tools')">
+</div>
+
+{{> org/http4k/wiretap/footer}}
+</body>
+{{/partial}}
+{{/layout}}

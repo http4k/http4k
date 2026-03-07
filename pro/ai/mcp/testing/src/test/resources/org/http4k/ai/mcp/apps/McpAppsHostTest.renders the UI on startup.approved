@@ -54,7 +54,7 @@
         switch (e.data.method) {
             case 'ui/initialize':
                 result = {
-                    protocolVersion: '2025-03-26',
+                    protocolVersion: '2026-01-26',
                     hostInfo: {name: 'http4k-mcp-apps-host', version: '0.0.0'},
                     hostCapabilities: {serverTools: {}, openLinks: {}, updateModelContext: {text: {}}},
                     hostContext: {theme: 'light', platform: 'web', displayMode: 'inline', availableDisplayModes: ['inline']}

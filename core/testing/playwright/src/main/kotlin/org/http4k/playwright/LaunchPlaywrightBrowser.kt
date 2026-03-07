@@ -6,10 +6,14 @@ import com.microsoft.playwright.BrowserType.LaunchOptions
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Playwright.create
 import org.http4k.core.HttpHandler
+import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.server.Http4kServer
+import org.http4k.server.PolyServerConfig
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.server.uri
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -18,12 +22,29 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import java.util.concurrent.atomic.AtomicReference
 
 class LaunchPlaywrightBrowser @JvmOverloads constructor(
-    http: HttpHandler,
+    private val server: Http4kServer,
     private val browserType: Playwright.() -> BrowserType = Playwright::chromium,
     private val launchOptions: LaunchOptions = LaunchOptions(),
     private val createPlaywright: () -> Playwright = ::create,
-    serverFn: (Int) -> ServerConfig = ::SunHttp
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
+    @JvmOverloads
+    constructor(
+        http: HttpHandler,
+        browserType: Playwright.() -> BrowserType = Playwright::chromium,
+        launchOptions: LaunchOptions = LaunchOptions(),
+        createPlaywright: () -> Playwright = ::create,
+        serverFn: (Int) -> ServerConfig = ::SunHttp
+    ) : this(http.asServer(serverFn(0)), browserType, launchOptions, createPlaywright)
+
+    @JvmOverloads
+    constructor(
+        poly: PolyHandler,
+        serverFn: (Int) -> PolyServerConfig,
+        browserType: Playwright.() -> BrowserType = Playwright::chromium,
+        launchOptions: LaunchOptions = LaunchOptions(),
+        createPlaywright: () -> Playwright = ::create,
+    ) : this(poly.asServer(serverFn(0)), browserType, launchOptions, createPlaywright)
 
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
         pc.parameter.parameterizedType.typeName == Browser::class.java.name ||
@@ -31,11 +52,9 @@ class LaunchPlaywrightBrowser @JvmOverloads constructor(
 
     private val playwright = AtomicReference<Playwright>()
 
-    private val server = http.asServer(serverFn(0))
-
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) = Http4kBrowser(
         browserType(playwright.get()).launch(launchOptions),
-        Uri.of("http://localhost:${server.port()}")
+        server.uri()
     )
 
     override fun beforeTestExecution(context: ExtensionContext) {
