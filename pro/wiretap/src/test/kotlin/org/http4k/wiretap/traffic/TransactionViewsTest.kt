@@ -22,11 +22,14 @@ import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.domain.toSummary
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
+
 @ExtendWith(JsonApprovalTest::class)
 class TransactionViewsTest {
+    private val clock = Clock.systemUTC()
 
     private fun tx(
         uri: Uri = Uri.of("/foo"),
@@ -45,25 +48,25 @@ class TransactionViewsTest {
 
     @Test
     fun `row path shows only path when no query string`() {
-        val view = TransactionRowView(tx(uri = Uri.of("/foo")).toSummary())
+        val view = TransactionRowView(tx(uri = Uri.of("/foo")).toSummary(clock))
         assertThat(view.tx.path, equalTo("/foo"))
     }
 
     @Test
     fun `row path includes query string when present`() {
-        val view = TransactionRowView(tx(uri = Uri.of("/foo?bar=baz&qux=1")).toSummary())
+        val view = TransactionRowView(tx(uri = Uri.of("/foo?bar=baz&qux=1")).toSummary(clock))
         assertThat(view.tx.path, equalTo("/foo?bar=baz&qux=1"))
     }
 
     @Test
     fun `detail view has no query params when query is empty`() {
-        val view = TransactionDetailView(tx(uri = Uri.of("/foo")).toDetail())
+        val view = TransactionDetailView(tx(uri = Uri.of("/foo")).toDetail(clock))
         assertThat(view.tx.queryParams, equalTo(emptyList()))
     }
 
     @Test
     fun `detail view parses query params`() {
-        val view = TransactionDetailView(tx(uri = Uri.of("/foo?bar=baz&qux=1")).toDetail())
+        val view = TransactionDetailView(tx(uri = Uri.of("/foo?bar=baz&qux=1")).toDetail(clock))
         assertThat(
             view.tx.queryParams, equalTo(
                 listOf(
@@ -76,7 +79,7 @@ class TransactionViewsTest {
 
     @Test
     fun `detail view handles query param without value`() {
-        val view = TransactionDetailView(tx(uri = Uri.of("/foo?flag")).toDetail())
+        val view = TransactionDetailView(tx(uri = Uri.of("/foo?flag")).toDetail(clock))
         assertThat(
             view.tx.queryParams, equalTo(
                 listOf(HeaderEntry("flag", ""))
@@ -91,7 +94,7 @@ class TransactionViewsTest {
                 request = Request(GET, "/foo")
                     .with(CONTENT_TYPE of APPLICATION_JSON)
                     .body("""{"a":1,"b":"hello"}""")
-            ).toDetail()
+            ).toDetail(clock)
         )
         approver.assertApproved(view.tx.requestBody, APPLICATION_JSON)
     }
@@ -103,7 +106,7 @@ class TransactionViewsTest {
                 response = Response(OK)
                     .with(CONTENT_TYPE of APPLICATION_JSON)
                     .body("""{"x":[1,2]}""")
-            ).toDetail()
+            ).toDetail(clock)
         )
         approver.assertApproved(view.tx.responseBody, APPLICATION_JSON)
     }
@@ -115,7 +118,7 @@ class TransactionViewsTest {
                 request = Request(GET, "/foo")
                     .with(CONTENT_TYPE of TEXT_PLAIN)
                     .body("plain text body")
-            ).toDetail()
+            ).toDetail(clock)
         )
         assertThat(view.tx.requestBody, equalTo("plain text body"))
     }
@@ -127,7 +130,7 @@ class TransactionViewsTest {
                 request = Request(GET, "/foo")
                     .with(CONTENT_TYPE of APPLICATION_JSON)
                     .body("not json")
-            ).toDetail()
+            ).toDetail(clock)
         )
         assertThat(view.tx.requestBody, equalTo("not json"))
     }
@@ -135,7 +138,7 @@ class TransactionViewsTest {
     @Test
     fun `row view detects chaos from response header`() {
         val view = TransactionRowView(
-            tx(response = Response(OK).header("x-http4k-chaos", "Latency (100ms)")).toSummary()
+            tx(response = Response(OK).header("x-http4k-chaos", "Latency (100ms)")).toSummary(clock)
         )
         assertThat(view.tx.isChaos, equalTo(true))
         assertThat(view.tx.chaosInfo, equalTo("Latency (100ms)"))
@@ -143,7 +146,7 @@ class TransactionViewsTest {
 
     @Test
     fun `row view has no chaos info without header`() {
-        val view = TransactionRowView(tx().toSummary())
+        val view = TransactionRowView(tx().toSummary(clock))
         assertThat(view.tx.isChaos, equalTo(false))
     }
 }

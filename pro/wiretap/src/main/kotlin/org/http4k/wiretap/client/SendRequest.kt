@@ -66,7 +66,7 @@ fun SendRequest(clock: Clock, direction: Direction, proxy: HttpHandler) =
                     start
                 ),
                 direction = direction
-            ).toDetail()
+            ).toDetail(clock)
         }
 
         override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

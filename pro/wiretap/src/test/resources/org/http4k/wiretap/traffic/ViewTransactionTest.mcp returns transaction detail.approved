@@ -1,6 +1,6 @@
 {
   "content" : [ {
-    "text" : "{\"id\":1,\"direction\":\"Inbound\",\"method\":\"GET\",\"uri\":\"/test\",\"status\":200,\"durationMs\":10,\"timestamp\":\"01:00:00.000\",\"queryParams\":[],\"requestHeaders\":[],\"responseHeaders\":[],\"requestBody\":\"\",\"responseBody\":\"\",\"curl\":\"curl -X GET \\\"/test\\\"\",\"isChaos\":false,\"isReplay\":false}",
+    "text" : "{\"id\":1,\"direction\":\"Inbound\",\"method\":\"GET\",\"uri\":\"/test\",\"status\":200,\"durationMs\":10,\"timestamp\":\"00:00:00.000\",\"queryParams\":[],\"requestHeaders\":[],\"responseHeaders\":[],\"requestBody\":\"\",\"responseBody\":\"\",\"curl\":\"curl -X GET \\\"/test\\\"\",\"isChaos\":false,\"isReplay\":false}",
     "annotations" : null
   } ],
   "structuredContent" : null,

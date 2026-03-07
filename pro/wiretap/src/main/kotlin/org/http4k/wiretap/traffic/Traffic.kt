@@ -9,18 +9,19 @@ import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.domain.traceparent
+import java.time.Clock
 
-fun Traffic(transactionStore: TransactionStore, viewStore: ViewStore) = object : WiretapFunction {
+fun Traffic(transactionStore: TransactionStore, viewStore: ViewStore, clock: Clock) = object : WiretapFunction {
     private val functions = listOf(
-        ListTransactions(transactionStore),
+        ListTransactions(transactionStore, clock),
         ClearTransaction(transactionStore),
         ListViews(viewStore),
         CreateView(viewStore),
         UpdateView(viewStore),
         DeleteView(viewStore),
-        ActivateView(viewStore, transactionStore),
+        ActivateView(viewStore, transactionStore, clock),
         ExportHar(transactionStore),
-        ViewTransaction(transactionStore),
+        ViewTransaction(transactionStore, clock),
     )
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

@@ -18,15 +18,16 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.util.datastarSignal
+import java.time.Clock
 
-fun ActivateView(viewStore: ViewStore, transactionStore: TransactionStore) = object : WiretapFunction {
+fun ActivateView(viewStore: ViewStore, transactionStore: TransactionStore, clock: Clock) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/views/{id}/activate" bind POST to { req ->
             val id = Path.long().of("id")(req)
             val view = viewStore.list().find { it.id == id }
             val signals = view?.let { ViewActivationSignals(it) } ?: ViewActivationSignals.Reset
             val filter = view?.filter ?: TransactionFilter()
-            val rows = transactionStore.list(filter, 50).map { it.toSummary() }.map { TransactionRowView(it) }
+            val rows = transactionStore.list(filter, 50).map { it.toSummary(clock) }.map { TransactionRowView(it) }
 
             Response(OK)
                 .datastarSignal(signals)

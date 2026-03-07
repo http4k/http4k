@@ -25,10 +25,11 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.TransactionSummary
 import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.util.Json
+import java.time.Clock
 
-fun ListTransactions(transactionStore: TransactionStore) = object : WiretapFunction {
+fun ListTransactions(transactionStore: TransactionStore, clock: Clock) = object : WiretapFunction {
     private fun list(filter: TransactionFilter, limit: Int) =
-        transactionStore.list(filter, limit).map { it.toSummary() }
+        transactionStore.list(filter, limit).map { it.toSummary(clock) }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/list" bind POST to { req ->

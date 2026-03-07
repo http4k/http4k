@@ -22,9 +22,10 @@ import org.http4k.wiretap.domain.TransactionDetail
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.util.Json
+import java.time.Clock
 
-fun ViewTransaction(transactionStore: TransactionStore) = object : WiretapFunction {
-    private fun lookup(id: Long) = transactionStore.get(id)?.toDetail()
+fun ViewTransaction(transactionStore: TransactionStore, clock: Clock) = object : WiretapFunction {
+    private fun lookup(id: Long) = transactionStore.get(id)?.toDetail(clock)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{id}" bind GET to { req ->

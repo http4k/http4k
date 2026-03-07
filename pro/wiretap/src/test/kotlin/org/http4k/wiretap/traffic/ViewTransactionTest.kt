@@ -14,6 +14,7 @@ import org.http4k.wiretap.McpWiretapFunctionContract
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.TransactionStore
 import org.junit.jupiter.api.Test
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
@@ -23,7 +24,7 @@ class ViewTransactionTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
 
     private val store = TransactionStore.InMemory()
 
-    override val function = ViewTransaction(store)
+    override val function = ViewTransaction(store, Clock.systemUTC())
 
     private fun record() = store.record(
         HttpTransaction(Request(GET, "/test"), Response(OK), Duration.ofMillis(10), start = Instant.EPOCH),

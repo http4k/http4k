@@ -1,6 +1,6 @@
 {
   "content" : [ {
-    "text" : "{\"id\":0,\"direction\":\"Inbound\",\"method\":\"GET\",\"uri\":\"/test\",\"status\":200,\"durationMs\":0,\"timestamp\":\"01:00:00.000\",\"queryParams\":[],\"requestHeaders\":[{\"name\":\"x-http4k-wiretap\",\"value\":\"replay\"}],\"responseHeaders\":[],\"requestBody\":\"\",\"responseBody\":\"proxied\",\"curl\":\"curl -X GET -H \\\"x-http4k-wiretap:replay\\\" \\\"/test\\\"\",\"isChaos\":false,\"isReplay\":true}",
+    "text" : "{\"id\":0,\"direction\":\"Inbound\",\"method\":\"GET\",\"uri\":\"/test\",\"status\":200,\"durationMs\":0,\"timestamp\":\"00:00:00.000\",\"queryParams\":[],\"requestHeaders\":[{\"name\":\"x-http4k-wiretap\",\"value\":\"replay\"}],\"responseHeaders\":[],\"requestBody\":\"\",\"responseBody\":\"proxied\",\"curl\":\"curl -X GET -H \\\"x-http4k-wiretap:replay\\\" \\\"/test\\\"\",\"isChaos\":false,\"isReplay\":true}",
     "annotations" : null
   } ],
   "structuredContent" : null,

@@ -13,6 +13,7 @@ import org.http4k.wiretap.domain.TransactionFilter
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.junit.jupiter.api.Test
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
@@ -21,7 +22,7 @@ class ActivateViewTest : HttpWiretapFunctionContract {
     private val views = ViewStore.InMemory()
     private val store = TransactionStore.InMemory()
 
-    override val function = ActivateView(views, store)
+    override val function = ActivateView(views, store, Clock.systemUTC())
 
     private fun record(uri: String = "/test") = store.record(
         HttpTransaction(Request(GET, uri), Response(OK), Duration.ofMillis(10), start = Instant.EPOCH),

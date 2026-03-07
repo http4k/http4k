@@ -90,7 +90,7 @@ object Wiretap {
         val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())
 
         val baseFunctions = listOf(
-            Traffic(transactionStore, viewStore),
+            Traffic(transactionStore, viewStore, clock),
             Chaos(inboundChaos, outboundChaos),
             OTel(traceStore),
             InboundClient(clock, transactionStore, proxy),

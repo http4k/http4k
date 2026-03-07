@@ -5,14 +5,12 @@ import org.http4k.core.queries
 import org.http4k.core.toCurl
 import org.http4k.lens.contentType
 import org.http4k.wiretap.util.formatBody
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.time.Clock
+import java.time.ZoneId.systemDefault
 import java.time.format.DateTimeFormatter.ISO_INSTANT
+import java.time.format.DateTimeFormatter.ofPattern
 
-private val format: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault())
-
-internal fun WiretapTransaction.toSummary(): TransactionSummary {
+internal fun WiretapTransaction.toSummary(clock: Clock): TransactionSummary {
     val uri = transaction.request.uri
     return TransactionSummary(
         id = id,
@@ -28,14 +26,14 @@ internal fun WiretapTransaction.toSummary(): TransactionSummary {
         },
         status = transaction.response.status.code,
         durationMs = transaction.duration.toMillis(),
-        timestamp = format.format(transaction.start),
+        timestamp = ofPattern("HH:mm:ss.SSS").withZone(clock.zone).format(transaction.start),
         isChaos = transaction.response.headerValues("x-http4k-chaos").firstOrNull() != null,
         isReplay = transaction.request.header("x-http4k-wiretap") == "replay",
         chaosInfo = transaction.response.headerValues("x-http4k-chaos").firstOrNull()
     )
 }
 
-internal fun WiretapTransaction.toDetail(): TransactionDetail {
+internal fun WiretapTransaction.toDetail(clock: Clock): TransactionDetail {
     val req = transaction.request
     val resp = transaction.response
     return TransactionDetail(
@@ -45,7 +43,7 @@ internal fun WiretapTransaction.toDetail(): TransactionDetail {
         uri = req.uri.toString(),
         status = resp.status.code,
         durationMs = transaction.duration.toMillis(),
-        timestamp = format.format(transaction.start),
+        timestamp = ofPattern("HH:mm:ss.SSS").withZone(clock.zone).format(transaction.start),
         queryParams = req.uri.queries().map { HeaderEntry(it.first, it.second ?: "") },
         requestHeaders = req.headers.map { HeaderEntry(it.first, it.second ?: "") },
         responseHeaders = resp.headers.map { HeaderEntry(it.first, it.second ?: "") },

@@ -1,6 +1,8 @@
 package org.http4k.wiretap.domain
 
+import io.micrometer.core.instrument.MockClock.clock
 import org.http4k.core.HttpTransaction
+import java.time.Clock
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicLong
@@ -18,7 +20,7 @@ interface TransactionStore {
     fun clear()
 
     companion object {
-        fun InMemory(maxSize: Int = 500) = object : TransactionStore {
+        fun InMemory(maxSize: Int = 500, clock: Clock = Clock.systemUTC()) = object : TransactionStore {
             private val nextId = AtomicLong()
             private val transactions = ConcurrentLinkedDeque<WiretapTransaction>()
             private val subscribers = CopyOnWriteArrayList<(WiretapTransaction) -> Unit>()
@@ -36,7 +38,7 @@ interface TransactionStore {
             override fun list(filter: TransactionFilter, limit: Int, cursor: Long?): List<WiretapTransaction> {
                 val base = if (cursor != null) transactions.filter { it.id < cursor } else transactions.toList()
                 return base
-                    .filter { it.toSummary().matches(filter) }
+                    .filter { it.toSummary(clock).matches(filter) }
                     .take(limit)
             }
 
