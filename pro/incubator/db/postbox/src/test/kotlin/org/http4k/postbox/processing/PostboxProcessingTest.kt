@@ -4,13 +4,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.FixedTimeSource
+import dev.forkhandles.tx.mem.InMemoryTransactor
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNPROCESSABLE_ENTITY
-import org.http4k.db.InMemoryTransactor
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.RequestId
@@ -27,7 +27,8 @@ import java.time.Duration.ofSeconds
 class PostboxProcessingTest {
 
     private val timeSource = FixedTimeSource()
-    private val transactor = InMemoryTransactor<Postbox>(InMemoryPostbox(timeSource))
+    private val postbox = InMemoryPostbox(timeSource)
+    private val transactor = InMemoryTransactor<Postbox, Postbox>(postbox, { postbox })
     private val testTarget = routes("/success" bind { Response(OK) },
         "/failure" bind { Response(BAD_GATEWAY) },
         "/permanent_failure" bind { Response(UNPROCESSABLE_ENTITY) },

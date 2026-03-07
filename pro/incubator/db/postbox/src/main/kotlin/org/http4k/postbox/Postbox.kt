@@ -1,11 +1,13 @@
 package org.http4k.postbox
 
+import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
+import dev.forkhandles.tx.Transactional
 import dev.forkhandles.values.NonEmptyStringValueFactory
 import dev.forkhandles.values.StringValue
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.db.Transactor
 import org.http4k.lens.Path
 import org.http4k.lens.asResult
 import java.time.Duration
@@ -123,4 +125,11 @@ class RequestId private constructor(value: String) : StringValue(value) {
     }
 }
 
-typealias PostboxTransactor = Transactor<Postbox>
+typealias TransactionalPostbox = Transactional<Postbox>
+
+fun <T> TransactionalPostbox.performAsResult(work: (Postbox) -> T): Result<T, Exception> =
+    try {
+        Success(perform(work))
+    } catch (e: Exception) {
+        Failure(e)
+    }
