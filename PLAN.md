@@ -6,8 +6,8 @@ A pro-tier development console that wraps an http4k application and provides a b
 to add, one port to connect to, full visibility and control.
 
 ```kotlin
-Wiretap { http, oTel, clock -> MyApp(http, oTel) }.asServer(Jetty(8080)).start()
-// Your app:     http://localhost:8080/
+Wiretap { http, oTel, clock -> MyApp(http, oTel).asServer(Jetty(8000)).start().uri() }.asServer(Jetty(8080)).start()
+// Your app:     http://localhost:8000/
 // Wiretap:      http://localhost:8080/__wiretap
 ```
 
