@@ -1,5 +1,7 @@
-package org.http4k.wiretap
-
+import Option.app
+import Option.externalMcpAppUrl
+import Option.mcpApp
+import Option.website
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
@@ -39,7 +41,6 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters
-import org.http4k.filter.debug
 import org.http4k.lens.contentType
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
@@ -49,10 +50,6 @@ import org.http4k.security.BasicAuthSecurity
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri
-import org.http4k.wiretap.Option.app
-import org.http4k.wiretap.Option.externalMcpAppUrl
-import org.http4k.wiretap.Option.mcpApp
-import org.http4k.wiretap.Option.website
 
 enum class Option {
     mcpApp, app, website, externalMcpAppUrl
@@ -181,20 +178,20 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
 
 private fun wiretapFor(option: Option): PolyHandler = when (option) {
     mcpApp ->
-        Wiretap { client, oTel, _ ->
+        _root_ide_package_.org.http4k.wiretap.Wiretap { client, oTel, _ ->
             ExampleMcpApp(oTel, client).asServer(Jetty(0)).start().uri()
         }
 
     app -> {
         val clientApp = App2().asServer(Jetty(0)).start()
 
-        Wiretap { http, oTel, _ ->
+        _root_ide_package_.org.http4k.wiretap.Wiretap { http, oTel, _ ->
             ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
         }
     }
 
-    website -> Wiretap(Uri.of("https://http4k.org"))
-    externalMcpAppUrl -> Wiretap(
+    website -> _root_ide_package_.org.http4k.wiretap.Wiretap(Uri.of("https://http4k.org"))
+    externalMcpAppUrl -> _root_ide_package_.org.http4k.wiretap.Wiretap(
         Uri.of("https://demo.http4k.org/mcp-app/"),
         JavaHttpClient()
     )

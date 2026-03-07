@@ -16,7 +16,6 @@ import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.poly
 import org.http4k.routing.routes
-import org.http4k.routing.sse.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.wiretap.chaos.Chaos
 import org.http4k.wiretap.client.InboundClient
@@ -36,7 +35,6 @@ import org.http4k.wiretap.mcp_api.WiretapMcp
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
 import org.http4k.wiretap.traffic.Traffic
-import org.http4k.wiretap.traffic.TrafficStream
 import org.http4k.wiretap.util.Metrics
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
@@ -50,8 +48,7 @@ object Wiretap {
     operator fun invoke(
         uri: Uri,
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
-    ) =
-        this(httpClient = httpClient, appBuilder = { _, _, _ -> uri })
+    ) = this(httpClient = httpClient, appBuilder = { _, _, _ -> uri })
 
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
@@ -108,20 +105,19 @@ object Wiretap {
             allCapabilities.count { it is ToolCapability } + 1
         )
 
-        val functions = baseFunctions +
+        val allFunctions = baseFunctions +
             GetStats(trafficMetrics, traceStore, inboundChaos, outboundChaos, mcpCapabilities, meterRegistry)
 
-        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, functions)
+        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, allFunctions)
 
         val httpRoutes = listOf(
             ServerFilters.CatchAll()
                 .then(
                     routes(
-                        WiretapUi(renderer, templates, functions),
+                        WiretapUi(renderer, templates, allFunctions),
                         orElse bind proxy
                     )
-                ),
-            "/_wiretap/traffic" bind TrafficStream(transactionStore, renderer),
+                )
         )
         return poly(
             httpRoutes + mcpRoutes
