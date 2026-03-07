@@ -1,7 +1,6 @@
 package org.http4k.wiretap.client
 
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
@@ -14,50 +13,49 @@ import org.http4k.core.then
 import org.http4k.filter.ResponseFilters
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
 import org.http4k.wiretap.domain.Direction
+import org.http4k.wiretap.domain.Direction.*
 import org.http4k.wiretap.domain.TransactionStore
-import org.http4k.wiretap.util.Json
+import org.http4k.wiretap.util.Json.json
 import org.http4k.wiretap.util.Templates
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Clock
 import java.time.Duration
-import java.time.Instant
+import java.time.Instant.EPOCH
+import java.time.ZoneOffset.UTC
 
+@ExtendWith(ApprovalTest::class)
 class ClientTest {
 
+    private val clock = Clock.fixed(EPOCH, UTC)
     private val templates: TemplateRenderer = Templates()
     private val renderer = DatastarElementRenderer(templates)
     private val transactions = TransactionStore.InMemory()
 
     private val client = InboundClient(
-        clock = Clock.systemUTC(), transactions,
+        clock = clock, transactions,
     ) { Response(OK).body("proxied") }.http(renderer, templates)
 
     private val outbound = OutboundClient(
-        httpClient = { Response(OK).body("direct") }, clock = Clock.systemUTC(),
+        httpClient = { Response(OK).body("direct") }, clock = clock,
         transactions,
     ).http(renderer, templates)
 
     @Test
-    fun `inbound client index page returns OK with correct basePath and title`() {
-        val response = client(Request(GET, "/inbound"))
-
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/_wiretap/inbound/"))
-        assertThat(response.bodyString(), containsSubstring("Inbound Client"))
+    fun `inbound client index page returns OK`(approver: Approver) {
+        approver.assertApproved(client(Request(GET, "/inbound")))
     }
 
     @Test
-    fun `outbound client index page returns OK with correct basePath and title`() {
-        val response = outbound(Request(GET, "/outbound"))
-
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/_wiretap/outbound/"))
-        assertThat(response.bodyString(), containsSubstring("Outbound Client"))
+    fun `outbound client index page returns OK`(approver: Approver) {
+        approver.assertApproved(outbound(Request(GET, "/outbound")))
     }
 
     @Test
-    fun `inbound client import pre-populates from transaction`() {
+    fun `inbound client import pre-populates from transaction`(approver: Approver) {
         transactions.record(
             HttpTransaction(
                 request = Request(POST, Uri.of("http://example.com/api"))
@@ -66,34 +64,19 @@ class ClientTest {
                     .body("""{"key":"value"}"""),
                 response = Response(OK),
                 duration = Duration.ofMillis(100),
-                start = Instant.now()
+                start = EPOCH
             ),
-            Direction.Inbound
+            Inbound
         )
 
         val txId = transactions.list().first().id
-        val response = client(Request(GET, "/inbound?import=$txId"))
-
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("POST"))
-        assertThat(response.bodyString(), containsSubstring("http://example.com/api"))
-        assertThat(response.bodyString(), containsSubstring("application/json"))
-
-        val signalsJson = Regex("""data-signals="([^"]*?)"""").find(response.bodyString())!!.groupValues[1]
-            .replace("&quot;", "\"")
-            .replace("&amp;", "&")
-        val parsed = Json.parse(signalsJson)
-        assertThat(Json.textValueOf(parsed, "method")!!, equalTo("POST"))
-        assertThat(Json.textValueOf(parsed, "url")!!, equalTo("http://example.com/api"))
-        assertThat(Json.textValueOf(parsed, "body")!!, equalTo("""{"key":"value"}"""))
+        approver.assertApproved(client(Request(GET, "/inbound").query("import", txId.toString())))
     }
 
     @Test
     fun `outbound client records transactions through decorated handler`() {
-        val clock = Clock.systemUTC()
-
         val recordingFilter = ResponseFilters.ReportHttpTransaction(clock) { tx ->
-            transactions.record(tx, Direction.Outbound)
+            transactions.record(tx, Outbound)
         }
 
         val recordingOutbound = OutboundClient(
@@ -101,29 +84,32 @@ class ClientTest {
             transactions,
         ).http(renderer, templates)
 
-        val body = Json.asFormatString(ClientRequest(method = GET, url = Uri.of("http://example.com/test")))
-        val response = recordingOutbound(Request(POST, "/outbound/send").body(body))
+        val response = recordingOutbound(
+            Request(POST, "/outbound/send").json(
+                ClientRequest(
+                    method = GET,
+                    url = Uri.of("http://example.com/test")
+                )
+            )
+        )
 
         assertThat(response.status, equalTo(OK))
         assertThat(transactions.list().size, equalTo(1))
-        assertThat(transactions.list().first().direction, equalTo(Direction.Outbound))
+        assertThat(transactions.list().first().direction, equalTo(Outbound))
     }
 
     @Test
-    fun `outbound client import pre-populates from outbound transaction`() {
+    fun `outbound client import pre-populates from outbound transaction`(approver: Approver) {
         val tx = transactions.record(
             HttpTransaction(
                 request = Request(GET, Uri.of("https://external.com/data")),
                 response = Response(OK),
                 duration = Duration.ofMillis(50),
-                start = Instant.now()
+                start = EPOCH
             ),
-            Direction.Outbound
+            Outbound
         )
 
-        val response = outbound(Request(GET, "/outbound?import=${tx.id}"))
-
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("https://external.com/data"))
+        approver.assertApproved(outbound(Request(GET, "/outbound").query("import", tx.id.toString())))
     }
 }

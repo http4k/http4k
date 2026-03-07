@@ -1,0 +1,15 @@
+{
+  "content" : [ {
+    "text" : "{\"traceId\":\"00000000000000000000000000000001\",\"totalDurationMs\":1,\"spans\":[{\"spanId\":\"1234567890abcdef\",\"parentSpanId\":\"0000000000000000\",\"name\":\"test\",\"kind\":\"SERVER\",\"durationMs\":1,\"statusCode\":\"OK\",\"statusDescription\":\"\",\"serviceName\":\"\",\"depth\":0,\"startOffsetPercent\":0.0,\"widthPercent\":100.0,\"attributes\":[],\"baggageAttributes\":[],\"resourceAttributes\":[],\"events\":[],\"links\":[]}]}",
+    "annotations" : null
+  } ],
+  "structuredContent" : null,
+  "meta" : {
+    "progressToken" : null,
+    "relatedTask" : null,
+    "ui" : null,
+    "traceparent" : null,
+    "tracestate" : null,
+    "baggage" : null
+  }
+}

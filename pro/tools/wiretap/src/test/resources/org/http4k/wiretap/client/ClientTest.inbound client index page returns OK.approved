@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbound Client | http4k Wiretap</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="https://http4k.org/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://http4k.org/favicon-16.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/_wiretap/wiretap.css">
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
+</head>
+
+<body data-signals="{&quot;url&quot;:&quot;/&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;headers&quot;:{&quot;0&quot;:{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;&quot;}}}">
+<header class="app-header">
+    <div class="app-header-brand">
+        <a href="https://http4k.org" target="_blank"><img class="app-logo" src="https://www.http4k.org/images/logo.png" alt="http4k"></a>
+        <span class="app-header-title">Wiretap</span>
+    </div>
+    <div class="app-header-right">
+        <nav class="app-nav">
+            <a href="/_wiretap" class="nav-link ">Overview</a>
+            <a href="/_wiretap/traffic" class="nav-link ">Traffic</a>
+            <a href="/_wiretap/otel" class="nav-link ">OTel</a>
+            <a href="/_wiretap/openapi" class="nav-link ">OpenAPI</a>
+            <a href="/_wiretap/inbound" class="nav-link nav-link-active">Inbound Client</a>
+            <a href="/_wiretap/outbound" class="nav-link ">Outbound Client</a>
+            <a href="/_wiretap/mcp" class="nav-link ">MCP</a>
+            <a href="/_wiretap/chaos" class="nav-link ">Chaos</a>
+        </nav>
+    </div>
+</header>
+
+<div class="client-page">
+    <div class="client-request-section">
+        <form class="client-toolbar" data-on:submit__prevent="@post('/_wiretap/inbound/send')">
+            <select class="form-select form-select-sm client-method" data-bind="method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+                <option value="HEAD">HEAD</option>
+                <option value="OPTIONS">OPTIONS</option>
+            </select>
+            <input type="text" class="form-control form-control-sm client-url" data-bind="url" placeholder="{url}" required>
+            <button type="submit" class="action-btn action-btn-primary">
+                Send
+            </button>
+            <button type="button" class="action-btn action-btn-danger"
+                    data-on:click="@post('/_wiretap/inbound/headers/reset')">
+                Clear
+            </button>
+        </form>
+        <div class="client-form">
+            <div class="client-form-columns">
+                <div class="client-section">
+                    <h4>Headers</h4>
+                    <div id="client-headers" class="client-headers">
+                        
+<div class="client-header-row">
+    <input type="text" class="form-control form-control-sm" data-bind="headers.0.name" placeholder="Header name">
+    <input type="text" class="form-control form-control-sm" data-bind="headers.0.value" placeholder="Value">
+    <button class="action-btn action-btn-danger client-remove-header"
+            data-on:click="@post('/_wiretap/inbound/headers/remove/0')">×
+    </button>
+</div>
+
+
+<button class="action-btn client-add-header"
+        data-on:click="@post('/_wiretap/inbound/headers/add')">+ Add Header
+</button>
+
+
+                    </div>
+                </div>
+                <div class="client-section">
+                    <div class="client-section-header">
+                        <h4>Body</h4>
+                        <select data-bind="contentType" class="form-select form-select-sm client-content-type">
+                            <option value="">No Content-Type</option>
+                            <option value="application/json">application/json</option>
+                        </select>
+                        <button class="action-btn"
+                                data-on:click="@post('/_wiretap/inbound/format')"
+                                data-show="$contentType === 'application/json'">
+                            Format
+                        </button>
+                    </div>
+                    <textarea class="form-control form-control-sm client-body" data-bind="body" rows="6" placeholder="Request body..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-resize-handle"></div>
+    <div class="client-detail-panel">
+        <div id="detail-panel" class="empty">Send a request to see the response</div>
+    </div>
+</div>
+<script src="/_wiretap/wiretap.js"></script>
+
+</body>
+
+</html>
+

@@ -1,0 +1,15 @@
+{
+  "content" : [ {
+    "text" : "[]",
+    "annotations" : null
+  } ],
+  "structuredContent" : null,
+  "meta" : {
+    "progressToken" : null,
+    "relatedTask" : null,
+    "ui" : null,
+    "traceparent" : null,
+    "tracestate" : null,
+    "baggage" : null
+  }
+}

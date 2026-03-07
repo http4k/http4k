@@ -1,5 +1,6 @@
 package org.http4k.wiretap.domain
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpTransaction
@@ -89,7 +90,7 @@ class HarMappingTest {
     @Test
     fun `har request has no post data for empty body`() {
         val req = tx(request = Request(POST, "/foo")).toHar().log.entries.first().request
-        assertThat(req.postData, equalTo(null))
+        assertThat(req.postData, absent())
     }
 
     @Test

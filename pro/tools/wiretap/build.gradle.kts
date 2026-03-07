@@ -23,4 +23,5 @@ dependencies {
     testImplementation(project(":http4k-server-jetty"))
 
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-ops-opentelemetry")))
 }

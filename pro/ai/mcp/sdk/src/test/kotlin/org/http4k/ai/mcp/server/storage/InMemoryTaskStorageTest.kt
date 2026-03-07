@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.server.storage
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
@@ -40,7 +41,7 @@ class InMemoryTaskStorageTest {
         storage.store(session1, task)
 
         assertThat(storage.get(session1, task.taskId), equalTo(task))
-        assertThat(storage.get(session2, task.taskId), equalTo(null))
+        assertThat(storage.get(session2, task.taskId), absent())
     }
 
     @Test
@@ -54,7 +55,7 @@ class InMemoryTaskStorageTest {
 
         storage.delete(session1, task.taskId)
 
-        assertThat(storage.get(session1, task.taskId), equalTo(null))
+        assertThat(storage.get(session1, task.taskId), absent())
     }
 
     @Test
@@ -67,7 +68,7 @@ class InMemoryTaskStorageTest {
         storage.storeResult(session1, taskId, result)
 
         assertThat(storage.resultFor(session1, taskId), equalTo(result))
-        assertThat(storage.resultFor(session2, taskId), equalTo(null))
+        assertThat(storage.resultFor(session2, taskId), absent())
     }
 
     @Test
@@ -83,8 +84,8 @@ class InMemoryTaskStorageTest {
         storage.remove(session1)
 
         assertThat(storage.list(session1).tasks, isEmpty)
-        assertThat(storage.get(session1, task1.taskId), equalTo(null))
-        assertThat(storage.resultFor(session1, task1.taskId), equalTo(null))
+        assertThat(storage.get(session1, task1.taskId), absent())
+        assertThat(storage.resultFor(session1, task1.taskId), absent())
     }
 
     private fun task(taskId: TaskId) = Task(

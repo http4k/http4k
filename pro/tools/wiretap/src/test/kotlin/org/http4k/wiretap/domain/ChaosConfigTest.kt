@@ -1,5 +1,6 @@
 package org.http4k.wiretap.domain
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
@@ -87,7 +88,7 @@ class ChaosConfigTest {
         val passthrough = { _: Request -> Response(OK) }
 
         val getFilter = stage(Request(GET, "/any"))
-        assertThat(getFilter, equalTo(null))
+        assertThat(getFilter, absent())
 
         val postFilter = stage(Request(POST, "/any"))
         assertThat(postFilter != null, equalTo(true))

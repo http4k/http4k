@@ -34,6 +34,8 @@ EditHeaders, FormatBody, TrafficStream, and all `Index` functions.
 - [ ] `unsubscribe stops notifications`
 - [ ] `evicts oldest when maxSize exceeded`
 
+Then move these test cases to be TransactionStoreContract (interface!) with an InMemoryTransactionStoreTest that supplies the in memory version to be tested
+
 ### ViewStoreTest (add to existing file)
 
 - [ ] `list returns default views when created with defaults`
@@ -42,12 +44,16 @@ EditHeaders, FormatBody, TrafficStream, and all `Index` functions.
 - [ ] `remove nonexistent id is no-op`
 - [ ] `built-in views are present in defaults`
 
+Then move these test cases to be ViewStoreContract (interface!) with an InMemoryViewStoreTest that supplies the in memory version to be tested
+
 ### TraceStoreTest (new file)
 
 - [ ] `record and get returns spans for trace id`
 - [ ] `get returns empty list for unknown trace id`
 - [ ] `traces groups spans by trace id`
 - [ ] `evicts oldest spans when maxSpans exceeded`
+
+Then move these test cases to be TraceStoreContract (interface!) with an InMemoryTraceStoreTest that supplies the in memory version to be tested
 
 ### TransactionMatchingTest (add to existing file)
 

@@ -15,7 +15,7 @@ fun OutboundClient(
     clock: Clock,
     transactions: TransactionStore,
 ) = object : WiretapFunction {
-    private val sendRequest = SendRequest(httpClient, clock, Outbound)
+    private val sendRequest = SendRequest(clock, Outbound, httpClient)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "outbound" bind routes(

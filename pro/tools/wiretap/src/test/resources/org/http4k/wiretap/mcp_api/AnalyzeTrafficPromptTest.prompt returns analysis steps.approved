@@ -1,0 +1,12 @@
+{
+  "messages" : [ {
+    "role" : {
+      "value" : "assistant"
+    },
+    "content" : {
+      "text" : "I'll analyze the captured HTTP traffic. Let me start by gathering an overview and recent transactions.\n\nSteps:\n1. Call `get_stats` to get an overview of traffic patterns\n2. Call `list_transactions` to see recent requests\n3. Look for error patterns (4xx/5xx responses)\n4. Identify slow requests (high latency)\n5. Check if chaos engineering is active and its impact\n6. Summarize findings with actionable insights",
+      "annotations" : null
+    }
+  } ],
+  "description" : "Analyze HTTP traffic captured by Wiretap"
+}

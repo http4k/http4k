@@ -1,0 +1,15 @@
+{
+  "content" : [ {
+    "text" : "[{\"traceId\":\"00000000000000000000000000000001\",\"spanCount\":1,\"rootSpanName\":\"test\",\"serviceName\":\"\",\"totalDurationMs\":1,\"timestamp\":\"01:00:00.001\"}]",
+    "annotations" : null
+  } ],
+  "structuredContent" : null,
+  "meta" : {
+    "progressToken" : null,
+    "relatedTask" : null,
+    "ui" : null,
+    "traceparent" : null,
+    "tracestate" : null,
+    "baggage" : null
+  }
+}

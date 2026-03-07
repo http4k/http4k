@@ -35,24 +35,21 @@ fun GetStats(
     private fun gauge(name: String, vararg tags: String): Double =
         meterRegistry.find(name).tags(*tags).gauge()?.value() ?: 0.0
 
-    private fun getStats(): WiretapStats {
-        val uptimeSeconds = gauge("process.uptime").toLong()
-        return WiretapStats(
-            uptime = formatUptime(Duration.ofSeconds(uptimeSeconds)),
-            totalRequests = trafficMetrics.totalRequests(),
-            inboundCount = trafficMetrics.inboundCount(),
-            outboundCount = trafficMetrics.outboundCount(),
-            latencyCounts = trafficMetrics.latencyCounts(),
-            trafficTimeline = trafficMetrics.trafficTimeline(),
-            hostTimelines = trafficMetrics.hostTimelines(),
-            traceCount = traceStore.traces().size,
-            inboundChaosActive = inboundChaos.isEnabled(),
-            inboundChaosDescription = inboundChaos.toString(),
-            outboundChaosActive = outboundChaos.isEnabled(),
-            outboundChaosDescription = outboundChaos.toString(),
-            jvm = jvmMetrics()
-        )
-    }
+    private fun getStats() = WiretapStats(
+        uptime = formatUptime(Duration.ofSeconds(gauge("process.uptime").toLong())),
+        totalRequests = trafficMetrics.totalRequests(),
+        inboundCount = trafficMetrics.inboundCount(),
+        outboundCount = trafficMetrics.outboundCount(),
+        latencyCounts = trafficMetrics.latencyCounts(),
+        trafficTimeline = trafficMetrics.trafficTimeline(),
+        hostTimelines = trafficMetrics.hostTimelines(),
+        traceCount = traceStore.traces().size,
+        inboundChaosActive = inboundChaos.isEnabled(),
+        inboundChaosDescription = inboundChaos.toString(),
+        outboundChaosActive = outboundChaos.isEnabled(),
+        outboundChaosDescription = outboundChaos.toString(),
+        jvm = jvmMetrics()
+    )
 
     private fun jvmMetrics(): JvmMetrics {
         val gcTimer = meterRegistry.find("jvm.gc.pause").timer()

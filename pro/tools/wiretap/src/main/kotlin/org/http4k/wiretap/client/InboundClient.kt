@@ -15,7 +15,7 @@ fun InboundClient(
     transactions: TransactionStore,
     proxy: HttpHandler
 ) = object : WiretapFunction {
-    private val sendRequest = SendRequest(proxy, clock, Inbound)
+    private val sendRequest = SendRequest(clock, Inbound, proxy)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "inbound" bind routes(

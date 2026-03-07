@@ -1,0 +1,12 @@
+{
+  "messages" : [ {
+    "role" : {
+      "value" : "assistant"
+    },
+    "content" : {
+      "text" : "I'll debug transaction 42. Let me get the full details.\n\nSteps:\n1. Call `get_transaction` with id=42 to get full request/response details\n2. Examine request headers, body, and URL parameters\n3. Examine response status, headers, and body\n4. Check for trace correlation via traceparent header\n5. If a trace ID is found, call `get_trace` to see the full span tree\n6. Identify potential issues (malformed requests, error responses, missing headers)",
+      "annotations" : null
+    }
+  } ],
+  "description" : "Debug a specific HTTP transaction"
+}

@@ -1,5 +1,6 @@
 package org.http4k.ai.mcp.client
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
@@ -284,7 +285,7 @@ abstract class McpClientContract<T> : PortBasedTest {
             val cancelResult = tasks().cancel(taskId)
             assertThat(cancelResult.valueOrNull(), equalTo(Unit))
 
-            assertThat(tasks().get(taskId).valueOrNull(), equalTo(null))
+            assertThat(tasks().get(taskId).valueOrNull(), absent())
         }
     }
 
