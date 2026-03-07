@@ -1,14 +1,13 @@
 package org.http4k.wiretap
 
 import org.http4k.ai.mcp.server.capability.ToolCapability
-import org.http4k.ai.mcp.server.security.McpSecurity
-import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
@@ -44,10 +43,11 @@ import kotlin.concurrent.fixedRateTimer
  * Wiretap is a tool for debugging http4k applications. It wraps a http4k application and records
  * all requests and responses, allowing you to monitor what is going on inside the app.
  */
+
 object Wiretap {
     operator fun invoke(
         uri: Uri,
-        mcpSecurity: McpSecurity = NoMcpSecurity,
+        mcpOptions: McpServerOptions = McpServerOptions.default,
         httpClient: HttpHandler = JavaHttpClient()
     ) = this(httpClient = httpClient) { _, _ -> uri }
 
@@ -55,7 +55,7 @@ object Wiretap {
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
-        mcpSecurity: McpSecurity = NoMcpSecurity,
+        mcpOptions: McpServerOptions = McpServerOptions.default,
         httpClient: HttpHandler = JavaHttpClient(),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
         clock: Clock = Clock.systemUTC(),
@@ -96,20 +96,20 @@ object Wiretap {
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),
-            Mcp(uri, httpClient, proxy)
+            Mcp(uri.extend(Uri.of(mcpOptions.path)), httpClient, proxy)
         )
 
         val allCapabilities = prompts + baseFunctions.flatMap { it.mcp() }
 
         val mcpCapabilities = McpCapabilities(
-            mcpSecurity.name,
+            mcpOptions.security.name,
             allCapabilities.count { it is ToolCapability } + 1
         )
 
         val allFunctions = baseFunctions +
             GetStats(trafficMetrics, traceStore, inboundChaos, outboundChaos, mcpCapabilities, meterRegistry)
 
-        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, allFunctions)
+        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpOptions.security, allFunctions)
 
         val http = CatchAndReportErrors()
             .then(
