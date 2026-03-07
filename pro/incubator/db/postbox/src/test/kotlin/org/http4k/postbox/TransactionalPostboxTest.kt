@@ -3,6 +3,7 @@ package org.http4k.postbox
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.FixedTimeSource
+import dev.forkhandles.tx.mem.InMemoryTransactor
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -11,7 +12,6 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.db.InMemoryTransactor
 import org.http4k.hamkrest.hasStatus
 import org.http4k.postbox.PendingResponseGenerators.linkHeader
 import org.http4k.postbox.Postbox.PendingRequest
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 class TransactionalPostboxTest {
     private val timeSource = FixedTimeSource()
     private val postbox = InMemoryPostbox(timeSource)
-    private val transactor = InMemoryTransactor<Postbox>(postbox)
+    private val transactor = InMemoryTransactor<Postbox, Postbox>(postbox, { postbox })
     private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
     private val handlers = PostboxHandlers(transactor, linkHeader("requestId"))
     private val requestHandler = handlers.intercepting(fromPath("requestId"))

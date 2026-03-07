@@ -16,7 +16,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
-import org.http4k.db.performAsResult
 import org.http4k.lens.location
 import org.http4k.postbox.PendingResponseGenerators.Empty
 import org.http4k.postbox.RequestIdResolvers.fromPath
@@ -34,7 +33,7 @@ typealias PendingResponseGenerator = (RequestId) -> Response
  * Configures HTTP handlers for a transactional postbox.
  */
 class PostboxHandlers(
-    private val transactor: PostboxTransactor,
+    private val transactor: TransactionalPostbox,
     private val responseGenerator: PendingResponseGenerator = Empty
 ) {
 

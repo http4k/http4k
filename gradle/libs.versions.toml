@@ -300,6 +300,7 @@ testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version
 testcontainers-junit-jupiter = "org.testcontainers:junit-jupiter:1.21.4"
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
+tx4k = { module = "dev.forkhandles:tx4k", version.ref = "forkhandles-bom" }
 underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }

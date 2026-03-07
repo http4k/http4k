@@ -17,7 +17,7 @@ import org.http4k.postbox.PostboxError
 import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
 import org.http4k.postbox.PostboxError.RequestNotFound
-import org.http4k.postbox.PostboxTransactor
+import org.http4k.postbox.TransactionalPostbox
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.RequestProcessingStatus.Dead
@@ -30,7 +30,7 @@ import java.time.Instant
 abstract class PostboxContract {
     val timeSource = FixedTimeSource()
     private val tick = Duration.ofSeconds(1)
-    abstract val postbox: PostboxTransactor
+    abstract val postbox: TransactionalPostbox
 
     private val requestId = id(1)
     private val request = Request(GET, "/1")

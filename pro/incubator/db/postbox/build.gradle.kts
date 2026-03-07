@@ -11,15 +11,14 @@ dependencies {
     compileOnly(platform(libs.junit.bom))
     compileOnly(libs.junit.jupiter.api)
     api(project(":http4k-core"))
-    api(project(":http4k-incubator-db-core"))
-    api(project(":http4k-incubator-db-exposed"))
-    api(project(":http4k-incubator-db-jdbc"))
+
     testImplementation(testFixtures(project(":http4k-core")))
 
     testImplementation(project(":http4k-testing-strikt"))
     api(libs.result4k)
     api(libs.values4k)
     api(libs.time4k)
+    api(libs.tx4k)
 
     testImplementation(libs.hsqldb)
 

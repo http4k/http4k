@@ -9,10 +9,10 @@ import dev.forkhandles.result4k.peek
 import dev.forkhandles.result4k.peekFailure
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import org.http4k.db.performAsResult
 import org.http4k.events.Events
 import org.http4k.postbox.Postbox
-import org.http4k.postbox.PostboxTransactor
+import org.http4k.postbox.TransactionalPostbox
+import org.http4k.postbox.performAsResult
 import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingFailed
 import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingSucceeded
 import org.http4k.postbox.processing.ProcessingEvent.PollWait
@@ -27,7 +27,7 @@ import kotlin.time.toKotlinDuration
  * PostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
  */
 class PostboxProcessing(
-    private val transactor: PostboxTransactor,
+    private val transactor: TransactionalPostbox,
     private val target: HttpHandler,
     private val batchSize: Int = 10,
     private val maxFailures: Int = 3,
