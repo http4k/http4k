@@ -48,7 +48,7 @@ object Wiretap {
     operator fun invoke(
         uri: Uri,
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
-    ) = this(httpClient = httpClient, appBuilder = { _, _, _ -> uri })
+    ) = this(httpClient = httpClient, appBuilder = { _, _ -> uri })
 
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
@@ -110,18 +110,15 @@ object Wiretap {
 
         val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpSecurity, allFunctions)
 
-        val httpRoutes = listOf(
-            ServerFilters.CatchAll()
-                .then(
-                    routes(
-                        WiretapUi(renderer, templates, allFunctions),
-                        orElse bind proxy
-                    )
+        val http = ServerFilters.CatchAll()
+            .then(
+                routes(
+                    WiretapUi(renderer, templates, allFunctions),
+                    orElse bind proxy
                 )
-        )
-        return poly(
-            httpRoutes + mcpRoutes
-        )
+            )
+
+        return poly(listOf(http) + mcpRoutes)
     }
 }
 

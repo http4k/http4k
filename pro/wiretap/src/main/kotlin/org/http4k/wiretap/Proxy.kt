@@ -8,7 +8,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ResponseFilters
-import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
@@ -67,7 +66,7 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
-    val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces), clock)
+    val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces))
 
     return ProxyHandlers(
         uri,

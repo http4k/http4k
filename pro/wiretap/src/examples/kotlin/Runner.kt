@@ -50,6 +50,7 @@ import org.http4k.security.BasicAuthSecurity
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri
+import org.http4k.wiretap.Wiretap
 
 enum class Option {
     mcpApp, app, website, externalMcpAppUrl
@@ -177,21 +178,21 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
 
 
 private fun wiretapFor(option: Option): PolyHandler = when (option) {
-    mcpApp ->
-        _root_ide_package_.org.http4k.wiretap.Wiretap { client, oTel, _ ->
+    mcpApp -> Wiretap { client, oTel ->
             ExampleMcpApp(oTel, client).asServer(Jetty(0)).start().uri()
         }
 
     app -> {
         val clientApp = App2().asServer(Jetty(0)).start()
 
-        _root_ide_package_.org.http4k.wiretap.Wiretap { http, oTel, _ ->
+        Wiretap { http, oTel ->
             ServerApp(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
         }
     }
 
-    website -> _root_ide_package_.org.http4k.wiretap.Wiretap(Uri.of("https://http4k.org"))
-    externalMcpAppUrl -> _root_ide_package_.org.http4k.wiretap.Wiretap(
+    website -> Wiretap(Uri.of("https://http4k.org"))
+
+    externalMcpAppUrl -> Wiretap(
         Uri.of("https://demo.http4k.org/mcp-app/"),
         JavaHttpClient()
     )

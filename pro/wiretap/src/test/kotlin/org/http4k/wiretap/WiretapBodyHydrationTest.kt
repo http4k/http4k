@@ -29,7 +29,7 @@ class HttpWiretapBodyHydrationTest : PortBasedTest {
         val poly = Wiretap(
             transactionStore = store,
             bodyHydration = bodyHydration
-        ) { _, _, _ ->
+        ) { _, _ ->
             { _: Request ->
                 Response(OK).body(Body("response-body".byteInputStream()))
             }.asServer(SunHttp(0)).start()

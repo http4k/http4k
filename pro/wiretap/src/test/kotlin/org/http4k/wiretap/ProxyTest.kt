@@ -45,7 +45,7 @@ class ProxyTest {
         inboundChaos = inboundChaos,
         outboundChaos = outboundChaos,
         sanitise = sanitise,
-        appBuilder = { _, _, _ -> Uri.of("http://localhost:9000") }
+        appBuilder = { _, _ -> Uri.of("http://localhost:9000") }
     )
 
     @Test

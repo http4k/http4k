@@ -6,5 +6,5 @@ import org.http4k.core.Uri
 import java.time.Clock
 
 fun interface WiretapAppBuilder {
-    operator fun invoke(http: HttpHandler, oTel: OpenTelemetry, clock: Clock): Uri
+    operator fun invoke(http: HttpHandler, oTel: OpenTelemetry): Uri
 }

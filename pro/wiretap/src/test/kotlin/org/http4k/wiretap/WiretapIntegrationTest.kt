@@ -35,7 +35,7 @@ class HttpWiretapIntegrationTest : PortBasedTest {
     @Disabled("Pre-existing failure")
     @Test
     fun `records transactions via real server`() {
-        val poly = Wiretap(transactionStore = store) { _, _, _ ->
+        val poly = Wiretap(transactionStore = store) { _, _ ->
             routes("/" bind GET to { Response(OK).body("hello") }).asServer(SunHttp(0)).start().uri()
         }
 
@@ -53,7 +53,7 @@ class HttpWiretapIntegrationTest : PortBasedTest {
     @Disabled("Pre-existing failure")
     @Test
     fun `recorded transactions contain traceparent from OTel tracing`() {
-        val poly = Wiretap(transactionStore = store) { _, oTel, _ ->
+        val poly = Wiretap(transactionStore = store) { _, oTel ->
             ServerFilters.OpenTelemetryTracing(oTel)
                 .then(routes("/" bind GET to { Response(OK).body("hello") }))
                 .asServer(SunHttp(0)).start().uri()
