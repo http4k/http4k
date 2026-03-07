@@ -1,5 +1,17 @@
 event: datastar-patch-elements
-data: elements <div id="tx-1" class="tx-row" data-class:selected="$selectedTx==='1'" data-on:click="$selectedTx='1'; @get('/_wiretap/traffic/1')">    <span class="dir-in"><span class="filterable" title="Filter by Inbound" data-on:click__stop="$direction==='Inbound' ? ($direction='') : ($direction='Inbound')">↓</span></span>    <span class="timestamp">00:00:00.000</span>    <span class="badge badge-in"><span class="filterable" title="Filter by Inbound" data-on:click__stop="$direction==='Inbound' ? ($direction='') : ($direction='Inbound')">IN</span></span>    <span class="method"><span class="filterable" title="Filter by GET" data-on:click__stop="$method==='GET' ? ($method='') : ($method='GET')">GET</span></span>        <span class="uri-cell"></span>        <span class="uri-cell"><span class="filterable" title="Filter by /test" data-on:click__stop="$path==='/test' ? ($path='') : ($path='/test')">/test</span></span>    <span class="status-2xx"><span class="filterable" title="Filter by 200" data-on:click__stop="$status==='200' ? ($status='') : ($status='200')">200</span></span>    <span class="duration">10ms</span></div>
+data: elements <div id="tx-1" class="tx-row" data-class:selected="$selectedTx==='1'" data-on:click="$selectedTx='1'; @get('/_wiretap/traffic/1')">
+data: elements     <span class="dir-in"><span class="filterable" title="Filter by Inbound" data-on:click__stop="$direction==='Inbound' ? ($direction='') : ($direction='Inbound')">↓</span></span>
+data: elements     <span class="timestamp">00:00:00.000</span>
+data: elements     <span class="badge badge-in"><span class="filterable" title="Filter by Inbound" data-on:click__stop="$direction==='Inbound' ? ($direction='') : ($direction='Inbound')">IN</span></span>
+data: elements     <span class="method"><span class="filterable" title="Filter by GET" data-on:click__stop="$method==='GET' ? ($method='') : ($method='GET')">GET</span></span>
+data: elements     
+data: elements     <span class="uri-cell"></span>
+data: elements     
+data: elements     <span class="uri-cell"><span class="filterable" title="Filter by /test" data-on:click__stop="$path==='/test' ? ($path='') : ($path='/test')">/test</span></span>
+data: elements     <span class="status-2xx"><span class="filterable" title="Filter by 200" data-on:click__stop="$status==='200' ? ($status='') : ($status='200')">200</span></span>
+data: elements     <span class="duration">10ms</span>
+data: elements </div>
+data: elements 
 data: selector #tx-list
 data: mode inner
 

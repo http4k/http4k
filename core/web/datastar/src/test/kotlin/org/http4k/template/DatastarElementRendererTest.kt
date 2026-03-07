@@ -28,7 +28,7 @@ class DatastarElementRendererTest {
         assertThat(
             renderer(viewModel1, viewModel2),
             equalTo(
-                listOf(Element.of("<foo>bar</foo><bar>foo</bar>"), Element.of("<foo2>bar</foo2><bar2>foo</bar2>"))
+                listOf(Element.of("<foo>bar</foo>\n<bar>foo</bar>"), Element.of("<foo2>bar</foo2>\n<bar2>foo</bar2>"))
             )
         )
     }

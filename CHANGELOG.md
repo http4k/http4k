@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.32.0.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-web-datastar**: [Possible Break] Render Datastar Elements with new lines as events with multiple data element lines.
 - **http4k-ai-mcp-sdk**: [Fix] Improve lens support for Tool arguments which are not strings.
 - **http4k-ai-mcp-sdk**: [Fix] Improve lens support for Tool arguments which are not strings.
 - **http4k-ai-mcp-sdk**: Improve support for OpenTelemetry tracing as per the OTel specification.

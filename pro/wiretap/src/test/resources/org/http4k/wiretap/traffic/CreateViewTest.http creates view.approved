@@ -1,5 +1,28 @@
 event: datastar-patch-elements
-data: elements <div class="tab-btn" data-tab-id="-3" data-class:active="$activeView==='-3'"     data-on:click="@post('/_wiretap/traffic/views/-3/activate')">    <span>All</span></div><div class="tab-btn" data-tab-id="-2" data-class:active="$activeView==='-2'"     data-on:click="@post('/_wiretap/traffic/views/-2/activate')">    <span>Inbound</span></div><div class="tab-btn" data-tab-id="-1" data-class:active="$activeView==='-1'"     data-on:click="@post('/_wiretap/traffic/views/-1/activate')">    <span>Outbound</span></div><div class="tab-btn" data-tab-id="4" data-class:active="$activeView==='4'"     data-on:click="@post('/_wiretap/traffic/views/4/activate')">    <span>API</span></div><div class="add-tab-btn" data-on:click="$showAddView=!$showAddView; $name=''"><i class="bi bi-plus-lg"></i> Add Tab</div><div class="action-btn action-btn-danger" style="margin-left: auto" data-on:click="@delete('/_wiretap/traffic')"><i class="bi bi-trash"></i> Clear</div>
+data: elements 
+data: elements <div class="tab-btn" data-tab-id="-3" data-class:active="$activeView==='-3'"
+data: elements      data-on:click="@post('/_wiretap/traffic/views/-3/activate')">
+data: elements     <span>All</span>
+data: elements </div>
+data: elements 
+data: elements <div class="tab-btn" data-tab-id="-2" data-class:active="$activeView==='-2'"
+data: elements      data-on:click="@post('/_wiretap/traffic/views/-2/activate')">
+data: elements     <span>Inbound</span>
+data: elements </div>
+data: elements 
+data: elements <div class="tab-btn" data-tab-id="-1" data-class:active="$activeView==='-1'"
+data: elements      data-on:click="@post('/_wiretap/traffic/views/-1/activate')">
+data: elements     <span>Outbound</span>
+data: elements </div>
+data: elements 
+data: elements <div class="tab-btn" data-tab-id="4" data-class:active="$activeView==='4'"
+data: elements      data-on:click="@post('/_wiretap/traffic/views/4/activate')">
+data: elements     <span>API</span>
+data: elements </div>
+data: elements 
+data: elements <div class="add-tab-btn" data-on:click="$showAddView=!$showAddView; $name=''"><i class="bi bi-plus-lg"></i> Add Tab</div>
+data: elements <div class="action-btn action-btn-danger" style="margin-left: auto" data-on:click="@delete('/_wiretap/traffic')"><i class="bi bi-trash"></i> Clear</div>
+data: elements 
 data: selector #tab-bar
 data: mode inner
 

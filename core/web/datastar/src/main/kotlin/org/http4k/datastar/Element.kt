@@ -4,8 +4,8 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 
 /**
- * Represents a Fragment which contains no surrounding whitespace or inline newlines
+ * Represents a HTML Fragment for Datastar SSE transport
  */
-class Element private constructor(value: String) : StringValue(value.trim().replace("\n", "")) {
+class Element private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Element>(::Element)
 }

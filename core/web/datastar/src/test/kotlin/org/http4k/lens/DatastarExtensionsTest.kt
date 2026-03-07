@@ -45,7 +45,7 @@ class DatastarExtensionsTest {
         assertThat(
             response.datastarEvents(), equalTo(
                 listOf(
-                    PatchElements("<foo/>", "<bar/>"),
+                    PatchElements("<foo/>\n<bar/>"),
                     PatchSignals(listOf(Signal.of("foo"))),
                 )
             )

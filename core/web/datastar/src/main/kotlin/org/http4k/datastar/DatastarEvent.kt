@@ -24,7 +24,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         override val id: SseEventId? = null,
     ) : DatastarEvent(
         "datastar-patch-elements",
-        elements.map { "elements $it" } + listOfNotNull(
+        elements.flatMap { el -> el.value.split("\n").map { "elements $it" } } + listOfNotNull(
             selector?.value?.let { "selector $it" },
             mode.takeIf { it != outer }?.let { "mode $it" },
             useViewTransition.takeIf { it }?.let { "useViewTransition $it" }
@@ -75,7 +75,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
             when (event.event) {
                 "datastar-patch-elements" -> {
                     PatchElements(
-                        data("elements", Element.Companion::of),
+                        listOf(Element.of(data("elements") { it }.joinToString("\n"))),
                         data("mode", MorphMode::valueOf).firstOrNull() ?: outer,
                         data("selector", Selector.Companion::of).firstOrNull(),
                         data("useViewTransition", String::toBoolean).firstOrNull() ?: false,
@@ -96,7 +96,7 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
         }
 
         private fun <T> List<String>.data(name: String, fn: (String) -> T): List<T> =
-            filter { it.startsWith(name) }.map { it.removePrefix(name).trim() }.map(fn)
+            filter { it.startsWith(name) }.map { it.removePrefix("$name ") }.map(fn)
     }
 }
 

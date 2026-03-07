@@ -22,6 +22,26 @@ class DatastarEventTest {
     }
 
     @Test
+    fun `patch multi-line element splits into separate SSE data lines`() {
+        assertThat(
+            DatastarEvent.PatchElements(Element.of("<pre>\n  hello\n</pre>")).toSseEvent(),
+            equalTo(
+                SseMessage.Event(
+                    "datastar-patch-elements",
+                    "elements <pre>\nelements   hello\nelements </pre>",
+                    null
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `round trips multi-line element`() {
+        val original = DatastarEvent.PatchElements(Element.of("<pre>\n  hello\n</pre>"))
+        assertThat(DatastarEvent.from(original.toSseEvent()), equalTo(original))
+    }
+
+    @Test
     fun `only include useViewTransition and mode in event if defaults are overridden`() {
         assertThat(
             DatastarEvent.PatchElements(Element.of("foo"), morphMode = MorphMode.replace, useViewTransition = true).toSseEvent(),

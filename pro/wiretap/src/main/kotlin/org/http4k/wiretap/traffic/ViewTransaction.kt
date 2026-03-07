@@ -5,6 +5,7 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.long
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -28,14 +29,16 @@ fun ViewTransaction(transactionStore: TransactionStore, clock: Clock) = object :
     private fun lookup(id: Long) = transactionStore.get(id)?.toDetail(clock)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "/{id}" bind GET to { req ->
+        "/{id}" bind GET to { req: Request ->
             val id = Path.long().of("id")(req)
             when (val detail = lookup(id)?.let { TransactionDetailView(it) }) {
                 null -> Response(NOT_FOUND)
-                else -> Response(OK).datastarElements(
-                    elements(detail),
-                    selector = Selector.of("#detail-panel")
-                )
+                else -> {
+                    Response(OK).datastarElements(
+                        elements(detail),
+                        selector = Selector.of("#detail-panel")
+                    )
+                }
             }
         }
 

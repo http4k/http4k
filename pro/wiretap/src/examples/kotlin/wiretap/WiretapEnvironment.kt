@@ -15,13 +15,13 @@ import wiretap.examples.McpServer
 import wiretap.examples.McpServerWithOtelTracing
 import wiretap.examples.OpenApiApp
 
-sealed class WiretapEnvironment : () -> PolyHandler
+sealed interface WiretapEnvironment : () -> PolyHandler
 
-object HttpApp : WiretapEnvironment() {
+object HttpApp : WiretapEnvironment {
     override fun invoke() = Wiretap(HttpApp().asServer(Jetty(0)).start().uri())
 }
 
-object HttpAppWithOtelTracing : WiretapEnvironment() {
+object HttpAppWithOtelTracing : WiretapEnvironment {
     override fun invoke(): PolyHandler {
         val clientApp = HttpApp().asServer(Jetty(0)).start()
         return Wiretap { http, oTel ->
@@ -30,32 +30,32 @@ object HttpAppWithOtelTracing : WiretapEnvironment() {
     }
 }
 
-object McpApp : WiretapEnvironment() {
+object McpApp : WiretapEnvironment {
     override fun invoke() = Wiretap(McpApp().asServer(Jetty(0)).start().uri())
 }
 
-object McpServer : WiretapEnvironment() {
+object McpServer : WiretapEnvironment {
     override fun invoke() = Wiretap(McpServer().asServer(Jetty(0)).start().uri())
 }
 
-object McpServerWithOtel : WiretapEnvironment() {
+object McpServerWithOtel : WiretapEnvironment {
     override fun invoke() = Wiretap { http, otel ->
         McpServerWithOtelTracing(http, otel).asServer(Jetty(0)).start().uri()
     }
 }
 
-object OpenApiApp : WiretapEnvironment() {
+object OpenApiApp : WiretapEnvironment {
     override fun invoke() = Wiretap(OpenApiApp().asServer(Jetty(0)).start().uri())
 }
 
-object ExternalMcpServer : WiretapEnvironment() {
+object ExternalMcpServer : WiretapEnvironment {
     override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org/mcp-sdk"), httpClient = JavaHttpClient().debug())
 }
 
-object ExternalMcpApp : WiretapEnvironment() {
+object ExternalMcpApp : WiretapEnvironment {
     override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org/mcp-app"))
 }
 
-object ExternalWebsite : WiretapEnvironment() {
+object ExternalWebsite : WiretapEnvironment {
     override fun invoke() = Wiretap(Uri.of("https://http4k.org"))
 }
