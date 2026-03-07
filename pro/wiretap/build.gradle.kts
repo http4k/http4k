@@ -21,7 +21,6 @@ dependencies {
     testImplementation(project(":http4k-testing-approval"))
     testImplementation(project(":http4k-testing-hamkrest"))
     testImplementation(project(":http4k-server-jetty"))
-    testImplementation(project(":http4k-testing-playwright"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(testFixtures(project(":http4k-ops-opentelemetry")))
