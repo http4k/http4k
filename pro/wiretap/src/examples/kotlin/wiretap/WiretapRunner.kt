@@ -16,9 +16,9 @@ fun main() {
 //    val wiretap = McpServer()
 //    val wiretap = McpServerWithOtel()
 //    val wiretap = OpenApiApp()
-    val wiretap = ExternalMcpServer()
+//    val wiretap = ExternalMcpServer()
 //    val wiretap = ExternalMcpApp()
-//    val wiretap = ExternalWebsite()
+    val wiretap = ExternalWebsite()
 
 //    println(
 //        HttpNonStreamingMcpClient(Uri.of("https://demo.http4k.org/mcp-sdk/mcp")).apply { start() }

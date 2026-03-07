@@ -49,7 +49,7 @@ object OpenApiApp : WiretapEnvironment {
 }
 
 object ExternalMcpServer : WiretapEnvironment {
-    override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org/mcp-sdk"), httpClient = JavaHttpClient().debug())
+    override fun invoke() = Wiretap(Uri.of("https://demo.http4k.org/mcp-sdk"))
 }
 
 object ExternalMcpApp : WiretapEnvironment {

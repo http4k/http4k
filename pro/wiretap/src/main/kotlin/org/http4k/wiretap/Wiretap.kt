@@ -7,7 +7,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
@@ -96,7 +95,7 @@ object Wiretap {
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),
-            Mcp(uri.extend(Uri.of(mcpOptions.path)), httpClient, proxy)
+            Mcp(uri, mcpOptions.path, httpClient, proxy)
         )
 
         val allCapabilities = prompts + baseFunctions.flatMap { it.mcp() }
@@ -109,7 +108,7 @@ object Wiretap {
         val allFunctions = baseFunctions +
             GetStats(trafficMetrics, traceStore, inboundChaos, outboundChaos, mcpCapabilities, meterRegistry)
 
-        val mcpRoutes = "/_wiretap" bind WiretapMcp("http4k-wiretap", mcpOptions.security, allFunctions)
+        val mcpRoutes = "/_wiretap" bind WiretapMcp(mcpOptions.security, allFunctions)
 
         val http = CatchAndReportErrors()
             .then(

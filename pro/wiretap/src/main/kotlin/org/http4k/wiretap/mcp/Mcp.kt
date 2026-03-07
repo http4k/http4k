@@ -8,17 +8,23 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.extend
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 
-fun Mcp(mcpServerUri: Uri, rawClient: HttpHandler, proxy: HttpHandler) = object : WiretapFunction {
+fun Mcp(
+    baseUri: Uri,
+    path: String,
+    rawClient: HttpHandler,
+    proxy: HttpHandler
+) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer): RoutingHttpHandler {
-
+        val mcpServerUri = baseUri.extend(Uri.of(path))
         val mcpClient = HttpNonStreamingMcpClient(
-            mcpServerUri,
+            Uri.of(path),
             McpEntity.of("http4k-wiretap"), Version.of("0.0.0"),
             proxy
         )

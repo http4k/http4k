@@ -7,11 +7,10 @@ import org.http4k.routing.mcpHttpStreaming
 import org.http4k.wiretap.WiretapFunction
 
 fun WiretapMcp(
-    name: String,
     mcpSecurity: McpSecurity,
     functions: List<WiretapFunction>,
 ): PolyHandler = mcpHttpStreaming(
-    ServerMetaData(name, "0.0.0"),
+    ServerMetaData("http4k-wiretap", "0.0.0"),
     mcpSecurity,
     *(
         listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt()) +
