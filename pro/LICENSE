@@ -9,7 +9,15 @@ Copyright (c) 2025-present http4k Ltd, a company registered in England and Wales
 
 "Subscription Tier" means the specific commercial subscription offering as defined in the Commercial Terms.
 
-"Host" means each individual machine (real or virtual, including servers, containers, workstations, smartphones, POS, industrial controls, gateways, sensors, IoT endpoints, or any other physical or simulated computing interface or machine) of Customer and/or its Affiliates (including, without limitation, employees, agents or consultants thereof) with access to Licensed Materials hereunder; provided that, for development purposes only, a Host license shall operate as a floating developer license that permits installation of the Licensed Materials on any number of Developer Workstations, provided that the Licensed Materials may only be accessed and used by one unnamed developer at a time per license.
+"Host" means each individual machine (real or virtual, including servers, containers, workstations, smartphones, POS, industrial controls, gateways, sensors, IoT endpoints, or any other physical or simulated computing interface or machine) of Customer and/or its Affiliates (including, without limitation, employees, agents or consultants thereof) with access to Licensed Materials hereunder.
+
+"Developer Workstation" means a single physical or virtual machine operated interactively by one or more human developers for the purpose of writing, running, or testing software. A Developer Workstation must have a single active interactive session. The following are explicitly excluded from this definition and are treated as Hosts for licensing purposes:
+- Shared servers accessed concurrently by multiple developers via remote sessions (e.g. SSH)
+- Continuous integration or continuous delivery (CI/CD) runners or build agents
+- Automated test execution environments not directly operated by a human
+- Staging, pre-production, or any environment used to run software outside of direct human development activity
+
+"Floating Developer License" means a license that permits installation of the Proprietary Components on any number of Developer Workstations, provided that the number of concurrently active Developer Workstations does not exceed the number of Floating Developer Licenses held by the Customer. Collaborative development practices such as pair programming or mob programming on a single Developer Workstation consume only one Floating Developer License.
 
 "Proprietary Components" means all portions of the Software not released under Apache 2 license.
 
@@ -19,6 +27,8 @@ Copyright (c) 2025-present http4k Ltd, a company registered in England and Wales
 
 "Annual Recurring Revenue" or "ARR" means the total gross revenue received by an organization and its Affiliates from all sources during a twelve-month period, including but not limited to sales of products or services, licensing fees, subscriptions, consulting revenue, and any other commercial income, calculated on a rolling twelve-month basis.
 
+"Evaluation Period" means a single, non-renewable period of sixty (60) days commencing on the date of first access to or use of any Proprietary Component by or on behalf of an organization, during which that organization may use the Software for internal evaluation purposes without a paid subscription, subject to the conditions of Section 2.3.
+
 ## 2. License Grant and Restrictions
 
 2.1 License Types and Conditions
@@ -27,7 +37,7 @@ This Software is governed by this Commercial License. The Software may be used u
 a) Commercial Usage:
 - Have a valid subscription (paid or free) obtained through http4k's official channels
 - Have agreed to and are in compliance with the Commercial Terms
-- Maintain the correct number of Host licenses for your usage
+- Maintain the correct number of Host licenses and/or Floating Developer Licenses for your usage
 - Comply with all subscription requirements as specified by http4k Ltd
 
 b) Non-Commercial Usage:
@@ -50,9 +60,18 @@ Subject to the foregoing conditions, you are permitted to:
 All modifications, patches, and derivatives remain the property of http4k Ltd and/or its licensors. Such modifications may only be used, copied, modified, displayed, distributed, or otherwise exploited in accordance with your applicable license type.
 
 2.2 Development and Testing
-For development purposes only, a Host license shall operate as a floating developer license that permits installation of the Software on any number of Developer Workstations, provided that the Software may only be accessed and used by one unnamed developer at a time per license.
+For development purposes, a subscription includes Floating Developer Licenses as specified in the applicable Subscription Tier or Quote. Each Floating Developer License permits installation of the Proprietary Components on any number of Developer Workstations, provided that the total number of concurrently active Developer Workstations does not exceed the number of Floating Developer Licenses held. All other Hosts, including but not limited to CI/CD runners, shared development servers, staging environments, and automated test environments, require a separate Host license.
 
-2.3 Copying and Modification
+2.3 Evaluation Period for Commercial Entities
+Organizations with ARR of $1,000,000 USD or more that have not yet obtained a paid subscription may use the Proprietary Components solely for internal evaluation during the Evaluation Period, subject to the following conditions:
+
+- The Evaluation Period begins on the date of first access to or use of any Proprietary Component and runs for sixty (60) consecutive days
+- The Evaluation Period is non-renewable and may not be reset or restarted under any circumstances
+- Evaluation use is limited to Developer Workstations only; use on CI/CD runners, staging environments, shared servers, or any production environment is not permitted during the Evaluation Period
+- Upon expiry of the Evaluation Period, the organization must either obtain a valid subscription or cease all use of the Proprietary Components immediately
+- Organizations that have previously held a subscription are not eligible for a new Evaluation Period
+
+2.4 Copying and Modification
 You may:
 - Copy and modify the Software for your own use in accordance with your license type
 - Create derivative works based on the Software
@@ -67,13 +86,13 @@ You may not:
 - Use http4k trademarks without written permission
 - Redistribute the original Software or modifications thereof as standalone products competing with http4k
 
-2.4 License Validation and Access Control
+2.5 License Validation and Access Control
 - The commercially licensed components include protected source code and technical measures that control access
 - You are responsible for maintaining valid license keys or access tokens provided by http4k Ltd
 - You may not share, publish, distribute, or expose license keys or protected source code to unauthorized users
 - You must ensure your usage complies with the license grant for your subscription tier
 
-2.5 Prohibited Activities
+2.6 Prohibited Activities
 
 You may not, with respect to the Proprietary Components, directly or indirectly:
 - Create commercial products that:
@@ -87,7 +106,7 @@ You may not, with respect to the Proprietary Components, directly or indirectly:
 
 The above restrictions do not apply to http4k components released under the Apache 2 license.
 
-2.6 Access to Protected Components
+2.7 Access to Protected Components
 - Access to protected source code and binary distributions is provided through designated private repositories
 - Your rights to access these repositories are determined by your subscription tier
 - You may not redistribute protected source code or binaries except as explicitly permitted
