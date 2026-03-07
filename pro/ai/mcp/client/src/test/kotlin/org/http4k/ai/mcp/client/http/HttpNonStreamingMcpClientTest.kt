@@ -43,8 +43,8 @@ class HttpNonStreamingMcpClientTest : McpClientContract<Sse>() {
     private val creds = Credentials("user", "password")
 
     override fun clientFor(port: Int) = HttpNonStreamingMcpClient(
-        McpEntity.of("http4k MCP client"), Version.of("0.0.0"),
         Uri.of("http://localhost:${port}/mcp"),
+        McpEntity.of("http4k MCP client"), Version.of("0.0.0"),
         ClientFilters.BasicAuth(creds).then(JavaHttpClient()),
     )
 

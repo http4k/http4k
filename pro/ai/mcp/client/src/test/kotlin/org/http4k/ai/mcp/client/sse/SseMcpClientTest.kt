@@ -23,8 +23,8 @@ class SseMcpClientTest : McpStreamingClientContract<Sse>() {
     override val doesNotifications = true
 
     override fun clientFor(port: Int) = SseMcpClient(
-        clientName, Version.of("1.0.0"),
         Request(GET, Uri.of("http://localhost:${port}/sse")),
+        clientName, Version.of("1.0.0"),
         ClientFilters.ApiKeyAuth(Header.required("KEY") of "123").then(JavaHttpClient(responseBodyMode = Stream)),
         ClientCapabilities()
     )

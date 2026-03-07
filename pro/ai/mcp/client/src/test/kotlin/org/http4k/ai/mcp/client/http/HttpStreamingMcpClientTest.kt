@@ -73,8 +73,8 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
     )
 
     override fun clientFor(port: Int) = HttpStreamingMcpClient(
-        clientName, Version.of("1.0.0"),
         Uri.of("http://localhost:${port}/mcp"),
+        clientName, Version.of("1.0.0"),
         http,
         ClientCapabilities(),
         notificationSseReconnectionMode = Disconnect,

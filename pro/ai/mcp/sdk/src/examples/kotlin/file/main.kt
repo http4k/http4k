@@ -42,8 +42,8 @@ fun main() {
     Thread.sleep(200)
 
     HttpStreamingMcpClient(
-        McpEntity.of("client"), Version.of("1"),
         Uri.of("http://localhost:8000/mcp"),
+        McpEntity.of("client"), Version.of("1"),
         notificationSseReconnectionMode = Disconnect
     ).use {
         it.start()

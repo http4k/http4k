@@ -94,9 +94,9 @@ import kotlin.concurrent.thread
  * HTTP Streaming connection MCP client
  */
 class HttpStreamingMcpClient(
-    private val name: McpEntity,
-    private val version: Version,
     private val baseUri: Uri,
+    private val name: McpEntity = McpEntity.of("http4k-mcp-client"),
+    private val version: Version = Version.of("0.0.0"),
     private val http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     private val capabilities: ClientCapabilities = All,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,

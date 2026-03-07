@@ -44,7 +44,7 @@ fun BlaiseCode(env: Environment): PolyHandler {
 
     val history = History.InMemory()
 
-    val client = HttpStreamingMcpClient(McpEntity.of("mcp"), Version.of("1.0"), MCP_URL(env), http)
+    val client = HttpStreamingMcpClient(MCP_URL(env), McpEntity.of("mcp"), Version.of("1.0"), http)
 
     val llm = Chat.AnthropicAI(ANTHROPIC_API_KEY(env), http)
 

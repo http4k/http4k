@@ -26,8 +26,8 @@ class WebsocketMcpClientTest : McpStreamingClientContract<Websocket>() {
     ).apply { start() }
 
     override fun clientFor(port: Int) = WebsocketMcpClient(
-        clientName, Version.of("1.0.0"),
         Request(GET, Uri.of("ws://localhost:${port}/ws")),
+        clientName, Version.of("1.0.0"),
         WebsocketClient(Duration.ofSeconds(2), true),
         ClientCapabilities(),
     )

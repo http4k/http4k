@@ -20,8 +20,9 @@ fun Mcp(uri: Uri, rawClient: HttpHandler, proxy: HttpHandler) = object : Wiretap
         val mcpServerUri = uri.extend(Uri.of("/mcp"))
 
         val mcpClient = HttpNonStreamingMcpClient(
-            McpEntity.of("http4k Wiretap"), Version.of("0.0.0"),
-            mcpServerUri, proxy
+            mcpServerUri,
+            McpEntity.of("http4k-wiretap"), Version.of("0.0.0"),
+            proxy
         )
 
         return "/mcp" bind when {

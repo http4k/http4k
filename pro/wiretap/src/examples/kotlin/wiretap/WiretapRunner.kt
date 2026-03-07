@@ -1,14 +1,16 @@
 package wiretap
 
+import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri
 
 fun main() {
-    val wiretap = HttpApp()
+//    val wiretap = HttpApp()
 //    val wiretap = HttpAppWithOtelTracing()
 //    val wiretap = McpApp()
 //    val wiretap = McpServer()
@@ -16,7 +18,12 @@ fun main() {
 //    val wiretap = OpenApiApp()
 //    val wiretap = ExternalMcpServer()
 //    val wiretap = ExternalMcpApp()
-//    val wiretap = ExternalWebsite()
+    val wiretap = ExternalWebsite()
+
+//    println(
+//        HttpNonStreamingMcpClient(Uri.of("https://demo.http4k.org/mcp-sdk/mcp")).apply { start() }
+//            .tools().list()
+//    )
 
     val server = wiretap.asServer(Jetty(21000)).start()
 

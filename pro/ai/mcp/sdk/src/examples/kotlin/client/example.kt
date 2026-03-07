@@ -19,8 +19,8 @@ import org.http4k.ai.mcp.protocol.Version
 
 fun main() {
     val mcpClient = HttpStreamingMcpClient(
-        McpEntity.of("foobar"), Version.of("1.0.0"),
         Uri.of("http://localhost:3001/mcp"),
+        McpEntity.of("foobar"), Version.of("1.0.0"),
         JavaHttpClient(responseBodyMode = Stream),
         ClientCapabilities()
     )

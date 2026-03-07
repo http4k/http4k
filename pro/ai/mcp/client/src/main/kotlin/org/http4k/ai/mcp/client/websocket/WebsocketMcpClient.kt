@@ -49,9 +49,9 @@ import kotlin.random.Random
  * using received().
  */
 class WebsocketMcpClient(
-    name: McpEntity,
-    version: Version,
     private val wsRequest: Request,
+    name: McpEntity = McpEntity.of("http4k-mcp-client"),
+    version: Version = Version.of("0.0.0"),
     private val websocketFactory: WebsocketFactory,
     capabilities: ClientCapabilities = All,
     protocolVersion: ProtocolVersion = LATEST_VERSION,

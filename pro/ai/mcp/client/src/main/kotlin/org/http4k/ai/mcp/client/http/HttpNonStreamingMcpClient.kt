@@ -62,9 +62,9 @@ import java.util.concurrent.atomic.AtomicReference
  * JSON Rpc connection MCP client.
  */
 class HttpNonStreamingMcpClient(
-    private val entity: McpEntity,
-    private val version: Version,
     private val baseUri: Uri,
+    private val entity: McpEntity = McpEntity.of("http4k-mcp-client"),
+    private val version: Version = Version.of("0.0.0"),
     private val http: HttpHandler = JavaHttpClient(),
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
 ) : McpClient {

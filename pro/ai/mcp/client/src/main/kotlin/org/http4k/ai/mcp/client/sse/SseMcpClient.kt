@@ -45,9 +45,9 @@ import kotlin.random.Random
  * SSE connection MCP client.
  */
 class SseMcpClient(
-    name: McpEntity,
-    version: Version,
     sseRequest: Request,
+    name: McpEntity = McpEntity.of("http4k-mcp-client"),
+    version: Version = Version.of("0.0.0"),
     http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     capabilities: ClientCapabilities = All,
     protocolVersion: ProtocolVersion = LATEST_VERSION,

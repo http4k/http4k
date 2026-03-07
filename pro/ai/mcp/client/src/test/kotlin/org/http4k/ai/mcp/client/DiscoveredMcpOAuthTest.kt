@@ -89,8 +89,8 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
         val http = JavaHttpClient(responseBodyMode = Stream)
 
         HttpStreamingMcpClient(
-            McpEntity.of("client"), Version.of("1.0.0"),
             Uri.of("http://localhost:${mcpServer.port()}/mcp"),
+            McpEntity.of("client"), Version.of("1.0.0"),
             ClientFilters.DiscoveredMcpOAuth(Credentials("123", "123"), listOf("read", "write")).then(http),
             ClientCapabilities(),
             notificationSseReconnectionMode = Disconnect,

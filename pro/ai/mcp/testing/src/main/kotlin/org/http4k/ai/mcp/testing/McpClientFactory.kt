@@ -27,9 +27,8 @@ fun interface McpClientFactory : () -> McpClient {
         ) =
             McpClientFactory {
                 HttpStreamingMcpClient(
-                    McpEntity.of("http4k MCP Testing"),
-                    Version.of("0.0.0"),
-                    serverUri, http
+                    serverUri,
+                    http = http
                 )
             }
 
