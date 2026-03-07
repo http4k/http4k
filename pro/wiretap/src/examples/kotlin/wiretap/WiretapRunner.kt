@@ -23,7 +23,7 @@ fun main() {
     println("started ${server.uri().path("_wiretap")}")
 
     (0..5).forEach {
-        JavaHttpClient()(Request(GET, server.uri().path(it.toString())))
+        JavaHttpClient()(Request(GET, server.uri()))
     }
 
 }
