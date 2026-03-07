@@ -1,40 +1,41 @@
-package org.http4k.wiretap
+package org.http4k.wiretap.proxy
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.http4k.chaos.ChaosBehaviours
 import org.http4k.chaos.ChaosEngine
-import org.http4k.core.Method.GET
+import org.http4k.core.HttpTransaction
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
-import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status
+import org.http4k.core.Body
 import org.http4k.core.Uri
 import org.http4k.wiretap.domain.BodyHydration
-import org.http4k.wiretap.domain.Direction.Inbound
-import org.http4k.wiretap.domain.Direction.Outbound
+import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
 import org.junit.jupiter.api.Test
 import java.time.Clock
-import java.time.Instant.EPOCH
-import java.time.ZoneOffset.UTC
+import java.time.Instant
+import java.time.ZoneOffset
 
 class ProxyTest {
 
-    private val clock = Clock.fixed(EPOCH, UTC)
+    private val clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
     private val transactions = TransactionStore.InMemory()
     private val trafficMetrics = TrafficMetrics(SimpleMeterRegistry(), clock = clock)
 
     private fun proxy(
         bodyHydration: BodyHydration = BodyHydration.None,
-        httpClient: (Request) -> Response = { Response(OK).body("upstream") },
+        httpClient: (Request) -> Response = { Response(Status.OK).body("upstream") },
         inboundChaos: ChaosEngine = ChaosEngine(),
         outboundChaos: ChaosEngine = ChaosEngine(),
-        sanitise: (org.http4k.core.HttpTransaction) -> org.http4k.core.HttpTransaction? = { it }
+        sanitise: (HttpTransaction) -> HttpTransaction? = { it }
     ) = Proxy(
         bodyHydration = bodyHydration,
         httpClient = httpClient,
@@ -51,27 +52,27 @@ class ProxyTest {
     @Test
     fun `inbound request is recorded with Direction Inbound`() {
         val proxy = proxy()
-        proxy.routing(Request(GET, "/test"))
+        proxy.routing(Request(Method.GET, "/test"))
 
         val recorded = transactions.list()
         assertThat(recorded, hasSize(equalTo(1)))
-        assertThat(recorded.first().direction, equalTo(Inbound))
+        assertThat(recorded.first().direction, equalTo(Direction.Inbound))
     }
 
     @Test
     fun `outbound request is recorded with Direction Outbound`() {
         val proxy = proxy()
-        proxy.outboundHttp(Request(GET, "http://example.com/test"))
+        proxy.outboundHttp(Request(Method.GET, "http://example.com/test"))
 
         val recorded = transactions.list()
         assertThat(recorded, hasSize(equalTo(1)))
-        assertThat(recorded.first().direction, equalTo(Outbound))
+        assertThat(recorded.first().direction, equalTo(Direction.Outbound))
     }
 
     @Test
     fun `sanitise filter can suppress recording`() {
         val proxy = proxy(sanitise = { null })
-        proxy.routing(Request(GET, "/test"))
+        proxy.routing(Request(Method.GET, "/test"))
 
         assertThat(transactions.list(), hasSize(equalTo(0)))
     }
@@ -81,7 +82,7 @@ class ProxyTest {
         val proxy = proxy(sanitise = { tx ->
             tx.copy(request = tx.request.removeHeader("Authorization"))
         })
-        proxy.routing(Request(GET, "/test").header("Authorization", "Bearer secret"))
+        proxy.routing(Request(Method.GET, "/test").header("Authorization", "Bearer secret"))
 
         val recorded = transactions.list().first()
         assertThat(recorded.transaction.request.header("Authorization"), absent())
@@ -90,22 +91,36 @@ class ProxyTest {
     @Test
     fun `chaos filter is applied to inbound proxied requests`() {
         val inboundChaos = ChaosEngine()
-        inboundChaos.enable(org.http4k.chaos.ChaosBehaviours.ReturnStatus(INTERNAL_SERVER_ERROR))
+        inboundChaos.enable(ChaosBehaviours.ReturnStatus(Status.INTERNAL_SERVER_ERROR))
 
         val proxy = proxy(inboundChaos = inboundChaos)
-        val response = proxy.routing(Request(GET, "/test"))
+        val response = proxy.routing(Request(Method.GET, "/test"))
 
-        assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+        assertThat(response.status, equalTo(Status.INTERNAL_SERVER_ERROR))
+    }
+
+    @Test
+    fun `records transaction with stream bodies intact`() {
+        val proxy = proxy(
+            bodyHydration = BodyHydration.All,
+            httpClient = { Response(Status.OK).body(Body("response-body".byteInputStream())) }
+        )
+        proxy.routing(Request(Method.GET, "/test").body(Body("request-body".byteInputStream())))
+
+        val recorded = transactions.list()
+        assertThat(recorded, hasSize(equalTo(1)))
+        assertThat(recorded.first().transaction.request.bodyString(), equalTo("request-body"))
+        assertThat(recorded.first().transaction.response.bodyString(), equalTo("response-body"))
     }
 
     @Test
     fun `chaos filter is applied to outbound requests`() {
         val outboundChaos = ChaosEngine()
-        outboundChaos.enable(org.http4k.chaos.ChaosBehaviours.ReturnStatus(INTERNAL_SERVER_ERROR))
+        outboundChaos.enable(ChaosBehaviours.ReturnStatus(Status.INTERNAL_SERVER_ERROR))
 
         val proxy = proxy(outboundChaos = outboundChaos)
-        val response = proxy.outboundHttp(Request(GET, "http://example.com/test"))
+        val response = proxy.outboundHttp(Request(Method.GET, "http://example.com/test"))
 
-        assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+        assertThat(response.status, equalTo(Status.INTERNAL_SERVER_ERROR))
     }
 }

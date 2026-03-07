@@ -1,4 +1,4 @@
-package org.http4k.wiretap
+package org.http4k.wiretap.mcp_api
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
@@ -28,10 +28,10 @@ interface McpPromptContract {
         ServerMetaData("entity", "version"),
         NoMcpSecurity,
         prompt
-    ).testMcpClient(Request(Method.GET, "/mcp"))
+    ).testMcpClient(Request.Companion(Method.GET, "/mcp"))
 
     fun Approver.assertPromptResponse(args: Map<String, String> = emptyMap()) {
-        when (val result = mcpClient().prompts().get(PromptName.of(promptName), PromptRequest(args))) {
+        when (val result = mcpClient().prompts().get(PromptName.Companion.of(promptName), PromptRequest(args))) {
             is Success<PromptResponse> -> assertApproved(
                 Jackson.prettify(Jackson.asFormatString(result.value))
             )

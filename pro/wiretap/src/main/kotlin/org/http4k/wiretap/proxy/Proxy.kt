@@ -1,4 +1,4 @@
-package org.http4k.wiretap
+package org.http4k.wiretap.proxy
 
 import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
@@ -11,6 +11,7 @@ import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
+import org.http4k.wiretap.WiretapAppBuilder
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound

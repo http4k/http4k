@@ -14,33 +14,29 @@ import org.junit.jupiter.api.Test
 
 class BodyHydrationTest {
 
-    private val request = Request(GET, "/test")
+    private val request = Request(GET, "/")
     private val response = Response(OK)
 
     @Test
-    fun `All returns true for request`() {
+    fun `All hydrates both requests and responses`() {
         assertThat(All(request), equalTo(true))
-    }
-
-    @Test
-    fun `All returns true for response`() {
         assertThat(All(response), equalTo(true))
     }
 
     @Test
-    fun `RequestOnly returns true for request and false for response`() {
+    fun `RequestOnly hydrates only requests`() {
         assertThat(RequestOnly(request), equalTo(true))
         assertThat(RequestOnly(response), equalTo(false))
     }
 
     @Test
-    fun `ResponseOnly returns true for response and false for request`() {
-        assertThat(ResponseOnly(response), equalTo(true))
+    fun `ResponseOnly hydrates only responses`() {
         assertThat(ResponseOnly(request), equalTo(false))
+        assertThat(ResponseOnly(response), equalTo(true))
     }
 
     @Test
-    fun `None returns false for both`() {
+    fun `None hydrates nothing`() {
         assertThat(None(request), equalTo(false))
         assertThat(None(response), equalTo(false))
     }

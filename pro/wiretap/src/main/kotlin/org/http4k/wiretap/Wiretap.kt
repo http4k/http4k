@@ -34,6 +34,7 @@ import org.http4k.wiretap.mcp_api.DebugRequestPrompt
 import org.http4k.wiretap.mcp_api.WiretapMcp
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
+import org.http4k.wiretap.proxy.Proxy
 import org.http4k.wiretap.traffic.Traffic
 import org.http4k.wiretap.util.Metrics
 import org.http4k.wiretap.util.Templates

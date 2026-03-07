@@ -1,7 +1,7 @@
 package org.http4k.wiretap.mcp_api
 
 import org.http4k.testing.Approver
-import org.http4k.wiretap.McpPromptContract
+import org.http4k.wiretap.mcp_api.McpPromptContract
 import org.junit.jupiter.api.Test
 
 class DebugRequestPromptTest : McpPromptContract {
