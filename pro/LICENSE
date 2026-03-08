@@ -27,7 +27,7 @@ Copyright (c) 2025-present http4k Ltd, a company registered in England and Wales
 
 "Annual Recurring Revenue" or "ARR" means the total gross revenue received by an organization and its Affiliates from all sources during a twelve-month period, including but not limited to sales of products or services, licensing fees, subscriptions, consulting revenue, and any other commercial income, calculated on a rolling twelve-month basis.
 
-"Evaluation Period" means a single, non-renewable period of sixty (60) days commencing on the date of first access to or use of any Proprietary Component by or on behalf of an organization, during which that organization may use the Software for internal evaluation purposes without a paid subscription, subject to the conditions of Section 2.3.
+"Evaluation Period" means a single, non-renewable period of ninety (90) days commencing on the date of first access to or use of any Proprietary Component by or on behalf of an organization, during which that organization may use the Software for internal evaluation purposes without a paid subscription, subject to the conditions of Section 2.3.
 
 ## 2. License Grant and Restrictions
 
@@ -65,9 +65,9 @@ For development purposes, a subscription includes Floating Developer Licenses as
 2.3 Evaluation Period for Commercial Entities
 Organizations with ARR of $1,000,000 USD or more that have not yet obtained a paid subscription may use the Proprietary Components solely for internal evaluation during the Evaluation Period, subject to the following conditions:
 
-- The Evaluation Period begins on the date of first access to or use of any Proprietary Component and runs for sixty (60) consecutive days
+- The Evaluation Period begins on the date of first access to or use of any Proprietary Component and runs for ninety (90) consecutive days
 - The Evaluation Period is non-renewable and may not be reset or restarted under any circumstances
-- Evaluation use is limited to Developer Workstations only; use on CI/CD runners, staging environments, shared servers, or any production environment is not permitted during the Evaluation Period
+- Evaluation use is permitted on Developer Workstations, CI/CD runners, staging, and other non-production environments. Use in any Production Environment, defined as any environment used to serve real end users, process live transactions, or generate revenue directly or indirectly, is not permitted during the Evaluation Period
 - Upon expiry of the Evaluation Period, the organization must either obtain a valid subscription or cease all use of the Proprietary Components immediately
 - Organizations that have previously held a subscription are not eligible for a new Evaluation Period
 
