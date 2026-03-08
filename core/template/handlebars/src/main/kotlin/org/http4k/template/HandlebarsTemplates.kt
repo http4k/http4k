@@ -15,8 +15,10 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class HandlebarsTemplates(
     private val configure: (Handlebars) -> Handlebars = { it },
-    private val templateSuffix: String? = null
+    private val templateSuffix: String?
 ) : Templates {
+    constructor(configure: (Handlebars) -> Handlebars = { it }) : this(configure, null)
+
     override fun CachingClasspath(baseClasspathPackage: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Pair<Class<*>, String>, Template>()
         private val handlebars = configure(
