@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.server.protocol
 
 import dev.forkhandles.result4k.Result4k
-import org.http4k.core.Request
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
 
 /**
  * Responsible for managing the lifecycle of client sessions, including the assignment of

@@ -1,5 +1,15 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.testing
 
+import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.protocol.McpRpcMethod
+import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.ClientMessage
+import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -12,12 +22,6 @@ import org.http4k.format.renderResult
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
-import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.protocol.SessionId
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
-import org.http4k.ai.mcp.protocol.messages.McpRpc
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.sse.SseMessage
 import org.http4k.testing.testSseClient
 import java.util.concurrent.atomic.AtomicInteger

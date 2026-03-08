@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.postbox
 
 import com.natpryce.hamkrest.assertion.assertThat
@@ -16,8 +20,8 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.postbox.PendingResponseGenerators.linkHeader
 import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.postbox.processing.PostboxProcessing
+import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.junit.jupiter.api.Test
 
 class TransactionalPostboxTest {

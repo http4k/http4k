@@ -1,7 +1,10 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.testing.capabilities
 
 import dev.forkhandles.result4k.map
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.client.McpClient
@@ -9,6 +12,7 @@ import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
 import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.core.Uri
 import java.time.Duration
 
 class TestingResources(

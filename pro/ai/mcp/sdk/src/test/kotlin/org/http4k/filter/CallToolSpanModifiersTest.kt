@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey.stringKey
-import io.opentelemetry.api.trace.StatusCode.*
+import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import org.http4k.ai.mcp.util.McpJson.asJsonObject

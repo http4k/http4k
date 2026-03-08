@@ -1,13 +1,17 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp
 
-import org.http4k.ai.model.Role
-import org.http4k.core.Request
-import org.http4k.lens.McpLensTarget
+import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.model.Meta.Companion.default
+import org.http4k.ai.model.Role
+import org.http4k.core.Request
+import org.http4k.lens.McpLensTarget
 
 /**
  * A PromptHandler is a function which creates a Prompt from a set of inputs

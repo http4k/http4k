@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.protocol
 
+import org.http4k.ai.mcp.protocol.ServerProtocolCapability.Completions
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.Experimental
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.Logging
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.PromptsChanged
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.ResourcesChanged
-import org.http4k.ai.mcp.protocol.ServerProtocolCapability.Completions
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.TaskCancel
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.TaskList
 import org.http4k.ai.mcp.protocol.ServerProtocolCapability.TaskToolCall

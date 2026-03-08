@@ -1,9 +1,12 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.client.sse
 
 import org.http4k.ai.mcp.client.McpStreamingClientContract
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.ApiKeyMcpSecurity
 import org.http4k.ai.mcp.server.sse.SseMcp

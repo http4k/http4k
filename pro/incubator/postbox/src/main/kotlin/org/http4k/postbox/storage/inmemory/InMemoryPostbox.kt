@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.postbox.storage.inmemory
 
 import dev.forkhandles.result4k.Failure
@@ -8,11 +12,13 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.PostboxError
-import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.PostboxError.Companion.RequestAlreadyProcessed
+import org.http4k.postbox.PostboxError.Companion.RequestMarkedAsDead
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus
-import org.http4k.postbox.storage.inmemory.InMemoryPostbox.Status.*
+import org.http4k.postbox.storage.inmemory.InMemoryPostbox.Status.DEAD
+import org.http4k.postbox.storage.inmemory.InMemoryPostbox.Status.PENDING
+import org.http4k.postbox.storage.inmemory.InMemoryPostbox.Status.PROCESSED
 import java.time.Duration
 import java.time.Instant
 

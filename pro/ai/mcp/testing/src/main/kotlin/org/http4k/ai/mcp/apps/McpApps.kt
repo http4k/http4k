@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.apps
 
 import dev.forkhandles.result4k.map
@@ -10,9 +14,9 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.apps.McpServerResult.Failure
 import org.http4k.ai.mcp.apps.McpServerResult.Success
 import org.http4k.ai.mcp.apps.McpServerResult.Unknown
+import org.http4k.ai.mcp.apps.model.AvailableMcpApp
 import org.http4k.ai.mcp.apps.model.HostToolRequest
 import org.http4k.ai.mcp.apps.model.HostToolResponse
-import org.http4k.ai.mcp.apps.model.AvailableMcpApp
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.apps.Csp

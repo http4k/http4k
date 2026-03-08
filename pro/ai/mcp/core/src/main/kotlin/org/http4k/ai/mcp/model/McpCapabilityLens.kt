@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.lens.BiDiLens
 import org.http4k.lens.LensInjectorExtractor
 import org.http4k.lens.Meta
-import org.http4k.ai.mcp.util.McpNodeType
 
 class McpCapabilityLens<IN : Any, OUT>(
     meta: Meta,

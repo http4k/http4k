@@ -1,15 +1,19 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 @file:JvmName("StandardSseMcpKt")
 
 package org.http4k.ai.mcp.server.sse
 
+import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.core.HttpFilter
 import org.http4k.core.then
 import org.http4k.filter.CatchAllSse
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
-import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.sse.Sse

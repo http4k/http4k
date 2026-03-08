@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
@@ -5,17 +9,6 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
-import org.http4k.ai.model.MaxTokens
-import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.Role.Companion.Assistant
-import org.http4k.ai.model.StopReason
-import org.http4k.ai.model.ToolName
-import org.http4k.connect.model.Base64Blob
-import org.http4k.connect.model.MimeType
-import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.Uri
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
-import org.http4k.lens.int
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.McpError
@@ -58,11 +51,22 @@ import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
-import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.http.HttpSessions
+import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role.Companion.Assistant
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.ToolName
+import org.http4k.connect.model.Base64Blob
+import org.http4k.connect.model.MimeType
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.http4k.core.Uri
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.lens.int
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.junit.jupiter.api.Test

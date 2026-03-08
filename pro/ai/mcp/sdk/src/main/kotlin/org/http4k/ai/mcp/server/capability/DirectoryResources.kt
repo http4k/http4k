@@ -1,5 +1,18 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.server.capability
 
+import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.model.ResourceUriTemplate
+import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.server.capability.RecursionMode.Flat
+import org.http4k.ai.mcp.server.capability.RecursionMode.Recursive
+import org.http4k.ai.mcp.server.protocol.Resources
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
 import org.http4k.core.ContentType
@@ -12,15 +25,6 @@ import org.http4k.core.MimeTypes
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
-import org.http4k.ai.mcp.Client
-import org.http4k.ai.mcp.model.Resource
-import org.http4k.ai.mcp.model.ResourceName
-import org.http4k.ai.mcp.model.ResourceUriTemplate
-import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.server.capability.RecursionMode.Flat
-import org.http4k.ai.mcp.server.capability.RecursionMode.Recursive
-import org.http4k.ai.mcp.server.protocol.Resources
 import java.io.File
 import java.io.File.separatorChar
 

@@ -1,11 +1,9 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp
 
-import org.http4k.ai.model.MaxTokens
-import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.Role
-import org.http4k.ai.model.StopReason
-import org.http4k.ai.model.SystemPrompt
-import org.http4k.ai.model.Temperature
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.ModelPreferences
@@ -14,6 +12,12 @@ import org.http4k.ai.mcp.model.SamplingIncludeContext
 import org.http4k.ai.mcp.model.ToolChoice
 import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.model.MaxTokens
+import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.Role
+import org.http4k.ai.model.StopReason
+import org.http4k.ai.model.SystemPrompt
+import org.http4k.ai.model.Temperature
 
 /**
  *  Processes a sampling request from an MCP server to a client

@@ -1,31 +1,33 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.client
 
-import org.http4k.ai.model.ToolName
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.ElicitationHandler
-import org.http4k.ai.mcp.model.ElicitationId
+import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.SamplingHandler
-import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.PromptName
+import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
-import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.SessionId
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.model.ToolName
+import org.http4k.core.Uri
 import java.time.Duration
 
 /**

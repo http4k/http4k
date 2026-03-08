@@ -1,9 +1,9 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package file
 
-import org.http4k.client.ReconnectionMode.Disconnect
-import org.http4k.connect.model.MimeType
-import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
@@ -14,6 +14,10 @@ import org.http4k.ai.mcp.model.Resource.Content
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.client.ReconnectionMode.Disconnect
+import org.http4k.connect.model.MimeType
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.Uri
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom

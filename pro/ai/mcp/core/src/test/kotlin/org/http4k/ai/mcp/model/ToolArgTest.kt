@@ -1,14 +1,18 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.model
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.lens.LensFailure
-import org.http4k.lens.with
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.auto
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.lens.LensFailure
+import org.http4k.lens.with
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved

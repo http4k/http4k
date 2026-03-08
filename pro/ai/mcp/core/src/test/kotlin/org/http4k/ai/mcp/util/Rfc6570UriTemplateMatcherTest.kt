@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.util
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Uri
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.util.Rfc6570UriTemplateMatcher.matches
+import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 
 class Rfc6570UriTemplateMatcherTest {

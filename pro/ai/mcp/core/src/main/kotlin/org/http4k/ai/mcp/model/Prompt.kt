@@ -1,11 +1,15 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.PromptRequest
 import org.http4k.lens.BiDiLens
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta.StringParam
-import org.http4k.ai.mcp.PromptRequest
 
 /**
  * Spec of a Prompt capability.

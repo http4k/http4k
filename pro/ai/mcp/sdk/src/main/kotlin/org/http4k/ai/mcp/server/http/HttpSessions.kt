@@ -1,13 +1,13 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.server.http
 
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
-import org.http4k.core.Request
-import org.http4k.lens.Header
-import org.http4k.lens.LAST_EVENT_ID
-import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
@@ -19,6 +19,10 @@ import org.http4k.ai.mcp.server.sessions.SessionEventTracking
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.util.McpJson.compact
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.core.Request
+import org.http4k.lens.Header
+import org.http4k.lens.LAST_EVENT_ID
+import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.time.Duration

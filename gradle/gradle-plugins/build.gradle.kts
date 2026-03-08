@@ -26,6 +26,7 @@ dependencies {
     api(lib("kotlin-gradle-plugin"))
     api(lib("ksp-gradle-plugin"))
     api(lib("gradle-maven-publish-plugin"))
+    api(lib("spotless-gradle-plugin"))
 }
 
 fun lib(s: String) = the<VersionCatalogsExtension>()

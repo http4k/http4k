@@ -1,9 +1,9 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package experiment
 
-import org.http4k.connect.model.MimeType
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Uri
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
@@ -16,6 +16,10 @@ import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.connect.model.MimeType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Uri
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.routing.bind
 import org.http4k.routing.mcpHttpStreaming
 import org.http4k.server.JettyLoom

@@ -1,11 +1,15 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package agentic
 
 import agentic.tools.person.PersonToolPack
-import org.http4k.core.PolyHandler
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
+import org.http4k.core.PolyHandler
 import org.http4k.routing.mcpHttpStreaming
 import java.time.DayOfWeek
 import java.time.LocalDate

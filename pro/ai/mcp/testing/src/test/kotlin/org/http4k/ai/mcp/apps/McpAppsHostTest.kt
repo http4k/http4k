@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.apps
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Domain
 import org.http4k.ai.mcp.model.Tool
@@ -21,8 +27,6 @@ import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 
 @ExtendWith(ApprovalTest::class)
 class McpAppsHostTest {

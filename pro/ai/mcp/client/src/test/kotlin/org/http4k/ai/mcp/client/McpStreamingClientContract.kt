@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.client
 
 import com.natpryce.hamkrest.assertion.assertThat
@@ -6,7 +10,6 @@ import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
-import org.http4k.ai.mcp.Client.Companion.NoOp.progress
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.ResourceResponse
@@ -39,7 +42,6 @@ import org.http4k.core.Uri
 import org.http4k.format.auto
 import org.http4k.lens.with
 import org.http4k.routing.bind
-import org.http4k.routing.tools
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant

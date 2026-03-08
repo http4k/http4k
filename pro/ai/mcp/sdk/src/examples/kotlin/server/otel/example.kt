@@ -1,12 +1,12 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package server.otel
 
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.ServerProtocolCapability
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.http.HttpSessions
-import org.http4k.ai.mcp.server.http.HttpStreamingMcp
-import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON

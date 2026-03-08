@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.server.websocket
 
-import org.http4k.filter.CatchAllWs
-import org.http4k.filter.ServerFilters
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.McpSecurity
+import org.http4k.filter.CatchAllWs
+import org.http4k.filter.ServerFilters
 import org.http4k.routing.poly
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsFilter

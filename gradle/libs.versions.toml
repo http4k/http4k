@@ -25,6 +25,7 @@ cloudevents-json-jackson = "4.0.1"
 com-github-ben-manes-versions = "0.53.0"
 com-github-jk1-gradle-license-report = "3.1.1"
 com-google-devtools-ksp = "2.3.6"
+com-diffplug-spotless = "7.0.2"
 com-gradleup-shadow = "9.3.2"
 com-vanniktech-gradle-maven-publish-plugin = "0.36.0"
 commons-codec = "1.21.0"
@@ -165,6 +166,7 @@ fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
 gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
 google-http-client = { module = "com.google.http-client:google-http-client", version.ref = "google-http-client" }
 gradle-license-report = { module = "com.github.jk1:gradle-license-report", version.ref = "com-github-jk1-gradle-license-report" }
+spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "com-diffplug-spotless" }
 gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "com-vanniktech-gradle-maven-publish-plugin" }
 graphql-java = { module = "com.graphql-java:graphql-java", version.ref = "graphql-java" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
