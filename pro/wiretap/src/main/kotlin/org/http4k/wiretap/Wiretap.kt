@@ -3,6 +3,7 @@ package org.http4k.wiretap
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyHandler
@@ -45,21 +46,21 @@ import kotlin.concurrent.fixedRateTimer
 
 object Wiretap {
     operator fun invoke(
-        uri: Uri,
+        wiretappedUri: Uri,
         mcpOptions: McpServerOptions = McpServerOptions.default,
-        httpClient: HttpHandler = JavaHttpClient()
-    ) = this(httpClient = httpClient) { _, _ -> uri }
+        httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
+    ) = this(httpClient = httpClient) { _, _ -> wiretappedUri }
 
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
         mcpOptions: McpServerOptions = McpServerOptions.default,
-        httpClient: HttpHandler = JavaHttpClient(),
+        httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
         clock: Clock = Clock.systemUTC(),
         bodyHydration: BodyHydration = All,
-        appBuilder: WiretapAppBuilder
+        uriProvider: WiretappedUriProvider
     ): PolyHandler {
 
         val html = Templates()
@@ -83,7 +84,7 @@ object Wiretap {
             inboundChaos,
             outboundChaos,
             sanitise,
-            appBuilder
+            uriProvider
         )
 
         val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())

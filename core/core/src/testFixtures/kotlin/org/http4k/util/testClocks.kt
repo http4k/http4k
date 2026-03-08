@@ -15,7 +15,7 @@ class TickingClock : Clock() {
 
     override fun withZone(zone: ZoneId?): Clock = this
 
-    override fun getZone(): ZoneId = systemDefault()
+    override fun getZone(): ZoneId = systemUTC().zone
 
     override fun instant(): Instant = Instant.ofEpochMilli(0).plusSeconds(ticks++)
 }
@@ -23,7 +23,7 @@ class TickingClock : Clock() {
 object FixedClock : Clock() {
     override fun withZone(zone: ZoneId?): Clock = this
 
-    override fun getZone(): ZoneId = systemDefault()
+    override fun getZone(): ZoneId = systemUTC().zone
 
     override fun instant(): Instant = Instant.ofEpochMilli(0)
 }

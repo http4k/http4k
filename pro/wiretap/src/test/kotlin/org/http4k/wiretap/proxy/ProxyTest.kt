@@ -46,13 +46,13 @@ class ProxyTest {
         inboundChaos = inboundChaos,
         outboundChaos = outboundChaos,
         sanitise = sanitise,
-        appBuilder = { _, _ -> Uri.of("http://localhost:9000") }
+        uriProvider = { _, _ -> Uri.of("http://localhost:9000") }
     )
 
     @Test
     fun `inbound request is recorded with Direction Inbound`() {
         val proxy = proxy()
-        proxy.routing(Request(Method.GET, "/test"))
+        proxy.http(Request(Method.GET, "/test"))
 
         val recorded = transactions.list()
         assertThat(recorded, hasSize(equalTo(1)))
@@ -72,7 +72,7 @@ class ProxyTest {
     @Test
     fun `sanitise filter can suppress recording`() {
         val proxy = proxy(sanitise = { null })
-        proxy.routing(Request(Method.GET, "/test"))
+        proxy.http(Request(Method.GET, "/test"))
 
         assertThat(transactions.list(), hasSize(equalTo(0)))
     }
@@ -82,7 +82,7 @@ class ProxyTest {
         val proxy = proxy(sanitise = { tx ->
             tx.copy(request = tx.request.removeHeader("Authorization"))
         })
-        proxy.routing(Request(Method.GET, "/test").header("Authorization", "Bearer secret"))
+        proxy.http(Request(Method.GET, "/test").header("Authorization", "Bearer secret"))
 
         val recorded = transactions.list().first()
         assertThat(recorded.transaction.request.header("Authorization"), absent())
@@ -94,7 +94,7 @@ class ProxyTest {
         inboundChaos.enable(ChaosBehaviours.ReturnStatus(Status.INTERNAL_SERVER_ERROR))
 
         val proxy = proxy(inboundChaos = inboundChaos)
-        val response = proxy.routing(Request(Method.GET, "/test"))
+        val response = proxy.http(Request(Method.GET, "/test"))
 
         assertThat(response.status, equalTo(Status.INTERNAL_SERVER_ERROR))
     }
@@ -105,7 +105,7 @@ class ProxyTest {
             bodyHydration = BodyHydration.All,
             httpClient = { Response(Status.OK).body(Body("response-body".byteInputStream())) }
         )
-        proxy.routing(Request(Method.GET, "/test").body(Body("request-body".byteInputStream())))
+        proxy.http(Request(Method.GET, "/test").body(Body("request-body".byteInputStream())))
 
         val recorded = transactions.list()
         assertThat(recorded, hasSize(equalTo(1)))

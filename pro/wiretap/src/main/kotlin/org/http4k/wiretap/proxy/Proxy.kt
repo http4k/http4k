@@ -11,7 +11,7 @@ import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
-import org.http4k.wiretap.WiretapAppBuilder
+import org.http4k.wiretap.WiretappedUriProvider
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
@@ -24,7 +24,7 @@ import java.time.Clock
 
 data class ProxyHandlers(
     val uri: Uri,
-    val routing: HttpHandler,
+    val http: HttpHandler,
     val outboundHttp: HttpHandler
 )
 
@@ -38,7 +38,7 @@ fun Proxy(
     inboundChaos: ChaosEngine,
     outboundChaos: ChaosEngine,
     sanitise: (HttpTransaction) -> HttpTransaction?,
-    appBuilder: WiretapAppBuilder
+    uriProvider: WiretappedUriProvider
 ): ProxyHandlers {
 
     val bufferRequest = Filter { next ->
@@ -67,11 +67,11 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
-    val uri = appBuilder(outboundHttp, WiretapOpenTelemetry(traces))
+    val uri = uriProvider(outboundHttp, WiretapOpenTelemetry(traces))
 
     return ProxyHandlers(
         uri,
-        routing = routes(
+        http = routes(
             orElse bind
                 recordTransaction(Inbound)
                     .then(inboundChaos)
