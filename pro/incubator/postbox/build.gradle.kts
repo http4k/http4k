@@ -21,14 +21,8 @@ dependencies {
     api(libs.tx4k)
 
     testImplementation(libs.hsqldb)
-
     testImplementation(libs.postgresql)
-
     testImplementation(libs.mysql.connector.java)
 
     api(libs.hikaricp)
-    api(platform(libs.exposed.bom))
-    api(libs.exposed.core)
-    api(libs.exposed.jdbc)
-    api(libs.exposed.java.time)
 }
