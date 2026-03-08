@@ -11,17 +11,16 @@ import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.ai.model.ToolName
-import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Uri
 import org.http4k.util.FixedClock
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.Wiretap
 import org.http4k.wiretap.WiretappedUriProvider
 import org.http4k.wiretap.util.Json
 import org.junit.jupiter.api.Test
 
-interface WiretapSmokeContract {
+interface WiretapSmokeContract : PortBasedTest {
 
     val uriProvider: WiretappedUriProvider
     val testRequest: Request

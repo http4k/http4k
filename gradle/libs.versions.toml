@@ -22,10 +22,10 @@ base16-encoding = "2.6.0"
 bcprov-jdk18on = "1.83"
 cloudevents-core = "4.0.1"
 cloudevents-json-jackson = "4.0.1"
+com-diffplug-spotless = "8.3.0"
 com-github-ben-manes-versions = "0.53.0"
 com-github-jk1-gradle-license-report = "3.1.1"
 com-google-devtools-ksp = "2.3.6"
-com-diffplug-spotless = "7.0.2"
 com-gradleup-shadow = "9.3.2"
 com-vanniktech-gradle-maven-publish-plugin = "0.36.0"
 commons-codec = "1.21.0"
@@ -35,7 +35,7 @@ docker-java-core = "3.7.0"
 docker-java-transport-httpclient5 = "3.7.0"
 dokka = "2.1.0"
 failsafe = "3.3.2"
-forkhandles-bom = "2.25.2.1"
+forkhandles-bom = "2.25.3.0"
 freemarker = "2.3.34"
 fuel = "2.3.1"
 gcp-functions-framework-api = "2.0.0"
@@ -64,7 +64,7 @@ jetbrains-exposed = "1.1.1"
 jetty-bom = "12.1.7"
 # frozen to 11.0.26
 jetty11-bom = "11.0.26"
-joda-time = "2.14.0"
+joda-time = "2.14.1"
 jose4j = "0.9.6"
 json = "20251224"
 jsoup = "1.22.1"
@@ -73,7 +73,7 @@ junit = "6.0.3"
 klaxon = "5.6"
 kondor-core = "3.6.1"
 konsist = "0.17.3"
-kotest = "6.1.4"
+kotest = "6.1.5"
 kotlin = "2.3.10"
 kotlinpoet = "2.2.0"
 kotlinx-dataframe = "1.0.0-Beta4"
@@ -94,7 +94,7 @@ netty-codec-http2 = "4.2.10.Final"
 nu-studer-rocker = "3.3"
 okhttp-eventsource = "4.2.0"
 okhttp3 = "5.3.2"
-opentelemetry-bom = "1.60.0"
+opentelemetry-bom = "1.60.1"
 opentelemetry-semconv = "1.40.0"
 opentelemetry-semconv-incubating = "1.40.0-alpha"
 org-openapi-generator = "7.20.0"
@@ -166,7 +166,6 @@ fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
 gcp-functions-framework-api = { module = "com.google.cloud.functions:functions-framework-api", version.ref = "gcp-functions-framework-api" }
 google-http-client = { module = "com.google.http-client:google-http-client", version.ref = "google-http-client" }
 gradle-license-report = { module = "com.github.jk1:gradle-license-report", version.ref = "com-github-jk1-gradle-license-report" }
-spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "com-diffplug-spotless" }
 gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "com-vanniktech-gradle-maven-publish-plugin" }
 graphql-java = { module = "com.graphql-java:graphql-java", version.ref = "graphql-java" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -289,6 +288,7 @@ rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker
 rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker" }
 selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "com-diffplug-spotless" }
 spring-context = { module = "org.springframework:spring-context", version.ref = "spring" }
 spring-test = { module = "org.springframework:spring-test", version.ref = "spring" }
 spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring" }
