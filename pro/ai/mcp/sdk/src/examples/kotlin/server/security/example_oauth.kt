@@ -10,7 +10,7 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.core.Uri
 import org.http4k.filter.debug
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
@@ -21,7 +21,7 @@ import org.http4k.server.asServer
  * version of the configuration - there are other constructors of OAuthMcpSecurity available for more complex cases.
  */
 fun main() {
-    val secureMcpServer = mcpHttpStreaming(
+    val secureMcpServer = mcp(
         ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
         OAuthMcpSecurity(Uri.of("http://oauth-server"), Uri.of("http://mcp-server")) { it == "123" }
     )

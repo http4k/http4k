@@ -25,12 +25,12 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 
 fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry): PolyHandler =
     PolyFilters.OpenTelemetryTracing(otel)
         .then(
-            mcpHttpStreaming(
+            mcp(
                 ServerMetaData("mcp server with otel", "0.0.0").withExtensions(McpApps),
                 NoMcpSecurity,
                 RenderMcpApp(

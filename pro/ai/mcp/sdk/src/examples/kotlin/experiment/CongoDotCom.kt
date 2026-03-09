@@ -21,7 +21,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
@@ -58,7 +58,7 @@ fun getInvoiceForPurchase(): ToolCapability {
     }
 }
 
-val congoDotCom = mcpHttpStreaming(
+val congoDotCom = mcp(
     ServerMetaData("CongoDotCom", "1.0.0"),
     NoMcpSecurity,
     getPurchases(),

@@ -13,9 +13,9 @@ import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.model.Role
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 
-fun McpServer() = mcpHttpStreaming(
+fun McpServer() = mcp(
     ServerMetaData("mcp server", "0.0.0").withExtensions(McpApps),
     NoMcpSecurity,
     ToolWithArgs(),
@@ -23,7 +23,6 @@ fun McpServer() = mcpHttpStreaming(
 )
 
 private fun ToolWithArgs(): ToolCapability {
-
     val first = Tool.Arg.long().required("first", "first number")
     val second = Tool.Arg.long().optional("second", "second number")
 

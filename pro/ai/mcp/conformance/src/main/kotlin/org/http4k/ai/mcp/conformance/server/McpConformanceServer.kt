@@ -24,7 +24,7 @@ import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
 import org.http4k.filter.PolyFilters
 import org.http4k.filter.debugMcp
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
@@ -32,7 +32,7 @@ import org.http4k.server.asServer
  * Server which implements the MCP Conformance test suite using the http4k MCP SDK
  */
 fun McpConformanceServer(): PolyHandler {
-    val next = mcpHttpStreaming(
+    val next = mcp(
         ServerMetaData(
             McpEntity.of("http4k MCP conformance"), Version.of("0.1.0"),
             *ServerProtocolCapability.entries.toTypedArray()

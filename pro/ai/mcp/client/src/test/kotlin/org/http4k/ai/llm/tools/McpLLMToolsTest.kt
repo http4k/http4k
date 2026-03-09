@@ -12,7 +12,7 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 
 class McpLLMToolsTest : LLMToolsContract {
 
@@ -22,7 +22,7 @@ class McpLLMToolsTest : LLMToolsContract {
         "required" to emptyList<String>()
     ))
 
-    private val mcp = mcpHttpStreaming(
+    private val mcp = mcp(
         ServerMetaData(McpEntity.of("123"), Version.of("123")),
         NoMcpSecurity,
         Tool(echoTool.name.value, echoTool.description) bind {

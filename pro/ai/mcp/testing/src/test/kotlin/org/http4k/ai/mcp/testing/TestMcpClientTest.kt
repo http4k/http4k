@@ -68,7 +68,7 @@ import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.int
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -81,7 +81,7 @@ class TestMcpClientTest {
 
     @Test
     fun `can use mcp client to connect and get responses`() {
-        val response = mcpHttpStreaming(
+        val response = mcp(
             ServerMetaData(
                 serverName, Version.of("1"),
                 PromptsChanged,

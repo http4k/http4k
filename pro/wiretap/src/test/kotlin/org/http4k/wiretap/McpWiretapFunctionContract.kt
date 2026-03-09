@@ -12,7 +12,7 @@ import org.http4k.ai.model.ToolName
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.format.Jackson
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -24,7 +24,7 @@ interface McpWiretapFunctionContract {
     val toolName: String
     val function: WiretapFunction
 
-    fun mcpClient() = mcpHttpStreaming(
+    fun mcpClient() = mcp(
         ServerMetaData("entity", "version"),
         NoMcpSecurity,
         function.mcp()

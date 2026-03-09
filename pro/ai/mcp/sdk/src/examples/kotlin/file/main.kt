@@ -19,7 +19,7 @@ import org.http4k.connect.model.MimeType
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Uri
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import java.io.File
@@ -37,7 +37,7 @@ fun main() {
     }
 
     val server =
-        mcpHttpStreaming(
+        mcp(
             ServerMetaData("http4k_mcp", "1"),
             NoMcpSecurity,
             Resource.Templated("home://{path}", "foo") bind dir(File("."))

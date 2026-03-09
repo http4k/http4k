@@ -29,7 +29,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.lens.contentType
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.routing.routes
 import org.http4k.security.OAuthWebForms.requestForm
 import org.http4k.security.OAuthWebForms.resource
@@ -79,7 +79,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
 
         var count = 0
 
-        val mcpServer = mcpHttpStreaming(
+        val mcpServer = mcp(
             ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
             OAuthMcpSecurity(
                 Uri.of("http://localhost:${authServer.port()}"),

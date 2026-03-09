@@ -15,7 +15,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.filter.debug
 import org.http4k.lens.contentType
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import server.completions
@@ -27,7 +27,7 @@ import server.tools
  * This example demonstrates how to create an MCP server using the draft HTTP Streaming protocol.
  */
 fun main() {
-    val mcpServer = mcpHttpStreaming( // replace with mcpHttpNonStreaming for simple RPC interactions
+    val mcpServer = mcp( // replace with mcpHttpNonStreaming for simple RPC interactions
         ServerMetaData(
             McpEntity.of("http4k mcp via SSE"), Version.of("0.1.0"),
             *ServerProtocolCapability.entries.toTypedArray()

@@ -16,7 +16,7 @@ import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.debug
 import org.http4k.lens.contentType
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import server.prompts
@@ -28,7 +28,7 @@ import server.tools
  */
 fun main() {
 
-    val mcpServer = mcpHttpStreaming(
+    val mcpServer = mcp(
         ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
         NoMcpSecurity,
         tools(),

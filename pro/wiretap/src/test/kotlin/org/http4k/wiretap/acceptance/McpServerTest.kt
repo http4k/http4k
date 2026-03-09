@@ -2,7 +2,6 @@ package org.http4k.wiretap.acceptance
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.greaterThan
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.ai.mcp.model.Content.Text
@@ -13,17 +12,15 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.ai.model.ToolName
-import org.http4k.client.Http4kSseClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.server.uri
-import org.http4k.testing.testSseClient
 import org.http4k.util.FixedClock
 import org.http4k.wiretap.Wiretap
 import org.http4k.wiretap.WiretappedUriProvider
@@ -35,7 +32,7 @@ class McpServerTest : WiretapSmokeContract {
 
     override val testRequest = Request(GET, Uri.of("/mcp"))
 
-    private val server = mcpHttpStreaming(
+    private val server = mcp(
         ServerMetaData(McpEntity.of("123"), Version.of("123")),
         NoMcpSecurity,
         Tool("foo", "bar") bind { Ok("Hello") }

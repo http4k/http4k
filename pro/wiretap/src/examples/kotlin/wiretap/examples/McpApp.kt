@@ -12,9 +12,9 @@ import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.core.Uri
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 
-fun McpApp() = mcpHttpStreaming(
+fun McpApp() = mcp(
     ServerMetaData("mcp app", "0.0.0").withExtensions(McpApps),
     NoMcpSecurity,
     RenderMcpApp(

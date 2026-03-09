@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.33.0.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-ai-mcp-***: [Deprecation] use `mcp()` as a replacement for `mcpHttpStreaming()` as this is now the standard implementation. Simple replacement
 
 ### v6.32.0.0
 - **http4k-***: Upgrade versions

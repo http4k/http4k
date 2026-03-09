@@ -5,17 +5,16 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse.*
+import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.ai.model.ToolName
 import org.http4k.chaos.ChaosEngine
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
@@ -74,7 +73,7 @@ class StatsTest {
 
     @Test
     fun `mcp returns stats as JSON`() {
-        val client = mcpHttpStreaming(
+        val client = mcp(
             ServerMetaData("entity", "version"),
             NoMcpSecurity,
             function.mcp()

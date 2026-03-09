@@ -22,7 +22,7 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.routing.bind
-import org.http4k.routing.mcpHttpStreaming
+import org.http4k.routing.mcp
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -33,7 +33,7 @@ class McpAppsHostTest {
     private val appName = "mcp app"
     private val uiUrl = Uri.of("ui://a-ui")
 
-    private fun McpApp(): PolyHandler = mcpHttpStreaming(
+    private fun McpApp(): PolyHandler = mcp(
         ServerMetaData("mcp app", "0.0.0").withExtensions(McpApps),
         NoMcpSecurity,
         RenderMcpApp(
@@ -50,7 +50,7 @@ class McpAppsHostTest {
         ) { "hello world" },
     )
 
-    private fun NonMcpApp() = mcpHttpStreaming(
+    private fun NonMcpApp() = mcp(
         ServerMetaData("mcp server", "0.0.0").withExtensions(McpApps),
         NoMcpSecurity,
         Tool("non_app", "") bind { ToolResponse.Ok("hello") }
