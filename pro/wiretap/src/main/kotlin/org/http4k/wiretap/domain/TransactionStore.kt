@@ -1,6 +1,9 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.domain
 
-import io.micrometer.core.instrument.MockClock.clock
 import org.http4k.core.HttpTransaction
 import java.time.Clock
 import java.util.concurrent.ConcurrentLinkedDeque

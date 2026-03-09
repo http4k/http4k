@@ -1,11 +1,11 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.domain
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.ContentType.Companion.APPLICATION_XML
-import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved

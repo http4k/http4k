@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.traffic
 
 import org.http4k.core.Body
@@ -10,8 +14,8 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.View
 import org.http4k.wiretap.domain.ViewId
-import org.http4k.wiretap.util.auto
 import org.http4k.wiretap.util.SignalModel
+import org.http4k.wiretap.util.auto
 
 val filterLens = Body.auto<TransactionFilterSignals>()
 val viewSignalsLens = Body.auto<ViewSignals>()

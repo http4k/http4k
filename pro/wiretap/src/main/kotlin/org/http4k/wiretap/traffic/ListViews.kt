@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.traffic
 
 import org.http4k.ai.mcp.model.Tool
@@ -6,7 +10,6 @@ import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
-import org.http4k.wiretap.domain.View
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.util.Json
 

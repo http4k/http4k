@@ -1,8 +1,7 @@
-description = "http4k Wiretap"
+description = "http4k Wiretap: See everything. Break anything."
 
 plugins {
-    id("org.http4k.conventions")
-//    id("org.http4k.pro")
+    id("org.http4k.pro")
 }
 
 dependencies {

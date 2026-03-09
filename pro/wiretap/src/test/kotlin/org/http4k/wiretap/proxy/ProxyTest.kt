@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.proxy
 
 import com.natpryce.hamkrest.absent
@@ -7,12 +11,12 @@ import com.natpryce.hamkrest.hasSize
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.chaos.ChaosBehaviours
 import org.http4k.chaos.ChaosEngine
+import org.http4k.core.Body
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Body
 import org.http4k.core.Uri
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction

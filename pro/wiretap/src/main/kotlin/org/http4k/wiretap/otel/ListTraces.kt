@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.otel
 
 import io.opentelemetry.api.common.AttributeKey
@@ -19,7 +23,6 @@ import org.http4k.wiretap.domain.TraceSummary
 import org.http4k.wiretap.util.Json
 import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId.systemDefault
 import java.time.format.DateTimeFormatter.ofPattern
 
 fun ListTraces(traceStore: TraceStore, clock: Clock) = object : WiretapFunction {

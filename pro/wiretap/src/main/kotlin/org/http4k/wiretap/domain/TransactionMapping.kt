@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.domain
 
 import org.http4k.core.HttpMessage
@@ -6,7 +10,6 @@ import org.http4k.core.toCurl
 import org.http4k.lens.contentType
 import org.http4k.wiretap.util.formatBody
 import java.time.Clock
-import java.time.ZoneId.systemDefault
 import java.time.format.DateTimeFormatter.ISO_INSTANT
 import java.time.format.DateTimeFormatter.ofPattern
 

@@ -1,10 +1,12 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package wiretap
 
-import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Uri
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.server.uri

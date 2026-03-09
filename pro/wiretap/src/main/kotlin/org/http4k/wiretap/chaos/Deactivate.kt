@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.chaos
 
 import org.http4k.ai.mcp.ToolResponse
@@ -11,8 +15,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.datastar.Selector
 import org.http4k.lens.Path
-import org.http4k.lens.enum
 import org.http4k.lens.datastarElements
+import org.http4k.lens.enum
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer

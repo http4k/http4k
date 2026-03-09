@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.mcp.prompts
 
 import dev.forkhandles.result4k.map
@@ -17,9 +21,9 @@ import org.http4k.lens.datastarElements
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.ViewModel
-import org.http4k.wiretap.util.auto
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.SignalModel
+import org.http4k.wiretap.util.auto
 
 data class GetPromptSignals(val promptName: String, val promptArgs: String = "{}") : SignalModel
 

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.wiretap.client
 
 import com.natpryce.hamkrest.assertion.assertThat
@@ -15,8 +19,8 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
-import org.http4k.wiretap.domain.Direction
-import org.http4k.wiretap.domain.Direction.*
+import org.http4k.wiretap.domain.Direction.Inbound
+import org.http4k.wiretap.domain.Direction.Outbound
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.util.Json.json
 import org.http4k.wiretap.util.Templates
