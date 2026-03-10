@@ -3,11 +3,17 @@ package org.http4k.webdriver
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
+import org.http4k.core.Credentials
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Response.Companion.invoke
+import org.http4k.core.Status.Companion.OK
+import org.http4k.lens.basicAuthentication
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
@@ -148,6 +154,26 @@ class JSoupWebElementTest {
     fun `submit an element inside the form`() {
         form(DELETE).findElement(By.tagName("p")).submit()
         assertThat(newLocation, equalTo(DELETE to "/posted?checkedCheckbox=checkedCheckbox&radio=checkedRadio"))
+    }
+
+    @Test
+    fun `submitting an element sets the basic auth header when the current url contains userinfo`() {
+        var receivedRequest: Request? = null
+        val navigate: (Request) -> Unit = { receivedRequest = it }
+
+        val username = "username"
+        val password = "password"
+        val getURL: () -> String? = { "http://${username}:${password}@example.org" }
+
+        val form = JSoupWebElement(navigate, getURL, Jsoup.parse("""
+            <form method="POST" action="/action">
+                <input id="submit" type="submit" value="Submit"/>
+            </form>
+        """))
+        form.findElement(By.id("submit")).submit()
+
+        assertThat(receivedRequest, present())
+        assertThat(receivedRequest?.basicAuthentication(), equalTo(Credentials(username, password)))
     }
 
     @Test
