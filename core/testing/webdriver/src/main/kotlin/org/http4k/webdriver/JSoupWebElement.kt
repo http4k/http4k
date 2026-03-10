@@ -9,6 +9,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.relative
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters.CustomBasicAuth.withBasicAuth
 import org.http4k.lens.FormField
 import org.http4k.lens.MultipartForm
 import org.http4k.lens.MultipartFormField
@@ -117,7 +118,13 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             val formActionUri = Uri.of(actionString)
             val current = getURL()?.let { Uri.of(it) }
             val formUri = current?.relative(formActionUri) ?: formActionUri
-            val postRequest = Request(method, formUri).with(addFormModifier)
+
+            val postRequest = Request(method, formUri)
+                .with(addFormModifier)
+                .let {
+                    val credentials = formUri.credentials()
+                    if (credentials != null) it.withBasicAuth(credentials) else it
+                }
 
             if (method == POST) navigate(postRequest)
             else navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
