@@ -56,8 +56,6 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
 
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
-
-
             bootstrap.group(masterGroup, workerGroup)
                 .channelFactory { NioServerSocketChannel() }
                 .childHandler(object : ChannelInitializer<SocketChannel>() {
