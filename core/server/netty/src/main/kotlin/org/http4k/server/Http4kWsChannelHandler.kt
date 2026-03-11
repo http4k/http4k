@@ -74,6 +74,8 @@ class Http4kWsChannelHandler(
                 websocket?.triggerClose(NOCODE)
                 websocket = null
             }, CLOSE)
+        } else {
+            websocket = null
         }
 
         // Release buffer to prevent memory leak for closed connections
