@@ -137,7 +137,6 @@ abstract class WebsocketServerContract(
             client.received().take(1).toList(),
             equalTo(listOf(WsMessage("event")))
         )
-
         val syserr = String(err.toByteArray()).lowercase()
         assertThat(syserr, !containsSubstring("exception"))
         assertThat(syserr, !containsSubstring("error"))

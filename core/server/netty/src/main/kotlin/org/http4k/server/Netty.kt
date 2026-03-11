@@ -49,13 +49,14 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
 
         private val masterGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
         private val workerGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
+        private val appExecutor = Executors.newCachedThreadPool()
 
         private var closeFuture: ChannelFuture? = null
         private lateinit var address: InetSocketAddress
 
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
-            val appExecutor = Executors.newCachedThreadPool()
+
 
             bootstrap.group(masterGroup, workerGroup)
                 .channelFactory { NioServerSocketChannel() }
@@ -81,6 +82,8 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
 
         override fun stop() = apply {
             closeFuture?.cancel(false)
+
+            appExecutor.shutdown()
 
             val sleepTime = minOf(2000L, shutdownTimeoutMillis)
             workerGroup.shutdownGracefully(sleepTime, shutdownTimeoutMillis, MILLISECONDS).sync()

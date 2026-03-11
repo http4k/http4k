@@ -55,6 +55,7 @@ class Http4kWsChannelHandler(
             }
         }
 
+        // Delegate websocket init to the application so as to not block the netty event loop group
         appExecutor.execute {
             wSocket(ws)
 
@@ -75,6 +76,7 @@ class Http4kWsChannelHandler(
         }
         websocket = null
 
+        // Release buffer to prevent memory leak for closed connections
         while(messageBuffer.isNotEmpty()) {
             messageBuffer.poll().release()
             bufferSize.decrementAndGet()
@@ -82,6 +84,7 @@ class Http4kWsChannelHandler(
     }
 
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
+        // Always buffer messages to ensure they are processed in the correct order
         messageBuffer.offer(msg.retain())
         bufferSize.incrementAndGet()
 
@@ -90,11 +93,8 @@ class Http4kWsChannelHandler(
             ctx.channel().config().isAutoRead = false
         }
 
-        websocket?.let { ws ->
-            if (drainLock.compareAndSet(false, true)) {
-                appExecutor.execute { drainBuffer(ctx, ws) }
-            }
-        }
+        // if the websocket hasn't been initialized, just buffer the message
+        websocket?.let { tryDrainBuffer(ctx, it) }
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
@@ -143,9 +143,18 @@ class Http4kWsChannelHandler(
             }
         } finally {
             drainLock.set(false)
-            if (messageBuffer.isNotEmpty() && drainLock.compareAndSet(false, true)) {
-                appExecutor.execute { drainBuffer(ctx, websocket) }
-            }
+            tryDrainBuffer(ctx, websocket) // prevent deadlock by trying to drain immediately after release
+        }
+    }
+
+    /**
+     * Only drain the buffer:
+     * 1. If we can get an exclusive lock
+     * 2. On the app executor to prevent blocking the netty event loop group
+     */
+    private fun tryDrainBuffer(ctx: ChannelHandlerContext, websocket: PushPullAdaptingWebSocket) {
+        if (messageBuffer.isNotEmpty() && drainLock.compareAndSet(false, true)) {
+            appExecutor.execute { drainBuffer(ctx, websocket) }
         }
     }
 
