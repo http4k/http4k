@@ -3,6 +3,11 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.34.0.0 (uncut)
+- **http4k-***: Upgrade versions
+- **http4k-connect-x402**: [New module!] Support for X402 payments protocol client. You'll need to plug in your own signer (use an OSS one wuch as web3j).
+- **http4k-connect-x402-fake**: [New module!] Fake implementation of X402 Facilitator for testing.
+
 ### v6.33.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-***: [Deprecation] use `mcp()` as a replacement for `mcpHttpStreaming()` as this is now the standard implementation. Simple replacement
