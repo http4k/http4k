@@ -47,9 +47,9 @@ class Http4kWsChannelHandler(
             }
 
             override fun close(status: WsStatus) {
-                normalClose = true
                 ctx.writeAndFlush(CloseWebSocketFrame(status.code, status.description))
                     .addListeners(ChannelFutureListener {
+                        normalClose = true
                         websocket?.triggerClose(status)
                     }, CLOSE)
             }
@@ -72,9 +72,9 @@ class Http4kWsChannelHandler(
         if (!normalClose) {
             ctx.writeAndFlush(EMPTY_BUFFER).addListeners(ChannelFutureListener {
                 websocket?.triggerClose(NOCODE)
+                websocket = null
             }, CLOSE)
         }
-        websocket = null
 
         // Release buffer to prevent memory leak for closed connections
         while(messageBuffer.isNotEmpty()) {
