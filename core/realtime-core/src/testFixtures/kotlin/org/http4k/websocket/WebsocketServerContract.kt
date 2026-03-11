@@ -3,7 +3,6 @@ package org.http4k.websocket
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
@@ -309,18 +308,11 @@ abstract class WebsocketServerContract(
     fun `messages processed in order`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/echo"))
 
+        // must be enough messages to stress concurrency
         val messages = (1..10_000).map { "message_$it" }
         messages.forEach { client.send(WsMessage(it)) }
 
         val received = client.received().take(messages.size).map { it.bodyString() }.toList()
-        for (line in received) {
-            println(line)
-        }
-
-        val syserr = String(err.toByteArray())
-
-        assertThat(messages, hasSize(equalTo(10_000)))
-        assertThat(received, hasSize(equalTo(10_000)))
         assertThat(received, equalTo(messages))
     }
 }
