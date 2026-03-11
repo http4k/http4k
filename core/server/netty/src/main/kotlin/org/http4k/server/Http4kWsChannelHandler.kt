@@ -24,7 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger
 class Http4kWsChannelHandler(
     private val wSocket: WsConsumer,
     private val appExecutor: Executor,
-    private val messageBufferLimit: Int = 1_000
+    private val bufferCapacity: Int = 1_000, // beyond this size, apply backpressure to netty
+    private val lowWaterMark: Float = 0.5f
 ) : SimpleChannelInboundHandler<WebSocketFrame>() {
     @Volatile private var websocket: PushPullAdaptingWebSocket? = null
     private var normalClose = false
@@ -81,17 +82,13 @@ class Http4kWsChannelHandler(
     }
 
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
-        // Enforce buffer capacity to prevent OOM
-        if (bufferSize.get() >= messageBufferLimit) {
-            websocket?.also { ws ->
-                ws.triggerError(IllegalStateException("Message buffer limit exceeded: $messageBufferLimit"))
-                closeWebsocket(ctx, ws, CloseWebSocketFrame(WsStatus.TOOBIG.code, WsStatus.TOOBIG.description))
-            }
-            return
-        }
-
         messageBuffer.offer(msg.retain())
         bufferSize.incrementAndGet()
+
+        // Apply backpressure to prevent OOM from backup up buffer
+        if (bufferSize.get() >= bufferCapacity) {
+            ctx.channel().config().isAutoRead = false
+        }
 
         websocket?.let { ws ->
             if (drainLock.compareAndSet(false, true)) {
@@ -115,7 +112,7 @@ class Http4kWsChannelHandler(
         try {
             while (messageBuffer.isNotEmpty()) {
                 val msg = messageBuffer.poll() ?: return
-                bufferSize.decrementAndGet()
+                val currentSize = bufferSize.decrementAndGet()
 
                 try {
                     when (msg) {
@@ -136,6 +133,12 @@ class Http4kWsChannelHandler(
                     websocket.triggerError(e)
                 } finally {
                     msg.release()
+                }
+
+                // Try to release back-pressure if below low-water mark
+                if (currentSize < bufferCapacity.times(lowWaterMark) && !ctx.channel().config().isAutoRead) {
+                    ctx.channel().config().isAutoRead = true
+                    ctx.read()
                 }
             }
         } finally {
