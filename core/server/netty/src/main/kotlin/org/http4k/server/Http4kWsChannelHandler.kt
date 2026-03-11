@@ -47,9 +47,9 @@ class Http4kWsChannelHandler(
             }
 
             override fun close(status: WsStatus) {
+                normalClose = true
                 ctx.writeAndFlush(CloseWebSocketFrame(status.code, status.description))
                     .addListeners(ChannelFutureListener {
-                        normalClose = true
                         websocket?.triggerClose(status)
                     }, CLOSE)
             }
@@ -88,13 +88,15 @@ class Http4kWsChannelHandler(
         messageBuffer.offer(msg.retain())
         bufferSize.incrementAndGet()
 
-        // Apply backpressure to prevent OOM from backup up buffer
-        if (bufferSize.get() >= bufferCapacity) {
-            ctx.channel().config().isAutoRead = false
-        }
-
         // if the websocket hasn't been initialized, just buffer the message
-        websocket?.let { tryDrainBuffer(ctx, it) }
+        websocket?.let {
+            // Apply backpressure to prevent OOM from backed-up buffer
+            if (bufferSize.get() >= bufferCapacity) {
+                ctx.channel().config().isAutoRead = false
+            }
+
+            tryDrainBuffer(ctx, it)
+        }
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {

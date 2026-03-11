@@ -213,21 +213,26 @@ abstract class WebsocketServerContract(
 
     @Test
     fun `should propagate close on server close`() {
-        val closeStatus = CompletableFuture<WsStatus>()
+        val serverStatus = CompletableFuture<WsStatus>()
+        val clientStatus = CompletableFuture<WsStatus>()
 
         val server = websockets(
             "/closes" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onMessage {
-                        ws.close()
+                        ws.close(WsStatus.GOING_AWAY)
                     }
-                    ws.onClose(closeStatus::complete)
+                    ws.onClose(serverStatus::complete)
                 }
             }).asServer(serverConfig(0)).start()
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
-        client.send(WsMessage("message"))
 
-        assertThat(closeStatus.get(5, TimeUnit.SECONDS), present())
+        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:${server.port()}/closes")) {
+            it.onClose(clientStatus::complete)
+            it.send(WsMessage("message"))
+        }
+
+        assertThat(serverStatus.get(5, TimeUnit.SECONDS), equalTo(WsStatus.GOING_AWAY))
+        assertThat(clientStatus.get(5, TimeUnit.SECONDS), equalTo(WsStatus.GOING_AWAY))
         client.close()
         server.close()
     }

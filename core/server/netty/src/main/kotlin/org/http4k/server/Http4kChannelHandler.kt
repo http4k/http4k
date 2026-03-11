@@ -70,7 +70,8 @@ class Http4kChannelHandler(
                 }
             }
         } catch (_: RejectedExecutionException) {
-            writeResponse(ctx, Response(Status.NOT_IMPLEMENTED))
+            // if the executor is full,
+            writeResponse(ctx, Response(Status.SERVICE_UNAVAILABLE))
             request.release()
         }
     }
