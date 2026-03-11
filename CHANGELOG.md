@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.33.0.1 (uncut)
+- **http4k-server-netty**: [Fix] Don't block the event loop group when processing requests and websocket messages. H/T @oharaandrew314
+- **http4k-server-netty**: [Fix] Don't drop websocket messages if received before the websocket is fully registered.  H/T @oharaandrew314
+
 ### v6.33.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-***: [Deprecation] use `mcp()` as a replacement for `mcpHttpStreaming()` as this is now the standard implementation. Simple replacement
