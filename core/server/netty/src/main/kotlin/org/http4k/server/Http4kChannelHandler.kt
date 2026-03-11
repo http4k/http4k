@@ -52,7 +52,7 @@ class Http4kChannelHandler(
          * Doing so isn't noticable for no-op requests, but longer-lived requests will quickly starve Netty
          * of event loop threads.
          *
-         * To work around this, delegate the work to an app-controller executor.
+         * To work around this, delegate the work to an app-controlled executor.
          * Message buffers must be carefully managed to ensure the data is available in executor threads,
          * whilst avoiding memory leaks.  We do not copy the buffers to non-volatile memory, as this would
          * break body streaming mode.
