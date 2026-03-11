@@ -112,8 +112,6 @@ class Http4kWsChannelHandler(
      * and only allow a single thread to drain the buffer at a time.
      */
     private fun drainBuffer(ctx: ChannelHandlerContext, websocket: PushPullAdaptingWebSocket) {
-        require(drainLock.get()) { "Attempted to drain buffer without a lock" }
-
         try {
             while (messageBuffer.isNotEmpty()) {
                 val msg = messageBuffer.poll() ?: return
