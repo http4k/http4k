@@ -83,8 +83,10 @@ class Http4kWsChannelHandler(
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
         // Enforce buffer capacity to prevent OOM
         if (bufferSize.get() >= messageBufferLimit) {
-            websocket?.triggerError(IllegalStateException("Message buffer limit exceeded: $messageBufferLimit"))
-            ctx.close()
+            websocket?.also { ws ->
+                ws.triggerError(IllegalStateException("Message buffer limit exceeded: $messageBufferLimit"))
+                closeWebsocket(ctx, ws, CloseWebSocketFrame(WsStatus.TOOBIG.code, WsStatus.TOOBIG.description))
+            }
             return
         }
 
@@ -129,10 +131,7 @@ class Http4kWsChannelHandler(
 
                         is CloseWebSocketFrame -> {
                             msg.retain() // writeAndFlush releases, so the caller might decrement the message count illegally
-                            ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {
-                                normalClose = true
-                                websocket.triggerClose(WsStatus(msg.statusCode(), msg.reasonText()))
-                            }, CLOSE)
+                            closeWebsocket(ctx, websocket, msg)
                         }
                     }
                 } catch (e: Exception) {
@@ -147,5 +146,12 @@ class Http4kWsChannelHandler(
                 appExecutor.execute { drainBuffer(ctx, websocket) }
             }
         }
+    }
+
+    private fun closeWebsocket(ctx: ChannelHandlerContext, websocket: PushPullAdaptingWebSocket, msg: CloseWebSocketFrame) {
+        ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {
+            normalClose = msg.statusCode() == WsStatus.NORMAL.code
+            websocket.triggerClose(WsStatus(msg.statusCode(), msg.reasonText()))
+        }, CLOSE)
     }
 }
