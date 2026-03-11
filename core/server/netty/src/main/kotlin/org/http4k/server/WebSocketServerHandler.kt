@@ -14,8 +14,13 @@ import org.http4k.core.RequestSource
 import org.http4k.core.Uri
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
+import java.util.concurrent.Executor
 
-class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundHandlerAdapter() {
+class WebSocketServerHandler(
+    private val wsHandler: WsHandler,
+    private val appExecutor: Executor
+) : ChannelInboundHandlerAdapter() {
+
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (msg is HttpRequest) {
             if (requiresWsUpgrade(msg)) {
@@ -38,7 +43,7 @@ class WebSocketServerHandler(private val wsHandler: WsHandler) : ChannelInboundH
                                 ctx.pipeline().addAfter(
                                     ctx.name(),
                                     Http4kWsChannelHandler::class.java.name,
-                                    Http4kWsChannelHandler(wsConsumer)
+                                    Http4kWsChannelHandler(wsConsumer, appExecutor)
                                 )
                             }
                         }

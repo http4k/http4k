@@ -30,6 +30,7 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -196,6 +197,7 @@ abstract class WebsocketServerContract(
     }
 
     @Test
+    @Timeout(5)
     fun `should propagate close on client close`() {
         val latch = CountDownLatch(1)
         var closeStatus: WsStatus? = null

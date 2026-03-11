@@ -16,13 +16,24 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.NOCODE
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executor
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
-class Http4kWsChannelHandler(private val wSocket: WsConsumer) : SimpleChannelInboundHandler<WebSocketFrame>() {
-    private var websocket: PushPullAdaptingWebSocket? = null
+class Http4kWsChannelHandler(
+    private val wSocket: WsConsumer,
+    private val appExecutor: Executor,
+    private val messageBufferLimit: Int = 1_000
+) : SimpleChannelInboundHandler<WebSocketFrame>() {
+    @Volatile private var websocket: PushPullAdaptingWebSocket? = null
     private var normalClose = false
+    private val messageBuffer = ConcurrentLinkedQueue<WebSocketFrame>()
+    private val bufferSize = AtomicInteger(0) // because the queue's size getter is O(n)
+    private val drainLock = AtomicBoolean()
 
     override fun handlerAdded(ctx: ChannelHandlerContext) {
-        websocket = object : PushPullAdaptingWebSocket() {
+        val ws = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 when (message.mode) {
                     WsMessage.Mode.Text -> ctx.writeAndFlush(TextWebSocketFrame(message.bodyString()))
@@ -41,7 +52,18 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer) : SimpleChannelInb
                         websocket?.triggerClose(status)
                     }, CLOSE)
             }
-        }.apply(wSocket)
+        }
+
+        appExecutor.execute {
+            wSocket(ws)
+
+            /* Do not register the websocket until the WsConsumer is invoked.
+             * Otherwise, there will be a race between draining messages and registering message handlers.
+             */
+            websocket = ws
+
+            drainBuffer(ctx, ws)
+        }
     }
 
     override fun handlerRemoved(ctx: ChannelHandlerContext) {
@@ -51,23 +73,79 @@ class Http4kWsChannelHandler(private val wSocket: WsConsumer) : SimpleChannelInb
             }, CLOSE)
         }
         websocket = null
+
+        while(messageBuffer.isNotEmpty()) {
+            messageBuffer.poll().release()
+            bufferSize.decrementAndGet()
+        }
     }
 
     override fun channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) {
-        when (msg) {
-            is TextWebSocketFrame -> websocket?.triggerMessage(WsMessage(msg.text()))
-            is BinaryWebSocketFrame -> websocket?.triggerMessage(WsMessage(ByteBufInputStream(msg.content()), WsMessage.Mode.Binary))
-            is CloseWebSocketFrame -> {
-                msg.retain()
-                ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {
-                    normalClose = true
-                    websocket?.triggerClose(WsStatus(msg.statusCode(), msg.reasonText()))
-                }, CLOSE)
+        // Enforce buffer capacity to prevent OOM
+        if (bufferSize.get() >= messageBufferLimit) {
+            websocket?.triggerError(IllegalStateException("Message buffer limit exceeded: $messageBufferLimit"))
+            ctx.close()
+            return
+        }
+
+        messageBuffer.offer(msg.retain())
+        bufferSize.incrementAndGet()
+
+        websocket?.let { ws ->
+            if (drainLock.compareAndSet(false, true)) {
+                appExecutor.execute { drainBuffer(ctx, ws) }
             }
         }
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        websocket?.triggerError(cause)
+        websocket?.also {
+            appExecutor.execute { it.triggerError(cause) }
+        }
+    }
+
+    /*
+     * It's very important to guarantee websocket frames are processed in order.  If we submit all frames to the
+     * executor independently, we risk out-of-order and/or concurrent processing.  Thus, we buffer incoming frames
+     * and only allow a single thread to drain the buffer at a time.
+     */
+    private fun drainBuffer(ctx: ChannelHandlerContext, websocket: PushPullAdaptingWebSocket) {
+        require(drainLock.get()) { "Attempted to drain buffer without a lock" }
+
+        try {
+            while (messageBuffer.isNotEmpty()) {
+                val msg = messageBuffer.poll() ?: return
+                bufferSize.decrementAndGet()
+
+                try {
+                    when (msg) {
+                        is TextWebSocketFrame -> websocket.triggerMessage(WsMessage(msg.text()))
+                        is BinaryWebSocketFrame -> websocket.triggerMessage(
+                            WsMessage(
+                                ByteBufInputStream(msg.content()),
+                                WsMessage.Mode.Binary
+                            )
+                        )
+
+                        is CloseWebSocketFrame -> {
+                            msg.retain() // writeAndFlush releases, so the caller might decrement the message count illegally
+                            ctx.writeAndFlush(msg).addListeners(ChannelFutureListener {
+                                normalClose = true
+                                websocket.triggerClose(WsStatus(msg.statusCode(), msg.reasonText()))
+                            }, CLOSE)
+                        }
+                    }
+                } catch (e: Exception) {
+                    websocket.triggerError(e)
+                } finally {
+                    msg.release()
+                }
+            }
+        } finally {
+            drainLock.set(false)
+            if (messageBuffer.isNotEmpty() && drainLock.compareAndSet(false, true)) {
+                appExecutor.execute { drainBuffer(ctx, websocket) }
+            }
+        }
     }
 }

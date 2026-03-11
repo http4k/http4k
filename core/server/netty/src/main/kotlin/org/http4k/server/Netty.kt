@@ -20,6 +20,7 @@ import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 import java.time.Duration.ofSeconds
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
@@ -54,6 +55,8 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
 
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
+            val appExecutor = Executors.newCachedThreadPool()
+
             bootstrap.group(masterGroup, workerGroup)
                 .channelFactory { NioServerSocketChannel() }
                 .childHandler(object : ChannelInitializer<SocketChannel>() {
@@ -62,10 +65,10 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
                         ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
                         ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
 
-                        if (ws != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(ws))
+                        if (ws != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(ws, appExecutor))
 
                         ch.pipeline().addLast("streamer", ChunkedWriteHandler())
-                        if (http != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(http))
+                        if (http != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(http, appExecutor))
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 1000)
