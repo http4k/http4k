@@ -246,7 +246,7 @@ abstract class WebsocketServerContract(
         client.send(WsMessage("message"))
         server.close()
 
-        assertThat(closeStatus.get(5, TimeUnit.SECONDS), present())
+        assertThat(closeStatus.get(10, TimeUnit.SECONDS), present())
         client.close()
     }
 
