@@ -109,7 +109,7 @@ abstract class ConfigurableMcpJson(
         val autoJsonToJsonSchema = AutoJsonToJsonSchema(this@ConfigurableMcpJson)
         val jsonSchemaCollapser = JsonSchemaCollapser(this@ConfigurableMcpJson)
 
-        return ToolOutputLensBuilder(
+        return ToolOutputLensBuilder(this@ConfigurableMcpJson,
             LensGet { _, target -> listOf(convert(target.structuredContent!!)) },
             { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
         )
