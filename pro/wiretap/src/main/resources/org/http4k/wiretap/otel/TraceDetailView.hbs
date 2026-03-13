@@ -170,4 +170,13 @@
         </div>
         {{/each}}
     </div>
+    {{#if hasSequenceDiagram}}
+    <div class="sequence-diagram">
+        <div class="sequence-diagram-toolbar">
+            <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+        </div>
+        <pre class="mermaid">{{{mermaidDiagram}}}</pre>
+        <pre class="mermaid-source" style="display:none">{{{mermaidDiagram}}}</pre>
+    </div>
+    {{/if}}
 </div>

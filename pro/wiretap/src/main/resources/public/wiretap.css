@@ -899,6 +899,27 @@ body {
     margin-top: 4px;
 }
 
+/* Sequence Diagram */
+.sequence-diagram {
+    margin-top: 16px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.sequence-diagram-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.sequence-diagram .mermaid {
+    display: flex;
+    justify-content: center;
+}
+
 /* Panel resize handle */
 .panel-resize-handle {
     height: 5px;

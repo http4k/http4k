@@ -44,17 +44,10 @@ interface McpWiretapFunctionContract {
             .valueOrNull()!!.find { it.name.value == toolName }
     )
 
-    fun Approver.assertToolResponse(args: Map<String, Any>) {
+    fun Approver.assertToolResponse(args: Map<String, Any>) =
         when (val result = callTool(args)) {
-            is Success<ToolResponse> -> assertApproved(
-                Jackson.prettify(Jackson.asFormatString(result.value))
-            )
-
-            is Failure<*> -> {
-                println(result)
-                TODO()
-            }
+            is Success<ToolResponse> -> assertApproved(Jackson.prettify(Jackson.asFormatString(result.value)))
+            is Failure<*> -> TODO()
         }
-    }
 
 }

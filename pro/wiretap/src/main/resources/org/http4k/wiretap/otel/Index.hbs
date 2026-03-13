@@ -18,6 +18,16 @@
         {{/if}}
     </div>
 </div>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: false, theme: 'default' });
+window._mermaidRender = async function() {
+    const nodes = document.querySelectorAll('.mermaid:not([data-processed])');
+    if (nodes.length === 0) return;
+    await mermaid.run({ nodes: nodes });
+};
+window._mermaidRender();
+</script>
 {{> org/http4k/wiretap/footer}}
 </body>
 {{/partial}}

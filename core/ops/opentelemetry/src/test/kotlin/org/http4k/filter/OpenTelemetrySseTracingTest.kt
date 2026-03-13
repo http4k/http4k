@@ -184,6 +184,24 @@ class OpenTelemetrySseTracingTest {
     }
 
     @Test
+    fun `server span records http status code attribute`() {
+        var createdContext: SpanData? = null
+
+        val app = ServerFilters.OpenTelemetrySseTracing(spanCompletionMutator = { span, _, _ ->
+            createdContext = (span as ReadableSpan).toSpanData()
+        })
+            .then(sse("/foo" bind {
+                SseResponse { it.close() }
+            }))
+
+        val response = app(Request(GET, "http://localhost:8080/foo"))
+
+        response.consumer.invoke(testSse())
+
+        assertThat(createdContext!!.attributes.get(longKey("http.status_code")), equalTo(200L))
+    }
+
+    @Test
     fun `span ends when SSE connection closes`() {
         var spanEndedBeforeClose = true
         var spanEndedAfterClose = false

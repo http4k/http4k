@@ -6,10 +6,13 @@ package org.http4k.wiretap.otel
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.SpanContext
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.TraceFlags
 import io.opentelemetry.api.trace.TraceState
+import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.testing.trace.TestSpanData
 import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
@@ -33,22 +36,32 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
         traceId: String,
         spanId: String = "1234567890abcdef",
         name: String = "test",
-        parentSpanId: String = "0000000000000000"
+        parentSpanId: String = "0000000000000000",
+        kind: SpanKind = SpanKind.SERVER,
+        serviceName: String = "",
+        startNanos: Long = 1000000,
+        endNanos: Long = 2000000,
+        status: StatusData = StatusData.ok()
     ) {
-        traceStore.record(
-            TestSpanData.builder()
-                .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
-                .setParentSpanContext(
-                    SpanContext.create(traceId, parentSpanId, TraceFlags.getSampled(), TraceState.getDefault())
-                )
-                .setName(name)
-                .setKind(SpanKind.SERVER)
-                .setStartEpochNanos(1000000)
-                .setEndEpochNanos(2000000)
-                .setHasEnded(true)
-                .setStatus(StatusData.ok())
-                .build()
-        )
+        val builder = TestSpanData.builder()
+            .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
+            .setParentSpanContext(
+                SpanContext.create(traceId, parentSpanId, TraceFlags.getSampled(), TraceState.getDefault())
+            )
+            .setName(name)
+            .setKind(kind)
+            .setStartEpochNanos(startNanos)
+            .setEndEpochNanos(endNanos)
+            .setHasEnded(true)
+            .setStatus(status)
+
+        if (serviceName.isNotEmpty()) {
+            builder.setResource(
+                Resource.create(Attributes.of(AttributeKey.stringKey("service.name"), serviceName))
+            )
+        }
+
+        traceStore.record(builder.build())
     }
 
     @Test
@@ -72,5 +85,14 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
     @Test
     fun `mcp returns error for unknown trace`(approver: Approver) {
         approver.assertToolResponse(mapOf("trace_id" to "00000000000000000000000000000099"))
+    }
+
+    @Test
+    fun `http returns trace with sequence diagram for multi-service trace`(approver: Approver) {
+        val traceId = "00000000000000000000000000000002"
+        recordSpan(traceId, spanId = "aaaaaaaaaaaaaaaa", name = "GET /", kind = SpanKind.SERVER, serviceName = "frontend", startNanos = 1000000, endNanos = 5000000)
+        recordSpan(traceId, spanId = "bbbbbbbbbbbbbbbb", parentSpanId = "aaaaaaaaaaaaaaaa", name = "GET /api", kind = SpanKind.CLIENT, serviceName = "frontend", startNanos = 1500000, endNanos = 4500000)
+        recordSpan(traceId, spanId = "cccccccccccccccc", parentSpanId = "bbbbbbbbbbbbbbbb", name = "GET /api", kind = SpanKind.SERVER, serviceName = "backend", startNanos = 2000000, endNanos = 4000000)
+        approver.assertApproved(httpClient()(Request(GET, "/$traceId")))
     }
 }

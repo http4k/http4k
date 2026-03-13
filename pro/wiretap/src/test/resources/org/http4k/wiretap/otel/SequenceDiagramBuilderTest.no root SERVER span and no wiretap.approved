@@ -1,0 +1,5 @@
+sequenceDiagram
+    participant frontend
+    participant backend
+    frontend->>backend: GET /api
+    backend-->>frontend: 200 (25ms)

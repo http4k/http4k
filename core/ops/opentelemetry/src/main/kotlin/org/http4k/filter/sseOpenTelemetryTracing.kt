@@ -37,6 +37,7 @@ fun ServerFilters.OpenTelemetrySseTracing(
                             response.consumer(object : Sse by sse {
                                 override fun close() {
                                     try {
+                                        span.setAttribute(attributesKeys.statusCode, response.status.code.toLong())
                                         spanCompletionMutator(span, req, response)
                                         span.setStatusFromResponse(response.status)
                                         sse.close()

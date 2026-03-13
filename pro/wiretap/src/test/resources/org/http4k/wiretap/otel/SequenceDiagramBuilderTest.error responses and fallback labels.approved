@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant wiretap
+    participant myapp
+    participant downstream
+    wiretap->>myapp: GET /fail
+    myapp->>downstream: GET /not-found
+    downstream-->>myapp: 404 (15ms)
+    myapp->>downstream: POST /data
+    downstream-->>myapp: OK (20ms)
+    myapp--xwiretap: 500 (42ms)

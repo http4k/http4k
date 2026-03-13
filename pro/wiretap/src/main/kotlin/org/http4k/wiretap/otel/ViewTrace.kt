@@ -78,6 +78,10 @@ data class SpanNodeView(val span: SpanDetail) : ViewModel
 data class TraceDetailView(val detail: TraceDetail) : ViewModel {
     val shortTraceId = detail.traceId.takeLast(8)
     val spans = detail.spans.map { SpanNodeView(it) }
+
+    private val diagram = detail.toSequenceDiagram()
+    val hasSequenceDiagram = diagram.messages.isNotEmpty()
+    val mermaidDiagram = diagram.toMermaid()
 }
 
 private fun buildSpanTree(
