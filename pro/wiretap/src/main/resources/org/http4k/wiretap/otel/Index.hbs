@@ -20,7 +20,26 @@
 </div>
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    themeVariables: {
+        primaryColor: '#e8f4fd',
+        primaryBorderColor: '#0A53BE',
+        primaryTextColor: '#212529',
+        lineColor: '#212529',
+        signalColor: '#212529',
+        signalTextColor: '#212529',
+        actorBkg: '#e8f4fd',
+        actorBorder: '#0A53BE',
+        actorTextColor: '#212529',
+        actorLineColor: '#6c757d',
+        background: '#f8f9fa',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    }
+});
+
 window._mermaidRender = async function() {
     const nodes = document.querySelectorAll('.mermaid:not([data-processed])');
     if (nodes.length === 0) return;
