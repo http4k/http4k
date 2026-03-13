@@ -20,6 +20,7 @@ import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
+import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
@@ -37,6 +38,7 @@ fun Proxy(
     httpClient: HttpHandler,
     clock: Clock,
     traces: TraceStore,
+    logs: LogStore,
     transactions: TransactionStore,
     trafficMetrics: TrafficMetrics,
     inboundChaos: ChaosEngine,
@@ -71,7 +73,7 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
-    val uri = uriProvider(outboundHttp, WiretapOpenTelemetry(traces))
+    val uri = uriProvider(outboundHttp, WiretapOpenTelemetry(traces, logs))
 
     return ProxyHandlers(
         uri,

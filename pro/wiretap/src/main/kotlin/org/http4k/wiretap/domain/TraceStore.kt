@@ -23,12 +23,9 @@ interface TraceStore {
                 }
             }
 
-            override fun traces(): Map<String, List<SpanData>> =
-                spans.groupBy { it.traceId }
+            override fun traces() = spans.groupBy { it.traceId }
 
-            override fun get(traceId: String): List<SpanData> =
-                spans.filter { it.traceId == traceId }
-
+            override fun get(traceId: String) = spans.filter { it.traceId == traceId }
         }
     }
 }

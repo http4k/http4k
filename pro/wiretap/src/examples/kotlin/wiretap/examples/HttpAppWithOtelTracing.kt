@@ -4,7 +4,6 @@
  */
 package wiretap.examples
 
-import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.trace.SpanKind
@@ -13,27 +12,44 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.events.AutoOpenTelemetryEvents
+import org.http4k.events.Event
+import org.http4k.events.EventFilters
+import org.http4k.events.Events
+import org.http4k.events.HttpEvent
+import org.http4k.events.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.OpenTelemetryTracing
+import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ServerFilters
+import org.http4k.format.Moshi
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import java.time.Instant
 
 fun HttpAppWithOtelTracing(
     downstreamUri: Uri,
     httpClient: HttpHandler,
-    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
+    openTelemetry: OpenTelemetry
 ): RoutingHttpHandler {
     val tracer = openTelemetry.tracerProvider.get("demo-app")
 
-    val client = ClientFilters.SetBaseUriFrom(downstreamUri)
-        .then(ClientFilters.OpenTelemetryTracing(openTelemetry)).then(httpClient)
+    val events = EventFilters.AddServiceName("demo-app")
+        .then(EventFilters.AddEventName())
+        .then(AutoOpenTelemetryEvents(Moshi, openTelemetry))
 
-    return ServerFilters.OpenTelemetryTracing(openTelemetry).then(AppRoutes(tracer, client))
+    val client = ClientFilters.SetBaseUriFrom(downstreamUri)
+        .then(ClientFilters.OpenTelemetryTracing(openTelemetry))
+        .then(ResponseFilters.ReportHttpTransaction { events(HttpEvent.Outgoing(it)) })
+        .then(httpClient)
+
+    return ServerFilters.OpenTelemetryTracing(openTelemetry)
+        .then(ResponseFilters.ReportHttpTransaction { events(HttpEvent.Incoming(it)) })
+        .then(AppRoutes(tracer, events, client))
 }
 
-private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
+private fun AppRoutes(tracer: Tracer, events: Events, client: HttpHandler) = routes(
     "/{name:.*}" bind GET to { req ->
         Baggage.current()
             .toBuilder()
@@ -62,8 +78,12 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
                 cacheSpan.addEvent("cache-miss")
                 cacheSpan.end()
 
+                events(AnEvent("event1", Instant.now(), 123, true))
+
                 // make a call downstream
                 client(req)
+
+                events(AnEvent("event2", Instant.now(), 321, false))
 
                 // make another call downstream
                 val response = client(req)
@@ -80,3 +100,5 @@ private fun AppRoutes(tracer: Tracer, client: HttpHandler) = routes(
                 response
             }
     })
+
+data class AnEvent(val bar: String, val anotherDate: Instant, val aNumber: Int, val aBool: Boolean) : Event

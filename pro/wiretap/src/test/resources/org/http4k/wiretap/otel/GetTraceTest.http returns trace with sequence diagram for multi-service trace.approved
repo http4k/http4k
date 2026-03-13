@@ -96,6 +96,7 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements             </div>
+data: elements             
 data: elements         </div>
 data: elements         
 data: elements         <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
@@ -176,6 +177,7 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements             </div>
+data: elements             
 data: elements         </div>
 data: elements         
 data: elements         <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
@@ -256,32 +258,12 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements             </div>
+data: elements             
 data: elements         </div>
 data: elements         
 data: elements     </div>
 data: elements     
-data: elements     <div class="sequence-diagram">
-data: elements         <div class="sequence-diagram-toolbar">
-data: elements             <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
-data: elements         </div>
-data: elements         <pre class="mermaid">sequenceDiagram
-data: elements     participant wiretap
-data: elements     participant frontend
-data: elements     participant backend
-data: elements     wiretap->>frontend: GET /
-data: elements     frontend->>backend: GET /api
-data: elements     backend-->>frontend: OK (3ms)
-data: elements     frontend-->>wiretap: OK (4ms)</pre>
-data: elements         <pre class="mermaid-source" style="display:none">sequenceDiagram
-data: elements     participant wiretap
-data: elements     participant frontend
-data: elements     participant backend
-data: elements     wiretap->>frontend: GET /
-data: elements     frontend->>backend: GET /api
-data: elements     backend-->>frontend: OK (3ms)
-data: elements     frontend-->>wiretap: OK (4ms)</pre>
-data: elements     </div>
-data: elements     
+data: elements     <div id="trace-diagram-panel" data-init="@get('/_wiretap/otel/diagram/00000000000000000000000000000002')"></div>
 data: elements </div>
 data: elements 
 data: selector #trace-detail-panel

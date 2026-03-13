@@ -999,6 +999,130 @@ body {
     overflow: hidden;
 }
 
+
+/* Severity badges */
+.badge-severity-info, .badge-severity-INFO {
+    background: #d1e7dd;
+    color: #0f5132;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.badge-severity-warn, .badge-severity-WARN {
+    background: #fff3cd;
+    color: #664d03;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.badge-severity-error, .badge-severity-ERROR {
+    background: #f8d7da;
+    color: #842029;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* Span-level logs in gantt detail */
+.span-logs-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #dee2e6;
+}
+
+.span-logs-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.span-log-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+
+.span-log-table thead th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.span-log-row {
+    cursor: pointer;
+}
+
+.span-log-row td {
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.span-log-row:hover td {
+    background: var(--color-bg-hover);
+}
+
+.span-log-body {
+    font-weight: 600;
+}
+
+.span-log-detail-row {
+    display: none;
+}
+
+.span-log-detail-row.expanded {
+    display: table-row;
+}
+
+.span-log-detail-row td {
+    padding: 8px 8px 8px 16px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.span-log-detail-columns {
+    display: flex;
+    gap: 24px;
+}
+
+.span-log-detail-section {
+    flex: 1;
+    margin-bottom: 8px;
+}
+
+.span-log-detail-section h5 {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    margin: 0 0 4px;
+}
+
+.span-log-fields {
+    margin-top: 4px;
+}
+
+/* Trace-level orphan logs section */
+.trace-logs-section {
+    padding: 12px 16px;
+    border-top: 1px solid #dee2e6;
+}
+
+.trace-logs-section h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 /* Replay badge */
 .badge-replay {
     display: inline-block;

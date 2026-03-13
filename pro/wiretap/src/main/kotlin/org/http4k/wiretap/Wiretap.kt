@@ -23,6 +23,7 @@ import org.http4k.wiretap.client.InboundClient
 import org.http4k.wiretap.client.OutboundClient
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.BodyHydration.All
+import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
@@ -58,6 +59,7 @@ object Wiretap {
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
+        logStore: LogStore = LogStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
         mcpOptions: McpServerOptions = McpServerOptions.default,
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
@@ -83,6 +85,7 @@ object Wiretap {
             httpClient,
             clock,
             traceStore,
+            logStore,
             transactionStore,
             trafficMetrics,
             inboundChaos,
@@ -96,7 +99,7 @@ object Wiretap {
         val baseFunctions = listOf(
             Traffic(transactionStore, viewStore, clock),
             Chaos(inboundChaos, outboundChaos),
-            OTel(traceStore, clock),
+            OTel(traceStore, logStore, clock),
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),

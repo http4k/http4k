@@ -8,34 +8,29 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.logs.Severity
 import io.opentelemetry.api.trace.SpanContext
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.TraceFlags
 import io.opentelemetry.api.trace.TraceState
 import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.sdk.testing.logs.TestLogRecordData
 import io.opentelemetry.sdk.testing.trace.TestSpanData
 import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.testing.Approver
-import org.http4k.util.FixedClock
 import org.http4k.wiretap.HttpWiretapFunctionContract
 import org.http4k.wiretap.McpWiretapFunctionContract
-import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.junit.jupiter.api.Test
 
-class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
+class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
-    override val toolName = "get_trace"
+    override val toolName = "get_trace_diagram"
 
     private val traceStore = TraceStore.InMemory()
-    private val logStore = LogStore.InMemory()
 
-    override val function = GetTrace(traceStore, logStore, FixedClock)
+    override val function = GetTraceDiagram(traceStore)
 
     private fun recordSpan(
         traceId: String,
@@ -70,58 +65,38 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
     }
 
     @Test
-    fun `http returns trace detail`(approver: Approver) {
-        recordSpan("00000000000000000000000000000001")
-        approver.assertApproved(httpClient()(Request(GET, "/00000000000000000000000000000001")))
-    }
-
-    @Test
-    fun `http returns 404 for unknown trace`() {
-        val response = httpClient()(Request(GET, "/00000000000000000000000000000099"))
-        assertThat(response.status, equalTo(NOT_FOUND))
-    }
-
-    @Test
-    fun `mcp returns trace detail`(approver: Approver) {
-        recordSpan("00000000000000000000000000000001")
-        approver.assertToolResponse(mapOf("trace_id" to "00000000000000000000000000000001"))
-    }
-
-    @Test
-    fun `mcp returns error for unknown trace`(approver: Approver) {
-        approver.assertToolResponse(mapOf("trace_id" to "00000000000000000000000000000099"))
-    }
-
-    private fun recordLog(
-        traceId: String,
-        spanId: String = "1234567890abcdef",
-        body: String = "TestEvent",
-        severity: Severity = Severity.INFO
-    ) {
-        logStore.record(
-            TestLogRecordData.builder()
-                .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
-                .setBody(body)
-                .setSeverity(severity)
-                .setTimestamp(1000000, java.util.concurrent.TimeUnit.NANOSECONDS)
-                .setAttributes(Attributes.of(AttributeKey.stringKey("key"), "value"))
-                .build()
-        )
-    }
-
-    @Test
-    fun `http returns trace detail with logs`(approver: Approver) {
-        recordSpan("00000000000000000000000000000001")
-        recordLog("00000000000000000000000000000001", spanId = "1234567890abcdef", body = "something happened")
-        approver.assertApproved(httpClient()(Request(GET, "/00000000000000000000000000000001")))
-    }
-
-    @Test
-    fun `http returns trace with sequence diagram for multi-service trace`(approver: Approver) {
+    fun `http returns diagram for multi-service trace`(approver: Approver) {
         val traceId = "00000000000000000000000000000002"
         recordSpan(traceId, spanId = "aaaaaaaaaaaaaaaa", name = "GET /", kind = SpanKind.SERVER, serviceName = "frontend", startNanos = 1000000, endNanos = 5000000)
         recordSpan(traceId, spanId = "bbbbbbbbbbbbbbbb", parentSpanId = "aaaaaaaaaaaaaaaa", name = "GET /api", kind = SpanKind.CLIENT, serviceName = "frontend", startNanos = 1500000, endNanos = 4500000)
         recordSpan(traceId, spanId = "cccccccccccccccc", parentSpanId = "bbbbbbbbbbbbbbbb", name = "GET /api", kind = SpanKind.SERVER, serviceName = "backend", startNanos = 2000000, endNanos = 4000000)
-        approver.assertApproved(httpClient()(Request(GET, "/$traceId")))
+        approver.assertApproved(httpClient()(Request(GET, "/diagram/$traceId")))
+    }
+
+    @Test
+    fun `http returns 404 for unknown trace`() {
+        val response = httpClient()(Request(GET, "/diagram/00000000000000000000000000000099"))
+        assertThat(response.status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `http returns 404 for single-service trace without diagram`() {
+        recordSpan("00000000000000000000000000000001")
+        val response = httpClient()(Request(GET, "/diagram/00000000000000000000000000000001"))
+        assertThat(response.status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `mcp returns diagram for multi-service trace`(approver: Approver) {
+        val traceId = "00000000000000000000000000000002"
+        recordSpan(traceId, spanId = "aaaaaaaaaaaaaaaa", name = "GET /", kind = SpanKind.SERVER, serviceName = "frontend", startNanos = 1000000, endNanos = 5000000)
+        recordSpan(traceId, spanId = "bbbbbbbbbbbbbbbb", parentSpanId = "aaaaaaaaaaaaaaaa", name = "GET /api", kind = SpanKind.CLIENT, serviceName = "frontend", startNanos = 1500000, endNanos = 4500000)
+        recordSpan(traceId, spanId = "cccccccccccccccc", parentSpanId = "bbbbbbbbbbbbbbbb", name = "GET /api", kind = SpanKind.SERVER, serviceName = "backend", startNanos = 2000000, endNanos = 4000000)
+        approver.assertToolResponse(mapOf("trace_id" to traceId))
+    }
+
+    @Test
+    fun `mcp returns empty for unknown trace`(approver: Approver) {
+        approver.assertToolResponse(mapOf("trace_id" to "00000000000000000000000000000099"))
     }
 }

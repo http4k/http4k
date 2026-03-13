@@ -20,6 +20,7 @@ import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
+import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
@@ -45,6 +46,7 @@ class ProxyTest {
         httpClient = httpClient,
         clock = clock,
         traces = TraceStore.InMemory(),
+        logs = LogStore.InMemory(),
         transactions = transactions,
         trafficMetrics = trafficMetrics,
         inboundChaos = inboundChaos,
