@@ -31,7 +31,7 @@ class WiretapLogRecordExporterTest {
         val result = exporter.export(listOf(log))
 
         assertThat(result.isSuccess, equalTo(true))
-        assertThat(logStore.all(), hasSize(equalTo(1)))
+        assertThat(logStore.forTrace("00000000000000000000000000000001"), hasSize(equalTo(1)))
     }
 
     @Test

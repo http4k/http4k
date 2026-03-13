@@ -39,7 +39,7 @@ class LogStoreTest {
         store.record(logRecord(body = "first", timestampNanos = 1000000L))
         store.record(logRecord(body = "second", timestampNanos = 2000000L))
 
-        val logs = store.all()
+        val logs = store.forTrace("00000000000000000000000000000001")
         assertThat(logs, hasSize(equalTo(2)))
         assertThat(logs[0].bodyValue?.asString(), equalTo("second"))
         assertThat(logs[1].bodyValue?.asString(), equalTo("first"))
@@ -52,9 +52,9 @@ class LogStoreTest {
         store.record(logRecord(body = "third"))
         store.record(logRecord(body = "fourth"))
 
-        val logs = store.all()
+        val logs = store.forTrace("00000000000000000000000000000001")
         assertThat(logs, hasSize(equalTo(3)))
-        assertThat(logs[0].body.asString(), equalTo("fourth"))
+        assertThat(logs[0].bodyValue?.asString(), equalTo("fourth"))
     }
 
     @Test

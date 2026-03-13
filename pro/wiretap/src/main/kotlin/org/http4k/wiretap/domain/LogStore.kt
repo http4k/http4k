@@ -9,9 +9,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 interface LogStore {
     fun record(log: LogRecordData)
-    fun all(): List<LogRecordData>
     fun forTrace(traceId: String): List<LogRecordData>
-    fun list(filter: LogFilter, limit: Int = 100): List<LogRecordData>
 
     companion object {
         fun InMemory(maxLogs: Int = 5000) = object : LogStore {
@@ -24,18 +22,8 @@ interface LogStore {
                 }
             }
 
-            override fun all(): List<LogRecordData> = logs.toList()
-
             override fun forTrace(traceId: String): List<LogRecordData> =
                 logs.filter { it.spanContext.traceId == traceId }
-
-            override fun list(filter: LogFilter, limit: Int): List<LogRecordData> {
-                val filtered = when (filter.traceId) {
-                    null -> logs.toList()
-                    else -> logs.filter { it.spanContext.traceId == filter.traceId }
-                }
-                return filtered.take(limit)
-            }
         }
     }
 }
