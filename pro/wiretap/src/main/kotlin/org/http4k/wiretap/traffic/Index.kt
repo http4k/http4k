@@ -33,9 +33,9 @@ data class TrafficSignals(
     val customView: Boolean = false,
     val showAddView: Boolean = false,
     val name: String? = null,
-    val selectedTx: TransactionId? = null
+    val selectedTx: String? = null
 ) : SignalModel
 
 data class Index(val deepLinkTxId: TransactionId? = null) : ViewModel {
-    val initialSignals = Json.asFormatString(TrafficSignals(selectedTx = deepLinkTxId))
+    val initialSignals = Json.asFormatString(TrafficSignals(selectedTx = deepLinkTxId?.value?.toString()))
 }

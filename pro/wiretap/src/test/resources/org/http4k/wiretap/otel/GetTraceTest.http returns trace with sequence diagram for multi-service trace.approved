@@ -76,10 +76,6 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements                 
-data: elements             </div>
-data: elements             <div class="gantt-detail-columns">
-data: elements                 
-data: elements                 
 data: elements                 
 data: elements                 <div class="gantt-detail-col">
 data: elements                     <div class="span-detail-section">
@@ -96,6 +92,8 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements             </div>
+data: elements             
+data: elements             
 data: elements             
 data: elements         </div>
 data: elements         
@@ -157,10 +155,6 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements                 
-data: elements             </div>
-data: elements             <div class="gantt-detail-columns">
-data: elements                 
-data: elements                 
 data: elements                 
 data: elements                 <div class="gantt-detail-col">
 data: elements                     <div class="span-detail-section">
@@ -177,6 +171,8 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements             </div>
+data: elements             
+data: elements             
 data: elements             
 data: elements         </div>
 data: elements         
@@ -238,10 +234,6 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements                 
-data: elements             </div>
-data: elements             <div class="gantt-detail-columns">
-data: elements                 
-data: elements                 
 data: elements                 
 data: elements                 <div class="gantt-detail-col">
 data: elements                     <div class="span-detail-section">
@@ -258,6 +250,8 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements             </div>
+data: elements             
+data: elements             
 data: elements             
 data: elements         </div>
 data: elements         

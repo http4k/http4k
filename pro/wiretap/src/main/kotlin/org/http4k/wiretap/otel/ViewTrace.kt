@@ -26,6 +26,7 @@ import org.http4k.wiretap.domain.LogSummary
 import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.SpanDetail
+import org.http4k.wiretap.domain.SpanEvent
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.toSummary
@@ -72,12 +73,15 @@ fun GetTrace(traceStore: TraceStore, logStore: LogStore, clock: Clock) = object 
 
 data class LogRowView(val log: LogSummary, val columnValues: List<String>)
 
+data class EventRowView(val event: SpanEvent, val attributeCount: Int)
+
 data class SpanNodeView(val span: SpanDetail, val logs: List<LogSummary> = emptyList()) : ViewModel {
     val logAttrColumns = logs.flatMap { it.attributes.map { a -> a.key } }.distinct()
     val logRows = logs.map { log ->
         val attrMap = log.attributes.associate { it.key to it.value }
         LogRowView(log, logAttrColumns.map { attrMap[it] ?: "" })
     }
+    val eventRows = span.events.map { EventRowView(it, it.attributes.size) }
 }
 
 data class TraceDetailView(val detail: TraceDetail, val logsBySpan: Map<OtelSpanId?, List<LogSummary>> = emptyMap()) : ViewModel {

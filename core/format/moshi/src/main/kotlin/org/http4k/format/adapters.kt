@@ -11,9 +11,8 @@ import org.http4k.contract.jsonschema.ArrayItems
 import org.http4k.contract.jsonschema.EmptyArray
 import org.http4k.contract.jsonschema.OneOfArray
 import org.http4k.contract.jsonschema.SchemaNode
-import org.http4k.core.Status
 import org.http4k.events.Event
-import org.http4k.websocket.WsStatus
+import org.http4k.events.ProtocolStatus
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
@@ -81,12 +80,19 @@ object EventAdapter : JsonAdapter.Factory {
 }
 
 object ProtocolStatusAdapter : JsonAdapter.Factory {
-    override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) =
-        when (p0.typeName) {
-            WsStatus::class.java.typeName -> p2.adapter(WsStatus::class.java)
-            Status::class.java.typeName -> p2.adapter(Status::class.java)
+    override fun create(p0: Type, p1: MutableSet<out Annotation>, p2: Moshi) = with(getRawType(p0)) {
+        when {
+            isA(ProtocolStatus::class.java) -> object : JsonAdapter<ProtocolStatus>() {
+                override fun fromJson(p0: JsonReader) = error("not supported")
+
+                override fun toJson(p0: JsonWriter, p1: ProtocolStatus?) {
+                    p1?.let { p0.value(it.code) } ?: p0.nullValue()
+                }
+            }
+
             else -> null
         }
+    }
 }
 
 object ProhibitUnknownValuesAdapter : JsonAdapter.Factory {
@@ -112,10 +118,10 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
                 else -> null
             }
         }
-
-    private fun Class<*>?.isA(testCase: Class<*>): Boolean =
-        this?.let { testCase.isAssignableFrom(this) } ?: false
 }
+
+private fun Class<*>?.isA(testCase: Class<*>): Boolean =
+    this?.let { testCase.isAssignableFrom(this) } ?: false
 
 class UnmappedValue(type: Type) : Exception("unmapped type $type")
 

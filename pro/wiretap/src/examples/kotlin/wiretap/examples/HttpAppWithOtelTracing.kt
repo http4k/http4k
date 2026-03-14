@@ -6,6 +6,8 @@ package wiretap.examples
 
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 import org.http4k.core.HttpHandler
@@ -66,7 +68,15 @@ private fun AppRoutes(tracer: Tracer, events: Events, client: HttpHandler) = rou
                 validateSpan.setAttribute("user.role", "admin")
                 baggage.forEach { key, value -> validateSpan.setAttribute("baggage.$key", value.value) }
                 Thread.sleep(5)
-                validateSpan.addEvent("credentials-verified")
+
+                val eventAttrs = Attributes.builder()
+                    .put(AttributeKey.stringKey("foo"), "bar")
+                    .put(AttributeKey.booleanKey("baz"), true)
+                    .put(AttributeKey.longArrayKey("quux"), listOf(1L, 2L, 3L))
+                    .put(AttributeKey.stringKey("waldo"), "fred")
+                    .build()
+                validateSpan.addEvent("event name 1", eventAttrs, Instant.now())
+                validateSpan.addEvent("event name 2", eventAttrs, Instant.now())
                 validateSpan.end()
 
                 val cacheSpan = tracer.spanBuilder("cache-lookup")

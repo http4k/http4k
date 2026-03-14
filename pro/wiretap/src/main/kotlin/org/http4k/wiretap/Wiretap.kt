@@ -17,6 +17,8 @@ import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.poly
 import org.http4k.routing.routes
+import org.http4k.security.NoSecurity
+import org.http4k.security.Security
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.wiretap.chaos.Chaos
 import org.http4k.wiretap.client.InboundClient
@@ -52,15 +54,17 @@ import kotlin.concurrent.fixedRateTimer
 object Wiretap {
     operator fun invoke(
         wiretappedUri: Uri,
+        security: Security = NoSecurity,
         mcpOptions: McpServerOptions = McpServerOptions.default,
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
-    ) = this(httpClient = httpClient) { _, _ -> wiretappedUri }
+    ) = this(httpClient = httpClient, security = security) { _, _ -> wiretappedUri }
 
     operator fun invoke(
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
         logStore: LogStore = LogStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
+        security: Security = NoSecurity,
         mcpOptions: McpServerOptions = McpServerOptions.default,
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
@@ -121,7 +125,7 @@ object Wiretap {
         val http = CatchAndReportErrors()
             .then(
                 routes(
-                    WiretapUi(renderer, html, allFunctions),
+                    WiretapUi(renderer, html, allFunctions, security),
                     orElse bind proxy
                 )
             )

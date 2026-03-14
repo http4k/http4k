@@ -5,6 +5,7 @@
 package org.http4k.wiretap.otel
 
 import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.data.SpanData
 import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.OtelTraceId
@@ -14,6 +15,13 @@ import org.http4k.wiretap.domain.SpanEvent
 import org.http4k.wiretap.domain.SpanLink
 import org.http4k.wiretap.domain.TraceDetail
 import kotlin.math.max
+
+private fun Any.toAttributeValue(): String = when (this) {
+    is Array<*> -> contentToString()
+    else -> toString()
+}
+
+private fun Attributes.toSpanAttributes() = asMap().map { (k, v) -> SpanAttribute(k.key, v.toAttributeValue()) }
 
 fun List<SpanData>.toTraceDetail(traceId: OtelTraceId): TraceDetail {
     val traceStartNanos = minOf { it.startEpochNanos }
@@ -62,7 +70,7 @@ private fun flattenSpan(
     traceStartNanos: Long,
     traceDurationNanos: Long
 ): List<SpanDetail> {
-    val allAttributes = span.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
+    val allAttributes = span.attributes.toSpanAttributes()
     val detail = SpanDetail(
         spanId = OtelSpanId.of(span.spanId),
         parentSpanId = OtelSpanId.of(span.parentSpanId),
@@ -79,19 +87,19 @@ private fun flattenSpan(
         baggageAttributes = allAttributes
             .filter { it.key.startsWith("baggage.") }
             .map { it.copy(key = it.key.removePrefix("baggage.")) },
-        resourceAttributes = span.resource.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) },
+        resourceAttributes = span.resource.attributes.toSpanAttributes(),
         events = span.events.map { event ->
             SpanEvent(
                 name = event.name,
                 timestampMs = (event.epochNanos - traceStartNanos) / 1_000_000,
-                attributes = event.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
+                attributes = event.attributes.toSpanAttributes()
             )
         },
         links = span.links.map { link ->
             SpanLink(
                 traceId = OtelTraceId.of(link.spanContext.traceId),
                 spanId = OtelSpanId.of(link.spanContext.spanId),
-                attributes = link.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
+                attributes = link.attributes.toSpanAttributes()
             )
         }
     )

@@ -71,12 +71,10 @@ data: elements                     </div>
 data: elements                 </div>
 data: elements                 
 data: elements                 
-data: elements             </div>
-data: elements             <div class="gantt-detail-columns">
-data: elements                 
-data: elements                 
 data: elements                 
 data: elements             </div>
+data: elements             
+data: elements             
 data: elements             
 data: elements         </div>
 data: elements         

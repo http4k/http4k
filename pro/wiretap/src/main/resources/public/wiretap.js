@@ -344,13 +344,9 @@ new MutationObserver(function () {
     _chartInitTimer = setTimeout(initOverviewCharts, 50);
 }).observe(document.body, {childList: true, subtree: true});
 
-let _mermaidTimer = null;
 new MutationObserver(function () {
     if (!document.querySelector('.mermaid:not([data-processed])')) return;
-    if (_mermaidTimer) clearTimeout(_mermaidTimer);
-    _mermaidTimer = setTimeout(function () {
-        if (typeof window._mermaidRender === 'function') {
-            window._mermaidRender();
-        }
-    }, 100);
+    if (typeof window._mermaidRender === 'function') {
+        window._mermaidRender();
+    }
 }).observe(document.body, {childList: true, subtree: true});

@@ -16,6 +16,7 @@ import io.opentelemetry.api.trace.TraceState
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.testing.logs.TestLogRecordData
 import io.opentelemetry.sdk.testing.trace.TestSpanData
+import io.opentelemetry.sdk.trace.data.EventData
 import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -46,7 +47,9 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
         serviceName: String = "",
         startNanos: Long = 1000000,
         endNanos: Long = 2000000,
-        status: StatusData = StatusData.ok()
+        status: StatusData = StatusData.ok(),
+        events: List<EventData> = emptyList(),
+        attributes: Attributes = Attributes.empty()
     ) {
         val builder = TestSpanData.builder()
             .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
@@ -59,6 +62,9 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
             .setEndEpochNanos(endNanos)
             .setHasEnded(true)
             .setStatus(status)
+            .setAttributes(attributes)
+            .setEvents(events)
+            .setTotalRecordedEvents(events.size)
 
         if (serviceName.isNotEmpty()) {
             builder.setResource(
@@ -113,6 +119,25 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
     fun `http returns trace detail with logs`(approver: Approver) {
         recordSpan("00000000000000000000000000000001")
         recordLog("00000000000000000000000000000001", spanId = "1234567890abcdef", body = "something happened")
+        approver.assertApproved(httpClient()(Request(GET, "/00000000000000000000000000000001")))
+    }
+
+    @Test
+    fun `http returns trace detail with events and array attributes`(approver: Approver) {
+        recordSpan(
+            "00000000000000000000000000000001",
+            attributes = Attributes.of(AttributeKey.longArrayKey("http.codes"), listOf(200L, 301L, 404L)),
+            events = listOf(
+                EventData.create(
+                    1500000, "validation-start",
+                    Attributes.of(AttributeKey.stringKey("field"), "email")
+                ),
+                EventData.create(
+                    1800000, "validation-end",
+                    Attributes.empty()
+                )
+            )
+        )
         approver.assertApproved(httpClient()(Request(GET, "/00000000000000000000000000000001")))
     }
 
