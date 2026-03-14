@@ -13,6 +13,7 @@ import io.opentelemetry.api.trace.TraceFlags
 import io.opentelemetry.api.trace.TraceState
 import io.opentelemetry.sdk.testing.logs.TestLogRecordData
 import org.http4k.wiretap.domain.LogStore
+import org.http4k.wiretap.domain.OtelTraceId
 import org.junit.jupiter.api.Test
 
 class WiretapLogRecordExporterTest {
@@ -31,7 +32,7 @@ class WiretapLogRecordExporterTest {
         val result = exporter.export(listOf(log))
 
         assertThat(result.isSuccess, equalTo(true))
-        assertThat(logStore.forTrace("00000000000000000000000000000001"), hasSize(equalTo(1)))
+        assertThat(logStore.forTrace(OtelTraceId.of("00000000000000000000000000000001")), hasSize(equalTo(1)))
     }
 
     @Test

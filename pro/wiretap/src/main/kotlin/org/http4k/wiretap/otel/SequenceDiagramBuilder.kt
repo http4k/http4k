@@ -5,6 +5,7 @@
 package org.http4k.wiretap.otel
 
 import org.http4k.core.Uri
+import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.Participant
 import org.http4k.wiretap.domain.SequenceDiagram
 import org.http4k.wiretap.domain.SequenceMessage
@@ -18,7 +19,7 @@ fun TraceDetail.toSequenceDiagram(): SequenceDiagram {
 
     val rootServerSpan = spans.find {
         it.kind == "SERVER" && it.serviceName.isNotEmpty() &&
-            (it.parentSpanId == "0000000000000000" || it.parentSpanId !in spanById)
+            (it.parentSpanId == ROOT_PARENT_SPAN_ID || it.parentSpanId !in spanById)
     }
 
     val serviceOrder = mutableListOf<String>()
@@ -81,7 +82,7 @@ private fun addClientSpanMessages(
     clientSpan: SpanDetail,
     indexFor: (String) -> Int,
     messages: MutableList<SequenceMessage>,
-    spanById: Map<String, SpanDetail>
+    spanById: Map<OtelSpanId, SpanDetail>
 ) {
     val fromIdx = indexFor(clientSpan.serviceName)
 
@@ -118,6 +119,8 @@ private fun SpanDetail.remoteAuthority() = attributes
     ?.let { Uri.of(it) }
     ?.authority
     ?: "unknown"
+
+private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
 
 fun SequenceDiagram.toMermaid(): String {
     if (participants.isEmpty()) return ""

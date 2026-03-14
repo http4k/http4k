@@ -16,8 +16,8 @@ data class LogSummary(
     val severity: String,
     val body: String,
     val serviceName: String,
-    val traceId: String?,
-    val spanId: String?,
+    val traceId: OtelTraceId?,
+    val spanId: OtelSpanId?,
     val attributes: List<SpanAttribute>,
     val bodyFields: List<SpanAttribute>
 )
@@ -28,8 +28,8 @@ fun LogRecordData.toSummary(clock: Clock) = LogSummary(
     severity = severity.name,
     body = this.bodyValue?.asString() ?: "",
     serviceName = resource.attributes.get(AttributeKey.stringKey("service.name")) ?: "",
-    traceId = spanContext.traceId.takeIf { it != "00000000000000000000000000000000" },
-    spanId = spanContext.spanId.takeIf { it != "0000000000000000" },
+    traceId = spanContext.traceId.takeIf { it != "00000000000000000000000000000000" }?.let { OtelTraceId.of(it) },
+    spanId = spanContext.spanId.takeIf { it != "0000000000000000" }?.let { OtelSpanId.of(it) },
     attributes = attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) },
     bodyFields = parseJsonFields(this.bodyValue?.asString() ?: "")
 )

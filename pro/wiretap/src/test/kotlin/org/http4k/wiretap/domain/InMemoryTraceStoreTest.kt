@@ -19,7 +19,7 @@ class InMemoryTraceStoreTest : TraceStoreContract {
         smallStore.record(span("00000000000000000000000000000001", spanId = "2222222222222222", name = "second"))
         smallStore.record(span("00000000000000000000000000000001", spanId = "3333333333333333", name = "third"))
 
-        val spans = smallStore.get("00000000000000000000000000000001")
+        val spans = smallStore.get(OtelTraceId.of("00000000000000000000000000000001"))
         assertThat(spans.size, equalTo(2))
         assertThat(spans.none { it.name == "first" }, equalTo(true))
     }

@@ -14,10 +14,11 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.domain.TransactionId
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.SignalModel
 
-fun Index(templates: TemplateRenderer, findByTraceId: (String) -> Long?): RoutingHttpHandler =
+fun Index(templates: TemplateRenderer, findByTraceId: (String) -> TransactionId?): RoutingHttpHandler =
     "/" bind GET to { req ->
         Response(OK).html(templates(Index(Query.string().optional("trace")(req)?.let { findByTraceId(it) })))
     }
@@ -32,9 +33,9 @@ data class TrafficSignals(
     val customView: Boolean = false,
     val showAddView: Boolean = false,
     val name: String? = null,
-    val selectedTx: Long? = null
+    val selectedTx: TransactionId? = null
 ) : SignalModel
 
-data class Index(val deepLinkTxId: Long? = null) : ViewModel {
+data class Index(val deepLinkTxId: TransactionId? = null) : ViewModel {
     val initialSignals = Json.asFormatString(TrafficSignals(selectedTx = deepLinkTxId))
 }

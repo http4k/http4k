@@ -62,9 +62,9 @@ internal fun WiretapTransaction.toDetail(clock: Clock): TransactionDetail {
 internal fun HttpMessage.prettifyBody() =
     formatBody(bodyString(), contentType()?.value ?: "")
 
-internal fun WiretapTransaction.traceparent(): String? =
+internal fun WiretapTransaction.traceparent(): OtelTraceId? =
     (transaction.request.header("traceparent") ?: transaction.response.header("traceparent"))
-        ?.split("-")?.getOrNull(1)
+        ?.split("-")?.getOrNull(1)?.let { OtelTraceId.of(it) }
 
 internal fun WiretapTransaction.toHar(): Har {
     val req = transaction.request

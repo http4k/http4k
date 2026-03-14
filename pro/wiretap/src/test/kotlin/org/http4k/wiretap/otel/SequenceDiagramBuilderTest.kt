@@ -9,6 +9,8 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
+import org.http4k.wiretap.domain.OtelSpanId
+import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.SequenceDiagram
 import org.http4k.wiretap.domain.SpanAttribute
 import org.http4k.wiretap.domain.SpanDetail
@@ -21,14 +23,14 @@ class SequenceDiagramBuilderTest {
 
     @Test
     fun `empty trace produces empty diagram`() {
-        val trace = TraceDetail("trace1", 0L, emptyList())
+        val trace = TraceDetail(OtelTraceId.of("trace1"), 0L, emptyList())
         assertThat(trace.toSequenceDiagram(), equalTo(SequenceDiagram(emptyList(), emptyList())))
     }
 
     @Test
     fun `multi-service trace with wiretap, http status, duration, and remote authority`(approver: Approver) {
         val trace = TraceDetail(
-            "trace1", 200L, listOf(
+            OtelTraceId.of("trace1"), 200L, listOf(
                 spanDetail(
                     spanId = "root1", parentSpanId = "0000000000000000",
                     name = "GET /", kind = "SERVER", serviceName = "frontend", statusCode = "OK",
@@ -64,7 +66,7 @@ class SequenceDiagramBuilderTest {
     @Test
     fun `error responses and fallback labels`(approver: Approver) {
         val trace = TraceDetail(
-            "trace2", 100L, listOf(
+            OtelTraceId.of("trace2"), 100L, listOf(
                 spanDetail(
                     spanId = "root1", parentSpanId = "0000000000000000",
                     name = "GET /fail", kind = "SERVER", serviceName = "myapp", statusCode = "ERROR",
@@ -101,7 +103,7 @@ class SequenceDiagramBuilderTest {
     @Test
     fun `no root SERVER span and no wiretap`(approver: Approver) {
         val trace = TraceDetail(
-            "trace3", 100L, listOf(
+            OtelTraceId.of("trace3"), 100L, listOf(
                 spanDetail(
                     spanId = "client1", parentSpanId = "ext-parent",
                     name = "GET /api", kind = "CLIENT", serviceName = "frontend", statusCode = "OK",
@@ -122,7 +124,7 @@ class SequenceDiagramBuilderTest {
     @Test
     fun `url-based remote authority extraction`(approver: Approver) {
         val trace = TraceDetail(
-            "trace4", 100L, listOf(
+            OtelTraceId.of("trace4"), 100L, listOf(
                 spanDetail(
                     spanId = "client1", parentSpanId = "root1",
                     name = "GET /new-api", kind = "CLIENT", serviceName = "frontend", statusCode = "OK",
@@ -149,7 +151,7 @@ class SequenceDiagramBuilderTest {
     @Test
     fun `special characters in service names use mermaid aliases`(approver: Approver) {
         val trace = TraceDetail(
-            "trace5", 100L, listOf(
+            OtelTraceId.of("trace5"), 100L, listOf(
                 spanDetail(
                     spanId = "client1", parentSpanId = "root1",
                     name = "GET {name:.*}", kind = "CLIENT", serviceName = "unknown_service:java",
@@ -171,8 +173,8 @@ class SequenceDiagramBuilderTest {
         attributes: List<SpanAttribute> = emptyList(),
         durationMs: Long = 10L
     ) = SpanDetail(
-        spanId = spanId,
-        parentSpanId = parentSpanId,
+        spanId = OtelSpanId.of(spanId),
+        parentSpanId = OtelSpanId.of(parentSpanId),
         name = name,
         kind = kind,
         durationMs = durationMs,

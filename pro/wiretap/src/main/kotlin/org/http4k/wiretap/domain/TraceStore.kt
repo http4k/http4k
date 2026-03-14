@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 interface TraceStore {
     fun record(span: SpanData)
-    fun traces(): Map<String, List<SpanData>>
-    fun get(traceId: String): List<SpanData>
+    fun traces(): Map<OtelTraceId, List<SpanData>>
+    fun get(traceId: OtelTraceId): List<SpanData>
 
     companion object {
         fun InMemory(maxSpans: Int = 5000) = object : TraceStore {
@@ -23,9 +23,9 @@ interface TraceStore {
                 }
             }
 
-            override fun traces() = spans.groupBy { it.traceId }
+            override fun traces() = spans.groupBy { OtelTraceId.of(it.traceId) }
 
-            override fun get(traceId: String) = spans.filter { it.traceId == traceId }
+            override fun get(traceId: OtelTraceId) = spans.filter { it.traceId == traceId.value }
         }
     }
 }

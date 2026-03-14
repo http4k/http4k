@@ -5,7 +5,7 @@
 package org.http4k.wiretap.domain
 
 data class TransactionSummary(
-    val id: Long,
+    val id: TransactionId,
     val direction: Direction,
     val method: String,
     val uri: String,
@@ -22,7 +22,7 @@ data class TransactionSummary(
 data class HeaderEntry(val name: String, val value: String)
 
 data class TransactionDetail(
-    val id: Long,
+    val id: TransactionId,
     val direction: Direction,
     val method: String,
     val uri: String,
@@ -35,7 +35,7 @@ data class TransactionDetail(
     val requestBody: String,
     val responseBody: String,
     val curl: String,
-    val traceId: String?,
+    val traceId: OtelTraceId?,
     val isChaos: Boolean,
     val isReplay: Boolean
 )

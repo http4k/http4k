@@ -11,14 +11,14 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicLong
 
 interface TransactionStore {
-    fun record(transaction: HttpTransaction, direction: Direction): WiretapTransaction
+    fun record(transaction: HttpTransaction, direction: Direction): TransactionId
     fun list(
         filter: TransactionFilter = TransactionFilter(),
-        limit: Int = 500,
-        cursor: Long? = null
+        limit: Int = Int.MAX_VALUE,
+        cursor: TransactionId? = null
     ): List<WiretapTransaction>
 
-    fun get(id: Long): WiretapTransaction?
+    fun get(id: TransactionId): WiretapTransaction?
     fun subscribe(fn: (WiretapTransaction) -> Unit): () -> Unit
     fun clear()
 
@@ -28,33 +28,31 @@ interface TransactionStore {
             private val transactions = ConcurrentLinkedDeque<WiretapTransaction>()
             private val subscribers = CopyOnWriteArrayList<(WiretapTransaction) -> Unit>()
 
-            override fun record(transaction: HttpTransaction, direction: Direction): WiretapTransaction {
-                val wiretapTransaction = WiretapTransaction(nextId.incrementAndGet(), transaction, direction)
+            override fun record(transaction: HttpTransaction, direction: Direction): TransactionId {
+                val wiretapTransaction = WiretapTransaction(TransactionId.of(nextId.incrementAndGet()), transaction, direction)
                 transactions.addFirst(wiretapTransaction)
                 while (transactions.size > maxSize) {
                     transactions.removeLast()
                 }
                 subscribers.forEach { it(wiretapTransaction) }
-                return wiretapTransaction
+                return wiretapTransaction.id
             }
 
-            override fun list(filter: TransactionFilter, limit: Int, cursor: Long?): List<WiretapTransaction> {
-                val base = if (cursor != null) transactions.filter { it.id < cursor } else transactions.toList()
+            override fun list(filter: TransactionFilter, limit: Int, cursor: TransactionId?): List<WiretapTransaction> {
+                val base = if (cursor != null) transactions.filter { it.id.value < cursor.value } else transactions.toList()
                 return base
                     .filter { it.toSummary(clock).matches(filter) }
                     .take(limit)
             }
 
-            override fun get(id: Long): WiretapTransaction? = transactions.find { it.id == id }
+            override fun get(id: TransactionId): WiretapTransaction? = transactions.find { it.id == id }
 
             override fun subscribe(fn: (WiretapTransaction) -> Unit): () -> Unit {
                 subscribers.add(fn)
                 return { subscribers.remove(fn) }
             }
 
-            override fun clear() {
-                transactions.clear()
-            }
+            override fun clear() = transactions.clear()
         }
     }
 }

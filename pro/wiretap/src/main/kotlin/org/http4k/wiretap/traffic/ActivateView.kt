@@ -31,7 +31,7 @@ fun ActivateView(viewStore: ViewStore, transactionStore: TransactionStore, clock
             val view = viewStore.list().find { it.id == id }
             val signals = view?.let { ViewActivationSignals(it) } ?: ViewActivationSignals.Reset
             val filter = view?.filter ?: TransactionFilter()
-            val rows = transactionStore.list(filter, 50).map { it.toSummary(clock) }.map { TransactionRowView(it) }
+            val rows = transactionStore.list(filter).map { it.toSummary(clock) }.map { TransactionRowView(it) }
 
             Response(OK)
                 .datastarSignal(signals)

@@ -16,7 +16,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.datastar.Selector
 import org.http4k.lens.Path
 import org.http4k.lens.datastarElements
-import org.http4k.lens.long
+import org.http4k.lens.value
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
@@ -24,17 +24,18 @@ import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionDetail
+import org.http4k.wiretap.domain.TransactionId
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.util.Json
 import java.time.Clock
 
 fun ViewTransaction(transactionStore: TransactionStore, clock: Clock) = object : WiretapFunction {
-    private fun lookup(id: Long) = transactionStore.get(id)?.toDetail(clock)
+    private fun lookup(id: TransactionId) = transactionStore.get(id)?.toDetail(clock)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{id}" bind GET to { req: Request ->
-            val id = Path.long().of("id")(req)
+            val id = Path.value(TransactionId).of("id")(req)
             when (val detail = lookup(id)?.let { TransactionDetailView(it) }) {
                 null -> Response(NOT_FOUND)
                 else -> {
@@ -54,7 +55,7 @@ fun ViewTransaction(transactionStore: TransactionStore, clock: Clock) = object :
             "Get full request/response detail for a specific HTTP transaction",
             id
         ) bind { req ->
-            when (val tx = lookup(id(req))) {
+            when (val tx = lookup(TransactionId.of(id(req)))) {
                 null -> Error("Transaction not found")
                 else -> Json.asToolResponse(tx)
             }
@@ -69,5 +70,5 @@ data class TransactionDetailView(val tx: TransactionDetail, val showImport: Bool
     val importPath = if (isInbound) "/_wiretap/inbound" else "/_wiretap/outbound"
     val importLabel = if (isInbound) "Inbound Client" else "Outbound Client"
     val statusClass = statusClass(tx.status)
-    val shortTraceId = tx.traceId?.takeLast(8)
+    val shortTraceId = tx.traceId?.value?.takeLast(8)
 }

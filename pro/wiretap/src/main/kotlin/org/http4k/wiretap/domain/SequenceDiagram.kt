@@ -15,7 +15,7 @@ data class Participant(
 )
 
 data class SequenceMessage(
-    val spanId: String,
+    val spanId: OtelSpanId,
     val fromIndex: Int,
     val toIndex: Int,
     val label: String,

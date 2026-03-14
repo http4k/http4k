@@ -39,7 +39,7 @@ class LogStoreTest {
         store.record(logRecord(body = "first", timestampNanos = 1000000L))
         store.record(logRecord(body = "second", timestampNanos = 2000000L))
 
-        val logs = store.forTrace("00000000000000000000000000000001")
+        val logs = store.forTrace(OtelTraceId.of("00000000000000000000000000000001"))
         assertThat(logs, hasSize(equalTo(2)))
         assertThat(logs[0].bodyValue?.asString(), equalTo("second"))
         assertThat(logs[1].bodyValue?.asString(), equalTo("first"))
@@ -52,7 +52,7 @@ class LogStoreTest {
         store.record(logRecord(body = "third"))
         store.record(logRecord(body = "fourth"))
 
-        val logs = store.forTrace("00000000000000000000000000000001")
+        val logs = store.forTrace(OtelTraceId.of("00000000000000000000000000000001"))
         assertThat(logs, hasSize(equalTo(3)))
         assertThat(logs[0].bodyValue?.asString(), equalTo("fourth"))
     }
@@ -66,13 +66,13 @@ class LogStoreTest {
         store.record(logRecord(traceId = traceB, body = "log-b"))
         store.record(logRecord(traceId = traceA, body = "log-a2"))
 
-        val logs = store.forTrace(traceA)
+        val logs = store.forTrace(OtelTraceId.of(traceA))
         assertThat(logs, hasSize(equalTo(2)))
         assertThat(logs.all { it.spanContext.traceId == traceA }, equalTo(true))
     }
 
     @Test
     fun `forTrace returns empty list for unknown trace`() {
-        assertThat(store.forTrace("0000000000000000000000000000ffff"), hasSize(equalTo(0)))
+        assertThat(store.forTrace(OtelTraceId.of("0000000000000000000000000000ffff")), hasSize(equalTo(0)))
     }
 }

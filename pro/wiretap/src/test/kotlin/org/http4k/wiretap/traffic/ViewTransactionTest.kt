@@ -37,20 +37,19 @@ class ViewTransactionTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
 
     @Test
     fun `http returns transaction detail`(approver: Approver) {
-        val tx = record()
-        approver.assertApproved(httpClient()(Request(GET, "/${tx.id}")))
+        val txId = record()
+        approver.assertApproved(httpClient()(Request(GET, "/${txId}")))
     }
 
     @Test
     fun `http returns 404 for unknown id`() {
-        val response = httpClient()(Request(GET, "/999"))
-        assertThat(response.status, equalTo(NOT_FOUND))
+        assertThat(httpClient()(Request(GET, "/999")).status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `mcp returns transaction detail`(approver: Approver) {
-        val tx = record()
-        approver.assertToolResponse(mapOf("id" to tx.id))
+        approver.assertToolResponse(mapOf("id" to record().value))
+
     }
 
     @Test

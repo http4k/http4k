@@ -20,6 +20,7 @@ interface TraceStoreContract {
     val store: TraceStore
 
     fun span(traceId: String, spanId: String = "1234567890abcdef", name: String = "test"): SpanData =
+
         TestSpanData.builder()
             .setSpanContext(
                 SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault())
@@ -37,14 +38,14 @@ interface TraceStoreContract {
         val s = span("00000000000000000000000000000001")
         store.record(s)
 
-        val result = store.get("00000000000000000000000000000001")
+        val result = store.get(OtelTraceId.of("00000000000000000000000000000001"))
         assertThat(result.size, equalTo(1))
         assertThat(result.first().name, equalTo("test"))
     }
 
     @Test
     fun `get returns empty for unknown trace`() {
-        assertThat(store.get("00000000000000000000000000000099"), equalTo(emptyList()))
+        assertThat(store.get(OtelTraceId.of("00000000000000000000000000000099")), equalTo(emptyList()))
     }
 
     @Test
@@ -55,7 +56,7 @@ interface TraceStoreContract {
 
         val traces = store.traces()
         assertThat(traces.size, equalTo(2))
-        assertThat(traces["00000000000000000000000000000001"]?.size, equalTo(2))
-        assertThat(traces["00000000000000000000000000000002"]?.size, equalTo(1))
+        assertThat(traces[OtelTraceId.of("00000000000000000000000000000001")]?.size, equalTo(2))
+        assertThat(traces[OtelTraceId.of("00000000000000000000000000000002")]?.size, equalTo(1))
     }
 }

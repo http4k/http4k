@@ -6,6 +6,8 @@ package org.http4k.wiretap.otel
 
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.trace.data.SpanData
+import org.http4k.wiretap.domain.OtelSpanId
+import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.SpanAttribute
 import org.http4k.wiretap.domain.SpanDetail
 import org.http4k.wiretap.domain.SpanEvent
@@ -13,7 +15,7 @@ import org.http4k.wiretap.domain.SpanLink
 import org.http4k.wiretap.domain.TraceDetail
 import kotlin.math.max
 
-fun List<SpanData>.toTraceDetail(traceId: String): TraceDetail {
+fun List<SpanData>.toTraceDetail(traceId: OtelTraceId): TraceDetail {
     val traceStartNanos = minOf { it.startEpochNanos }
     val traceEndNanos = maxOf { it.endEpochNanos }
     val traceDurationNanos = max(1L, traceEndNanos - traceStartNanos)
@@ -62,8 +64,8 @@ private fun flattenSpan(
 ): List<SpanDetail> {
     val allAttributes = span.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
     val detail = SpanDetail(
-        spanId = span.spanId,
-        parentSpanId = span.parentSpanId,
+        spanId = OtelSpanId.of(span.spanId),
+        parentSpanId = OtelSpanId.of(span.parentSpanId),
         name = span.name,
         kind = span.kind.name,
         durationMs = (span.endEpochNanos - span.startEpochNanos) / 1_000_000,
@@ -87,8 +89,8 @@ private fun flattenSpan(
         },
         links = span.links.map { link ->
             SpanLink(
-                traceId = link.spanContext.traceId,
-                spanId = link.spanContext.spanId,
+                traceId = OtelTraceId.of(link.spanContext.traceId),
+                spanId = OtelSpanId.of(link.spanContext.spanId),
                 attributes = link.attributes.asMap().map { (k, v) -> SpanAttribute(k.key, v.toString()) }
             )
         }

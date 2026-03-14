@@ -22,7 +22,7 @@ class TransactionMatchingTest {
         path: String = "/test",
         host: String = ""
     ) = TransactionSummary(
-        id = 1,
+        id = TransactionId.of(1),
         direction = direction,
         method = method,
         uri = uri,

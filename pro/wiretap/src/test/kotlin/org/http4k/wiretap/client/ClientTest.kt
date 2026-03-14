@@ -104,7 +104,7 @@ class ClientTest {
 
     @Test
     fun `outbound client import pre-populates from outbound transaction`(approver: Approver) {
-        val tx = transactions.record(
+        val txId = transactions.record(
             HttpTransaction(
                 request = Request(GET, Uri.of("https://external.com/data")),
                 response = Response(OK),
@@ -114,6 +114,6 @@ class ClientTest {
             Outbound
         )
 
-        approver.assertApproved(outbound(Request(GET, "/outbound").query("import", tx.id.toString())))
+        approver.assertApproved(outbound(Request(GET, "/outbound").query("import", txId.toString())))
     }
 }

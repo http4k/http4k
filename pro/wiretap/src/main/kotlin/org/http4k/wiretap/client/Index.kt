@@ -12,6 +12,7 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
+import org.http4k.wiretap.domain.TransactionId
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.SignalModel
@@ -24,7 +25,7 @@ fun Index(
     pageTitle: String
 ): RoutingHttpHandler =
     "/" bind GET to { req ->
-        val importId = req.query("import")?.toLongOrNull()
+        val importId = req.query("import")?.toLongOrNull()?.let { TransactionId.of(it) }
         val tx = importId?.let { transactions.get(it) }
 
         when (tx) {

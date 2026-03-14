@@ -9,9 +9,17 @@ import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.core.Body
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
+import org.http4k.format.value
 import org.http4k.lens.BiDiBodyLens
+import org.http4k.wiretap.domain.OtelSpanId
+import org.http4k.wiretap.domain.OtelTraceId
+import org.http4k.wiretap.domain.TransactionId
 
-object Json : ConfigurableMoshi(standardConfig().done()) {
+object Json : ConfigurableMoshi(standardConfig()
+    .value(OtelTraceId)
+    .value(OtelSpanId)
+    .value(TransactionId)
+    .done()) {
     fun <T : Any> asToolResponse(t: T): Ok = Ok(listOf(Text(asFormatString(t))))
 }
 
