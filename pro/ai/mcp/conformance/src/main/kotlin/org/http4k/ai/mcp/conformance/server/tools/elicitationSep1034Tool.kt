@@ -16,6 +16,8 @@ import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.format.auto
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import org.http4k.routing.bind
 
 enum class Status { active, inactive, pending }
@@ -35,7 +37,7 @@ fun elicitationSep1034Tool() = Tool("test_elicitation_sep1034_defaults", "test_e
         ElicitationRequest.Form(
             "Please review and update the form fields with defaults",
             defaultForm,
-            progressToken = it.meta.progressToken
+            progressToken = MetaKey.progressToken<Any>().toLens()(it.meta)
         )
     )
         .map {

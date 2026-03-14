@@ -14,6 +14,8 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
 import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import java.time.Duration
 
 class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicitations {
@@ -42,7 +44,7 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
                 is McpElicitations.Request.Form -> ElicitationRequest.Form(
                     protocolRequest.message,
                     protocolRequest.requestedSchema,
-                    protocolRequest._meta.progressToken,
+                    MetaKey.progressToken<Any>().toLens()(protocolRequest._meta),
                     protocolRequest.task
                 )
 
@@ -50,7 +52,7 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
                     protocolRequest.message,
                     protocolRequest.url,
                     protocolRequest.elicitationId,
-                    protocolRequest._meta.progressToken,
+                    MetaKey.progressToken<Any>().toLens()(protocolRequest._meta),
                     protocolRequest.task
                 )
             }

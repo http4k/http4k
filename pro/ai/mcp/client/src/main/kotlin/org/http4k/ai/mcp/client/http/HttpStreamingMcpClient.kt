@@ -83,7 +83,9 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.MCP_SESSION_ID
+import org.http4k.lens.MetaKey
 import org.http4k.lens.accept
+import org.http4k.lens.progressToken
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.chunkedSseSequence
 import java.time.Duration
@@ -236,7 +238,7 @@ class HttpStreamingMcpClient(
                             ElicitationRequest.Form(
                                 message,
                                 requestedSchema,
-                                _meta.progressToken,
+                                MetaKey.progressToken<Any>().toLens()(_meta),
                                 task
                             )
                         )
@@ -258,7 +260,7 @@ class HttpStreamingMcpClient(
                                 message,
                                 url,
                                 elicitationId,
-                                _meta.progressToken,
+                                MetaKey.progressToken<Any>().toLens()(_meta),
                                 task
                             )
                         )
@@ -301,7 +303,7 @@ class HttpStreamingMcpClient(
                                     metadata,
                                     tools ?: emptyList(),
                                     toolChoice,
-                                    _meta.progressToken
+                                    MetaKey.progressToken<Any>().toLens()(_meta)
                                 )
                             )
                         }

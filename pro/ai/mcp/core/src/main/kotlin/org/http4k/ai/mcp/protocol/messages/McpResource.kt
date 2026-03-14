@@ -30,7 +30,7 @@ data class McpResource internal constructor(
     val size: Size?,
     val annotations: Annotations?,
     val icons: kotlin.collections.List<Icon>? = null,
-    val _meta: Meta? = null
+    val _meta: Meta = Meta.default
 ) {
     constructor(
         uri: Uri,
@@ -41,7 +41,7 @@ data class McpResource internal constructor(
         annotations: Annotations? = null,
         title: String? = null,
         icons: kotlin.collections.List<Icon>? = null,
-        _meta: Meta? = null
+        _meta: Meta = Meta.default
     ) : this(uri, null, name, description, title, mimeType, size, annotations, icons, _meta)
 
     constructor(
@@ -53,7 +53,7 @@ data class McpResource internal constructor(
         annotations: Annotations? = null,
         title: String? = null,
         icons: kotlin.collections.List<Icon>? = null,
-        _meta: Meta? = null
+        _meta: Meta = Meta.default
     ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons, _meta)
 
     object Read : McpRpc {

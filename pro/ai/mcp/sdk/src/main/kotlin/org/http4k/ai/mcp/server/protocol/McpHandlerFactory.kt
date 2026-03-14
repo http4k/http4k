@@ -16,6 +16,8 @@ import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
@@ -38,7 +40,7 @@ class McpHandlerFactory<Transport>(
                 McpResponse(
                     req.json.runCatching { req.json.fromJsonRpc(clazz) }
                         .mapCatching {
-                            val progressToken = it._meta.progressToken ?: 0
+                            val progressToken = MetaKey.progressToken<Any>().toLens()(it._meta) ?: 0
                             val callCtx = ClientRequestContext.ClientCall(
                                 progressToken,
                                 req.session,

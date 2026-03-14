@@ -5,7 +5,10 @@
 package org.http4k.ai.mcp.util
 
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types.getRawType
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
@@ -14,6 +17,8 @@ import org.http4k.ai.mcp.model.Domain
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.MetaField
 import org.http4k.ai.mcp.model.Priority
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.ResourceName
@@ -46,18 +51,24 @@ import org.http4k.format.MapAdapter
 import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiNodeAdapter
 import org.http4k.format.MoshiNull
+import org.http4k.format.MoshiObject
 import org.http4k.format.SchemaNodeJsonAdapterFactory
 import org.http4k.format.SetAdapter
 import org.http4k.format.ThrowableAdapter
 import org.http4k.format.asConfigurable
+import org.http4k.format.unwrap
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
+import org.http4k.format.wrap
 import org.http4k.lens.Header
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
+import org.http4k.lens.MetaKey
+import org.http4k.lens.MetaLensSpec
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.sse.SseMessage.Event
 import se.ansman.kotshi.KotshiJsonAdapterFactory
+import java.lang.reflect.Type
 
 typealias McpNodeType = MoshiNode
 
@@ -70,6 +81,7 @@ abstract class ConfigurableMcpJson(
 ) : ConfigurableMoshi(
     Moshi.Builder()
         .add(McpJsonFactory)
+        .add(MetaAdapter)
         .addLast(SchemaNodeJsonAdapterFactory)
         .addLast(ArrayItemsJsonAdapterFactory)
         .addLast(ThrowableAdapter)
@@ -114,6 +126,37 @@ abstract class ConfigurableMcpJson(
             { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
         )
     }
+}
+
+inline fun <reified T : Any> MetaKey.auto(field: MetaField<T>) = MetaLensSpec(
+    field.key,
+    { McpJson.convert<MoshiNode, T>(it) },
+    { McpJson.asJsonObject(it) }
+)
+
+
+object MetaAdapter : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
+        with(getRawType(type)) {
+            when {
+                isA(Meta::class.java) -> object : JsonAdapter<Meta>() {
+                    override fun fromJson(reader: JsonReader): Meta {
+                        val value = MoshiNode.wrap(reader.readJsonValue())
+                        return Meta(value as? MoshiObject ?: MoshiObject())
+                    }
+
+                    override fun toJson(writer: JsonWriter, value: Meta?) {
+                        val obj = value?.node ?: MoshiObject()
+                        writer.jsonValue(obj.unwrap())
+                    }
+                }
+
+                else -> null
+            }
+        }
+
+    private fun Class<*>?.isA(testCase: Class<*>): Boolean =
+        this?.let { testCase.isAssignableFrom(this) } ?: false
 }
 
 @KotshiJsonAdapterFactory

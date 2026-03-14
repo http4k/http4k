@@ -18,8 +18,10 @@ import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.mcp.model.apps.McpAppVisibility
 import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.ai.mcp.server.capability.CapabilityPack
+import org.http4k.ai.mcp.util.auto
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
+import org.http4k.lens.MetaKey
 import org.http4k.routing.bind
 
 /**
@@ -38,7 +40,7 @@ fun RenderMcpApp(
     Tool(
         name = name,
         description = description,
-        meta = Meta(ui = McpAppMeta(uri, visibility))
+        meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uri, visibility))
     ) bind { ToolResponse.Ok(listOf()) },
     Static(uri, ResourceName.of(name), description, mimeType) bind {
         ResourceResponse(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))

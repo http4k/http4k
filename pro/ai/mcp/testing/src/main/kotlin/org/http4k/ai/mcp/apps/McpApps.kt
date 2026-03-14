@@ -20,8 +20,11 @@ import org.http4k.ai.mcp.apps.model.HostToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.apps.Csp
+import org.http4k.ai.mcp.model.apps.McpAppMeta
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.util.auto
 import org.http4k.core.Uri
+import org.http4k.lens.MetaKey
 
 /**
  * Facade to interact with MCP apps.
@@ -40,7 +43,7 @@ class McpApps(private val clients: List<McpClient>) {
         .mapNotNull { (entity, client) ->
             client.tools().list()
                 .map {
-                    it.mapNotNull { tool -> tool._meta?.ui?.resourceUri?.let { tool.name to it } }
+                    it.mapNotNull { tool -> MetaKey.auto(McpAppMeta).toLens()(tool._meta)?.resourceUri?.let { tool.name to it } }
                         .map { AvailableMcpApp(entity.name.value, entity.name.value, it.first, it.second) }
                 }
                 .valueOrNull()

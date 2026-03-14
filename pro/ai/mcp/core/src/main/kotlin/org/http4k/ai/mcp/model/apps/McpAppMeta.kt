@@ -4,6 +4,7 @@
  */
 package org.http4k.ai.mcp.model.apps
 
+import org.http4k.ai.mcp.model.MetaField
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
@@ -11,4 +12,6 @@ import se.ansman.kotshi.JsonSerializable
 data class McpAppMeta(
     val resourceUri: Uri? = null,
     val visibility: List<McpAppVisibility>? = null
-)
+) {
+    companion object : MetaField<McpAppMeta>("ui")
+}

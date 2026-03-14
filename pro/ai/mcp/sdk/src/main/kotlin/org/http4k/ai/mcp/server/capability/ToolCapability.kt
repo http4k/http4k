@@ -17,6 +17,7 @@ import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.ToolResponse.Task
 import org.http4k.ai.mcp.model.Content.Text
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -48,7 +49,7 @@ class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler)
         tool.annotations,
         tool.icons,
         tool.execution,
-        tool.meta
+        tool.meta ?: Meta.default
     )
 
     fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =

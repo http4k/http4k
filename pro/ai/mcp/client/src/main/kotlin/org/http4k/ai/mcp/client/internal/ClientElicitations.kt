@@ -13,6 +13,8 @@ import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import java.time.Duration
 
 internal class ClientElicitations(
@@ -39,7 +41,7 @@ internal class ClientElicitations(
                     ElicitationRequest.Form(
                         request.message,
                         request.requestedSchema,
-                        request._meta.progressToken,
+                        MetaKey.progressToken<Any>().toLens()(request._meta),
                         request.task
                     )
                 )
@@ -66,7 +68,7 @@ internal class ClientElicitations(
                         request.message,
                         request.url,
                         request.elicitationId,
-                        request._meta.progressToken,
+                        MetaKey.progressToken<Any>().toLens()(request._meta),
                         request.task
                     )
                 )

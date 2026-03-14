@@ -57,6 +57,8 @@ import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.ai.model.ToolName
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
@@ -271,7 +273,7 @@ abstract class McpClientContract<T> : PortBasedTest {
         )
 
         withMcpServer(tools = tools) {
-            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
+            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "tasks")))
 
             val tasks = tasks().list().valueOrNull()
             assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
@@ -280,7 +282,7 @@ abstract class McpClientContract<T> : PortBasedTest {
             assertThat(retrieved?.taskId, equalTo(taskId))
             assertThat(retrieved?.status, equalTo(TaskStatus.working))
 
-            tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta("tasks")))
+            tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "tasks")))
 
             val result = tasks().result(taskId).valueOrNull()
             assertThat(result, equalTo(expectedResult))

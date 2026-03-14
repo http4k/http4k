@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ResourceFilter
 import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.ResourceRequest
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.Resource.Templated
@@ -25,8 +26,8 @@ class ResourceCapability(
 
     fun toResource() = with(resource) {
         when (this) {
-            is Static -> McpResource(uri, name, description, mimeType, size, annotations, title, icons, meta)
-            is Templated -> McpResource(uriTemplate, name, description, mimeType, size, annotations, title, icons, meta)
+            is Static -> McpResource(uri, name, description, mimeType, size, annotations, title, icons, meta ?: Meta.default)
+            is Templated -> McpResource(uriTemplate, name, description, mimeType, size, annotations, title, icons, meta ?: Meta.default)
         }
     }
 

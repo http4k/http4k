@@ -17,6 +17,8 @@ import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.format.auto
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import org.http4k.routing.bind
 
 class UserForm : ElicitationModel() {
@@ -28,7 +30,7 @@ val message = Tool.Arg.string().required("message")
 val userForm = Elicitation.auto(UserForm()).toLens("form", "it's a form")
 
 fun elicitationTool() = Tool("test_elicitation", "test_elicitation", message) bind {
-    it.client.elicit(ElicitationRequest.Form(message(it), userForm, progressToken = it.meta.progressToken))
+    it.client.elicit(ElicitationRequest.Form(message(it), userForm, progressToken = MetaKey.progressToken<Any>().toLens()(it.meta)))
         .map {
             when (it) {
                 is ElicitationResponse.Ok -> ToolResponse.Ok(it.content.toString())

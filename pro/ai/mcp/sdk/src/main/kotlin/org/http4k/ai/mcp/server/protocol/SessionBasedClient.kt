@@ -34,6 +34,8 @@ import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import java.time.Duration
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -73,7 +75,7 @@ class SessionBasedClient<Transport>(
                     is Form -> McpElicitations.Request.Form(
                         request.message,
                         request.requestedSchema,
-                        Meta(progressToken),
+                        Meta(MetaKey.progressToken<Any>().toLens() of progressToken),
                         request.task
                     )
 
@@ -81,7 +83,7 @@ class SessionBasedClient<Transport>(
                         request.message,
                         request.url,
                         request.elicitationId,
-                        Meta(progressToken),
+                        Meta(MetaKey.progressToken<Any>().toLens() of progressToken),
                         request.task
                     )
                 }
@@ -138,7 +140,7 @@ class SessionBasedClient<Transport>(
                             metadata,
                             tools,
                             toolChoice,
-                            _meta = Meta(progressToken)
+                            _meta = Meta(MetaKey.progressToken<Any>().toLens() of progressToken)
                         ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
                     )
                 }
