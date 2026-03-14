@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.34.0.0 (uncut)
+### v6.34.0.0
 - **http4k-***: Upgrade versions
 - **http4k-connect-x402**: [New module!] Support for X402 payments protocol client. You'll need to plug in your own signer (use an OSS one such as web3j).
 - **http4k-connect-x402-fake**: [New module!] Fake implementation of X402 Facilitator for testing.
