@@ -4,15 +4,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.logs.Severity
-import io.opentelemetry.api.trace.Span
-import io.opentelemetry.api.trace.SpanContext
-import io.opentelemetry.api.trace.TraceFlags
-import io.opentelemetry.api.trace.TraceState
-import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.logs.SdkLoggerProvider
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.testing.exporter.InMemoryLogRecordExporter
+import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter
+import io.opentelemetry.sdk.trace.SdkTracerProvider
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.format.Jackson
 import org.junit.jupiter.api.Test
 
@@ -21,28 +19,36 @@ data class TestEvent(val name: String, val count: Int, val active: Boolean, val 
 data class Nested(val inner: String)
 data class ComplexEvent(val nested: Nested, val items: List<String>) : Event
 
+data class Deep(val value: String)
+data class Mid(val deep: Deep)
+data class DeeplyNestedEvent(val mid: Mid) : Event
+
 class AutoOpenTelemetryEventsTest {
 
-    private val exporter = InMemoryLogRecordExporter.create()
+    private val logExporter = InMemoryLogRecordExporter.create()
+    private val spanExporter = InMemorySpanExporter.create()
+    private val tracerProvider = SdkTracerProvider.builder()
+        .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))
+        .build()
     private val otel = OpenTelemetrySdk.builder()
         .setLoggerProvider(
             SdkLoggerProvider.builder()
-                .addLogRecordProcessor(SimpleLogRecordProcessor.create(exporter))
+                .addLogRecordProcessor(SimpleLogRecordProcessor.create(logExporter))
                 .build()
         )
+        .setTracerProvider(tracerProvider)
         .build()
 
     private val events = AutoOpenTelemetryEvents(Jackson, otel)
 
     @Test
-    fun `event fields appear as typed LogRecord attributes`() {
+    fun `event fields appear as typed LogRecord attributes when no active span`() {
         events(TestEvent("hello", 42, true, 3.14))
 
-        val records = exporter.finishedLogRecordItems
+        val records = logExporter.finishedLogRecordItems
         assertThat(records.size, equalTo(1))
 
         val record = records.first()
-        assertThat(record.bodyValue?.asString(), equalTo("""{"name":"hello","count":42,"active":true,"rate":3.14}"""))
         assertThat(record.attributes.get(AttributeKey.stringKey("name")), equalTo("hello"))
         assertThat(record.attributes.get(AttributeKey.longKey("count")), equalTo(42L))
         assertThat(record.attributes.get(AttributeKey.booleanKey("active")), equalTo(true))
@@ -50,62 +56,94 @@ class AutoOpenTelemetryEventsTest {
     }
 
     @Test
-    fun `metadata event metadata appears as attributes`() {
+    fun `metadata event metadata appears as log attributes when no active span`() {
         val event = TestEvent("test", 1, false, 0.0) + ("service" to "my-service") + ("region" to "eu-west")
 
         events(event)
 
-        val record = exporter.finishedLogRecordItems.first()
-        assertThat(record.bodyValue?.asString(), equalTo("""{"name":"test","count":1,"active":false,"rate":0}"""))
+        val record = logExporter.finishedLogRecordItems.first()
         assertThat(record.attributes.get(AttributeKey.stringKey("service")), equalTo("my-service"))
         assertThat(record.attributes.get(AttributeKey.stringKey("region")), equalTo("eu-west"))
     }
 
     @Test
-    fun `error events have ERROR severity`() {
+    fun `error events have ERROR severity in log records`() {
         events(Event.Companion.Error("something broke"))
 
-        val record = exporter.finishedLogRecordItems.first()
+        val record = logExporter.finishedLogRecordItems.first()
         assertThat(record.severity, equalTo(Severity.ERROR))
     }
 
     @Test
-    fun `non-error events have INFO severity`() {
+    fun `non-error events have INFO severity in log records`() {
         events(TestEvent("hello", 1, true, 0.0))
 
-        val record = exporter.finishedLogRecordItems.first()
+        val record = logExporter.finishedLogRecordItems.first()
         assertThat(record.severity, equalTo(Severity.INFO))
     }
 
     @Test
-    fun `trace context is captured from current OTel span`() {
-        val spanContext = SpanContext.create(
-            "0af7651916cd43dd8448eb211c80319c",
-            "b7ad6b7169203331",
-            TraceFlags.getSampled(),
-            TraceState.getDefault()
-        )
-        val span = Span.wrap(spanContext)
-        val scope = Context.current().with(span).makeCurrent()
+    fun `nested objects use dot-separated keys for attributes`() {
+        events(ComplexEvent(Nested("value"), listOf("a", "b")))
 
-        try {
-            events(TestEvent("traced", 1, true, 0.0))
-        } finally {
-            scope.close()
-        }
-
-        val record = exporter.finishedLogRecordItems.first()
-        assertThat(record.spanContext.traceId, equalTo("0af7651916cd43dd8448eb211c80319c"))
-        assertThat(record.spanContext.spanId, equalTo("b7ad6b7169203331"))
+        val record = logExporter.finishedLogRecordItems.first()
+        assertThat(record.attributes.get(AttributeKey.stringKey("nested.inner")), equalTo("value"))
+        assertThat(record.attributes.get(AttributeKey.stringKey("items")), equalTo("""["a","b"]"""))
     }
 
     @Test
-    fun `nested objects become compact JSON string attributes`() {
-        events(ComplexEvent(Nested("value"), listOf("a", "b")))
+    fun `deeply nested objects use dot-separated keys`() {
+        events(DeeplyNestedEvent(Mid(Deep("hello"))))
 
-        val record = exporter.finishedLogRecordItems.first()
-        assertThat(record.bodyValue?.asString(), equalTo("""{"nested":{"inner":"value"},"items":["a","b"]}"""))
-        assertThat(record.attributes.get(AttributeKey.stringKey("nested")), equalTo("""{"inner":"value"}"""))
-        assertThat(record.attributes.get(AttributeKey.stringKey("items")), equalTo("""["a","b"]"""))
+        val record = logExporter.finishedLogRecordItems.first()
+        assertThat(record.attributes.get(AttributeKey.stringKey("mid.deep.value")), equalTo("hello"))
     }
+
+    @Test
+    fun `event emitted with active span becomes a span event`() {
+        val tracer = otel.getTracer("test")
+        val span = tracer.spanBuilder("test-span").startSpan()
+        val scope = span.makeCurrent()
+
+        try {
+            events(TestEvent("traced", 42, true, 3.14))
+        } finally {
+            scope.close()
+            span.end()
+        }
+
+        assertThat(logExporter.finishedLogRecordItems.size, equalTo(0))
+
+        val spans = spanExporter.finishedSpanItems
+        assertThat(spans.size, equalTo(1))
+
+        val spanEvents = spans.first().events
+        assertThat(spanEvents.size, equalTo(1))
+
+        val spanEvent = spanEvents.first()
+        assertThat(spanEvent.name, equalTo("TestEvent"))
+        assertThat(spanEvent.attributes.get(AttributeKey.stringKey("name")), equalTo("traced"))
+        assertThat(spanEvent.attributes.get(AttributeKey.longKey("count")), equalTo(42L))
+        assertThat(spanEvent.attributes.get(AttributeKey.booleanKey("active")), equalTo(true))
+        assertThat(spanEvent.attributes.get(AttributeKey.doubleKey("rate")), equalTo(3.14))
+    }
+
+    @Test
+    fun `metadata appears as span event attributes with active span`() {
+        val tracer = otel.getTracer("test")
+        val span = tracer.spanBuilder("test-span").startSpan()
+        val scope = span.makeCurrent()
+
+        try {
+            events(TestEvent("test", 1, false, 0.0) + ("service" to "my-service"))
+        } finally {
+            scope.close()
+            span.end()
+        }
+
+        val spanEvent = spanExporter.finishedSpanItems.first().events.first()
+        assertThat(spanEvent.attributes.get(AttributeKey.stringKey("service")), equalTo("my-service"))
+        assertThat(spanEvent.attributes.get(AttributeKey.stringKey("name")), equalTo("test"))
+    }
+
 }

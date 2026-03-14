@@ -5,8 +5,11 @@ changes with their rationale when appropriate:
 
 ### v6.34.0.0 (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-connect-x402**: [New module!] Support for X402 payments protocol client. You'll need to plug in your own signer (use an OSS one wuch as web3j).
+- **http4k-connect-x402**: [New module!] Support for X402 payments protocol client. You'll need to plug in your own signer (use an OSS one such as web3j).
 - **http4k-connect-x402-fake**: [New module!] Fake implementation of X402 Facilitator for testing.
+- **http4k-ops-opentelemetry**: Added events implementation `AutoOpenTelemetryEvents` for plugging the http4k event system into OpenTelemetry backends. Supports both span-based and log events.
+- **http4k-testing-webdriver**: Include basic auth in requests from the WebDriver. H/T @tamj0rd2
+- **http4k-ai-mcp-sdk**: Fix to allow for custom JSON types in MCP server tool responses.
 
 ### v6.33.0.0
 - **http4k-***: Upgrade versions

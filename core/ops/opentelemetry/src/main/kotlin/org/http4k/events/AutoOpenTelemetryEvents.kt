@@ -6,10 +6,15 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.logs.Severity
+import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Context
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.JsonType
 
+/**
+ * Bridges http4k Events to OpenTelemetry. When there is an active span, events are emitted as
+ * span events (visible inline on the span in OTel backends). Otherwise, falls back to log records.
+ */
 fun <NODE : Any> AutoOpenTelemetryEvents(
     json: AutoMarshallingJson<NODE>,
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
@@ -35,12 +40,17 @@ fun <NODE : Any> AutoOpenTelemetryEvents(
 
             metadata.forEach { (key, metaValue) -> attrs.put(AttributeKey.stringKey(key), metaValue.toString()) }
 
-            logger.logRecordBuilder()
-                .setContext(Context.current())
-                .setBody(json.pretty(jsonObj))
-                .setAllAttributes(attrs.build())
-                .setSeverity(if (unwrapped is Event.Companion.Error) Severity.ERROR else Severity.INFO)
-                .emit()
+            val span = Span.current()
+            when {
+                span.spanContext.isValid ->
+                    span.addEvent(unwrapped.javaClass.simpleName, attrs.build())
+
+                else -> logger.logRecordBuilder()
+                    .setContext(Context.current())
+                    .setAllAttributes(attrs.build())
+                    .setSeverity(if (unwrapped is Event.Companion.Error) Severity.ERROR else Severity.INFO)
+                    .emit()
+            }
         }
     }
 }
@@ -57,7 +67,8 @@ private fun <NODE : Any> addTypedAttribute(
         JsonType.Number -> attrs.put(AttributeKey.doubleKey(key), json.decimal(value).toDouble())
         JsonType.Boolean -> attrs.put(AttributeKey.booleanKey(key), json.bool(value))
         JsonType.Null -> {}
-        JsonType.Object, JsonType.Array -> attrs.put(AttributeKey.stringKey(key), json.compact(value))
+        JsonType.Object -> json.fields(value).forEach { (k, v) -> addTypedAttribute(json, attrs, "$key.$k", v) }
+        JsonType.Array -> attrs.put(AttributeKey.stringKey(key), json.compact(value))
     }
 }
 
