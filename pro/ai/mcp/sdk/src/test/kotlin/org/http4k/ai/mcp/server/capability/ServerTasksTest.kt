@@ -17,6 +17,8 @@ import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
@@ -93,13 +95,13 @@ class ServerTasksTest {
             statusMessage = "Processing...",
             createdAt = now,
             lastUpdatedAt = now,
-            _meta = Meta(progressToken = "token")
+            _meta = Meta(MetaKey.progressToken<Any>().toLens() of "token")
         )
         tasks.update(session1, notification)
 
         assertThat(receivedTask.get().taskId, equalTo(taskId))
         assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
         assertThat(receivedTask.get().statusMessage, equalTo("Processing..."))
-        assertThat(receivedMeta.get().progressToken, equalTo("token" as Any))
+        assertThat(MetaKey.progressToken<Any>().toLens()(receivedMeta.get()), equalTo("token" as Any))
     }
 }

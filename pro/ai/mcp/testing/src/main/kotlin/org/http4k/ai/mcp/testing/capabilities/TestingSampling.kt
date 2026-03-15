@@ -12,6 +12,8 @@ import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import java.time.Duration
 
 class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
@@ -33,7 +35,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         modelPreferences, metadata,
                         tools ?: emptyList(),
                         toolChoice,
-                        _meta.progressToken,
+                        MetaKey.progressToken<Any>().toLens()(_meta),
                         )
                 }.valueOrNull()!!
             onSampling.forEach { handler ->

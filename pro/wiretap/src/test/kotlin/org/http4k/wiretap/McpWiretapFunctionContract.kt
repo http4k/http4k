@@ -6,7 +6,6 @@ package org.http4k.wiretap
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.protocol.ServerMetaData
@@ -37,11 +36,6 @@ interface McpWiretapFunctionContract {
     fun callTool(args: Map<String, Any>) = mcpClient().tools().call(
         ToolName.of(toolName),
         ToolRequest(args)
-    )
-
-    fun printTool() = println(
-        mcpClient().tools().list()
-            .valueOrNull()!!.find { it.name.value == toolName }
     )
 
     fun Approver.assertToolResponse(args: Map<String, Any>) =
