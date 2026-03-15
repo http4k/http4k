@@ -12,6 +12,7 @@ import org.http4k.format.AutoMappingConfiguration
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
+import org.http4k.format.MoshiNodeAdapter
 import org.http4k.format.SetAdapter
 import org.http4k.format.ThrowableAdapter
 import org.http4k.format.asConfigurable
@@ -26,6 +27,7 @@ object X402Moshi : ConfigurableMoshi(
         .addLast(SetAdapter)
         .addLast(MapAdapter)
         .addLast(ThrowableAdapter)
+        .addLast(MoshiNodeAdapter)
         .asConfigurable()
         .withStandardMappings()
         .withX402Mappings()

@@ -3,6 +3,7 @@ package org.http4k.connect.x402
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
 import org.http4k.connect.x402.X402Moshi.json
+import org.http4k.connect.x402.model.FacilitatorRequest
 import org.http4k.connect.x402.model.PaymentNetwork
 import org.http4k.connect.x402.model.PaymentScheme
 import org.http4k.connect.x402.model.SettleResponse
@@ -24,26 +25,31 @@ class FakeX402Facilitator(
         SupportedKind(PaymentScheme.of("exact"), listOf(PaymentNetwork.of("base-sepolia")))
     )
 ) : ChaoticHttpHandler() {
+    private fun isSupported(req: FacilitatorRequest) =
+        supportedSchemes.any { it.scheme == req.payload.scheme && req.payload.network in it.networks }
+
     override val app = routes(
         "/verify" bind POST to {
+            val req = it.json<FacilitatorRequest>()
             Response(OK).json(
-                VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer"))
+                if (isSupported(req)) VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer"))
+                else VerifyResponse(isValid = false, invalidReason = "Unsupported scheme/network")
             )
         },
         "/settle" bind POST to {
+            val req = it.json<FacilitatorRequest>()
             Response(OK).json(
-                SettleResponse(
+                if (isSupported(req)) SettleResponse(
                     success = true,
                     transaction = TransactionHash.of("0xtx"),
                     network = PaymentNetwork.of("base-sepolia"),
                     payer = WalletAddress.of("0xpayer")
                 )
+                else SettleResponse(success = false, errorReason = "Unsupported scheme/network")
             )
         },
         "/supported" bind GET to {
-            Response(OK).json(
-                SupportedResponse(x402Version = 2, kinds = supportedSchemes)
-            )
+            Response(OK).json(SupportedResponse(x402Version = 2, kinds = supportedSchemes))
         }
     )
 

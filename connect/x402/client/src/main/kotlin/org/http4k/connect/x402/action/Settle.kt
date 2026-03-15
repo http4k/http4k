@@ -21,17 +21,17 @@ import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
 @Http4kConnectAction
-data class Settle(val payload: PaymentPayload, val requirements: PaymentRequirements) : X402FacilitatorAction<Settled> {
+data class Settle(val payload: PaymentPayload, val requirements: PaymentRequirements) : X402FacilitatorAction<SettledResponse> {
     override fun toRequest() = Request(POST, "/settle").json(FacilitatorRequest(payload, requirements))
 
-    override fun toResult(response: Response): Result<Settled, RemoteFailure> {
+    override fun toResult(response: Response): Result<SettledResponse, RemoteFailure> {
         val wire = response.json<SettleResponse>()
         return when {
-            wire.success -> Success(Settled(wire.transaction!!, wire.network!!, wire.payer!!))
+            wire.success -> Success(SettledResponse(wire.transaction!!, wire.network!!, wire.payer!!))
             else -> Failure(RemoteFailure(POST, Uri.of("/settle"), response.status, wire.errorReason))
         }
     }
 }
 
 @JsonSerializable
-data class Settled(val transaction: TransactionHash, val network: PaymentNetwork, val payer: WalletAddress)
+data class SettledResponse(val transaction: TransactionHash, val network: PaymentNetwork, val payer: WalletAddress)

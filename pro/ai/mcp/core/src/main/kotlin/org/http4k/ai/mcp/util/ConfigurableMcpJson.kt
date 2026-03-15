@@ -45,6 +45,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.with
 import org.http4k.format.ArrayItemsJsonAdapterFactory
 import org.http4k.format.AutoMappingConfiguration
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
@@ -128,10 +129,10 @@ abstract class ConfigurableMcpJson(
     }
 }
 
-inline fun <reified T : Any> MetaKey.auto(field: MetaField<T>) = MetaLensSpec(
+inline fun <reified T : Any> MetaKey.auto(field: MetaField<T>, json: AutoMarshallingJson<McpNodeType> = McpJson) = MetaLensSpec(
     field.key,
-    { McpJson.convert<MoshiNode, T>(it) },
-    { McpJson.asJsonObject(it) }
+    { json.convert<MoshiNode, T>(it) },
+    { json.asJsonObject(it) }
 )
 
 

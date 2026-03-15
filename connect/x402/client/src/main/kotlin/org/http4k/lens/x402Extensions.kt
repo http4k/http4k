@@ -2,7 +2,7 @@ package org.http4k.lens
 
 import org.http4k.connect.x402.X402Moshi.asA
 import org.http4k.connect.x402.X402Moshi.asFormatString
-import org.http4k.connect.x402.action.Settled
+import org.http4k.connect.x402.action.SettledResponse
 import org.http4k.connect.x402.model.PaymentPayload
 import org.http4k.connect.x402.model.PaymentRequired
 
@@ -18,5 +18,5 @@ val paymentRequiredLens = Header
 
 val paymentResponseLens = Header
     .base64()
-    .map({ asA<Settled>(it) }, { asFormatString(it) })
+    .map({ asA<SettledResponse>(it) }, { asFormatString(it) })
     .required("X-PAYMENT-RESPONSE")

@@ -53,7 +53,7 @@ data class ErrorMessageWithData(override val code: Int, override val message: St
     ErrorMessage(code, message)
 
 fun toToolResponseOrError(response: McpTool.Call.Response): ToolResponse = when (response.isError) {
-    true -> Error(response.content, response._meta)
+    true -> Error(response.content, response.structuredContent?.let(McpJson::convert), response._meta)
 
     else -> {
         when (response.task) {

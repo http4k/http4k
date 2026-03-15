@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
@@ -16,6 +17,7 @@ import org.http4k.ai.mcp.model.enum
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asFormatString
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
@@ -62,5 +64,24 @@ class ToolCapabilityTest {
         )
 
         assertThat(response, equalTo(McpTool.Call.Response(task = task)))
+    }
+
+    @Test
+    fun `tool returning Error passes through content and structuredContent`() {
+        val structured = McpJson { obj("error" to string("payment required"), "code" to number(402)) }
+        val content = listOf(Text("Payment required"))
+
+        val tool = Tool("paid-tool", "A paid tool")
+        val capability = ToolCapability(tool) { ToolResponse.Error(content, structured) }
+
+        val response = capability.call(
+            McpTool.Call.Request(tool.name),
+            NoOp,
+            Request(GET, "/")
+        )
+
+        assertThat(response.isError, equalTo(true))
+        assertThat(response.content, equalTo(content))
+        assertThat(response.structuredContent, equalTo(McpJson.convert(structured)))
     }
 }

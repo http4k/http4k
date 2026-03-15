@@ -23,16 +23,17 @@ fun ServerFilters.X402PaymentRequired(
     requirements: (Request) -> List<PaymentRequirements>
 ) = Filter { next ->
     { req ->
-        val payload = paymentSignatureLens(req)
         val reqs = requirements(req)
 
-        when (payload) {
-            null -> paymentRequiredResponse(reqs, "Payment Required", req)
-            else -> facilitator(Verify(payload, reqs.first()))
-                .flatMap { facilitator(Settle(payload, reqs.first())) }
-                .map { next(req).with(paymentResponseLens of it) }
-                .recover { paymentRequiredResponse(reqs, it.message ?: "Payment failed", req) }
-        }
+        paymentSignatureLens(req)?.let { payload ->
+            reqs.firstOrNull { it.scheme == payload.scheme && it.network == payload.network }
+                ?.let { matched ->
+                    facilitator(Verify(payload, matched))
+                        .flatMap { facilitator(Settle(payload, matched)) }
+                        .map { next(req).with(paymentResponseLens of it) }
+                        .recover { paymentRequiredResponse(reqs, it.message ?: "Payment failed", req) }
+                } ?: paymentRequiredResponse(reqs, "Unsupported payment scheme/network", req)
+        } ?: paymentRequiredResponse(reqs, "Payment Required", req)
     }
 }
 

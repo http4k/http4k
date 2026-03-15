@@ -19,17 +19,17 @@ import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
 @Http4kConnectAction
-data class Verify(val payload: PaymentPayload, val requirements: PaymentRequirements) : X402FacilitatorAction<Verified> {
+data class Verify(val payload: PaymentPayload, val requirements: PaymentRequirements) : X402FacilitatorAction<VerifiedResponse> {
     override fun toRequest() = Request(POST, "/verify").json(FacilitatorRequest(payload, requirements))
 
-    override fun toResult(response: Response): Result<Verified, RemoteFailure> {
+    override fun toResult(response: Response): Result<VerifiedResponse, RemoteFailure> {
         val wire = response.json<VerifyResponse>()
         return when {
-            wire.isValid -> Success(Verified(wire.payer!!))
+            wire.isValid -> Success(VerifiedResponse(wire.payer!!))
             else -> Failure(RemoteFailure(POST, Uri.of("/verify"), response.status, wire.invalidReason))
         }
     }
 }
 
 @JsonSerializable
-data class Verified(val payer: WalletAddress)
+data class VerifiedResponse(val payer: WalletAddress)

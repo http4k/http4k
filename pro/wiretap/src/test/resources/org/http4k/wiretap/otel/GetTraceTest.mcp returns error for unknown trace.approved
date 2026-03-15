@@ -1,8 +1,9 @@
 {
   "content" : [ {
-    "text" : "Failure",
+    "text" : "Trace not found",
     "annotations" : null
   } ],
+  "structuredContent" : null,
   "meta" : {
     "node" : {
       "attributes" : { }

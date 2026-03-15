@@ -9,8 +9,8 @@ import org.http4k.connect.RemoteFailure
 import org.http4k.connect.x402.X402Facilitator
 import org.http4k.connect.x402.X402FacilitatorAction
 import org.http4k.connect.x402.action.Settle
-import org.http4k.connect.x402.action.Settled
-import org.http4k.connect.x402.action.Verified
+import org.http4k.connect.x402.action.SettledResponse
+import org.http4k.connect.x402.action.VerifiedResponse
 import org.http4k.connect.x402.action.Verify
 import org.http4k.connect.x402.model.AssetAddress
 import org.http4k.connect.x402.model.PaymentAmount
@@ -87,9 +87,9 @@ class X402ServerFilterTest {
     fun `valid payment with successful settlement returns 200 with payment response header`() {
         val handler = ServerFilters.X402PaymentRequired(
             fakeFacilitator(
-                verifyResult = Success(Verified(payer = WalletAddress.of("0xpayer"))),
+                verifyResult = Success(VerifiedResponse(payer = WalletAddress.of("0xpayer"))),
                 settleResult = Success(
-                    Settled(
+                    SettledResponse(
                         transaction = TransactionHash.of("0xtx"),
                         network = PaymentNetwork.of("base-sepolia"),
                         payer = WalletAddress.of("0xpayer")
@@ -112,7 +112,7 @@ class X402ServerFilterTest {
     fun `settlement failure returns 402`() {
         val handler = ServerFilters.X402PaymentRequired(
             fakeFacilitator(
-                verifyResult = Success(Verified(payer = WalletAddress.of("0xpayer"))),
+                verifyResult = Success(VerifiedResponse(payer = WalletAddress.of("0xpayer"))),
                 settleResult = Failure(RemoteFailure(POST, Uri.of("/settle"), OK, "timeout"))
             )
         ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
@@ -126,9 +126,9 @@ class X402ServerFilterTest {
 
     @Suppress("UNCHECKED_CAST")
     private fun fakeFacilitator(
-        verifyResult: Result<Verified, RemoteFailure> = Success(Verified(payer = WalletAddress.of("0xpayer"))),
-        settleResult: Result<Settled, RemoteFailure> = Success(
-            Settled(
+        verifyResult: Result<VerifiedResponse, RemoteFailure> = Success(VerifiedResponse(payer = WalletAddress.of("0xpayer"))),
+        settleResult: Result<SettledResponse, RemoteFailure> = Success(
+            SettledResponse(
                 transaction = TransactionHash.of("0xtx"),
                 network = PaymentNetwork.of("base-sepolia"),
                 payer = WalletAddress.of("0xpayer")

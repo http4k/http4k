@@ -16,5 +16,5 @@ data object Supported : X402FacilitatorAction<SupportedResponse> {
     override fun toRequest() = Request(GET, "/supported")
 
     override fun toResult(response: Response): Result<SupportedResponse, RemoteFailure> =
-        Success(asA(response.bodyString()))
+        Success(asA<SupportedResponse>(response.bodyString()))
 }

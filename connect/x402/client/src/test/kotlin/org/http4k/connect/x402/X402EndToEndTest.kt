@@ -7,8 +7,8 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.x402.action.Settle
-import org.http4k.connect.x402.action.Settled
-import org.http4k.connect.x402.action.Verified
+import org.http4k.connect.x402.action.SettledResponse
+import org.http4k.connect.x402.action.VerifiedResponse
 import org.http4k.connect.x402.action.Verify
 import org.http4k.connect.x402.model.AssetAddress
 import org.http4k.connect.x402.model.PaymentAmount
@@ -61,12 +61,12 @@ class X402EndToEndTest {
     private val fakeFacilitator = object : X402Facilitator {
         override fun <R> invoke(action: X402FacilitatorAction<R>): Result<R, RemoteFailure> = when (action) {
             is Verify -> (if (action.payload.payload["signature"] == "0xsigned")
-                Success(Verified(payer = WalletAddress.of("0xpayer")))
+                Success(VerifiedResponse(payer = WalletAddress.of("0xpayer")))
             else
                 Failure(RemoteFailure(POST, Uri.of("/verify"), OK, "invalid signature"))) as Result<R, RemoteFailure>
 
             is Settle -> Success(
-                Settled(
+                SettledResponse(
                     transaction = TransactionHash.of("0xtx123"),
                     network = action.requirements.network,
                     payer = WalletAddress.of("0xpayer")

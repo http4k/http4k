@@ -59,8 +59,12 @@ sealed interface ToolResponse {
         constructor(vararg content: String, meta: Meta = default) : this(content.map(::Text).toList(), null, meta)
     }
 
-    data class Error(val content: List<Content>? = null, override val meta: Meta = default) : ToolResponse {
-        constructor(message: String, meta: Meta = default) : this(listOf(Text(message)), meta)
+    data class Error(
+        val content: List<Content>? = null,
+        val structuredContent: McpNodeType? = null,
+        override val meta: Meta = default
+    ) : ToolResponse {
+        constructor(message: String, meta: Meta = default) : this(listOf(Text(message)), null, meta)
     }
 
     data class Task(val task: org.http4k.ai.mcp.model.Task, override val meta: Meta = default) : ToolResponse

@@ -10,7 +10,4 @@ dependencies {
     }
     api(project(":http4k-security-core"))
     api(libs.kotshi.api)
-    api(libs.values4k)
-    testFixturesApi(testFixtures(project(":http4k-connect-core")))
-    testImplementation(testFixtures(project(":http4k-core")))
 }
