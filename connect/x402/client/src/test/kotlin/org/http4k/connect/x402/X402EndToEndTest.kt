@@ -79,9 +79,8 @@ class X402EndToEndTest {
 
     @Test
     fun `full round trip - 402 then sign then retry then verify then settle then 200`() {
-        val server = ServerFilters.X402PaymentRequired(
-            fakeFacilitator
-        ) { listOf(requirements) }.then { Response(OK).body("premium content") }
+        val server = ServerFilters.X402PaymentRequired(fakeFacilitator) { listOf(requirements) }
+            .then { Response(OK).body("premium content") }
 
         val client = ClientFilters.X402PaymentRequired(fakeSigner).then(server)
 

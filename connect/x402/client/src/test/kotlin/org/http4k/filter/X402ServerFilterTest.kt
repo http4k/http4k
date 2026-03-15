@@ -57,9 +57,8 @@ class X402ServerFilterTest {
 
     @Test
     fun `no payment header returns 402 with payment required header`() {
-        val handler = ServerFilters.X402PaymentRequired(
-            fakeFacilitator()
-        ) { listOf(requirements) }.then { Response(OK).body("content") }
+        val handler = ServerFilters.X402PaymentRequired(fakeFacilitator()) { listOf(requirements) }
+            .then { Response(OK).body("content") }
 
         val response = handler(Request(Method.GET, "/"))
 
