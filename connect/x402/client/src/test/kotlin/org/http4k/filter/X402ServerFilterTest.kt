@@ -58,9 +58,8 @@ class X402ServerFilterTest {
     @Test
     fun `no payment header returns 402 with payment required header`() {
         val handler = ServerFilters.X402PaymentRequired(
-            { listOf(requirements) },
             fakeFacilitator()
-        ).then { Response(OK).body("content") }
+        ) { listOf(requirements) }.then { Response(OK).body("content") }
 
         val response = handler(Request(Method.GET, "/"))
 
@@ -73,11 +72,10 @@ class X402ServerFilterTest {
     @Test
     fun `invalid payment returns 402 with error`() {
         val handler = ServerFilters.X402PaymentRequired(
-            { listOf(requirements) },
             fakeFacilitator(
                 verifyResult = Failure(RemoteFailure(POST, Uri.of("/verify"), OK, "bad signature"))
             )
-        ).then { Response(OK).body("content") }
+        ) { listOf(requirements) }.then { Response(OK).body("content") }
 
         val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
 
@@ -89,7 +87,6 @@ class X402ServerFilterTest {
     @Test
     fun `valid payment with successful settlement returns 200 with payment response header`() {
         val handler = ServerFilters.X402PaymentRequired(
-            { listOf(requirements) },
             fakeFacilitator(
                 verifyResult = Success(Verified(payer = WalletAddress.of("0xpayer"))),
                 settleResult = Success(
@@ -100,7 +97,7 @@ class X402ServerFilterTest {
                     )
                 )
             )
-        ).then { Response(Status.OK).body("content") }
+        ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
 
         val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
 
@@ -115,12 +112,11 @@ class X402ServerFilterTest {
     @Test
     fun `settlement failure returns 402`() {
         val handler = ServerFilters.X402PaymentRequired(
-            { listOf(requirements) },
             fakeFacilitator(
                 verifyResult = Success(Verified(payer = WalletAddress.of("0xpayer"))),
                 settleResult = Failure(RemoteFailure(POST, Uri.of("/settle"), OK, "timeout"))
             )
-        ).then { Response(Status.OK).body("content") }
+        ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
 
         val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
 

@@ -10,5 +10,5 @@ class X402Security(
     requirements: (Request) -> List<PaymentRequirements>,
     facilitator: X402Facilitator
 ) : Security {
-    override val filter = ServerFilters.X402PaymentRequired(requirements, facilitator)
+    override val filter = ServerFilters.X402PaymentRequired(facilitator, requirements)
 }

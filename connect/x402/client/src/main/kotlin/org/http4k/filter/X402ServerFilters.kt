@@ -19,8 +19,8 @@ import org.http4k.lens.paymentResponseLens
 import org.http4k.lens.paymentSignatureLens
 
 fun ServerFilters.X402PaymentRequired(
-    requirements: (Request) -> List<PaymentRequirements>,
-    facilitator: X402Facilitator
+    facilitator: X402Facilitator,
+    requirements: (Request) -> List<PaymentRequirements>
 ) = Filter { next ->
     { req ->
         val payload = paymentSignatureLens(req)
