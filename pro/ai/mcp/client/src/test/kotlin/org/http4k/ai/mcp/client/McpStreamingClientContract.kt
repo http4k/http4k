@@ -40,6 +40,8 @@ import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Uri
 import org.http4k.format.auto
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
@@ -78,12 +80,12 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
             sampling().onSampled { samplingResponses.asSequence() }
 
             assertThat(
-                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
+                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "sample"))),
                 equalTo(Success(Ok(Content.Text("2"))))
             )
 
             assertThat(
-                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("sample"))),
+                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "sample"))),
                 equalTo(Success(Ok(Content.Text("2"))))
             )
         }
@@ -103,14 +105,14 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
 
         val tools = ServerTools(
             Tool("elicit", "description") bind {
-                val request = ElicitationRequest.Form("foobar", output, progressToken = it.meta.progressToken)
+                val request = ElicitationRequest.Form("foobar", output, progressToken = MetaKey.progressToken<Any>().toLens()(it.meta))
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
 
                 assertThat(
                     received,
                     equalTo(
                         Success(
-                            ElicitationResponse.Ok(ElicitationAction.valueOf(it.meta.progressToken!!.toString())).with(
+                            ElicitationResponse.Ok(ElicitationAction.valueOf(MetaKey.progressToken<Any>().toLens()(it.meta)!!.toString())).with(
                                 output of response
                             )
                         )
@@ -136,19 +138,19 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
             }
 
             assertThat(
-                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("accept"))),
+                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "accept"))),
                 equalTo(Success(Ok(Content.Text("accept"))))
             )
 
             assertThat(receivedElicitationId.get(), equalTo(elicitationId))
 
             assertThat(
-                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("decline"))),
+                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "decline"))),
                 equalTo(Success(Ok(Content.Text("decline"))))
             )
 
             assertThat(
-                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta("cancel"))),
+                tools().call(ToolName.of("elicit"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "cancel"))),
                 equalTo(Success(Ok(Content.Text("cancel"))))
             )
         }
@@ -164,7 +166,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
 
         val tools = ServerTools(
             Tool("elicit-task", "description") bind {
-                val request = ElicitationRequest.Form("foobar", output, progressToken = it.meta.progressToken)
+                val request = ElicitationRequest.Form("foobar", output, progressToken = MetaKey.progressToken<Any>().toLens()(it.meta))
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
 
                 assertThat(received, present(isA<Success<ElicitationResponse.Task>>()))
@@ -182,7 +184,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
             }
 
             assertThat(
-                tools().call(ToolName.of("elicit-task"), ToolRequest(meta = Meta("elicit-task"))),
+                tools().call(ToolName.of("elicit-task"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "elicit-task"))),
                 equalTo(Success(Ok(Content.Text("done"))))
             )
         }
@@ -202,7 +204,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
             progress().onProgress(fn = prog::set)
 
             assertThat(
-                tools().call(ToolName.of("progress"), ToolRequest(meta = Meta("progress"))),
+                tools().call(ToolName.of("progress"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "progress"))),
                 equalTo(Success(Ok(Content.Text(""))))
             )
 
@@ -232,7 +234,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
                 latch.countDown()
             }
 
-            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta("tasks")))
+            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "tasks")))
 
             assertThat(latch.await(5, SECONDS), equalTo(true))
             assertThat(receivedTask.get().taskId, equalTo(taskId))
@@ -257,13 +259,13 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
         }
 
         withMcpServer(tasks = serverTasks) {
-            tasks().update(task, Meta(progressToken = "server-token"))
+            tasks().update(task, Meta(MetaKey.progressToken<Any>().toLens() of "server-token"))
 
             assertThat(latch.await(5, SECONDS), equalTo(true))
             assertThat(receivedTask.get().taskId, equalTo(taskId))
             assertThat(receivedTask.get().status, equalTo(TaskStatus.working))
             assertThat(receivedTask.get().statusMessage, equalTo("Client processing..."))
-            assertThat(receivedMeta.get().progressToken, equalTo("server-token" as Any))
+            assertThat(MetaKey.progressToken<Any>().toLens()(receivedMeta.get()), equalTo("server-token" as Any))
         }
     }
 

@@ -1,0 +1,145 @@
+event: datastar-patch-elements
+data: elements <div id="trace-detail-panel" class="detail-content">
+data: elements     <div class="detail-toolbar">
+data: elements         <span class="badge badge-trace">TRACE</span>
+data: elements         <span class="trace-id-detail" title="00000000000000000000000000000001">00000001</span>
+data: elements         <span class="gantt-total-duration">1ms</span>
+data: elements         <a href="/_wiretap/traffic?trace=00000000000000000000000000000001" class="trace-link-btn">Traffic</a>
+data: elements     </div>
+data: elements     <div class="gantt-chart">
+data: elements         <div class="gantt-timeline-header">
+data: elements             <div class="gantt-label-col"></div>
+data: elements             <div class="gantt-timeline-col">
+data: elements                 <span class="gantt-tick" style="left: 0%">0%</span>
+data: elements                 <span class="gantt-tick" style="left: 25%">25%</span>
+data: elements                 <span class="gantt-tick" style="left: 50%">50%</span>
+data: elements                 <span class="gantt-tick" style="left: 75%">75%</span>
+data: elements                 <span class="gantt-tick" style="left: 100%">100%</span>
+data: elements             </div>
+data: elements         </div>
+data: elements         
+data: elements         <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+data: elements             <div class="gantt-label-col" style="padding-left: 0em;">
+data: elements                 <span class="span-kind badge-span-SERVER">SERVER</span>
+data: elements                 <span class="gantt-span-name">test</span>
+data: elements                 <span class="duration">1ms</span>
+data: elements             </div>
+data: elements             <div class="gantt-timeline-col">
+data: elements                 <div class="gantt-gridlines">
+data: elements                     <div class="gantt-gridline" style="left: 25%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 50%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 75%"></div>
+data: elements                 </div>
+data: elements                 <div class="gantt-bar gantt-bar-SERVER" style="left: 0.0%; width: 100.0%;" title="test (1ms)"></div>
+data: elements             </div>
+data: elements         </div>
+data: elements         <div id="span-detail-1234567890abcdef" class="gantt-detail">
+data: elements             <div class="gantt-detail-columns">
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Span Info</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             <tr>
+data: elements                                 <td>Name</td>
+data: elements                                 <td>test</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Span ID</td>
+data: elements                                 <td><code>1234567890abcdef</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Parent Span ID</td>
+data: elements                                 <td><code>0000000000000000</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Kind</td>
+data: elements                                 <td>SERVER</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Status</td>
+data: elements                                 <td>OK</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Duration</td>
+data: elements                                 <td>1ms</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Attributes</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>http.codes</td>
+data: elements                                 <td>[200, 301, 404]</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements                 
+data: elements                 
+data: elements             </div>
+data: elements             
+data: elements             <div class="span-events-section">
+data: elements                 <h4>Events</h4>
+data: elements                 <table class="data-table span-event-table">
+data: elements                     <thead>
+data: elements                         <tr>
+data: elements                             <th>Name</th>
+data: elements                             <th>Time</th>
+data: elements                             <th>Attributes</th>
+data: elements                         </tr>
+data: elements                     </thead>
+data: elements                     <tbody>
+data: elements                         
+data: elements                         <tr class="span-event-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+data: elements                             <td>validation-start</td>
+data: elements                             <td class="timestamp">+0ms</td>
+data: elements                             <td>1</td>
+data: elements                         </tr>
+data: elements                         <tr class="span-event-detail-row">
+data: elements                             <td colspan="99">
+data: elements                                 
+data: elements                                 <table class="data-table span-detail-table span-event-fields">
+data: elements                                     
+data: elements                                     <tr><td>field</td><td>email</td></tr>
+data: elements                                     
+data: elements                                 </table>
+data: elements                                 
+data: elements                             </td>
+data: elements                         </tr>
+data: elements                         
+data: elements                         <tr class="span-event-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+data: elements                             <td>validation-end</td>
+data: elements                             <td class="timestamp">+0ms</td>
+data: elements                             <td>0</td>
+data: elements                         </tr>
+data: elements                         <tr class="span-event-detail-row">
+data: elements                             <td colspan="99">
+data: elements                                 
+data: elements                             </td>
+data: elements                         </tr>
+data: elements                         
+data: elements                     </tbody>
+data: elements                 </table>
+data: elements             </div>
+data: elements             
+data: elements             
+data: elements             
+data: elements         </div>
+data: elements         
+data: elements     </div>
+data: elements     
+data: elements     <div id="trace-diagram-panel" data-init="@get('/_wiretap/otel/diagram/00000000000000000000000000000001')"></div>
+data: elements </div>
+data: elements 
+data: selector #trace-detail-panel
+

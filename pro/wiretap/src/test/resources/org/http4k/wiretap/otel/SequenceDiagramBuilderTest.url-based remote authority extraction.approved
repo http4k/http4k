@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant frontend
+    participant P1 as backend.internal:9000
+    participant legacy-service
+    participant unknown
+    frontend->>P1: GET /new-api
+    P1-->>frontend: OK (35ms)
+    frontend->>legacy-service: GET /legacy
+    legacy-service-->>frontend: OK (50ms)
+    frontend->>unknown: internal-call
+    unknown-->>frontend: OK (5ms)

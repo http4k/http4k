@@ -1,5 +1,3 @@
-
-
 plugins {
     id("org.http4k.community")
     id("org.http4k.connect.module")
@@ -12,6 +10,5 @@ dependencies {
     }
 
     api(project(":http4k-security-oauth"))
-
     api(libs.kotshi.api)
 }

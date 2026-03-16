@@ -1,7 +1,7 @@
 function makeDraggable(handle, onMove) {
     handle.addEventListener('mousedown', function (e) {
         e.preventDefault();
-        var state = {startX: e.clientX, startY: e.clientY};
+        const state = {startX: e.clientX, startY: e.clientY};
 
         function move(e) {
             onMove(e, state);
@@ -202,11 +202,21 @@ function initOverviewCharts() {
 }
 
 function copyCurl(btn) {
-    var text = btn.parentElement.querySelector('.curl-data').textContent;
+    const text = btn.parentElement.querySelector('.curl-data').textContent;
     navigator.clipboard.writeText(text).then(function () {
         btn.textContent = 'Copied!';
         setTimeout(function () {
             btn.textContent = 'Copy cURL';
+        }, 1500);
+    });
+}
+
+function copyMermaid(btn) {
+    const text = btn.closest('.sequence-diagram').querySelector('.mermaid-source').textContent;
+    navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () {
+            btn.textContent = 'Copy Mermaid';
         }, 1500);
     });
 }
@@ -305,7 +315,7 @@ addEventListener('message', async function (e) {
 
 function initSwaggerUI() {
     if (typeof SwaggerUIBundle === 'undefined') return;
-    var el = document.getElementById('swagger-ui');
+    const el = document.getElementById('swagger-ui');
     if (!el || el.getAttribute('data-rendered') === 'true') return;
     el.setAttribute('data-rendered', 'true');
     SwaggerUIBundle({
@@ -332,4 +342,11 @@ new MutationObserver(function () {
     if (!dataEl || dataEl.getAttribute('data-rendered') === 'true') return;
     if (_chartInitTimer) clearTimeout(_chartInitTimer);
     _chartInitTimer = setTimeout(initOverviewCharts, 50);
+}).observe(document.body, {childList: true, subtree: true});
+
+new MutationObserver(function () {
+    if (!document.querySelector('.mermaid:not([data-processed])')) return;
+    if (typeof window._mermaidRender === 'function') {
+        window._mermaidRender();
+    }
 }).observe(document.body, {childList: true, subtree: true});

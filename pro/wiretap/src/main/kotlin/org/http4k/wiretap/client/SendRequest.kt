@@ -27,6 +27,7 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionDetail
+import org.http4k.wiretap.domain.TransactionId
 import org.http4k.wiretap.domain.WiretapTransaction
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.traffic.TransactionDetailView
@@ -61,7 +62,7 @@ fun SendRequest(clock: Clock, direction: Direction, proxy: HttpHandler) =
             val duration = Duration.between(start, clock.instant())
 
             return WiretapTransaction(
-                id = 0,
+                id = TransactionId.of(0),
                 transaction = HttpTransaction(
                     request,
                     response,

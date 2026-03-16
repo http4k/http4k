@@ -5,7 +5,7 @@
 package org.http4k.wiretap.domain
 
 data class TraceSummary(
-    val traceId: String,
+    val traceId: OtelTraceId,
     val spanCount: Int,
     val rootSpanName: String,
     val serviceName: String,
@@ -14,14 +14,14 @@ data class TraceSummary(
 )
 
 data class TraceDetail(
-    val traceId: String,
+    val traceId: OtelTraceId,
     val totalDurationMs: Long,
     val spans: List<SpanDetail>
 )
 
 data class SpanDetail(
-    val spanId: String,
-    val parentSpanId: String,
+    val spanId: OtelSpanId,
+    val parentSpanId: OtelSpanId,
     val name: String,
     val kind: String,
     val durationMs: Long,
@@ -47,7 +47,7 @@ data class SpanEvent(
 )
 
 data class SpanLink(
-    val traceId: String,
-    val spanId: String,
+    val traceId: OtelTraceId,
+    val spanId: OtelSpanId,
     val attributes: List<SpanAttribute>
 )

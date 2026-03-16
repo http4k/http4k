@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant wiretap
+    participant frontend
+    participant backend
+    participant P3 as api.example.com:8080
+    wiretap->>frontend: GET /
+    frontend->>backend: GET /api
+    backend-->>frontend: 200 (80ms)
+    backend->>P3: GET /ext
+    P3-->>backend: 200 (30ms)
+    frontend-->>wiretap: 200 (150ms)

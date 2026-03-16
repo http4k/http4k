@@ -31,23 +31,25 @@ interface TransactionStoreContract {
         uri: String = "/test",
         status: Status = OK,
         direction: Direction = Inbound
-    ) = store.record(
-        HttpTransaction(
-            Request(method, uri),
-            Response(status),
+    ): WiretapTransaction {
+        val request = Request(method, uri)
+        val response = Response(status)
+        val transaction = HttpTransaction(
+            request,
+            response,
             Duration.ofMillis(10),
             start = Instant.now()
-        ),
-        direction
-    )
+        )
+        val id = store.record(transaction, direction)
+        return WiretapTransaction(id, transaction,direction)
+    }
 
     @Test
     fun `record returns transaction with unique ids`() {
         val tx1 = record()
         val tx2 = record()
 
-        assertThat(tx1.id != tx2.id, equalTo(true))
-        assertThat(tx1.direction, equalTo(Inbound))
+        assertThat(tx1 != tx2, equalTo(true))
         assertThat(store.list(), equalTo(listOf(tx2, tx1)))
     }
 
@@ -121,7 +123,7 @@ interface TransactionStoreContract {
 
     @Test
     fun `get returns null for unknown id`() {
-        assertThat(store.get(999), absent())
+        assertThat(store.get(TransactionId.of(999)), absent())
     }
 
     @Test

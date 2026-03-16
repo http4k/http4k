@@ -103,54 +103,6 @@
                     </div>
                 </div>
                 {{/if}}
-            </div>
-            <div class="gantt-detail-columns">
-                {{#if span.events}}
-                <div class="gantt-detail-col">
-                    <div class="span-detail-section">
-                        <h4>Events</h4>
-                        {{#each span.events}}
-                        <div class="span-event">
-                            <span class="span-event-name">{{name}}</span>
-                            <span class="span-event-time">+{{timestampMs}}ms</span>
-                            {{#if attributes}}
-                            <table class="data-table span-detail-table span-event-attrs">
-                                {{#each attributes}}
-                                <tr>
-                                    <td>{{key}}</td>
-                                    <td>{{value}}</td>
-                                </tr>
-                                {{/each}}
-                            </table>
-                            {{/if}}
-                        </div>
-                        {{/each}}
-                    </div>
-                </div>
-                {{/if}}
-                {{#if span.links}}
-                <div class="gantt-detail-col">
-                    <div class="span-detail-section">
-                        <h4>Links</h4>
-                        {{#each span.links}}
-                        <div class="span-event">
-                            <span class="span-event-name">{{traceId}}</span>
-                            <code>{{spanId}}</code>
-                            {{#if attributes}}
-                            <table class="data-table span-detail-table span-event-attrs">
-                                {{#each attributes}}
-                                <tr>
-                                    <td>{{key}}</td>
-                                    <td>{{value}}</td>
-                                </tr>
-                                {{/each}}
-                            </table>
-                            {{/if}}
-                        </div>
-                        {{/each}}
-                    </div>
-                </div>
-                {{/if}}
                 {{#if span.resourceAttributes}}
                 <div class="gantt-detail-col">
                     <div class="span-detail-section">
@@ -167,7 +119,171 @@
                 </div>
                 {{/if}}
             </div>
+            {{#if eventRows}}
+            <div class="span-events-section">
+                <h4>Events</h4>
+                <table class="data-table span-event-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Time</th>
+                            <th>Attributes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each eventRows}}
+                        <tr class="span-event-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+                            <td>{{event.name}}</td>
+                            <td class="timestamp">+{{event.timestampMs}}ms</td>
+                            <td>{{attributeCount}}</td>
+                        </tr>
+                        <tr class="span-event-detail-row">
+                            <td colspan="99">
+                                {{#if event.attributes}}
+                                <table class="data-table span-detail-table span-event-fields">
+                                    {{#each event.attributes}}
+                                    <tr><td>{{key}}</td><td>{{value}}</td></tr>
+                                    {{/each}}
+                                </table>
+                                {{/if}}
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{/if}}
+            {{#if span.links}}
+            <div class="span-links-section">
+                <h4>Links</h4>
+                {{#each span.links}}
+                <div class="span-link">
+                    <span class="span-link-trace">{{traceId}}</span>
+                    <code>{{spanId}}</code>
+                    {{#if attributes}}
+                    <table class="data-table span-detail-table span-link-attrs">
+                        {{#each attributes}}
+                        <tr>
+                            <td>{{key}}</td>
+                            <td>{{value}}</td>
+                        </tr>
+                        {{/each}}
+                    </table>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            {{#if logRows}}
+            <div class="span-logs-section">
+                <h4>Logs</h4>
+                <table class="data-table span-log-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Severity</th>
+                            {{#each logAttrColumns}}
+                            <th>{{this}}</th>
+                            {{/each}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each logRows}}
+                        <tr class="span-log-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+                            <td class="timestamp">{{log.timestamp}}</td>
+                            <td><span class="badge badge-severity-{{log.severity}}">{{log.severity}}</span></td>
+                            {{#each columnValues}}
+                            <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr class="span-log-detail-row">
+                            <td colspan="99">
+                                <div class="span-log-detail-columns">
+                                    {{#if log.attributes}}
+                                    <div class="span-log-detail-section">
+                                        <h5>Attributes</h5>
+                                        <table class="data-table span-detail-table span-log-fields">
+                                            {{#each log.attributes}}
+                                            <tr><td>{{key}}</td><td>{{value}}</td></tr>
+                                            {{/each}}
+                                        </table>
+                                    </div>
+                                    {{/if}}
+                                    {{#if log.bodyFields}}
+                                    <div class="span-log-detail-section">
+                                        <h5>Body</h5>
+                                        <table class="data-table span-detail-table span-log-fields">
+                                            {{#each log.bodyFields}}
+                                            <tr><td>{{key}}</td><td>{{value}}</td></tr>
+                                            {{/each}}
+                                        </table>
+                                    </div>
+                                    {{/if}}
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{/if}}
         </div>
         {{/each}}
     </div>
+    {{#if orphanLogRows}}
+    <div class="trace-logs-section">
+        <h4>Logs (unlinked to span)</h4>
+        <table class="data-table span-log-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Severity</th>
+                    <th>Body</th>
+                    {{#each orphanLogAttrColumns}}
+                    <th>{{this}}</th>
+                    {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each orphanLogRows}}
+                <tr class="span-log-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+                    <td class="timestamp">{{log.timestamp}}</td>
+                    <td><span class="badge badge-severity-{{log.severity}}">{{log.severity}}</span></td>
+                    <td class="span-log-body">{{log.body}}</td>
+                    {{#each columnValues}}
+                    <td>{{this}}</td>
+                    {{/each}}
+                </tr>
+                <tr class="span-log-detail-row">
+                    <td colspan="99">
+                        <div class="span-log-detail-columns">
+                            {{#if log.attributes}}
+                            <div class="span-log-detail-section">
+                                <h5>Attributes</h5>
+                                <table class="data-table span-detail-table span-log-fields">
+                                    {{#each log.attributes}}
+                                    <tr><td>{{key}}</td><td>{{value}}</td></tr>
+                                    {{/each}}
+                                </table>
+                            </div>
+                            {{/if}}
+                            {{#if log.bodyFields}}
+                            <div class="span-log-detail-section">
+                                <h5>Body</h5>
+                                <table class="data-table span-detail-table span-log-fields">
+                                    {{#each log.bodyFields}}
+                                    <tr><td>{{key}}</td><td>{{value}}</td></tr>
+                                    {{/each}}
+                                </table>
+                            </div>
+                            {{/if}}
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{/if}}
+    <div id="trace-diagram-panel" data-init="@get('/_wiretap/otel/diagram/{{detail.traceId}}')"></div>
 </div>

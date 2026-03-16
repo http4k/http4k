@@ -1,0 +1,264 @@
+event: datastar-patch-elements
+data: elements <div id="trace-detail-panel" class="detail-content">
+data: elements     <div class="detail-toolbar">
+data: elements         <span class="badge badge-trace">TRACE</span>
+data: elements         <span class="trace-id-detail" title="00000000000000000000000000000002">00000002</span>
+data: elements         <span class="gantt-total-duration">4ms</span>
+data: elements         <a href="/_wiretap/traffic?trace=00000000000000000000000000000002" class="trace-link-btn">Traffic</a>
+data: elements     </div>
+data: elements     <div class="gantt-chart">
+data: elements         <div class="gantt-timeline-header">
+data: elements             <div class="gantt-label-col"></div>
+data: elements             <div class="gantt-timeline-col">
+data: elements                 <span class="gantt-tick" style="left: 0%">0%</span>
+data: elements                 <span class="gantt-tick" style="left: 25%">25%</span>
+data: elements                 <span class="gantt-tick" style="left: 50%">50%</span>
+data: elements                 <span class="gantt-tick" style="left: 75%">75%</span>
+data: elements                 <span class="gantt-tick" style="left: 100%">100%</span>
+data: elements             </div>
+data: elements         </div>
+data: elements         
+data: elements         <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+data: elements             <div class="gantt-label-col" style="padding-left: 0em;">
+data: elements                 <span class="span-kind badge-span-SERVER">SERVER</span>
+data: elements                 <span class="gantt-span-name">GET /</span>
+data: elements                 <span class="duration">4ms</span>
+data: elements             </div>
+data: elements             <div class="gantt-timeline-col">
+data: elements                 <div class="gantt-gridlines">
+data: elements                     <div class="gantt-gridline" style="left: 25%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 50%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 75%"></div>
+data: elements                 </div>
+data: elements                 <div class="gantt-bar gantt-bar-SERVER" style="left: 0.0%; width: 100.0%;" title="GET / (4ms)"></div>
+data: elements             </div>
+data: elements         </div>
+data: elements         <div id="span-detail-aaaaaaaaaaaaaaaa" class="gantt-detail">
+data: elements             <div class="gantt-detail-columns">
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Span Info</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             <tr>
+data: elements                                 <td>Name</td>
+data: elements                                 <td>GET /</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Span ID</td>
+data: elements                                 <td><code>aaaaaaaaaaaaaaaa</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Parent Span ID</td>
+data: elements                                 <td><code>0000000000000000</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Kind</td>
+data: elements                                 <td>SERVER</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Status</td>
+data: elements                                 <td>OK</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Duration</td>
+data: elements                                 <td>4ms</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Service</td>
+data: elements                                 <td>frontend</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements                 
+data: elements                 
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Resource Attributes</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>service.name</td>
+data: elements                                 <td>frontend</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements             </div>
+data: elements             
+data: elements             
+data: elements             
+data: elements         </div>
+data: elements         
+data: elements         <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+data: elements             <div class="gantt-label-col" style="padding-left: 1em;">
+data: elements                 <span class="span-kind badge-span-CLIENT">CLIENT</span>
+data: elements                 <span class="gantt-span-name">GET /api</span>
+data: elements                 <span class="duration">3ms</span>
+data: elements             </div>
+data: elements             <div class="gantt-timeline-col">
+data: elements                 <div class="gantt-gridlines">
+data: elements                     <div class="gantt-gridline" style="left: 25%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 50%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 75%"></div>
+data: elements                 </div>
+data: elements                 <div class="gantt-bar gantt-bar-CLIENT" style="left: 12.5%; width: 75.0%;" title="GET /api (3ms)"></div>
+data: elements             </div>
+data: elements         </div>
+data: elements         <div id="span-detail-bbbbbbbbbbbbbbbb" class="gantt-detail">
+data: elements             <div class="gantt-detail-columns">
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Span Info</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             <tr>
+data: elements                                 <td>Name</td>
+data: elements                                 <td>GET /api</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Span ID</td>
+data: elements                                 <td><code>bbbbbbbbbbbbbbbb</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Parent Span ID</td>
+data: elements                                 <td><code>aaaaaaaaaaaaaaaa</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Kind</td>
+data: elements                                 <td>CLIENT</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Status</td>
+data: elements                                 <td>OK</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Duration</td>
+data: elements                                 <td>3ms</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Service</td>
+data: elements                                 <td>frontend</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements                 
+data: elements                 
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Resource Attributes</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>service.name</td>
+data: elements                                 <td>frontend</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements             </div>
+data: elements             
+data: elements             
+data: elements             
+data: elements         </div>
+data: elements         
+data: elements         <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+data: elements             <div class="gantt-label-col" style="padding-left: 2em;">
+data: elements                 <span class="span-kind badge-span-SERVER">SERVER</span>
+data: elements                 <span class="gantt-span-name">GET /api</span>
+data: elements                 <span class="duration">2ms</span>
+data: elements             </div>
+data: elements             <div class="gantt-timeline-col">
+data: elements                 <div class="gantt-gridlines">
+data: elements                     <div class="gantt-gridline" style="left: 25%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 50%"></div>
+data: elements                     <div class="gantt-gridline" style="left: 75%"></div>
+data: elements                 </div>
+data: elements                 <div class="gantt-bar gantt-bar-SERVER" style="left: 25.0%; width: 50.0%;" title="GET /api (2ms)"></div>
+data: elements             </div>
+data: elements         </div>
+data: elements         <div id="span-detail-cccccccccccccccc" class="gantt-detail">
+data: elements             <div class="gantt-detail-columns">
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Span Info</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             <tr>
+data: elements                                 <td>Name</td>
+data: elements                                 <td>GET /api</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Span ID</td>
+data: elements                                 <td><code>cccccccccccccccc</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Parent Span ID</td>
+data: elements                                 <td><code>bbbbbbbbbbbbbbbb</code></td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Kind</td>
+data: elements                                 <td>SERVER</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Status</td>
+data: elements                                 <td>OK</td>
+data: elements                             </tr>
+data: elements                             <tr>
+data: elements                                 <td>Duration</td>
+data: elements                                 <td>2ms</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>Service</td>
+data: elements                                 <td>backend</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements                 
+data: elements                 
+data: elements                 <div class="gantt-detail-col">
+data: elements                     <div class="span-detail-section">
+data: elements                         <h4>Resource Attributes</h4>
+data: elements                         <table class="data-table span-detail-table">
+data: elements                             
+data: elements                             <tr>
+data: elements                                 <td>service.name</td>
+data: elements                                 <td>backend</td>
+data: elements                             </tr>
+data: elements                             
+data: elements                         </table>
+data: elements                     </div>
+data: elements                 </div>
+data: elements                 
+data: elements             </div>
+data: elements             
+data: elements             
+data: elements             
+data: elements         </div>
+data: elements         
+data: elements     </div>
+data: elements     
+data: elements     <div id="trace-diagram-panel" data-init="@get('/_wiretap/otel/diagram/00000000000000000000000000000002')"></div>
+data: elements </div>
+data: elements 
+data: selector #trace-detail-panel
+

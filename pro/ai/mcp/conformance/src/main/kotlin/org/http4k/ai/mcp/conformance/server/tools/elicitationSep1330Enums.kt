@@ -16,6 +16,8 @@ import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationModel
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.format.auto
+import org.http4k.lens.MetaKey
+import org.http4k.lens.progressToken
 import org.http4k.routing.bind
 
 enum class Options { option1, option2, option3 }
@@ -64,7 +66,7 @@ fun elicitationSep1330Enums() = Tool("test_elicitation_sep1330_enums", "test_eli
         ElicitationRequest.Form(
             "Please review and update the form fields with defaults",
             defaultForm2,
-            progressToken = it.meta.progressToken
+            progressToken = MetaKey.progressToken<Any>().toLens()(it.meta)
         )
     )
         .map {

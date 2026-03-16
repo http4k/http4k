@@ -66,7 +66,9 @@ import org.http4k.connect.model.MimeType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.lens.MetaKey
 import org.http4k.lens.int
+import org.http4k.lens.progressToken
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.junit.jupiter.api.Test
@@ -268,7 +270,7 @@ class TestMcpClientTest {
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val serverTools = ServerTools(listOf(tool bind {
-            it.meta.progressToken?.let { p ->
+            MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
                 it.client.progress(1, 5.0)
                 it.client.progress(2, 5.0)
             }
@@ -317,7 +319,7 @@ class TestMcpClientTest {
             }
 
             assertThat(
-                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123), meta = Meta("foobar"))),
+                tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123), meta = Meta(MetaKey.progressToken<String>().toLens() of "foobar"))),
                 equalTo(Success(ToolResponse.Ok(listOf(content, Content.Text("foo123")))))
             )
 
@@ -396,7 +398,7 @@ class TestMcpClientTest {
             assertThat(
                 completions().complete(
                     ref,
-                    CompletionRequest(CompletionArgument("arg", "value"), meta = Meta("hello"))
+                    CompletionRequest(CompletionArgument("arg", "value"), meta = Meta(MetaKey.progressToken<String>().toLens() of "hello"))
                 ),
                 equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
             )
@@ -459,7 +461,7 @@ class TestMcpClientTest {
                 )
             }
             assertThat(
-                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta("hello"))),
+                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta(MetaKey.progressToken<String>().toLens() of "hello"))),
                 equalTo(Success(ToolResponse.Ok(listOf(Content.Text("1")))))
             )
         }

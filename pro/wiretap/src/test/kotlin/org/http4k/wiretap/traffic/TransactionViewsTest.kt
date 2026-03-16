@@ -21,6 +21,7 @@ import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.HeaderEntry
+import org.http4k.wiretap.domain.TransactionId
 import org.http4k.wiretap.domain.WiretapTransaction
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.domain.toSummary
@@ -40,7 +41,7 @@ class TransactionViewsTest {
         request: Request = Request(GET, uri),
         response: Response = Response(OK)
     ) = WiretapTransaction(
-        id = 1,
+        id = TransactionId.of(1),
         transaction = HttpTransaction(
             request = request,
             response = response,

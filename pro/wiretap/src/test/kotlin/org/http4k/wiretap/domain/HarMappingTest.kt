@@ -30,7 +30,7 @@ class HarMappingTest {
         start: Instant = Instant.parse("2024-01-15T10:30:00Z"),
         duration: Duration = Duration.ofMillis(150)
     ) = WiretapTransaction(
-        id = 42,
+        id = TransactionId.of(42),
         transaction = HttpTransaction(
             request = request,
             response = response,

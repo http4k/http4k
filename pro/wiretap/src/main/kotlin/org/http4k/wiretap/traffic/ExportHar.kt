@@ -16,11 +16,12 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Path
-import org.http4k.lens.long
+import org.http4k.lens.value
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.TransactionId
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toHar
 import org.http4k.wiretap.util.Json
@@ -29,7 +30,7 @@ import org.http4k.wiretap.util.Json.json
 fun ExportHar(transactionStore: TransactionStore) = object : WiretapFunction {
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/{id}/har" bind GET to { req ->
-            val id = Path.long().of("id")(req)
+            val id = Path.value(TransactionId).of("id")(req)
             when (val har = transactionStore.get(id)?.toHar()) {
                 null -> Response(NOT_FOUND)
                 else -> Response(OK)
@@ -47,7 +48,7 @@ fun ExportHar(transactionStore: TransactionStore) = object : WiretapFunction {
             "Export a transaction as HAR (HTTP Archive) JSON",
             id
         ) bind { req ->
-            when (val har = transactionStore.get(id(req))?.toHar()) {
+            when (val har = transactionStore.get(TransactionId.of(id(req)))?.toHar()) {
                 null -> Error("Transaction not found")
                 else -> Json.asToolResponse(har)
             }

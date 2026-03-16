@@ -94,7 +94,9 @@ import org.http4k.format.renderRequest
 import org.http4k.format.renderResult
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.lens.MetaKey
 import org.http4k.lens.int
+import org.http4k.lens.progressToken
 import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
@@ -419,7 +421,7 @@ class McpProtocolTest {
                     val stringArg1 = stringArg(it)
                     val intArg1 = intArg(it)
 
-                    it.meta.progressToken?.let { _ ->
+                    MetaKey.progressToken<String>().toLens()(it.meta)?.let { _ ->
                         it.client.progress(1, 5.0, "d1")
                         it.client.progress(2, 5.0, "d2")
                     }
@@ -493,7 +495,7 @@ class McpProtocolTest {
                 McpTool.Call,
                 McpTool.Call.Request(
                     unstructuredTool.name,
-                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(progressToken)
+                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(MetaKey.progressToken<String>().toLens() of progressToken)
                 )
             )
 
@@ -508,7 +510,7 @@ class McpProtocolTest {
                 McpTool.Call.Request(
                     unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
-                    Meta(progress2)
+                    Meta(MetaKey.progressToken<String>().toLens() of progress2)
                 )
             )
 
@@ -516,7 +518,7 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(structuredTool.name, mapOf(), Meta(progress2))
+                McpTool.Call.Request(structuredTool.name, mapOf(), Meta(MetaKey.progressToken<String>().toLens() of progress2))
             )
 
             assertNextMessage(
@@ -569,7 +571,7 @@ class McpProtocolTest {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind {
-                it.meta.progressToken?.let { _ ->
+                MetaKey.progressToken<String>().toLens()(it.meta)?.let { _ ->
                     it.client.progress(1, 5.0, "d1")
                     it.client.progress(2, 5.0, "d2")
                 }
@@ -597,7 +599,7 @@ class McpProtocolTest {
                 McpCompletion.Request(
                     ref, CompletionArgument("arg", "value"),
                     CompletionContext(mapOf("foo" to "bar")),
-                    Meta(progressToken)
+                    Meta(MetaKey.progressToken<String>().toLens() of progressToken)
                 )
             )
 

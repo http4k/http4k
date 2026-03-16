@@ -1,0 +1,5 @@
+sequenceDiagram
+    participant P0 as unknown_service:java
+    participant unknown
+    P0->>unknown: GET {name:.*}
+    unknown-->>P0: OK (10ms)

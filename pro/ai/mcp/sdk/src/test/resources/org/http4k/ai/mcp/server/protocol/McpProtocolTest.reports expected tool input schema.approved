@@ -124,6 +124,8 @@
         },
         "execution": {
           "taskSupport": "optional"
+        },
+        "_meta": {
         }
       }
     ],

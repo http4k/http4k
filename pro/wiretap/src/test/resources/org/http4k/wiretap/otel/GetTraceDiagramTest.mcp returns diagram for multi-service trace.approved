@@ -1,0 +1,12 @@
+{
+  "content" : [ {
+    "text" : "{\"mermaid\":\"sequenceDiagram\\n    participant wiretap\\n    participant frontend\\n    participant backend\\n    wiretap->>frontend: GET /\\n    frontend->>backend: GET /api\\n    backend-->>frontend: OK (3ms)\\n    frontend-->>wiretap: OK (4ms)\"}",
+    "annotations" : null
+  } ],
+  "structuredContent" : null,
+  "meta" : {
+    "node" : {
+      "attributes" : { }
+    }
+  }
+}

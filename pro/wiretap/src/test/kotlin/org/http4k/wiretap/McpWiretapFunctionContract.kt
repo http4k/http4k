@@ -6,7 +6,6 @@ package org.http4k.wiretap
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.protocol.ServerMetaData
@@ -39,22 +38,10 @@ interface McpWiretapFunctionContract {
         ToolRequest(args)
     )
 
-    fun printTool() = println(
-        mcpClient().tools().list()
-            .valueOrNull()!!.find { it.name.value == toolName }
-    )
-
-    fun Approver.assertToolResponse(args: Map<String, Any>) {
+    fun Approver.assertToolResponse(args: Map<String, Any>) =
         when (val result = callTool(args)) {
-            is Success<ToolResponse> -> assertApproved(
-                Jackson.prettify(Jackson.asFormatString(result.value))
-            )
-
-            is Failure<*> -> {
-                println(result)
-                TODO()
-            }
+            is Success<ToolResponse> -> assertApproved(Jackson.prettify(Jackson.asFormatString(result.value)))
+            is Failure<*> -> TODO()
         }
-    }
 
 }

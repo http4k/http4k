@@ -1,0 +1,25 @@
+event: datastar-patch-elements
+data: elements <div class="sequence-diagram">
+data: elements     <div class="sequence-diagram-toolbar">
+data: elements         <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+data: elements     </div>
+data: elements     <pre class="mermaid">sequenceDiagram
+data: elements     participant wiretap
+data: elements     participant frontend
+data: elements     participant backend
+data: elements     wiretap->>frontend: GET /
+data: elements     frontend->>backend: GET /api
+data: elements     backend-->>frontend: OK (3ms)
+data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements     <pre class="mermaid-source" style="display:none">sequenceDiagram
+data: elements     participant wiretap
+data: elements     participant frontend
+data: elements     participant backend
+data: elements     wiretap->>frontend: GET /
+data: elements     frontend->>backend: GET /api
+data: elements     backend-->>frontend: OK (3ms)
+data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements </div>
+data: elements 
+data: selector #trace-diagram-panel
+
