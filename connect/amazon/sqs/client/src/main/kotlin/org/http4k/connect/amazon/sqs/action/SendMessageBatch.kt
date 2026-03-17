@@ -28,7 +28,7 @@ data class SendMessageBatchEntry(
     val MessageBody: String,
     val DelaySeconds: Int?,
     val MessageAttributes: Map<String, MessageFieldsDto>?,
-    val MessageDedeuplicationId: String?,
+    val MessageDeduplicationId: String?,
     val MessageGroupId: String?,
     val MessageSystemAttributes: Map<String, MessageFieldsDto>?,
 ) {
@@ -45,7 +45,7 @@ data class SendMessageBatchEntry(
         MessageBody = payload,
         DelaySeconds = delaySeconds,
         MessageAttributes = attributes?.associate { it.name to it.toDto() },
-        MessageDedeuplicationId = deduplicationId,
+        MessageDeduplicationId = deduplicationId,
         MessageGroupId = messageGroupId,
         MessageSystemAttributes = messageSystemAttributes?.associate { it.name to it.toDto() }
     )
