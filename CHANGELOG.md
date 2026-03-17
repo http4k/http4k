@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.35.0.1
+- **http4k-connect-amazon-sqs**: [Fix] Correct property typo in SendMessageBatch operation.  H/T @oharaandrew314
+
 ### v6.35.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-x402**: [New Pro module!] Support for X402 payments in MCP servers, allowing payments to be charged for tool and general MCP usage by plugging the server into a standardised X402 facilitator.
