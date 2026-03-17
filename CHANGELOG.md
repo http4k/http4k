@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v6.35.0.1 (uncut)
 - **http4k-server-netty**: [Fix] Don't block the event loop when processing requests and websocket messages. H/T @oharaandrew314
 - **http4k-server-netty**: [Fix] Don't drop websocket messages if received before the websocket is fully registered.  H/T @oharaandrew314
+- **http4k-connect-amazon-sqs**: [Fix] Correct property typo in SendMessageBatch operation.  H/T @oharaandrew314
 
 ### v6.35.0.0
 - **http4k-***: Upgrade versions
