@@ -30,11 +30,11 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.time.Duration
-import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import org.http4k.routing.bind as hbind
 
 abstract class WebsocketServerContract(
@@ -197,72 +197,61 @@ abstract class WebsocketServerContract(
 
     @Test
     fun `should propagate close on client close`() {
-        val latch = CountDownLatch(1)
-        var closeStatus: WsStatus? = null
+        val closeStatus = CompletableFuture<WsStatus>()
 
         val server = websockets(
             "/closes" bind { _: Request ->
                 WsResponse { ws ->
-                    ws.onClose {
-                        closeStatus = it
-                        latch.countDown()
-                    }
+                    ws.onClose(closeStatus::complete)
                 }
             }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.close()
 
-        latch.await()
-        assertThat(closeStatus, present())
-        server.close()
+        assertThat(closeStatus.get(5, TimeUnit.SECONDS), present())
     }
 
     @Test
     fun `should propagate close on server close`() {
-        val latch = CountDownLatch(1)
-        var closeStatus: WsStatus? = null
+        val serverStatus = CompletableFuture<WsStatus>()
+        val clientStatus = CompletableFuture<WsStatus>()
 
         val server = websockets(
             "/closes" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onMessage {
-                        ws.close()
+                        ws.close(WsStatus.GOING_AWAY)
                     }
-                    ws.onClose {
-                        closeStatus = it
-                        latch.countDown()
-                    }
+                    ws.onClose(serverStatus::complete)
                 }
             }).asServer(serverConfig(0)).start()
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
-        client.send(WsMessage("message"))
 
-        latch.await()
-        assertThat(closeStatus, present())
+        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:${server.port()}/closes")) {
+            it.onClose(clientStatus::complete)
+            it.send(WsMessage("message"))
+        }
+
+        assertThat(serverStatus.get(5, TimeUnit.SECONDS), equalTo(WsStatus.GOING_AWAY))
+        assertThat(clientStatus.get(5, TimeUnit.SECONDS), equalTo(WsStatus.GOING_AWAY))
         client.close()
         server.close()
     }
 
     @Test
     open fun `should propagate close on server stop`() {
-        val latch = CountDownLatch(1)
-        var closeStatus: WsStatus? = null
+        val closeStatus = CompletableFuture<WsStatus>()
 
         val server = websockets(
             "/closes" bind { _: Request ->
                 WsResponse { ws ->
-                    ws.onClose {
-                        closeStatus = it
-                        latch.countDown()
-                    }
+                    ws.onClose(closeStatus::complete)
                 }
             }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.send(WsMessage("message"))
         server.close()
 
-        latch.await()
-        assertThat(closeStatus, present())
+        assertThat(closeStatus.get(5, TimeUnit.SECONDS), present())
         client.close()
     }
 
@@ -276,12 +265,9 @@ abstract class WebsocketServerContract(
     @Test
     fun `can connect with non-blocking client`() {
         val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/hello/bob"))
-        val latch = CountDownLatch(1)
-        client.onMessage {
-            latch.countDown()
-        }
-
-        latch.await()
+        val message = CompletableFuture<WsMessage>()
+        client.onMessage(message::complete)
+        assertThat(message.get(5, TimeUnit.SECONDS), equalTo(WsMessage("bob")))
     }
 
     @Test
@@ -320,5 +306,17 @@ abstract class WebsocketServerContract(
             client.received().take(1).first().bodyString(),
             containsSubstring("Foo=bar")
         )
+    }
+
+    @Test
+    fun `messages processed in order`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/echo"))
+
+        // must be enough messages to stress concurrency
+        val messages = (1..10_000).map { "message_$it" }
+        messages.forEach { client.send(WsMessage(it)) }
+
+        val received = client.received().take(messages.size).map { it.bodyString() }.toList()
+        assertThat(received, equalTo(messages))
     }
 }
