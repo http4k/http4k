@@ -28,7 +28,7 @@ class Http4kWsChannelHandler(
     private val lowWaterMark: Float = 0.5f
 ) : SimpleChannelInboundHandler<WebSocketFrame>() {
     @Volatile private var websocket: PushPullAdaptingWebSocket? = null
-    private var normalClose = false
+    @Volatile private var normalClose = false
     private val messageBuffer = ConcurrentLinkedQueue<WebSocketFrame>()
     private val bufferSize = AtomicInteger(0) // because the queue's size getter is O(n)
     private val drainLock = AtomicBoolean()

@@ -3,7 +3,8 @@ package org.http4k.server
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
-import io.netty.channel.ChannelOption
+import io.netty.channel.ChannelOption.SO_BACKLOG
+import io.netty.channel.ChannelOption.SO_KEEPALIVE
 import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.nio.NioIoHandler
 import io.netty.channel.socket.SocketChannel
@@ -20,8 +21,10 @@ import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
 import java.time.Duration.ofSeconds
-import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
 
 /**
  * Stock version of an Netty Server. Not that if you want to configure your own server instance you
@@ -49,7 +52,7 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
 
         private val masterGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
         private val workerGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
-        private val appExecutor = Executors.newCachedThreadPool()
+        private val appExecutor = defaultExecutor()
 
         private var closeFuture: ChannelFuture? = null
         private lateinit var address: InetSocketAddress
@@ -70,8 +73,8 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
                         if (http != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(http, appExecutor))
                     }
                 })
-                .option(ChannelOption.SO_BACKLOG, 1000)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .option(SO_BACKLOG, 1000)
+                .childOption(SO_KEEPALIVE, true)
 
             val channel = bootstrap.bind(port).sync().channel()
             address = channel.localAddress() as InetSocketAddress
@@ -91,3 +94,10 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
         override fun port(): Int = if (port > 0) port else address.port
     }
 }
+
+fun defaultExecutor() = ThreadPoolExecutor(
+    Runtime.getRuntime().availableProcessors(),
+    Runtime.getRuntime().availableProcessors() * 2,
+    60L, SECONDS,
+    LinkedBlockingQueue(1000)
+)
