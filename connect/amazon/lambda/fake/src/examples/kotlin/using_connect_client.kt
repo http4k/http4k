@@ -16,7 +16,6 @@ import org.http4k.format.Moshi
 import org.http4k.serverless.FnHandler
 import org.http4k.serverless.FnLoader
 
-data class Req(val value: String)
 data class Resp(val value: String)
 
 const val USE_REAL_CLIENT = false
