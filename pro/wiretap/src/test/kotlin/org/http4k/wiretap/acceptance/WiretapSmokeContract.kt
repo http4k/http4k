@@ -20,28 +20,25 @@ import org.http4k.core.Request
 import org.http4k.util.FixedClock
 import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.Wiretap
-import org.http4k.wiretap.WiretappedUriProvider
+import org.http4k.wiretap.WiretapTarget
 import org.http4k.wiretap.util.Json
 import org.junit.jupiter.api.Test
 
 interface WiretapSmokeContract : PortBasedTest {
 
-    val uriProvider: WiretappedUriProvider
+    val target: WiretapTarget
     val testRequest: Request
 
     @Test
     fun `can boot and count tools`() {
-        Wiretap(uriProvider = uriProvider).testMcpClient(Request(POST, "_wiretap/mcp")).use {
+        Wiretap(target).testMcpClient(Request(POST, "_wiretap/mcp")).use {
             assertThat(it.tools().list().map { it.size }.orThrowIt(), equalTo(17))
         }
     }
 
     @Test
     fun `transactions through wiretap are stored`() {
-        val wiretap = Wiretap(
-            clock = FixedClock,
-            uriProvider = uriProvider
-        )
+        val wiretap = Wiretap(target, clock = FixedClock)
 
         wiretap.testMcpClient(Request(POST, "_wiretap/mcp")).use {
             wiretap.http!!(testRequest)
