@@ -13,9 +13,7 @@ dependencies {
     compileOnly(libs.kotlin.reflect)
 
     api(project(":http4k-realtime-core"))
-    api(project(":http4k-format-moshi")) {
-        exclude("org.jetbrains.kotlin", "kotlin-reflect")
-    }
+    api(project(":http4k-format-moshi"))
     api(libs.kotshi.api)
     api(project(":http4k-api-jsonrpc"))
     api(project(":http4k-ai-core"))
