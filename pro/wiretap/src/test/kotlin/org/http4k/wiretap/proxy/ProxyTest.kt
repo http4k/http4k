@@ -121,6 +121,17 @@ class ProxyTest {
     }
 
     @Test
+    fun `response body is still readable after hydration`() {
+        val proxy = proxy(
+            bodyHydration = BodyHydration.All,
+            httpClient = { Response(Status.OK).body(Body("response-body".byteInputStream())) }
+        )
+        val response = proxy.http(Request(Method.GET, "/test"))
+
+        assertThat(response.bodyString(), equalTo("response-body"))
+    }
+
+    @Test
     fun `chaos filter is applied to outbound requests`() {
         val outboundChaos = ChaosEngine()
         outboundChaos.enable(ChaosBehaviours.ReturnStatus(Status.INTERNAL_SERVER_ERROR))

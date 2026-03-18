@@ -5,6 +5,7 @@
 package org.http4k.wiretap.proxy
 
 import org.http4k.chaos.ChaosEngine
+import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
@@ -56,8 +57,10 @@ fun Proxy(
 
     val bufferResponse = Filter { next ->
         {
-            next(it)
-                .also { if (bodyHydration(it)) it.body.payload }
+            next(it).let { response ->
+                if (bodyHydration(response)) response.body(Body(response.body.payload))
+                else response
+            }
         }
     }
 
