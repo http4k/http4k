@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.35.0.1 (uncut)
+### v6.35.1.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-server-netty**: [Fix] Don't block the event loop when processing requests and websocket messages. H/T @oharaandrew314
 - **http4k-server-netty**: [Fix] Don't drop websocket messages if received before the websocket is fully registered.  H/T @oharaandrew314
