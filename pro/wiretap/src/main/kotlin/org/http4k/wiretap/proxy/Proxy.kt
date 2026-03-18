@@ -8,14 +8,14 @@ import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
-import org.http4k.wiretap.WiretappedUriProvider
+import org.http4k.wiretap.WiretapTarget
+import org.http4k.wiretap.Wiretapped
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Direction.Inbound
@@ -28,12 +28,13 @@ import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import java.time.Clock
 
 data class ProxyHandlers(
-    val uri: Uri,
+    val wiretapped: Wiretapped,
     val http: HttpHandler,
     val outboundHttp: HttpHandler
 )
 
 fun Proxy(
+    target: WiretapTarget,
     bodyHydration: BodyHydration,
     httpClient: HttpHandler,
     clock: Clock,
@@ -44,7 +45,6 @@ fun Proxy(
     inboundChaos: ChaosEngine,
     outboundChaos: ChaosEngine,
     sanitise: (HttpTransaction) -> HttpTransaction?,
-    uriProvider: WiretappedUriProvider
 ): ProxyHandlers {
 
     val bufferRequest = Filter { next ->
@@ -73,18 +73,16 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
-    val uri = uriProvider(outboundHttp, WiretapOpenTelemetry(traces, logs))
+    val wiretapped = target(outboundHttp, WiretapOpenTelemetry(traces, logs))
+
+    val inboundHandler = recordTransaction(Inbound)
+        .then(inboundChaos)
+        .then(wiretapped.using(httpClient))
+
 
     return ProxyHandlers(
-        uri,
-        http = routes(
-            orElse bind
-                recordTransaction(Inbound)
-                    .then(inboundChaos)
-                    .then(ClientFilters.SetBaseUriFrom(uri))
-                    .then(ClientFilters.FollowRedirects())
-                    .then(httpClient)
-        ),
+        wiretapped,
+        http = routes(orElse bind inboundHandler),
         outboundHttp = ClientFilters.FollowRedirects().then(outboundHttp)
     )
 }

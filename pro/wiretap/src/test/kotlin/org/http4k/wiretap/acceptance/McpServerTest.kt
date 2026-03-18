@@ -26,8 +26,9 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.util.FixedClock
+import org.http4k.wiretap.RemoteTarget
 import org.http4k.wiretap.Wiretap
-import org.http4k.wiretap.WiretappedUriProvider
+import org.http4k.wiretap.WiretapTarget
 import org.http4k.wiretap.util.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,14 +44,11 @@ class McpServerTest : WiretapSmokeContract {
     )
         .asServer(Helidon(0))
 
-    override lateinit var uriProvider: WiretappedUriProvider
+    override lateinit var target: WiretapTarget
 
     @Test
     fun `mcp transactions through wiretap are stored`() {
-        val wiretap = Wiretap(
-            clock = FixedClock,
-            uriProvider = uriProvider
-        )
+        val wiretap = Wiretap(target, clock = FixedClock)
 
         HttpNonStreamingMcpClient(Uri.of("/mcp"), http = wiretap.http!!).apply { start() }.use {
             val list = it.tools().list().orThrowIt()
@@ -70,7 +68,7 @@ class McpServerTest : WiretapSmokeContract {
     @BeforeEach
     fun start() {
         server.start()
-        uriProvider = WiretappedUriProvider { _, _ -> server.uri() }
+        target = RemoteTarget(server.uri())
     }
 
     @BeforeEach

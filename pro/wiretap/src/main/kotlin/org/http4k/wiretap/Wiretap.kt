@@ -11,7 +11,6 @@ import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyHandler
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
@@ -50,16 +49,9 @@ import kotlin.concurrent.fixedRateTimer
  * Wiretap is a tool for debugging http4k applications. It wraps a http4k application and records
  * all requests and responses, allowing you to monitor what is going on inside the app.
  */
-
 object Wiretap {
     operator fun invoke(
-        wiretappedUri: Uri,
-        security: Security = NoSecurity,
-        mcpOptions: McpServerOptions = McpServerOptions.default,
-        httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream)
-    ) = this(httpClient = httpClient, security = security) { _, _ -> wiretappedUri }
-
-    operator fun invoke(
+        target: WiretapTarget,
         transactionStore: TransactionStore = TransactionStore.InMemory(),
         traceStore: TraceStore = TraceStore.InMemory(),
         logStore: LogStore = LogStore.InMemory(),
@@ -70,7 +62,6 @@ object Wiretap {
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
         clock: Clock = Clock.systemUTC(),
         bodyHydration: BodyHydration = All,
-        uriProvider: WiretappedUriProvider
     ): PolyHandler {
 
         val html = Templates()
@@ -84,7 +75,8 @@ object Wiretap {
 
         fixedRateTimer("wiretap-snapshot", daemon = true, period = 5_000L) { trafficMetrics.snapshot() }
 
-        val (uri, proxy, outboundHttp) = Proxy(
+        val (wiretapped, proxy, outboundHttp) = Proxy(
+            target,
             bodyHydration,
             httpClient,
             clock,
@@ -95,7 +87,6 @@ object Wiretap {
             inboundChaos,
             outboundChaos,
             sanitise,
-            uriProvider
         )
 
         val prompts = listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt())
@@ -107,7 +98,7 @@ object Wiretap {
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),
-            Mcp(uri, mcpOptions.path, httpClient, proxy)
+            Mcp(wiretapped, mcpOptions.path, httpClient, proxy)
         )
 
         val allCapabilities = prompts + baseFunctions.flatMap { it.mcp() }

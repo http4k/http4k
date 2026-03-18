@@ -13,10 +13,13 @@ import org.http4k.server.uri
 
 fun main() {
 //    val wiretap = HttpApp()
-    val wiretap = HttpAppWithOtelTracing()
+//    val wiretap = HttpAppWithOtelTracing()
+//    val wiretap = LocalHttpAppWithOtelTracing()
 //    val wiretap = McpApp()
 //    val wiretap = McpServer()
 //    val wiretap = McpServerWithOtel()
+//    val wiretap = McpServerWithOtelLocal()
+    val wiretap = LocalMcpServerWithOtel()
 //    val wiretap = OpenApiApp()
 //    val wiretap = ExternalMcpServer()
 //    val wiretap = ExternalMcpApp()

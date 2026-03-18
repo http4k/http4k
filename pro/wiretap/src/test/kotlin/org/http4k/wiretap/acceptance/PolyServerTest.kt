@@ -16,7 +16,8 @@ import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
-import org.http4k.wiretap.WiretappedUriProvider
+import org.http4k.wiretap.RemoteTarget
+import org.http4k.wiretap.WiretapTarget
 import org.junit.jupiter.api.BeforeEach
 
 class PolyServerTest : WiretapSmokeContract {
@@ -29,12 +30,12 @@ class PolyServerTest : WiretapSmokeContract {
     })
         .asServer(Helidon(0))
 
-    override lateinit var uriProvider: WiretappedUriProvider
+    override lateinit var target: WiretapTarget
 
     @BeforeEach
     fun start() {
         server.start()
-        uriProvider = WiretappedUriProvider { _, _ -> server.uri() }
+        target = RemoteTarget(server.uri())
     }
 
     @BeforeEach

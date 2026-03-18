@@ -18,6 +18,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.wiretap.RemoteTarget
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.LogStore
@@ -42,17 +43,17 @@ class ProxyTest {
         outboundChaos: ChaosEngine = ChaosEngine(),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it }
     ) = Proxy(
-        bodyHydration = bodyHydration,
-        httpClient = httpClient,
-        clock = clock,
-        traces = TraceStore.InMemory(),
-        logs = LogStore.InMemory(),
-        transactions = transactions,
-        trafficMetrics = trafficMetrics,
-        inboundChaos = inboundChaos,
-        outboundChaos = outboundChaos,
-        sanitise = sanitise,
-        uriProvider = { _, _ -> Uri.of("http://localhost:9000") }
+        RemoteTarget(Uri.of("http://localhost:9000")),
+        bodyHydration,
+        httpClient,
+        clock,
+        TraceStore.InMemory(),
+        LogStore.InMemory(),
+        transactions,
+        trafficMetrics,
+        inboundChaos,
+        outboundChaos,
+        sanitise,
     )
 
     @Test
