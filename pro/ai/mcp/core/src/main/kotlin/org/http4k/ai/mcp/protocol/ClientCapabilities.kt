@@ -25,7 +25,7 @@ import se.ansman.kotshi.JsonSerializable
 data class ClientCapabilities internal constructor(
     val roots: Roots?,
     val sampling: SamplingCapability?,
-    val experimental: Unit?,
+    val experimental: Map<String, Any>?,
     val elicitation: Elicitation?,
     val tasks: Tasks?,
     val extensions: Map<String, Any>? = null,
@@ -33,24 +33,32 @@ data class ClientCapabilities internal constructor(
     constructor(vararg capabilities: ClientProtocolCapability = ClientProtocolCapability.entries.toTypedArray()) : this(
         Roots(capabilities.contains(RootChanged)),
         buildSampling(capabilities.toList()),
-        if (capabilities.contains(Experimental)) Unit else null,
+        if (capabilities.contains(Experimental)) emptyMap<String, Any>() else null,
         buildElicitation(capabilities.toList()),
         buildTasks(capabilities.toList())
     )
 
     companion object {
-        val All = ClientCapabilities(Roots(true), SamplingCapability(Unit, Unit), Unit, Elicitation(Unit, Unit), null)
+        val All = ClientCapabilities(
+            Roots(true),
+            SamplingCapability(
+                emptyMap<String, Any>(),
+                emptyMap<String, Any>()
+            ),
+            emptyMap<String, Any>(),
+            Elicitation(emptyMap<String, Any>(), emptyMap<String, Any>()), null
+        )
 
         @JsonSerializable
         data class SamplingCapability(
-            val tools: Unit? = null,
-            val context: Unit? = null
+            val tools: Map<String, Any>? = null,
+            val context: Map<String, Any>? = null
         )
 
         @JsonSerializable
         data class Elicitation(
-            val form: Unit? = null,
-            val url: Unit? = null
+            val form: Map<String, Any>? = null,
+            val url: Map<String, Any>? = null
         )
 
         @JsonSerializable
@@ -58,8 +66,8 @@ data class ClientCapabilities internal constructor(
 
         @JsonSerializable
         data class Tasks(
-            val list: Unit? = null,
-            val cancel: Unit? = null,
+            val list: Map<String, Any>? = null,
+            val cancel: Map<String, Any>? = null,
             val requests: TaskRequests? = null
         )
 
@@ -71,12 +79,12 @@ data class ClientCapabilities internal constructor(
 
         @JsonSerializable
         data class SamplingRequests(
-            val createMessage: Unit? = null
+            val createMessage: Map<String, Any>? = null
         )
 
         @JsonSerializable
         data class ElicitationRequests(
-            val create: Unit? = null
+            val create: Map<String, Any>?? = null
         )
 
         private fun buildSampling(capabilities: List<ClientProtocolCapability>): SamplingCapability? {
@@ -87,8 +95,8 @@ data class ClientCapabilities internal constructor(
             if (!hasSampling && !hasTools && !hasContext) return null
 
             return SamplingCapability(
-                tools = if (hasTools) Unit else null,
-                context = if (hasContext) Unit else null
+                tools = if (hasTools) emptyMap() else null,
+                context = if (hasContext) emptyMap() else null
             )
         }
 
@@ -99,8 +107,8 @@ data class ClientCapabilities internal constructor(
             if (!hasForm && !hasUrl) return null
 
             return Elicitation(
-                form = if (hasForm) Unit else null,
-                url = if (hasUrl) Unit else null
+                form = if (hasForm) emptyMap() else null,
+                url = if (hasUrl) emptyMap() else null
             )
         }
 
@@ -113,11 +121,11 @@ data class ClientCapabilities internal constructor(
             if (!hasList && !hasCancel && !hasSamplingCreateMessage && !hasElicitationCreate) return null
 
             return Tasks(
-                list = if (hasList) Unit else null,
-                cancel = if (hasCancel) Unit else null,
+                list = if (hasList) emptyMap() else null,
+                cancel = if (hasCancel) emptyMap() else null,
                 requests = TaskRequests(
-                    sampling = if (hasSamplingCreateMessage) SamplingRequests(Unit) else null,
-                    elicitation = if (hasElicitationCreate) ElicitationRequests(Unit) else null
+                    sampling = if (hasSamplingCreateMessage) SamplingRequests(emptyMap()) else null,
+                    elicitation = if (hasElicitationCreate) ElicitationRequests(emptyMap()) else null
                 )
             )
         }

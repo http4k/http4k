@@ -76,6 +76,12 @@ class ToolArgTest {
         approver.assertApproved(McpJson.asFormatString(spec.toSchema()), APPLICATION_JSON)
     }
 
+    @Test
+    fun `auto to schema list`(approver: Approver) {
+        val spec = Tool.Arg.auto<List<FooBar>>(listOf(FooBar())).multi.required("foo")
+        approver.assertApproved(McpJson.asFormatString(spec.toSchema()), APPLICATION_JSON)
+    }
+
     private fun <T : Any> Approver.check(spec: ToolArgLensSpec<T>, value: T, mapValue: Any) {
         val optionalLens = spec.optional("foo", "bar")
         val optionalInjected = ToolRequest().with(optionalLens of value)
