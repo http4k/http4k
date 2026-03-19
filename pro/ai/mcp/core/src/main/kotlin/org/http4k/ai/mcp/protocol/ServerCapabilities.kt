@@ -21,9 +21,9 @@ data class ServerCapabilities internal constructor(
     val tools: ToolCapabilities?,
     val prompts: PromptCapabilities?,
     val resources: ResourceCapabilities?,
-    val completions: Unit?,
-    val logging: Unit?,
-    val experimental: Unit?,
+    val completions: Map<String, Any>?,
+    val logging: Map<String, Any>?,
+    val experimental: Map<String, Any>?,
     val tasks: Tasks?,
     val extensions: Map<String, Any> = emptyMap(),
 ) {
@@ -31,9 +31,9 @@ data class ServerCapabilities internal constructor(
         ToolCapabilities(capabilities.contains(ToolsChanged)),
         PromptCapabilities(capabilities.contains(PromptsChanged)),
         ResourceCapabilities(capabilities.contains(ResourcesChanged)),
-        if (capabilities.contains(Completions)) Unit else null,
-        if (capabilities.contains(Logging)) Unit else null,
-        if (capabilities.contains(Experimental)) Unit else null,
+        if (capabilities.contains(Completions)) emptyMap() else null,
+        if (capabilities.contains(Logging)) emptyMap() else null,
+        if (capabilities.contains(Experimental)) emptyMap() else null,
         buildTasks(capabilities.toList())
     )
 
