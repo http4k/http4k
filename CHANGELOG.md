@@ -3,22 +3,24 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.35.1.0 (uncut)
+### v6.36.0.0
 - **http4k-***: Upgrade versions
+- **http4k-connect-mpp**: [New Pro module!] Support for MPP payments protocol. Protect your endpoints with MPP payments and sign and verify MPP payments using standardised server and client filters. 
+- **http4k-ai-mcp-mpp**: [New Pro module!] Support for MPP payments in MCP servers, allowing payments to be charged for tool and general MCP usage by plugging in an MPP verifier.
 - **http4k-server-netty**: [Fix] Don't block the event loop when processing requests and websocket messages. H/T @oharaandrew314
 - **http4k-server-netty**: [Fix] Don't drop websocket messages if received before the websocket is fully registered.  H/T @oharaandrew314
 - **http4k-connect-amazon-sqs**: [Fix] Correct property typo in SendMessageBatch operation.  H/T @oharaandrew314
 
 ### v6.35.0.0
 - **http4k-***: Upgrade versions
-- **http4k-ai-mcp-x402**: [New Pro module!] Support for X402 payments in MCP servers, allowing payments to be charged for tool and general MCP usage by plugging the server into a standardised X402 facilitator.
+- **http4k-ai-mcp-x402**: [New Pro module!] Support for X402 payments in MCP servers, allowing payments to be charged for tool and general MCP usage by plugging the server into a standardised X402 facilitators. Includes server and client filters.
 - **http4k-connect-***: [Unlikely break] Corrected http4k Connect Action variance. This affects all Connect client modules.
 - **http4k-ai-mcp-sdk**: [Unlikely break] Improved support for varying the shape of the MCP meta response fields, and plugging into the http4k lense system.
 
 ### v6.34.0.0
 - **http4k-***: Upgrade versions
-- **http4k-connect-x402**: [New module!] Support for X402 payments protocol client. You'll need to plug in your own signer (use an OSS one such as web3j).
-- **http4k-connect-x402-fake**: [New module!] Fake implementation of X402 Facilitator for testing.
+- **http4k-connect-x402**: [New Pro module!] Support for X402 payments protocol client. You'll need to plug in your own signer (use an OSS one such as web3j).
+- **http4k-connect-x402-fake**: [New Pro module!] Fake implementation of X402 Facilitator for testing.
 - **http4k-ops-opentelemetry**: Added events implementation `AutoOpenTelemetryEvents` for plugging the http4k event system into OpenTelemetry backends. Supports both span-based and log events.
 - **http4k-testing-webdriver**: Include basic auth in requests from the WebDriver. H/T @tamj0rd2
 - **http4k-ai-mcp-sdk**: Fix to allow for custom JSON types in MCP server tool responses.
