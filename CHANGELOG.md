@@ -7,9 +7,10 @@ changes with their rationale when appropriate:
 - **http4k-***: Upgrade versions
 - **http4k-connect-mpp**: [New Pro module!] Support for MPP payments protocol. Protect your endpoints with MPP payments and sign and verify MPP payments using standardised server and client filters. 
 - **http4k-ai-mcp-mpp**: [New Pro module!] Support for MPP payments in MCP servers, allowing payments to be charged for tool and general MCP usage by plugging in an MPP verifier.
-- **http4k-server-netty**: [Fix] Don't block the event loop when processing requests and websocket messages. H/T @oharaandrew314
 - **http4k-server-netty**: [Fix] Don't drop websocket messages if received before the websocket is fully registered.  H/T @oharaandrew314
 - **http4k-connect-amazon-sqs**: [Fix] Correct property typo in SendMessageBatch operation.  H/T @oharaandrew314
+- **http4k-connect-x402**: [Fix] This module was published under the wrong Maven central coordinates.
+- **http4k-connect-x402-fake**:[Fix] This module was published under the wrong Maven central coordinates.
 
 ### v6.35.0.0
 - **http4k-***: Upgrade versions
