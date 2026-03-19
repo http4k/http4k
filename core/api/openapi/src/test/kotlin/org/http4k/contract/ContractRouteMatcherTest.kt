@@ -36,6 +36,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind
+import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
 import org.http4k.security.ApiKeySecurity
 import org.http4k.security.BasicAuthSecurity
@@ -90,6 +91,19 @@ class ContractRouteMatcherTest {
                 )
             )
         assertThat(app(Request(GET, "/hello/there$validPath")), hasStatus(OK))
+    }
+
+    @Test
+    fun `can bind under reverse proxy`() {
+        val app = reverseProxy(
+            "host" to contract {
+                renderer = SimpleJson(Jackson)
+                routes += validPath bindContract GET to { _ -> Response(OK) }
+            }
+        )
+
+        assertThat(app(Request(GET, "http://host$validPath")), hasStatus(OK))
+        assertThat(app(Request(GET, "http://anotherHost$validPath")), hasStatus(NOT_FOUND))
     }
 
     @Test

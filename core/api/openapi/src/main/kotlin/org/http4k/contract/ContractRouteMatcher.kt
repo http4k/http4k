@@ -20,6 +20,7 @@ import org.http4k.routing.RouteMatcher
 import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingMatch
+import org.http4k.routing.RoutingResult
 import org.http4k.routing.and
 import org.http4k.security.NoSecurity.filter
 import org.http4k.security.Security
@@ -64,6 +65,10 @@ data class ContractRouteMatcher(
 
     private fun internalMatch(request: Request): ContractRouterMatch {
         val unmatched: ContractRouterMatch = Unmatched
+
+        if (router(request) is RoutingResult.NotMatched) {
+            return unmatched
+        }
 
         return if (request.isIn(contractRoot)) {
             routers.fold(unmatched) { memo, (routeFilter, router) ->
