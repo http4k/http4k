@@ -17,7 +17,7 @@ class LocalTargetTest : WiretapSmokeContract {
 
     override val testRequest = Request(GET, Uri.of("/foo"))
 
-    override val target = LocalTarget(
+    override val target = LocalTarget {
         routes("/foo" bind GET to { _: Request -> Response(OK) })
-    )
+    }
 }

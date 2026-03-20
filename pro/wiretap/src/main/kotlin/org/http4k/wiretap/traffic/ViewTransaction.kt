@@ -63,7 +63,7 @@ fun ViewTransaction(transactionStore: TransactionStore, clock: Clock) = object :
     }
 }
 
-data class TransactionDetailView(val tx: TransactionDetail, val showImport: Boolean = true) : ViewModel {
+data class TransactionDetailView(val tx: TransactionDetail, val showImport: Boolean = true, val showHar: Boolean = true, val showOTelLink: Boolean = true) : ViewModel {
     val isInbound = tx.direction == Direction.Inbound
     val dirBadgeClass = if (isInbound) "badge-in" else "badge-out"
     val dirBadgeText = if (isInbound) "INBOUND" else "OUTBOUND"

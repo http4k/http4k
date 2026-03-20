@@ -4,7 +4,6 @@
  */
 package org.http4k.wiretap
 
-import io.opentelemetry.api.OpenTelemetry
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -14,15 +13,15 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 
 fun interface WiretapTarget {
-    operator fun invoke(http: HttpHandler, oTel: OpenTelemetry): Wiretapped
+    operator fun invoke(setup: WiretapContext): Wiretapped
 }
 
 
-class RemoteTarget(private val fn: (HttpHandler, OpenTelemetry) -> Uri) : WiretapTarget {
-    constructor(uri: Uri) : this({ _, _ -> uri })
+class RemoteTarget(private val fn: WiretapContext.() -> Uri) : WiretapTarget {
+    constructor(uri: Uri) : this({ uri })
 
-    override operator fun invoke(http: HttpHandler, oTel: OpenTelemetry): Wiretapped {
-        val uri = fn(http, oTel)
+    override operator fun invoke(setup: WiretapContext): Wiretapped {
+        val uri = setup.fn()
         return object : Wiretapped {
             override fun supportsMcp(http: HttpHandler, mcpPath: String) =
                 http(Request(GET, uri.extend(Uri.of(mcpPath)))).status.successful
@@ -35,11 +34,9 @@ class RemoteTarget(private val fn: (HttpHandler, OpenTelemetry) -> Uri) : Wireta
     }
 }
 
-class LocalTarget(private val fn: (HttpHandler, OpenTelemetry) -> HttpHandler) : WiretapTarget {
-    constructor(http: HttpHandler) : this({ _, _ -> http })
-
-    override operator fun invoke(http: HttpHandler, oTel: OpenTelemetry): Wiretapped {
-        val app = fn(http, oTel)
+class LocalTarget(private val fn: WiretapContext.() -> HttpHandler) : WiretapTarget {
+    override operator fun invoke(setup: WiretapContext): Wiretapped {
+        val app = setup.fn()
         return object : Wiretapped {
             override fun supportsMcp(http: HttpHandler, mcpPath: String) =
                 app(Request(GET, Uri.of(mcpPath))).status.successful

@@ -15,6 +15,7 @@ import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
+import org.http4k.wiretap.WiretapContext
 import org.http4k.wiretap.WiretapTarget
 import org.http4k.wiretap.Wiretapped
 import org.http4k.wiretap.domain.BodyHydration
@@ -76,7 +77,8 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
-    val wiretapped = target(outboundHttp, WiretapOpenTelemetry(traces, logs))
+    val setup = WiretapContext(outboundHttp) { name -> WiretapOpenTelemetry(traces, logs, name) }
+    val wiretapped = target(setup)
 
     val inboundHandler = recordTransaction(Inbound)
         .then(inboundChaos)

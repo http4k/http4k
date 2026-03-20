@@ -18,8 +18,8 @@ import io.opentelemetry.semconv.ServiceAttributes.SERVICE_NAME
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 
-fun WiretapOpenTelemetry(traceStore: TraceStore, logStore: LogStore): OpenTelemetry {
-    val resource = Resource.create(Attributes.of(SERVICE_NAME, "http4k server"))
+fun WiretapOpenTelemetry(traceStore: TraceStore, logStore: LogStore, serviceName: String = "http4k server"): OpenTelemetry {
+    val resource = Resource.create(Attributes.of(SERVICE_NAME, serviceName))
     return OpenTelemetrySdk.builder()
         .setTracerProvider(
             SdkTracerProvider.builder()

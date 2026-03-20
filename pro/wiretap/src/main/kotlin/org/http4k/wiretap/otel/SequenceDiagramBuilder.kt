@@ -118,6 +118,7 @@ private fun SpanDetail.remoteAuthority() = attributes
     ?.value
     ?.let { Uri.of(it) }
     ?.authority
+    ?.ifEmpty { null }
     ?: "unknown"
 
 private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
