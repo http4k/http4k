@@ -13,13 +13,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import testRequest
 
-class RenderTestInteractionsTest {
+class InterceptTest {
 
     private val downstream: HttpHandler = { Response(OK).body("downstream") }
 
     @RegisterExtension
     @JvmField
-    val wiretap = RenderTestInteractions({ App(http(), otel("test app 1"), "test app 1") }, downstream, Always)
+    val intercept = Intercept(downstream, Always) {
+        App(http(), otel("test app 1"), "test app 1")
+    }
 
     @Test
     fun `requests through factory-built app reach the app`(http: HttpHandler) {
@@ -31,7 +33,7 @@ class RenderTestInteractionsTest {
     fun `captures both server and client spans`(http: HttpHandler) {
         http(testRequest())
 
-        val spans = wiretap.traceStore.traces().values.first()
+        val spans = intercept.traceStore.traces().values.first()
         assertThat(spans.any { it.kind == SpanKind.SERVER }, equalTo(true))
         assertThat(spans.any { it.kind == SpanKind.CLIENT }, equalTo(true))
     }
@@ -40,7 +42,7 @@ class RenderTestInteractionsTest {
     fun `captures traffic for each request`(http: HttpHandler) {
         http(testRequest())
 
-        val traffic = wiretap.transactionStore.list()
+        val traffic = intercept.transactionStore.list()
         assertThat(traffic.size, equalTo(1))
         assertThat(traffic.first().transaction.request.method, equalTo(GET))
     }
@@ -49,8 +51,8 @@ class RenderTestInteractionsTest {
     fun `captures stdout and stderr during test execution`(http: HttpHandler) {
         http(testRequest())
 
-        assertThat("stdout has event JSON", wiretap.capturedStdOut.contains("user-42"), equalTo(true))
-        assertThat("stderr has app warning", wiretap.capturedStdErr.contains("downstream warning"), equalTo(true))
+        assertThat("stdout has event JSON", intercept.capturedStdOut.contains("user-42"), equalTo(true))
+        assertThat("stderr has app warning", intercept.capturedStdErr.contains("downstream warning"), equalTo(true))
     }
 
     @Test
@@ -58,13 +60,13 @@ class RenderTestInteractionsTest {
         http(testRequest())
         http(testRequest())
 
-        assertThat(wiretap.traceStore.traces().size, equalTo(2))
+        assertThat(intercept.traceStore.traces().size, equalTo(2))
 
-        val file = renderTestReport("TestClass.testMethod", "org/http4k/wiretap/junit", wiretap.traceStore, wiretap.logStore, wiretap.transactionStore)
+        val file = renderTestReport("TestClass.testMethod", "org/http4k/wiretap/junit", intercept.traceStore, intercept.logStore, intercept.transactionStore)
         assertThat(file.name, equalTo("TestClass.testMethod.html"))
 
         val content = file.readText()
-        wiretap.traceStore.traces().keys.forEach { traceId ->
+        intercept.traceStore.traces().keys.forEach { traceId ->
             assertThat("report contains trace $traceId", content.contains(traceId.value), equalTo(true))
         }
     }

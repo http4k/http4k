@@ -20,7 +20,7 @@ class LaunchWiretapTest {
 
     @RegisterExtension
     @JvmField
-    val wiretap = RenderTestInteractions(app, Always)
+    val wiretap = Intercept(app, Always)
 
     @Test
     fun `requests through httpHandler reach the original app`(http: HttpHandler) {

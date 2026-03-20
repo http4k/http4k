@@ -44,16 +44,19 @@ import java.util.concurrent.atomic.AtomicReference
 
 enum class RenderMode { Never, OnFailure, Always }
 
-class RenderTestInteractions @JvmOverloads constructor(
-    private val appFn: WiretapContext.() -> HttpHandler,
+class Intercept @JvmOverloads constructor(
     private val httpClient: HttpHandler = JavaHttpClient(),
     private val renderMode: RenderMode = OnFailure,
     private val clock: Clock = Clock.systemUTC(),
     private val random: Random = SecureRandom(byteArrayOf()),
+    private val appFn: WiretapContext.() -> HttpHandler,
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
-        : this({ ClientFilters.OpenTelemetryTracing(otel()).then(app) }, JavaHttpClient(), renderMode)
+        : this(
+        renderMode = renderMode,
+        random = SecureRandom(byteArrayOf()),
+        appFn = { ClientFilters.OpenTelemetryTracing(otel()).then(app) })
 
     private val state = AtomicReference<TestState>()
 
@@ -123,7 +126,7 @@ private val outputDir by lazy {
 
 internal fun renderTestReport(testName: String, packageDir: String, traceStore: TraceStore, logStore: LogStore, transactionStore: TransactionStore, stdOut: String = "", stdErr: String = ""): File {
     val html = Templates()
-    val css = RenderTestInteractions::class.java.classLoader.getResourceAsStream("public/wiretap.css")
+    val css = Intercept::class.java.classLoader.getResourceAsStream("public/wiretap.css")
         ?.bufferedReader()?.readText() ?: ""
 
     val traceEntries = traceStore.traces().map { (traceId, spans) ->
