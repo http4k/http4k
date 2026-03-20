@@ -5,6 +5,8 @@ import io.opentelemetry.api.trace.Span
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.events.AutoMarshallingEvents
 import org.http4k.events.AutoOpenTelemetryEvents
@@ -18,7 +20,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 
 fun App(
-    httpClient: HttpHandler,
+    httpClient: HttpHandler = { _: Request -> Response(Status.OK) },
     name: String = "test app",
     oTel: OpenTelemetry = GlobalOpenTelemetry.get()
 ): RoutingHttpHandler {
