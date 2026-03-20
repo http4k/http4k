@@ -51,7 +51,6 @@ class Intercept @JvmOverloads constructor(
     private val random: Random = SecureRandom(byteArrayOf()),
     private val appFn: WiretapContext.() -> HttpHandler,
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
-
     constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
         : this(
         renderMode = renderMode,

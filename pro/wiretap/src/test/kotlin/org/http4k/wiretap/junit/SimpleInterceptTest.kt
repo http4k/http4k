@@ -14,13 +14,13 @@ import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class LaunchWiretapTest {
+class SimpleInterceptTest {
 
     private val app = routes("/" bind GET to { Response(OK).body("hello") })
 
     @RegisterExtension
     @JvmField
-    val wiretap = Intercept(app, Always)
+    val intercept = Intercept(app, Always)
 
     @Test
     fun `requests through httpHandler reach the original app`(http: HttpHandler) {
@@ -32,7 +32,7 @@ class LaunchWiretapTest {
     fun `otel traces are recorded when requests pass through`(http: HttpHandler) {
         http(Request(GET, "/"))
 
-        val traces = wiretap.traceStore.traces()
+        val traces = intercept.traceStore.traces()
         assertThat(traces.size, greaterThan(0))
     }
 }

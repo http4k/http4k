@@ -70,4 +70,5 @@ class InterceptTest {
             assertThat("report contains trace $traceId", content.contains(traceId.value), equalTo(true))
         }
     }
+
 }
