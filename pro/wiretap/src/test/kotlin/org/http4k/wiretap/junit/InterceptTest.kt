@@ -8,6 +8,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -43,8 +44,14 @@ class InterceptTest {
         http(testRequest())
 
         val traffic = intercept.transactionStore.list()
-        assertThat(traffic.size, equalTo(1))
-        assertThat(traffic.first().transaction.request.method, equalTo(GET))
+        assertThat(traffic.size, equalTo(3))
+
+        val inbound = traffic.filter { it.direction == Direction.Inbound }
+        assertThat(inbound.size, equalTo(1))
+        assertThat(inbound.first().transaction.request.method, equalTo(GET))
+
+        val outbound = traffic.filter { it.direction == Direction.Outbound }
+        assertThat(outbound.size, equalTo(2))
     }
 
     @Test

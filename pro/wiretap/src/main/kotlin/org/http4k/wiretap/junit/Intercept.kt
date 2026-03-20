@@ -85,7 +85,10 @@ class Intercept @JvmOverloads constructor(
         val traceStore = TraceStore.InMemory()
         val logStore = LogStore.InMemory()
         val transactionStore = TransactionStore.InMemory()
-        val setup = WiretapContext(httpClient, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
+        val outboundHttp = ResponseFilters.ReportHttpTransaction(clock) { tx ->
+            transactionStore.record(tx, Direction.Outbound)
+        }.then(httpClient)
+        val setup = WiretapContext(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Direction.Inbound)
         }.then(setup.appFn())
