@@ -37,18 +37,19 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
 import java.io.PrintStream
+import java.security.SecureRandom
 import java.time.Clock
+import java.util.Random
 import java.util.concurrent.atomic.AtomicReference
 
 enum class RenderMode { Never, OnFailure, Always }
-
-@Deprecated("Renamed to RenderTestInteractions", ReplaceWith("RenderTestInteractions"))
-typealias RenderTraces = RenderTestInteractions
 
 class RenderTestInteractions @JvmOverloads constructor(
     private val appFn: WiretapContext.() -> HttpHandler,
     private val httpClient: HttpHandler = JavaHttpClient(),
     private val renderMode: RenderMode = OnFailure,
+    private val clock: Clock = Clock.systemUTC(),
+    private val random: Random = SecureRandom(byteArrayOf()),
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
@@ -82,7 +83,7 @@ class RenderTestInteractions @JvmOverloads constructor(
         val traceStore = TraceStore.InMemory()
         val logStore = LogStore.InMemory()
         val transactionStore = TransactionStore.InMemory()
-        val setup = WiretapContext(httpClient) { WiretapOpenTelemetry(traceStore, logStore, it) }
+        val setup = WiretapContext(httpClient, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Direction.Inbound)
         }.then(setup.appFn())
@@ -111,8 +112,6 @@ class RenderTestInteractions @JvmOverloads constructor(
         val file = renderTestReport(testName, packageDir, traceStore, logStore, transactionStore, stdOutCapture.toString(), stdErrCapture.toString())
         println("Wiretap report: file://${file.absolutePath}")
     }
-
-    private val clock = Clock.systemUTC()
 
     private data class TestState(val handler: HttpHandler, val traceStore: TraceStore, val logStore: LogStore, val transactionStore: TransactionStore, val stdOutCapture: ByteArrayOutputStream, val stdErrCapture: ByteArrayOutputStream)
 }

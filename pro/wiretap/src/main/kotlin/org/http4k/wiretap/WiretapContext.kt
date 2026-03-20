@@ -6,11 +6,17 @@ package org.http4k.wiretap
 
 import io.opentelemetry.api.OpenTelemetry
 import org.http4k.core.HttpHandler
+import java.time.Clock
+import java.util.Random
 
 class WiretapContext(
     private val httpHandler: HttpHandler,
+    private val clock: Clock,
+    private val random: Random,
     private val oTelFn: (String) -> OpenTelemetry
 ) {
-    fun http(): HttpHandler = httpHandler
-    fun otel(serviceName: String = "http4k server"): OpenTelemetry = oTelFn(serviceName)
+    fun clock() = clock
+    fun http() = httpHandler
+    fun random() = random
+    fun otel(serviceName: String = "http4k server") = oTelFn(serviceName)
 }
