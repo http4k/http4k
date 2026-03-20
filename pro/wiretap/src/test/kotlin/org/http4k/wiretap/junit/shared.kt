@@ -18,7 +18,8 @@ import org.http4k.routing.routes
 
 fun App(httpClient: HttpHandler, oTel: OpenTelemetry, name: String): RoutingHttpHandler {
     val tracer = oTel.tracerProvider.get(name)
-    val tracedClient = ClientFilters.OpenTelemetryTracing(oTel).then(httpClient)
+    val tracedClient = ClientFilters.OpenTelemetryTracing(oTel)
+        .then(httpClient)
     val logger = oTel.logsBridge.get(name)
     val events: (Event) -> Unit = { event ->
         AutoOpenTelemetryEvents(Moshi, oTel)(event)
@@ -50,7 +51,12 @@ fun App(httpClient: HttpHandler, oTel: OpenTelemetry, name: String): RoutingHttp
                     val fetchSpan = tracer.spanBuilder("fetch-downstream").startSpan()
                     val result = fetchSpan.makeCurrent().use {
                         tracedClient(
-                            Request(GET, "/downstream")
+                            Request(GET, "http://c2/downstream1")
+                                .header("Accept", "application/json")
+                                .header("X-Correlation-Id", "corr-001")
+                        )
+                        tracedClient(
+                            Request(GET, "http://c3/downstream2")
                                 .header("Accept", "application/json")
                                 .header("X-Correlation-Id", "corr-001")
                         )

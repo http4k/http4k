@@ -83,9 +83,24 @@ function copyCurl(btn) {
         });
     }
 }
+function copyMermaid(btn) {
+    var container = btn.closest('.sequence-diagram') || btn.closest('.otel-detail-panel') || btn.closest('.otel-layout');
+    var pre = container && (container.querySelector('.mermaid-source') || container.querySelector('.mermaid'));
+    if (pre) {
+        navigator.clipboard.writeText(pre.textContent.trim()).then(function() {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = orig; }, 1500);
+        });
+    }
+}
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-on\\:click]');
-    if (btn) { var fn = btn.getAttribute('data-on:click'); if (fn.indexOf('copyCurl') === 0) copyCurl(btn); }
+    if (btn) {
+        var fn = btn.getAttribute('data-on:click');
+        if (fn.indexOf('copyCurl') === 0) copyCurl(btn);
+        if (fn.indexOf('copyMermaid') === 0) copyMermaid(btn);
+    }
 });
 </script>
 <script type="module">
