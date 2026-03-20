@@ -26,6 +26,7 @@ import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
 import org.junit.jupiter.api.Test
+import java.security.SecureRandom
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -35,6 +36,7 @@ class ProxyTest {
     private val clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
     private val transactions = TransactionStore.InMemory()
     private val trafficMetrics = TrafficMetrics(SimpleMeterRegistry(), clock = clock)
+    private val random = SecureRandom(byteArrayOf())
 
     private fun proxy(
         bodyHydration: BodyHydration = BodyHydration.None,
@@ -47,6 +49,7 @@ class ProxyTest {
         bodyHydration,
         httpClient,
         clock,
+        random,
         TraceStore.InMemory(),
         LogStore.InMemory(),
         transactions,

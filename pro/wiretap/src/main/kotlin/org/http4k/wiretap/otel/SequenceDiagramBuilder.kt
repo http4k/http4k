@@ -96,13 +96,23 @@ private fun addClientSpanMessages(
     }
 
     messages.add(
-        SequenceMessage(clientSpan.spanId, fromIdx, toIdx, clientSpan.name, isResponse = false, isError = false)
+        SequenceMessage(clientSpan.spanId, fromIdx, toIdx, clientSpan.clientLabel(), isResponse = false, isError = false)
     )
     messages.add(
         SequenceMessage(
             clientSpan.spanId, toIdx, fromIdx, clientSpan.responseLabel(), true, clientSpan.isError()
         )
     )
+}
+
+private fun SpanDetail.clientLabel(): String {
+    val url = attributes
+        .firstOrNull { it.key == "url.full" || it.key == "http.url" }
+        ?.value
+        ?.let { Uri.of(it) }
+    val path = url?.path?.ifEmpty { null } ?: return name
+    val method = name.split(" ").firstOrNull() ?: return name
+    return "$method $path"
 }
 
 private fun SpanDetail.responseLabel() = "${httpStatusCode()?.toString() ?: statusCode} (${durationMs}ms)"
@@ -118,6 +128,7 @@ private fun SpanDetail.remoteAuthority() = attributes
     ?.value
     ?.let { Uri.of(it) }
     ?.authority
+    ?.ifEmpty { null }
     ?: "unknown"
 
 private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")

@@ -17,6 +17,8 @@ dependencies {
     api(project(":http4k-web-datastar"))
     api(libs.jsoup)
 
+    implementation(libs.junit.jupiter.api)
+
     testImplementation(project(":http4k-testing-approval"))
     testImplementation(project(":http4k-testing-hamkrest"))
     testImplementation(project(":http4k-server-jetty"))

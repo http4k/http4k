@@ -15,6 +15,7 @@ import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.orElse
 import org.http4k.routing.routes
+import org.http4k.wiretap.Context
 import org.http4k.wiretap.WiretapTarget
 import org.http4k.wiretap.Wiretapped
 import org.http4k.wiretap.domain.BodyHydration
@@ -27,6 +28,7 @@ import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import java.time.Clock
+import java.util.Random
 
 data class ProxyHandlers(
     val wiretapped: Wiretapped,
@@ -39,6 +41,7 @@ fun Proxy(
     bodyHydration: BodyHydration,
     httpClient: HttpHandler,
     clock: Clock,
+    random: Random,
     traces: TraceStore,
     logs: LogStore,
     transactions: TransactionStore,
@@ -76,7 +79,8 @@ fun Proxy(
 
     val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
 
-    val wiretapped = target(outboundHttp, WiretapOpenTelemetry(traces, logs))
+    val setup = Context(outboundHttp, clock, random) { name -> WiretapOpenTelemetry(traces, logs, name) }
+    val wiretapped = target(setup)
 
     val inboundHandler = recordTransaction(Inbound)
         .then(inboundChaos)

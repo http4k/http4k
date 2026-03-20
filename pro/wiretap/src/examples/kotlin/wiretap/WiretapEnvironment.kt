@@ -4,8 +4,6 @@
  */
 package wiretap
 
-import io.opentelemetry.api.OpenTelemetry
-import org.http4k.core.HttpHandler
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.server.Jetty
@@ -24,16 +22,16 @@ import wiretap.examples.OpenApiApp
 sealed interface WiretapEnvironment : () -> PolyHandler
 
 object HttpApp : WiretapEnvironment {
-    override fun invoke() = Wiretap(RemoteTarget { _, _ ->
-            HttpApp().asServer(Jetty(0)).start().uri()
+    override fun invoke() = Wiretap(RemoteTarget {
+        HttpApp().asServer(Jetty(0)).start().uri()
     })
 }
 
 object HttpAppWithOtelTracing : WiretapEnvironment {
     override fun invoke(): PolyHandler {
         val clientApp = HttpApp().asServer(Jetty(0)).start()
-        return Wiretap(RemoteTarget { http, oTel ->
-            HttpAppWithOtelTracing(clientApp.uri(), http, oTel).asServer(Jetty(0)).start().uri()
+        return Wiretap(RemoteTarget {
+            HttpAppWithOtelTracing(clientApp.uri(), http(), otel()).asServer(Jetty(0)).start().uri()
         })
     }
 }
@@ -41,33 +39,33 @@ object HttpAppWithOtelTracing : WiretapEnvironment {
 object LocalHttpAppWithOtelTracing : WiretapEnvironment {
     override fun invoke(): PolyHandler {
         val clientApp = HttpApp().asServer(Jetty(0)).start()
-        return Wiretap(LocalTarget { http, oTel ->
-            HttpAppWithOtelTracing(clientApp.uri(), http, oTel)
+        return Wiretap(LocalTarget {
+            HttpAppWithOtelTracing(clientApp.uri(), http(), otel())
         })
     }
 }
 
 object McpApp : WiretapEnvironment {
-    override fun invoke() = Wiretap(RemoteTarget { _: HttpHandler, _: OpenTelemetry ->
+    override fun invoke() = Wiretap(RemoteTarget {
         McpApp().asServer(Jetty(0)).start().uri()
     })
 }
 
 object McpServer : WiretapEnvironment {
-    override fun invoke() = Wiretap(RemoteTarget { _: HttpHandler, _: OpenTelemetry ->
+    override fun invoke() = Wiretap(RemoteTarget {
         McpServer().asServer(Jetty(0)).start().uri()
     })
 }
 
 object McpServerWithOtel : WiretapEnvironment {
-    override fun invoke() = Wiretap(RemoteTarget { http: HttpHandler, otel: OpenTelemetry ->
-        McpServerWithOtelTracing(http, otel).asServer(Jetty(0)).start().uri()
+    override fun invoke() = Wiretap(RemoteTarget {
+        McpServerWithOtelTracing(http(), otel()).asServer(Jetty(0)).start().uri()
     })
 }
 
 object LocalMcpServerWithOtel : WiretapEnvironment {
-    override fun invoke() = Wiretap(LocalTarget { http: HttpHandler, otel: OpenTelemetry ->
-        McpServerWithOtelTracing(http, otel).http!!
+    override fun invoke() = Wiretap(LocalTarget {
+        McpServerWithOtelTracing(http(), otel()).http!!
     })
 }
 

@@ -251,6 +251,7 @@ class OpenTelemetryTracingTest {
         app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
 
         with(createdContext!!) {
+            assertThat(name, equalTo("GET http://localhost:8080/foo/bar?a=b"))
             assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
             assertThat(traceId, !equalTo(TraceId.getInvalid()))

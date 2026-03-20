@@ -42,7 +42,9 @@ import org.http4k.wiretap.traffic.Traffic
 import org.http4k.wiretap.util.CatchAndReportErrors
 import org.http4k.wiretap.util.Metrics
 import org.http4k.wiretap.util.Templates
+import java.security.SecureRandom
 import java.time.Clock
+import java.util.Random
 import kotlin.concurrent.fixedRateTimer
 
 /**
@@ -61,6 +63,7 @@ object Wiretap {
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
         clock: Clock = Clock.systemUTC(),
+        random: Random = SecureRandom(byteArrayOf()),
         bodyHydration: BodyHydration = All,
     ): PolyHandler {
 
@@ -80,6 +83,7 @@ object Wiretap {
             bodyHydration,
             httpClient,
             clock,
+            random,
             traceStore,
             logStore,
             transactionStore,
