@@ -13,15 +13,14 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 
 fun interface WiretapTarget {
-    operator fun invoke(setup: WiretapContext): Wiretapped
+    operator fun invoke(ctx: Context): Wiretapped
 }
 
-
-class RemoteTarget(private val fn: WiretapContext.() -> Uri) : WiretapTarget {
+class RemoteTarget(private val fn: Context.() -> Uri) : WiretapTarget {
     constructor(uri: Uri) : this({ uri })
 
-    override operator fun invoke(setup: WiretapContext): Wiretapped {
-        val uri = setup.fn()
+    override operator fun invoke(ctx: Context): Wiretapped {
+        val uri = ctx.fn()
         return object : Wiretapped {
             override fun supportsMcp(http: HttpHandler, mcpPath: String) =
                 http(Request(GET, uri.extend(Uri.of(mcpPath)))).status.successful
@@ -34,9 +33,9 @@ class RemoteTarget(private val fn: WiretapContext.() -> Uri) : WiretapTarget {
     }
 }
 
-class LocalTarget(private val fn: WiretapContext.() -> HttpHandler) : WiretapTarget {
-    override operator fun invoke(setup: WiretapContext): Wiretapped {
-        val app = setup.fn()
+class LocalTarget(private val fn: Context.() -> HttpHandler) : WiretapTarget {
+    override operator fun invoke(ctx: Context): Wiretapped {
+        val app = ctx.fn()
         return object : Wiretapped {
             override fun supportsMcp(http: HttpHandler, mcpPath: String) =
                 app(Request(GET, Uri.of(mcpPath))).status.successful

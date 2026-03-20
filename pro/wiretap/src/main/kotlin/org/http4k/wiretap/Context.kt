@@ -9,7 +9,10 @@ import org.http4k.core.HttpHandler
 import java.time.Clock
 import java.util.Random
 
-class WiretapContext(
+/**
+ *
+ */
+class Context(
     private val httpHandler: HttpHandler,
     private val clock: Clock,
     private val random: Random,

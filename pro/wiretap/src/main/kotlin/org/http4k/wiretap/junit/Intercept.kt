@@ -10,7 +10,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.ResponseFilters
-import org.http4k.wiretap.WiretapContext
+import org.http4k.wiretap.Context
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
@@ -49,7 +49,7 @@ class Intercept @JvmOverloads constructor(
     private val renderMode: RenderMode = OnFailure,
     private val clock: Clock = Clock.systemUTC(),
     private val random: Random = SecureRandom(byteArrayOf()),
-    private val appFn: WiretapContext.() -> HttpHandler,
+    private val appFn: Context.() -> HttpHandler,
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
     constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
         : this(
@@ -88,7 +88,7 @@ class Intercept @JvmOverloads constructor(
         val outboundHttp = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Direction.Outbound)
         }.then(httpClient)
-        val setup = WiretapContext(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
+        val setup = Context(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Direction.Inbound)
         }.then(setup.appFn())
