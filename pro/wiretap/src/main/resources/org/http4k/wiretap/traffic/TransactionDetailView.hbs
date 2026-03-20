@@ -6,18 +6,16 @@
         <span class="uri" title="{{tx.uri}}">{{tx.uri}}</span>
         <span class="duration">{{tx.durationMs}}ms</span>
         <span class="timestamp">{{tx.timestamp}}</span>
-        {{#if showOTelLink}}{{#if tx.traceId}}
+        {{#if tx.traceId}}
         <a href="/_wiretap/otel?trace={{tx.traceId}}" class="trace-link-btn" title="{{tx.traceId}}">OTel {{shortTraceId}}</a>
-        {{/if}}{{/if}}
+        {{/if}}
         <button class="action-btn"
                 data-on:click="copyCurl(evt.currentTarget)">
             Copy cURL
         </button>
-        {{~#if showHar}}
         <a href="/_wiretap/traffic/{{tx.id}}/har" class="action-btn" download="transaction-{{tx.id}}.har">
             Download HAR
         </a>
-        {{~/if}}
         {{#if showImport}}
         <a href="{{importPath}}?import={{tx.id}}" class="action-btn">
             Import to {{importLabel}}

@@ -142,7 +142,7 @@ internal fun renderTestReport(testName: String, packageDir: String, traceStore: 
 
     val trafficEntries = transactionStore.list().map { wtx ->
         val detail = wtx.toDetail(Clock.systemUTC())
-        TrafficEntry(html(TransactionDetailView(detail, showImport = false, showHar = false, showOTelLink = false)))
+        TrafficEntry(html(TransactionDetailView(detail)))
     }
 
     val fileName = testName.replace(' ', '-')
