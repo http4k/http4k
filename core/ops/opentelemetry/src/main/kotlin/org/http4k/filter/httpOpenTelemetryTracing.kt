@@ -129,7 +129,7 @@ private fun Span.addStandardDataFrom(resp: Response, req: Request, attributeKeys
 val defaultSpanNamer: (Request) -> String = {
     when (it) {
         is RequestWithContext -> it.method.name + it.xUriTemplate?.let { " $it" }
-        else -> it.method.name
+        else -> it.method.name + " " + it.uri
     }
 }
 

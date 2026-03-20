@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.36.0.1 (uncut)
+- **http4k-***: Upgrade versions
+- **http4k-ops-opentelemetry**: [Fix] Urls not being correctly shown in `defaultSpanNamer`. This affected client filter span naming.
+
 ### v6.36.0.0
 - **http4k-***: Upgrade versions
 - **http4k-connect-mpp**: [New Pro module!] Support for MPP payments protocol. Protect your endpoints with MPP payments and sign and verify MPP payments using standardised server and client filters. 
