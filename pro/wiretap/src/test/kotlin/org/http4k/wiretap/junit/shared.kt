@@ -1,3 +1,4 @@
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.trace.Span
@@ -16,7 +17,11 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-fun App(httpClient: HttpHandler, oTel: OpenTelemetry, name: String): RoutingHttpHandler {
+fun App(
+    httpClient: HttpHandler,
+    name: String = "test app",
+    oTel: OpenTelemetry = GlobalOpenTelemetry.get()
+): RoutingHttpHandler {
     val tracer = oTel.tracerProvider.get(name)
     val tracedClient = ClientFilters.OpenTelemetryTracing(oTel)
         .then(httpClient)

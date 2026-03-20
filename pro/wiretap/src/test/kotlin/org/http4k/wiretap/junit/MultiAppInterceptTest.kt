@@ -18,7 +18,7 @@ class MultiAppInterceptTest {
     @RegisterExtension
     @JvmField
     val intercept = Intercept(downstream, Always) {
-        App(App(http(), otel("test app 2"), "test app 2"), otel("test app 1"), "test app 1")
+        App(App(http(), "test app 2", otel("test app 2")), "test app 1", otel("test app 1"))
     }
 
     @Test

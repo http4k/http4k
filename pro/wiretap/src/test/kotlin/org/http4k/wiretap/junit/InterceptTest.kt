@@ -21,7 +21,7 @@ class InterceptTest {
     @RegisterExtension
     @JvmField
     val intercept = Intercept(downstream, Always) {
-        App(http(), otel("test app 1"), "test app 1")
+        App(http(), "test app 1", otel("test app 1"))
     }
 
     @Test

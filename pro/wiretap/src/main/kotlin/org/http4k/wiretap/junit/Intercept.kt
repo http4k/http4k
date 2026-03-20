@@ -4,6 +4,7 @@
  */
 package org.http4k.wiretap.junit
 
+import io.opentelemetry.api.GlobalOpenTelemetry
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
@@ -11,7 +12,8 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.ResponseFilters
 import org.http4k.wiretap.Context
-import org.http4k.wiretap.domain.Direction
+import org.http4k.wiretap.domain.Direction.Inbound
+import org.http4k.wiretap.domain.Direction.Outbound
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
@@ -49,8 +51,11 @@ class Intercept @JvmOverloads constructor(
     private val renderMode: RenderMode = OnFailure,
     private val clock: Clock = Clock.systemUTC(),
     private val random: Random = SecureRandom(byteArrayOf()),
-    private val appFn: Context.() -> HttpHandler,
+    private val appFn: Context.() -> HttpHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
+    @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
+
     constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
         : this(
         renderMode = renderMode,
@@ -59,11 +64,11 @@ class Intercept @JvmOverloads constructor(
 
     private val state = AtomicReference<TestState>()
 
-    val traceStore get() = state.get().traceStore
-    val logStore get() = state.get().logStore
-    val transactionStore get() = state.get().transactionStore
-    val capturedStdOut get() = state.get().stdOutCapture.toString()
-    val capturedStdErr get() = state.get().stdErrCapture.toString()
+    internal val traceStore get() = state.get().traceStore
+    internal val logStore get() = state.get().logStore
+    internal val transactionStore get() = state.get().transactionStore
+    internal val capturedStdOut get() = state.get().stdOutCapture.toString()
+    internal val capturedStdErr get() = state.get().stdErrCapture.toString()
 
     private var originalOut: PrintStream? = null
     private var originalErr: PrintStream? = null
@@ -85,12 +90,16 @@ class Intercept @JvmOverloads constructor(
         val traceStore = TraceStore.InMemory()
         val logStore = LogStore.InMemory()
         val transactionStore = TransactionStore.InMemory()
+
+        GlobalOpenTelemetry.resetForTest()
+        GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore))
+
         val outboundHttp = ResponseFilters.ReportHttpTransaction(clock) { tx ->
-            transactionStore.record(tx, Direction.Outbound)
+            transactionStore.record(tx, Outbound)
         }.then(httpClient)
         val setup = Context(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
-            transactionStore.record(tx, Direction.Inbound)
+            transactionStore.record(tx, Inbound)
         }.then(setup.appFn())
 
         state.set(TestState(app, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture))
