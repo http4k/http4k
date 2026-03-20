@@ -18,11 +18,12 @@ import org.http4k.format.Moshi
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class GlobalOTelInterceptTest {
+class GlobalOTelInterceptTest : PortBasedTest {
 
     @RegisterExtension
     @JvmField
