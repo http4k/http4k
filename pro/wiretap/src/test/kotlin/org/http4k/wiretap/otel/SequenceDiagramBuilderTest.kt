@@ -6,6 +6,8 @@ package org.http4k.wiretap.otel
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.filter.OpenTelemetrySemanticConventions
+import org.http4k.filter.OpenTelemetrySemanticConventions.statusCode
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -34,13 +36,13 @@ class SequenceDiagramBuilderTest {
                 spanDetail(
                     spanId = "root1", parentSpanId = "0000000000000000",
                     name = "GET /", kind = "SERVER", serviceName = "frontend", statusCode = "OK",
-                    attributes = listOf(SpanAttribute("http.status_code", "200")),
+                    attributes = listOf(SpanAttribute(statusCode, "200")),
                     durationMs = 150L
                 ),
                 spanDetail(
                     spanId = "client1", parentSpanId = "root1",
                     name = "GET /api", kind = "CLIENT", serviceName = "frontend", statusCode = "OK",
-                    attributes = listOf(SpanAttribute("http.status_code", "200")),
+                    attributes = listOf(SpanAttribute(statusCode, "200")),
                     durationMs = 80L
                 ),
                 spanDetail(
@@ -52,8 +54,8 @@ class SequenceDiagramBuilderTest {
                     spanId = "client2", parentSpanId = "server1",
                     name = "GET /ext", kind = "CLIENT", serviceName = "backend", statusCode = "OK",
                     attributes = listOf(
-                        SpanAttribute("http.url", "http://api.example.com:8080/ext"),
-                        SpanAttribute("http.status_code", "200")
+                        SpanAttribute(OpenTelemetrySemanticConventions.clientUrl, "http://api.example.com:8080/ext"),
+                        SpanAttribute(statusCode, "200")
                     ),
                     durationMs = 30L
                 )
@@ -70,13 +72,13 @@ class SequenceDiagramBuilderTest {
                 spanDetail(
                     spanId = "root1", parentSpanId = "0000000000000000",
                     name = "GET /fail", kind = "SERVER", serviceName = "myapp", statusCode = "ERROR",
-                    attributes = listOf(SpanAttribute("http.status_code", "500")),
+                    attributes = listOf(SpanAttribute(statusCode, "500")),
                     durationMs = 42L
                 ),
                 spanDetail(
                     spanId = "client1", parentSpanId = "root1",
                     name = "GET /not-found", kind = "CLIENT", serviceName = "myapp", statusCode = "UNSET",
-                    attributes = listOf(SpanAttribute("http.status_code", "404")),
+                    attributes = listOf(SpanAttribute(statusCode, "404")),
                     durationMs = 15L
                 ),
                 spanDetail(
@@ -107,7 +109,7 @@ class SequenceDiagramBuilderTest {
                 spanDetail(
                     spanId = "client1", parentSpanId = "ext-parent",
                     name = "GET /api", kind = "CLIENT", serviceName = "frontend", statusCode = "OK",
-                    attributes = listOf(SpanAttribute("http.status_code", "200")),
+                    attributes = listOf(SpanAttribute(statusCode, "200")),
                     durationMs = 25L
                 ),
                 spanDetail(
@@ -128,13 +130,23 @@ class SequenceDiagramBuilderTest {
                 spanDetail(
                     spanId = "client1", parentSpanId = "root1",
                     name = "GET /new-api", kind = "CLIENT", serviceName = "frontend", statusCode = "OK",
-                    attributes = listOf(SpanAttribute("url.full", "https://backend.internal:9000/api/data")),
+                    attributes = listOf(
+                        SpanAttribute(
+                            OpenTelemetrySemanticConventions.clientUrl,
+                            "https://backend.internal:9000/api/data"
+                        )
+                    ),
                     durationMs = 35L
                 ),
                 spanDetail(
                     spanId = "client2", parentSpanId = "root1",
                     name = "GET /legacy", kind = "CLIENT", serviceName = "frontend", statusCode = "OK",
-                    attributes = listOf(SpanAttribute("http.url", "http://legacy-service/api")),
+                    attributes = listOf(
+                        SpanAttribute(
+                            OpenTelemetrySemanticConventions.clientUrl,
+                            "http://legacy-service/api"
+                        )
+                    ),
                     durationMs = 50L
                 ),
                 spanDetail(

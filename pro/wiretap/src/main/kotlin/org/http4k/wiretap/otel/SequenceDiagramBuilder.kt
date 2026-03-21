@@ -5,7 +5,6 @@
 package org.http4k.wiretap.otel
 
 import org.http4k.core.Uri
-import org.http4k.filter.LegacyHttp4kConventions
 import org.http4k.filter.OpenTelemetrySemanticConventions
 import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.Participant
@@ -94,7 +93,7 @@ private fun addClientSpanMessages(
 
     val toIdx = when {
         childServer != null -> indexFor(childServer.serviceName)
-        else -> indexFor(clientSpan.remoteAuthority()) ?: fromIdx
+        else -> indexFor(clientSpan.remoteAuthority())
     }
 
     messages.add(
@@ -109,11 +108,7 @@ private fun addClientSpanMessages(
 
 private fun SpanDetail.clientLabel(): String {
     val url = attributes
-        .firstOrNull {
-            it.key == OpenTelemetrySemanticConventions.clientUrl ||
-                it.key == LegacyHttp4kConventions.clientUrl
-        }
-        ?.value
+        .firstOrNull { it.key == OpenTelemetrySemanticConventions.clientUrl }?.value
         ?.let { Uri.of(it) }
     val path = url?.path?.ifEmpty { null } ?: return name
     val method = name.split(" ").firstOrNull() ?: return name
@@ -125,14 +120,11 @@ private fun SpanDetail.responseLabel() = "${httpStatusCode()?.toString() ?: stat
 private fun SpanDetail.isError() = httpStatusCode()?.let { it >= 500 } ?: (statusCode == "ERROR")
 
 private fun SpanDetail.httpStatusCode(): Int? =
-    attributes.firstOrNull { it.key == OpenTelemetrySemanticConventions.statusCode || it.key == LegacyHttp4kConventions.statusCode }
+    attributes.firstOrNull { it.key == OpenTelemetrySemanticConventions.statusCode }
         ?.value?.toIntOrNull()
 
 private fun SpanDetail.remoteAuthority() = attributes
-    .firstOrNull {
-        it.key == OpenTelemetrySemanticConventions.clientUrl ||
-            it.key == LegacyHttp4kConventions.clientUrl
-    }
+    .firstOrNull { it.key == OpenTelemetrySemanticConventions.clientUrl }
     ?.value
     ?.let { Uri.of(it) }
     ?.authority
