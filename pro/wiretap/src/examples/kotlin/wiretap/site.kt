@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import org.http4k.core.HttpHandler
