@@ -1,5 +1,7 @@
 
 
+description = "http4k Connect KSP code generator"
+
 plugins {
     id("org.http4k.community")
     id("org.http4k.connect.module")

@@ -1,5 +1,7 @@
 package org.http4k.connect
 
+description = "http4k Connect Client: ${project.name.removePrefix("http4k-connect-")}"
+
 plugins {
     id("org.http4k.connect.module")
     id("com.google.devtools.ksp")

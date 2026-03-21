@@ -1,9 +1,6 @@
 package org.http4k.connect
 
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.`java-test-fixtures`
-import org.gradle.kotlin.dsl.kotlin
-import org.gradle.kotlin.dsl.project
+description = "http4k Connect Storage: ${project.name.removePrefix("http4k-connect-storage-")}"
 
 plugins {
     id("org.http4k.connect.module")

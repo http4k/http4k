@@ -1,7 +1,6 @@
 package org.http4k.connect
 
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.project
+description = "http4k Connect Fake: ${project.name.removePrefix("http4k-connect-").removeSuffix("-fake")}"
 
 plugins {
     id("org.http4k.connect.module")
