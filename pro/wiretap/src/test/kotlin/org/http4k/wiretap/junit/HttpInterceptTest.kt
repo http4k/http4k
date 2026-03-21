@@ -13,6 +13,8 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.wiretap.domain.Direction
+import org.http4k.wiretap.domain.Ordering.Ascending
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -38,7 +40,7 @@ class HttpInterceptTest {
     fun `captures both server and client spans`(http: HttpHandler) {
         http(testRequest())
 
-        val spans = intercept.traceStore.traces().values.first()
+        val spans = intercept.traceStore.traces(Descending).values.first()
         assertThat(spans.any { it.kind == SpanKind.SERVER }, equalTo(true))
         assertThat(spans.any { it.kind == SpanKind.CLIENT }, equalTo(true))
     }
@@ -47,7 +49,7 @@ class HttpInterceptTest {
     fun `captures traffic for each request`(http: HttpHandler) {
         http(testRequest())
 
-        val traffic = intercept.transactionStore.list()
+        val traffic = intercept.transactionStore.list(Descending)
         assertThat(traffic.size, equalTo(3))
 
         val inbound = traffic.filter { it.direction == Direction.Inbound }
@@ -71,13 +73,13 @@ class HttpInterceptTest {
         http(testRequest())
         http(testRequest())
 
-        assertThat(intercept.traceStore.traces().size, equalTo(2))
+        assertThat(intercept.traceStore.traces(Ascending).size, equalTo(2))
 
         val file = renderTestReport("TestClass.testMethod", "org/http4k/wiretap/junit", intercept.traceStore, intercept.logStore, intercept.transactionStore)
         assertThat(file.name, equalTo("TestClass.testMethod.html"))
 
         val content = file.readText()
-        intercept.traceStore.traces().keys.forEach { traceId ->
+        intercept.traceStore.traces(Ascending).keys.forEach { traceId ->
             assertThat("report contains trace $traceId", content.contains(traceId.value), equalTo(true))
         }
     }

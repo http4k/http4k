@@ -19,6 +19,7 @@ import org.http4k.wiretap.Context
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
 import org.http4k.wiretap.domain.LogStore
+import org.http4k.wiretap.domain.Ordering
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
@@ -162,7 +163,7 @@ internal fun renderTestReport(testName: String, packageDir: String, traceStore: 
     val css = Intercept::class.java.classLoader.getResourceAsStream("public/wiretap.css")
         ?.bufferedReader()?.readText() ?: ""
 
-    val traceEntries = traceStore.traces().map { (traceId, spans) ->
+    val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
         val detail = spans.toTraceDetail(traceId)
         val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(Clock.systemUTC()) }.groupBy { it.spanId }
         val diagram = detail.toSequenceDiagram()
@@ -171,7 +172,7 @@ internal fun renderTestReport(testName: String, packageDir: String, traceStore: 
         TraceEntry(traceId.value, ganttHtml, diagramHtml)
     }
 
-    val trafficEntries = transactionStore.list().map { wtx ->
+    val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->
         val detail = wtx.toDetail(Clock.systemUTC())
         TrafficEntry(html(TransactionDetailView(detail)))
     }

@@ -19,6 +19,7 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.JvmMetrics
+import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TrafficTimeline
@@ -47,7 +48,7 @@ fun GetStats(
         latencyCounts = trafficMetrics.latencyCounts(),
         trafficTimeline = trafficMetrics.trafficTimeline(),
         hostTimelines = trafficMetrics.hostTimelines(),
-        traceCount = traceStore.traces().size,
+        traceCount = traceStore.traces(Ascending).size,
         inboundChaosActive = inboundChaos.isEnabled(),
         inboundChaosDescription = inboundChaos.toString(),
         outboundChaosActive = outboundChaos.isEnabled(),

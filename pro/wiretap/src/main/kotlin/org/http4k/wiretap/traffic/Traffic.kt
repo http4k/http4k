@@ -10,6 +10,7 @@ import org.http4k.routing.routes
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
@@ -33,7 +34,7 @@ fun Traffic(transactionStore: TransactionStore, viewStore: ViewStore, clock: Clo
         "traffic" bind routes(
             functions.map { it.http(elements, html) } + Index(html) { traceId ->
                 val otelTraceId = OtelTraceId.of(traceId)
-                transactionStore.list().find { it.traceparent() == otelTraceId }?.id
+                transactionStore.list(ordering = Descending, limit = Int.MAX_VALUE).find { it.traceparent() == otelTraceId }?.id
             }
         )
 

@@ -18,6 +18,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -50,7 +51,7 @@ interface TransactionStoreContract {
         val tx2 = record()
 
         assertThat(tx1 != tx2, equalTo(true))
-        assertThat(store.list(), equalTo(listOf(tx2, tx1)))
+        assertThat(store.list(Descending), equalTo(listOf(tx2, tx1)))
     }
 
     @Test
@@ -58,7 +59,7 @@ interface TransactionStoreContract {
         record()
         record()
 
-        assertThat(store.list().size, equalTo(2))
+        assertThat(store.list(Descending).size, equalTo(2))
     }
 
     @Test
@@ -67,7 +68,7 @@ interface TransactionStoreContract {
         record(direction = Outbound)
 
         assertThat(
-            store.list(TransactionFilter(direction = Inbound)).size,
+            store.list(Descending, TransactionFilter(direction = Inbound)).size,
             equalTo(1)
         )
     }
@@ -78,7 +79,7 @@ interface TransactionStoreContract {
         record(method = POST)
 
         assertThat(
-            store.list(TransactionFilter(method = GET)).size,
+            store.list(Descending, TransactionFilter(method = GET)).size,
             equalTo(1)
         )
     }
@@ -89,7 +90,7 @@ interface TransactionStoreContract {
         record(uri = "/baz")
 
         assertThat(
-            store.list(TransactionFilter(path = "foo")).size,
+            store.list(Descending, TransactionFilter(path = "foo")).size,
             equalTo(1)
         )
     }
@@ -99,7 +100,7 @@ interface TransactionStoreContract {
         repeat(10) { record() }
 
         assertThat(
-            store.list(limit = 3).size,
+            store.list(Descending, limit = 3).size,
             equalTo(3)
         )
     }
@@ -110,7 +111,7 @@ interface TransactionStoreContract {
         repeat(5) { record(method = POST) }
 
         assertThat(
-            store.list(TransactionFilter(method = GET), limit = 2).size,
+            store.list(Descending, TransactionFilter(method = GET), limit = 2).size,
             equalTo(2)
         )
     }
@@ -131,7 +132,7 @@ interface TransactionStoreContract {
         record()
         record()
         store.clear()
-        assertThat(store.list().size, equalTo(0))
+        assertThat(store.list(Descending).size, equalTo(0))
     }
 
     @Test
@@ -140,7 +141,7 @@ interface TransactionStoreContract {
         record(status = NOT_FOUND)
 
         assertThat(
-            store.list(TransactionFilter(status = NOT_FOUND)).size,
+            store.list(Descending, TransactionFilter(status = NOT_FOUND)).size,
             equalTo(1)
         )
     }
@@ -151,9 +152,27 @@ interface TransactionStoreContract {
         record(uri = "http://other.com/test", direction = Outbound)
 
         assertThat(
-            store.list(TransactionFilter(host = "example")).size,
+            store.list(Descending, TransactionFilter(host = "example")).size,
             equalTo(1)
         )
+    }
+
+    @Test
+    fun `list with OldestFirst returns chronological order`() {
+        val tx1 = record()
+        val tx2 = record()
+
+        assertThat(store.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE), equalTo(listOf(tx1, tx2)))
+    }
+
+    @Test
+    fun `list with OldestFirst and cursor returns transactions after cursor`() {
+        val tx1 = record()
+        val tx2 = record()
+        val tx3 = record()
+
+        val result = store.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE, cursor = tx1.id)
+        assertThat(result, equalTo(listOf(tx2, tx3)))
     }
 
     @Test
@@ -162,7 +181,7 @@ interface TransactionStoreContract {
         val tx2 = record()
         val tx3 = record()
 
-        val result = store.list(cursor = tx3.id)
+        val result = store.list(Descending, cursor = tx3.id)
         assertThat(result, equalTo(listOf(tx2, tx1)))
     }
 

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 
 interface TraceStore {
     fun record(span: SpanData)
-    fun traces(): Map<OtelTraceId, List<SpanData>>
+    fun traces(ordering: Ordering): Map<OtelTraceId, List<SpanData>>
     fun get(traceId: OtelTraceId): List<SpanData>
 
     companion object {
@@ -23,7 +23,13 @@ interface TraceStore {
                 }
             }
 
-            override fun traces() = spans.groupBy { OtelTraceId.of(it.traceId) }
+            override fun traces(ordering: Ordering): Map<OtelTraceId, List<SpanData>> {
+                val ordered = when (ordering) {
+                    Ordering.Descending -> spans.toList()
+                    Ordering.Ascending -> spans.reversed()
+                }
+                return ordered.groupBy { OtelTraceId.of(it.traceId) }
+            }
 
             override fun get(traceId: OtelTraceId) = spans.filter { it.traceId == traceId.value }
         }

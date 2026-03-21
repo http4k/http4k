@@ -18,6 +18,7 @@ import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TraceSummary
 import org.http4k.wiretap.util.Json
@@ -27,7 +28,7 @@ import java.time.format.DateTimeFormatter.ofPattern
 
 fun ListTraces(traceStore: TraceStore, clock: Clock) = object : WiretapFunction {
     private fun list(): List<TraceSummary> =
-        traceStore.traces().map { (traceId, spans) ->
+        traceStore.traces(Descending).map { (traceId, spans) ->
             val rootSpan = spans.find { it.parentSpanId == "0000000000000000" } ?: spans.firstOrNull()
             val earliest = spans.minOfOrNull { it.startEpochNanos } ?: 0L
             val latest = spans.maxOfOrNull { it.endEpochNanos } ?: 0L

@@ -11,6 +11,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -40,7 +41,7 @@ class InMemoryTransactionStoreEvictionTest {
         val tx3 = record()
         val tx4 = record()
 
-        val all = store.list()
+        val all = store.list(Descending)
         assertThat(all.size, equalTo(3))
         assertThat(all.any { it.id == tx1 }, equalTo(false))
         assertThat(all, equalTo(listOf(tx4, tx3, tx2)))

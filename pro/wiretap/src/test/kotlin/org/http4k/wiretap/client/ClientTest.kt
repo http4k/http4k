@@ -21,6 +21,7 @@ import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.util.Json.json
 import org.http4k.wiretap.util.Templates
@@ -73,7 +74,7 @@ class ClientTest {
             Inbound
         )
 
-        val txId = transactions.list().first().id
+        val txId = transactions.list(Descending).first().id
         approver.assertApproved(client(Request(GET, "/inbound").query("import", txId.toString())))
     }
 
@@ -98,8 +99,9 @@ class ClientTest {
         )
 
         assertThat(response.status, equalTo(OK))
-        assertThat(transactions.list().size, equalTo(1))
-        assertThat(transactions.list().first().direction, equalTo(Outbound))
+        val list = transactions.list(Descending)
+        assertThat(list.size, equalTo(1))
+        assertThat(list.first().direction, equalTo(Outbound))
     }
 
     @Test

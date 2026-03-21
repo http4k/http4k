@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong
 interface TransactionStore {
     fun record(transaction: HttpTransaction, direction: Direction): TransactionId
     fun list(
+        ordering: Ordering,
         filter: TransactionFilter = TransactionFilter(),
         limit: Int = Int.MAX_VALUE,
         cursor: TransactionId? = null
@@ -38,8 +39,16 @@ interface TransactionStore {
                 return wiretapTransaction.id
             }
 
-            override fun list(filter: TransactionFilter, limit: Int, cursor: TransactionId?): List<WiretapTransaction> {
-                val base = if (cursor != null) transactions.filter { it.id.value < cursor.value } else transactions.toList()
+            override fun list(ordering: Ordering, filter: TransactionFilter, limit: Int, cursor: TransactionId?): List<WiretapTransaction> {
+                val ordered = when (ordering) {
+                    Ordering.Descending -> transactions.toList()
+                    Ordering.Ascending -> transactions.reversed()
+                }
+                val base = when {
+                    cursor == null -> ordered
+                    ordering == Ordering.Descending -> ordered.filter { it.id.value < cursor.value }
+                    else -> ordered.filter { it.id.value > cursor.value }
+                }
                 return base
                     .filter { it.toSummary(clock).matches(filter) }
                     .take(limit)

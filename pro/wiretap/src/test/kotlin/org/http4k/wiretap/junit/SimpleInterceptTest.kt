@@ -14,6 +14,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -36,7 +37,7 @@ class SimpleInterceptTest {
     fun `otel traces are recorded when requests pass through`(http: HttpHandler) {
         http(Request(GET, "/"))
 
-        val traces = intercept.traceStore.traces()
+        val traces = intercept.traceStore.traces(Ascending)
         assertThat(traces.size, greaterThan(0))
     }
 }

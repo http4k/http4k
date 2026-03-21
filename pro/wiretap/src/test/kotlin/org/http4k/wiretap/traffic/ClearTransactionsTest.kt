@@ -16,6 +16,7 @@ import org.http4k.testing.Approver
 import org.http4k.wiretap.HttpWiretapFunctionContract
 import org.http4k.wiretap.McpWiretapFunctionContract
 import org.http4k.wiretap.domain.Direction.Inbound
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.domain.TransactionStore
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -41,7 +42,7 @@ class ClearTransactionsTest : HttpWiretapFunctionContract, McpWiretapFunctionCon
 
         approver.assertApproved(httpClient()(Request(DELETE, "/")))
 
-        assertThat(store.list().size, equalTo(0))
+        assertThat(store.list(Descending).size, equalTo(0))
     }
 
     @Test
@@ -51,6 +52,6 @@ class ClearTransactionsTest : HttpWiretapFunctionContract, McpWiretapFunctionCon
 
         approver.assertToolResponse(emptyMap())
 
-        assertThat(store.list().size, equalTo(0))
+        assertThat(store.list(Descending).size, equalTo(0))
     }
 }

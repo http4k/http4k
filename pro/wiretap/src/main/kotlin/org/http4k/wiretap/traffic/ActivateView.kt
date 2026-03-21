@@ -17,6 +17,7 @@ import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.domain.TransactionFilter
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
@@ -31,7 +32,7 @@ fun ActivateView(viewStore: ViewStore, transactionStore: TransactionStore, clock
             val view = viewStore.list().find { it.id == id }
             val signals = view?.let { ViewActivationSignals(it) } ?: ViewActivationSignals.Reset
             val filter = view?.filter ?: TransactionFilter()
-            val rows = transactionStore.list(filter).map { it.toSummary(clock) }.map { TransactionRowView(it) }
+            val rows = transactionStore.list(Descending, filter, Int.MAX_VALUE).map { it.toSummary(clock) }.map { TransactionRowView(it) }
 
             Response(OK)
                 .datastarSignal(signals)

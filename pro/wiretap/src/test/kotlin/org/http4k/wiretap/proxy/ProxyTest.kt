@@ -13,7 +13,7 @@ import org.http4k.chaos.ChaosBehaviours
 import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Body
 import org.http4k.core.HttpTransaction
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -22,6 +22,7 @@ import org.http4k.wiretap.RemoteTarget
 import org.http4k.wiretap.domain.BodyHydration
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.LogStore
+import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TrafficMetrics
 import org.http4k.wiretap.domain.TransactionStore
@@ -62,9 +63,9 @@ class ProxyTest {
     @Test
     fun `inbound request is recorded with Direction Inbound`() {
         val proxy = proxy()
-        proxy.http(Request(Method.GET, "/test"))
+        proxy.http(Request(GET, "/test"))
 
-        val recorded = transactions.list()
+        val recorded = transactions.list(Descending)
         assertThat(recorded, hasSize(equalTo(1)))
         assertThat(recorded.first().direction, equalTo(Direction.Inbound))
     }
@@ -72,9 +73,9 @@ class ProxyTest {
     @Test
     fun `outbound request is recorded with Direction Outbound`() {
         val proxy = proxy()
-        proxy.outboundHttp(Request(Method.GET, "http://example.com/test"))
+        proxy.outboundHttp(Request(GET, "http://example.com/test"))
 
-        val recorded = transactions.list()
+        val recorded = transactions.list(Descending)
         assertThat(recorded, hasSize(equalTo(1)))
         assertThat(recorded.first().direction, equalTo(Direction.Outbound))
     }
@@ -82,9 +83,9 @@ class ProxyTest {
     @Test
     fun `sanitise filter can suppress recording`() {
         val proxy = proxy(sanitise = { null })
-        proxy.http(Request(Method.GET, "/test"))
+        proxy.http(Request(GET, "/test"))
 
-        assertThat(transactions.list(), hasSize(equalTo(0)))
+        assertThat(transactions.list(Descending), hasSize(equalTo(0)))
     }
 
     @Test
@@ -92,9 +93,9 @@ class ProxyTest {
         val proxy = proxy(sanitise = { tx ->
             tx.copy(request = tx.request.removeHeader("Authorization"))
         })
-        proxy.http(Request(Method.GET, "/test").header("Authorization", "Bearer secret"))
+        proxy.http(Request(GET, "/test").header("Authorization", "Bearer secret"))
 
-        val recorded = transactions.list().first()
+        val recorded = transactions.list(Descending).first()
         assertThat(recorded.transaction.request.header("Authorization"), absent())
     }
 
@@ -104,7 +105,7 @@ class ProxyTest {
         inboundChaos.enable(ChaosBehaviours.ReturnStatus(Status.INTERNAL_SERVER_ERROR))
 
         val proxy = proxy(inboundChaos = inboundChaos)
-        val response = proxy.http(Request(Method.GET, "/test"))
+        val response = proxy.http(Request(GET, "/test"))
 
         assertThat(response.status, equalTo(Status.INTERNAL_SERVER_ERROR))
     }
@@ -115,9 +116,9 @@ class ProxyTest {
             bodyHydration = BodyHydration.All,
             httpClient = { Response(Status.OK).body(Body("response-body".byteInputStream())) }
         )
-        proxy.http(Request(Method.GET, "/test").body(Body("request-body".byteInputStream())))
+        proxy.http(Request(GET, "/test").body(Body("request-body".byteInputStream())))
 
-        val recorded = transactions.list()
+        val recorded = transactions.list(Descending)
         assertThat(recorded, hasSize(equalTo(1)))
         assertThat(recorded.first().transaction.request.bodyString(), equalTo("request-body"))
         assertThat(recorded.first().transaction.response.bodyString(), equalTo("response-body"))
@@ -129,7 +130,7 @@ class ProxyTest {
             bodyHydration = BodyHydration.All,
             httpClient = { Response(Status.OK).body(Body("response-body".byteInputStream())) }
         )
-        val response = proxy.http(Request(Method.GET, "/test"))
+        val response = proxy.http(Request(GET, "/test"))
 
         assertThat(response.bodyString(), equalTo("response-body"))
     }
@@ -140,7 +141,7 @@ class ProxyTest {
         outboundChaos.enable(ChaosBehaviours.ReturnStatus(Status.INTERNAL_SERVER_ERROR))
 
         val proxy = proxy(outboundChaos = outboundChaos)
-        val response = proxy.outboundHttp(Request(Method.GET, "http://example.com/test"))
+        val response = proxy.outboundHttp(Request(GET, "http://example.com/test"))
 
         assertThat(response.status, equalTo(Status.INTERNAL_SERVER_ERROR))
     }
