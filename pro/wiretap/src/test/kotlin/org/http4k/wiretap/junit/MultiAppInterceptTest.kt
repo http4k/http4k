@@ -27,7 +27,7 @@ class MultiAppInterceptTest {
 
     @Test
     fun `requests through factory-built app reach the app`(http: HttpHandler) {
-        val response = http(testRequest())
-        assertThat(response.bodyString(), equalTo("downstream"))
+        assertThat(http(testRequest()).bodyString(), equalTo("downstream"))
+        assertThat(http(testRequest()).bodyString(), equalTo("downstream"))
     }
 }
