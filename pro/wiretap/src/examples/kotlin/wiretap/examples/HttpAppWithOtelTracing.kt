@@ -4,6 +4,7 @@
  */
 package wiretap.examples
 
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.common.AttributeKey
@@ -33,7 +34,7 @@ import java.time.Instant
 fun HttpAppWithOtelTracing(
     downstreamUri: Uri,
     httpClient: HttpHandler,
-    openTelemetry: OpenTelemetry
+    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
 ): RoutingHttpHandler {
     val tracer = openTelemetry.tracerProvider.get("demo-app")
 

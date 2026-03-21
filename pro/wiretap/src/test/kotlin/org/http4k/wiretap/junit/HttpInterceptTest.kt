@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import testRequest
 
-class InterceptTest {
+class HttpInterceptTest {
 
     private val downstream: HttpHandler = { Response(OK).body("downstream") }
 

@@ -13,19 +13,24 @@ import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.StatusCode
+import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.events.AutoOpenTelemetryEvents
 import org.http4k.format.Moshi
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.util.PortBasedTest
+import org.http4k.wiretap.acceptance.orThrowIt
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import wiretap.examples.McpServerWithOtelTracing
 
 class GlobalOTelInterceptTest : PortBasedTest {
 
@@ -34,12 +39,19 @@ class GlobalOTelInterceptTest : PortBasedTest {
     val intercept = Intercept(renderMode = Always)
 
     @Test
-    fun `traces are captured via GlobalOpenTelemetry without explicit otel wiring`(http: HttpHandler) {
+    fun `http traces are captured via GlobalOpenTelemetry without explicit otel wiring`(http: HttpHandler) {
         val app = App(http)
         app(Request(GET, "/test"))
 
         val traces = intercept.traceStore.traces()
         assertThat(traces.size, greaterThan(0))
+    }
+
+    @Test
+    fun `mcp traces are captured via GlobalOpenTelemetry without explicit otel wiring`() {
+        McpServerWithOtelTracing({ _: Request -> Response(Status.OK) }).testMcpClient().use {
+            it.tools().list().orThrowIt()
+        }
     }
 
     @Test

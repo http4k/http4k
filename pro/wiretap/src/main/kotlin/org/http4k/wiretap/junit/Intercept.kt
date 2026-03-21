@@ -5,9 +5,12 @@
 package org.http4k.wiretap.junit
 
 import io.opentelemetry.api.GlobalOpenTelemetry
+import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.OpenTelemetryTracing
@@ -76,12 +79,14 @@ class Intercept @JvmOverloads constructor(
 
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
         pc.parameter.type == ChaosEngine::class.java ||
+            pc.parameter.type == McpClient::class.java ||
         pc.parameter.parameterizedType.typeName ==
             "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
+            McpClient::class.java -> HttpNonStreamingMcpClient(Uri.of("/mcp"), http = state.get().handler)
             else -> state.get().handler
         }
 

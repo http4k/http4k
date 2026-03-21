@@ -4,6 +4,7 @@
  */
 package wiretap.examples
 
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ToolResponse
@@ -31,7 +32,7 @@ import org.http4k.filter.PolyFilters
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 
-fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry): PolyHandler =
+fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOpenTelemetry.get()): PolyHandler =
     PolyFilters.OpenTelemetryTracing(otel)
         .then(
             mcp(
