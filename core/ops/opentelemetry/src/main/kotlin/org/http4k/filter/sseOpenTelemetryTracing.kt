@@ -19,7 +19,7 @@ fun ServerFilters.OpenTelemetrySseTracing(
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, SseResponse) -> Unit = { _, _, _ -> },
-    attributesKeys: OpenTelemetryAttributesKeys = LegacyHttp4kConventions
+    attributesKeys: OpenTelemetryAttributesKeys = OpenTelemetrySemanticConventions
 ): SseFilter {
     val context = ServerTracingContext(openTelemetry, spanNamer, error, spanCreationMutator, attributesKeys)
 

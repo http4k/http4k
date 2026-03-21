@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.36.0.1 (uncut)
-- **http4k-***: Upgrade versions
+### v6.37.0.0
+- **http4k-***: Upgrade versions, including Kotlin to 2.3.20
+- **http4k-ops-opentelemetry**: [Possible Break] Convert to use new `OpenTelemetrySemanticConventions` for attribute naming. This may break some observability. It is possible to revert to the old versions by passing `LegacyHttp4kConventions` to the OTel filters instead.
 - **http4k-ops-opentelemetry**: [Fix] Urls not being correctly shown in `defaultSpanNamer`. This affected client filter span naming.
 
 ### v6.36.0.0

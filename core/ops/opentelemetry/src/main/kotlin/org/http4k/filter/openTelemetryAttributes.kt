@@ -13,13 +13,13 @@ interface OpenTelemetryAttributesKeys {
 // Following the OpenTelemetry Semantic Conventions v1.38.0
 // https://opentelemetry.io/docs/specs/semconv/http/http-spans/
 object OpenTelemetrySemanticConventions : OpenTelemetryAttributesKeys {
-    override val method: String = "http.request.method"
+    override val method = "http.request.method"
     override val clientUrl = "url.full"
     override val serverUrl = null
     override val userAgent = "user_agent.original"
-    override val httpRoute: String = "http.route"
+    override val httpRoute = "http.route"
     override val clientAddress = "client.address"
-    override val statusCode: String = "http.response.status_code"
+    override val statusCode = "http.response.status_code"
 }
 
 @Deprecated("To be removed in favour of OTel Semantic Conventions", ReplaceWith("OpenTelemetrySemanticConventions"))

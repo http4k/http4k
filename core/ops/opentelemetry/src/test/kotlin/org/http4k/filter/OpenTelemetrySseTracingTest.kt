@@ -15,6 +15,9 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.data.SpanData
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.filter.OpenTelemetrySemanticConventions.httpRoute
+import org.http4k.filter.OpenTelemetrySemanticConventions.method
+import org.http4k.filter.OpenTelemetrySemanticConventions.statusCode
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
@@ -61,9 +64,9 @@ class OpenTelemetrySseTracingTest {
         response.consumer.invoke(testSse())
 
         with(createdContext!!) {
-            assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey(method)), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
-            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{id}"))
+            assertThat(attributes.get(stringKey(httpRoute)), equalTo("foo/{id}"))
             assertThat(traceId, equalTo(sentTraceId))
             assertThat(spanId, !equalTo(parentSpanId))
             assertThat(this.parentSpanId, equalTo(parentSpanId))
@@ -86,9 +89,9 @@ class OpenTelemetrySseTracingTest {
         response.consumer.invoke(testSse())
 
         with(createdContext!!) {
-            assertThat(attributes.get(stringKey("http.method")), equalTo("GET"))
+            assertThat(attributes.get(stringKey(method)), equalTo("GET"))
             assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
-            assertThat(attributes.get(stringKey("http.route")), equalTo("foo/{id}"))
+            assertThat(attributes.get(stringKey(httpRoute)), equalTo("foo/{id}"))
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
@@ -198,7 +201,7 @@ class OpenTelemetrySseTracingTest {
 
         response.consumer.invoke(testSse())
 
-        assertThat(createdContext!!.attributes.get(longKey("http.status_code")), equalTo(200L))
+        assertThat(createdContext!!.attributes.get(longKey(statusCode)), equalTo(200L))
     }
 
     @Test

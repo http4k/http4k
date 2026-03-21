@@ -18,10 +18,10 @@ fun main() {
 //    val wiretap = McpApp()
 //    val wiretap = McpServer()
 //    val wiretap = McpServerWithOtel()
-//    val wiretap = LocalMcpServerWithOtel()
+    val wiretap = LocalMcpServerWithOtel()
 //    val wiretap = OpenApiApp()
 //    val wiretap = ExternalMcpServer()
-    val wiretap = ExternalMcpApp()
+//    val wiretap = ExternalMcpApp()
 //    val wiretap = ExternalWebsite()
 
 //    println(

@@ -21,7 +21,7 @@ fun PolyFilters.OpenTelemetryTracing(
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     httpSpanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
     sseSpanCompletionMutator: (Span, Request, SseResponse) -> Unit = { _, _, _ -> },
-    attributeKeys: OpenTelemetryAttributesKeys = LegacyHttp4kConventions
+    attributeKeys: OpenTelemetryAttributesKeys = OpenTelemetrySemanticConventions
 ) = PolyFilter { next ->
     PolyHandler(
         http = next.http?.let {

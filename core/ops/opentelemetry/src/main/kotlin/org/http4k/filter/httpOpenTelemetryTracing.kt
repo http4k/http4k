@@ -34,7 +34,7 @@ fun ClientFilters.OpenTelemetryTracing(
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder) -> SpanBuilder = { it },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
-    attributeKeys: OpenTelemetryAttributesKeys = LegacyHttp4kConventions
+    attributeKeys: OpenTelemetryAttributesKeys = OpenTelemetrySemanticConventions
 ): Filter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
@@ -85,7 +85,7 @@ fun ServerFilters.OpenTelemetryTracing(
     error: (Request, Throwable) -> String = { _, t -> t.message ?: "no message" },
     spanCreationMutator: (SpanBuilder, Request) -> SpanBuilder = { spanBuilder, _ -> spanBuilder },
     spanCompletionMutator: (Span, Request, Response) -> Unit = { _, _, _ -> },
-    attributeKeys: OpenTelemetryAttributesKeys = LegacyHttp4kConventions
+    attributeKeys: OpenTelemetryAttributesKeys = OpenTelemetrySemanticConventions
 ): Filter {
     val context = ServerTracingContext(openTelemetry, spanNamer, error, spanCreationMutator, attributeKeys)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
