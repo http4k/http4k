@@ -22,8 +22,8 @@ class McpInterceptTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(downstream, Always) {
-        McpServerWithOtelTracing(http(), otel("test app 1")).http!!
+    val intercept = Intercept.poly(downstream, Always) {
+        McpServerWithOtelTracing(http(), otel("test app 1"))
     }
 
     @Test

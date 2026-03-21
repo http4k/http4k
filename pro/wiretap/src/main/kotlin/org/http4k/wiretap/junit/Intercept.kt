@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
+import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -59,6 +60,23 @@ class Intercept @JvmOverloads constructor(
     private val appFn: Context.() -> HttpHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
+    companion object {
+        fun http(
+            httpClient: HttpHandler = JavaHttpClient(),
+            renderMode: RenderMode = OnFailure,
+            clock: Clock = Clock.systemUTC(),
+            random: Random = SecureRandom(byteArrayOf()),
+            appFn: Context.() -> HttpHandler
+        ) = Intercept(httpClient, renderMode, clock, random, appFn)
+
+        fun poly(
+            httpClient: HttpHandler = JavaHttpClient(),
+            renderMode: RenderMode = OnFailure,
+            clock: Clock = Clock.systemUTC(),
+            random: Random = SecureRandom(byteArrayOf()),
+            appFn: Context.() -> PolyHandler
+        ) = Intercept(httpClient, renderMode, clock, random, { appFn().http!! })
+    }
     @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
 
     constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
