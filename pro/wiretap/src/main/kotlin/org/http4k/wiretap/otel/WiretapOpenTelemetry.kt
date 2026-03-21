@@ -15,20 +15,28 @@ import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import io.opentelemetry.semconv.ServiceAttributes.SERVICE_NAME
+import org.http4k.util.OpenTelemetryClock
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
+import java.time.Clock
 
-fun WiretapOpenTelemetry(traceStore: TraceStore, logStore: LogStore, serviceName: String = "http4k server"): OpenTelemetry {
+fun WiretapOpenTelemetry(traceStore: TraceStore,
+                         logStore: LogStore,
+                         clock: Clock,
+                         serviceName: String = "http4k server"): OpenTelemetry {
     val resource = Resource.create(Attributes.of(SERVICE_NAME, serviceName))
+    val otelClock = OpenTelemetryClock(clock)
     return OpenTelemetrySdk.builder()
         .setTracerProvider(
             SdkTracerProvider.builder()
+                .setClock(otelClock)
                 .setResource(resource)
                 .addSpanProcessor(SimpleSpanProcessor.create(WiretapSpanExporter(traceStore)))
                 .build()
         )
         .setLoggerProvider(
             SdkLoggerProvider.builder()
+                .setClock(otelClock)
                 .setResource(resource)
                 .addLogRecordProcessor(SimpleLogRecordProcessor.create(WiretapLogRecordExporter(logStore)))
                 .build()

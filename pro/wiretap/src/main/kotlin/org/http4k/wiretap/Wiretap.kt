@@ -48,7 +48,7 @@ import java.util.Random
 import kotlin.concurrent.fixedRateTimer
 
 /**
- * Wiretap is a tool for debugging http4k applications. It wraps a http4k application and records
+ * Wiretap is a console for monitoring and testing http4k applications. It wraps a http4k application and records
  * all requests and responses, allowing you to monitor what is going on inside the app.
  */
 object Wiretap {

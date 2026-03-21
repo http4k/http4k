@@ -22,6 +22,7 @@ import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import org.junit.jupiter.api.Test
+import java.time.Clock.systemUTC
 import java.time.Duration
 import java.time.Instant
 
@@ -34,7 +35,8 @@ class RenderTestReportsTest {
         val traceStore = TraceStore.InMemory()
         val logStore = LogStore.InMemory()
         val transactionStore = TransactionStore.InMemory()
-        val handler = ServerFilters.OpenTelemetryTracing(WiretapOpenTelemetry(traceStore, logStore)).then(app)
+        val handler =
+            ServerFilters.OpenTelemetryTracing(WiretapOpenTelemetry(traceStore, logStore, systemUTC())).then(app)
 
         handler(Request(Method.GET, "/"))
 

@@ -52,6 +52,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 enum class RenderMode { Never, OnFailure, Always }
 
+/**
+ * Wiretap Intercept is a JUnit Extension that records all traffic and telemetry inside an application
+ * in order that it can be visualised post-test.
+ */
 class Intercept @JvmOverloads constructor(
     private val httpClient: HttpHandler = JavaHttpClient(),
     private val renderMode: RenderMode = OnFailure,
@@ -122,7 +126,7 @@ class Intercept @JvmOverloads constructor(
         val transactionStore = TransactionStore.InMemory()
 
         GlobalOpenTelemetry.resetForTest()
-        GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore))
+        GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock))
 
         val outboundChaos = ChaosEngine()
         val outboundHttp = ResponseFilters.ReportHttpTransaction(clock) { tx ->
@@ -130,7 +134,7 @@ class Intercept @JvmOverloads constructor(
         }
             .then(outboundChaos)
             .then(httpClient)
-        val setup = Context(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
+        val setup = Context(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Inbound)
         }.then(setup.appFn())
