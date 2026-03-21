@@ -5,6 +5,7 @@
 package org.http4k.wiretap.junit
 
 import io.opentelemetry.api.GlobalOpenTelemetry
+import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
@@ -74,10 +75,15 @@ class Intercept @JvmOverloads constructor(
     private var originalErr: PrintStream? = null
 
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
+        pc.parameter.type == ChaosEngine::class.java ||
         pc.parameter.parameterizedType.typeName ==
             "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
 
-    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any = state.get().handler
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
+        when (pc.parameter.type) {
+            ChaosEngine::class.java -> state.get().outboundChaos
+            else -> state.get().handler
+        }
 
     override fun beforeTestExecution(context: ExtensionContext) {
         val stdOutCapture = ByteArrayOutputStream()
@@ -94,15 +100,18 @@ class Intercept @JvmOverloads constructor(
         GlobalOpenTelemetry.resetForTest()
         GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore))
 
+        val outboundChaos = ChaosEngine()
         val outboundHttp = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Outbound)
-        }.then(httpClient)
+        }
+            .then(outboundChaos)
+            .then(httpClient)
         val setup = Context(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Inbound)
         }.then(setup.appFn())
 
-        state.set(TestState(app, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture))
+        state.set(TestState(app, outboundChaos, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
@@ -122,12 +131,20 @@ class Intercept @JvmOverloads constructor(
         val testClass = context.requiredTestClass
         val testName = "${testClass.simpleName}.${context.requiredTestMethod.name}"
         val packageDir = testClass.packageName.replace('.', '/')
-        val (_, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture) = state.get()
+        val (_, _, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture) = state.get()
         val file = renderTestReport(testName, packageDir, traceStore, logStore, transactionStore, stdOutCapture.toString(), stdErrCapture.toString())
         println("Wiretap report: file://${file.absolutePath}")
     }
 
-    private data class TestState(val handler: HttpHandler, val traceStore: TraceStore, val logStore: LogStore, val transactionStore: TransactionStore, val stdOutCapture: ByteArrayOutputStream, val stdErrCapture: ByteArrayOutputStream)
+    private data class TestState(
+        val handler: HttpHandler,
+        val outboundChaos: ChaosEngine,
+        val traceStore: TraceStore,
+        val logStore: LogStore,
+        val transactionStore: TransactionStore,
+        val stdOutCapture: ByteArrayOutputStream,
+        val stdErrCapture: ByteArrayOutputStream
+    )
 }
 
 private val outputDir by lazy {
