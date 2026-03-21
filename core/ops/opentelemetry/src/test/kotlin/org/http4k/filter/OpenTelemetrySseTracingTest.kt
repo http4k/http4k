@@ -65,7 +65,6 @@ class OpenTelemetrySseTracingTest {
 
         with(createdContext!!) {
             assertThat(attributes.get(stringKey(method)), equalTo("GET"))
-            assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
             assertThat(attributes.get(stringKey(httpRoute)), equalTo("foo/{id}"))
             assertThat(traceId, equalTo(sentTraceId))
             assertThat(spanId, !equalTo(parentSpanId))
@@ -90,7 +89,6 @@ class OpenTelemetrySseTracingTest {
 
         with(createdContext!!) {
             assertThat(attributes.get(stringKey(method)), equalTo("GET"))
-            assertThat(attributes.get(stringKey("http.url")), equalTo("http://localhost:8080/foo/bar?a=b"))
             assertThat(attributes.get(stringKey(httpRoute)), equalTo("foo/{id}"))
             assertThat(traceId, !equalTo(TraceId.getInvalid()))
             assertThat(spanId, !equalTo(SpanId.getInvalid()))
