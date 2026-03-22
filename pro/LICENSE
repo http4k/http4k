@@ -37,7 +37,7 @@ This Software is governed by this Commercial License. The Software may be used u
 a) Commercial Usage:
 - Have a valid subscription (paid or free) obtained through http4k's official channels
 - Have agreed to and are in compliance with the Commercial Terms
-- Maintain the correct number of Host licenses and/or Floating Developer Licenses for your usage
+- Maintain the correct number of Floating Developer Licenses for your usage
 - Comply with all subscription requirements as specified by http4k Ltd
 
 b) Non-Commercial Usage:
@@ -59,8 +59,8 @@ Subject to the foregoing conditions, you are permitted to:
 
 All modifications, patches, and derivatives remain the property of http4k Ltd and/or its licensors. Such modifications may only be used, copied, modified, displayed, distributed, or otherwise exploited in accordance with your applicable license type.
 
-2.2 Development and Testing
-For development purposes, a subscription includes Floating Developer Licenses as specified in the applicable Subscription Tier or Quote. Each Floating Developer License permits installation of the Proprietary Components on any number of Developer Workstations, provided that the total number of concurrently active Developer Workstations does not exceed the number of Floating Developer Licenses held. All other Hosts, including but not limited to CI/CD runners, shared development servers, staging environments, and automated test environments, require a separate Host license.
+2.2 Development, Deployment, and Testing
+For development purposes, a subscription includes Floating Developer Licenses as specified in the applicable Subscription Tier or Quote. Each Floating Developer License permits installation of the Proprietary Components on any number of Developer Workstations, provided that the total number of concurrently active Developer Workstations does not exceed the number of Floating Developer Licenses held. A valid subscription includes the right to deploy and use the Licensed Materials in production, staging, CI/CD, and other non-development environments. The Floating Developer License count applies only to concurrent Developer Workstation usage; deployment of the Licensed Materials to non-development Hosts does not require additional licenses.
 
 2.3 Evaluation Period for Commercial Entities
 Organizations with ARR of $1,000,000 USD or more that have not yet obtained a paid subscription may use the Proprietary Components solely for internal evaluation during the Evaluation Period, subject to the following conditions:
