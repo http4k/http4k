@@ -59,7 +59,7 @@ object Wiretap {
         logStore: LogStore = LogStore.InMemory(),
         viewStore: ViewStore = ViewStore.InMemory(),
         security: Security = NoSecurity,
-        mcpOptions: McpServerOptions = McpServerOptions.default,
+        mcpOptions: WiretapMcpServerOptions = WiretapMcpServerOptions.default,
         httpClient: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
         sanitise: (HttpTransaction) -> HttpTransaction? = { it },
         clock: Clock = Clock.systemUTC(),

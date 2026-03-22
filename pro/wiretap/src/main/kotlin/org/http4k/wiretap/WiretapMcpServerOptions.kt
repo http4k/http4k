@@ -8,10 +8,10 @@ import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 
 /**
- * Options for connecting to the underlying MCP server. Defaults to NoMcpSecurity and "/mcp" path
+ * Options for configuring the Wiretap MCP server. Defaults to NoMcpSecurity and "/mcp" path
  */
-data class McpServerOptions(val security: McpSecurity, val path: String) {
+data class WiretapMcpServerOptions(val security: McpSecurity, val path: String) {
     companion object {
-        val default = McpServerOptions(NoMcpSecurity, "/mcp")
+        val default = WiretapMcpServerOptions(NoMcpSecurity, "/mcp")
     }
 }
