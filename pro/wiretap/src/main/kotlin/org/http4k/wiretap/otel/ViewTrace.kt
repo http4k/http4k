@@ -27,6 +27,7 @@ import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.SpanDetail
 import org.http4k.wiretap.domain.SpanEvent
+import org.http4k.wiretap.domain.SpanLink
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.toSummary
@@ -75,7 +76,18 @@ data class LogRowView(val log: LogSummary, val columnValues: List<String>)
 
 data class EventRowView(val event: SpanEvent, val attributeCount: Int)
 
+data class SpanLinkView(val link: SpanLink) {
+    val traceId = link.traceId
+    val spanId = link.spanId
+    val shortTraceId = link.traceId.short
+    val shortSpanId = link.spanId.short
+    val attributes = link.attributes
+}
+
 data class SpanNodeView(val span: SpanDetail, val logs: List<LogSummary> = emptyList()) : ViewModel {
+    val shortSpanId = span.spanId.short
+    val shortParentSpanId = span.parentSpanId.short
+    val links = span.links.map(::SpanLinkView)
     val logAttrColumns = logs.flatMap { it.attributes.map { a -> a.key } }.distinct()
     val logRows = logs.map { log ->
         val attrMap = log.attributes.associate { it.key to it.value }
@@ -85,7 +97,7 @@ data class SpanNodeView(val span: SpanDetail, val logs: List<LogSummary> = empty
 }
 
 data class TraceDetailView(val detail: TraceDetail, val logsBySpan: Map<OtelSpanId?, List<LogSummary>> = emptyMap()) : ViewModel {
-    val shortTraceId = detail.traceId.value.takeLast(8)
+    val shortTraceId = detail.traceId.short
     val spans = detail.spans.map { SpanNodeView(it, logsBySpan[it.spanId] ?: emptyList()) }
     val orphanLogs = logsBySpan[null] ?: emptyList()
     val orphanLogAttrColumns = orphanLogs.flatMap { it.attributes.map { a -> a.key } }.distinct()

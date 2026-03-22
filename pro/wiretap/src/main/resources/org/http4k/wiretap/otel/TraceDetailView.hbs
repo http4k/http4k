@@ -44,12 +44,12 @@
                             </tr>
                             <tr>
                                 <td>Span ID</td>
-                                <td><code>{{span.spanId}}</code></td>
+                                <td><code title="{{span.spanId}}">{{shortSpanId}}</code></td>
                             </tr>
                             {{#if span.parentSpanId}}
                             <tr>
                                 <td>Parent Span ID</td>
-                                <td><code>{{span.parentSpanId}}</code></td>
+                                <td><code title="{{span.parentSpanId}}">{{shortParentSpanId}}</code></td>
                             </tr>
                             {{/if}}
                             <tr>
@@ -153,13 +153,13 @@
                 </table>
             </div>
             {{/if}}
-            {{#if span.links}}
+            {{#if links}}
             <div class="span-links-section">
                 <h4>Links</h4>
-                {{#each span.links}}
+                {{#each links}}
                 <div class="span-link">
-                    <span class="span-link-trace">{{traceId}}</span>
-                    <code>{{spanId}}</code>
+                    <span class="span-link-trace" title="{{traceId}}">{{shortTraceId}}</span>
+                    <code title="{{spanId}}">{{shortSpanId}}</code>
                     {{#if attributes}}
                     <table class="data-table span-detail-table span-link-attrs">
                         {{#each attributes}}

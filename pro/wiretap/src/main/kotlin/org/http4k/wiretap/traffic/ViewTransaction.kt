@@ -70,5 +70,5 @@ data class TransactionDetailView(val tx: TransactionDetail, val showImport: Bool
     val importPath = if (isInbound) "/_wiretap/inbound" else "/_wiretap/outbound"
     val importLabel = if (isInbound) "Inbound Client" else "Outbound Client"
     val statusClass = statusClass(tx.status)
-    val shortTraceId = tx.traceId?.value?.takeLast(8)
+    val shortTraceId = tx.traceId?.short
 }

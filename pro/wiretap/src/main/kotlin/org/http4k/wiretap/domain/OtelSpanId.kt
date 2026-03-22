@@ -8,5 +8,6 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 
 class OtelSpanId private constructor(value: String) : StringValue(value) {
+    val short get() = value.take(8)
     companion object : NonBlankStringValueFactory<OtelSpanId>(::OtelSpanId)
 }

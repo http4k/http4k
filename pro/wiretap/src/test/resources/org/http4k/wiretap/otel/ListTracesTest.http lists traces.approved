@@ -1,7 +1,7 @@
 event: datastar-patch-elements
 data: elements <div class="trace-row" data-trace-id="00000000000000000000000000000001" data-class:selected="$selectedTrace==='00000000000000000000000000000001'" data-on:click="$selectedTrace='00000000000000000000000000000001'; @get('/_wiretap/otel/00000000000000000000000000000001')">
 data: elements     <span class="timestamp">00:00:00.001</span>
-data: elements     <span class="trace-id" title="00000000000000000000000000000001">00000001</span>
+data: elements     <span class="trace-id" title="00000000000000000000000000000001">00000000</span>
 data: elements     <span class="trace-root-name" title="test">test</span>
 data: elements     <span class="trace-service-name"></span>
 data: elements     <span class="trace-span-count">1</span>

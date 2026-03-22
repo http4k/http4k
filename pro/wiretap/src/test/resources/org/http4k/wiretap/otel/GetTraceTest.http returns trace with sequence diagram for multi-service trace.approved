@@ -2,7 +2,7 @@ event: datastar-patch-elements
 data: elements <div id="trace-detail-panel" class="detail-content">
 data: elements     <div class="detail-toolbar">
 data: elements         <span class="badge badge-trace">TRACE</span>
-data: elements         <span class="trace-id-detail" title="00000000000000000000000000000002">00000002</span>
+data: elements         <span class="trace-id-detail" title="00000000000000000000000000000002">00000000</span>
 data: elements         <span class="gantt-total-duration">4ms</span>
 data: elements         <a href="/_wiretap/traffic?trace=00000000000000000000000000000002" class="trace-link-btn">Traffic</a>
 data: elements     </div>
@@ -45,12 +45,12 @@ data: elements                                 <td>GET /</td>
 data: elements                             </tr>
 data: elements                             <tr>
 data: elements                                 <td>Span ID</td>
-data: elements                                 <td><code>aaaaaaaaaaaaaaaa</code></td>
+data: elements                                 <td><code title="aaaaaaaaaaaaaaaa">aaaaaaaa</code></td>
 data: elements                             </tr>
 data: elements                             
 data: elements                             <tr>
 data: elements                                 <td>Parent Span ID</td>
-data: elements                                 <td><code>0000000000000000</code></td>
+data: elements                                 <td><code title="0000000000000000">00000000</code></td>
 data: elements                             </tr>
 data: elements                             
 data: elements                             <tr>
@@ -124,12 +124,12 @@ data: elements                                 <td>GET /api</td>
 data: elements                             </tr>
 data: elements                             <tr>
 data: elements                                 <td>Span ID</td>
-data: elements                                 <td><code>bbbbbbbbbbbbbbbb</code></td>
+data: elements                                 <td><code title="bbbbbbbbbbbbbbbb">bbbbbbbb</code></td>
 data: elements                             </tr>
 data: elements                             
 data: elements                             <tr>
 data: elements                                 <td>Parent Span ID</td>
-data: elements                                 <td><code>aaaaaaaaaaaaaaaa</code></td>
+data: elements                                 <td><code title="aaaaaaaaaaaaaaaa">aaaaaaaa</code></td>
 data: elements                             </tr>
 data: elements                             
 data: elements                             <tr>
@@ -203,12 +203,12 @@ data: elements                                 <td>GET /api</td>
 data: elements                             </tr>
 data: elements                             <tr>
 data: elements                                 <td>Span ID</td>
-data: elements                                 <td><code>cccccccccccccccc</code></td>
+data: elements                                 <td><code title="cccccccccccccccc">cccccccc</code></td>
 data: elements                             </tr>
 data: elements                             
 data: elements                             <tr>
 data: elements                                 <td>Parent Span ID</td>
-data: elements                                 <td><code>bbbbbbbbbbbbbbbb</code></td>
+data: elements                                 <td><code title="bbbbbbbbbbbbbbbb">bbbbbbbb</code></td>
 data: elements                             </tr>
 data: elements                             
 data: elements                             <tr>

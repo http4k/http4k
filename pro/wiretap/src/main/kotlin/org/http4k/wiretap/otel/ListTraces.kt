@@ -60,5 +60,5 @@ fun ListTraces(traceStore: TraceStore, clock: Clock) = object : WiretapFunction 
 }
 
 data class TraceRowView(val trace: TraceSummary) : ViewModel {
-    val shortTraceId = trace.traceId.value.takeLast(8)
+    val shortTraceId = trace.traceId.short
 }
