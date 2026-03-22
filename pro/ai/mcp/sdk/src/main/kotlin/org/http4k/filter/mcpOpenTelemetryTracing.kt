@@ -23,8 +23,8 @@ import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
  * OpenTelemetry tracing for MCP servers. Follows the latest conventions from the OTel spec.
  */
 fun McpFilters.OpenTelemetryTracing(
-    spanModifiers: List<McpOpenTelemetrySpanModifiers> = defaultMcpOtelSpanModifiers,
-    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get()
+    openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
+    spanModifiers: List<McpOpenTelemetrySpanModifiers> = defaultMcpOtelSpanModifiers
 ): McpFilter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
