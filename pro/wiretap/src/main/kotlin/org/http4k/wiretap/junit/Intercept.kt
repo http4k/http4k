@@ -8,7 +8,6 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.chaos.ChaosEngine
-import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
@@ -57,7 +56,6 @@ enum class RenderMode { Never, OnFailure, Always }
  * in order that it can be visualised post-test.
  */
 class Intercept @JvmOverloads constructor(
-    private val httpClient: HttpHandler = JavaHttpClient(),
     private val renderMode: RenderMode = OnFailure,
     private val clock: Clock = Clock.systemUTC(),
     private val random: Random = SecureRandom(byteArrayOf()),
@@ -66,20 +64,18 @@ class Intercept @JvmOverloads constructor(
 
     companion object {
         fun http(
-            httpClient: HttpHandler = JavaHttpClient(),
             renderMode: RenderMode = OnFailure,
             clock: Clock = Clock.systemUTC(),
             random: Random = SecureRandom(byteArrayOf()),
             appFn: Context.() -> HttpHandler
-        ) = Intercept(httpClient, renderMode, clock, random, appFn)
+        ) = Intercept(renderMode, clock, random, appFn)
 
         fun poly(
-            httpClient: HttpHandler = JavaHttpClient(),
             renderMode: RenderMode = OnFailure,
             clock: Clock = Clock.systemUTC(),
             random: Random = SecureRandom(byteArrayOf()),
             appFn: Context.() -> PolyHandler
-        ) = Intercept(httpClient, renderMode, clock, random, { appFn().http!! })
+        ) = Intercept(renderMode, clock, random, { appFn().http!! })
     }
     @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
 
@@ -129,12 +125,11 @@ class Intercept @JvmOverloads constructor(
         GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock))
 
         val outboundChaos = ChaosEngine()
-        val outboundHttp = ResponseFilters.ReportHttpTransaction(clock) { tx ->
+        val outboundFilter = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Outbound)
         }
             .then(outboundChaos)
-            .then(httpClient)
-        val setup = Context(outboundHttp, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
+        val setup = Context(outboundFilter, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
         val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
             transactionStore.record(tx, Inbound)
         }.then(setup.appFn())

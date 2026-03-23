@@ -77,9 +77,9 @@ fun Proxy(
             })
         .then(bufferResponse)
 
-    val outboundHttp = recordTransaction(Outbound).then(outboundChaos).then(httpClient)
+    val outboundFilter = recordTransaction(Outbound).then(outboundChaos)
 
-    val setup = Context(outboundHttp, clock, random) { name -> WiretapOpenTelemetry(traces, logs, clock, name) }
+    val setup = Context(outboundFilter, clock, random) { name -> WiretapOpenTelemetry(traces, logs, clock, name) }
     val wiretapped = target(setup)
 
     val inboundHandler = recordTransaction(Inbound)
@@ -90,6 +90,6 @@ fun Proxy(
     return ProxyHandlers(
         wiretapped,
         http = routes(orElse bind inboundHandler),
-        outboundHttp = ClientFilters.FollowRedirects().then(outboundHttp)
+        outboundHttp = ClientFilters.FollowRedirects().then(outboundFilter).then(httpClient)
     )
 }

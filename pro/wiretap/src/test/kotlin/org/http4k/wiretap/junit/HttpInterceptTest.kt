@@ -22,12 +22,10 @@ import testRequest
 
 class HttpInterceptTest {
 
-    private val downstream: HttpHandler = { Response(OK).body("downstream") }
-
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(downstream, Always) {
-        App(http(), "test app 1", otel("test app 1"))
+    val intercept = Intercept(Always) {
+        App(http { Response(OK).body("downstream") }, "test app 1", otel("test app 1"))
     }
 
     @Test

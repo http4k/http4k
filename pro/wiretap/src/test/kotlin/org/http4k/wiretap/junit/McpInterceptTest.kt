@@ -7,7 +7,6 @@ package org.http4k.wiretap.junit
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.greaterThan
 import org.http4k.ai.mcp.client.McpClient
-import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.wiretap.acceptance.orThrowIt
@@ -18,12 +17,10 @@ import wiretap.examples.McpServerWithOtelTracing
 
 class McpInterceptTest {
 
-    private val downstream: HttpHandler = { Response(OK).body("downstream") }
-
     @RegisterExtension
     @JvmField
-    val intercept = Intercept.poly(downstream, Always) {
-        McpServerWithOtelTracing(http(), otel("test app 1"))
+    val intercept = Intercept.poly(Always) {
+        McpServerWithOtelTracing(http { Response(OK).body("downstream") }, otel("test app 1"))
     }
 
     @Test

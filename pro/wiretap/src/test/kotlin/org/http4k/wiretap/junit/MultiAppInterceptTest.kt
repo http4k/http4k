@@ -17,12 +17,14 @@ import testRequest
 
 class MultiAppInterceptTest {
 
-    private val downstream: HttpHandler = { Response(OK).body("downstream") }
-
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(downstream, Always) {
-        App(App(http(), "test app 2", otel("test app 2")), "test app 1", otel("test app 1"))
+    val intercept = Intercept(Always) {
+        App(
+            App(http { Response(OK).body("downstream") }, "test app 2", otel("test app 2")),
+            "test app 1",
+            otel("test app 1")
+        )
     }
 
     @Test
