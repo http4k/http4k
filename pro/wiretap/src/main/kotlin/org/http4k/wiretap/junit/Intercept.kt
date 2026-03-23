@@ -59,6 +59,7 @@ class Intercept @JvmOverloads constructor(
     private val renderMode: RenderMode = OnFailure,
     private val clock: Clock = Clock.systemUTC(),
     private val random: Random = SecureRandom(byteArrayOf()),
+    private val serverName: String = "http4k-server",
     private val appFn: Context.() -> HttpHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
@@ -67,23 +68,25 @@ class Intercept @JvmOverloads constructor(
             renderMode: RenderMode = OnFailure,
             clock: Clock = Clock.systemUTC(),
             random: Random = SecureRandom(byteArrayOf()),
+            serverName: String = "http4k-server",
             appFn: Context.() -> HttpHandler
-        ) = Intercept(renderMode, clock, random, appFn)
+        ) = Intercept(renderMode, clock, random, serverName, appFn)
 
         fun poly(
             renderMode: RenderMode = OnFailure,
             clock: Clock = Clock.systemUTC(),
             random: Random = SecureRandom(byteArrayOf()),
+            serverName: String = "http4k-server",
             appFn: Context.() -> PolyHandler
-        ) = Intercept(renderMode, clock, random, { appFn().http!! })
+        ) = Intercept(renderMode, clock, random, serverName, { appFn().http!! })
     }
     @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
 
-    constructor(app: HttpHandler, renderMode: RenderMode = OnFailure)
+    constructor(app: HttpHandler, renderMode: RenderMode = OnFailure, serverName: String = "http4k-server",)
         : this(
         renderMode = renderMode,
         random = SecureRandom(byteArrayOf()),
-        appFn = { ClientFilters.OpenTelemetryTracing(otel()).then(app) })
+        appFn = { ClientFilters.OpenTelemetryTracing(otel(serverName)).then(app) })
 
     private val state = AtomicReference<TestState>()
 
@@ -122,7 +125,7 @@ class Intercept @JvmOverloads constructor(
         val transactionStore = TransactionStore.InMemory()
 
         GlobalOpenTelemetry.resetForTest()
-        GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock))
+        GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock, serverName))
 
         val outboundChaos = ChaosEngine()
         val outboundFilter = ResponseFilters.ReportHttpTransaction(clock) { tx ->

@@ -40,5 +40,5 @@ class Context(
     /**
      * @return create an OpenTelemetry instance with the supplied service name
      */
-    fun otel(serviceName: String = "http4k server") = oTelFn(serviceName)
+    fun otel(serviceName: String = "http4k-server") = oTelFn(serviceName)
 }

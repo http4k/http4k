@@ -19,7 +19,7 @@ class MultiAppInterceptTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(Always) {
+    val intercept = Intercept(Always, serverName = "foobar") {
         App(
             App(http { Response(OK).body("downstream") }, "test app 2", otel("test app 2")),
             "test app 1",

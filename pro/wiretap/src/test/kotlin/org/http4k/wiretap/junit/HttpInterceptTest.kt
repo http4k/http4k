@@ -8,10 +8,12 @@ import App
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.trace.SpanKind
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.domain.Ordering.Descending
@@ -25,7 +27,9 @@ class HttpInterceptTest {
     @RegisterExtension
     @JvmField
     val intercept = Intercept(Always) {
-        App(http { Response(OK).body("downstream") }, "test app 1", otel("test app 1"))
+        val myClient: HttpHandler = { Response(OK).body("downstream") }
+        val methodAsFilter: Filter = { http(it) }
+        App(methodAsFilter.then(myClient), "test app 1", otel("test app 1"))
     }
 
     @Test
