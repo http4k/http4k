@@ -5,7 +5,7 @@
 flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
     subgraph newreleaseupgradebranchesyml["New Release - Update other projects"]
-        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (10 runs)"]
+        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (11 runs)"]
     end
     repositorydispatch --> newreleaseupgradebranchesyml_createupgradebranches
 ```

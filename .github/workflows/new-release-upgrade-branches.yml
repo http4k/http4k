@@ -19,6 +19,7 @@ jobs:
         - http4k/lts-examples
         - http4k/toolbox
         - http4k/www
+        - http4k/agent-skills
     steps:
     - name: Trigger ${{ matrix.repo }}
       run: |-
