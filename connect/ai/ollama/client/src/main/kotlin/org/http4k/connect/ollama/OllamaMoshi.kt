@@ -13,6 +13,7 @@ import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object OllamaMoshi : ConfigurableMoshi(
     Moshi.Builder()
+        .add(ResponseFormatAdapterFactory)
         .add(OllamaJsonAdapterFactory)
         .add(ListAdapter)
         .add(MapAdapter)

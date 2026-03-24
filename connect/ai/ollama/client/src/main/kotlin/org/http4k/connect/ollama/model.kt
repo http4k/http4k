@@ -10,8 +10,9 @@ class Template private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Template>(::Template)
 }
 
-enum class ResponseFormat {
-    json
+sealed class ResponseFormat {
+    data object json : ResponseFormat()
+    data class Schema(val schema: Map<String, Any>) : ResponseFormat()
 }
 
 @JsonSerializable
