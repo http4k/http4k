@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.38.1.0 
+- **http4k-***: Upgrade versions
+- **http4k-***: Upgrade versions
+
 ### v6.38.0.0 
 - **http4k-***: Upgrade versions
 - **http4k-***: New [http4k Agent Skills Marketplace](https://github.com/http4k/agent-skills) — a Claude Code plugin providing AI coding guidance for all 200+ http4k modules. Install the marketplace and then the plugin via `/plugin` in Claude Code.

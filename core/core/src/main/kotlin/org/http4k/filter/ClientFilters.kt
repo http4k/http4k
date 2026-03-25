@@ -20,6 +20,8 @@ import org.http4k.core.extend
 import org.http4k.core.relative
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.events.Events
+import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
@@ -295,4 +297,9 @@ object ClientFilters {
             }
         }
     }
+
+    /**
+     * Convenience method to report the HTTP transaction to the Events system.
+     */
+    fun ReportHttpTransaction(events: Events) = ResponseFilters.ReportHttpTransaction { events(Outgoing(it)) }
 }

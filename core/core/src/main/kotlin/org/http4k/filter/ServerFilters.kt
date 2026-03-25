@@ -18,6 +18,8 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.events.Events
+import org.http4k.events.HttpEvent.Incoming
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_PARENTSPANID
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_SPANID
@@ -448,4 +450,10 @@ object ServerFilters {
             }
         }
     }
+
+    /**
+     * Convenience method to report the HTTP transaction to the Events system.
+     */
+    fun ReportHttpTransaction(events: Events) = ResponseFilters.ReportHttpTransaction { events(Incoming(it)) }
+
 }
