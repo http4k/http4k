@@ -16,7 +16,7 @@ import java.util.Random
  * Provides a deterministic context for the application through test runs.
  */
 class Context(
-    private val outboundFilter: Filter,
+    private val clientFilter: Filter,
     private val clock: Clock,
     private val random: Random,
     private val oTelFn: (String) -> OpenTelemetry
@@ -30,7 +30,7 @@ class Context(
     /**
      * @return wrap or create the outbound HTTP client used by the application
      */
-    fun http(http: HttpHandler = JavaHttpClient()) = outboundFilter.then(http)
+    fun http(http: HttpHandler = JavaHttpClient()) = clientFilter.then(http)
 
     /**
      * @return the random number generator used by the application

@@ -8,9 +8,12 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.chaos.ChaosEngine
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.NoOp
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.OpenTelemetryTracing
@@ -57,28 +60,34 @@ enum class RenderMode { Never, OnFailure, Always }
  */
 class Intercept @JvmOverloads constructor(
     private val renderMode: RenderMode = OnFailure,
+    private val redirectFilter: Filter = Filter.NoOp,
     private val clock: Clock = Clock.systemUTC(),
     private val random: Random = SecureRandom(byteArrayOf()),
     private val serverName: String = "http4k-server",
+    private val baseUrl: Uri = Uri.of(""),
     private val appFn: Context.() -> HttpHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     companion object {
         fun http(
             renderMode: RenderMode = OnFailure,
+            redirectFilter: Filter = Filter.NoOp,
             clock: Clock = Clock.systemUTC(),
             random: Random = SecureRandom(byteArrayOf()),
             serverName: String = "http4k-server",
+            baseUrl: Uri = Uri.of(""),
             appFn: Context.() -> HttpHandler
-        ) = Intercept(renderMode, clock, random, serverName, appFn)
+        ) = Intercept(renderMode, redirectFilter, clock, random, serverName, baseUrl, appFn)
 
         fun poly(
             renderMode: RenderMode = OnFailure,
+            redirectFilter: Filter = Filter.NoOp,
             clock: Clock = Clock.systemUTC(),
             random: Random = SecureRandom(byteArrayOf()),
             serverName: String = "http4k-server",
+            baseUrl: Uri = Uri.of(""),
             appFn: Context.() -> PolyHandler
-        ) = Intercept(renderMode, clock, random, serverName, { appFn().http!! })
+        ) = Intercept(renderMode, redirectFilter, clock, random, serverName, baseUrl, { appFn().http!! })
     }
     @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
 
@@ -108,8 +117,8 @@ class Intercept @JvmOverloads constructor(
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
-            McpClient::class.java -> HttpNonStreamingMcpClient(Uri.of("/mcp"), http = state.get().handler)
-            else -> state.get().handler
+            McpClient::class.java -> HttpNonStreamingMcpClient(baseUrl.extend(Uri.of("/mcp")), http = state.get().http)
+            else -> state.get().http
         }
 
     override fun beforeTestExecution(context: ExtensionContext) {
@@ -122,22 +131,21 @@ class Intercept @JvmOverloads constructor(
 
         val traceStore = TraceStore.InMemory()
         val logStore = LogStore.InMemory()
-        val transactionStore = TransactionStore.InMemory()
+        val txStore = TransactionStore.InMemory()
 
         GlobalOpenTelemetry.resetForTest()
         GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock, serverName))
 
         val outboundChaos = ChaosEngine()
-        val outboundFilter = ResponseFilters.ReportHttpTransaction(clock) { tx ->
-            transactionStore.record(tx, Outbound)
-        }
+        val clientFilter = ResponseFilters.ReportHttpTransaction(clock) { tx -> txStore.record(tx, Outbound) }
             .then(outboundChaos)
-        val setup = Context(outboundFilter, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
-        val app = ResponseFilters.ReportHttpTransaction(clock) { tx ->
-            transactionStore.record(tx, Inbound)
-        }.then(setup.appFn())
+        val setup = Context(clientFilter, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
 
-        state.set(TestState(app, outboundChaos, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture))
+        val app = redirectFilter
+            .then(ResponseFilters.ReportHttpTransaction(clock) { tx -> txStore.record(tx, Inbound) })
+            .then(setup.appFn())
+
+        state.set(TestState(app, outboundChaos, traceStore, logStore, txStore, stdOutCapture, stdErrCapture))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
@@ -163,7 +171,7 @@ class Intercept @JvmOverloads constructor(
     }
 
     private data class TestState(
-        val handler: HttpHandler,
+        val http: HttpHandler,
         val outboundChaos: ChaosEngine,
         val traceStore: TraceStore,
         val logStore: LogStore,

@@ -23,13 +23,15 @@ fun interface AuthServerDiscovery {
 
     companion object {
         fun fromKnownAuthServer(serverUri: Uri) = AuthServerDiscovery { http: HttpHandler ->
-            val response = http(Request(GET, serverUri.path("/.well-known/oauth-authorization-server")))
+            val uri = serverUri.path("/.well-known/oauth-authorization-server")
+            val response = http(Request(GET, uri))
+
             when {
                 response.status.successful -> resultFrom {
                     OAuthAuthorizationServer(serverUri, OAuthMoshi.asA(response.bodyString(), ServerMetadata::class))
                 }
 
-                else -> Failure(Exception("Failed to discover OAuth endpoints"))
+                else -> Failure(Exception("Failed to discover OAuth endpoints from $uri (got ${response.status})"))
             }
         }
 
@@ -42,10 +44,11 @@ fun interface AuthServerDiscovery {
                 it.authorizationServers?.first() ?: error("No auth servers")
             }
         ) = AuthServerDiscovery { http: HttpHandler ->
-            val response = http(Request(GET, resourceUri.path("/.well-known/oauth-protected-resource")))
+            val uri = resourceUri.path("/.well-known/oauth-protected-resource")
+            val response = http(Request(GET, uri))
             when {
                 response.status.successful -> Success(OAuthMoshi.asA(response.bodyString(), ResourceMetadata::class))
-                else -> Failure(Exception("Failed to discover OAuth endpoints"))
+                else -> Failure(Exception("Failed to discover OAuth endpoints from $uri (got ${response.status})"))
             }
                 .flatMap { resultFrom { retrieveAuthServer(it) } }
                 .flatMap { fromKnownAuthServer(it)(http) }

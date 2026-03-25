@@ -70,7 +70,7 @@ fun FakeOAuthServer(
         },
         AuthorizationServerWellKnown(
             ServerMetadata(
-                "http4k -auth",
+                "fake-http4k-oauth",
                 Uri.of(authPath),
                 Uri.of(tokenPath),
                 listOf(client_secret_basic),

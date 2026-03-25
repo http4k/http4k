@@ -63,7 +63,9 @@ fun ClientFilters.DiscoveredMcpOAuth(
         ClientFilters.AutoDiscoveryOAuthToken(
             fromKnownAuthServer(Uri.of(wwwAuthenticate["auth_server"]!!)),
             clientCredentials,
-            next
+            next,
+            clock,
+            scopes
         )
 
     private fun authFromProtectedResource(
