@@ -1,6 +1,5 @@
 package org.http4k.security.oauth.testing
 
-import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -15,6 +14,10 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
+import org.http4k.security.ResponseType.Code
+import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.oauth.metadata.AuthMethod.client_secret_basic
+import org.http4k.security.oauth.metadata.ServerMetadata
 import org.http4k.security.oauth.server.AccessTokenResponseRenderer
 import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthRequest
@@ -22,13 +25,13 @@ import org.http4k.security.oauth.server.AuthRequestTracking
 import org.http4k.security.oauth.server.AuthorizationCode
 import org.http4k.security.oauth.server.AuthorizationCodeDetails
 import org.http4k.security.oauth.server.AuthorizationCodes
+import org.http4k.security.oauth.server.AuthorizationServerWellKnown
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientValidator
 import org.http4k.security.oauth.server.DefaultAccessTokenResponseRenderer
 import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.TokenRequest
-import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import org.http4k.security.oauth.server.authorizationRequest
 import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
@@ -65,6 +68,19 @@ fun FakeOAuthServer(
         authPath bind GET to server.authenticationStart.then {
             Response(FOUND).with(LOCATION of it.uri.path("/autologin"))
         },
+        AuthorizationServerWellKnown(
+            ServerMetadata(
+                "http4k -auth",
+                Uri.of(authPath),
+                Uri.of(tokenPath),
+                listOf(client_secret_basic),
+                listOf(),
+                listOfNotNull(
+                    Code,
+                    CodeIdToken.takeIf { IdTokens.Unsupported != idTokens }
+                )
+            )
+        ),
         "/autologin" bind GET to { server.authenticationComplete(it) }
     )
 }
@@ -113,10 +129,8 @@ private class InMemoryAuthRequestTracking : AuthRequestTracking {
 
 private class SimpleAccessTokens : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
-        Failure(UnsupportedGrantType("client_credentials"))
+        Success(AccessToken("OAUTH_" + UUID.randomUUID().toString()))
 
-    override fun create(
-        clientId: ClientId,
-        tokenRequest: AuthorizationCodeAccessTokenRequest,
-    ) = Success(AccessToken("OAUTH_" + tokenRequest.authorizationCode.value.reversed()))
+    override fun create(clientId: ClientId, tokenRequest: AuthorizationCodeAccessTokenRequest) =
+        Success(AccessToken("OAUTH_" + tokenRequest.authorizationCode.value.reversed()))
 }
