@@ -3,9 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.38.1.0 
+### v6.38.1.0 (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-***: Upgrade versions
+- **http4k-security-oauth**: Better support for OAuth discovery in FakeOAuthServer.
 
 ### v6.38.0.0 
 - **http4k-***: Upgrade versions
