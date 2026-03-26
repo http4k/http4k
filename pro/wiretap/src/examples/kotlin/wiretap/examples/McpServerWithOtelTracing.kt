@@ -6,10 +6,16 @@ package wiretap.examples
 
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
+import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.PromptResponse
+import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Domain
 import org.http4k.ai.mcp.model.Prompt
+import org.http4k.ai.mcp.model.Reference
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
@@ -59,7 +65,14 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                     "hello world"
                 },
                 Tool("non_app", "") bind { ToolResponse.Ok("hello") },
-                Prompt("prompt", "") bind { PromptResponse(Role.Assistant, "hello") },
+                Prompt("prompt", "", Prompt.Arg.required("city")) bind { PromptResponse(Role.Assistant, "hello") },
+                Resource.Templated(
+                    ResourceUriTemplate.of("docs://articles/{+topic}"),
+                    ResourceName.of("articles"),
+                    "Browse articles by topic"
+                ) bind { ResourceResponse(Resource.Content.Text("article content", Uri.of(""))) },
+                Reference.Prompt("prompt") bind { CompletionResponse(listOf("London", "Paris", "Tokyo", "New York")) },
+                Reference.ResourceTemplate("docs://articles/{+topic}") bind { CompletionResponse(listOf("http4k", "kotlin", "testing", "mcp")) },
                 mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
             )
         )

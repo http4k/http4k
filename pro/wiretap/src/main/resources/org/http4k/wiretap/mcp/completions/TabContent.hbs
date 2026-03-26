@@ -1,0 +1,36 @@
+<div id="mcp-content" class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        {{#if prompts}}
+        <div class="mcp-client-list-header">Prompts ({{prompts.length}})</div>
+        {{#each prompts}}
+        <div class="mcp-client-item"
+             data-class-mcp-client-item-active="$selectedItem==='prompt:{{this.name}}'"
+             data-on:click="$selectedItem='prompt:{{this.name}}'; @get('/_wiretap/mcp/completions/prompts/{{this.name}}')">
+            <div class="mcp-client-item-name">{{this.name}}</div>
+            <div class="mcp-client-item-desc">{{this.description}}</div>
+        </div>
+        {{/each}}
+        {{/if}}
+
+        {{#if templates}}
+        <div class="mcp-client-list-header">Resource Templates ({{templates.length}})</div>
+        {{#each templates}}
+        <div class="mcp-client-item"
+             data-class-mcp-client-item-active="$selectedItem==='template:{{this.name}}'"
+             data-on:click="$selectedItem='template:{{this.name}}'; @get('/_wiretap/mcp/completions/templates/{{this.name}}')">
+            <div class="mcp-client-item-name">{{this.name}}</div>
+            <div class="mcp-client-item-desc">{{this.description}}</div>
+            <div class="mcp-client-item-uri">{{this.uriTemplate}}</div>
+        </div>
+        {{/each}}
+        {{/if}}
+
+        {{#unless prompts}}{{#unless templates}}
+        <div class="empty">No prompts or resource templates available</div>
+        {{/unless}}{{/unless}}
+    </div>
+
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="empty">Select a prompt or template to test completions</div>
+    </div>
+</div>
