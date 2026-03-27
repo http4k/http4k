@@ -48,7 +48,7 @@ tasks {
             outputDir = "./build"
             validateSpec = false
             inputSpec =
-                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved".toString()
+                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved"
             inputs.file(inputSpec)
         }
 
@@ -57,7 +57,7 @@ tasks {
             outputDir = "./build"
             validateSpec = false
             inputSpec =
-                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved".toString()
+                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved"
             inputs.file(inputSpec)
             mustRunAfter("generateOpenApi3AutoClient")
         }
@@ -67,7 +67,7 @@ tasks {
             outputDir = "./build"
             validateSpec = false
             inputSpec =
-                "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
+                "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved"
             inputs.file(inputSpec)
             mustRunAfter("generateOpenApi3Client")
         }
