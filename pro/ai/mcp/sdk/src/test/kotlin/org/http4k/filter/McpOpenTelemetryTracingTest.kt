@@ -20,13 +20,16 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
@@ -202,6 +205,31 @@ class McpOpenTelemetryTracingTest {
         assertThat(span.parentSpanId, equalTo(SpanId.getInvalid()))
     }
 
+    @Test
+    fun `supports custom span modifiers for the same method`() {
+        val filter = McpFilters.OpenTelemetryTracing(
+            openTelemetry = openTelemetry,
+            spanModifiers = listOf(
+                spanModifier("request-attr-key-1" to "request-attr-value-1", "response-attr-key-1" to "response-attr-value-1", McpTool.Call.Method),
+                spanModifier("request-attr-key-2" to "request-attr-value-2", "response-attr-key-2" to "response-attr-value-2", McpTool.Call.Method),
+            )
+        )
+        val handler = filter.then {
+            McpResponse(McpJson.nullNode())
+        }
+
+        handler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), Request.Companion(POST, "/mcp")))
+
+        val capturedSpan = spanExporter.finishedSpanItems.single()
+        with(capturedSpan!!) {
+            assertThat(attributes.get(AttributeKey.stringKey("request-attr-key-1")), equalTo("request-attr-value-1"))
+            assertThat(attributes.get(AttributeKey.stringKey("response-attr-key-1")), equalTo("response-attr-value-1"))
+
+            assertThat(attributes.get(AttributeKey.stringKey("request-attr-key-2")), equalTo("request-attr-value-2"))
+            assertThat(attributes.get(AttributeKey.stringKey("response-attr-key-2")), equalTo("response-attr-value-2"))
+        }
+    }
+
     private fun jsonRpcRequest() = JsonRpcRequest(
         McpJson, mapOf(
             "jsonrpc" to asJsonObject("2.0"),
@@ -210,4 +238,20 @@ class McpOpenTelemetryTracingTest {
             "params" to asJsonObject(emptyMap<String, Any>())
         )
     )
+
+    private fun spanModifier(
+        requestAttribute: Pair<String, String>,
+        responseAttribute: Pair<String, String>,
+        method: McpRpcMethod = McpTool.Call.Method
+    ) = object : McpOpenTelemetrySpanModifiers {
+        override val method: McpRpcMethod = method
+
+        override fun request(sb: Span, request: McpNodeType) {
+            sb.setAttribute(requestAttribute.first, requestAttribute.second)
+        }
+
+        override fun response(sb: Span, response: McpNodeType) {
+            sb.setAttribute(responseAttribute.first, responseAttribute.second)
+        }
+    }
 }
