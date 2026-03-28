@@ -7,9 +7,9 @@ package org.http4k.wiretap.home
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.testMcpClient
@@ -86,9 +86,9 @@ class StatsTest {
         val result = client.tools().call(
             ToolName.of("get_stats"),
             ToolRequest(emptyMap())
-        ).valueOrNull()!!
+        ).coerce<Ok>()
 
-        val content = (result as Ok).content!!.first().toString()
+        val content = result.content!!.first().toString()
         assertThat(content, containsSubstring("uptime"))
         assertThat(content, containsSubstring("heapUsedMb"))
         assertThat(content, containsSubstring("threadCount"))

@@ -8,11 +8,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
+import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.ai.model.ToolName
@@ -51,14 +53,14 @@ class McpServerTest : WiretapSmokeContract {
         val wiretap = Wiretap(target, clock = FixedClock)
 
         HttpNonStreamingMcpClient(Uri.of("/mcp"), http = wiretap.http!!).apply { start() }.use {
-            val list = it.tools().list().orThrowIt()
+            val list = it.tools().list().coerce<List<McpTool>>()
             assertThat(list.size, equalTo(1))
         }
 
         wiretap.testMcpClient(Request(POST, "_wiretap/mcp")).use {
-            val call = it.tools().call(ToolName.of("list_transactions")).orThrowIt()
+            val call = it.tools().call(ToolName.of("list_transactions")).coerce<Ok>()
 
-            val calls = (call as Ok).content!![0] as Text
+            val calls = call.content!![0] as Text
             val elements = Json.elements(Json.parse(calls.text))
             assertThat(elements.size, equalTo(4))
         }

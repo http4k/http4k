@@ -19,6 +19,7 @@ import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.ElicitationId
@@ -39,6 +40,9 @@ import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
+import org.http4k.ai.mcp.protocol.messages.McpPrompt
+import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
@@ -136,10 +140,10 @@ abstract class McpClientContract<T> : PortBasedTest {
         )
 
         withMcpServer(prompts = prompts) {
-            assertThat(prompts().list().valueOrNull()!!.size, equalTo(1))
+            assertThat(prompts().list().coerce<List<McpPrompt>>().size, equalTo(1))
             assertThat(
-                (prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
-                    .valueOrNull()!! as PromptResponse.Ok).description,
+                prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
+                    .coerce<PromptResponse.Ok>().description,
                 equalTo("description")
             )
         }
@@ -165,10 +169,10 @@ abstract class McpClientContract<T> : PortBasedTest {
         )
 
         withMcpServer(resources = resources) {
-            assertThat(resources().list().valueOrNull()!!.size, equalTo(1))
-            assertThat(resources().listTemplates().valueOrNull()!!.size, equalTo(1))
+            assertThat(resources().list().coerce<List<McpResource>>().size, equalTo(1))
+            assertThat(resources().listTemplates().coerce<List<McpResource>>().size, equalTo(1))
             assertThat(
-                resources().read(ResourceRequest(Uri.of("https://http4k.org"))).valueOrNull()!!,
+                resources().read(ResourceRequest(Uri.of("https://http4k.org"))).coerce<ResourceResponse.Ok>(),
                 equalTo(ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of("")))))
             )
         }
@@ -188,7 +192,7 @@ abstract class McpClientContract<T> : PortBasedTest {
                     .complete(
                         Reference.ResourceTemplate(Uri.of("https://http4k.org")),
                         CompletionRequest(CompletionArgument("foo", "bar"))
-                    ).valueOrNull()!!,
+                    ).coerce<CompletionResponse.Ok>(),
                 equalTo(CompletionResponse.Ok(listOf("1", "2")))
             )
         }
@@ -211,14 +215,14 @@ abstract class McpClientContract<T> : PortBasedTest {
         )
 
         withMcpServer(tools = tools) {
-            assertThat(tools().list().valueOrNull()!!.size, equalTo(2))
+            assertThat(tools().list().coerce<List<McpTool>>().size, equalTo(2))
             assertThat(
-                tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).valueOrNull()!!,
+                tools().call(ToolName.of("reverse"), ToolRequest().with(toolArg of "foobar")).coerce<ToolResponse.Ok>(),
                 equalTo(ToolResponse.Ok(listOf(Content.Text("raboof"))))
             )
             assertThat(
                 tools().call(ToolName.of("reverseStructured"), ToolRequest().with(toolArg of "foobar"))
-                    .valueOrNull()!!,
+                    .coerce<ToolResponse.Ok>(),
                 equalTo(ToolResponse.Ok(listOf(Content.Text("""{"foo":"raboof"}""")), obj("foo" to string("raboof"))))
             )
         }
@@ -242,13 +246,13 @@ abstract class McpClientContract<T> : PortBasedTest {
                 latch.countDown()
             }
 
-            assertThat(tools().list().valueOrNull()!!.size, equalTo(1))
+            assertThat(tools().list().coerce<List<McpTool>>().size, equalTo(1))
 
             tools.items = emptyList()
 
             require(latch.await(2, SECONDS))
 
-            assertThat(tools().list().valueOrNull()!!.size, equalTo(0))
+            assertThat(tools().list().coerce<List<McpTool>>().size, equalTo(0))
         }
     }
 

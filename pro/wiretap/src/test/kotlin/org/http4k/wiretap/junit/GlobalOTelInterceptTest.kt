@@ -13,6 +13,8 @@ import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.StatusCode
+import org.http4k.ai.mcp.coerce
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
@@ -26,7 +28,6 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.util.PortBasedTest
-import org.http4k.wiretap.acceptance.orThrowIt
 import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
@@ -51,7 +52,7 @@ class GlobalOTelInterceptTest : PortBasedTest {
     @Test
     fun `mcp traces are captured via GlobalOpenTelemetry without explicit otel wiring`() {
         McpServerWithOtelTracing({ _: Request -> Response(Status.OK) }).testMcpClient().use {
-            it.tools().list().orThrowIt()
+            it.tools().list().coerce<List<McpTool>>()
         }
     }
 

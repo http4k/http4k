@@ -7,9 +7,11 @@ package org.http4k.wiretap.junit
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.greaterThan
 import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.coerce
+import org.http4k.ai.mcp.protocol.messages.McpPrompt
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.wiretap.acceptance.orThrowIt
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -25,7 +27,7 @@ class McpInterceptTest {
 
     @Test
     fun `can pass through an mcp client`(mcpClient: McpClient) {
-        assertThat(mcpClient.tools().list().orThrowIt().size, greaterThan(0))
-        assertThat(mcpClient.prompts().list().orThrowIt().size, greaterThan(0))
+        assertThat(mcpClient.tools().list().coerce<List<McpTool>>().size, greaterThan(0))
+        assertThat(mcpClient.prompts().list().coerce<List<McpPrompt>>().size, greaterThan(0))
     }
 }

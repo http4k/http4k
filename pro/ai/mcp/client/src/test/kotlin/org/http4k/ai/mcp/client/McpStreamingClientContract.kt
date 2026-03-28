@@ -9,7 +9,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.ResourceResponse
@@ -17,6 +16,7 @@ import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Elicitation
 import org.http4k.ai.mcp.model.ElicitationAction
@@ -119,7 +119,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
                     )
                 )
 
-                val ok = received.valueOrNull()!! as ElicitationResponse.Ok
+                val ok = received.coerce<ElicitationResponse.Ok>()
                 assertThat(output(ok), equalTo(response))
 
                 it.client.elicitationComplete(elicitationId)
@@ -170,7 +170,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
 
                 assertThat(received, present(isA<Success<ElicitationResponse.Task>>()))
-                val taskResponse = received.valueOrNull() as ElicitationResponse.Task
+                val taskResponse = received.coerce<ElicitationResponse.Task>()
                 assertThat(taskResponse.task.taskId, equalTo(taskId))
                 assertThat(taskResponse.task.status, equalTo(TaskStatus.working))
 
