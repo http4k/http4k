@@ -3,9 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.38.1.0 (uncut)
+### v6.39.0.0
 - **http4k-***: Upgrade versions
 - **http4k-security-oauth**: Better support for OAuth discovery in FakeOAuthServer.
+- **http4k-ai-mcp-***: [Breaking] `ResourceResponse`, `PromptResponse`, and `CompletionResponse` are now sealed interfaces with `Ok` and `Error` subtypes. Construct via `ResourceResponse.Ok(...)` etc. `SamplingResponse` and `ElicitationResponse` gain a new `Error` subtype. Error variants take a `message: String` and round-trip through the protocol using a custom domain error code (`-32050`), allowing http4k clients to reconstruct `*.Error` on the client side rather than surfacing them as `McpError.Protocol`.
 
 ### v6.38.0.0 
 - **http4k-***: Upgrade versions
