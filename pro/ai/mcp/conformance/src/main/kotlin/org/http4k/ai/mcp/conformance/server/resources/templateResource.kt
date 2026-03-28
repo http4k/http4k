@@ -17,7 +17,7 @@ fun templateResource() = Resource.Templated(
     null,
     APPLICATION_JSON
 ) bind {
-    ResourceResponse(
+    ResourceResponse.Ok(
         listOf(
             Resource.Content.Text(
                 "content for ${it.uri}",

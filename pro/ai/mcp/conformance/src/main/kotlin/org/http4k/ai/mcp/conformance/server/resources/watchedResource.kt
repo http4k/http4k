@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun watchedResource() =
     Resource.Static(Uri.of("test://watched-resource"), ResourceName.of("watched-resource"), null, MimeType.TEXT_PLAIN) bind {
-        ResourceResponse(
+        ResourceResponse.Ok(
             listOf(
                 Resource.Content.Text(
                     "Watched resource content.",

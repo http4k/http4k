@@ -69,13 +69,18 @@ class McpApps(private val clients: List<McpClient>) {
         null -> Unknown
         else -> s.resources().read(ResourceRequest(resourceUri))
             .map {
-                val textContents = it.list.filterIsInstance<Resource.Content.Text>()
-                Success(
-                    ResourceResponse(
-                        textContents.joinToString("") { it.text.replace("\"", "'") },
-                        textContents.firstNotNullOfOrNull { it._meta?.ui?.csp }
-                    )
-                )
+                when (it) {
+                    is org.http4k.ai.mcp.ResourceResponse.Ok -> {
+                        val textContents = it.list.filterIsInstance<Resource.Content.Text>()
+                        Success(
+                            ResourceResponse(
+                                textContents.joinToString("") { it.text.replace("\"", "'") },
+                                textContents.firstNotNullOfOrNull { it._meta?.ui?.csp }
+                            )
+                        )
+                    }
+                    is org.http4k.ai.mcp.ResourceResponse.Error -> Failure(it.error.message)
+                }
             }
             .recover { Failure(it.toString()) }
     }

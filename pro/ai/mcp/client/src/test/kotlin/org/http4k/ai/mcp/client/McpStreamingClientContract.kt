@@ -275,7 +275,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
 
         val resources = ServerResources(
             Resource.Static(resourceUri, ResourceName.of("test-resource"), "A test resource") bind {
-                ResourceResponse(listOf(Resource.Content.Text("content", resourceUri)))
+                ResourceResponse.Ok(listOf(Resource.Content.Text("content", resourceUri)))
             }
         )
 

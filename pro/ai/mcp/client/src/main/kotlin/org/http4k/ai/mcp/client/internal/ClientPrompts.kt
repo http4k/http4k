@@ -48,5 +48,5 @@ internal class ClientPrompts(
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }
-            .map { PromptResponse(it.messages, it.description) }
+            .map { PromptResponse.Ok(it.messages, it.description) }
 }

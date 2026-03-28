@@ -138,13 +138,13 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
                     ResourceName.of("HTTP4K"),
                     "description"
                 ) bind {
-                    ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                    ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
             ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
-                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
+                PromptResponse.Ok(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
             ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
-                CompletionResponse(listOf("1", "2"))
+                CompletionResponse.Ok(listOf("1", "2"))
             })
         )
 

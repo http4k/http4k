@@ -22,7 +22,7 @@ fun argumentsPrompt() = Prompt(
     arg2,
     title = "A prompt with required arguments"
 ) bind {
-    PromptResponse(
+    PromptResponse.Ok(
         listOf(
             Message(
                 Role.User,

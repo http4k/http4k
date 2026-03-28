@@ -40,7 +40,7 @@ fun insuranceClaim(): PromptCapability {
         claimant,
         item
     ) bind { req ->
-        PromptResponse(
+        PromptResponse.Ok(
             listOf(
                 Message(
                     User, Text(

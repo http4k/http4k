@@ -45,7 +45,7 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
                 Uri.of(it.attr("href"))
             )
         }
-    ResourceResponse(links)
+    ResourceResponse.Ok(links)
 }
 
 fun tools() = compose(
@@ -61,7 +61,7 @@ fun resources() = compose(
 
 fun completions() = compose(
     Reference.Prompt("prompt2") bind {
-        CompletionResponse(listOf("1", "2"))
+        CompletionResponse.Ok(listOf("1", "2"))
     }
 )
 
@@ -110,7 +110,7 @@ fun staticResource() =
     )
 
 fun prompt1() = Prompt(PromptName.of("prompt1"), "description1") bind {
-    PromptResponse(listOf(Message(Role.Assistant, Content.Text(it.toString()))), "description")
+    PromptResponse.Ok(listOf(Message(Role.Assistant, Content.Text(it.toString()))), "description")
 }
 
 fun prompt2(): PromptCapability {
@@ -121,6 +121,6 @@ fun prompt2(): PromptCapability {
         arg1,
         arg2
     ) bind {
-        PromptResponse(listOf(Message(Role.Assistant, Content.Text(arg1(it) + arg2(it)))), "description")
+        PromptResponse.Ok(listOf(Message(Role.Assistant, Content.Text(arg1(it) + arg2(it)))), "description")
     }
 }

@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.ElicitationId
+import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
@@ -61,6 +62,7 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
                 val protocolResponse = when (val response = handler(domainRequest)) {
                     is ElicitationResponse.Ok -> McpElicitations.Response(response.action, response.content, _meta = response._meta)
                     is ElicitationResponse.Task -> McpElicitations.Response(task = response.task)
+                    is ElicitationResponse.Error -> throw McpException(response.error)
                 }
                 sender(protocolResponse, id!!)
             }

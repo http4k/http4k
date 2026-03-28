@@ -27,7 +27,7 @@ import java.io.File
 fun main() {
 
     fun dir(root: File): ResourceHandler = {
-        ResourceResponse(
+        ResourceResponse.Ok(
             Content.Text(
                 File(root, it.uri.toString().removePrefix("home://")).readText(),
                 it.uri,

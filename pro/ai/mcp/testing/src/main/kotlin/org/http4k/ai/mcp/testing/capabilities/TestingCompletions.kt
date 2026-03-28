@@ -27,7 +27,7 @@ class TestingCompletions(
         sender(McpCompletion, McpCompletion.Request(ref, request.argument, request.context, request.meta))
             .first()
             .nextEvent<CompletionResponse, McpCompletion.Response> {
-                CompletionResponse(completion.values, completion.total, completion.hasMore)
+                CompletionResponse.Ok(completion.values, completion.total, completion.hasMore)
             }
             .map { it.second }
 }

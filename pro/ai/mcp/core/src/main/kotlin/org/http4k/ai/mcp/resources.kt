@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.jsonrpc.ErrorMessage
 
 /**
  * A resource handler is responsible for loading the content of a Resource
@@ -34,6 +35,10 @@ data class ResourceRequest(
     val connectRequest: Request? = null
 ) : CapabilityRequest
 
-data class ResourceResponse(val list: List<Resource.Content>, val meta: Meta = default) {
-    constructor(vararg content: Resource.Content, meta: Meta = default) : this(content.toList(), meta)
+sealed interface ResourceResponse {
+    data class Ok(val list: List<Resource.Content>, val meta: Meta = default) : ResourceResponse {
+        constructor(vararg content: Resource.Content, meta: Meta = default) : this(content.toList(), meta)
+    }
+
+    data class Error(val error: ErrorMessage) : ResourceResponse
 }

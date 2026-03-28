@@ -44,17 +44,20 @@ fun CreatePrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
 
         val result = mcpClient.prompts().get(PromptName.of(signals.promptName), PromptRequest(arguments))
         val view = result.map { response ->
-            PromptResultView(response.messages.map { msg ->
-                val content = msg.content
-                PromptMessageView(
-                    msg.role.value, when (content) {
-                        is Text -> content.text
-                        is EmbeddedResource -> content.resource.uri.toString()
-                        is ResourceLink -> "${content.uri.scheme}://${content.uri.authority}${content.uri.path}"
-                        else -> content.toString()
-                    }
-                )
-            })
+            when (response) {
+                is org.http4k.ai.mcp.PromptResponse.Ok -> PromptResultView(response.messages.map { msg ->
+                    val content = msg.content
+                    PromptMessageView(
+                        msg.role.value, when (content) {
+                            is Text -> content.text
+                            is EmbeddedResource -> content.resource.uri.toString()
+                            is ResourceLink -> "${content.uri.scheme}://${content.uri.authority}${content.uri.path}"
+                            else -> content.toString()
+                        }
+                    )
+                })
+                is org.http4k.ai.mcp.PromptResponse.Error -> PromptResultView(listOf(PromptMessageView("error", response.error.message)))
+            }
         }.valueOrNull() ?: PromptResultView(listOf(PromptMessageView("error", "Prompt get failed")))
 
         Response(OK).datastarElements(

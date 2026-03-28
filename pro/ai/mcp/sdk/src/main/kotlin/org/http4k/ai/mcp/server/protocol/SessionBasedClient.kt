@@ -159,8 +159,8 @@ class SessionBasedClient<Transport>(
                             else -> {
                                 yield(Success(nextMessage))
                                 when (nextMessage) {
-                                    is SamplingResponse.Task -> break
                                     is SamplingResponse.Ok -> if (nextMessage.stopReason != null) break
+                                    else -> break
                                 }
                             }
                         }

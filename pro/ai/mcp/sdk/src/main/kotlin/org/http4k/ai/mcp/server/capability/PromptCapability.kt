@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.PromptFilter
 import org.http4k.ai.mcp.PromptHandler
 import org.http4k.ai.mcp.PromptRequest
+import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
@@ -28,8 +29,12 @@ class PromptCapability(
     }, prompt.icons)
 
     fun get(mcp: McpPrompt.Get.Request, client: Client, http: Request) = try {
-        handler(PromptRequest(mcp.arguments, mcp._meta, client, http))
-            .let { McpPrompt.Get.Response(it.messages, it.description) }
+        when (val result = handler(PromptRequest(mcp.arguments, mcp._meta, client, http))) {
+            is PromptResponse.Ok -> McpPrompt.Get.Response(result.messages, result.description)
+            is PromptResponse.Error -> throw McpException(result.error)
+        }
+    } catch (e: McpException) {
+        throw e
     } catch (e: LensFailure) {
         throw McpException(InvalidParams, e)
     } catch (e: Exception) {

@@ -131,15 +131,15 @@ abstract class McpClientContract<T> : PortBasedTest {
     fun `can list and get prompts`() {
         val prompts = ServerPrompts(
             Prompt(PromptName.of("prompt"), "description1") bind {
-                PromptResponse(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
+                PromptResponse.Ok(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }
         )
 
         withMcpServer(prompts = prompts) {
             assertThat(prompts().list().valueOrNull()!!.size, equalTo(1))
             assertThat(
-                prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
-                    .valueOrNull()!!.description,
+                (prompts().get(PromptName.of("prompt"), PromptRequest(mapOf("a1" to "foo")))
+                    .valueOrNull()!! as PromptResponse.Ok).description,
                 equalTo("description")
             )
         }
@@ -153,14 +153,14 @@ abstract class McpClientContract<T> : PortBasedTest {
                 ResourceName.of("HTTP4K"),
                 "description"
             ) bind {
-                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of(""))))
             },
             Resource.Templated(
                 ResourceUriTemplate.of("https://http4k.org"),
                 ResourceName.of("HTTP4K"),
                 "templated resource"
             ) bind {
-                ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of(""))))
+                ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of(""))))
             }
         )
 
@@ -169,7 +169,7 @@ abstract class McpClientContract<T> : PortBasedTest {
             assertThat(resources().listTemplates().valueOrNull()!!.size, equalTo(1))
             assertThat(
                 resources().read(ResourceRequest(Uri.of("https://http4k.org"))).valueOrNull()!!,
-                equalTo(ResourceResponse(listOf(Resource.Content.Text("foo", Uri.of("")))))
+                equalTo(ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of("")))))
             )
         }
     }
@@ -178,7 +178,7 @@ abstract class McpClientContract<T> : PortBasedTest {
     fun `can complete references`() {
         val completions = ServerCompletions(
             Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
-                CompletionResponse(listOf("1", "2"))
+                CompletionResponse.Ok(listOf("1", "2"))
             }
         )
 
@@ -189,7 +189,7 @@ abstract class McpClientContract<T> : PortBasedTest {
                         Reference.ResourceTemplate(Uri.of("https://http4k.org")),
                         CompletionRequest(CompletionArgument("foo", "bar"))
                     ).valueOrNull()!!,
-                equalTo(CompletionResponse(listOf("1", "2")))
+                equalTo(CompletionResponse.Ok(listOf("1", "2")))
             )
         }
 

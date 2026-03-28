@@ -14,7 +14,7 @@ import org.http4k.connect.model.MimeType
 import org.http4k.routing.bind
 
 fun imagePrompt() = Prompt("test_prompt_with_image", "test_prompt_with_image", title = "Prompt With Image") bind {
-    PromptResponse(
+    PromptResponse.Ok(
         listOf(
             Message(Role.User, Content.Image(imageContent.data, MimeType.IMAGE_PNG)),
             Message(Role.User, Content.Text("Please analyze the image above."))

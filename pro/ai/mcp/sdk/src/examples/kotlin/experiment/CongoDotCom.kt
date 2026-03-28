@@ -30,7 +30,7 @@ fun getPurchases() = Resource.Static(
     Uri.of("purchases://david"), ResourceName.of("DavidPurchases"), "List of purchases for David",
     MimeType.of(APPLICATION_JSON)
 ) bind { req ->
-    ResourceResponse(
+    ResourceResponse.Ok(
         listOf(
             Resource.Content.Text(
                 when (req.uri.authority) {

@@ -22,7 +22,7 @@ fun embeddedResourcePrompt() = Prompt(
     resourceUri,
     title = "A prompt that includes an embedded resource"
 ) bind {
-    PromptResponse(
+    PromptResponse.Ok(
         listOf(
             Message(
                 Role.User, Content.EmbeddedResource(

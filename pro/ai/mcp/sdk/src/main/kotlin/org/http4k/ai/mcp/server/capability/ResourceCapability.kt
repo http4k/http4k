@@ -8,10 +8,12 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ResourceFilter
 import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.ResourceRequest
+import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.Resource.Templated
+import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.then
 import org.http4k.core.Request
@@ -34,8 +36,9 @@ class ResourceCapability(
     fun matches(uri: Uri) = resource.matches(uri)
 
     fun read(mcp: McpResource.Read.Request, client: Client, http: Request) =
-        this(ResourceRequest(mcp.uri, mcp._meta, client, http)).let {
-            McpResource.Read.Response(it.list, it.meta)
+        when (val result = this(ResourceRequest(mcp.uri, mcp._meta, client, http))) {
+            is ResourceResponse.Ok -> McpResource.Read.Response(result.list, result.meta)
+            is ResourceResponse.Error -> throw McpException(result.error)
         }
 
     override fun invoke(p1: ResourceRequest) = handler(p1)

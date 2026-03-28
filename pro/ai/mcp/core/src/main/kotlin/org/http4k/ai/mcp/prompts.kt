@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.ai.model.Role
 import org.http4k.core.Request
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
 
 /**
@@ -36,7 +37,11 @@ data class PromptRequest(
     val connectRequest: Request? = null
 ) : Map<String, String> by args, CapabilityRequest, McpLensTarget
 
-data class PromptResponse(val messages: List<Message>, val description: String? = null) {
-    constructor(vararg messages: Message, description: String? = null) : this(messages.toList(), description)
-    constructor(role: Role, content: String) : this(listOf(Message(role, Text(content))))
+sealed interface PromptResponse {
+    data class Ok(val messages: List<Message>, val description: String? = null) : PromptResponse {
+        constructor(vararg messages: Message, description: String? = null) : this(messages.toList(), description)
+        constructor(role: Role, content: String) : this(listOf(Message(role, Text(content))))
+    }
+
+    data class Error(val error: ErrorMessage) : PromptResponse
 }

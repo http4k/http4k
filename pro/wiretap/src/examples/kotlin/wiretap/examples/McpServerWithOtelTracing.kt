@@ -65,14 +65,14 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                     "hello world"
                 },
                 Tool("non_app", "") bind { ToolResponse.Ok("hello") },
-                Prompt("prompt", "", Prompt.Arg.required("city")) bind { PromptResponse(Role.Assistant, "hello") },
+                Prompt("prompt", "", Prompt.Arg.required("city")) bind { PromptResponse.Ok(Role.Assistant, "hello") },
                 Resource.Templated(
                     ResourceUriTemplate.of("docs://articles/{+topic}"),
                     ResourceName.of("articles"),
                     "Browse articles by topic"
-                ) bind { ResourceResponse(Resource.Content.Text("article content", Uri.of(""))) },
-                Reference.Prompt("prompt") bind { CompletionResponse(listOf("London", "Paris", "Tokyo", "New York")) },
-                Reference.ResourceTemplate("docs://articles/{+topic}") bind { CompletionResponse(listOf("http4k", "kotlin", "testing", "mcp")) },
+                ) bind { ResourceResponse.Ok(Resource.Content.Text("article content", Uri.of(""))) },
+                Reference.Prompt("prompt") bind { CompletionResponse.Ok(listOf("London", "Paris", "Tokyo", "New York")) },
+                Reference.ResourceTemplate("docs://articles/{+topic}") bind { CompletionResponse.Ok(listOf("http4k", "kotlin", "testing", "mcp")) },
                 mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
             )
         )

@@ -12,5 +12,5 @@ import org.http4k.ai.model.Role
 import org.http4k.routing.bind
 
 fun simplePrompt() = Prompt("test_simple_prompt", "test_simple_prompt", title = "Simple Test Prompt") bind {
-    PromptResponse(listOf(Message(Role.User, Content.Text("This is a simple prompt for testing."))))
+    PromptResponse.Ok(listOf(Message(Role.User, Content.Text("This is a simple prompt for testing."))))
 }

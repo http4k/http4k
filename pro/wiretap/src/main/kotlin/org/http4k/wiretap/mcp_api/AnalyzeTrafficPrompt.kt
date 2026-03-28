@@ -18,7 +18,7 @@ fun AnalyzeTrafficPrompt(): PromptCapability =
         PromptName.of("analyze_traffic"),
         "Analyze captured HTTP traffic for error patterns, slow requests, and anomalies"
     ) bind {
-        PromptResponse(
+        PromptResponse.Ok(
             listOf(
                 Message(
                     Role.Assistant, Content.Text(

@@ -84,5 +84,5 @@ internal class ClientResources(
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpResource.Read.Response>() }
-            .map { ResourceResponse(it.contents) }
+            .map { ResourceResponse.Ok(it.contents) }
 }

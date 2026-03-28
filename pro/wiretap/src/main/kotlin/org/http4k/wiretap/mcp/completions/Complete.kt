@@ -52,7 +52,12 @@ fun Complete(mcpClient: McpClient, elements: DatastarElementRenderer) =
         val view = mcpClient.completions()
             .complete(ref, CompletionRequest(signals.argumentName, signals.argumentValue))
             .valueOrNull()
-            ?.let { CompletionResultView(it.values, it.total, it.hasMore) }
+            ?.let {
+                when (it) {
+                    is org.http4k.ai.mcp.CompletionResponse.Ok -> CompletionResultView(it.values, it.total, it.hasMore)
+                    is org.http4k.ai.mcp.CompletionResponse.Error -> CompletionResultView(emptyList(), null, null)
+                }
+            }
             ?: CompletionResultView(emptyList(), null, null)
 
         Response(OK).datastarElements(

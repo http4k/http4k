@@ -42,5 +42,5 @@ private fun PromptWithArguments(): PromptCapability {
     return Prompt(
         "greet", "say hello to my little friend",
         name
-    ) bind { PromptResponse(Role.Assistant, "hello ${name(it)}") }
+    ) bind { PromptResponse.Ok(Role.Assistant, "hello ${name(it)}") }
 }

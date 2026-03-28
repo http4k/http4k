@@ -9,6 +9,7 @@ import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import java.time.Duration
@@ -52,6 +53,7 @@ internal class ClientSampling(
                         )
 
                         is SamplingResponse.Task -> McpSampling.Response(task = response.task)
+                        is SamplingResponse.Error -> throw McpException(response.error)
                     }
                     sender(
                         McpSampling,
@@ -63,6 +65,7 @@ internal class ClientSampling(
                     when (response) {
                         is SamplingResponse.Task -> tidyUp(requestId)
                         is SamplingResponse.Ok -> if (response.stopReason != null) tidyUp(requestId)
+                        is SamplingResponse.Error -> tidyUp(requestId)
                     }
                 }
             })

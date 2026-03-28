@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun staticTextResource() =
     Resource.Static(Uri.of("test://static-text"), ResourceName.of("static-text"), null, MimeType.TEXT_PLAIN) bind {
-        ResourceResponse(
+        ResourceResponse.Ok(
             listOf(
                 Resource.Content.Text(
                     "This is the content of the static text resource.",

@@ -16,6 +16,7 @@ import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Uri
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
 import org.http4k.lens.ParamMeta.ObjectParam
 
@@ -94,4 +95,6 @@ sealed interface ElicitationResponse {
     ) : ElicitationResponse, McpLensTarget
 
     data class Task(val task: org.http4k.ai.mcp.model.Task) : ElicitationResponse
+
+    data class Error(val error: ErrorMessage) : ElicitationResponse
 }

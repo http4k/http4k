@@ -43,7 +43,7 @@ fun RenderMcpApp(
         meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uri, visibility))
     ) bind { ToolResponse.Ok(listOf()) },
     Static(uri, ResourceName.of(name), description, mimeType) bind {
-        ResourceResponse(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))
+        ResourceResponse.Ok(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))
     }
 )
 

@@ -122,7 +122,7 @@ class HttpNonStreamingMcpClient(
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
         ) = http.send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
-            .map { PromptResponse(it.messages, it.description) }
+            .map { PromptResponse.Ok(it.messages, it.description) }
     }
 
     override fun sampling() = throw UnsupportedOperationException()
@@ -147,7 +147,7 @@ class HttpNonStreamingMcpClient(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
         ) = http.send<McpResource.Read.Response>(McpResource.Read, McpResource.Read.Request(request.uri))
-            .map { ResourceResponse(it.contents) }
+            .map { ResourceResponse.Ok(it.contents) }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) = throw UnsupportedOperationException()
 
@@ -157,7 +157,7 @@ class HttpNonStreamingMcpClient(
     override fun completions() = object : McpClient.Completions {
         override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
             http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(ref, request.argument))
-                .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
+                .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) } }
     }
 
     override fun tasks() = object : McpClient.Tasks {

@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 
 fun staticBinaryResource() =
     Resource.Static(Uri.of("test://static-binary"), ResourceName.of("static-binary"), null, imageContent.mimeType) bind {
-        ResourceResponse(
+        ResourceResponse.Ok(
             listOf(
                 Resource.Content.Blob(
                     imageContent.data,

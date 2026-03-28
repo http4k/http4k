@@ -10,6 +10,7 @@ import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.core.Request
+import org.http4k.jsonrpc.ErrorMessage
 
 /**
  * A CompletionHandler is a function which creates a Completion from a set of inputs
@@ -46,4 +47,8 @@ data class CompletionRequest(
 }
 
 
-data class CompletionResponse(val values: List<String>, val total: Int? = null, val hasMore: Boolean? = null)
+sealed interface CompletionResponse {
+    data class Ok(val values: List<String>, val total: Int? = null, val hasMore: Boolean? = null) : CompletionResponse
+
+    data class Error(val error: ErrorMessage) : CompletionResponse
+}

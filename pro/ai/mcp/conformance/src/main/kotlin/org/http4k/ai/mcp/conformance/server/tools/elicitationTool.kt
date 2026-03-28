@@ -35,6 +35,7 @@ fun elicitationTool() = Tool("test_elicitation", "test_elicitation", message) bi
             when (it) {
                 is ElicitationResponse.Ok -> ToolResponse.Ok(it.content.toString())
                 is Task -> error("Unexpected task response")
+                is ElicitationResponse.Error -> Error(it.error.message)
             }
         }.mapFailure { Error("Problem with response") }
         .get()

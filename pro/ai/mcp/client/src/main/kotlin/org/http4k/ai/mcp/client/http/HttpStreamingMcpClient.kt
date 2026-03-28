@@ -46,6 +46,7 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
+import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
@@ -224,7 +225,7 @@ class HttpStreamingMcpClient(
             overrideDefaultTimeout: Duration?
         ) = http.send(McpPrompt.Get, McpPrompt.Get.Request(name, request))
             .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response>() }
-            .map { PromptResponse(it.messages, it.description) }
+            .map { PromptResponse.Ok(it.messages, it.description) }
     }
 
     override fun elicitations() = object : McpClient.Elicitations {
@@ -317,6 +318,7 @@ class HttpStreamingMcpClient(
                             )
 
                             is SamplingResponse.Task -> McpSampling.Response(task = response.task)
+                            is SamplingResponse.Error -> throw McpException(response.error)
                         }
                         http.send(
                             McpSampling,
@@ -353,7 +355,7 @@ class HttpStreamingMcpClient(
             overrideDefaultTimeout: Duration?
         ) = http.send(McpResource.Read, McpResource.Read.Request(request.uri))
             .flatMap { it.first().asAOrFailure<McpResource.Read.Response>() }
-            .map { ResourceResponse(it.contents) }
+            .map { ResourceResponse.Ok(it.contents) }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) {
             callbacks.getOrPut(McpResource.Updated.Method) { mutableListOf() }.add(
@@ -374,7 +376,7 @@ class HttpStreamingMcpClient(
         override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
             http.send(McpCompletion, McpCompletion.Request(ref, request.argument))
                 .flatMap { it.first().asAOrFailure<McpCompletion.Response>() }
-                .map { it.completion.run { CompletionResponse(values, total, hasMore) } }
+                .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) } }
     }
 
     override fun tasks() = object : McpClient.Tasks {
@@ -441,4 +443,5 @@ class HttpStreamingMcpClient(
 private fun ElicitationResponse.toProtocol() = when (this) {
     is Ok -> McpElicitations.Response(action, content, _meta = _meta)
     is Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
+    is ElicitationResponse.Error -> throw McpException(error)
 }

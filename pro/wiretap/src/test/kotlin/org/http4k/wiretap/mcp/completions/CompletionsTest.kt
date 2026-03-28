@@ -34,10 +34,10 @@ class CompletionsTest {
         ServerMetaData("test", "1.0"),
         NoMcpSecurity,
         Prompt("test-prompt", "a test prompt", Prompt.Arg.required("city")) bind {
-            PromptResponse(Role.Assistant, "hello")
+            PromptResponse.Ok(Role.Assistant, "hello")
         },
         Reference.Prompt("test-prompt") bind {
-            CompletionResponse(listOf("alpha", "beta", "gamma"))
+            CompletionResponse.Ok(listOf("alpha", "beta", "gamma"))
         }
     ).testMcpClient(Request(GET, "/mcp"))
 

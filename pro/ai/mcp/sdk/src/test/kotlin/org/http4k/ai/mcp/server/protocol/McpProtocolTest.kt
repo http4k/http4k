@@ -215,7 +215,7 @@ class McpProtocolTest {
                 prompts = ServerPrompts(
                     listOf(
                         prompt bind {
-                            PromptResponse(
+                            PromptResponse.Ok(
                                 listOf(
                                     Message(Assistant, Content.Text(intArg(it).toString().reversed()))
                                 ),
@@ -268,7 +268,7 @@ class McpProtocolTest {
         )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val resources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val resources = ServerResources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
 
         val mcp = SseMcp(
             McpProtocol(
@@ -336,7 +336,7 @@ class McpProtocolTest {
             )
 
         val resources = ServerResources(listOf(resource bind {
-            ResourceResponse(
+            ResourceResponse.Ok(
                 listOf(
                     Resource.Content.Blob(Base64Blob.encode("image"), it.uri)
                 )
@@ -576,7 +576,7 @@ class McpProtocolTest {
                     it.client.progress(2, 5.0, "d2")
                 }
 
-                CompletionResponse(listOf("values"), 1, true)
+                CompletionResponse.Ok(listOf("values"), 1, true)
             })
         )
 
@@ -614,7 +614,7 @@ class McpProtocolTest {
     fun `can handle batched messages`() {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { CompletionResponse.Ok(listOf("values"), 1, true) })
         )
 
         val mcp = SseMcp(

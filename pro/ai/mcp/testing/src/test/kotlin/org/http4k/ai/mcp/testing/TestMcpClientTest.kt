@@ -113,7 +113,7 @@ class TestMcpClientTest {
         val serverPrompts = ServerPrompts(
             listOf(
                 prompt bind {
-                    PromptResponse(
+                    PromptResponse.Ok(
                         listOf(
                             Message(Assistant, Content.Text(intArg(it).toString().reversed()))
                         ),
@@ -149,7 +149,7 @@ class TestMcpClientTest {
                 prompts().get(prompt.name, PromptRequest(mapOf("name" to "123"))),
                 equalTo(
                     Success(
-                        PromptResponse(
+                        PromptResponse.Ok(
                             listOf(Message(Assistant, Content.Text("321"))),
                             "description"
                         )
@@ -174,7 +174,7 @@ class TestMcpClientTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description", icons = icons)
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val serverResources = ServerResources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
@@ -194,7 +194,7 @@ class TestMcpClientTest {
 
             assertThat(
                 resources().read(ResourceRequest(resource.uri)),
-                equalTo(Success(ResourceResponse(listOf(content))))
+                equalTo(Success(ResourceResponse.Ok(listOf(content))))
             )
 
             var calls = 0
@@ -229,7 +229,7 @@ class TestMcpClientTest {
             )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), uri)
 
-        val serverResources = ServerResources(listOf(resource bind { ResourceResponse(listOf(content)) }))
+        val serverResources = ServerResources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
@@ -245,7 +245,7 @@ class TestMcpClientTest {
 
             assertThat(
                 resources().read(ResourceRequest(uri)),
-                equalTo(Success(ResourceResponse(listOf(content))))
+                equalTo(Success(ResourceResponse.Ok(listOf(content))))
             )
         }
     }
@@ -346,7 +346,7 @@ class TestMcpClientTest {
     fun `deal with completions`() {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val serverCompletions = ServerCompletions(
-            listOf(ref bind { CompletionResponse(listOf("values"), 1, true) })
+            listOf(ref bind { CompletionResponse.Ok(listOf("values"), 1, true) })
         )
 
         val mcp = HttpStreamingMcp(
@@ -361,7 +361,7 @@ class TestMcpClientTest {
         mcp.useClient {
             assertThat(
                 completions().complete(ref, CompletionRequest(CompletionArgument("arg", "value"))),
-                equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
+                equalTo(Success(CompletionResponse.Ok(listOf("values"), 1, true)))
             )
         }
     }
@@ -375,7 +375,7 @@ class TestMcpClientTest {
             listOf(ref bind {
                 it.client.progress(progress.progress, progress.total)
 
-                CompletionResponse(listOf("values"), 1, true)
+                CompletionResponse.Ok(listOf("values"), 1, true)
             })
         )
 
@@ -400,7 +400,7 @@ class TestMcpClientTest {
                     ref,
                     CompletionRequest(CompletionArgument("arg", "value"), meta = Meta(MetaKey.progressToken<String>().toLens() of "hello"))
                 ),
-                equalTo(Success(CompletionResponse(listOf("values"), 1, true)))
+                equalTo(Success(CompletionResponse.Ok(listOf("values"), 1, true)))
             )
 
             latch.await()

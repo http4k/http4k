@@ -22,7 +22,7 @@ fun DebugRequestPrompt(): PromptCapability {
         transactionId
     ) bind { req ->
         val id = transactionId(req)
-        PromptResponse(
+        PromptResponse.Ok(
             listOf(
                 Message(
                     Role.Assistant, Content.Text(

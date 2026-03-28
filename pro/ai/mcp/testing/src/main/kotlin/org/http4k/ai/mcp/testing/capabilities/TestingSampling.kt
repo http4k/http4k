@@ -9,6 +9,7 @@ import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
@@ -49,6 +50,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         )
 
                         is SamplingResponse.Task -> McpSampling.Response(task = response.task)
+                        is SamplingResponse.Error -> throw McpException(response.error)
                     }
                     sender(protocolResponse, id!!)
                 }
