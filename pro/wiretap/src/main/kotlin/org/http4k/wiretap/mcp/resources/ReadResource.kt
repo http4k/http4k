@@ -7,6 +7,8 @@ package org.http4k.wiretap.mcp.resources
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ResourceRequest
+import org.http4k.ai.mcp.ResourceResponse.Error
+import org.http4k.ai.mcp.ResourceResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource.Content.Blob
 import org.http4k.ai.mcp.model.Resource.Content.Text
@@ -40,7 +42,7 @@ fun ReadResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
         val result = mcpClient.resources().read(ResourceRequest(uri))
         val view = result.map { response ->
             when (response) {
-                is org.http4k.ai.mcp.ResourceResponse.Ok -> ResourceResultView(response.list.map { content ->
+                is Ok -> ResourceResultView(response.list.map { content ->
                     ResourceContentView(
                         uri = content.uri.toString(),
                         mimeType = content.mimeType?.value ?: "",
@@ -51,7 +53,7 @@ fun ReadResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
                         }
                     )
                 })
-                is org.http4k.ai.mcp.ResourceResponse.Error -> ResourceResultView(listOf(ResourceContentView("", "", response.error.message)))
+                is Error -> ResourceResultView(listOf(ResourceContentView("", "", response.message)))
             }
         }.valueOrNull() ?: ResourceResultView(listOf(ResourceContentView("", "", "Resource read failed")))
 

@@ -11,7 +11,6 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.ai.model.Role
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.McpLensTarget
 
 /**
@@ -43,5 +42,5 @@ sealed interface PromptResponse {
         constructor(role: Role, content: String) : this(listOf(Message(role, Text(content))))
     }
 
-    data class Error(val error: ErrorMessage) : PromptResponse
+    data class Error(val message: String) : PromptResponse
 }

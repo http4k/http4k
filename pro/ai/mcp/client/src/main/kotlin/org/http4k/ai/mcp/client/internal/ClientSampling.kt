@@ -6,10 +6,13 @@ package org.http4k.ai.mcp.client.internal
 
 import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.SamplingRequest
-import org.http4k.ai.mcp.SamplingResponse
+import org.http4k.ai.mcp.SamplingResponse.Error
+import org.http4k.ai.mcp.SamplingResponse.Ok
+import org.http4k.ai.mcp.SamplingResponse.Task
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import java.time.Duration
@@ -45,15 +48,15 @@ internal class ClientSampling(
 
                 responses.forEach { response ->
                     val protocolResponse = when (response) {
-                        is SamplingResponse.Ok -> McpSampling.Response(
+                        is Ok -> McpSampling.Response(
                             response.model,
                             response.stopReason,
                             response.role,
                             response.content
                         )
 
-                        is SamplingResponse.Task -> McpSampling.Response(task = response.task)
-                        is SamplingResponse.Error -> throw McpException(response.error)
+                        is Task -> McpSampling.Response(task = response.task)
+                        is Error -> throw McpException(DomainError(response.message))
                     }
                     sender(
                         McpSampling,
@@ -63,9 +66,8 @@ internal class ClientSampling(
                     )
 
                     when (response) {
-                        is SamplingResponse.Task -> tidyUp(requestId)
-                        is SamplingResponse.Ok -> if (response.stopReason != null) tidyUp(requestId)
-                        is SamplingResponse.Error -> tidyUp(requestId)
+                        is Ok -> if (response.stopReason != null) tidyUp(requestId)
+                        else -> tidyUp(requestId)
                     }
                 }
             })

@@ -7,10 +7,14 @@ package org.http4k.ai.mcp.client.internal
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.ElicitationResponse.Error
+import org.http4k.ai.mcp.ElicitationResponse.Ok
+import org.http4k.ai.mcp.ElicitationResponse.Task
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
@@ -89,8 +93,8 @@ internal class ClientElicitations(
 }
 
 private fun ElicitationResponse.toProtocol() = when (this) {
-    is ElicitationResponse.Ok -> McpElicitations.Response(action, content, _meta = _meta)
-    is ElicitationResponse.Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
-    is ElicitationResponse.Error -> throw McpException(error)
+    is Ok -> McpElicitations.Response(action, content, _meta = _meta)
+    is Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
+    is Error -> throw McpException(DomainError(message))
 }
 

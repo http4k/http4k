@@ -5,9 +5,11 @@
 package org.http4k.ai.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
+import org.http4k.ai.mcp.PromptResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.PromptName
@@ -48,5 +50,6 @@ internal class ClientPrompts(
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }
-            .map { PromptResponse.Ok(it.messages, it.description) }
+            .map { Ok(it.messages, it.description) as PromptResponse }
+            .flatMapFailure { toPromptErrorOrFailure(it) }
 }

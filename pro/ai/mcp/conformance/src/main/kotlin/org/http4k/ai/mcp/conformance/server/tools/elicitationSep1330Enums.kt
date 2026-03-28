@@ -74,7 +74,7 @@ fun elicitationSep1330Enums() = Tool("test_elicitation_sep1330_enums", "test_eli
             when (it) {
                 is Ok -> ToolResponse.Ok(it.content.toString())
                 is Task -> error("Unexpected task response")
-                is ElicitationResponse.Error -> ToolResponse.Error(it.error.message)
+                is ElicitationResponse.Error -> ToolResponse.Error(it.message)
             }
         }
         .mapFailure { Error("Problem with response") }

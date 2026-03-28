@@ -9,6 +9,7 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
+import org.http4k.ai.mcp.SamplingResponse.Task
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content.Text
@@ -36,8 +37,8 @@ fun samplingTool() = Tool("test_sampling", "test_sampling", prompt) bind {
         .map {
             when (it) {
                 is SamplingResponse.Ok -> Ok(it.content.toString())
-                is SamplingResponse.Task -> error("Unexpected task response")
-                is SamplingResponse.Error -> Error(it.error.message)
+                is Task -> error("Unexpected task response")
+                is SamplingResponse.Error -> Error(it.message)
             }
         }
         .mapFailure { Error("Problem with response") }

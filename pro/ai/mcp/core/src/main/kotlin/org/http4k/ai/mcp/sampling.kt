@@ -18,7 +18,6 @@ import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.SystemPrompt
 import org.http4k.ai.model.Temperature
-import org.http4k.jsonrpc.ErrorMessage
 
 /**
  *  Processes a sampling request from an MCP server to a client
@@ -60,5 +59,5 @@ sealed interface SamplingResponse {
 
     data class Task(val task: org.http4k.ai.mcp.model.Task) : SamplingResponse
 
-    data class Error(val error: ErrorMessage) : SamplingResponse
+    data class Error(val message: String) : SamplingResponse
 }

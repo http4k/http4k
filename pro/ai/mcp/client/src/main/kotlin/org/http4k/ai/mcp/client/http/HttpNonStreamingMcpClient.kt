@@ -21,6 +21,9 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
+import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
+import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
+import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
@@ -122,7 +125,8 @@ class HttpNonStreamingMcpClient(
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
         ) = http.send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
-            .map { PromptResponse.Ok(it.messages, it.description) }
+            .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
+            .flatMapFailure { toPromptErrorOrFailure(it) }
     }
 
     override fun sampling() = throw UnsupportedOperationException()
@@ -147,7 +151,8 @@ class HttpNonStreamingMcpClient(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
         ) = http.send<McpResource.Read.Response>(McpResource.Read, McpResource.Read.Request(request.uri))
-            .map { ResourceResponse.Ok(it.contents) }
+            .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
+            .flatMapFailure { toResourceErrorOrFailure(it) }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) = throw UnsupportedOperationException()
 
@@ -157,7 +162,8 @@ class HttpNonStreamingMcpClient(
     override fun completions() = object : McpClient.Completions {
         override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
             http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(ref, request.argument))
-                .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) } }
+                .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) as CompletionResponse } }
+                .flatMapFailure { toCompletionErrorOrFailure(it) }
     }
 
     override fun tasks() = object : McpClient.Tasks {

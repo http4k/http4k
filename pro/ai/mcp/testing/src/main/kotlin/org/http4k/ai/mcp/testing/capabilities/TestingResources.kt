@@ -4,10 +4,12 @@
  */
 package org.http4k.ai.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
@@ -61,6 +63,7 @@ class TestingResources(
                 ResourceResponse.Ok(contents)
             })
             .map { it.second }
+            .flatMapFailure { toResourceErrorOrFailure(it) }
 
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {

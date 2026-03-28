@@ -28,11 +28,15 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.SamplingRequest
 import org.http4k.ai.mcp.SamplingResponse
+import org.http4k.ai.mcp.SamplingResponse.Error
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
 import org.http4k.ai.mcp.client.internal.McpCallback
+import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
+import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
+import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
@@ -54,6 +58,7 @@ import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
@@ -225,7 +230,8 @@ class HttpStreamingMcpClient(
             overrideDefaultTimeout: Duration?
         ) = http.send(McpPrompt.Get, McpPrompt.Get.Request(name, request))
             .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response>() }
-            .map { PromptResponse.Ok(it.messages, it.description) }
+            .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
+            .flatMapFailure { toPromptErrorOrFailure(it) }
     }
 
     override fun elicitations() = object : McpClient.Elicitations {
@@ -318,7 +324,7 @@ class HttpStreamingMcpClient(
                             )
 
                             is SamplingResponse.Task -> McpSampling.Response(task = response.task)
-                            is SamplingResponse.Error -> throw McpException(response.error)
+                            is Error -> throw McpException(DomainError(response.message))
                         }
                         http.send(
                             McpSampling,
@@ -355,7 +361,8 @@ class HttpStreamingMcpClient(
             overrideDefaultTimeout: Duration?
         ) = http.send(McpResource.Read, McpResource.Read.Request(request.uri))
             .flatMap { it.first().asAOrFailure<McpResource.Read.Response>() }
-            .map { ResourceResponse.Ok(it.contents) }
+            .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
+            .flatMapFailure { toResourceErrorOrFailure(it) }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) {
             callbacks.getOrPut(McpResource.Updated.Method) { mutableListOf() }.add(
@@ -376,7 +383,8 @@ class HttpStreamingMcpClient(
         override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
             http.send(McpCompletion, McpCompletion.Request(ref, request.argument))
                 .flatMap { it.first().asAOrFailure<McpCompletion.Response>() }
-                .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) } }
+                .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) as CompletionResponse } }
+                .flatMapFailure { toCompletionErrorOrFailure(it) }
     }
 
     override fun tasks() = object : McpClient.Tasks {
@@ -443,5 +451,5 @@ class HttpStreamingMcpClient(
 private fun ElicitationResponse.toProtocol() = when (this) {
     is Ok -> McpElicitations.Response(action, content, _meta = _meta)
     is Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
-    is ElicitationResponse.Error -> throw McpException(error)
+    is ElicitationResponse.Error -> throw McpException(DomainError(message))
 }

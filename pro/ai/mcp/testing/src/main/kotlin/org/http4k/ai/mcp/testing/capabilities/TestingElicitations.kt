@@ -7,10 +7,13 @@ package org.http4k.ai.mcp.testing.capabilities
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.ElicitationRequest
-import org.http4k.ai.mcp.ElicitationResponse
+import org.http4k.ai.mcp.ElicitationResponse.Error
+import org.http4k.ai.mcp.ElicitationResponse.Ok
+import org.http4k.ai.mcp.ElicitationResponse.Task
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
@@ -60,9 +63,9 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
 
             onElicitation.forEach { handler ->
                 val protocolResponse = when (val response = handler(domainRequest)) {
-                    is ElicitationResponse.Ok -> McpElicitations.Response(response.action, response.content, _meta = response._meta)
-                    is ElicitationResponse.Task -> McpElicitations.Response(task = response.task)
-                    is ElicitationResponse.Error -> throw McpException(response.error)
+                    is Ok -> McpElicitations.Response(response.action, response.content, _meta = response._meta)
+                    is Task -> McpElicitations.Response(task = response.task)
+                    is Error -> throw McpException(DomainError(response.message))
                 }
                 sender(protocolResponse, id!!)
             }

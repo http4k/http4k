@@ -15,6 +15,7 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Reference.Prompt
 import org.http4k.ai.mcp.model.Reference.ResourceTemplate
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.then
 import org.http4k.core.Request
@@ -29,7 +30,7 @@ class CompletionCapability(
     fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
         when (val result = handler(CompletionRequest(mcp.argument, mcp.context, mcp._meta, client, http))) {
             is Ok -> McpCompletion.Response(Completion(result.values, result.total, result.hasMore))
-            is Error -> throw McpException(result.error)
+            is Error -> throw McpException(DomainError(result.message))
         }
 
     override fun invoke(p1: CompletionRequest) = handler(p1)

@@ -4,10 +4,12 @@
  */
 package org.http4k.ai.mcp.testing.capabilities
 
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.testing.TestMcpSender
@@ -45,4 +47,5 @@ class TestingPrompts(
     ) = sender(McpPrompt.Get, McpPrompt.Get.Request(name, request, request.meta)).first()
         .nextEvent<PromptResponse, McpPrompt.Get.Response> { PromptResponse.Ok(messages, description) }
         .map { it.second }
+        .flatMapFailure { toPromptErrorOrFailure(it) }
 }

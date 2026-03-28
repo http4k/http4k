@@ -7,9 +7,12 @@ package org.http4k.ai.mcp.testing.capabilities
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.SamplingRequest
-import org.http4k.ai.mcp.SamplingResponse
+import org.http4k.ai.mcp.SamplingResponse.Error
+import org.http4k.ai.mcp.SamplingResponse.Ok
+import org.http4k.ai.mcp.SamplingResponse.Task
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
@@ -42,15 +45,15 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
             onSampling.forEach { handler ->
                 handler(req).forEach { response ->
                     val protocolResponse = when (response) {
-                        is SamplingResponse.Ok -> McpSampling.Response(
+                        is Ok -> McpSampling.Response(
                             response.model,
                             response.stopReason,
                             response.role,
                             response.content
                         )
 
-                        is SamplingResponse.Task -> McpSampling.Response(task = response.task)
-                        is SamplingResponse.Error -> throw McpException(response.error)
+                        is Task -> McpSampling.Response(task = response.task)
+                        is Error -> throw McpException(DomainError(response.message))
                     }
                     sender(protocolResponse, id!!)
                 }

@@ -8,9 +8,11 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.PromptFilter
 import org.http4k.ai.mcp.PromptHandler
 import org.http4k.ai.mcp.PromptRequest
-import org.http4k.ai.mcp.PromptResponse
+import org.http4k.ai.mcp.PromptResponse.Error
+import org.http4k.ai.mcp.PromptResponse.Ok
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.then
 import org.http4k.core.Request
@@ -30,8 +32,8 @@ class PromptCapability(
 
     fun get(mcp: McpPrompt.Get.Request, client: Client, http: Request) = try {
         when (val result = handler(PromptRequest(mcp.arguments, mcp._meta, client, http))) {
-            is PromptResponse.Ok -> McpPrompt.Get.Response(result.messages, result.description)
-            is PromptResponse.Error -> throw McpException(result.error)
+            is Ok -> McpPrompt.Get.Response(result.messages, result.description)
+            is Error -> throw McpException(DomainError(result.message))
         }
     } catch (e: McpException) {
         throw e

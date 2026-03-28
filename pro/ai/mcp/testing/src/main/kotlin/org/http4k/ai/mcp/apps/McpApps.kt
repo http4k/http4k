@@ -9,6 +9,7 @@ import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.recover
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ResourceRequest
+import org.http4k.ai.mcp.ResourceResponse.Error
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.apps.McpServerResult.Failure
@@ -79,7 +80,7 @@ class McpApps(private val clients: List<McpClient>) {
                             )
                         )
                     }
-                    is org.http4k.ai.mcp.ResourceResponse.Error -> Failure(it.error.message)
+                    is Error -> Failure(it.message)
                 }
             }
             .recover { Failure(it.toString()) }

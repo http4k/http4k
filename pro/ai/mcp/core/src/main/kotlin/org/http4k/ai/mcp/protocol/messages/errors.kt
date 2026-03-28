@@ -9,6 +9,12 @@ import org.http4k.format.Json
 import org.http4k.jsonrpc.ErrorMessage
 import se.ansman.kotshi.JsonSerializable
 
+data class DomainError(override val message: String) : ErrorMessage(CODE, message) {
+    companion object {
+        val CODE = -32050
+    }
+}
+
 @JsonSerializable
 data class URLElicitationRequiredError(
     val elicitations: List<McpElicitations.Request.Url>,

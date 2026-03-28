@@ -5,9 +5,11 @@
 package org.http4k.ai.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
+import org.http4k.ai.mcp.ResourceResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpResource
@@ -84,5 +86,6 @@ internal class ClientResources(
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpResource.Read.Response>() }
-            .map { ResourceResponse.Ok(it.contents) }
+            .map { Ok(it.contents) as ResourceResponse }
+            .flatMapFailure { toResourceErrorOrFailure(it) }
 }

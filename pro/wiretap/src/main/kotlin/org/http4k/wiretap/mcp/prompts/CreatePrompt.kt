@@ -7,6 +7,8 @@ package org.http4k.wiretap.mcp.prompts
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.PromptRequest
+import org.http4k.ai.mcp.PromptResponse.Error
+import org.http4k.ai.mcp.PromptResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Content.EmbeddedResource
 import org.http4k.ai.mcp.model.Content.ResourceLink
@@ -45,7 +47,7 @@ fun CreatePrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
         val result = mcpClient.prompts().get(PromptName.of(signals.promptName), PromptRequest(arguments))
         val view = result.map { response ->
             when (response) {
-                is org.http4k.ai.mcp.PromptResponse.Ok -> PromptResultView(response.messages.map { msg ->
+                is Ok -> PromptResultView(response.messages.map { msg ->
                     val content = msg.content
                     PromptMessageView(
                         msg.role.value, when (content) {
@@ -56,7 +58,7 @@ fun CreatePrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
                         }
                     )
                 })
-                is org.http4k.ai.mcp.PromptResponse.Error -> PromptResultView(listOf(PromptMessageView("error", response.error.message)))
+                is Error -> PromptResultView(listOf(PromptMessageView("error", response.message)))
             }
         }.valueOrNull() ?: PromptResultView(listOf(PromptMessageView("error", "Prompt get failed")))
 

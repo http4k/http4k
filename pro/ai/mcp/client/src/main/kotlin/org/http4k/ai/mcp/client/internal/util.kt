@@ -9,12 +9,16 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.resultFrom
+import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Internal
 import org.http4k.ai.mcp.McpError.Protocol
+import org.http4k.ai.mcp.PromptResponse
+import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.URLElicitationRequiredError.Companion.CODE
@@ -81,3 +85,24 @@ fun toToolElicitationRequiredOrError(mcpError: McpError): Result<ToolResponse, M
 
     return Failure(mcpError)
 }
+
+fun toResourceErrorOrFailure(mcpError: McpError) = when (mcpError) {
+    is Protocol if mcpError.error.code == DomainError.CODE ->
+        Success(ResourceResponse.Error(mcpError.error.message))
+
+    else -> Failure(mcpError)
+}
+
+fun toPromptErrorOrFailure(mcpError: McpError) =
+    when (mcpError) {
+        is Protocol if mcpError.error.code == DomainError.CODE -> Success(PromptResponse.Error(mcpError.error.message))
+        else -> Failure(mcpError)
+    }
+
+fun toCompletionErrorOrFailure(mcpError: McpError) =
+    when (mcpError) {
+        is Protocol if mcpError.error.code == DomainError.CODE ->
+            Success(CompletionResponse.Error(mcpError.error.message))
+
+        else -> Failure(mcpError)
+    }

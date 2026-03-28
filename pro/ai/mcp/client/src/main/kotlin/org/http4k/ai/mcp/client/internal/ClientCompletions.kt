@@ -5,9 +5,11 @@
 package org.http4k.ai.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
+import org.http4k.ai.mcp.CompletionResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Reference
@@ -31,5 +33,6 @@ internal class ClientCompletions(
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
-            .map { CompletionResponse.Ok(it.completion.values, it.completion.total, it.completion.hasMore) }
+            .map { Ok(it.completion.values, it.completion.total, it.completion.hasMore) as CompletionResponse }
+            .flatMapFailure { toCompletionErrorOrFailure(it) }
 }
