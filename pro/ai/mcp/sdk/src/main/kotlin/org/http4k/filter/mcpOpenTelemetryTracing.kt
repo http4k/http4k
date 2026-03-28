@@ -29,7 +29,7 @@ fun McpFilters.OpenTelemetryTracing(
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
 
-    val spanModifierMap = spanModifiers.associateBy { it.method }
+    val spanModifierMap = spanModifiers.groupBy { it.method }
 
     return McpFilter { next ->
         { req ->
@@ -56,12 +56,12 @@ fun McpFilters.OpenTelemetryTracing(
                 }
                 .startSpan()
 
-            spanModifiers?.request(span, req.json.params ?: McpJson.obj())
+            spanModifiers?.forEach { it.request(span, req.json.params ?: McpJson.obj()) }
 
             try {
                 span.makeCurrent().use { next(req) }
                     .also { resp ->
-                        spanModifiers?.response(span, resp.json)
+                        spanModifiers?.forEach { it.response(span, resp.json) }
 
                         val error = McpJson.fields(resp.json).toMap()["error"]
                         if (error != null) {
