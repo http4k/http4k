@@ -15,4 +15,4 @@ intellij-settings/
 jte-classes
 **/CLAUDE.md
 /results/
-/.playwright-mcp/
+.playwright-mcp/
