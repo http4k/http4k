@@ -29,6 +29,7 @@ com-google-devtools-ksp = "2.3.6"
 com-gradleup-shadow = "9.4.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.36.0"
 commons-codec = "1.21.0"
+cyclonedx-gradle-plugin = "2.2.0"
 # Blocked on 2.22.5.0 until Jackson 3 upgrade
 data4k = "2.22.5.0"
 docker-java-core = "3.7.1"
@@ -149,6 +150,7 @@ bunting4k = { module = "dev.forkhandles:bunting4k", version.ref = "forkhandles-b
 cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "cloudevents-core" }
 cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson", version.ref = "cloudevents-json-jackson" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+cyclonedx-gradle-plugin = { module = "org.cyclonedx:cyclonedx-gradle-plugin", version.ref = "cyclonedx-gradle-plugin" }
 data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }

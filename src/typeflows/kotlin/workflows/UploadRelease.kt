@@ -42,6 +42,10 @@ class UploadRelease : Builder<Workflow> {
 
             steps += SetupGradle()
 
+            steps += UseAction("sigstore/cosign-installer@v3.8.0") { // 4.1.1
+                name = "Install cosign"
+            }
+
             steps += RunCommand(
                 $$"""
                 ./gradlew publish --no-configuration-cache \
@@ -64,6 +68,40 @@ class UploadRelease : Builder<Workflow> {
                 env["ORG_GRADLE_PROJECT_mavenCentralPassword"] = Secrets.string("MAVEN_CENTRAL_PASSWORD")
                 env["ORG_GRADLE_PROJECT_signingInMemoryKey"] = Secrets.string("SIGNING_KEY")
                 env["ORG_GRADLE_PROJECT_signingInMemoryKeyPassword"] = Secrets.string("SIGNING_PASSWORD")
+            }
+
+            steps += RunCommand(
+                $$"""
+                ./gradlew cyclonedxBom --no-configuration-cache \
+                -PreleaseVersion="$RELEASE_VERSION"
+            """.trimIndent()
+            ) {
+                name = "Generate SBOMs"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+            }
+
+            steps += RunCommand($$"""bin/sign-and-attest.sh "$RELEASE_VERSION"""") {
+                name = "Sign artifacts and generate provenance"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["COSIGN_PRIVATE_KEY"] = Secrets.string("COSIGN_PRIVATE_KEY")
+                env["COSIGN_PASSWORD"] = Secrets.string("COSIGN_PASSWORD")
+            }
+
+            steps += RunCommand(
+                $$"""
+                ./gradlew uploadProvenance --no-configuration-cache \
+                -PreleaseVersion="$RELEASE_VERSION" \
+                -PltsPublishingUser="$LTS_PUBLISHING_USER" \
+                -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
+            """.trimIndent()
+            ) {
+                name = "Upload provenance to S3"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["LTS_PUBLISHING_USER"] = Secrets.string("LTS_PUBLISHING_USER")
+                env["LTS_PUBLISHING_PASSWORD"] = $$"${{ secrets.LTS_PUBLISHING_PASSWORD }}"
             }
 
             steps += RunCommand($$"bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}") {

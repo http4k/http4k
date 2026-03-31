@@ -84,7 +84,7 @@ data class ClientCapabilities internal constructor(
 
         @JsonSerializable
         data class ElicitationRequests(
-            val create: Map<String, Any>?? = null
+            val create: Map<String, Any>? = null
         )
 
         private fun buildSampling(capabilities: List<ClientProtocolCapability>): SamplingCapability? {
