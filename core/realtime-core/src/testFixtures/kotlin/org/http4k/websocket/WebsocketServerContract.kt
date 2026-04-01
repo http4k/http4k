@@ -34,6 +34,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.http4k.routing.bind as hbind
 
@@ -241,14 +242,18 @@ abstract class WebsocketServerContract(
     open fun `should propagate close on server stop`() {
         val closeStatus = CompletableFuture<WsStatus>()
 
+        val serverStarted = CountDownLatch(1)
         val server = websockets(
             "/closes" bind { _: Request ->
                 WsResponse { ws ->
                     ws.onClose(closeStatus::complete)
+                    serverStarted.countDown()
                 }
             }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.send(WsMessage("message"))
+
+        serverStarted.await(5, TimeUnit.SECONDS)
         server.close()
 
         assertThat(closeStatus.get(5, TimeUnit.SECONDS), present())

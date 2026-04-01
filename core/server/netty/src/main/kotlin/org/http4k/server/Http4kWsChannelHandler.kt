@@ -39,6 +39,9 @@ class Http4kWsChannelHandler(
     @Volatile private var previousMessageType: WsMessage.Mode? = null
 
     override fun handlerAdded(ctx: ChannelHandlerContext) {
+        // apply back-pressure until the websocket is initialized
+        ctx.channel().config().isAutoRead = false
+
         val ws = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
                 ctx.writeMessageChunked(message.body.payload.array(), message.mode)
@@ -60,6 +63,7 @@ class Http4kWsChannelHandler(
             wSocket(ws)
             websocket = ws
             drainBuffer(ctx, ws)
+            ctx.channel().config().isAutoRead = true
         }
     }
 
