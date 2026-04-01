@@ -16,8 +16,11 @@ mkdir -p "$PROVENANCE_DIR"
 GIT_COMMIT=$(git -C "$REPO_ROOT" rev-parse HEAD)
 BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-SIGNING_CONFIG="$REPO_ROOT/build/signing-config-no-tlog.json"
-cat > "$SIGNING_CONFIG" <<'CFGEOF'
+COSIGN_MAJOR=$(cosign version 2>&1 | grep -oP 'GitVersion:\s+v\K[0-9]+' || echo "2")
+
+if [[ "$COSIGN_MAJOR" -ge 3 ]]; then
+    SIGNING_CONFIG="$REPO_ROOT/build/signing-config-no-tlog.json"
+    cat > "$SIGNING_CONFIG" <<'CFGEOF'
 {
   "mediaType": "application/vnd.dev.sigstore.signingconfig.v0.2+json",
   "caUrls": [],
@@ -27,13 +30,17 @@ cat > "$SIGNING_CONFIG" <<'CFGEOF'
   "tsaConfig": { "selector": "ANY" }
 }
 CFGEOF
+    TLOG_FLAG="--signing-config $SIGNING_CONFIG"
+else
+    TLOG_FLAG="--tlog-upload=false"
+fi
 
 sign_blob() {
     local file="$1"
     local bundle="${file}.sigstore.json"
     cosign sign-blob "$file" \
         --key env://COSIGN_PRIVATE_KEY \
-        --signing-config "$SIGNING_CONFIG" \
+        $TLOG_FLAG \
         --bundle "$bundle" \
         --yes 2>/dev/null
     echo "  Signed: $(basename "$bundle")"
