@@ -189,10 +189,10 @@ abstract class WebsocketServerContract(
     fun `errors are propagated to the 'on error' handler`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
-        assertThat(
-            client.received().take(1).toList(),
-            equalTo(listOf(WsMessage("websocket 'message' must be object")))
-        )
+
+        val received = client.received().take(1).first()
+        assertThat(received.mode, equalTo(WsMessage.Mode.Text))
+        assertThat(received.bodyString(), equalTo("websocket 'message' must be object"))
     }
 
     @Test
