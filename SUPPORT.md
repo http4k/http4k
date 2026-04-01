@@ -5,5 +5,5 @@ to APIs will not need to be mixed in with security patches.
 
 | Version       | Supported          |
 |---------------| ------------------ |
-| 5.x           | :white_check_mark: |
-| 4.x and below | :x:                |
+| 6.x           | :white_check_mark: |
+| 5.x and below | :x:                |
