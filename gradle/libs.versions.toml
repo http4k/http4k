@@ -28,7 +28,7 @@ com-google-devtools-ksp = "2.3.6"
 com-gradleup-shadow = "9.4.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.36.0"
 commons-codec = "1.21.0"
-cyclonedx-gradle-plugin = "2.2.0"
+cyclonedx-gradle-plugin = "3.2.3"
 # Blocked on 2.22.5.0 until Jackson 3 upgrade
 data4k = "2.22.5.0"
 docker-java-core = "3.7.1"

@@ -8,10 +8,8 @@ plugins {
     id("org.cyclonedx.bom")
 }
 
-tasks.named<org.cyclonedx.gradle.CycloneDxTask>("cyclonedxBom") {
-    setIncludeConfigs(listOf("runtimeClasspath"))
-    setOutputFormat("json")
-    setOutputName("${project.name}-sbom")
+tasks.named<org.cyclonedx.gradle.CyclonedxAggregateTask>("cyclonedxBom") {
+    jsonOutput.set(layout.buildDirectory.file("reports/${project.name}-sbom.json"))
 }
 
 tasks.register("writePublishManifest") {
