@@ -27,7 +27,7 @@ jobs:
       shell: bash
     - name: Publish to S3
       run: |-
-        ./gradlew :http4k-incubator:publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+        ./gradlew publishAllPublicationsToHttp4kRepository --no-configuration-cache \
         -Psign=true \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
@@ -42,11 +42,11 @@ jobs:
         ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
         ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
-    - name: Generate SBOM
-      run: ./gradlew :http4k-incubator:cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+    - name: Generate SBOMs
+      run: ./gradlew cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Build publish manifest
-      run: ./gradlew :http4k-incubator:writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      run: ./gradlew writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Sign artifacts and generate provenance
       run: bin/sign-and-attest.sh "$RELEASE_VERSION"
@@ -56,7 +56,7 @@ jobs:
       shell: bash
     - name: Upload provenance to S3
       run: |-
-        ./gradlew :http4k-incubator:uploadProvenance --no-configuration-cache \
+        ./gradlew uploadProvenance --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
         -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
