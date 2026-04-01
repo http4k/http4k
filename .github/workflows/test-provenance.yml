@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-  RELEASE_VERSION: '0.0.0.0'
+  RELEASE_VERSION: '4.48.0.1'
 jobs:
   test-provenance:
     runs-on: ubuntu-latest
