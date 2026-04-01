@@ -28,6 +28,3 @@ tasks.register("writePublishManifest") {
     }
 }
 
-tasks.register("uploadProvenance") {
-    doLast { project.uploadProvenance() }
-}

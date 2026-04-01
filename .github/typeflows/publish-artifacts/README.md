@@ -51,21 +51,27 @@ flowchart TD
     style action5 fill:#e1f5fe,stroke:#0277bd
     step5 -.-> action5
     step4 --> step5
-    step6["Step 6: Publish<br/>💻 bash"]
+    step6["Step 6: Build artifacts<br/>💻 bash"]
     style step6 fill:#f3e5f5,stroke:#7b1fa2
     step5 --> step6
     step7["Step 7: Generate SBOMs<br/>💻 bash"]
     style step7 fill:#f3e5f5,stroke:#7b1fa2
     step6 --> step7
-    step8["Step 8: Sign artifacts and generate provenance<br/>💻 bash"]
+    step8["Step 8: Build publish manifest<br/>💻 bash"]
     style step8 fill:#f3e5f5,stroke:#7b1fa2
     step7 --> step8
-    step9["Step 9: Upload provenance to S3<br/>💻 bash"]
+    step9["Step 9: Sign artifacts and generate provenance<br/>💻 bash"]
     style step9 fill:#f3e5f5,stroke:#7b1fa2
     step8 --> step9
-    step10["Step 10: Notify LTS Slack<br/>💻 bash"]
+    step10["Step 10: Publish to http4k Maven<br/>💻 bash"]
     style step10 fill:#f3e5f5,stroke:#7b1fa2
     step9 --> step10
+    step11["Step 11: Publish to Maven Central<br/>💻 bash"]
+    style step11 fill:#f3e5f5,stroke:#7b1fa2
+    step10 --> step11
+    step12["Step 12: Notify LTS Slack<br/>💻 bash"]
+    style step12 fill:#f3e5f5,stroke:#7b1fa2
+    step11 --> step12
 ```
 
 **Step Types Legend:**

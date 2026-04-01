@@ -42,32 +42,19 @@ class UploadRelease : Builder<Workflow> {
 
             steps += SetupGradle()
 
-            steps += UseAction("sigstore/cosign-installer@v3.8.0") { // 4.1.1
+            steps += UseAction("sigstore/cosign-installer@v3.8.0") {
                 name = "Install cosign"
             }
 
             steps += RunCommand(
                 $$"""
-                ./gradlew publish --no-configuration-cache \
-                -Psign=true \
-                -PreleaseVersion="$RELEASE_VERSION" \
-                -PltsPublishingUser="$LTS_PUBLISHING_USER" \
-                -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
-                -PsigningKey="$SIGNING_KEY" \
-                -PsigningPassword="$SIGNING_PASSWORD"
+                ./gradlew jar --no-configuration-cache \
+                -PreleaseVersion="$RELEASE_VERSION"
             """.trimIndent()
             ) {
-                name = "Publish"
+                name = "Build artifacts"
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
-                env["LTS_PUBLISHING_USER"] = Secrets.string("LTS_PUBLISHING_USER")
-                env["LTS_PUBLISHING_PASSWORD"] = $$"${{ secrets.LTS_PUBLISHING_PASSWORD }}"
-                env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
-                env["SIGNING_PASSWORD"] = Secrets.string("SIGNING_PASSWORD")
-                env["ORG_GRADLE_PROJECT_mavenCentralUsername"] = Secrets.string("MAVEN_CENTRAL_USERNAME")
-                env["ORG_GRADLE_PROJECT_mavenCentralPassword"] = Secrets.string("MAVEN_CENTRAL_PASSWORD")
-                env["ORG_GRADLE_PROJECT_signingInMemoryKey"] = Secrets.string("SIGNING_KEY")
-                env["ORG_GRADLE_PROJECT_signingInMemoryKeyPassword"] = Secrets.string("SIGNING_PASSWORD")
             }
 
             steps += RunCommand(
@@ -77,6 +64,17 @@ class UploadRelease : Builder<Workflow> {
             """.trimIndent()
             ) {
                 name = "Generate SBOMs"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+            }
+
+            steps += RunCommand(
+                $$"""
+                ./gradlew writePublishManifest --no-configuration-cache \
+                -PreleaseVersion="$RELEASE_VERSION"
+            """.trimIndent()
+            ) {
+                name = "Build publish manifest"
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
             }
@@ -91,17 +89,45 @@ class UploadRelease : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"""
-                ./gradlew uploadProvenance --no-configuration-cache \
+                ./gradlew publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+                -Psign=true \
+                -PincludeProvenance=true \
                 -PreleaseVersion="$RELEASE_VERSION" \
                 -PltsPublishingUser="$LTS_PUBLISHING_USER" \
-                -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
+                -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
+                -PsigningKey="$SIGNING_KEY" \
+                -PsigningPassword="$SIGNING_PASSWORD"
             """.trimIndent()
             ) {
-                name = "Upload provenance to S3"
+                name = "Publish to http4k Maven"
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
                 env["LTS_PUBLISHING_USER"] = Secrets.string("LTS_PUBLISHING_USER")
                 env["LTS_PUBLISHING_PASSWORD"] = $$"${{ secrets.LTS_PUBLISHING_PASSWORD }}"
+                env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
+                env["SIGNING_PASSWORD"] = Secrets.string("SIGNING_PASSWORD")
+                env["ORG_GRADLE_PROJECT_signingInMemoryKey"] = Secrets.string("SIGNING_KEY")
+                env["ORG_GRADLE_PROJECT_signingInMemoryKeyPassword"] = Secrets.string("SIGNING_PASSWORD")
+            }
+
+            steps += RunCommand(
+                $$"""
+                ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache \
+                -Psign=true \
+                -PreleaseVersion="$RELEASE_VERSION" \
+                -PsigningKey="$SIGNING_KEY" \
+                -PsigningPassword="$SIGNING_PASSWORD"
+            """.trimIndent()
+            ) {
+                name = "Publish to Maven Central"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
+                env["SIGNING_PASSWORD"] = Secrets.string("SIGNING_PASSWORD")
+                env["ORG_GRADLE_PROJECT_mavenCentralUsername"] = Secrets.string("MAVEN_CENTRAL_USERNAME")
+                env["ORG_GRADLE_PROJECT_mavenCentralPassword"] = Secrets.string("MAVEN_CENTRAL_PASSWORD")
+                env["ORG_GRADLE_PROJECT_signingInMemoryKey"] = Secrets.string("SIGNING_KEY")
+                env["ORG_GRADLE_PROJECT_signingInMemoryKeyPassword"] = Secrets.string("SIGNING_PASSWORD")
             }
 
             steps += RunCommand($$"bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}") {

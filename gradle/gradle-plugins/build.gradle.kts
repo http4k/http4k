@@ -28,7 +28,6 @@ dependencies {
     api(lib("gradle-maven-publish-plugin"))
     api(lib("spotless-gradle-plugin"))
     api(lib("cyclonedx-gradle-plugin"))
-    api(lib("awssdk-s3"))
 }
 
 fun lib(s: String) = the<VersionCatalogsExtension>()

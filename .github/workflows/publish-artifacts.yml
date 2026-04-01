@@ -26,29 +26,23 @@ jobs:
       uses: gradle/actions/setup-gradle@v5.0.0
     - name: Install cosign
       uses: sigstore/cosign-installer@v3.8.0
-    - name: Publish
+    - name: Build artifacts
       run: |-
-        ./gradlew publish --no-configuration-cache \
-        -Psign=true \
-        -PreleaseVersion="$RELEASE_VERSION" \
-        -PltsPublishingUser="$LTS_PUBLISHING_USER" \
-        -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
-        -PsigningKey="$SIGNING_KEY" \
-        -PsigningPassword="$SIGNING_PASSWORD"
+        ./gradlew jar --no-configuration-cache \
+        -PreleaseVersion="$RELEASE_VERSION"
       env:
         RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
-        LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
-        LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
-        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
-        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
     - name: Generate SBOMs
       run: |-
         ./gradlew cyclonedxDirectBom --no-configuration-cache \
+        -PreleaseVersion="$RELEASE_VERSION"
+      env:
+        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+      shell: bash
+    - name: Build publish manifest
+      run: |-
+        ./gradlew writePublishManifest --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION"
       env:
         RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
@@ -60,16 +54,40 @@ jobs:
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       shell: bash
-    - name: Upload provenance to S3
+    - name: Publish to http4k Maven
       run: |-
-        ./gradlew uploadProvenance --no-configuration-cache \
+        ./gradlew publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+        -Psign=true \
+        -PincludeProvenance=true \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
-        -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
+        -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
+        -PsigningKey="$SIGNING_KEY" \
+        -PsigningPassword="$SIGNING_PASSWORD"
       env:
         RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
         LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
         LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+      shell: bash
+    - name: Publish to Maven Central
+      run: |-
+        ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache \
+        -Psign=true \
+        -PreleaseVersion="$RELEASE_VERSION" \
+        -PsigningKey="$SIGNING_KEY" \
+        -PsigningPassword="$SIGNING_PASSWORD"
+      env:
+        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
     - name: Notify LTS Slack
       run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}

@@ -1,9 +1,14 @@
 name: Test Provenance Pipeline
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '6.39.1.0'
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-  RELEASE_VERSION: '6.39.1.0'
+  RELEASE_VERSION: ${{ github.event.inputs.version }}
 jobs:
   test-provenance:
     runs-on: ubuntu-latest
@@ -25,10 +30,26 @@ jobs:
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       shell: bash
-    - name: Publish to S3
+    - name: Build artifacts
+      run: ./gradlew :http4k-incubator:jar --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      shell: bash
+    - name: Generate SBOM
+      run: ./gradlew :http4k-incubator:cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      shell: bash
+    - name: Build publish manifest
+      run: ./gradlew :http4k-incubator:writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      shell: bash
+    - name: Sign artifacts and generate provenance
+      run: bin/sign-and-attest.sh "$RELEASE_VERSION"
+      env:
+        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+      shell: bash
+    - name: Publish to S3 with provenance
       run: |-
-        ./gradlew publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+        ./gradlew :http4k-incubator:publishAllPublicationsToHttp4kRepository --no-configuration-cache \
         -Psign=true \
+        -PincludeProvenance=true \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
         -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
@@ -41,26 +62,4 @@ jobs:
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
         ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-      shell: bash
-    - name: Generate SBOMs
-      run: ./gradlew cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
-      shell: bash
-    - name: Build publish manifest
-      run: ./gradlew writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
-      shell: bash
-    - name: Sign artifacts and generate provenance
-      run: bin/sign-and-attest.sh "$RELEASE_VERSION"
-      env:
-        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-        COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-      shell: bash
-    - name: Upload provenance to S3
-      run: |-
-        ./gradlew uploadProvenance --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION" \
-        -PltsPublishingUser="$LTS_PUBLISHING_USER" \
-        -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
-      env:
-        LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
-        LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
       shell: bash

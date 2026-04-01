@@ -1,9 +1,9 @@
 package org.http4k.internal
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import groovy.namespace.QName
 import groovy.util.Node
 import java.net.URI
-import groovy.namespace.QName
 
 plugins {
     kotlin("jvm")
@@ -65,6 +65,34 @@ configure<MavenPublishBaseExtension> {
             project.name,
             project.properties["releaseVersion"]?.toString() ?: "LOCAL"
         )
+
+        if (project.findProperty("includeProvenance") == "true") {
+            val version = project.properties["releaseVersion"]?.toString() ?: "LOCAL"
+            val buildDir = project.layout.buildDirectory.get().asFile
+
+            publications.withType<MavenPublication> {
+                artifact(File(buildDir, "reports/${project.name}-sbom.json")) {
+                    classifier = "cyclonedx"
+                    extension = "json"
+                }
+                artifact(File(buildDir, "reports/${project.name}-sbom.json.sigstore.json")) {
+                    classifier = "cyclonedx-sigstore"
+                    extension = "json"
+                }
+                artifact(File(buildDir, "libs/${project.name}-${version}.jar.sigstore.json")) {
+                    classifier = "jar-sigstore"
+                    extension = "json"
+                }
+                artifact(File(rootProject.layout.buildDirectory.get().asFile, "provenance/${project.name}-${version}.provenance.json")) {
+                    classifier = "provenance"
+                    extension = "json"
+                }
+                artifact(File(rootProject.layout.buildDirectory.get().asFile, "provenance/${project.name}-${version}.provenance.json.sigstore.json")) {
+                    classifier = "provenance-sigstore"
+                    extension = "json"
+                }
+            }
+        }
 
         pom {
             withXml {
