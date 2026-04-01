@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.39.0.1
+### v6.39.0.1 (uncut)
 - **http4k-server-netty**: [Fix] Properly chunk and consume chunked websocket messages. H/T @oharaandrew314
 
 ### v6.39.0.0
