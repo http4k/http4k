@@ -18,8 +18,6 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
-import java.io.File
-import java.security.PublicKey
 
 abstract class VerifyHttp4kDependencies : DefaultTask() {
 
@@ -55,14 +53,41 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
             return
         }
 
-        val publicKey = loadPublicKey()
+        val toVerify = artifactsWithBundles.filter { (id, jarFile, _) ->
+            !VerificationCache.isVerified(
+                this.project.gradle.gradleUserHomeDir,
+                id.group,
+                id.module,
+                id.version,
+                jarFile
+            )
+        }
+
+        if (toVerify.isEmpty()) {
+            val noBundles = http4kArtifacts.size - artifactsWithBundles.size
+            logger.lifecycle("All ${artifactsWithBundles.size} http4k artifact(s) previously verified (cached)")
+            if (noBundles > 0) {
+                logger.lifecycle("  Skipped $noBundles artifact(s) without sigstore bundles (resolved from Maven Central)")
+            }
+            return
+        }
+
         val results = mutableListOf<VerificationResult>()
 
-        logger.lifecycle("Verifying ${artifactsWithBundles.size} http4k artifact(s)...")
+        logger.lifecycle("Verifying ${toVerify.size} http4k artifact(s) (${artifactsWithBundles.size - toVerify.size} cached)...")
 
-        for ((id, jarFile, bundleFile) in artifactsWithBundles) {
-            val result = BundleVerifier.verify(jarFile, bundleFile.readText(), publicKey)
+        for ((id, jarFile, bundleFile) in toVerify) {
+            val result = BundleVerifier.verify(jarFile, bundleFile.readText(), loadPublicKey())
             results.add(result)
+            if (result.passed) {
+                VerificationCache.markVerified(
+                    this.project.gradle.gradleUserHomeDir,
+                    id.group,
+                    id.module,
+                    id.version,
+                    jarFile
+                )
+            }
             logger.lifecycle("  ${if (result.passed) "PASS" else "FAIL"}: ${id.group}:${id.module}:${id.version} — ${result.message}")
         }
 
@@ -80,20 +105,19 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
         }
     }
 
-    private fun loadPublicKey(): PublicKey {
-        val keyContent = when {
+    private fun loadPublicKey() = BundleVerifier.loadPublicKey(
+        when {
             publicKeyFile.isPresent -> publicKeyFile.get().asFile.readText()
             else -> {
-                logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
+                this.logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
                 val response = JavaHttpClient()(Request(GET, "https://http4k.org/cosign.pub"))
                 if (response.status != OK) throw GradleException("Failed to download public key: ${response.status}")
                 response.bodyString()
             }
         }
-        return BundleVerifier.loadPublicKey(keyContent)
-    }
+    )
 
-    private fun resolveHttp4kArtifacts(configuration: Configuration): List<Pair<ModuleComponentIdentifier, File>> =
+    private fun resolveHttp4kArtifacts(configuration: Configuration) =
         configuration.resolvedConfiguration.resolvedArtifacts
             .filter { artifact ->
                 val id = artifact.id.componentIdentifier
@@ -104,12 +128,12 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
                 artifact.id.componentIdentifier as ModuleComponentIdentifier to artifact.file
             }
 
-    private fun resolveSigstoreBundle(id: ModuleComponentIdentifier): File? =
+    private fun resolveSigstoreBundle(id: ModuleComponentIdentifier) =
         try {
             val dep = project.dependencies.create("${id.group}:${id.module}:${id.version}:jar-sigstore@json")
             val config = project.configurations.detachedConfiguration(dep)
             config.resolve().firstOrNull()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
 }
