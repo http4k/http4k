@@ -71,7 +71,7 @@ if [ -n "${PUBLIC_KEY:-}" ]; then
         cosign verify-blob "$JAR" \
             --key "$PUBLIC_KEY" \
             --bundle "${JAR}.sigstore.json" \
-            --insecure-ignore-tlog 2>&1 && echo "  JAR signature: VALID" || echo "  JAR signature: FAILED"
+            --private-infrastructure 2>&1 && echo "  JAR signature: VALID" || echo "  JAR signature: FAILED"
     fi
 
     SBOM="$REPO_ROOT/core/core/build/reports/http4k-core-sbom.json"
@@ -79,7 +79,7 @@ if [ -n "${PUBLIC_KEY:-}" ]; then
         cosign verify-blob "$SBOM" \
             --key "$PUBLIC_KEY" \
             --bundle "${SBOM}.sigstore.json" \
-            --insecure-ignore-tlog 2>&1 && echo "  SBOM signature: VALID" || echo "  SBOM signature: FAILED"
+            --private-infrastructure 2>&1 && echo "  SBOM signature: VALID" || echo "  SBOM signature: FAILED"
     fi
 
     PROV=$(find "$REPO_ROOT/build/provenance" -name "*.provenance.json" ! -name "*.sigstore.json" | head -1)
@@ -87,7 +87,7 @@ if [ -n "${PUBLIC_KEY:-}" ]; then
         cosign verify-blob "$PROV" \
             --key "$PUBLIC_KEY" \
             --bundle "${PROV}.sigstore.json" \
-            --insecure-ignore-tlog 2>&1 && echo "  Provenance signature: VALID" || echo "  Provenance signature: FAILED"
+            --private-infrastructure 2>&1 && echo "  Provenance signature: VALID" || echo "  Provenance signature: FAILED"
     fi
 
     echo ""
@@ -97,4 +97,3 @@ fi
 
 echo ""
 echo "=== Done ==="
-echo "S3 upload is handled by: ./gradlew uploadProvenance -PreleaseVersion=$VERSION -PltsPublishingUser=... -PltsPublishingPassword=..."

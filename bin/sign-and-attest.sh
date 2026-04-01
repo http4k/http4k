@@ -48,10 +48,15 @@ fi
 sign_blob() {
     local file="$1"
     local bundle="${file}.sigstore.json"
+    local extra_flags=""
+    if [[ "$COSIGN_MAJOR" -lt 3 ]]; then
+        extra_flags="--rfc3161-timestamp=${file}.rfc3161.timestamp"
+    fi
     cosign sign-blob "$file" \
         --key env://COSIGN_PRIVATE_KEY \
         $TLOG_FLAG \
         --bundle "$bundle" \
+        $extra_flags \
         --yes
     echo "  Signed: $(basename "$bundle")"
 }
