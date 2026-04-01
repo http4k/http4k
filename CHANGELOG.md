@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.40.0.0 (uncut)
+- **http4k-tools-verify**: [New Pro module!] Gradle plugin for automated supply chain verification. Verifies cosign signatures on all http4k artifacts resolved from the http4k Enterprise
+  Repository at build time. Pure JVM — no CLI tools required. Apply with `id("org.http4k.verify")`.
+
 ### v6.39.1.0
 - **http4k-***: Upgrade versions
 - **http4k-server-netty**: [Fix] Properly chunk and consume chunked websocket messages. H/T @oharaandrew314
