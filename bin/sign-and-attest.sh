@@ -22,20 +22,27 @@ COSIGN_MAJOR="${COSIGN_MAJOR:-2}"
 echo "Detected cosign major version: $COSIGN_MAJOR"
 
 if [[ "$COSIGN_MAJOR" -ge 3 ]]; then
-    SIGNING_CONFIG="$REPO_ROOT/build/signing-config-no-tlog.json"
+    SIGNING_CONFIG="$REPO_ROOT/build/signing-config.json"
     cat > "$SIGNING_CONFIG" <<'CFGEOF'
 {
   "mediaType": "application/vnd.dev.sigstore.signingconfig.v0.2+json",
   "caUrls": [],
   "oidcUrls": [],
-  "tsaUrls": [],
+  "tsaUrls": [
+    {
+      "url": "https://timestamp.sigstore.dev/api/v1/timestamp",
+      "majorApiVersion": 1,
+      "validFor": { "start": "2025-07-04T00:00:00Z" },
+      "operator": "sigstore.dev"
+    }
+  ],
   "rekorTlogConfig": { "selector": "ANY" },
   "tsaConfig": { "selector": "ANY" }
 }
 CFGEOF
     TLOG_FLAG="--signing-config $SIGNING_CONFIG"
 else
-    TLOG_FLAG="--tlog-upload=false"
+    TLOG_FLAG="--tlog-upload=false --timestamp-server-url=https://timestamp.sigstore.dev/api/v1/timestamp"
 fi
 
 sign_blob() {
