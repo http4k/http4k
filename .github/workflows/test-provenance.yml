@@ -3,15 +3,13 @@ on:
   workflow_dispatch:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-  RELEASE_VERSION: '6.39.0.0'
+  RELEASE_VERSION: '0.0.0.0'
 jobs:
   test-provenance:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v5.0.0
-      with:
-        ref: 6.39.0.0
     - name: Setup Java
       uses: actions/setup-java@v5.0.0
       with:
@@ -21,20 +19,14 @@ jobs:
       uses: gradle/actions/setup-gradle@v5.0.0
     - name: Install cosign
       uses: sigstore/cosign-installer@v3.8.0
-    - name: Build all artifacts
-      run: |-
-        ./gradlew jar --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+    - name: Build
+      run: ./gradlew :http4k-incubator:jar --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
-    - name: Generate SBOMs
-      run: |-
-        ./gradlew cyclonedxBom --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+    - name: Generate SBOM
+      run: ./gradlew :http4k-incubator:cyclonedxBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Build publish manifest
-      run: |-
-        ./gradlew writePublishManifest --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+      run: ./gradlew :http4k-incubator:writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Sign artifacts and generate provenance
       run: bin/sign-and-attest.sh "$RELEASE_VERSION"
@@ -44,7 +36,7 @@ jobs:
       shell: bash
     - name: Upload provenance to S3
       run: |-
-        ./gradlew uploadProvenance --no-configuration-cache \
+        ./gradlew :http4k-incubator:uploadProvenance --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
         -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
