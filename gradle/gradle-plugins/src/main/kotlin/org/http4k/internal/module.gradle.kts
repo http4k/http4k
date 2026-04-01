@@ -8,8 +8,12 @@ plugins {
     id("org.cyclonedx.bom")
 }
 
-tasks.named<org.cyclonedx.gradle.CyclonedxAggregateTask>("cyclonedxBom") {
+tasks.named<org.cyclonedx.gradle.CyclonedxDirectTask>("cyclonedxDirectBom") {
     jsonOutput.set(layout.buildDirectory.file("reports/${project.name}-sbom.json"))
+}
+
+tasks.named("cyclonedxBom") {
+    dependsOn("cyclonedxDirectBom")
 }
 
 tasks.register("writePublishManifest") {

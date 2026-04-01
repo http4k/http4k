@@ -1,22 +1,15 @@
-name: Publish Artifacts
+name: Test Provenance Pipeline
 on:
-  push:
-    tags:
-    - '*'
+  workflow_dispatch:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+  RELEASE_VERSION: '4.48.0.1'
 jobs:
-  release:
+  test-provenance:
     runs-on: ubuntu-latest
-    if: github.repository == 'http4k/http4k'
     steps:
     - name: Checkout
       uses: actions/checkout@v5.0.0
-      with:
-        ref: ${{ steps.tagName.outputs.tag }}
-    - name: Grab tag name
-      id: tagName
-      uses: olegtarasov/get-tag@v2.1.4
     - name: Setup Java
       uses: actions/setup-java@v5.0.0
       with:
@@ -26,9 +19,15 @@ jobs:
       uses: gradle/actions/setup-gradle@v5.0.0
     - name: Install cosign
       uses: sigstore/cosign-installer@v3.8.0
-    - name: Publish
+    - name: Verify cosign key decryption
+      run: echo "test" | cosign sign-blob --key env://COSIGN_PRIVATE_KEY --tlog-upload=false - > /dev/null
+      env:
+        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+      shell: bash
+    - name: Publish to S3
       run: |-
-        ./gradlew publish --no-configuration-cache \
+        ./gradlew :http4k-incubator:publishAllPublicationsToHttp4kRepository --no-configuration-cache \
         -Psign=true \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
@@ -36,43 +35,32 @@ jobs:
         -PsigningKey="$SIGNING_KEY" \
         -PsigningPassword="$SIGNING_PASSWORD"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
         LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
         LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
         SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
         ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
-    - name: Generate SBOMs
-      run: |-
-        ./gradlew cyclonedxDirectBom --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
-      env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+    - name: Generate SBOM
+      run: ./gradlew :http4k-incubator:cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      shell: bash
+    - name: Build publish manifest
+      run: ./gradlew :http4k-incubator:writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Sign artifacts and generate provenance
       run: bin/sign-and-attest.sh "$RELEASE_VERSION"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       shell: bash
     - name: Upload provenance to S3
       run: |-
-        ./gradlew uploadProvenance --no-configuration-cache \
+        ./gradlew :http4k-incubator:uploadProvenance --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION" \
         -PltsPublishingUser="$LTS_PUBLISHING_USER" \
         -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
         LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
         LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
-      shell: bash
-    - name: Notify LTS Slack
-      run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}
-      env:
-        LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
       shell: bash

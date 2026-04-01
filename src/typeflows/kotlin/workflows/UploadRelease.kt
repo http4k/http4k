@@ -72,7 +72,7 @@ class UploadRelease : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"""
-                ./gradlew cyclonedxBom --no-configuration-cache \
+                ./gradlew cyclonedxDirectBom --no-configuration-cache \
                 -PreleaseVersion="$RELEASE_VERSION"
             """.trimIndent()
             ) {
