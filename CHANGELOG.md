@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.39.0.1
+- **http4k-server-netty**: [Fix] Properly chunk and consume chunked websocket messages. H/T @oharaandrew314
+
 ### v6.39.0.0
 - **http4k-***: Upgrade versions
 - **http4k-security-oauth**: Better support for OAuth discovery in FakeOAuthServer.
