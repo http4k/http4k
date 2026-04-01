@@ -19,6 +19,12 @@ jobs:
       uses: gradle/actions/setup-gradle@v5.0.0
     - name: Install cosign
       uses: sigstore/cosign-installer@v3.8.0
+    - name: Verify cosign key decryption
+      run: echo "test" | cosign sign-blob --key env://COSIGN_PRIVATE_KEY --tlog-upload=false - > /dev/null
+      env:
+        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+      shell: bash
     - name: Build
       run: ./gradlew :http4k-incubator:jar --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
