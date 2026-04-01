@@ -16,7 +16,10 @@ mkdir -p "$PROVENANCE_DIR"
 GIT_COMMIT=$(git -C "$REPO_ROOT" rev-parse HEAD)
 BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-COSIGN_MAJOR=$(cosign version 2>&1 | grep -oP 'GitVersion:\s+v\K[0-9]+' || echo "2")
+COSIGN_MAJOR=$(cosign version 2>&1 | sed -n 's/.*GitVersion:[[:space:]]*v\([0-9]*\).*/\1/p')
+COSIGN_MAJOR="${COSIGN_MAJOR:-2}"
+
+echo "Detected cosign major version: $COSIGN_MAJOR"
 
 if [[ "$COSIGN_MAJOR" -ge 3 ]]; then
     SIGNING_CONFIG="$REPO_ROOT/build/signing-config-no-tlog.json"
@@ -42,7 +45,7 @@ sign_blob() {
         --key env://COSIGN_PRIVATE_KEY \
         $TLOG_FLAG \
         --bundle "$bundle" \
-        --yes 2>/dev/null
+        --yes
     echo "  Signed: $(basename "$bundle")"
 }
 
