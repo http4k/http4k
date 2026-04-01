@@ -14,14 +14,6 @@ tasks.named<org.cyclonedx.gradle.CycloneDxTask>("cyclonedxBom") {
     setOutputName("${project.name}-sbom")
 }
 
-tasks.register("dependencyList") {
-    doLast {
-        configurations.runtimeClasspath.get().resolvedConfiguration.lenientConfiguration.allModuleDependencies.forEach { resolved ->
-            println("${project.name} -> ${resolved.module.id}")
-        }
-    }
-}
-
 tasks.register("writePublishManifest") {
     doLast {
         val group = project.group.toString()
