@@ -26,7 +26,7 @@ import java.io.File
 private data class ModuleVerification(
     val gav: String,
     val checks: MutableMap<String, VerificationResult?> = mutableMapOf(
-        "jar" to null, "sbom" to null, "provenance" to null
+        "jar" to null, "sbom" to null, "provenance" to null, "license" to null
     )
 ) {
     val allPassed get() = checks.values.all { it == null || it.passed }
@@ -109,6 +109,20 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
                     val result = BundleVerifier.verify(provArtifact, provBundle.readText(), publicKey)
                     module.checks["provenance"] = result
                     if (result.passed) VerificationCache.markVerified(gradleHome, cacheKey, provArtifact)
+                }
+            }
+
+            val licenseArtifact = resolveClassified(id, "license-report")
+            val licenseBundle = resolveClassified(id, "license-report-sigstore")
+            if (licenseArtifact != null && licenseBundle != null) {
+                val cacheKey = "$gav:license"
+                if (VerificationCache.isVerified(gradleHome, cacheKey, licenseArtifact)) {
+                    module.checks["license"] = VerificationResult(licenseArtifact.name, true, "cached")
+                } else {
+                    val publicKey = loadPublicKey()
+                    val result = BundleVerifier.verify(licenseArtifact, licenseBundle.readText(), publicKey)
+                    module.checks["license"] = result
+                    if (result.passed) VerificationCache.markVerified(gradleHome, cacheKey, licenseArtifact)
                 }
             }
 

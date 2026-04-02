@@ -16,6 +16,15 @@ tasks.named("cyclonedxBom") {
     dependsOn("cyclonedxDirectBom")
 }
 
+tasks.register("generateLicenseReportJson") {
+    dependsOn("generateLicenseReport")
+    doLast {
+        val source = layout.buildDirectory.file("reports/dependency-license/index.json").get().asFile
+        val dest = layout.buildDirectory.file("reports/${project.name}-license-report.json").get().asFile
+        if (source.exists()) source.copyTo(dest, overwrite = true)
+    }
+}
+
 tasks.register("writePublishManifest") {
     doLast {
         val group = project.group.toString()

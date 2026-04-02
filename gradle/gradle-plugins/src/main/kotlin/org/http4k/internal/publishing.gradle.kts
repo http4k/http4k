@@ -91,6 +91,14 @@ configure<MavenPublishBaseExtension> {
                     classifier = "provenance-sigstore"
                     extension = "json"
                 }
+                artifact(File(buildDir, "reports/${project.name}-license-report.json")) {
+                    classifier = "license-report"
+                    extension = "json"
+                }
+                artifact(File(buildDir, "reports/${project.name}-license-report.json.sigstore.json")) {
+                    classifier = "license-report-sigstore"
+                    extension = "json"
+                }
             }
         }
 

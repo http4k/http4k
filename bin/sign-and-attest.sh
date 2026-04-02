@@ -84,6 +84,11 @@ while IFS='|' read -r GROUP ARTIFACT_ID MODULE_VERSION BUILD_DIR; do
         sign_blob "$SBOM_FILE"
     fi
 
+    LICENSE_REPORT="$BUILD_DIR/reports/${ARTIFACT_ID}-license-report.json"
+    if [ -f "$LICENSE_REPORT" ]; then
+        sign_blob "$LICENSE_REPORT"
+    fi
+
     PROVENANCE_FILE="$PROVENANCE_DIR/${ARTIFACT_ID}-${MODULE_VERSION}.provenance.json"
     cat > "$PROVENANCE_FILE" <<PROVEOF
 {

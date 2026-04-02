@@ -40,6 +40,13 @@ jobs:
       env:
         RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
       shell: bash
+    - name: Generate license reports
+      run: |-
+        ./gradlew generateLicenseReportJson --no-configuration-cache \
+        -PreleaseVersion="$RELEASE_VERSION"
+      env:
+        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+      shell: bash
     - name: Build publish manifest
       run: |-
         ./gradlew writePublishManifest --no-configuration-cache \

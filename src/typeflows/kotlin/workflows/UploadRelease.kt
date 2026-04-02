@@ -70,6 +70,17 @@ class UploadRelease : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"""
+                ./gradlew generateLicenseReportJson --no-configuration-cache \
+                -PreleaseVersion="$RELEASE_VERSION"
+            """.trimIndent()
+            ) {
+                name = "Generate license reports"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+            }
+
+            steps += RunCommand(
+                $$"""
                 ./gradlew writePublishManifest --no-configuration-cache \
                 -PreleaseVersion="$RELEASE_VERSION"
             """.trimIndent()
