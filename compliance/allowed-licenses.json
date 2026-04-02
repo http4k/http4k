@@ -139,7 +139,7 @@
         {
             "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
             "moduleName": "org\\.openjdk\\.nashorn:nashorn-core",
-            "comment": "Transitive dep of Handlebars. GPL-2.0 with Classpath Exception is permissive for library use (same as JDK itself)"
+            "comment": "Transitive dep of Handlebars. Classpath Exception makes it permissive for library use"
         }
     ]
 }
