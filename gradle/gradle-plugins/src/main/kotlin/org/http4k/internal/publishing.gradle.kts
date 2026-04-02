@@ -53,6 +53,12 @@ configure<MavenPublishBaseExtension> {
                 useInMemoryPgpKeys(signingKey, signingPassword)
                 sign(project.the<PublishingExtension>().publications)
             }
+
+            project.afterEvaluate {
+                tasks.withType<PublishToMavenRepository>().configureEach {
+                    dependsOn(tasks.withType<Sign>())
+                }
+            }
         }
 
         publishToMavenCentral(automaticRelease = true)
