@@ -25,8 +25,7 @@ object Rfc6570UriTemplateMatcher {
     /**
      * Checks if a URI matches a template
      *
-     * @param template The URI template to match against
-     * @param uri The URI to check
+     * @param testUri The URI to check
      * @return true if the URI matches the template, false otherwise
      */
     fun ResourceUriTemplate.matches(testUri: Uri): Boolean {
@@ -40,7 +39,7 @@ object Rfc6570UriTemplateMatcher {
         val pattern = convertTemplateToPattern(template)
         return try {
             pattern.matches(uri)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
