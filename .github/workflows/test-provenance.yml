@@ -36,6 +36,9 @@ jobs:
     - name: Generate SBOM
       run: ./gradlew :http4k-incubator:cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
+    - name: Generate license report
+      run: ./gradlew :http4k-incubator:generateLicenseReportJson --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      shell: bash
     - name: Build publish manifest
       run: ./gradlew :http4k-incubator:writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
