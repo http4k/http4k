@@ -24,18 +24,11 @@ class UploadRelease : Builder<Workflow> {
             tags += Tag.of("*")
         }
 
-        env["ACTIONS_ALLOW_UNSECURE_COMMANDS"] = "true"
-
         jobs += Job("Release", RunsOn.UBUNTU_LATEST) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
 
             steps += Checkout {
-                ref = $$"${{ steps.tagName.outputs.tag }}"
-            }
-
-            steps += UseAction("olegtarasov/get-tag@v2.1.4") {
-                name = "Grab tag name"
-                id = "tagName"
+                ref = $$"${{ github.ref_name }}"
             }
 
             steps += SetupJava(Adopt, V21)
@@ -54,7 +47,7 @@ class UploadRelease : Builder<Workflow> {
             ) {
                 name = "Build artifacts"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
             }
 
             steps += RunCommand(
@@ -65,7 +58,7 @@ class UploadRelease : Builder<Workflow> {
             ) {
                 name = "Generate SBOMs"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
             }
 
             steps += RunCommand(
@@ -76,7 +69,7 @@ class UploadRelease : Builder<Workflow> {
             ) {
                 name = "Generate license reports"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
             }
 
             steps += RunCommand(
@@ -87,13 +80,13 @@ class UploadRelease : Builder<Workflow> {
             ) {
                 name = "Build publish manifest"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
             }
 
             steps += RunCommand($$"""bin/sign-and-attest.sh "$RELEASE_VERSION"""") {
                 name = "Sign artifacts and generate provenance"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
                 env["COSIGN_PRIVATE_KEY"] = Secrets.string("COSIGN_PRIVATE_KEY")
                 env["COSIGN_PASSWORD"] = Secrets.string("COSIGN_PASSWORD")
             }
@@ -112,7 +105,7 @@ class UploadRelease : Builder<Workflow> {
             ) {
                 name = "Publish to http4k Maven"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
                 env["LTS_PUBLISHING_USER"] = Secrets.string("LTS_PUBLISHING_USER")
                 env["LTS_PUBLISHING_PASSWORD"] = $$"${{ secrets.LTS_PUBLISHING_PASSWORD }}"
                 env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
@@ -132,7 +125,7 @@ class UploadRelease : Builder<Workflow> {
             ) {
                 name = "Publish to Maven Central"
                 shell = "bash"
-                env["RELEASE_VERSION"] = $$"${{ steps.tagName.outputs.tag }}"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
                 env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
                 env["SIGNING_PASSWORD"] = Secrets.string("SIGNING_PASSWORD")
                 env["ORG_GRADLE_PROJECT_mavenCentralUsername"] = Secrets.string("MAVEN_CENTRAL_USERNAME")
@@ -141,7 +134,7 @@ class UploadRelease : Builder<Workflow> {
                 env["ORG_GRADLE_PROJECT_signingInMemoryKeyPassword"] = Secrets.string("SIGNING_PASSWORD")
             }
 
-            steps += RunCommand($$"bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}") {
+            steps += RunCommand($$"bin/notify_lts_slack.sh ${{ github.ref_name }}") {
                 name = "Notify LTS Slack"
                 env["LTS_SLACK_WEBHOOK"] = Secrets.string("LTS_SLACK_WEBHOOK")
             }

@@ -68,15 +68,9 @@ flowchart TD
     action1["🎬 actions<br/>checkout"]
     style action1 fill:#e1f5fe,stroke:#0277bd
     step1 -.-> action1
-    step2["Step 2: Grab tag name"]
-    style step2 fill:#f8f9fa,stroke:#495057
-    action2["🎬 olegtarasov<br/>get-tag"]
-    style action2 fill:#e1f5fe,stroke:#0277bd
-    step2 -.-> action2
+    step2["Step 2: Repository Dispatch<br/>💻 bash"]
+    style step2 fill:#f3e5f5,stroke:#7b1fa2
     step1 --> step2
-    step3["Step 3: Repository Dispatch<br/>💻 bash"]
-    style step3 fill:#f3e5f5,stroke:#7b1fa2
-    step2 --> step3
 ```
 
 **Step Types Legend:**

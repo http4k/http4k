@@ -7,7 +7,6 @@ on:
         required: true
         default: '6.39.1.0'
 env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
   RELEASE_VERSION: ${{ github.event.inputs.version }}
 jobs:
   test-provenance:

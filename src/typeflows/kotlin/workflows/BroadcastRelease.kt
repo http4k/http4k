@@ -86,11 +86,6 @@ class BroadcastRelease : Builder<Workflow> {
 
             steps += Checkout()
 
-            steps += UseAction("olegtarasov/get-tag@v2.1.4") {
-                name = "Grab tag name"
-                id = "tagName"
-            }
-
             steps += SendRepositoryDispatch(
                 RELEASE_EVENT,
                 Secrets.string("ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING"),

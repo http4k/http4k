@@ -3,8 +3,6 @@ on:
   push:
     tags:
     - '*'
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -13,10 +11,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5.0.0
       with:
-        ref: ${{ steps.tagName.outputs.tag }}
-    - name: Grab tag name
-      id: tagName
-      uses: olegtarasov/get-tag@v2.1.4
+        ref: ${{ github.ref_name }}
     - name: Setup Java
       uses: actions/setup-java@v5.0.0
       with:
@@ -31,33 +26,33 @@ jobs:
         ./gradlew jar --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
       shell: bash
     - name: Generate SBOMs
       run: |-
         ./gradlew cyclonedxDirectBom --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
       shell: bash
     - name: Generate license reports
       run: |-
         ./gradlew generateLicenseReportJson --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
       shell: bash
     - name: Build publish manifest
       run: |-
         ./gradlew writePublishManifest --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
       shell: bash
     - name: Sign artifacts and generate provenance
       run: bin/sign-and-attest.sh "$RELEASE_VERSION"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       shell: bash
@@ -72,7 +67,7 @@ jobs:
         -PsigningKey="$SIGNING_KEY" \
         -PsigningPassword="$SIGNING_PASSWORD"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
         LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
         LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
         SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
@@ -88,7 +83,7 @@ jobs:
         -PsigningKey="$SIGNING_KEY" \
         -PsigningPassword="$SIGNING_PASSWORD"
       env:
-        RELEASE_VERSION: ${{ steps.tagName.outputs.tag }}
+        RELEASE_VERSION: ${{ github.ref_name }}
         SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -97,7 +92,7 @@ jobs:
         ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
     - name: Notify LTS Slack
-      run: bin/notify_lts_slack.sh ${{ steps.tagName.outputs.tag }}
+      run: bin/notify_lts_slack.sh ${{ github.ref_name }}
       env:
         LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
       shell: bash
