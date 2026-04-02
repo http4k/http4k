@@ -15,7 +15,7 @@
                 <div class="mcp-client-field">
                     <label>${field.name}<#if field.required> *</#if></label>
                     <#if field.description?has_content><small>${field.description}</small></#if>
-                    <#if field.isEnum>
+                    <#if field.enum>
                     <select class="form-control form-control-sm" data-bind="field__${field.name}"<#if field.required> required</#if>>
                     <option value=""></option>
                     <#list field.enumValues as enumVal>
@@ -23,10 +23,10 @@
                     </#list>
                     </select>
                     </#if>
-                    <#if field.isBoolean>
+                    <#if field.boolean>
                     <input type="checkbox" data-bind="field__${field.name}"<#if field.required> required</#if>/>
                     </#if>
-                    <#if field.isText>
+                    <#if field.text>
                     <input type="text" class="form-control form-control-sm" data-bind="field__${field.name}" placeholder="${field.type}"<#if field.required> required</#if>/>
                     </#if>
                 </div>
