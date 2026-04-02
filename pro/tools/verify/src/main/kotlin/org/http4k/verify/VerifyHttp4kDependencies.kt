@@ -23,16 +23,16 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import java.io.File
 
-private data class VerifiableArtifact(
-    val label: String,
-    val artifact: File,
-    val bundle: File
-)
-
-private val CLASSIFIED_ARTIFACTS = listOf(
-    "cyclonedx-sigstore" to "cyclonedx",
-    "provenance-sigstore" to "provenance"
-)
+private data class ModuleVerification(
+    val gav: String,
+    val checks: MutableMap<String, VerificationResult?> = mutableMapOf(
+        "jar" to null, "sbom" to null, "provenance" to null
+    )
+) {
+    val allPassed get() = checks.values.all { it == null || it.passed }
+    val failures get() = checks.filter { it.value?.passed == false }
+    val verified get() = checks.count { it.value?.passed == true }
+}
 
 @DisableCachingByDefault(because = "Verification uses its own caching mechanism")
 abstract class VerifyHttp4kDependencies : DefaultTask() {
@@ -60,59 +60,120 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
             return
         }
 
-        val allVerifiable = http4kArtifacts.flatMap { (id, jarFile) -> resolveVerifiableArtifacts(id, jarFile) }
+        val gradleHome = project.gradle.gradleUserHomeDir
+        val modules = mutableListOf<ModuleVerification>()
+        var totalVerified = 0
+        var totalFailed = 0
+        var anyBundleFound = false
 
-        if (allVerifiable.isEmpty()) {
+        for ((id, jarFile) in http4kArtifacts) {
+            val gav = "${id.group}:${id.module}:${id.version}"
+            val module = ModuleVerification(gav)
+
+            val jarBundle = resolveClassified(id, "jar-sigstore")
+            if (jarBundle != null) {
+                anyBundleFound = true
+                val cacheKey = "$gav:jar"
+                if (VerificationCache.isVerified(gradleHome, cacheKey, jarFile)) {
+                    module.checks["jar"] = VerificationResult(jarFile.name, true, "cached")
+                } else {
+                    val publicKey = loadPublicKey()
+                    val result = BundleVerifier.verify(jarFile, jarBundle.readText(), publicKey)
+                    module.checks["jar"] = result
+                    if (result.passed) VerificationCache.markVerified(gradleHome, cacheKey, jarFile)
+                }
+            }
+
+            val sbomArtifact = resolveClassified(id, "cyclonedx")
+            val sbomBundle = resolveClassified(id, "cyclonedx-sigstore")
+            if (sbomArtifact != null && sbomBundle != null) {
+                val cacheKey = "$gav:sbom"
+                if (VerificationCache.isVerified(gradleHome, cacheKey, sbomArtifact)) {
+                    module.checks["sbom"] = VerificationResult(sbomArtifact.name, true, "cached")
+                } else {
+                    val publicKey = loadPublicKey()
+                    val result = BundleVerifier.verify(sbomArtifact, sbomBundle.readText(), publicKey)
+                    module.checks["sbom"] = result
+                    if (result.passed) VerificationCache.markVerified(gradleHome, cacheKey, sbomArtifact)
+                }
+            }
+
+            val provArtifact = resolveClassified(id, "provenance")
+            val provBundle = resolveClassified(id, "provenance-sigstore")
+            if (provArtifact != null && provBundle != null) {
+                val cacheKey = "$gav:provenance"
+                if (VerificationCache.isVerified(gradleHome, cacheKey, provArtifact)) {
+                    module.checks["provenance"] = VerificationResult(provArtifact.name, true, "cached")
+                } else {
+                    val publicKey = loadPublicKey()
+                    val result = BundleVerifier.verify(provArtifact, provBundle.readText(), publicKey)
+                    module.checks["provenance"] = result
+                    if (result.passed) VerificationCache.markVerified(gradleHome, cacheKey, provArtifact)
+                }
+            }
+
+            totalVerified += module.verified
+            totalFailed += module.failures.size
+            modules += module
+        }
+
+        if (!anyBundleFound) {
             logger.lifecycle("No sigstore bundles found for ${http4kArtifacts.size} http4k artifact(s).")
             logger.lifecycle("Add the http4k Enterprise Repository (maven.http4k.org) to verify artifact signatures.")
             return
         }
 
-        val gradleHome = project.gradle.gradleUserHomeDir
-        val toVerify = allVerifiable.filter { (label, artifact, _) ->
-            !VerificationCache.isVerified(gradleHome, label, artifact)
-        }
+        val newlyVerified = modules.filter { m -> m.checks.values.any { it?.message != "cached" && it != null } }
 
-        if (toVerify.isEmpty()) {
-            logger.lifecycle("All ${allVerifiable.size} http4k artifact signature(s) previously verified (cached)")
-            return
-        }
+        if (newlyVerified.isEmpty() && totalFailed == 0) return
 
-        val publicKey = loadPublicKey()
-        val results = mutableListOf<VerificationResult>()
-        val cached = allVerifiable.size - toVerify.size
+        if (newlyVerified.isNotEmpty()) {
+            logger.lifecycle("Verifying ${newlyVerified.size} http4k module(s)...")
+            val maxGavLen = newlyVerified.maxOf { it.gav.length }
+            val pad = (maxGavLen + 4).coerceAtLeast(50)
 
-        logger.lifecycle("Verifying ${toVerify.size} http4k artifact signature(s)${if (cached > 0) " ($cached cached)" else ""}...")
+            for (module in newlyVerified) {
+                val checks = module.checks.entries.joinToString("   ") { (name, result) ->
+                    when {
+                        result == null -> "$name -"
+                        result.passed -> "$name \u2713"
+                        else -> "$name \u2717"
+                    }
+                }
+                logger.lifecycle("  ${module.gav.padEnd(pad)} $checks")
 
-        for ((label, artifact, bundle) in toVerify) {
-            val result = BundleVerifier.verify(artifact, bundle.readText(), publicKey)
-            results.add(result)
-            if (result.passed) {
-                VerificationCache.markVerified(gradleHome, label, artifact)
+                for ((name, result) in module.failures) {
+                    logger.lifecycle("    FAIL: $name — ${result!!.message}")
+                }
             }
-            logger.lifecycle("  ${if (result.passed) "PASS" else "FAIL"}: $label — ${result.message}")
+
+            logger.lifecycle("Verified: ${newlyVerified.size} modules, $totalVerified signatures" +
+                if (totalFailed > 0) ", $totalFailed failed" else "")
         }
 
-        val passed = results.count { it.passed }
-        val failed = results.count { !it.passed }
-        logger.lifecycle("Verification complete: $passed passed, $failed failed")
-
-        if (failed > 0 && failOnError.get()) {
-            throw GradleException("http4k artifact verification failed for $failed artifact(s)")
+        if (totalFailed > 0 && failOnError.get()) {
+            throw GradleException("http4k artifact verification failed for $totalFailed signature(s)")
         }
     }
 
-    private fun loadPublicKey() = BundleVerifier.loadPublicKey(
-        when {
-            publicKeyFile.isPresent -> publicKeyFile.get().asFile.readText()
-            else -> {
-                logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
-                val response = JavaHttpClient()(Request(GET, "https://http4k.org/cosign.pub"))
-                if (response.status != OK) throw GradleException("Failed to download public key: ${response.status}")
-                response.bodyString()
+    private var cachedPublicKey: java.security.PublicKey? = null
+
+    private fun loadPublicKey(): java.security.PublicKey {
+        cachedPublicKey?.let { return it }
+        val key = BundleVerifier.loadPublicKey(
+            when {
+                publicKeyFile.isPresent -> publicKeyFile.get().asFile.readText()
+                else -> {
+                    logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
+                    val response = JavaHttpClient()(Request(GET, "https://http4k.org/cosign.pub"))
+                    if (response.status != OK) throw GradleException("Failed to download public key: ${response.status}")
+                    response.bodyString()
+                }
             }
-        }
-    )
+        )
+        cachedPublicKey = key
+        return key
+    }
 
     private fun resolveHttp4kArtifacts(configuration: Configuration) =
         configuration.resolvedConfiguration.resolvedArtifacts
@@ -124,30 +185,6 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
             .map { artifact ->
                 artifact.id.componentIdentifier as ModuleComponentIdentifier to artifact.file
             }
-
-    private fun resolveVerifiableArtifacts(id: ModuleComponentIdentifier, jarFile: File): List<VerifiableArtifact> {
-        val results = mutableListOf<VerifiableArtifact>()
-
-        resolveClassified(id, "jar-sigstore")?.let { bundle ->
-            results += VerifiableArtifact(
-                label = "${id.group}:${id.module}:${id.version}:jar",
-                artifact = jarFile,
-                bundle = bundle
-            )
-        }
-
-        CLASSIFIED_ARTIFACTS.forEach { (bundleClassifier, artifactClassifier) ->
-            val bundle = resolveClassified(id, bundleClassifier) ?: return@forEach
-            val artifact = resolveClassified(id, artifactClassifier) ?: return@forEach
-            results += VerifiableArtifact(
-                label = "${id.group}:${id.module}:${id.version}:$artifactClassifier",
-                artifact = artifact,
-                bundle = bundle
-            )
-        }
-
-        return results
-    }
 
     private fun resolveClassified(id: ModuleComponentIdentifier, classifier: String): File? =
         try {
