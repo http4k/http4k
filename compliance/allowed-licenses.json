@@ -80,6 +80,61 @@
             "moduleName": "org.latencyutils:LatencyUtils",
             "comment": "BSD 2-Clause License",
             "url": "https://github.com/LatencyUtils/LatencyUtils/blob/master/LICENSE"
+        },
+        {
+            "moduleLicense": "Eclipse Public License 2.0",
+            "moduleName": "jakarta\\..*",
+            "comment": "Jakarta APIs are dual-licensed EPL-2.0 + GPL-2.0-CE, both permissive for library use"
+        },
+        {
+            "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
+            "moduleName": "jakarta\\..*",
+            "comment": "Jakarta APIs are dual-licensed EPL-2.0 + GPL-2.0-CE, classpath exception makes this permissive"
+        },
+        {
+            "moduleLicense": "Eclipse Public License 2.0",
+            "moduleName": "org\\.glassfish:.*",
+            "comment": "Eclipse reference implementations, dual-licensed EPL-2.0 + GPL-2.0-CE"
+        },
+        {
+            "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
+            "moduleName": "org\\.glassfish:.*",
+            "comment": "Eclipse reference implementations, dual-licensed EPL-2.0 + GPL-2.0-CE"
+        },
+        {
+            "moduleLicense": "Eclipse Public License 2.0",
+            "moduleName": "ch\\.qos\\.logback:.*",
+            "comment": "Logback is dual-licensed EPL-1.0/LGPL-2.1 and EPL-2.0, permissive for library use"
+        },
+        {
+            "moduleLicense": "GNU Lesser General Public License 2.1",
+            "moduleName": "ch\\.qos\\.logback:.*",
+            "comment": "Logback LGPL-2.1 allows linking without copyleft"
+        },
+        {
+            "moduleLicense": "Eclipse Public License 2.0",
+            "moduleName": "com\\.sun\\.activation:.*",
+            "comment": "Jakarta Activation dual-licensed EPL-2.0 + GPL-2.0-CE"
+        },
+        {
+            "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
+            "moduleName": "com\\.sun\\.activation:.*",
+            "comment": "Jakarta Activation dual-licensed EPL-2.0 + GPL-2.0-CE"
+        },
+        {
+            "moduleLicense": "BSD 3-Clause License",
+            "moduleName": "com\\.sun\\..*",
+            "comment": "Sun/Oracle reference implementations"
+        },
+        {
+            "moduleLicense": "Eclipse Public License 2.0",
+            "moduleName": "com\\.sun\\.mail:.*",
+            "comment": "Jakarta Mail dual-licensed EPL-2.0 + GPL-2.0-CE"
+        },
+        {
+            "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
+            "moduleName": "com\\.sun\\.mail:.*",
+            "comment": "Jakarta Mail dual-licensed EPL-2.0 + GPL-2.0-CE"
         }
     ]
 }

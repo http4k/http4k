@@ -116,19 +116,19 @@
         },
         {
             "bundleName": "epl2",
-            "licenseNamePattern": "/*Eclipse Public License.*"
+            "licenseNamePattern": ".*Eclipse Public License.*"
         },
         {
             "bundleName": "epl2",
-            "licenseNamePattern": "EPL-2\\.0"
+            "licenseNamePattern": "EPL-.*"
         },
         {
             "bundleName": "gpl2ce",
-            "licenseNamePattern": "GNU GENERAL PUBLIC LICENSE, Version 2 + Classpath Exception"
+            "licenseNamePattern": "GNU GENERAL PUBLIC LICENSE, Version 2.*Classpath.*"
         },
         {
             "bundleName": "gpl2ce",
-            "licenseNamePattern": "GNU General Public License, Version 2 with Classpath Exception"
+            "licenseNamePattern": "GNU General Public License, Version 2.*Classpath.*"
         },
         {
             "bundleName": "gpl2ce",
@@ -136,7 +136,7 @@
         },
         {
             "bundleName": "lgpl21",
-            "licenseNamePattern": "GNU LESSER GENERAL PUBLIC LICENSE 2\\.1"
+            "licenseNamePattern": "GNU LESSER GENERAL PUBLIC LICENSE.*2\\.1"
         },
         {
             "bundleName": "lgpl21",

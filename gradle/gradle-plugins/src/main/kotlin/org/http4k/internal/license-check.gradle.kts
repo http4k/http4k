@@ -12,12 +12,21 @@ plugins {
 licenseReport {
     val groupsWeKnowArePermissivelyLicensed = listOf(
         "io.netty",                       // apache2: https://github.com/netty/netty/blob/4.1/LICENSE.txt
+        "org.http4k",                     // own modules (Apache-2.0)
+        "org.http4k.pro",                 // own modules (excluded as they're ours, not third-party)
+    )
+
+    val testDependencyGroups = listOf(
+        "org.junit.jupiter",
+        "org.junit.platform",
+        "org.junit.vintage",
+        "org.opentest4j",
     )
 
     val implementationDependenciesWhichWeDoNotDistribute =
         project.configurations.getAt("implementation").dependencies.map { it.group }
 
-    excludeGroups = (implementationDependenciesWhichWeDoNotDistribute + groupsWeKnowArePermissivelyLicensed)
+    excludeGroups = (implementationDependenciesWhichWeDoNotDistribute + groupsWeKnowArePermissivelyLicensed + testDependencyGroups)
         .toTypedArray()
 
     configurations = arrayOf("compileClasspath")
