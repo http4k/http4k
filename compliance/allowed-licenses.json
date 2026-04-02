@@ -135,6 +135,11 @@
             "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
             "moduleName": "com\\.sun\\.mail:.*",
             "comment": "Jakarta Mail dual-licensed EPL-2.0 + GPL-2.0-CE"
+        },
+        {
+            "moduleLicense": "GNU General Public License, Version 2 with Classpath Exception",
+            "moduleName": "org\\.openjdk\\.nashorn:nashorn-core",
+            "comment": "Transitive dep of Handlebars. GPL-2.0 with Classpath Exception is permissive for library use (same as JDK itself)"
         }
     ]
 }
