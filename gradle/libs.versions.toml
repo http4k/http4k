@@ -13,7 +13,7 @@ argo = "7.19"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.42.25"
+awssdk-bom = "2.42.26"
 azure-core = "1.57.1"
 azure-functions-java-library = "3.2.4"
 azure-storage-blob = "12.33.3"
@@ -61,7 +61,7 @@ jakarta-ws-rs-api = "4.0.0"
 java-websocket = "1.6.0"
 javax-servlet-api = "4.0.1"
 jetbrains-exposed = "1.2.0"
-jetty-bom = "12.1.7"
+jetty-bom = "12.1.8"
 # frozen to 11.0.26
 jetty11-bom = "11.0.26"
 joda-time = "2.14.1"
@@ -82,7 +82,7 @@ kotshi-api = "4.0.0"
 kotshi-compiler = "4.0.0"
 ktor = "3.4.2"
 langchain4j = "1.12.2"
-lettuce-core = "7.5.0.RELEASE"
+lettuce-core = "7.5.1.RELEASE"
 loremipsum = "1.0"
 mail = "2.0.2"
 micrometer-core = "1.16.4"
@@ -202,7 +202,7 @@ javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version.ref = 
 jetty-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty-bom" }
 jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
 jetty-client = { module = "org.eclipse.jetty:jetty-client", version.ref = "jetty-bom" }
-jetty-http2-server = "org.eclipse.jetty.http2:jetty-http2-server:12.1.7"
+jetty-http2-server = "org.eclipse.jetty.http2:jetty-http2-server:12.1.8"
 jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty-bom" }
 jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-client", version.ref = "jetty-bom" }
 jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }

@@ -21,6 +21,18 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
+import java.io.File
+
+private data class VerifiableArtifact(
+    val label: String,
+    val artifact: File,
+    val bundle: File
+)
+
+private val CLASSIFIED_ARTIFACTS = listOf(
+    "cyclonedx-sigstore" to "cyclonedx",
+    "provenance-sigstore" to "provenance"
+)
 
 @DisableCachingByDefault(because = "Verification uses its own caching mechanism")
 abstract class VerifyHttp4kDependencies : DefaultTask() {
@@ -48,57 +60,37 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
             return
         }
 
-        val artifactsWithBundles = http4kArtifacts.mapNotNull { (id, jarFile) ->
-            resolveSigstoreBundle(id)?.let { Triple(id, jarFile, it) }
-        }
+        val allVerifiable = http4kArtifacts.flatMap { (id, jarFile) -> resolveVerifiableArtifacts(id, jarFile) }
 
-        if (artifactsWithBundles.isEmpty()) {
+        if (allVerifiable.isEmpty()) {
             logger.lifecycle("No sigstore bundles found for ${http4kArtifacts.size} http4k artifact(s).")
             logger.lifecycle("Add the http4k Enterprise Repository (maven.http4k.org) to verify artifact signatures.")
             return
         }
 
-        val toVerify = artifactsWithBundles.filter { (id, jarFile, _) ->
-            !VerificationCache.isVerified(
-                this.project.gradle.gradleUserHomeDir,
-                id.group,
-                id.module,
-                id.version,
-                jarFile
-            )
+        val gradleHome = project.gradle.gradleUserHomeDir
+        val toVerify = allVerifiable.filter { (label, artifact, _) ->
+            !VerificationCache.isVerified(gradleHome, label, artifact)
         }
 
         if (toVerify.isEmpty()) {
-            val noBundles = http4kArtifacts.size - artifactsWithBundles.size
-            logger.lifecycle("All ${artifactsWithBundles.size} http4k artifact(s) previously verified (cached)")
-            if (noBundles > 0) {
-                logger.lifecycle("  Skipped $noBundles artifact(s) without sigstore bundles (resolved from Maven Central)")
-            }
+            logger.lifecycle("All ${allVerifiable.size} http4k artifact signature(s) previously verified (cached)")
             return
         }
 
+        val publicKey = loadPublicKey()
         val results = mutableListOf<VerificationResult>()
+        val cached = allVerifiable.size - toVerify.size
 
-        logger.lifecycle("Verifying ${toVerify.size} http4k artifact(s) (${artifactsWithBundles.size - toVerify.size} cached)...")
+        logger.lifecycle("Verifying ${toVerify.size} http4k artifact signature(s)${if (cached > 0) " ($cached cached)" else ""}...")
 
-        for ((id, jarFile, bundleFile) in toVerify) {
-            val result = BundleVerifier.verify(jarFile, bundleFile.readText(), loadPublicKey())
+        for ((label, artifact, bundle) in toVerify) {
+            val result = BundleVerifier.verify(artifact, bundle.readText(), publicKey)
             results.add(result)
             if (result.passed) {
-                VerificationCache.markVerified(
-                    this.project.gradle.gradleUserHomeDir,
-                    id.group,
-                    id.module,
-                    id.version,
-                    jarFile
-                )
+                VerificationCache.markVerified(gradleHome, label, artifact)
             }
-            logger.lifecycle("  ${if (result.passed) "PASS" else "FAIL"}: ${id.group}:${id.module}:${id.version} — ${result.message}")
-        }
-
-        val skipped = http4kArtifacts.size - artifactsWithBundles.size
-        if (skipped > 0) {
-            logger.lifecycle("  Skipped $skipped artifact(s) without sigstore bundles (resolved from Maven Central)")
+            logger.lifecycle("  ${if (result.passed) "PASS" else "FAIL"}: $label — ${result.message}")
         }
 
         val passed = results.count { it.passed }
@@ -114,7 +106,7 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
         when {
             publicKeyFile.isPresent -> publicKeyFile.get().asFile.readText()
             else -> {
-                this.logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
+                logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
                 val response = JavaHttpClient()(Request(GET, "https://http4k.org/cosign.pub"))
                 if (response.status != OK) throw GradleException("Failed to download public key: ${response.status}")
                 response.bodyString()
@@ -133,9 +125,33 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
                 artifact.id.componentIdentifier as ModuleComponentIdentifier to artifact.file
             }
 
-    private fun resolveSigstoreBundle(id: ModuleComponentIdentifier) =
+    private fun resolveVerifiableArtifacts(id: ModuleComponentIdentifier, jarFile: File): List<VerifiableArtifact> {
+        val results = mutableListOf<VerifiableArtifact>()
+
+        resolveClassified(id, "jar-sigstore")?.let { bundle ->
+            results += VerifiableArtifact(
+                label = "${id.group}:${id.module}:${id.version}:jar",
+                artifact = jarFile,
+                bundle = bundle
+            )
+        }
+
+        CLASSIFIED_ARTIFACTS.forEach { (bundleClassifier, artifactClassifier) ->
+            val bundle = resolveClassified(id, bundleClassifier) ?: return@forEach
+            val artifact = resolveClassified(id, artifactClassifier) ?: return@forEach
+            results += VerifiableArtifact(
+                label = "${id.group}:${id.module}:${id.version}:$artifactClassifier",
+                artifact = artifact,
+                bundle = bundle
+            )
+        }
+
+        return results
+    }
+
+    private fun resolveClassified(id: ModuleComponentIdentifier, classifier: String): File? =
         try {
-            val dep = project.dependencies.create("${id.group}:${id.module}:${id.version}:jar-sigstore@json")
+            val dep = project.dependencies.create("${id.group}:${id.module}:${id.version}:$classifier@json")
             val config = project.configurations.detachedConfiguration(dep)
             config.resolve().firstOrNull()
         } catch (_: Exception) {

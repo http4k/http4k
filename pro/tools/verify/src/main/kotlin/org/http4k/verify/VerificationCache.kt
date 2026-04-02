@@ -8,24 +8,20 @@ import java.io.File
 import java.security.MessageDigest
 
 object VerificationCache {
-    private fun cacheDir(gradleUserHome: File) =
+    private fun cacheFile(gradleUserHome: File) =
         File(gradleUserHome, "caches/http4k-verify").apply { mkdirs() }
+            .let { File(it, "verified.txt") }
 
-    private fun cacheKey(group: String, module: String, version: String, artifactChecksum: String) =
-        "$group:$module:$version:$artifactChecksum"
+    private fun cacheKey(label: String, artifact: File) = "$label:${sha256(artifact)}"
 
-    private fun cacheFile(gradleUserHome: File) = File(cacheDir(gradleUserHome), "verified.txt")
-
-    fun isVerified(gradleUserHome: File, group: String, module: String, version: String, artifact: File): Boolean {
-        val checksum = sha256(artifact)
-        val key = cacheKey(group, module, version, checksum)
+    fun isVerified(gradleUserHome: File, label: String, artifact: File): Boolean {
+        val key = cacheKey(label, artifact)
         val cache = cacheFile(gradleUserHome)
         return cache.exists() && cache.readLines().contains(key)
     }
 
-    fun markVerified(gradleUserHome: File, group: String, module: String, version: String, artifact: File) {
-        val checksum = sha256(artifact)
-        val key = cacheKey(group, module, version, checksum)
+    fun markVerified(gradleUserHome: File, label: String, artifact: File) {
+        val key = cacheKey(label, artifact)
         val cache = cacheFile(gradleUserHome)
         if (!cache.exists() || !cache.readLines().contains(key)) {
             cache.appendText("$key\n")
