@@ -13,12 +13,16 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity.NONE
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 
+@DisableCachingByDefault(because = "Verification uses its own caching mechanism")
 abstract class VerifyHttp4kDependencies : DefaultTask() {
 
     @get:Input
@@ -26,6 +30,7 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
 
     @get:InputFile
     @get:Optional
+    @get:PathSensitive(NONE)
     abstract val publicKeyFile: RegularFileProperty
 
     @TaskAction
