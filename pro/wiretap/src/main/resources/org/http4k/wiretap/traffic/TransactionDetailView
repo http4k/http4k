@@ -1,0 +1,81 @@
+<div id="detail-panel" class="detail-content">
+    <div class="detail-toolbar">
+        <span class="badge ${dirBadgeClass}">${dirBadgeText}</span>
+        <span class="method">${tx.method}</span>
+        <span class="${statusClass} status">${tx.status}</span>
+        <span class="uri" title="${tx.uri}">${tx.uri}</span>
+        <span class="duration">${tx.durationMs}ms</span>
+        <span class="timestamp">${tx.timestamp}</span>
+        <#if tx.traceId?has_content>
+        <a href="/_wiretap/otel?trace=${tx.traceId}" class="trace-link-btn" title="${tx.traceId}">OTel ${shortTraceId}</a>
+        </#if>
+        <button class="action-btn"
+                data-on:click="copyCurl(evt.currentTarget)">
+            Copy cURL
+        </button>
+        <a href="/_wiretap/traffic/${tx.id}/har" class="action-btn" download="transaction-${tx.id}.har">
+            Download HAR
+        </a>
+        <#if showImport!false>
+        <a href="${importPath}?import=${tx.id}" class="action-btn">
+            Import to ${importLabel}
+        </a>
+        </#if>
+        <pre class="curl-data" hidden>${tx.curl}</pre>
+    </div>
+    <div class="detail-req-resp">
+        <div class="detail-req-resp-col">
+            <h3 class="detail-col-title">Request</h3>
+            <#if tx.queryParams?has_content>
+            <div class="detail-section">
+                <h3>Query Parameters</h3>
+                <table class="data-table header-table">
+                    <#list tx.queryParams as param>
+                    <tr>
+                        <td>${param.name}</td>
+                        <td>${param.value}</td>
+                    </tr>
+                    </#list>
+                </table>
+            </div>
+            </#if>
+            <div class="detail-section">
+                <h3>Headers</h3>
+                <table class="data-table header-table">
+                    <#list tx.requestHeaders as header>
+                    <tr>
+                        <td>${header.name}</td>
+                        <td>${header.value}</td>
+                    </tr>
+                    </#list>
+                </table>
+            </div>
+            <#if tx.requestBody?has_content>
+            <div class="detail-section">
+                <h3>Body</h3>
+                <pre>${tx.requestBody}</pre>
+            </div>
+            </#if>
+        </div>
+        <div class="detail-req-resp-col">
+            <h3 class="detail-col-title">Response</h3>
+            <div class="detail-section">
+                <h3>Headers</h3>
+                <table class="data-table header-table">
+                    <#list tx.responseHeaders as header>
+                    <tr>
+                        <td>${header.name}</td>
+                        <td>${header.value}</td>
+                    </tr>
+                    </#list>
+                </table>
+            </div>
+            <#if tx.responseBody?has_content>
+            <div class="detail-section">
+                <h3>Body</h3>
+                <pre>${tx.responseBody}</pre>
+            </div>
+            </#if>
+        </div>
+    </div>
+</div>

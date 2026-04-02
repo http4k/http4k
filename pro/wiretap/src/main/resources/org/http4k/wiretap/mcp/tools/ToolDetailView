@@ -1,0 +1,50 @@
+<div id="detail-panel" class="mcp-client-detail" data-signals="{toolName: '${name}', toolArgs: '{}', argsMode: 'form'<#list fields as field>, field__${field.name}: '${field.defaultValue}'</#list> }">
+    <div class="client-request-section mcp-client-detail-form">
+        <div class="mcp-client-detail-header">
+            <h3>${name}</h3>
+            <p>${description}</p>
+        </div>
+        <div class="client-section">
+            <div class="args-mode-bar">
+                <span class="args-mode-tab" data-class-args-mode-tab-active="$argsMode==='form'" data-on:click="$argsMode='form'">Form</span>
+                <span class="args-mode-tab" data-class-args-mode-tab-active="$argsMode==='json'" data-on:click="$argsMode='json'">JSON</span>
+            </div>
+            <form data-show="$argsMode==='form'" id="tool-form" onsubmit="return false">
+                <#if fields?has_content>
+                <#list fields as field>
+                <div class="mcp-client-field">
+                    <label>${field.name}<#if field.required> *</#if></label>
+                    <#if field.description?has_content><small>${field.description}</small></#if>
+                    <#if field.isEnum>
+                    <select class="form-control form-control-sm" data-bind="field__${field.name}"<#if field.required> required</#if>>
+                    <option value=""></option>
+                    <#list field.enumValues as enumVal>
+                    <option value="${enumVal}">${enumVal}</option>
+                    </#list>
+                    </select>
+                    </#if>
+                    <#if field.isBoolean>
+                    <input type="checkbox" data-bind="field__${field.name}"<#if field.required> required</#if>/>
+                    </#if>
+                    <#if field.isText>
+                    <input type="text" class="form-control form-control-sm" data-bind="field__${field.name}" placeholder="${field.type}"<#if field.required> required</#if>/>
+                    </#if>
+                </div>
+                </#list>
+                <#else>
+                <p class="text-muted">No parameters</p>
+                </#if>
+            </form>
+            <div data-show="$argsMode==='json'">
+                <textarea class="form-control form-control-sm" style="font-family: monospace" rows="6" data-bind="toolArgs" placeholder="{}">{}</textarea>
+            </div>
+        </div>
+        <button class="action-btn action-btn-primary"
+                data-on:click="if($argsMode==='form'){const f=document.getElementById('tool-form');if(!f.reportValidity())return;const o={};<#list fields as field>if($field__${field.name}!=='')o['${field.name}']=$field__${field.name};</#list>$toolArgs=JSON.stringify(o)};@post('/_wiretap/mcp/tools/call')">Call Tool
+        </button>
+    </div>
+    <div class="panel-resize-handle"></div>
+    <div class="client-detail-panel">
+        <div id="tool-result" class="mcp-client-result"></div>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+<div id="completion-result" class="mcp-client-result">
+    <label>Completion Values (${values?size}<#if total?has_content> of ${total}</#if><#if hasMore!false>, more available</#if>)</label>
+    <#list values as item>
+    <div class="mcp-client-message">
+        <pre>${item}</pre>
+    </div>
+    </#list>
+    <#if values?size == 0>
+    <div class="empty">No completion values returned</div>
+    </#if>
+</div>

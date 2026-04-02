@@ -12,7 +12,7 @@ dependencies {
     api(project(":http4k-ops-micrometer"))
     api(project(":http4k-ops-opentelemetry"))
     api(project(":http4k-realtime-core"))
-    api(project(":http4k-template-handlebars"))
+    api(project(":http4k-template-freemarker"))
     api(project(":http4k-testing-chaos"))
     api(project(":http4k-web-datastar"))
     api(libs.jsoup)

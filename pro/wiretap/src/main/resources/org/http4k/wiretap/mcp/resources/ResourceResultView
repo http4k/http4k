@@ -1,0 +1,6 @@
+<div id="resource-result" class="mcp-client-result">
+    <label>Content</label>
+    <#list contents as item>
+    <pre class="code-block">${item.text}</pre>
+    </#list>
+</div>

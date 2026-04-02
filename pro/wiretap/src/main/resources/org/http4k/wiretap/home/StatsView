@@ -1,0 +1,127 @@
+<div class="overview-metrics">
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.uptime}</div>
+            <div class="metric-label">Uptime</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-arrow-left-right"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.totalRequests}</div>
+            <div class="metric-label">Total Requests</div>
+            <div class="metric-sub">
+                <span class="badge badge-in">IN ${stats.inboundCount}</span>
+                <span class="badge badge-out">OUT ${stats.outboundCount}</span>
+            </div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-diagram-3"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.traceCount}</div>
+            <div class="metric-label">Traces</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-lightning"></i></div>
+        <div class="metric-body">
+            <div class="metric-label">Chaos</div>
+            <div class="metric-sub"><span>In: </span><span class="badge ${inboundChaosBadgeClass}">${inboundChaosBadgeText}</span></div>
+            <div class="metric-sub"><span>Out: </span><span class="badge ${outboundChaosBadgeClass}">${outboundChaosBadgeText}</span></div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><img src="https://www.http4k.org/images/mcp.png" alt="MCP" class="mcp-logo"></div>
+        <div class="metric-body">
+            <div class="metric-label"><span class="mcp-status-dot"></span> MCP Server</div>
+            <div class="metric-sub">Tools: ${mcp.toolCount}</div>
+            <div class="metric-sub">Security: ${mcp.security}</div>
+            <div class="metric-sub">Copy URL:
+                <button class="mcp-copy-btn" title="Copy URL"><i class="bi bi-clipboard"></i></button>
+                <a class="mcp-url" href="${mcp.mcpUrl}"><code>${mcp.mcpUrl}</code></a></div>
+        </div>
+    </div>
+</div>
+
+<div class="overview-metrics">
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-memory"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.jvm.heapUsedMb} / ${stats.jvm.heapMaxMb} MB</div>
+            <div class="metric-label">Heap Memory</div>
+            <div class="metric-sub">Committed: ${stats.jvm.heapCommittedMb} MB (${heapPercent}% used)</div>
+            <div class="metric-sub">Non-Heap: ${stats.jvm.nonHeapUsedMb} MB</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-cpu"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${cpuPercent}</div>
+            <div class="metric-label">Process CPU</div>
+            <div class="metric-sub">System: ${systemCpuPercent}</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-layers"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.jvm.threadCount}</div>
+            <div class="metric-label">Threads</div>
+            <div class="metric-sub">Daemon: ${stats.jvm.daemonThreadCount}</div>
+            <div class="metric-sub">Peak: ${stats.jvm.peakThreadCount}</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-recycle"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.jvm.gcPauseCount}</div>
+            <div class="metric-label">GC Pauses</div>
+            <div class="metric-sub">Total: ${gcPauseTotalFormatted}</div>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon"><i class="bi bi-box"></i></div>
+        <div class="metric-body">
+            <div class="metric-value">${stats.jvm.classesLoaded}</div>
+            <div class="metric-label">Classes Loaded</div>
+            <div class="metric-sub">Unloaded: ${stats.jvm.classesUnloaded}</div>
+        </div>
+    </div>
+</div>
+
+<div id="overview-chart-data"
+     data-traffic="${trafficJson?no_esc}"
+     data-latency="${latencyJson?no_esc}"
+     style="display:none"></div>
+
+<div class="overview-traffic-chart">
+    <div class="chart-card chart-card-wide">
+        <h5>Traffic Over Time</h5>
+        <div class="chart-container chart-container-wide">
+            <canvas id="trafficChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="overview-charts">
+    <div class="chart-card">
+        <h5>Latency Distribution</h5>
+        <div class="chart-container">
+            <canvas id="latencyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<#if hasHostTimelines>
+<div class="overview-traffic-chart">
+    <#list hostTimelinesJson as item>
+    <div class="chart-card chart-card-wide" data-host-chart="${item.json}">
+        <h5>${item.host}</h5>
+        <div class="chart-container chart-container-wide">
+            <canvas class="hostChart"></canvas>
+        </div>
+    </div>
+    </#list>
+</div>
+</#if>

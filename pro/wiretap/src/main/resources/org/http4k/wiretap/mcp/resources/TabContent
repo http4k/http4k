@@ -1,0 +1,37 @@
+<div id="mcp-content" class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        <#if resources?has_content>
+        <div class="mcp-client-list-header">Resources (${resources?size})</div>
+        <#list resources as item>
+        <div class="mcp-client-item mcp-client-resource"
+             data-class-mcp-client-item-active="$selectedItem==='resource:${item.name}'"
+             data-on:click="$selectedItem='resource:${item.name}'; @get('/_wiretap/mcp/resources/${item.name}')">
+            <div class="mcp-client-item-name"><i class="bi bi-file-earmark"></i> ${item.name}</div>
+            <div class="mcp-client-item-desc">${item.description}</div>
+            <div class="mcp-client-item-uri">${item.uri}</div>
+        </div>
+        </#list>
+        </#if>
+
+        <#if templates?has_content>
+        <div class="mcp-client-list-header">Templates (${templates?size})</div>
+        <#list templates as item>
+        <div class="mcp-client-item mcp-client-template"
+             data-class-mcp-client-item-active="$selectedItem==='template:${item.name}'"
+             data-on:click="$selectedItem='template:${item.name}'; @get('/_wiretap/mcp/resources/templates/${item.name}')">
+            <div class="mcp-client-item-name"><i class="bi bi-braces"></i> ${item.name}</div>
+            <div class="mcp-client-item-desc">${item.description}</div>
+            <div class="mcp-client-item-uri">${item.uriTemplate}</div>
+        </div>
+        </#list>
+        </#if>
+
+        <#if !(resources??) && !(templates??)>
+        <div class="empty">No resources or templates available</div>
+        </#if>
+    </div>
+
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="empty">Select a resource or template to read it</div>
+    </div>
+</div>

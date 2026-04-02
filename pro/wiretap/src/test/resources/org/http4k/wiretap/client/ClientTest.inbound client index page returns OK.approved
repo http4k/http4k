@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="/_wiretap/wiretap.css">
     <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
 </head>
-
 <body data-signals="{&quot;url&quot;:&quot;/&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;headers&quot;:{&quot;0&quot;:{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;&quot;}}}">
 <header class="app-header">
     <div class="app-header-brand">
@@ -31,7 +30,6 @@
         </nav>
     </div>
 </header>
-
 <div class="client-page">
     <div class="client-request-section">
         <form class="client-toolbar" data-on:submit__prevent="@post('/_wiretap/inbound/send')">
@@ -58,7 +56,6 @@
                 <div class="client-section">
                     <h4>Headers</h4>
                     <div id="client-headers" class="client-headers">
-                        
 <div class="client-header-row">
     <input type="text" class="form-control form-control-sm" data-bind="headers.0.name" placeholder="Header name">
     <input type="text" class="form-control form-control-sm" data-bind="headers.0.value" placeholder="Value">
@@ -66,13 +63,9 @@
             data-on:click="@post('/_wiretap/inbound/headers/remove/0')">×
     </button>
 </div>
-
-
 <button class="action-btn client-add-header"
         data-on:click="@post('/_wiretap/inbound/headers/add')">+ Add Header
 </button>
-
-
                     </div>
                 </div>
                 <div class="client-section">
@@ -99,8 +92,5 @@
     </div>
 </div>
 <script src="/_wiretap/wiretap.js"></script>
-
 </body>
-
 </html>
-

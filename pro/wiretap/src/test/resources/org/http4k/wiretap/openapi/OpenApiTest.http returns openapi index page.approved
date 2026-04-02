@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="/_wiretap/wiretap.css">
     <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>
 </head>
-
 <body>
 <header class="app-header">
     <div class="app-header-brand">
@@ -31,14 +30,10 @@
         </nav>
     </div>
 </header>
-
 <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.32.1/swagger-ui.css"/>
 
 <div id="swagger-ui"></div>
 <script src="/_wiretap/wiretap.js"></script>
-
 <script src="https://unpkg.com/swagger-ui-dist@5.32.1/swagger-ui-bundle.js" crossorigin></script>
 </body>
-
 </html>
-

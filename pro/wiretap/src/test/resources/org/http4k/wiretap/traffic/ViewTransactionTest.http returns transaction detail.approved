@@ -7,7 +7,6 @@ data: elements         <span class="status-2xx status">200</span>
 data: elements         <span class="uri" title="/test">/test</span>
 data: elements         <span class="duration">10ms</span>
 data: elements         <span class="timestamp">00:00:00.000</span>
-data: elements         
 data: elements         <button class="action-btn"
 data: elements                 data-on:click="copyCurl(evt.currentTarget)">
 data: elements             Copy cURL
@@ -15,34 +14,27 @@ data: elements         </button>
 data: elements         <a href="/_wiretap/traffic/1/har" class="action-btn" download="transaction-1.har">
 data: elements             Download HAR
 data: elements         </a>
-data: elements         
 data: elements         <a href="/_wiretap/inbound?import=1" class="action-btn">
 data: elements             Import to Inbound Client
 data: elements         </a>
-data: elements         
 data: elements         <pre class="curl-data" hidden>curl -X GET &quot;/test&quot;</pre>
 data: elements     </div>
 data: elements     <div class="detail-req-resp">
 data: elements         <div class="detail-req-resp-col">
 data: elements             <h3 class="detail-col-title">Request</h3>
-data: elements             
 data: elements             <div class="detail-section">
 data: elements                 <h3>Headers</h3>
 data: elements                 <table class="data-table header-table">
-data: elements                     
 data: elements                 </table>
 data: elements             </div>
-data: elements             
 data: elements         </div>
 data: elements         <div class="detail-req-resp-col">
 data: elements             <h3 class="detail-col-title">Response</h3>
 data: elements             <div class="detail-section">
 data: elements                 <h3>Headers</h3>
 data: elements                 <table class="data-table header-table">
-data: elements                     
 data: elements                 </table>
 data: elements             </div>
-data: elements             
 data: elements         </div>
 data: elements     </div>
 data: elements </div>

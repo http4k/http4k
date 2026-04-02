@@ -1,0 +1,38 @@
+<div id="detail-panel" class="mcp-client-detail" data-signals="{refType: '${refType}', refName: '${refName}', argumentName: '${firstArgumentName}', argumentValue: ''}">
+    <div class="client-request-section mcp-client-detail-form">
+        <div class="mcp-client-detail-header">
+            <h3>${name}</h3>
+            <p>Test completions for this reference</p>
+        </div>
+        <div class="client-section">
+            <form id="completion-form" onsubmit="return false">
+                <div class="mcp-client-field">
+                    <label>Argument Name *</label>
+                    <small>Select a known argument or enter a custom name</small>
+                    <#if argumentNames?has_content>
+                    <select class="form-control form-control-sm" data-bind="argumentName" required>
+                        <option value="">-- select argument --</option>
+                        <#list argumentNames as argName>
+                        <option value="${argName}">${argName}</option>
+                        </#list>
+                    </select>
+                    <#else>
+                    <input type="text" class="form-control form-control-sm" data-bind="argumentName" placeholder="argument name" required/>
+                    </#if>
+                </div>
+                <div class="mcp-client-field">
+                    <label>Argument Value</label>
+                    <small>The partial value to complete</small>
+                    <input type="text" class="form-control form-control-sm" data-bind="argumentValue" placeholder="partial value"/>
+                </div>
+            </form>
+        </div>
+        <button class="action-btn action-btn-primary"
+                data-on:click="const f=document.getElementById('completion-form');if(!f.reportValidity())return;@post('/_wiretap/mcp/completions/complete')">Complete
+        </button>
+    </div>
+    <div class="panel-resize-handle"></div>
+    <div class="client-detail-panel">
+        <div id="completion-result" class="mcp-client-result"></div>
+    </div>
+</div>

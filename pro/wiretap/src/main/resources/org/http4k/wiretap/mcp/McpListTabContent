@@ -1,0 +1,20 @@
+<div id="mcp-content" class="app-layout mcp-client-layout">
+    <div class="mcp-client-list">
+        <div class="mcp-client-list-header">${typeName} (${items?size})</div>
+        <#list items as item>
+        <div class="mcp-client-item"
+             data-class-mcp-client-item-active="$selectedItem==='${item.name}'"
+             data-on:click="$selectedItem='${item.name}'; @get('/_wiretap/mcp/${typePath}/${item.name}')">
+            <div class="mcp-client-item-name">${item.name}</div>
+            <div class="mcp-client-item-desc">${item.description}</div>
+        </div>
+        </#list>
+        <#if items?size == 0>
+        <div class="empty">No ${typeNameLower} available</div>
+        </#if>
+    </div>
+
+    <div class="mcp-client-detail" id="detail-panel">
+        <div class="empty">${placeholderText}</div>
+    </div>
+</div>

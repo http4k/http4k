@@ -1,0 +1,18 @@
+<header class="app-header">
+    <div class="app-header-brand">
+        <a href="https://http4k.org" target="_blank"><img class="app-logo" src="https://www.http4k.org/images/logo.png" alt="http4k"></a>
+        <span class="app-header-title">Wiretap</span>
+    </div>
+    <div class="app-header-right">
+        <nav class="app-nav">
+            <a href="/_wiretap" class="nav-link <#if navOverview!false>nav-link-active</#if>">Overview</a>
+            <a href="/_wiretap/traffic" class="nav-link <#if navTraffic!false>nav-link-active</#if>">Traffic</a>
+            <a href="/_wiretap/otel" class="nav-link <#if navOTel!false>nav-link-active</#if>">OTel</a>
+            <a href="/_wiretap/openapi" class="nav-link <#if navOpenAPI!false>nav-link-active</#if>">OpenAPI</a>
+            <a href="/_wiretap/inbound" class="nav-link <#if navInbound!false>nav-link-active</#if>">Inbound Client</a>
+            <a href="/_wiretap/outbound" class="nav-link <#if navOutbound!false>nav-link-active</#if>">Outbound Client</a>
+            <a href="/_wiretap/mcp" class="nav-link <#if navMCP!false>nav-link-active</#if>">MCP</a>
+            <a href="/_wiretap/chaos" class="nav-link <#if navChaos!false>nav-link-active</#if>">Chaos</a>
+        </nav>
+    </div>
+</header>

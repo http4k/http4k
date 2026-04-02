@@ -1,0 +1,14 @@
+<#list rows as item>
+<div class="client-header-row">
+    <input type="text" class="form-control form-control-sm" data-bind="headers.${item.key}.name" placeholder="Header name">
+    <input type="text" class="form-control form-control-sm" data-bind="headers.${item.key}.value" placeholder="Value">
+    <button class="action-btn action-btn-danger client-remove-header"
+            data-on:click="@post('${basePath?no_esc}headers/remove/${item.index}')">×
+    </button>
+</div>
+</#list>
+<#if showAdd>
+<button class="action-btn client-add-header"
+        data-on:click="@post('${basePath?no_esc}headers/add')">+ Add Header
+</button>
+</#if>

@@ -1,0 +1,9 @@
+<div id="prompt-result" class="mcp-client-result">
+    <label>Messages</label>
+    <#list messages as item>
+    <div class="mcp-client-message">
+        <span class="mcp-client-role">${item.role}</span>
+        <pre>${item.content}</pre>
+    </div>
+    </#list>
+</div>

@@ -4,7 +4,14 @@
  */
 package org.http4k.wiretap.util
 
-import org.http4k.template.HandlebarsTemplates
+import freemarker.core.HTMLOutputFormat
+import freemarker.template.Configuration
+import freemarker.template.TemplateExceptionHandler
+import org.http4k.template.FreemarkerTemplates
 
-fun Templates() =
-    HandlebarsTemplates({ it.apply { setInfiniteLoops(true) } }).CachingClasspath()
+fun Templates() = FreemarkerTemplates(
+    Configuration(Configuration.getVersion()).apply {
+        outputFormat = HTMLOutputFormat.INSTANCE
+        templateExceptionHandler = TemplateExceptionHandler.IGNORE_HANDLER
+    }
+).CachingClasspath()
