@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets
  */
 object Rfc6570UriTemplateMatcher {
 
-    private val templateExpressionRegex = "\\{([+#]?)([^}]+)\\}".toRegex()
+    private val templateExpressionRegex = "\\{([+#]?)([^}]+)}".toRegex()
 
     /**
      * Checks if a URI matches a template
