@@ -72,12 +72,12 @@ configure<MavenPublishBaseExtension> {
             project.properties["releaseVersion"]?.toString() ?: "LOCAL"
         )
 
-        if (project.findProperty("includeProvenance") == "true" && !project.plugins.hasPlugin("java-gradle-plugin")) {
+        if (project.findProperty("includeProvenance") == "true") {
             val version = project.properties["releaseVersion"]?.toString() ?: "LOCAL"
             val buildDir = project.layout.buildDirectory.get().asFile
 
             project.afterEvaluate {
-                publications.withType<MavenPublication>().matching { !it.name.contains("PluginMarker") }.configureEach {
+                publications.withType<MavenPublication>().matching { it.name == "maven" }.configureEach {
                     artifact(File(buildDir, "reports/${project.name}-sbom.json")) {
                         classifier = "cyclonedx"
                         extension = "json"
