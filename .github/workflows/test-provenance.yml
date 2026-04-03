@@ -30,16 +30,24 @@ jobs:
         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       shell: bash
     - name: Build artifacts
-      run: ./gradlew :http4k-tools-verify:jar --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      run: |-
+        ./gradlew :http4k-incubator:jar :http4k-tools-verify:jar \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
-    - name: Generate SBOM
-      run: ./gradlew :http4k-tools-verify:cyclonedxDirectBom --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+    - name: Generate SBOMs
+      run: |-
+        ./gradlew :http4k-incubator:cyclonedxDirectBom :http4k-tools-verify:cyclonedxDirectBom \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
-    - name: Generate license report
-      run: ./gradlew :http4k-tools-verify:generateLicenseReportJson --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+    - name: Generate license reports
+      run: |-
+        ./gradlew :http4k-incubator:generateLicenseReportJson :http4k-tools-verify:generateLicenseReportJson \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Build publish manifest
-      run: ./gradlew :http4k-tools-verify:writePublishManifest --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
+      run: |-
+        ./gradlew :http4k-incubator:writePublishManifest :http4k-tools-verify:writePublishManifest \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Sign artifacts and generate provenance
       run: bin/sign-and-attest.sh "$RELEASE_VERSION"
@@ -49,7 +57,9 @@ jobs:
       shell: bash
     - name: Publish to S3 with provenance
       run: |-
-        ./gradlew :http4k-tools-verify:publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+        ./gradlew :http4k-incubator:publishAllPublicationsToHttp4kRepository \
+        :http4k-tools-verify:publishAllPublicationsToHttp4kRepository \
+        --no-configuration-cache \
         -Psign=true \
         -PincludeProvenance=true \
         -PreleaseVersion="$RELEASE_VERSION" \
