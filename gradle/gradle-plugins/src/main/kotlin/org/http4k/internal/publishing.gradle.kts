@@ -72,7 +72,7 @@ configure<MavenPublishBaseExtension> {
             project.properties["releaseVersion"]?.toString() ?: "LOCAL"
         )
 
-        if (project.findProperty("includeProvenance") == "true") {
+        if (project.findProperty("includeProvenance") == "true" && !project.plugins.hasPlugin("java-gradle-plugin")) {
             val version = project.properties["releaseVersion"]?.toString() ?: "LOCAL"
             val buildDir = project.layout.buildDirectory.get().asFile
 
