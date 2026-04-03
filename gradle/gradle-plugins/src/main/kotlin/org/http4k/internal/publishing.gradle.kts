@@ -76,7 +76,7 @@ configure<MavenPublishBaseExtension> {
             val version = project.properties["releaseVersion"]?.toString() ?: "LOCAL"
             val buildDir = project.layout.buildDirectory.get().asFile
 
-            publications.withType<MavenPublication> {
+            publications.withType<MavenPublication>().matching { it.name == "maven" }.configureEach {
                 artifact(File(buildDir, "reports/${project.name}-sbom.json")) {
                     classifier = "cyclonedx"
                     extension = "json"
