@@ -21,6 +21,8 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import java.io.File
 
 private data class ModuleVerification(
@@ -171,6 +173,8 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
     }
 
     private var cachedPublicKey: java.security.PublicKey? = null
+    private val client = ClientFilters.FollowRedirects()
+        .then(JavaHttpClient())
 
     private fun loadPublicKey(): java.security.PublicKey {
         cachedPublicKey?.let { return it }
@@ -178,8 +182,8 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
             when {
                 publicKeyFile.isPresent -> publicKeyFile.get().asFile.readText()
                 else -> {
-                    logger.lifecycle("Downloading public key from https://http4k.org/cosign.pub")
-                    val response = JavaHttpClient()(Request(GET, "https://http4k.org/cosign.pub"))
+                    logger.lifecycle("Downloading public key from https://www.http4k.org/cosign.pub")
+                    val response = client(Request(GET, "https://www.http4k.org/cosign.pub"))
                     if (response.status != OK) throw GradleException("Failed to download public key: ${response.status}")
                     response.bodyString()
                 }

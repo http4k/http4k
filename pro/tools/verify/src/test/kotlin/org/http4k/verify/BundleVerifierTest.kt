@@ -76,12 +76,13 @@ class BundleVerifierTest {
         }
 
     private fun createBundle(artifact: File): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(artifact.readBytes())
+        val artifactBytes = artifact.readBytes()
+        val digest = MessageDigest.getInstance("SHA-256").digest(artifactBytes)
         val digestB64 = Base64.getEncoder().encodeToString(digest)
 
         val sig = Signature.getInstance("SHA256withECDSA")
         sig.initSign(keyPair.private)
-        sig.update(digest)
+        sig.update(artifactBytes)
         val signatureB64 = Base64.getEncoder().encodeToString(sig.sign())
 
         return """

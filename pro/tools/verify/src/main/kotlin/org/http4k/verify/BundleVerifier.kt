@@ -27,25 +27,26 @@ object BundleVerifier {
         val name = artifact.name
 
         val signatureB64 = extractJsonString(bundleJson, "signature")
+            ?: extractJsonString(bundleJson, "base64Signature")
             ?: return VerificationResult(name, false, "No signature found in bundle")
 
         val digestB64 = extractJsonString(bundleJson, "digest")
-            ?: return VerificationResult(name, false, "No digest found in bundle")
 
         val signatureBytes = Base64.getDecoder().decode(signatureB64)
-        val digestBytes = Base64.getDecoder().decode(digestB64)
 
-        val actualDigest = artifact.inputStream().use {
-            java.security.MessageDigest.getInstance("SHA-256").digest(it.readBytes())
-        }
+        val artifactBytes = artifact.readBytes()
 
-        if (!actualDigest.contentEquals(digestBytes)) {
-            return VerificationResult(name, false, "Artifact digest mismatch — file may have been tampered with")
+        if (digestB64 != null) {
+            val digestBytes = Base64.getDecoder().decode(digestB64)
+            val actualDigest = java.security.MessageDigest.getInstance("SHA-256").digest(artifactBytes)
+            if (!actualDigest.contentEquals(digestBytes)) {
+                return VerificationResult(name, false, "Artifact digest mismatch — file may have been tampered with")
+            }
         }
 
         val sig = Signature.getInstance("SHA256withECDSA")
         sig.initVerify(publicKey)
-        sig.update(digestBytes)
+        sig.update(artifactBytes)
 
         return if (sig.verify(signatureBytes)) {
             VerificationResult(name, true, "Verified OK")
