@@ -3,6 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.40.1.0
+- **http4k-***: Upgrade versions
+- **http4k-tools-verify**: Exports all verification artifacts (bundles, SBOMs, provenance, license reports, cosign.pub) to `build/http4k-verify/` for independent inspection and audit.
+- **http4k-tools-verify**: Generates a JSON verification report at `build/http4k-verify/verification-report.json` with per-module signature status and exported file paths.
+- **http4k-tools-verify**: Added `clearHttp4kVerificationCache` Gradle task to force re-verification of all artifacts.
+
 ### v6.40.0.0
 - **http4k-***: Upgrade versions
 - **http4k-tools-verify**: [New Pro module!] Gradle plugin for automated supply chain verification. Verifies cosign signatures on all http4k artifacts resolved from the http4k Enterprise Repository at build time. Pure JVM — no CLI tools required. Apply with `id("org.http4k.verify")`.
