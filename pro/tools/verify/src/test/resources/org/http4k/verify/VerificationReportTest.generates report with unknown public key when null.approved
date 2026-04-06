@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-04-05T14:30:00Z",
+  "public_key_fingerprint": "unknown",
+  "modules": [
+    {
+      "group": "org.http4k",
+      "module": "http4k-core",
+      "version": "1.0.0",
+      "jar_sha256": "abc",
+      "jar": {
+        "verification": "not_available"
+      },
+      "sbom": {
+        "verification": "not_available"
+      },
+      "provenance": {
+        "verification": "not_available"
+      },
+      "license": {
+        "verification": "not_available"
+      }
+    }
+  ]
+}

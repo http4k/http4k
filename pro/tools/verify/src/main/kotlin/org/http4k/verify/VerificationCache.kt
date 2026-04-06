@@ -7,29 +7,30 @@ package org.http4k.verify
 import java.io.File
 import java.security.MessageDigest
 
-object VerificationCache {
-    private fun cacheFile(gradleUserHome: File) =
-        File(gradleUserHome, "caches/http4k-verify").apply { mkdirs() }
-            .let { File(it, "verified.txt") }
+internal fun ByteArray.sha256Hex(): String =
+    MessageDigest.getInstance("SHA-256")
+        .digest(this)
+        .joinToString("") { "%02x".format(it) }
 
-    private fun cacheKey(label: String, artifact: File) = "$label:${sha256(artifact)}"
+internal fun File.sha256Hex(): String = readBytes().sha256Hex()
 
-    fun isVerified(gradleUserHome: File, label: String, artifact: File): Boolean {
+class VerificationCache(gradleUserHome: File = File(System.getProperty("user.home"), ".gradle")) {
+    private val home = File(gradleUserHome, "caches/http4k-verify").apply { mkdirs() }
+    private val cacheFile = File(home, "verified.txt")
+
+    private fun cacheKey(label: String, artifact: File) = "$label:${artifact.sha256Hex()}"
+
+    fun isVerified(label: String, artifact: File): Boolean {
         val key = cacheKey(label, artifact)
-        val cache = cacheFile(gradleUserHome)
-        return cache.exists() && cache.readLines().contains(key)
+        return cacheFile.exists() && cacheFile.readLines().contains(key)
     }
 
-    fun markVerified(gradleUserHome: File, label: String, artifact: File) {
+    fun markVerified(label: String, artifact: File) {
         val key = cacheKey(label, artifact)
-        val cache = cacheFile(gradleUserHome)
-        if (!cache.exists() || !cache.readLines().contains(key)) {
-            cache.appendText("$key\n")
+        if (!cacheFile.exists() || !cacheFile.readLines().contains(key)) {
+            cacheFile.appendText("$key\n")
         }
     }
 
-    private fun sha256(file: File): String =
-        MessageDigest.getInstance("SHA-256")
-            .digest(file.readBytes())
-            .joinToString("") { "%02x".format(it) }
+    fun clear(): Boolean = cacheFile.exists().also { if (it) cacheFile.delete() }
 }

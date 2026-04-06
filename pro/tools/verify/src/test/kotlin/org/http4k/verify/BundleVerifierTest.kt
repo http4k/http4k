@@ -4,9 +4,8 @@
  */
 package org.http4k.verify
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.security.KeyPairGenerator
@@ -21,28 +20,30 @@ class BundleVerifierTest {
         initialize(ECGenParameterSpec("secp256r1"))
     }.generateKeyPair()
 
+    private val verifier = BundleVerifier(keyPair.public)
+
     @Test
     fun `verifies valid signature`() {
-        val artifact = createTempArtifact("hello world")
+        val artifact = createTempArtifact()
         val bundle = createBundle(artifact)
 
-        val result = BundleVerifier.verify(artifact, bundle, keyPair.public)
+        val result = verifier.verify(artifact, bundle)
 
-        assertTrue(result.passed)
-        assertEquals("Verified OK", result.message)
+        assertThat(result.passed, equalTo(true))
+        assertThat(result.message, equalTo("Verified OK"))
     }
 
     @Test
     fun `rejects tampered artifact`() {
-        val artifact = createTempArtifact("hello world")
+        val artifact = createTempArtifact()
         val bundle = createBundle(artifact)
 
         artifact.writeText("tampered content")
 
-        val result = BundleVerifier.verify(artifact, bundle, keyPair.public)
+        val result = verifier.verify(artifact, bundle)
 
-        assertFalse(result.passed)
-        assertEquals("Artifact digest mismatch — file may have been tampered with", result.message)
+        assertThat(result.passed, equalTo(false))
+        assertThat(result.message, equalTo("Artifact digest mismatch — file may have been tampered with"))
     }
 
     @Test
@@ -51,28 +52,19 @@ class BundleVerifierTest {
             initialize(ECGenParameterSpec("secp256r1"))
         }.generateKeyPair()
 
-        val artifact = createTempArtifact("hello world")
+        val artifact = createTempArtifact()
         val bundle = createBundle(artifact)
 
-        val result = BundleVerifier.verify(artifact, bundle, otherKeyPair.public)
+        val result = BundleVerifier(otherKeyPair.public).verify(artifact, bundle)
 
-        assertFalse(result.passed)
-        assertEquals("Signature verification failed", result.message)
+        assertThat(result.passed, equalTo(false))
+        assertThat(result.message, equalTo("Signature verification failed"))
     }
 
-    @Test
-    fun `loads PEM public key`() {
-        val encoded = Base64.getEncoder().encodeToString(keyPair.public.encoded)
-        val pem = "-----BEGIN PUBLIC KEY-----\n$encoded\n-----END PUBLIC KEY-----"
-
-        val key = BundleVerifier.loadPublicKey(pem)
-        assertEquals("EC", key.algorithm)
-    }
-
-    private fun createTempArtifact(content: String): File =
+    private fun createTempArtifact(): File =
         File.createTempFile("test-artifact", ".jar").apply {
             deleteOnExit()
-            writeText(content)
+            writeText("hello world")
         }
 
     private fun createBundle(artifact: File): String {

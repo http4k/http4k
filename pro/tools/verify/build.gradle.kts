@@ -14,6 +14,9 @@ gradlePlugin {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-format-moshi"))
+    testImplementation(project(":http4k-testing-approval"))
+    testImplementation(project(":http4k-testing-hamkrest"))
 }
 
 description = "http4k Supply Chain Verification Gradle Plugin"

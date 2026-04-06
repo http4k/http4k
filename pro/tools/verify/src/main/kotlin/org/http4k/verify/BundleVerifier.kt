@@ -4,59 +4,53 @@
  */
 package org.http4k.verify
 
+import org.http4k.format.Moshi
 import java.io.File
-import java.security.KeyFactory
+import java.security.MessageDigest
 import java.security.PublicKey
 import java.security.Signature
-import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 
 data class VerificationResult(val artifact: String, val passed: Boolean, val message: String)
 
-object BundleVerifier {
-    fun loadPublicKey(pemContent: String): PublicKey {
-        val base64 = pemContent
-            .replace("-----BEGIN PUBLIC KEY-----", "")
-            .replace("-----END PUBLIC KEY-----", "")
-            .replace("\\s+".toRegex(), "")
-        val keyBytes = Base64.getDecoder().decode(base64)
-        return KeyFactory.getInstance("EC").generatePublic(X509EncodedKeySpec(keyBytes))
-    }
+private data class MessageDigestInfo(val digest: String? = null)
+private data class MessageSignature(
+    val signature: String? = null,
+    val base64Signature: String? = null,
+    val messageDigest: MessageDigestInfo? = null
+)
+private data class SigstoreBundle(val messageSignature: MessageSignature? = null)
 
-    fun verify(artifact: File, bundleJson: String, publicKey: PublicKey): VerificationResult {
-        val name = artifact.name
+class BundleVerifier(private val publicKey: PublicKey) {
 
-        val signatureB64 = extractJsonString(bundleJson, "signature")
-            ?: extractJsonString(bundleJson, "base64Signature")
-            ?: return VerificationResult(name, false, "No signature found in bundle")
+    fun verify(artifact: File, bundleJson: String): VerificationResult {
+        val bundle = Moshi.asA<SigstoreBundle>(bundleJson)
+        val msg = bundle.messageSignature
 
-        val digestB64 = extractJsonString(bundleJson, "digest")
+        val signatureB64 = msg?.signature ?: msg?.base64Signature
+            ?: return VerificationResult(artifact.name, false, "No signature found in bundle")
 
+        val digestB64 = msg?.messageDigest?.digest
         val signatureBytes = Base64.getDecoder().decode(signatureB64)
-
         val artifactBytes = artifact.readBytes()
 
         if (digestB64 != null) {
             val digestBytes = Base64.getDecoder().decode(digestB64)
-            val actualDigest = java.security.MessageDigest.getInstance("SHA-256").digest(artifactBytes)
+            val actualDigest = MessageDigest.getInstance("SHA-256").digest(artifactBytes)
             if (!actualDigest.contentEquals(digestBytes)) {
-                return VerificationResult(name, false, "Artifact digest mismatch — file may have been tampered with")
+                return VerificationResult(artifact.name, false, "Artifact digest mismatch — file may have been tampered with")
             }
         }
 
-        val sig = Signature.getInstance("SHA256withECDSA")
-        sig.initVerify(publicKey)
-        sig.update(artifactBytes)
+        val sig = Signature.getInstance("SHA256withECDSA").apply {
+            initVerify(publicKey)
+            update(artifactBytes)
+        }
 
-        return if (sig.verify(signatureBytes)) {
-            VerificationResult(name, true, "Verified OK")
-        } else {
-            VerificationResult(name, false, "Signature verification failed")
+        return when {
+            sig.verify(signatureBytes) -> VerificationResult(artifact.name, true, "Verified OK")
+            else -> VerificationResult(artifact.name, false, "Signature verification failed")
         }
     }
 
-    private fun extractJsonString(json: String, key: String): String? {
-        val pattern = """"$key"\s*:\s*"([^"]+)"""".toRegex()
-        return pattern.find(json)?.groupValues?.get(1)
-    }
 }
