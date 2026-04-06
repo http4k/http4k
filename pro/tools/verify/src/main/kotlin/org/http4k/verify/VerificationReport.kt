@@ -7,6 +7,26 @@ package org.http4k.verify
 import org.http4k.format.Moshi
 import java.time.Instant
 
+private data class ArtifactCheckReport(
+    val file: String? = null,
+    val bundle: String? = null,
+    val verification: String
+)
+
+private data class ModuleReport(
+    val group: String,
+    val module: String,
+    val version: String,
+    val jar_sha256: String,
+    val checks: Map<ArtifactType, ArtifactCheckReport>
+)
+
+private data class Report(
+    val timestamp: String,
+    val public_key_fingerprint: String,
+    val modules: List<ModuleReport>
+)
+
 internal object VerificationReport {
 
     fun generate(modules: List<ModuleVerification>, publicKeyPem: String?, timestamp: Instant = Instant.now()): String {
@@ -14,38 +34,32 @@ internal object VerificationReport {
             ?.let { "sha256:" + it.toByteArray().sha256Hex() }
             ?: "unknown"
 
-        val modulesArray = modules.map { module ->
-            val checksFields = module.checks.entries.map { (type, result) ->
-                val verification = when {
+        val report = Report(
+            timestamp = timestamp.toString(),
+            public_key_fingerprint = fingerprint,
+            modules = modules.map { it.toReport() }
+        )
+
+        return Moshi.asFormatString(report)
+    }
+
+    private fun ModuleVerification.toReport() = ModuleReport(
+        group = group,
+        module = module,
+        version = version,
+        jar_sha256 = jarSha256,
+        checks = ArtifactType.entries.associateWith { type ->
+            val result = checks[type]
+            val name = type.name
+            ArtifactCheckReport(
+                file = exportedFiles["$name.file"],
+                bundle = exportedFiles["$name.bundle"],
+                verification = when {
                     result == null -> "not_available"
                     result.passed -> "passed"
                     else -> "failed"
                 }
-                val name = type.name
-                val fields = listOfNotNull(
-                    module.exportedFiles["$name.file"]?.let { "file" to Moshi.string(it) },
-                    module.exportedFiles["$name.bundle"]?.let { "bundle" to Moshi.string(it) },
-                    "verification" to Moshi.string(verification)
-                )
-                name to Moshi.obj(fields)
-            }
-
-            Moshi.obj(
-                listOf(
-                    "group" to Moshi.string(module.group),
-                    "module" to Moshi.string(module.module),
-                    "version" to Moshi.string(module.version),
-                    "jar_sha256" to Moshi.string(module.jarSha256)
-                ) + checksFields
             )
         }
-
-        return Moshi.pretty(
-            Moshi.obj(
-                "timestamp" to Moshi.string(timestamp.toString()),
-                "public_key_fingerprint" to Moshi.string(fingerprint),
-                "modules" to Moshi.array(modulesArray)
-            )
-        )
-    }
+    )
 }

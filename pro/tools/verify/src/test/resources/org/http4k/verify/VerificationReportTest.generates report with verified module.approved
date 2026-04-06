@@ -7,20 +7,22 @@
       "module": "http4k-core",
       "version": "5.0.0",
       "jar_sha256": "abc123def456",
-      "jar": {
-        "bundle": "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-jar-sigstore.json",
-        "verification": "passed"
-      },
-      "sbom": {
-        "file": "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-cyclonedx.json",
-        "bundle": "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-cyclonedx-sigstore.json",
-        "verification": "passed"
-      },
-      "provenance": {
-        "verification": "not_available"
-      },
-      "license": {
-        "verification": "not_available"
+      "checks": {
+        "jar": {
+          "bundle": "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-jar-sigstore.json",
+          "verification": "passed"
+        },
+        "sbom": {
+          "file": "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-cyclonedx.json",
+          "bundle": "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-cyclonedx-sigstore.json",
+          "verification": "passed"
+        },
+        "provenance": {
+          "verification": "not_available"
+        },
+        "license": {
+          "verification": "not_available"
+        }
       }
     }
   ]

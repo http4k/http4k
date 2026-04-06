@@ -7,17 +7,19 @@
       "module": "http4k-core",
       "version": "5.0.0",
       "jar_sha256": "aaa",
-      "jar": {
-        "verification": "not_available"
-      },
-      "sbom": {
-        "verification": "not_available"
-      },
-      "provenance": {
-        "verification": "not_available"
-      },
-      "license": {
-        "verification": "not_available"
+      "checks": {
+        "jar": {
+          "verification": "not_available"
+        },
+        "sbom": {
+          "verification": "not_available"
+        },
+        "provenance": {
+          "verification": "not_available"
+        },
+        "license": {
+          "verification": "not_available"
+        }
       }
     },
     {
@@ -25,17 +27,19 @@
       "module": "http4k-client-okhttp",
       "version": "5.0.0",
       "jar_sha256": "bbb",
-      "jar": {
-        "verification": "not_available"
-      },
-      "sbom": {
-        "verification": "not_available"
-      },
-      "provenance": {
-        "verification": "not_available"
-      },
-      "license": {
-        "verification": "not_available"
+      "checks": {
+        "jar": {
+          "verification": "not_available"
+        },
+        "sbom": {
+          "verification": "not_available"
+        },
+        "provenance": {
+          "verification": "not_available"
+        },
+        "license": {
+          "verification": "not_available"
+        }
       }
     }
   ]

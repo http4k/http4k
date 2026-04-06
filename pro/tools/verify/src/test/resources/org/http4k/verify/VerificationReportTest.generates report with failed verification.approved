@@ -7,17 +7,19 @@
       "module": "http4k-core",
       "version": "5.0.0",
       "jar_sha256": "abc123",
-      "jar": {
-        "verification": "failed"
-      },
-      "sbom": {
-        "verification": "not_available"
-      },
-      "provenance": {
-        "verification": "not_available"
-      },
-      "license": {
-        "verification": "not_available"
+      "checks": {
+        "jar": {
+          "verification": "failed"
+        },
+        "sbom": {
+          "verification": "not_available"
+        },
+        "provenance": {
+          "verification": "not_available"
+        },
+        "license": {
+          "verification": "not_available"
+        }
       }
     }
   ]
