@@ -18,6 +18,7 @@ import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
 import org.http4k.ai.mcp.model.apps.McpAppVisibility
 import org.http4k.ai.mcp.model.apps.McpApps
 import org.http4k.ai.mcp.server.capability.CapabilityPack
+import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.util.auto
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
@@ -35,16 +36,19 @@ fun RenderMcpApp(
     meta: McpAppResourceMeta = McpAppResourceMeta(),
     visibility: List<McpAppVisibility>? = null,
     mimeType: MimeType = McpApps.MIME_TYPE,
+    extraCapabilities: List<ServerCapability> = emptyList(),
     mcpAppHandler: McpAppHandler
 ) = CapabilityPack(
-    Tool(
-        name = name,
-        description = description,
-        meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uri, visibility))
-    ) bind { ToolResponse.Ok(listOf()) },
-    Static(uri, ResourceName.of(name), description, mimeType) bind {
-        ResourceResponse.Ok(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))
-    }
+    listOf(
+        Tool(
+            name = name,
+            description = description,
+            meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uri, visibility))
+        ) bind { ToolResponse.Ok(listOf()) },
+        Static(uri, ResourceName.of(name), description, mimeType) bind {
+            ResourceResponse.Ok(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))
+        }
+    ) + extraCapabilities
 )
 
 typealias McpAppHandler = (ResourceRequest) -> String
