@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerCapabilities
@@ -35,7 +34,7 @@ object McpInitialize : McpRpc {
     ) : HasMeta, ServerMessage.Response
 
     data object Initialized : McpRpc {
-        override val Method = of("notifications/initialized")
+        override val Method = McpRpcMethod.of("notifications/initialized")
 
         @JsonSerializable
         data object Notification : ClientMessage.Notification

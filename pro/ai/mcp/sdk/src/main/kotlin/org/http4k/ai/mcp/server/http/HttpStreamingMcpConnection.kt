@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.server.http
 
-import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
@@ -42,13 +41,8 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
                         GET -> {
                             assign(Subscription(session), sse, req)
                             handleInitialize(
-                                McpInitialize.Request(
-                                    VersionedMcpEntity(
-                                        McpEntity.of(session.id.value),
-                                        metaData.entity.version
-                                    ),
-                                    All
-                                ),
+                                McpInitialize.Request(VersionedMcpEntity(session.id.value, "0.0.0"), All),
+                                req,
                                 session
                             )
                             sse.send(Event("ping", ""))

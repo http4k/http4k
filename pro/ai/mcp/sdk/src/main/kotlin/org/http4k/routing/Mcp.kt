@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.server.capability.ServerCompletions
+import org.http4k.ai.mcp.server.capability.ServerInitializer
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTools
@@ -31,6 +32,7 @@ import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.ai.mcp.server.jsonrpc.JsonRpcSessions
+import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.NoOp
@@ -66,7 +68,7 @@ fun mcp(
     McpProtocol(
         metadata, HttpSessions().apply { start() },
         mcpFilter,
-        *capabilities.toList().flatten().toTypedArray()
+        capabilities = capabilities
     ),
     security,
     path
@@ -158,8 +160,8 @@ fun mcpStdIo(
     executor: SimpleScheduler = SimpleSchedulerService(1),
     mcpFilter: McpFilter = McpFilter.NoOp,
 ) = McpProtocol(
-    metadata,
     StdIoMcpSessions(writer),
+    ServerInitializer(SimpleInitializeHandler(metadata)),
     ServerTools(capabilities.filterIsInstance<ToolCapability>()),
     ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
     ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),

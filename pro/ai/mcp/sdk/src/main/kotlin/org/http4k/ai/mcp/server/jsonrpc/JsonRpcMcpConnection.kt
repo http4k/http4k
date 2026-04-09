@@ -5,6 +5,7 @@
 package org.http4k.ai.mcp.server.jsonrpc
 
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -28,7 +29,8 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: R
         is Session -> {
             with(protocol) {
                 handleInitialize(
-                    McpInitialize.Request(metaData.entity, All),
+                    McpInitialize.Request(VersionedMcpEntity(session.id.value, "0.0.0"), All),
+                    req,
                     session
                 )
                 receive(Unit, session, req).asHttp(OK)

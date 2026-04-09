@@ -23,3 +23,4 @@ class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapabilit
         ?.call(req, client, http)
         ?: throw McpException(InvalidParams)
 }
+

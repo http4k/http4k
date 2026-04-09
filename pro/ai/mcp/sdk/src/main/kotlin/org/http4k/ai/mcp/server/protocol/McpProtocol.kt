@@ -8,6 +8,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
+import org.http4k.ai.mcp.InitializeHandler
 import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.McpRpcMethod
@@ -32,11 +33,13 @@ import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.ai.mcp.server.capability.ServerCancellations
 import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.server.capability.ServerCompletions
+import org.http4k.ai.mcp.server.capability.ServerInitializer
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerRoots
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
+import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.util.McpJson
@@ -57,8 +60,8 @@ import kotlin.random.Random
  * Models the MCP protocol in terms of message handling and session management.
  */
 class McpProtocol<Transport>(
-    internal val metaData: ServerMetaData,
     private val sessions: Sessions<Transport>,
+    private val initializer: Initializer,
     private val tools: Tools = ServerTools(),
     private val resources: Resources = ServerResources(),
     private val prompts: Prompts = ServerPrompts(),
@@ -77,8 +80,22 @@ class McpProtocol<Transport>(
         mcpFilter: McpFilter = McpFilter.NoOp,
         vararg capabilities: ServerCapability,
     ) : this(
-        metaData,
         sessions,
+        ServerInitializer(SimpleInitializeHandler(metaData)),
+        ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
+        ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
+        ServerPrompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
+        ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        mcpFilter = mcpFilter,
+    )
+    constructor(
+        initializeHandler: InitializeHandler,
+        sessions: Sessions<Transport>,
+        mcpFilter: McpFilter = McpFilter.NoOp,
+        vararg capabilities: ServerCapability,
+    ) : this(
+        sessions,
+        ServerInitializer(initializeHandler),
         ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         ServerPrompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
@@ -127,7 +144,7 @@ class McpProtocol<Transport>(
                     McpInitialize.Method ->
                         hf.responder<McpInitialize.Request>(session, jsonReq, httpReq) { it, _ ->
                             assign(Subscription(session), transport, httpReq)
-                            handleInitialize(it, session)
+                            handleInitialize(it, httpReq, session)
                         }
 
                     McpCompletion.Method ->
@@ -286,7 +303,9 @@ class McpProtocol<Transport>(
         }.get()
     }
 
-    fun handleInitialize(request: McpInitialize.Request, session: Session): McpInitialize.Response {
+    fun handleInitialize(request: McpInitialize.Request, http: Request, session: Session): McpInitialize.Response {
+        val response = initializer(request, http)
+
         clientTracking[session] = ClientTracking(request)
 
         val context = Subscription(session)
@@ -332,13 +351,7 @@ class McpProtocol<Transport>(
             logger.unsubscribe(session)
             tasks.remove(session)
         }
-        return McpInitialize.Response(
-            metaData.entity, metaData.capabilities, when {
-                metaData.protocolVersions.contains(request.protocolVersion) -> request.protocolVersion
-                else -> metaData.protocolVersions.max()
-            },
-            metaData.instructions
-        )
+        return response
     }
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)

@@ -44,10 +44,12 @@ import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.capability.ServerCompletions
+import org.http4k.ai.mcp.server.capability.ServerInitializer
 import org.http4k.ai.mcp.server.capability.ServerPrompts
 import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerTasks
 import org.http4k.ai.mcp.server.capability.ServerTools
+import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
@@ -97,8 +99,8 @@ abstract class McpClientContract<T> : PortBasedTest {
         test: McpClient.() -> Unit
     ) {
         val protocol = McpProtocol(
-            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions(),
+            ServerInitializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
             tools = tools,
             resources = resources,
             tasks = tasks,
