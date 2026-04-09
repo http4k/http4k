@@ -9,11 +9,13 @@ import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ClientCapabilities
+import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.server.protocol.ClientTracking
 import org.http4k.ai.mcp.testing.capabilities.TestingCompletions
 import org.http4k.ai.mcp.testing.capabilities.TestingElicitations
 import org.http4k.ai.mcp.testing.capabilities.TestingPrompts
@@ -39,6 +41,7 @@ fun PolyHandler.testMcpClient(connectRequest: Request = Request(POST, "/mcp")) =
 class TestMcpClient(
     poly: PolyHandler,
     connectRequest: Request,
+    private val clientCapabilities: ClientCapabilities = All,
     private val protocolVersion: ProtocolVersion = LATEST_VERSION
 ) : McpClient {
 
@@ -58,7 +61,7 @@ class TestMcpClient(
         val initResponse = sender(
             McpInitialize, McpInitialize.Request(
                 VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
-                ClientCapabilities(), protocolVersion
+                clientCapabilities, protocolVersion
             )
         )
 
