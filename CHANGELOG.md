@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.41.0.0 (uncut)
+### v6.41.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk**: Add support for custom MCP session handshaking by introducing `InitializeHandler`.
 - **http4k-ai-mcp-testing**: Support for testing MCP handshaking with custom `ClientCapabilities`.
