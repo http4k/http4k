@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.41.0.0
 - **http4k-***: Upgrade versions
-- **http4k-ai-mcp-sdk**: Add support for custom MCP session handshaking by introducing `InitializeHandler`.
+- **http4k-ai-mcp-sdk**: [Unlikely Break] Add support for custom MCP session handshaking by introducing `InitializeHandler`.
 - **http4k-ai-mcp-testing**: Support for testing MCP handshaking with custom `ClientCapabilities`.
 - **http4k-tools-verify**: Support for key rotation when signing cosigned artifacts.
 
