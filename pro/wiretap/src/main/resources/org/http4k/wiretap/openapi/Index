@@ -3,10 +3,10 @@
 <body>
 <#assign navOpenAPI=true>
 <#include "/org/http4k/wiretap/header">
-<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.32.1/swagger-ui.css"/>
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.32.2/swagger-ui.css"/>
 
 <div id="swagger-ui"></div>
 <#include "/org/http4k/wiretap/footer">
-<script src="https://unpkg.com/swagger-ui-dist@5.32.1/swagger-ui-bundle.js" crossorigin></script>
+<script src="https://unpkg.com/swagger-ui-dist@5.32.2/swagger-ui-bundle.js" crossorigin></script>
 </body>
 </@layout.page>

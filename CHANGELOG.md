@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.40.2.0
+- **http4k-***: Upgrade versions
+- **http4k-tools-verify**: Support for key rotation.
+
 ### v6.40.1.0
 - **http4k-***: Upgrade versions
 - **http4k-tools-verify**: Exports all verification artifacts (bundles, SBOMs, provenance, license reports, cosign.pub) to `build/http4k-verify/` for independent inspection and audit.
