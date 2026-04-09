@@ -21,7 +21,9 @@ private data class MessageSignature(
 )
 private data class SigstoreBundle(val messageSignature: MessageSignature? = null)
 
-class BundleVerifier(private val publicKey: PublicKey) {
+class BundleVerifier(private val keys: List<PublicKey>) {
+
+    constructor(key: PublicKey) : this(listOf(key))
 
     fun verify(artifact: File, bundleJson: String): VerificationResult {
         val bundle = Moshi.asA<SigstoreBundle>(bundleJson)
@@ -42,15 +44,17 @@ class BundleVerifier(private val publicKey: PublicKey) {
             }
         }
 
-        val sig = Signature.getInstance("SHA256withECDSA").apply {
-            initVerify(publicKey)
-            update(artifactBytes)
+        for (key in keys) {
+            val sig = Signature.getInstance("SHA256withECDSA").apply {
+                initVerify(key)
+                update(artifactBytes)
+            }
+            if (sig.verify(signatureBytes)) {
+                return VerificationResult(artifact.name, true, "Verified OK")
+            }
         }
 
-        return when {
-            sig.verify(signatureBytes) -> VerificationResult(artifact.name, true, "Verified OK")
-            else -> VerificationResult(artifact.name, false, "Signature verification failed")
-        }
+        return VerificationResult(artifact.name, false, "Signature verification failed")
     }
 
 }

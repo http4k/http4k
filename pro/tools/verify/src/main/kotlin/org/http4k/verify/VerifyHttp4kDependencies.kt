@@ -19,6 +19,11 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.NONE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
+import org.http4k.format.Moshi
 import java.io.File
 
 @DisableCachingByDefault(because = "Verification uses its own caching mechanism")
@@ -31,6 +36,10 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
     @get:Optional
     @get:PathSensitive(NONE)
     abstract val publicKeyFile: RegularFileProperty
+
+    @get:Input
+    @get:Optional
+    abstract val keyListUrl: Property<String>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
@@ -54,14 +63,37 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
         outputDir.deleteRecursively()
         outputDir.mkdirs()
 
-        val (publicKey, pemText) = PublicKeyLoader(
-            publicKeyFile = publicKeyFile.orNull?.asFile,
-            log = { logger.lifecycle(it) }
-        ).load()
+        val singleKeyMode = publicKeyFile.isPresent
+        val client = ClientFilters.FollowRedirects().then(JavaHttpClient())
+
+        val resolveBundleVerifier: (KeyFingerprint) -> BundleVerifier
+        val publicKeyPem: String?
+        val keyList: CosignKeyList?
+
+        if (singleKeyMode) {
+            val (publicKey, pemText) = PublicKeyLoader(
+                publicKeyFile = publicKeyFile.orNull?.asFile,
+                log = { logger.lifecycle(it) },
+                client = client
+            ).load()
+            publicKeyPem = pemText
+            keyList = null
+            resolveBundleVerifier = { BundleVerifier(publicKey) }
+        } else {
+            keyList = KeyListLoader(
+                url = Uri.of(keyListUrl.get()),
+                log = { logger.lifecycle(it) },
+                client = client,
+                cacheDir = File(project.gradle.gradleUserHomeDir, "caches/http4k-verify")
+            ).load()
+            publicKeyPem = null
+            val keyResolver = KeyResolver(keyList)
+            resolveBundleVerifier = { fingerprint -> BundleVerifier(keyResolver.resolve(fingerprint).key) }
+        }
 
         val verifier = ModuleVerifier(
             cache = VerificationCache(project.gradle.gradleUserHomeDir),
-            bundleVerifier = BundleVerifier(publicKey),
+            resolveBundleVerifier = resolveBundleVerifier,
             resolveClassified = ::resolveClassified
         )
 
@@ -77,9 +109,14 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
             return
         }
 
-        File(outputDir, "cosign.pub").writeText(pemText)
+        if (publicKeyPem != null) {
+            File(outputDir, "cosign.pub").writeText(publicKeyPem)
+        }
+        if (keyList != null) {
+            File(outputDir, "cosign-keys.json").writeText(Moshi.asFormatString(keyList))
+        }
         File(outputDir, "verification-report.json")
-            .writeText(VerificationReport.generate(modules, pemText))
+            .writeText(VerificationReport.generate(modules))
 
         logResults(modules)
 
@@ -127,9 +164,7 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
                 id is ModuleComponentIdentifier &&
                     (id.group == "org.http4k" || id.group.startsWith("org.http4k."))
             }
-            .map { artifact ->
-                artifact.id.componentIdentifier as ModuleComponentIdentifier to artifact.file
-            }
+            .map { it.id.componentIdentifier as ModuleComponentIdentifier to it.file }
 
     private fun resolveClassified(id: ModuleComponentIdentifier, classifier: String): File? =
         try {

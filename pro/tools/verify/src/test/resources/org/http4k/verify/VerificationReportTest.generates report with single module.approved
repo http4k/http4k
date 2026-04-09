@@ -1,12 +1,12 @@
 {
   "timestamp": "2026-04-05T14:30:00Z",
-  "public_key_fingerprint": "unknown",
   "modules": [
     {
       "group": "org.http4k",
       "module": "http4k-core",
       "version": "1.0.0",
       "jar_sha256": "abc",
+      "signing_key_fingerprint": "sha256:test123",
       "checks": {
         "jar": {
           "verification": "not_available"

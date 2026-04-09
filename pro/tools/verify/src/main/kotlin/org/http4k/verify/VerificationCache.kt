@@ -7,12 +7,12 @@ package org.http4k.verify
 import java.io.File
 import java.security.MessageDigest
 
-internal fun ByteArray.sha256Hex(): String =
+fun ByteArray.sha256Hex(): String =
     MessageDigest.getInstance("SHA-256")
         .digest(this)
         .joinToString("") { "%02x".format(it) }
 
-internal fun File.sha256Hex(): String = readBytes().sha256Hex()
+fun File.sha256Hex(): String = readBytes().sha256Hex()
 
 class VerificationCache(gradleUserHome: File = File(System.getProperty("user.home"), ".gradle")) {
     private val home = File(gradleUserHome, "caches/http4k-verify").apply { mkdirs() }
@@ -32,5 +32,5 @@ class VerificationCache(gradleUserHome: File = File(System.getProperty("user.hom
         }
     }
 
-    fun clear(): Boolean = cacheFile.exists().also { if (it) cacheFile.delete() }
+    fun clear() = cacheFile.exists().also { if (it) cacheFile.delete() }
 }

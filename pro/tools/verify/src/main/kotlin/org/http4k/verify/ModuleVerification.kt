@@ -18,7 +18,8 @@ data class ModuleVerification(
     val version: String,
     val jarSha256: String,
     val checks: Map<ArtifactType, VerificationResult?> = ArtifactType.entries.associateWith { null },
-    val exportedFiles: Map<String, String> = emptyMap()
+    val exportedFiles: Map<String, String> = emptyMap(),
+    val signingKeyFingerprint: KeyFingerprint
 ) {
     val gav get() = "$group:$module:$version"
     val allPassed get() = checks.values.all { it == null || it.passed }

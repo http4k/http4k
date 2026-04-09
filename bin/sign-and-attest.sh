@@ -16,6 +16,9 @@ mkdir -p "$PROVENANCE_DIR"
 GIT_COMMIT=$(git -C "$REPO_ROOT" rev-parse HEAD)
 BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
+COSIGN_KEY_FINGERPRINT="sha256:$(cosign public-key --key env://COSIGN_PRIVATE_KEY 2>/dev/null | openssl pkey -pubin -outform DER 2>/dev/null | sha256sum | awk '{print $1}')"
+echo "Signing key fingerprint: $COSIGN_KEY_FINGERPRINT"
+
 COSIGN_MAJOR=$(cosign version 2>&1 | sed -n 's/.*GitVersion:[[:space:]]*v\([0-9]*\).*/\1/p')
 COSIGN_MAJOR="${COSIGN_MAJOR:-2}"
 
@@ -119,6 +122,9 @@ while IFS='|' read -r GROUP ARTIFACT_ID MODULE_VERSION BUILD_DIR; do
         "invocationId": "${GITHUB_RUN_ID:-local}",
         "startedOn": "$BUILD_TIMESTAMP"
       }
+    },
+    "signingKey": {
+      "fingerprint": "$COSIGN_KEY_FINGERPRINT"
     }
   }
 }

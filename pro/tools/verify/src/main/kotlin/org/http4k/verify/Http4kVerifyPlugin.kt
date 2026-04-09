@@ -18,6 +18,7 @@ class Http4kVerifyPlugin : Plugin<Project> {
             task.description = "Verifies cosign signatures on http4k artifacts from the http4k Enterprise Repository"
             task.failOnError.set(extension.failOnError)
             task.publicKeyFile.set(extension.publicKey)
+            task.keyListUrl.set(extension.keyListUrl)
             task.outputDirectory.set(project.layout.buildDirectory.dir("http4k-verify"))
         }
 

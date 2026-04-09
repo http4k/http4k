@@ -33,7 +33,7 @@ class PublicKeyLoaderTest {
             writeText(pem)
         }
 
-        val (key, pemText) = PublicKeyLoader(publicKeyFile = file, log = {}).load()
+        val (key, pemText) = PublicKeyLoader(publicKeyFile = file, log = {}, client = { throw IllegalStateException("should not be called") }).load()
 
         assertThat(key.algorithm, equalTo("EC"))
         assertThat(pemText, equalTo(pem))
@@ -67,6 +67,6 @@ class PublicKeyLoaderTest {
             client = { Response(NOT_FOUND) }
         )
 
-        assertThat({ loader.load() }, throws<IllegalArgumentException>())
+        assertThat({ loader.load() }, throws<IllegalStateException>())
     }
 }

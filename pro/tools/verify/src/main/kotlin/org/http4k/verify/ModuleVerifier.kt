@@ -9,7 +9,7 @@ import java.io.File
 
 class ModuleVerifier(
     private val cache: VerificationCache,
-    private val bundleVerifier: BundleVerifier,
+    private val resolveBundleVerifier: (KeyFingerprint) -> BundleVerifier,
     private val resolveClassified: (ModuleComponentIdentifier, String) -> File?
 ) {
     fun verify(id: ModuleComponentIdentifier, jarFile: File, outputDir: File): ModuleVerification {
@@ -20,12 +20,19 @@ class ModuleVerifier(
         val shaPath = "${id.group}/${id.module}/${id.version}/$baseName.jar.sha256"
         File(moduleDir, "$baseName.jar.sha256").writeText(jarSha256)
 
+        val provenanceFile = resolveClassified(id, ArtifactType.provenance.artifactClassifier!!)
+            ?: error("No provenance artifact found for ${id.group}:${id.module}:${id.version}")
+        val fingerprint = extractSigningFingerprint(provenanceFile.readText())
+
+        val bundleVerifier = resolveBundleVerifier(fingerprint)
+
         val seed = ModuleVerification(
             group = id.group,
             module = id.module,
             version = id.version,
             jarSha256 = jarSha256,
-            exportedFiles = mapOf("jar.sha256" to shaPath)
+            exportedFiles = mapOf("jar.sha256" to shaPath),
+            signingKeyFingerprint = fingerprint
         )
 
         return ArtifactType.entries.fold(seed) { module, type ->

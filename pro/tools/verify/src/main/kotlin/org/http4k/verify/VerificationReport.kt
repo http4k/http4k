@@ -5,38 +5,39 @@
 package org.http4k.verify
 
 import org.http4k.format.Moshi
+import org.http4k.verify.VerificationStatus.failed
+import org.http4k.verify.VerificationStatus.not_available
+import org.http4k.verify.VerificationStatus.passed
 import java.time.Instant
 
-private data class ArtifactCheckReport(
+@Suppress("EnumEntryName")
+enum class VerificationStatus { passed, failed, not_available }
+
+data class ArtifactCheckReport(
     val file: String? = null,
     val bundle: String? = null,
-    val verification: String
+    val verification: VerificationStatus
 )
 
-private data class ModuleReport(
+data class ModuleReport(
     val group: String,
     val module: String,
     val version: String,
     val jar_sha256: String,
+    val signing_key_fingerprint: String? = null,
     val checks: Map<ArtifactType, ArtifactCheckReport>
 )
 
-private data class Report(
+data class Report(
     val timestamp: String,
-    val public_key_fingerprint: String,
     val modules: List<ModuleReport>
 )
 
-internal object VerificationReport {
+object VerificationReport {
 
-    fun generate(modules: List<ModuleVerification>, publicKeyPem: String?, timestamp: Instant = Instant.now()): String {
-        val fingerprint = publicKeyPem
-            ?.let { "sha256:" + it.toByteArray().sha256Hex() }
-            ?: "unknown"
-
+    fun generate(modules: List<ModuleVerification>, timestamp: Instant = Instant.now()): String {
         val report = Report(
             timestamp = timestamp.toString(),
-            public_key_fingerprint = fingerprint,
             modules = modules.map { it.toReport() }
         )
 
@@ -48,6 +49,7 @@ internal object VerificationReport {
         module = module,
         version = version,
         jar_sha256 = jarSha256,
+        signing_key_fingerprint = signingKeyFingerprint.value,
         checks = ArtifactType.entries.associateWith { type ->
             val result = checks[type]
             val name = type.name
@@ -55,9 +57,9 @@ internal object VerificationReport {
                 file = exportedFiles["$name.file"],
                 bundle = exportedFiles["$name.bundle"],
                 verification = when {
-                    result == null -> "not_available"
-                    result.passed -> "passed"
-                    else -> "failed"
+                    result == null -> not_available
+                    result.passed -> passed
+                    else -> failed
                 }
             )
         }

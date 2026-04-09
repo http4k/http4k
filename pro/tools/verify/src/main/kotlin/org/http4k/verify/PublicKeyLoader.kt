@@ -4,13 +4,10 @@
  */
 package org.http4k.verify
 
-import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
-import org.http4k.filter.ClientFilters
 import java.io.File
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -22,7 +19,7 @@ data class LoadedKey(val key: PublicKey, val pemText: String)
 class PublicKeyLoader(
     private val publicKeyFile: File?,
     private val log: (String) -> Unit,
-    private val client: HttpHandler = ClientFilters.FollowRedirects().then(JavaHttpClient())
+    private val client: HttpHandler
 ) {
     fun load(): LoadedKey {
         val pem = when {
@@ -30,7 +27,7 @@ class PublicKeyLoader(
             else -> {
                 log("Downloading public key from https://http4k.org/cosign.pub")
                 val response = client(Request(GET, "https://http4k.org/cosign.pub"))
-                require(response.status == OK) { "Failed to download public key: ${response.status}" }
+                if (response.status != OK) error("Failed to download public key: ${response.status}")
                 response.bodyString()
             }
         }
@@ -39,13 +36,16 @@ class PublicKeyLoader(
     }
 
     companion object {
-        fun parsePem(pemContent: String): PublicKey {
-            val base64 = pemContent
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .replace("\\s+".toRegex(), "")
-            val keyBytes = Base64.getDecoder().decode(base64)
-            return KeyFactory.getInstance("EC").generatePublic(X509EncodedKeySpec(keyBytes))
-        }
+        fun parsePem(pemContent: String): PublicKey =
+            KeyFactory.getInstance("EC").generatePublic(
+                X509EncodedKeySpec(
+                    Base64.getDecoder().decode(
+                        pemContent
+                            .replace("-----BEGIN PUBLIC KEY-----", "")
+                            .replace("-----END PUBLIC KEY-----", "")
+                            .replace("\\s+".toRegex(), "")
+                    )
+                )
+            )
     }
 }

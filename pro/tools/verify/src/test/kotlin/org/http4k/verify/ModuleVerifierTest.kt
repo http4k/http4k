@@ -29,19 +29,25 @@ class ModuleVerifierTest {
         initialize(ECGenParameterSpec("secp256r1"))
     }.generateKeyPair()
 
+    private val fingerprint = KeyFingerprint.of("sha256:" + keyPair.public.encoded.sha256Hex())
+
     private val id = testModuleId("org.http4k", "http4k-core", "5.0.0")
+
+    private fun provenanceFile() = createTempFile("""{"predicate":{"signingKey":{"fingerprint":"${fingerprint.value}"}}}""")
 
     @Test
     fun `verifies jar with bundle`() {
         val jarFile = createTempFile("hello jar")
         val jarBundle = createBundle(jarFile)
+        val provenance = provenanceFile()
 
         val verifier = ModuleVerifier(
             cache = VerificationCache(cacheDir),
-            bundleVerifier = BundleVerifier(keyPair.public),
+            resolveBundleVerifier = { BundleVerifier(keyPair.public) },
             resolveClassified = { _, classifier ->
                 when (classifier) {
                     "jar-sigstore" -> createTempFile(jarBundle)
+                    "provenance" -> provenance
                     else -> null
                 }
             }
@@ -54,19 +60,22 @@ class ModuleVerifierTest {
         assertThat(result.version, equalTo("5.0.0"))
         assertThat(result.checks[ArtifactType.jar]!!.passed, equalTo(true))
         assertThat(result.checks[ArtifactType.sbom], absent())
+        assertThat(result.signingKeyFingerprint, equalTo(fingerprint))
     }
 
     @Test
     fun `returns cached result on second run`() {
         val jarFile = createTempFile("hello jar")
         val jarBundle = createBundle(jarFile)
+        val provenance = provenanceFile()
 
         val verifier = ModuleVerifier(
             cache = VerificationCache(cacheDir),
-            bundleVerifier = BundleVerifier(keyPair.public),
+            resolveBundleVerifier = { BundleVerifier(keyPair.public) },
             resolveClassified = { _, classifier ->
                 when (classifier) {
                     "jar-sigstore" -> createTempFile(jarBundle)
+                    "provenance" -> provenance
                     else -> null
                 }
             }
@@ -79,33 +88,18 @@ class ModuleVerifierTest {
     }
 
     @Test
-    fun `skips types with no bundle`() {
-        val jarFile = createTempFile("hello jar")
-
-        val verifier = ModuleVerifier(
-            cache = VerificationCache(cacheDir),
-            bundleVerifier = BundleVerifier(keyPair.public),
-            resolveClassified = { _, _ -> null }
-        )
-
-        val result = verifier.verify(id, jarFile, outputDir)
-
-        ArtifactType.entries.forEach { type ->
-            assertThat(result.checks[type], absent())
-        }
-    }
-
-    @Test
     fun `exports files to output directory`() {
         val jarFile = createTempFile("hello jar")
         val jarBundle = createBundle(jarFile)
+        val provenance = provenanceFile()
 
         val verifier = ModuleVerifier(
             cache = VerificationCache(cacheDir),
-            bundleVerifier = BundleVerifier(keyPair.public),
+            resolveBundleVerifier = { BundleVerifier(keyPair.public) },
             resolveClassified = { _, classifier ->
                 when (classifier) {
                     "jar-sigstore" -> createTempFile(jarBundle)
+                    "provenance" -> provenance
                     else -> null
                 }
             }
@@ -124,13 +118,15 @@ class ModuleVerifierTest {
         val jarFile = createTempFile("original content")
         val jarBundle = createBundle(jarFile)
         jarFile.writeText("tampered content")
+        val provenance = provenanceFile()
 
         val verifier = ModuleVerifier(
             cache = VerificationCache(cacheDir),
-            bundleVerifier = BundleVerifier(keyPair.public),
+            resolveBundleVerifier = { BundleVerifier(keyPair.public) },
             resolveClassified = { _, classifier ->
                 when (classifier) {
                     "jar-sigstore" -> createTempFile(jarBundle)
+                    "provenance" -> provenance
                     else -> null
                 }
             }
@@ -141,19 +137,58 @@ class ModuleVerifierTest {
         assertThat(result.checks[ArtifactType.jar]!!.passed, equalTo(false))
     }
 
+    @Test
+    fun `selects correct key from provenance fingerprint`() {
+        val keyPair2 = KeyPairGenerator.getInstance("EC").apply {
+            initialize(ECGenParameterSpec("secp256r1"))
+        }.generateKeyPair()
+
+        val fingerprint2 = KeyFingerprint.of("sha256:" + keyPair2.public.encoded.sha256Hex())
+
+        val jarFile = createTempFile("hello jar")
+        val jarBundle = createBundle(jarFile, keyPair2)
+        val provenanceContent = """{"predicate":{"signingKey":{"fingerprint":"${fingerprint2.value}"}}}"""
+        val provenance = createTempFile(provenanceContent)
+        val provenanceBundle = createBundle(provenance, keyPair2)
+
+        val verifier = ModuleVerifier(
+            cache = VerificationCache(cacheDir),
+            resolveBundleVerifier = { fp ->
+                when (fp) {
+                    fingerprint2 -> BundleVerifier(keyPair2.public)
+                    else -> BundleVerifier(keyPair.public)
+                }
+            },
+            resolveClassified = { _, classifier ->
+                when (classifier) {
+                    "jar-sigstore" -> createTempFile(jarBundle)
+                    "provenance" -> provenance
+                    "provenance-sigstore" -> createTempFile(provenanceBundle)
+                    else -> null
+                }
+            }
+        )
+
+        val result = verifier.verify(id, jarFile, outputDir)
+
+        assertThat(result.checks[ArtifactType.jar]!!.passed, equalTo(true))
+        assertThat(result.checks[ArtifactType.provenance]!!.passed, equalTo(true))
+        assertThat(result.signingKeyFingerprint, equalTo(fingerprint2))
+    }
+
     private fun createTempFile(content: String) =
         File.createTempFile("test", ".tmp").apply {
             deleteOnExit()
             writeText(content)
         }
 
-    private fun createBundle(artifact: File): String {
+    private fun createBundle(artifact: File, kp: java.security.KeyPair = keyPair): String {
         val artifactBytes = artifact.readBytes()
         val digest = MessageDigest.getInstance("SHA-256").digest(artifactBytes)
         val digestB64 = Base64.getEncoder().encodeToString(digest)
 
         val sig = Signature.getInstance("SHA256withECDSA")
-        sig.initSign(keyPair.private)
+        sig.initSign(kp.private)
         sig.update(artifactBytes)
         val signatureB64 = Base64.getEncoder().encodeToString(sig.sign())
 
@@ -170,7 +205,7 @@ class ModuleVerifierTest {
     }
 }
 
-private fun testModuleId(group: String, module: String, version: String) =
+internal fun testModuleId(group: String, module: String, version: String) =
     object : ModuleComponentIdentifier {
         override fun getGroup() = group
         override fun getModule() = module

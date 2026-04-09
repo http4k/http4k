@@ -15,6 +15,7 @@ gradlePlugin {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
+    api(libs.values4k)
     testImplementation(project(":http4k-testing-approval"))
     testImplementation(project(":http4k-testing-hamkrest"))
 }

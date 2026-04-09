@@ -20,7 +20,7 @@ import java.time.Instant
 class VerificationReportTest {
 
     private val fixedTimestamp = Instant.parse("2026-04-05T14:30:00Z")
-    private val testPublicKeyPem = "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtest\n-----END PUBLIC KEY-----"
+    private val testFingerprint = KeyFingerprint.of("sha256:test123")
 
     @Test
     fun `generates report with verified module`(approver: Approver) {
@@ -39,11 +39,12 @@ class VerificationReportTest {
                 "jar.bundle" to "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-jar-sigstore.json",
                 "sbom.file" to "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-cyclonedx.json",
                 "sbom.bundle" to "org.http4k/http4k-core/5.0.0/http4k-core-5.0.0-cyclonedx-sigstore.json"
-            )
+            ),
+            signingKeyFingerprint = testFingerprint
         )
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module), testPublicKeyPem, fixedTimestamp),
+            VerificationReport.generate(listOf(module), fixedTimestamp),
             APPLICATION_JSON
         )
     }
@@ -60,37 +61,39 @@ class VerificationReportTest {
                 sbom to null,
                 provenance to null,
                 license to null
-            )
+            ),
+            signingKeyFingerprint = testFingerprint
         )
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module), testPublicKeyPem, fixedTimestamp),
+            VerificationReport.generate(listOf(module), fixedTimestamp),
             APPLICATION_JSON
         )
     }
 
     @Test
-    fun `generates report with unknown public key when null`(approver: Approver) {
+    fun `generates report with single module`(approver: Approver) {
         val module = ModuleVerification(
             group = "org.http4k",
             module = "http4k-core",
             version = "1.0.0",
-            jarSha256 = "abc"
+            jarSha256 = "abc",
+            signingKeyFingerprint = testFingerprint
         )
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module), null, fixedTimestamp),
+            VerificationReport.generate(listOf(module), fixedTimestamp),
             APPLICATION_JSON
         )
     }
 
     @Test
     fun `generates report with multiple modules`(approver: Approver) {
-        val module1 = ModuleVerification("org.http4k", "http4k-core", "5.0.0", "aaa")
-        val module2 = ModuleVerification("org.http4k", "http4k-client-okhttp", "5.0.0", "bbb")
+        val module1 = ModuleVerification("org.http4k", "http4k-core", "5.0.0", "aaa", signingKeyFingerprint = testFingerprint)
+        val module2 = ModuleVerification("org.http4k", "http4k-client-okhttp", "5.0.0", "bbb", signingKeyFingerprint = testFingerprint)
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module1, module2), testPublicKeyPem, fixedTimestamp),
+            VerificationReport.generate(listOf(module1, module2), fixedTimestamp),
             APPLICATION_JSON
         )
     }
