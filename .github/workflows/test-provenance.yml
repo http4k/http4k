@@ -5,7 +5,7 @@ on:
       version:
         description: 'Release version'
         required: true
-        default: '6.39.1.0'
+        default: '6.40.0.2'
 env:
   RELEASE_VERSION: ${{ github.event.inputs.version }}
 jobs:
