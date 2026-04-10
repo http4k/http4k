@@ -31,23 +31,23 @@ jobs:
       shell: bash
     - name: Build artifacts
       run: |-
-        ./gradlew jar --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+        ./gradlew :http4k-incubator:jar :http4k-tools-verify:jar \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Generate SBOMs
       run: |-
-        ./gradlew cyclonedxDirectBom --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+        ./gradlew :http4k-incubator:cyclonedxDirectBom :http4k-tools-verify:cyclonedxDirectBom \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Generate license reports
       run: |-
-        ./gradlew generateLicenseReportJson --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+        ./gradlew :http4k-incubator:generateLicenseReportJson :http4k-tools-verify:generateLicenseReportJson \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Build publish manifest
       run: |-
-        ./gradlew writePublishManifest --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
+        ./gradlew :http4k-incubator:writePublishManifest :http4k-tools-verify:writePublishManifest \
+        --no-configuration-cache -PreleaseVersion="$RELEASE_VERSION"
       shell: bash
     - name: Sign artifacts and generate provenance
       run: bin/sign-and-attest.sh "$RELEASE_VERSION"
@@ -55,9 +55,11 @@ jobs:
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       shell: bash
-    - name: Publish to http4k Maven
+    - name: Publish to S3 with provenance
       run: |-
-        ./gradlew publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+        ./gradlew :http4k-incubator:publishAllPublicationsToHttp4kRepository \
+        :http4k-tools-verify:publishAllPublicationsToHttp4kRepository \
+        --no-configuration-cache \
         -Psign=true \
         -PincludeProvenance=true \
         -PreleaseVersion="$RELEASE_VERSION" \
