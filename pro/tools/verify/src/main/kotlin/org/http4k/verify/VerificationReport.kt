@@ -28,16 +28,23 @@ data class ModuleReport(
     val checks: Map<ArtifactType, ArtifactCheckReport>
 )
 
+data class PluginInfo(
+    val version: String,
+    val jar_sha256: String
+)
+
 data class Report(
     val timestamp: String,
+    val plugin: PluginInfo,
     val modules: List<ModuleReport>
 )
 
 object VerificationReport {
 
-    fun generate(modules: List<ModuleVerification>, timestamp: Instant = Instant.now()): String {
+    fun generate(modules: List<ModuleVerification>, pluginInfo: PluginInfo, timestamp: Instant = Instant.now()): String {
         val report = Report(
             timestamp = timestamp.toString(),
+            plugin = pluginInfo,
             modules = modules.map { it.toReport() }
         )
 

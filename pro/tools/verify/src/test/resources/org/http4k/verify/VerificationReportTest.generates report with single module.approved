@@ -1,5 +1,9 @@
 {
   "timestamp": "2026-04-05T14:30:00Z",
+  "plugin": {
+    "version": "1.0.0",
+    "jar_sha256": "sha256:pluginhash"
+  },
   "modules": [
     {
       "group": "org.http4k",

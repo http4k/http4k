@@ -119,8 +119,9 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
         if (keyList != null) {
             File(outputDir, "cosign-keys.json").writeText(Moshi.asFormatString(keyList))
         }
+        val pluginInfo = pluginInfo()
         File(outputDir, "verification-report.json")
-            .writeText(VerificationReport.generate(modules))
+            .writeText(VerificationReport.generate(modules, pluginInfo))
 
         logResults(modules)
 
@@ -178,4 +179,11 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
         } catch (_: Exception) {
             null
         }
+
+    private fun pluginInfo(): PluginInfo {
+        val jarFile = File(javaClass.protectionDomain.codeSource.location.toURI())
+        val version = jarFile.name.removePrefix("http4k-tools-verify-").removeSuffix(".jar")
+        val hash = if (jarFile.isFile) jarFile.sha256Hex() else "unknown"
+        return PluginInfo(version = version, jar_sha256 = hash)
+    }
 }

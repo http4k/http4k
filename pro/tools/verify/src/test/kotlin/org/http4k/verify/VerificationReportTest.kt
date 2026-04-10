@@ -21,6 +21,7 @@ class VerificationReportTest {
 
     private val fixedTimestamp = Instant.parse("2026-04-05T14:30:00Z")
     private val testFingerprint = KeyFingerprint.of("sha256:test123")
+    private val testPluginInfo = PluginInfo(version = "1.0.0", jar_sha256 = "sha256:pluginhash")
 
     @Test
     fun `generates report with verified module`(approver: Approver) {
@@ -44,7 +45,7 @@ class VerificationReportTest {
         )
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module), fixedTimestamp),
+            VerificationReport.generate(listOf(module), testPluginInfo, fixedTimestamp),
             APPLICATION_JSON
         )
     }
@@ -66,7 +67,7 @@ class VerificationReportTest {
         )
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module), fixedTimestamp),
+            VerificationReport.generate(listOf(module), testPluginInfo, fixedTimestamp),
             APPLICATION_JSON
         )
     }
@@ -82,7 +83,7 @@ class VerificationReportTest {
         )
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module), fixedTimestamp),
+            VerificationReport.generate(listOf(module), testPluginInfo, fixedTimestamp),
             APPLICATION_JSON
         )
     }
@@ -93,7 +94,7 @@ class VerificationReportTest {
         val module2 = ModuleVerification("org.http4k", "http4k-client-okhttp", "5.0.0", "bbb", signingKeyFingerprint = testFingerprint)
 
         approver.assertApproved(
-            VerificationReport.generate(listOf(module1, module2), fixedTimestamp),
+            VerificationReport.generate(listOf(module1, module2), testPluginInfo, fixedTimestamp),
             APPLICATION_JSON
         )
     }
