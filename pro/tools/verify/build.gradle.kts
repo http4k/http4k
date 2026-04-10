@@ -20,4 +20,8 @@ dependencies {
     testImplementation(project(":http4k-testing-hamkrest"))
 }
 
+tasks.named<Jar>("jar") {
+    archiveVersion.set(project.properties["releaseVersion"]?.toString() ?: "LOCAL")
+}
+
 description = "http4k Supply Chain Verification Gradle Plugin"
