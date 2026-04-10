@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.41.1.0 (uncut)
+- **http4k-tools-verify**: Verification scanning of test dependencies as well as production dependencies.
+
 ### v6.41.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Add support for custom MCP session handshaking by introducing `InitializeHandler`.

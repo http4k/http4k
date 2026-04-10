@@ -46,13 +46,17 @@ abstract class VerifyHttp4kDependencies : DefaultTask() {
 
     @TaskAction
     fun verify() {
-        val runtimeClasspath = project.configurations.findByName("runtimeClasspath")
-            ?: run {
-                logger.warn("No runtimeClasspath configuration found, skipping verification")
-                return
-            }
+        val classpaths = listOf("runtimeClasspath", "testRuntimeClasspath")
+            .mapNotNull { project.configurations.findByName(it) }
 
-        val http4kArtifacts = resolveHttp4kArtifacts(runtimeClasspath)
+        if (classpaths.isEmpty()) {
+            logger.warn("No classpath configurations found, skipping verification")
+            return
+        }
+
+        val http4kArtifacts = classpaths
+            .flatMap { resolveHttp4kArtifacts(it) }
+            .distinctBy { (id, _) -> "${id.group}:${id.module}:${id.version}" }
 
         if (http4kArtifacts.isEmpty()) {
             logger.lifecycle("No http4k artifacts found to verify")
