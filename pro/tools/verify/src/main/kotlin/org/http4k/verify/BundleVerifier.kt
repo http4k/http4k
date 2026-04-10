@@ -19,7 +19,10 @@ private data class MessageSignature(
     val base64Signature: String? = null,
     val messageDigest: MessageDigestInfo? = null
 )
-private data class SigstoreBundle(val messageSignature: MessageSignature? = null)
+private data class SigstoreBundle(
+    val messageSignature: MessageSignature? = null,
+    val base64Signature: String? = null
+)
 
 class BundleVerifier(private val keys: List<PublicKey>) {
 
@@ -29,7 +32,7 @@ class BundleVerifier(private val keys: List<PublicKey>) {
         val bundle = Moshi.asA<SigstoreBundle>(bundleJson)
         val msg = bundle.messageSignature
 
-        val signatureB64 = msg?.signature ?: msg?.base64Signature
+        val signatureB64 = msg?.signature ?: msg?.base64Signature ?: bundle.base64Signature
             ?: return VerificationResult(artifact.name, false, "No signature found in bundle")
 
         val digestB64 = msg?.messageDigest?.digest

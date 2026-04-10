@@ -26,9 +26,11 @@ class Http4kVerifyPlugin : Plugin<Project> {
             task.group = "verification"
             task.description = "Clears the http4k artifact verification cache"
             task.doLast {
-                val cleared = VerificationCache(project.gradle.gradleUserHomeDir).clear()
+                val cacheCleared = VerificationCache(project.gradle.gradleUserHomeDir).clear()
+                val outputDir = project.layout.buildDirectory.dir("http4k-verify").get().asFile
+                val outputCleared = outputDir.exists().also { if (it) outputDir.deleteRecursively() }
                 project.logger.lifecycle(
-                    if (cleared) "Cleared http4k verification cache"
+                    if (cacheCleared || outputCleared) "Cleared http4k verification cache"
                     else "No http4k verification cache found"
                 )
             }
