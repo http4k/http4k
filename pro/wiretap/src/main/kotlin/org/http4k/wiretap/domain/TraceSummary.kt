@@ -4,6 +4,10 @@
  */
 package org.http4k.wiretap.domain
 
+import org.http4k.core.Uri
+import org.http4k.filter.LegacyHttp4kConventions
+import org.http4k.filter.OpenTelemetrySemanticConventions
+
 data class TraceSummary(
     val traceId: OtelTraceId,
     val spanCount: Int,
@@ -51,3 +55,22 @@ data class SpanLink(
     val spanId: OtelSpanId,
     val attributes: List<SpanAttribute>
 )
+
+fun SpanDetail.httpStatusCode(): Int? =
+    attributes.firstOrNull {
+        it.key == OpenTelemetrySemanticConventions.statusCode ||
+            it.key == LegacyHttp4kConventions.statusCode
+    }?.value?.toIntOrNull()
+
+fun SpanDetail.isError(): Boolean = httpStatusCode()?.let { it >= 500 } ?: (statusCode == "ERROR")
+
+fun SpanDetail.remoteAuthority(): String = attributes
+    .firstOrNull {
+        it.key == OpenTelemetrySemanticConventions.clientUrl ||
+            it.key == LegacyHttp4kConventions.clientUrl
+    }
+    ?.value
+    ?.let { Uri.of(it) }
+    ?.authority
+    ?.ifEmpty { null }
+    ?: "unknown"

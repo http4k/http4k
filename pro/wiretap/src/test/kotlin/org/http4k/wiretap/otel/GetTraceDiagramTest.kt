@@ -17,7 +17,7 @@ import io.opentelemetry.sdk.testing.trace.TestSpanData
 import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.Approver
 import org.http4k.wiretap.HttpWiretapFunctionContract
 import org.http4k.wiretap.McpWiretapFunctionContract
@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Test
 
 class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
-    override val toolName = "get_trace_diagram"
+    override val toolName = "get_trace_diagrams"
 
     private val traceStore = TraceStore.InMemory()
 
-    override val function = GetTraceDiagram(traceStore)
+    override val function = GetTraceDiagrams(traceStore)
 
     private fun recordSpan(
         traceId: String,
@@ -70,20 +70,20 @@ class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
         recordSpan(traceId, spanId = "aaaaaaaaaaaaaaaa", name = "GET /", kind = SpanKind.SERVER, serviceName = "frontend", startNanos = 1000000, endNanos = 5000000)
         recordSpan(traceId, spanId = "bbbbbbbbbbbbbbbb", parentSpanId = "aaaaaaaaaaaaaaaa", name = "GET /api", kind = SpanKind.CLIENT, serviceName = "frontend", startNanos = 1500000, endNanos = 4500000)
         recordSpan(traceId, spanId = "cccccccccccccccc", parentSpanId = "bbbbbbbbbbbbbbbb", name = "GET /api", kind = SpanKind.SERVER, serviceName = "backend", startNanos = 2000000, endNanos = 4000000)
-        approver.assertApproved(httpClient()(Request(GET, "/diagram/$traceId")))
+        approver.assertApproved(httpClient()(Request(GET, "/diagrams/$traceId")))
     }
 
     @Test
-    fun `http returns 404 for unknown trace`() {
-        val response = httpClient()(Request(GET, "/diagram/00000000000000000000000000000099"))
-        assertThat(response.status, equalTo(NOT_FOUND))
+    fun `http returns empty 200 for unknown trace`() {
+        val response = httpClient()(Request(GET, "/diagrams/00000000000000000000000000000099"))
+        assertThat(response.status, equalTo(OK))
     }
 
     @Test
-    fun `http returns 404 for single-service trace without diagram`() {
+    fun `http returns empty 200 for single-service trace without diagram`() {
         recordSpan("00000000000000000000000000000001")
-        val response = httpClient()(Request(GET, "/diagram/00000000000000000000000000000001"))
-        assertThat(response.status, equalTo(NOT_FOUND))
+        val response = httpClient()(Request(GET, "/diagrams/00000000000000000000000000000001"))
+        assertThat(response.status, equalTo(OK))
     }
 
     @Test

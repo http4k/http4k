@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant wiretap
+    participant frontend
+    participant backend
+    wiretap->>frontend: GET /
+    frontend->>backend: GET /api
+    backend-->>frontend: 200 (100ms)
+    frontend-->>wiretap: OK (200ms)

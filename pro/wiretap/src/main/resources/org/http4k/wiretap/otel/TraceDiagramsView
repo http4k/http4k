@@ -1,0 +1,126 @@
+<ul class="nav nav-tabs px-3 pt-3" role="tablist">
+    <#if sequenceDiagram?has_content>
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sequence-tab" type="button" role="tab">Sequence</button>
+    </li>
+    </#if>
+    <#if interactionDiagram?has_content>
+    <li class="nav-item">
+        <button class="nav-link<#if !sequenceDiagram?has_content> active</#if>" data-bs-toggle="tab" data-bs-target="#interaction-tab" type="button" role="tab">Interactions</button>
+    </li>
+    </#if>
+    <#if timingEntries?has_content>
+    <li class="nav-item">
+        <button class="nav-link<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> active</#if>" data-bs-toggle="tab" data-bs-target="#timing-tab" type="button" role="tab">Timing</button>
+    </li>
+    </#if>
+    <#if errorTrace?has_content>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#error-tab" type="button" role="tab">Errors</button>
+    </li>
+    </#if>
+    <#if criticalPath?has_content>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#critical-path-tab" type="button" role="tab">Critical Path</button>
+    </li>
+    </#if>
+</ul>
+<div class="tab-content">
+    <#if sequenceDiagram?has_content>
+    <div class="tab-pane show active" id="sequence-tab" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">${sequenceDiagram?no_esc}</pre>
+            <pre class="mermaid-source" style="display:none">${sequenceDiagram?no_esc}</pre>
+        </div>
+    </div>
+    </#if>
+    <#if interactionDiagram?has_content>
+    <div class="tab-pane<#if !sequenceDiagram?has_content> show active</#if>" id="interaction-tab" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">${interactionDiagram?no_esc}</pre>
+            <pre class="mermaid-source" style="display:none">${interactionDiagram?no_esc}</pre>
+        </div>
+    </div>
+    </#if>
+    <#if timingEntries?has_content>
+    <div class="tab-pane<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> show active</#if>" id="timing-tab" role="tabpanel">
+        <div class="timing-table" style="padding: 1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Operation</th>
+                        <th>Kind</th>
+                        <th style="text-align: right;">Duration</th>
+                        <th style="width: 30%;">% of Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <#list timingEntries as entry>
+                    <tr<#if entry.error> style="color: #dc3545;"</#if>>
+                        <td>${entry.serviceName}</td>
+                        <td>${entry.operation}</td>
+                        <td>${entry.kind}</td>
+                        <td style="text-align: right;">${entry.durationMs}ms</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+                                    <div style="width: ${entry.percentOfTotal}%; background: <#if entry.error>#e57373<#else>#90a4ae</#if>; height: 100%; border-radius: 4px;"></div>
+                                </div>
+                                <span style="min-width: 3rem; text-align: right;">${entry.percentOfTotal?string("0.#")}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    </#list>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </#if>
+    <#if errorTrace?has_content>
+    <div class="tab-pane" id="error-tab" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">${errorTrace?no_esc}</pre>
+            <pre class="mermaid-source" style="display:none">${errorTrace?no_esc}</pre>
+        </div>
+    </div>
+    </#if>
+    <#if criticalPath?has_content>
+    <div class="tab-pane" id="critical-path-tab" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">${criticalPath?no_esc}</pre>
+            <pre class="mermaid-source" style="display:none">${criticalPath?no_esc}</pre>
+        </div>
+    </div>
+    </#if>
+</div>
+<script>
+document.addEventListener('shown.bs.tab', function(e) {
+    var target = e.target.getAttribute('data-bs-target');
+    if (!target) return;
+    var pane = document.querySelector(target);
+    if (!pane) return;
+    pane.querySelectorAll('.mermaid[data-processed]').forEach(function(el) {
+        var source = el.closest('.sequence-diagram');
+        source = source && source.querySelector('.mermaid-source');
+        if (source) {
+            el.removeAttribute('data-processed');
+            el.textContent = source.textContent;
+        }
+    });
+    var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
+    if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
+});
+</script>

@@ -11,11 +11,9 @@ import org.http4k.filter.OpenTelemetrySemanticConventions.statusCode
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
-import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.SequenceDiagram
 import org.http4k.wiretap.domain.SpanAttribute
-import org.http4k.wiretap.domain.SpanDetail
 import org.http4k.wiretap.domain.TraceDetail
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -184,22 +182,5 @@ class SequenceDiagramBuilderTest {
         statusCode: String,
         attributes: List<SpanAttribute> = emptyList(),
         durationMs: Long = 10L
-    ) = SpanDetail(
-        spanId = OtelSpanId.of(spanId),
-        parentSpanId = OtelSpanId.of(parentSpanId),
-        name = name,
-        kind = kind,
-        durationMs = durationMs,
-        statusCode = statusCode,
-        statusDescription = "",
-        serviceName = serviceName,
-        depth = 0,
-        startOffsetPercent = 0.0,
-        widthPercent = 100.0,
-        attributes = attributes,
-        baggageAttributes = emptyList(),
-        resourceAttributes = emptyList(),
-        events = emptyList(),
-        links = emptyList()
-    )
+    ) = testSpanDetail(spanId, parentSpanId, name, kind, serviceName, statusCode, durationMs, attributes)
 }

@@ -31,11 +31,9 @@ import org.http4k.wiretap.junit.RenderMode.Always
 import org.http4k.wiretap.junit.RenderMode.Never
 import org.http4k.wiretap.junit.RenderMode.OnFailure
 import org.http4k.wiretap.otel.TraceDetailView
-import org.http4k.wiretap.otel.TraceDiagramView
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
-import org.http4k.wiretap.otel.toMermaid
-import org.http4k.wiretap.otel.toSequenceDiagram
 import org.http4k.wiretap.otel.toTraceDetail
+import org.http4k.wiretap.otel.toTraceDiagramsView
 import org.http4k.wiretap.traffic.TransactionDetailView
 import org.http4k.wiretap.util.Templates
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
@@ -195,10 +193,9 @@ internal fun renderTestReport(testName: String, packageDir: String, traceStore: 
     val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
         val detail = spans.toTraceDetail(traceId)
         val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(Clock.systemUTC()) }.groupBy { it.spanId }
-        val diagram = detail.toSequenceDiagram()
         val ganttHtml = html(TraceDetailView(detail, logsBySpan))
-        val diagramHtml = if (diagram.messages.isNotEmpty()) html(TraceDiagramView(diagram.toMermaid())) else ""
-        TraceEntry(traceId.value, ganttHtml, diagramHtml)
+        val diagramsHtml = html(detail.toTraceDiagramsView())
+        TraceEntry(traceId.value, ganttHtml, diagramsHtml)
     }
 
     val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->

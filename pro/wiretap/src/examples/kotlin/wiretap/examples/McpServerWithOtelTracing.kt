@@ -26,7 +26,9 @@ import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.model.Role
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -56,10 +58,13 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                         )
                     )
                 ) {
+
                     runCatching {
-                        ClientFilters.OpenTelemetryTracing(otel).then(client)(
-                            Request(GET, "https://http4k.org/")
-                        )
+                        val downstreamClient = ClientFilters.OpenTelemetryTracing(otel).then(client)
+
+                        downstreamClient(Request(GET, "https://http4k.org/foo"))
+                        downstreamClient(Request(POST, "https://http4k.org/bar"))
+                        downstreamClient(Request(DELETE, "https://spring.io/foobar"))
                     }
 
                     "hello world"

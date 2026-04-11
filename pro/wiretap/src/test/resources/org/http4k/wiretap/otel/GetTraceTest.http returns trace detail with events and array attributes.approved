@@ -114,7 +114,7 @@ data: elements                 </table>
 data: elements             </div>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div id="trace-diagram-panel" data-init="@get('/_wiretap/otel/diagram/00000000000000000000000000000001')"></div>
+data: elements     <div id="trace-diagrams-panel" data-init="@get('/_wiretap/otel/diagrams/00000000000000000000000000000001')"></div>
 data: elements </div>
 data: elements 
 data: selector #trace-detail-panel

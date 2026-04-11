@@ -50,7 +50,7 @@
             <div class="otel-detail-panel">
                 ${item.ganttHtml?no_esc}
             </div>
-            ${item.diagramHtml?no_esc}
+            ${item.diagramsHtml?no_esc}
         </div>
         </#list>
     </div>
