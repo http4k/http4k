@@ -167,7 +167,9 @@ class Intercept @JvmOverloads constructor(
         val packageDir = testClass.packageName.replace('.', '/')
         val (_, _, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture) = state.get()
         val file = renderTestReport(testName, packageDir, traceStore, logStore, transactionStore, stdOutCapture.toString(), stdErrCapture.toString())
+
         println("Wiretap report: file://${file.absolutePath}")
+        context.publishReportEntry("wiretap", "file://${file.absolutePath}")
     }
 
     private data class TestState(
@@ -182,8 +184,7 @@ class Intercept @JvmOverloads constructor(
 }
 
 private val outputDir by lazy {
-    File(System.getProperty("java.io.tmpdir"), "wiretap/${java.time.LocalDateTime.now().toString().replace(":", "-")}")
-        .apply { mkdirs() }
+    File("build/reports/wiretap").apply { mkdirs() }
 }
 
 internal fun renderTestReport(testName: String, packageDir: String, traceStore: TraceStore, logStore: LogStore, transactionStore: TransactionStore, stdOut: String = "", stdErr: String = ""): File {

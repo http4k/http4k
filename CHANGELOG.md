@@ -4,9 +4,10 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.42.0.0 (uncut)
-- **http4k-tools-verify**: Verification scanning of test dependencies as well as production dependencies.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Better support for custom MCP app resource loading. Rename of `RenderMcpApp` parameters might break anything using
   named params.
+- **http4k-tools-verify**: Verification scanning of test dependencies as well as production dependencies.
+- **http4k-wiretap**: Intercept reports now output to build output instead of to a temp dir
 
 ### v6.41.0.0
 - **http4k-***: Upgrade versions
