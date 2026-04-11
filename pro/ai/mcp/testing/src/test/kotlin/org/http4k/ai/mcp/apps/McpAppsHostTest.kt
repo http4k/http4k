@@ -6,8 +6,11 @@ package org.http4k.ai.mcp.apps
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Domain
+import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.model.apps.McpAppResourceMeta
@@ -17,6 +20,7 @@ import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.capability.extension.RenderMcpApp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.McpClientFactory
+import org.http4k.connect.model.MimeType
 import org.http4k.core.Method.GET
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
@@ -36,18 +40,21 @@ class McpAppsHostTest {
     private fun McpApp(): PolyHandler = mcp(
         ServerMetaData("mcp app", "0.0.0").withExtensions(McpApps),
         NoMcpSecurity,
-        RenderMcpApp(
-            name = "show_ui",
-            description = "shows the UI",
-            uri = uiUrl,
-            meta = McpAppResourceMeta(
-                csp = Csp(
-                    resourceDomains = listOf(Domain.of("https://resource.com")),
-                    connectDomains = listOf(Domain.of("https://connect.com")),
-                    frameDomains = listOf(Domain.of("https://frame.com"))
+        RenderMcpApp("show_ui", "shows the UI", uiUrl, emptyList()) {
+            ResourceResponse.Ok(
+                Resource.Content.Text(
+                    "hello world", uiUrl, MimeType.IMAGE_PNG, Content.Meta(
+                        McpAppResourceMeta(
+                            Csp(
+                                listOf(Domain.of("https://connect.com")),
+                                listOf(Domain.of("https://resource.com")),
+                                listOf(Domain.of("https://frame.com"))
+                            )
+                        )
+                    )
                 )
             )
-        ) { "hello world" },
+        },
     )
 
     private fun NonMcpApp() = mcp(

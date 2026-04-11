@@ -3,8 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.41.1.0 (uncut)
+### v6.42.0.0 (uncut)
 - **http4k-tools-verify**: Verification scanning of test dependencies as well as production dependencies.
+- **http4k-ai-mcp-sdk**: [Unlikely Break] Better support for custom MCP app resource loading. Rename of `RenderMcpApp` parameters might break anything using
+  named params.
 
 ### v6.41.0.0
 - **http4k-***: Upgrade versions

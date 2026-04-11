@@ -4,12 +4,13 @@
  */
 package org.http4k.ai.mcp.server.capability.extension
 
+import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.model.Resource.Content.Text
+import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.Tool
@@ -27,27 +28,42 @@ import org.http4k.routing.bind
 
 /**
  * Creates a combined Tool and Resource capability for MCP Apps.
- * The Tool triggers UI display, and the Resource serves the HTML content.
+ * The Tool triggers UI display, and the Resource serves the UI content.
  */
 fun RenderMcpApp(
     name: String,
     description: String,
-    uri: Uri,
+    uiUri: Uri,
     meta: McpAppResourceMeta = McpAppResourceMeta(),
-    visibility: List<McpAppVisibility>? = null,
+    toolVisibility: List<McpAppVisibility>? = null,
     mimeType: MimeType = McpApps.MIME_TYPE,
     extraCapabilities: List<ServerCapability> = emptyList(),
     mcpAppHandler: McpAppHandler
-) = CapabilityPack(
+) = RenderMcpApp(name, description, uiUri, extraCapabilities, toolVisibility, mimeType) {
+    println(mcpAppHandler(it))
+    ResourceResponse.Ok(Resource.Content.Text(mcpAppHandler(it), uiUri, mimeType, Content.Meta(ui = meta)))
+}
+
+/**
+ * Creates a combined Tool and Resource capability for MCP Apps.
+ * The Tool triggers UI display, and the Resource serves the UI content.
+ */
+fun RenderMcpApp(
+    name: String,
+    description: String,
+    uiUri: Uri,
+    extraCapabilities: List<ServerCapability>,
+    toolVisibility: List<McpAppVisibility>? = null,
+    mimeType: MimeType = McpApps.MIME_TYPE,
+    resourceHandler: ResourceHandler,
+): CapabilityPack = CapabilityPack(
     listOf(
         Tool(
             name = name,
             description = description,
-            meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uri, visibility))
+            meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uiUri, toolVisibility))
         ) bind { ToolResponse.Ok(listOf()) },
-        Static(uri, ResourceName.of(name), description, mimeType) bind {
-            ResourceResponse.Ok(Text(mcpAppHandler(it), it.uri, mimeType, Content.Meta(ui = meta)))
-        }
+        Static(uiUri, ResourceName.of(name), description, mimeType) bind resourceHandler
     ) + extraCapabilities
 )
 

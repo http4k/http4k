@@ -47,7 +47,7 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                 RenderMcpApp(
                     name = "show_ui",
                     description = "shows the UI",
-                    uri = Uri.of("ui://a-ui"),
+                    uiUri = Uri.of("ui://a-ui"),
                     meta = McpAppResourceMeta(
                         csp = Csp(
                             resourceDomains = listOf(Domain.of("https://resource.com")),
