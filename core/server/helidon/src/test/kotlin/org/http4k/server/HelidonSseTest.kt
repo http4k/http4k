@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Disabled
 
 class HelidonSseTest : SseServerContract({ Helidon(it, Immediate) }) {
 
-    @Disabled("not available in Helidon")
+    @Disabled("Helidon SSE sink always responds with 200")
     override fun `can modify status`() {
         super.`can modify status`()
     }

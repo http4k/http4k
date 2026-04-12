@@ -54,9 +54,9 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 
     when {
         status.code < 400 -> {
-            val sseSink = res.sink(TYPE)
-
             res.status(create(status.code, status.description))
+
+            val sseSink = res.sink(TYPE)
 
             val latch = CountDownLatch(1)
 
@@ -67,7 +67,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
                             when (message) {
                                 is Retry -> builder().reconnectDelay(message.backoff).data("")
                                 is Ping -> builder().data("")
-                                is Data -> builder().data(message.sanitizeForMultipleRecords())
+                                is Data -> builder().data(message.data)
                                 is Event -> builder().name(message.event).data(message.data)
                                     .let { if (message.id == null) it else it.id(message.id?.value) }
                             }.build()
@@ -77,8 +77,6 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
                         latch.countDown()
                     }
                 }
-
-                private fun Data.sanitizeForMultipleRecords() = data.replace("\n", "\ndata:")
 
                 override fun close() {
                     try {
@@ -94,7 +92,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 
             try {
                 consumer(sse)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 sse.close()
             }
 

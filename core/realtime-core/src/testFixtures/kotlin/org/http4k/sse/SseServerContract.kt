@@ -353,7 +353,7 @@ abstract class SseServerContract(
     }
 
     @Test
-    open fun `when no http handler messages without the event stream header don't blow up`() {
+    fun `when no http handler messages without the event stream header don't blow up`() {
         poly(sse).asServer(serverConfig(0)).start().use {
             assertThat(
                 client(Request(GET, "http://localhost:${it.port()}/hello/bob")),
