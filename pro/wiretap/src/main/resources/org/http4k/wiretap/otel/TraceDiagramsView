@@ -96,7 +96,7 @@
     </div>
     </#if>
     <#if criticalPath?has_content>
-    <div class="tab-pane" data-diagram-pane="critical-path" role="tabpanel">
+    <div class="tab-pane show active" data-diagram-pane="critical-path" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>

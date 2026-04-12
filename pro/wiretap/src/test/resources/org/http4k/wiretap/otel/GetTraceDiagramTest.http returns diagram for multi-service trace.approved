@@ -118,7 +118,7 @@ data: elements                 </tbody>
 data: elements             </table>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div class="tab-pane" data-diagram-pane="critical-path" role="tabpanel">
+data: elements     <div class="tab-pane show active" data-diagram-pane="critical-path" role="tabpanel">
 data: elements         <div class="sequence-diagram">
 data: elements             <div class="sequence-diagram-toolbar">
 data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
