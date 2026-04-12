@@ -39,7 +39,7 @@
     </div>
     </#if>
     <#if interactionDiagram?has_content>
-    <div class="tab-pane<#if !sequenceDiagram?has_content> show active</#if>" data-diagram-pane="interaction" role="tabpanel">
+    <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -50,7 +50,7 @@
     </div>
     </#if>
     <#if timingEntries?has_content>
-    <div class="tab-pane<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> show active</#if>" data-diagram-pane="timing" role="tabpanel">
+    <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
         <div class="timing-table" style="padding: 1rem;">
             <table class="data-table">
                 <thead>
@@ -85,7 +85,7 @@
     </div>
     </#if>
     <#if errorTrace?has_content>
-    <div class="tab-pane" data-diagram-pane="error" role="tabpanel">
+    <div class="tab-pane show active" data-diagram-pane="error" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -109,6 +109,29 @@
 </div>
 </div>
 <script>
+(function() {
+    var container = document.currentScript.previousElementSibling;
+
+    function hidePanes() {
+        var firstPane = container.querySelector('[data-diagram-pane]');
+        container.querySelectorAll('[data-diagram-pane]').forEach(function(p) {
+            if (p !== firstPane) p.classList.remove('show', 'active');
+        });
+    }
+
+    var unprocessed = container.querySelectorAll('.mermaid:not([data-processed])');
+    if (unprocessed.length === 0) {
+        hidePanes();
+    } else {
+        var observer = new MutationObserver(function() {
+            if (container.querySelectorAll('.mermaid:not([data-processed])').length === 0) {
+                observer.disconnect();
+                hidePanes();
+            }
+        });
+        observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-processed'] });
+    }
+})();
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-diagram-tab]');
     if (!btn) return;
@@ -118,13 +141,6 @@ document.addEventListener('click', function(e) {
     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
     btn.classList.add('active');
     var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
-    if (pane) {
-        pane.classList.add('show', 'active');
-        if (!pane.hasAttribute('data-rendered')) {
-            var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
-            if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
-            pane.setAttribute('data-rendered', 'true');
-        }
-    }
+    if (pane) pane.classList.add('show', 'active');
 });
 </script>

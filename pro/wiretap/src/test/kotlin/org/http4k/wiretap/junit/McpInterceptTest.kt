@@ -38,12 +38,12 @@ class McpInterceptTest {
     @Test
     fun `can pass through an mcp client`(mcpClient: McpClient) {
         mcpClient.run {
-            assertThat(tools().list().coerce<List<McpTool>>().size, greaterThan(0))
-            assertThat(prompts().list().coerce<List<McpPrompt>>().size, greaterThan(0))
             assertThat(
                 resources().read(ResourceRequest(Uri.of("ui://a-ui"))).coerce<ResourceResponse.Ok>().list.first().uri,
                 equalTo(Uri.of("ui://a-ui"))
             )
+            assertThat(tools().list().coerce<List<McpTool>>().size, greaterThan(0))
+            assertThat(prompts().list().coerce<List<McpPrompt>>().size, greaterThan(0))
         }
     }
 }

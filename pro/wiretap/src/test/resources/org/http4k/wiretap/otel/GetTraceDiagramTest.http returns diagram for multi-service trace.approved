@@ -38,7 +38,7 @@ data: elements     backend-->>frontend: OK (3ms)
 data: elements     frontend-->>wiretap: OK (4ms)</pre>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div class="tab-pane" data-diagram-pane="interaction" role="tabpanel">
+data: elements     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
 data: elements         <div class="sequence-diagram">
 data: elements             <div class="sequence-diagram-toolbar">
 data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -59,7 +59,7 @@ data: elements     Rel_D(wiretap, frontend, " ")
 data: elements     Rel_D(frontend, backend, " ")</pre>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div class="tab-pane" data-diagram-pane="timing" role="tabpanel">
+data: elements     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
 data: elements         <div class="timing-table" style="padding: 1rem;">
 data: elements             <table class="data-table">
 data: elements                 <thead>
@@ -144,6 +144,29 @@ data: elements     </div>
 data: elements </div>
 data: elements </div>
 data: elements <script>
+data: elements (function() {
+data: elements     var container = document.currentScript.previousElementSibling;
+data: elements 
+data: elements     function hidePanes() {
+data: elements         var firstPane = container.querySelector('[data-diagram-pane]');
+data: elements         container.querySelectorAll('[data-diagram-pane]').forEach(function(p) {
+data: elements             if (p !== firstPane) p.classList.remove('show', 'active');
+data: elements         });
+data: elements     }
+data: elements 
+data: elements     var unprocessed = container.querySelectorAll('.mermaid:not([data-processed])');
+data: elements     if (unprocessed.length === 0) {
+data: elements         hidePanes();
+data: elements     } else {
+data: elements         var observer = new MutationObserver(function() {
+data: elements             if (container.querySelectorAll('.mermaid:not([data-processed])').length === 0) {
+data: elements                 observer.disconnect();
+data: elements                 hidePanes();
+data: elements             }
+data: elements         });
+data: elements         observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-processed'] });
+data: elements     }
+data: elements })();
 data: elements document.addEventListener('click', function(e) {
 data: elements     var btn = e.target.closest('[data-diagram-tab]');
 data: elements     if (!btn) return;
@@ -153,14 +176,7 @@ data: elements     container.querySelectorAll('[data-diagram-tab]').forEach(func
 data: elements     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
 data: elements     btn.classList.add('active');
 data: elements     var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
-data: elements     if (pane) {
-data: elements         pane.classList.add('show', 'active');
-data: elements         if (!pane.hasAttribute('data-rendered')) {
-data: elements             var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
-data: elements             if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
-data: elements             pane.setAttribute('data-rendered', 'true');
-data: elements         }
-data: elements     }
+data: elements     if (pane) pane.classList.add('show', 'active');
 data: elements });
 data: elements </script>
 data: elements 
