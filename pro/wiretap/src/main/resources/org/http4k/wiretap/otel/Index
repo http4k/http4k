@@ -25,7 +25,6 @@ import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.mi
 mermaid.initialize({
     startOnLoad: false,
     theme: 'base',
-    sequence: { mirrorActors: true },
     themeVariables: {
         primaryColor: '#e8f4fd',
         primaryBorderColor: '#0A53BE',
