@@ -12,6 +12,7 @@ import org.http4k.ai.mcp.util.ObservableList
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 
+
 class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
     constructor(vararg list: ToolCapability) : this(list.toList())
 

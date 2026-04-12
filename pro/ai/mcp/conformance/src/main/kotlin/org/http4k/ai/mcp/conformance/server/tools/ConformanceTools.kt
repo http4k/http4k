@@ -4,12 +4,12 @@
  */
 package org.http4k.ai.mcp.conformance.server.tools
 
-import org.http4k.ai.mcp.server.capability.CapabilityPack
+import org.http4k.ai.mcp.server.capability.capabilities
 
 /**
  * CapabilityPack containing Tool tests defined in the the MCP Conformance Test Suite
  */
-fun ConformanceTools() = CapabilityPack(
+fun ConformanceTools() = capabilities(
     simpleTextTool(),
     imageContentTool(),
     audioContentTool(),

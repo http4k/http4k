@@ -3,8 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.42.0.1 (uncut)
-**http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
+### v6.43.0.0 (uncut)
+- **http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
+- **http4k-ai-mcp-sdk**: [Unlikely Break] Externalised Progress Token so that you need to pass it directly into progress calls. This makes it explicit that
+  callers without progress tokens will not be able to track progress.
 
 ### v6.42.0.0
 - **http4k-***: Upgrade versions

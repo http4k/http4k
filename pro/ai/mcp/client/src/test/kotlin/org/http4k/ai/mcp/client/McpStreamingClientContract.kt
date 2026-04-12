@@ -194,7 +194,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
     fun `can do progress`() {
         val tools = ServerTools(
             Tool("progress", "description") bind {
-                it.client.progress(1, 2.0)
+                it.client.progress(MetaKey.progressToken<Any>().toLens()(it.meta) ?: "unknown", 1, 2.0)
                 Ok(listOf(Content.Text("")))
             }
         )

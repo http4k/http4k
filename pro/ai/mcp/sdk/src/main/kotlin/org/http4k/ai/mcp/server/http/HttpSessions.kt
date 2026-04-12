@@ -39,19 +39,14 @@ class HttpSessions(
     private val clientConnections = ConcurrentHashMap<ClientRequestContext, Sse>()
 
     override fun request(context: ClientRequestContext, message: McpNodeType) {
-        val sse = when (context) {
-            is ClientCall -> clientConnections[context]
-            is Subscription -> clientConnections[context]
-        }
-
-        when (sse) {
+        when (val sse = clientConnections[context]) {
             null -> {}
             else -> sse.sendAndStore(message, context.session)
         }
     }
 
-    override fun respond(transport: Sse, session: Session, message: McpNodeType): Result4k<McpNodeType, McpNodeType> {
-        transport.sendAndStore(message, session)
+    override fun respond(transport: Sse, context: ClientRequestContext, message: McpNodeType): Result4k<McpNodeType, McpNodeType> {
+        transport.sendAndStore(message, context.session)
         return Success(message)
     }
 

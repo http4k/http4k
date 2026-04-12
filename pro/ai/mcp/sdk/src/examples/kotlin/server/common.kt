@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.ai.mcp.server.capability.capabilities
 import org.http4k.ai.model.Role
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
@@ -29,7 +30,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Uri
 import org.http4k.lens.int
 import org.http4k.routing.bind
-import org.http4k.routing.compose
 import org.jsoup.Jsoup
 
 fun LinksOnPage(http: HttpHandler): ResourceHandler = {
@@ -48,24 +48,24 @@ fun LinksOnPage(http: HttpHandler): ResourceHandler = {
     ResourceResponse.Ok(links)
 }
 
-fun tools() = compose(
+fun tools() = capabilities(
     liveWeatherTool(),
     reverseTool(),
     countingTool()
 )
 
-fun resources() = compose(
+fun resources() = capabilities(
     staticResource(),
     templatedResource()
 )
 
-fun completions() = compose(
+fun completions() = capabilities(
     Reference.Prompt("prompt2") bind {
         CompletionResponse.Ok(listOf("1", "2"))
     }
 )
 
-fun prompts() = compose(
+fun prompts() = capabilities(
     prompt1(),
     prompt2()
 )

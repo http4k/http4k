@@ -276,8 +276,8 @@ class TestMcpClientTest {
 
         val serverTools = ServerTools(listOf(tool bind {
             MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
-                it.client.progress(1, 5.0)
-                it.client.progress(2, 5.0)
+                it.client.progress(p, 1, 5.0)
+                it.client.progress(p, 2, 5.0)
             }
 
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
@@ -380,7 +380,9 @@ class TestMcpClientTest {
         val progress = Progress("hello", 1, 1.0)
         val serverCompletions = ServerCompletions(
             listOf(ref bind {
-                it.client.progress(progress.progress, progress.total)
+                MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
+                    it.client.progress(p, progress.progress, progress.total)
+                }
 
                 CompletionResponse.Ok(listOf("values"), 1, true)
             })

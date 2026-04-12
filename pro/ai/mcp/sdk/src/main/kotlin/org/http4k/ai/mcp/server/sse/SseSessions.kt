@@ -36,10 +36,10 @@ class SseSessions(
 
     override fun respond(
         transport: Sse,
-        session: Session,
+        context: ClientRequestContext,
         message: McpNodeType
     ): Result4k<McpNodeType, McpNodeType> {
-        transport.sendAndStore(message, session)
+        transport.sendAndStore(message, context.session)
         return Success(message)
     }
 

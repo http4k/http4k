@@ -426,9 +426,9 @@ class McpProtocolTest {
                     val stringArg1 = stringArg(it)
                     val intArg1 = intArg(it)
 
-                    MetaKey.progressToken<String>().toLens()(it.meta)?.let { _ ->
-                        it.client.progress(1, 5.0, "d1")
-                        it.client.progress(2, 5.0, "d2")
+                    MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
+                        it.client.progress(p, 1, 5.0, "d1")
+                        it.client.progress(p, 2, 5.0, "d2")
                     }
 
                     Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
@@ -576,9 +576,9 @@ class McpProtocolTest {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
         val completions = ServerCompletions(
             listOf(ref bind {
-                MetaKey.progressToken<String>().toLens()(it.meta)?.let { _ ->
-                    it.client.progress(1, 5.0, "d1")
-                    it.client.progress(2, 5.0, "d2")
+                MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
+                    it.client.progress(p, 1, 5.0, "d1")
+                    it.client.progress(p, 2, 5.0, "d2")
                 }
 
                 CompletionResponse.Ok(listOf("values"), 1, true)

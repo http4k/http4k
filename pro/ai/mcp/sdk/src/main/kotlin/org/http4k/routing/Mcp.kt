@@ -16,7 +16,6 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.SessionId
-import org.http4k.ai.mcp.server.capability.CapabilityPack
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
@@ -183,5 +182,3 @@ infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)
 infix fun Resource.bind(handler: ResourceHandler) = ResourceCapability(this, handler)
 infix fun Reference.bind(handler: CompletionHandler) = CompletionCapability(this, handler)
-
-fun compose(vararg bindings: ServerCapability) = CapabilityPack(bindings = bindings)

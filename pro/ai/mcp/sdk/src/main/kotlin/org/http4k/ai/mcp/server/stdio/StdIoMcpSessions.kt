@@ -22,7 +22,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
         flush()
     }
 
-    override fun respond(transport: Unit, session: Session, message: McpNodeType) =
+    override fun respond(transport: Unit, context: ClientRequestContext, message: McpNodeType) =
         Success(message)
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) = fn()

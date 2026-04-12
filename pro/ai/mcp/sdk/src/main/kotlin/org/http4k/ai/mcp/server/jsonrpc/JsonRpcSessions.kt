@@ -20,7 +20,7 @@ class JsonRpcSessions(
 ) :
     Sessions<Unit> {
 
-    override fun respond(transport: Unit, session: Session, message: McpNodeType) =
+    override fun respond(transport: Unit, context: ClientRequestContext, message: McpNodeType) =
         Success(message)
 
     override fun request(context: ClientRequestContext, message: McpNodeType) {
