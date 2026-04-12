@@ -22,21 +22,13 @@ import org.http4k.wiretap.Context
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
 import org.http4k.wiretap.domain.LogStore
-import org.http4k.wiretap.domain.Ordering
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
-import org.http4k.wiretap.domain.toDetail
-import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.http4k.wiretap.junit.RenderMode.Never
 import org.http4k.wiretap.junit.RenderMode.OnFailure
 import org.http4k.wiretap.livingdoc.LivingDocRenderer
-import org.http4k.wiretap.otel.TraceDetailView
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
-import org.http4k.wiretap.otel.toTraceDetail
-import org.http4k.wiretap.otel.toTraceDiagramsView
-import org.http4k.wiretap.traffic.TransactionDetailView
-import org.http4k.wiretap.util.Templates
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -167,18 +159,18 @@ class Intercept @JvmOverloads constructor(
         val testName = "${testClass.simpleName}.${context.requiredTestMethod.name}"
         val packageDir = testClass.packageName.replace('.', '/')
         val (_, _, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture) = state.get()
-        val file = renderTestReport(
-            testName,
-            packageDir,
-            traceStore,
-            logStore,
-            transactionStore,
-            stdOutCapture.toString(),
-            stdErrCapture.toString()
-        )
+        val fileName = testName.replace(' ', '-')
+        val dir = File(outputDir, packageDir).apply { mkdirs() }
 
-        println("Wiretap report: file://${file.absolutePath}")
-        context.publishReportEntry("wiretap", "file://${file.absolutePath}")
+        File(dir, "${fileName}.md")
+            .writeText(LivingDocRenderer(traceStore, transactionStore)(testName))
+
+        val htmlFile = File(dir, "${fileName}.html").apply {
+            writeText(TestReportRenderer(traceStore, logStore, transactionStore, clock)(testName, stdOutCapture.toString(), stdErrCapture.toString()))
+        }
+
+        println("Wiretap report: file://${htmlFile.absolutePath}")
+        context.publishReportEntry("wiretap", "file://${htmlFile.absolutePath}")
     }
 
 
@@ -191,44 +183,6 @@ class Intercept @JvmOverloads constructor(
         val stdOutCapture: ByteArrayOutputStream,
         val stdErrCapture: ByteArrayOutputStream
     )
-}
-
-internal fun renderTestReport(
-    testName: String,
-    packageDir: String,
-    traceStore: TraceStore,
-    logStore: LogStore,
-    transactionStore: TransactionStore,
-    stdOut: String = "",
-    stdErr: String = ""
-): File {
-
-    val renderer = LivingDocRenderer(TraceStore.InMemory(), TransactionStore.InMemory())
-    val html = Templates()
-    val css = Intercept::class.java.classLoader.getResourceAsStream("public/wiretap.css")
-        ?.bufferedReader()?.readText() ?: ""
-
-    val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
-        val detail = spans.toTraceDetail(traceId)
-        val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(Clock.systemUTC()) }.groupBy { it.spanId }
-        val ganttHtml = html(TraceDetailView(detail, logsBySpan))
-        val diagramsHtml = html(detail.toTraceDiagramsView())
-        TraceEntry(traceId.value, ganttHtml, diagramsHtml)
-    }
-
-    val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->
-        val detail = wtx.toDetail(Clock.systemUTC())
-        TrafficEntry(html(TransactionDetailView(detail)))
-    }
-
-    val fileName = testName.replace(' ', '-')
-    val dir = File(outputDir, packageDir).apply { mkdirs() }
-
-    File(dir, "${fileName}.md")
-        .writeText(renderer(testName))
-
-    return File(dir, "${fileName}.html")
-        .apply { writeText(html(JUnitTestReport(testName, css, traceEntries, trafficEntries, stdOut, stdErr))) }
 }
 
 private val outputDir by lazy {

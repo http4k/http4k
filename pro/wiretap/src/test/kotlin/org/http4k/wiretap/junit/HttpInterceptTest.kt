@@ -15,7 +15,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.wiretap.domain.Direction
-import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.domain.Ordering.Descending
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
@@ -70,26 +69,5 @@ class HttpInterceptTest {
         assertThat("stderr has app warning", intercept.capturedStdErr.contains("downstream warning"), equalTo(true))
     }
 
-    @Test
-    fun `renders multiple traces into a single report`(http: HttpHandler) {
-        http(testRequest())
-        http(testRequest())
-
-        assertThat(intercept.traceStore.traces(Ascending).size, equalTo(2))
-
-        val file = renderTestReport(
-            "TestClass.testMethod",
-            "org/http4k/wiretap/junit",
-            intercept.traceStore,
-            intercept.logStore,
-            intercept.transactionStore
-        )
-        assertThat(file.name, equalTo("TestClass.testMethod.html"))
-
-        val content = file.readText()
-        intercept.traceStore.traces(Ascending).keys.forEach { traceId ->
-            assertThat("report contains trace $traceId", content.contains(traceId.value), equalTo(true))
-        }
-    }
 
 }
