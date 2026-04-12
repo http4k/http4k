@@ -5,6 +5,7 @@ data: elements         <span class="badge badge-trace">TRACE</span>
 data: elements         <span class="trace-id-detail" title="00000000000000000000000000000002">00000000</span>
 data: elements         <span class="gantt-total-duration">4ms</span>
 data: elements         <a href="/_wiretap/traffic?trace=00000000000000000000000000000002" class="trace-link-btn">Traffic</a>
+data: elements         <a href="/_wiretap/otel/markdown/00000000000000000000000000000002" class="action-btn" download="trace-00000000000000000000000000000002.md">Export Markdown</a>
 data: elements     </div>
 data: elements     <div class="gantt-chart">
 data: elements         <div class="gantt-timeline-header">

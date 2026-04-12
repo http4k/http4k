@@ -98,7 +98,7 @@ object Wiretap {
         val baseFunctions = listOf(
             Traffic(transactionStore, viewStore, clock),
             Chaos(inboundChaos, outboundChaos),
-            OTel(traceStore, logStore, clock),
+            OTel(traceStore, logStore, transactionStore, clock),
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),

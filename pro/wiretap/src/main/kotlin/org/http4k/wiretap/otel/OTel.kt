@@ -12,13 +12,15 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.domain.TransactionStore
 import java.time.Clock
 
-fun OTel(traceStore: TraceStore, logStore: LogStore, clock: Clock) = object : WiretapFunction {
+fun OTel(traceStore: TraceStore, logStore: LogStore, transactionStore: TransactionStore, clock: Clock) = object : WiretapFunction {
     private val functions = listOf(
         ListTraces(traceStore, clock),
         GetTrace(traceStore, logStore, clock),
         GetTraceDiagrams(traceStore),
+        GetTraceMarkdown(traceStore, transactionStore),
     )
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

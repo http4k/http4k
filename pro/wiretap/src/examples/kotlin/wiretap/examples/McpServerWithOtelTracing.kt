@@ -33,10 +33,15 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.CallToolDetailSpanModifiers
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.CompletionDetailSpanModifiers
+import org.http4k.filter.GetPromptDetailSpanModifiers
 import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
+import org.http4k.filter.ReadResourceDetailSpanModifiers
+import org.http4k.filter.defaultMcpOtelSpanModifiers
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 
@@ -78,7 +83,13 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                 ) bind { ResourceResponse.Ok(Resource.Content.Text("article content", Uri.of(""))) },
                 Reference.Prompt("prompt") bind { CompletionResponse.Ok(listOf("London", "Paris", "Tokyo", "New York")) },
                 Reference.ResourceTemplate("docs://articles/{+topic}") bind { CompletionResponse.Ok(listOf("http4k", "kotlin", "testing", "mcp")) },
-                mcpFilter = McpFilters.OpenTelemetryTracing(openTelemetry = otel)
+                mcpFilter = McpFilters.OpenTelemetryTracing(
+                    openTelemetry = otel, spanModifiers = defaultMcpOtelSpanModifiers
+                        + CallToolDetailSpanModifiers
+                        + GetPromptDetailSpanModifiers
+                        + ReadResourceDetailSpanModifiers
+                        + CompletionDetailSpanModifiers
+                )
             )
         )
 

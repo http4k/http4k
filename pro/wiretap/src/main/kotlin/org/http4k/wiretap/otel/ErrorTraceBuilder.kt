@@ -15,15 +15,11 @@ fun TraceDetail.toErrorTrace(): String {
     val errorSpans = spans.filter { it.isError() }
     if (errorSpans.isEmpty()) return ""
 
-    val errorPathSpanIds = mutableSetOf<OtelSpanId>()
-    for (errorSpan in errorSpans) {
-        var current = errorSpan
-        errorPathSpanIds.add(current.spanId)
-        while (current.parentSpanId != ROOT_PARENT_SPAN_ID && current.parentSpanId in spanById) {
-            current = spanById.getValue(current.parentSpanId)
-            errorPathSpanIds.add(current.spanId)
-        }
-    }
+    val errorPathSpanIds = errorSpans.flatMap { errorSpan ->
+        generateSequence(errorSpan) { current ->
+            spanById[current.parentSpanId]?.takeIf { current.parentSpanId != ROOT_PARENT_SPAN_ID }
+        }.map { it.spanId }
+    }.toSet()
 
     val filtered = copy(spans = spans.filter { it.spanId in errorPathSpanIds })
     val diagram = filtered.toSequenceDiagram()

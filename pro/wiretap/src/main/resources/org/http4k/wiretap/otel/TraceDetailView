@@ -4,6 +4,7 @@
         <span class="trace-id-detail" title="${detail.traceId}">${shortTraceId}</span>
         <span class="gantt-total-duration">${detail.totalDurationMs}ms</span>
         <a href="/_wiretap/traffic?trace=${detail.traceId}" class="trace-link-btn">Traffic</a>
+        <a href="/_wiretap/otel/markdown/${detail.traceId}" class="action-btn" download="trace-${detail.traceId}.md">Export Markdown</a>
     </div>
     <div class="gantt-chart">
         <div class="gantt-timeline-header">

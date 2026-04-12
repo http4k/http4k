@@ -77,7 +77,13 @@ class HttpInterceptTest {
 
         assertThat(intercept.traceStore.traces(Ascending).size, equalTo(2))
 
-        val file = renderTestReport("TestClass.testMethod", "org/http4k/wiretap/junit", intercept.traceStore, intercept.logStore, intercept.transactionStore)
+        val file = renderTestReport(
+            "TestClass.testMethod",
+            "org/http4k/wiretap/junit",
+            intercept.traceStore,
+            intercept.logStore,
+            intercept.transactionStore
+        )
         assertThat(file.name, equalTo("TestClass.testMethod.html"))
 
         val content = file.readText()

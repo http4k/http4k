@@ -30,6 +30,7 @@ import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.http4k.wiretap.junit.RenderMode.Never
 import org.http4k.wiretap.junit.RenderMode.OnFailure
+import org.http4k.wiretap.livingdoc.LivingDocRenderer
 import org.http4k.wiretap.otel.TraceDetailView
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import org.http4k.wiretap.otel.toTraceDetail
@@ -99,7 +100,9 @@ class Intercept @JvmOverloads constructor(
 
     internal val traceStore get() = state.get().traceStore
     internal val logStore get() = state.get().logStore
+
     internal val transactionStore get() = state.get().transactionStore
+
     internal val capturedStdOut get() = state.get().stdOutCapture.toString()
     internal val capturedStdErr get() = state.get().stdErrCapture.toString()
 
@@ -164,11 +167,20 @@ class Intercept @JvmOverloads constructor(
         val testName = "${testClass.simpleName}.${context.requiredTestMethod.name}"
         val packageDir = testClass.packageName.replace('.', '/')
         val (_, _, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture) = state.get()
-        val file = renderTestReport(testName, packageDir, traceStore, logStore, transactionStore, stdOutCapture.toString(), stdErrCapture.toString())
+        val file = renderTestReport(
+            testName,
+            packageDir,
+            traceStore,
+            logStore,
+            transactionStore,
+            stdOutCapture.toString(),
+            stdErrCapture.toString()
+        )
 
         println("Wiretap report: file://${file.absolutePath}")
         context.publishReportEntry("wiretap", "file://${file.absolutePath}")
     }
+
 
     private data class TestState(
         val http: HttpHandler,
@@ -181,11 +193,17 @@ class Intercept @JvmOverloads constructor(
     )
 }
 
-private val outputDir by lazy {
-    File("build/reports/wiretap").apply { mkdirs() }
-}
+internal fun renderTestReport(
+    testName: String,
+    packageDir: String,
+    traceStore: TraceStore,
+    logStore: LogStore,
+    transactionStore: TransactionStore,
+    stdOut: String = "",
+    stdErr: String = ""
+): File {
 
-internal fun renderTestReport(testName: String, packageDir: String, traceStore: TraceStore, logStore: LogStore, transactionStore: TransactionStore, stdOut: String = "", stdErr: String = ""): File {
+    val renderer = LivingDocRenderer(TraceStore.InMemory(), TransactionStore.InMemory())
     val html = Templates()
     val css = Intercept::class.java.classLoader.getResourceAsStream("public/wiretap.css")
         ?.bufferedReader()?.readText() ?: ""
@@ -206,8 +224,15 @@ internal fun renderTestReport(testName: String, packageDir: String, traceStore: 
     val fileName = testName.replace(' ', '-')
     val dir = File(outputDir, packageDir).apply { mkdirs() }
 
+    File(dir, "${fileName}.md")
+        .writeText(renderer(testName))
+
     return File(dir, "${fileName}.html")
         .apply { writeText(html(JUnitTestReport(testName, css, traceEntries, trafficEntries, stdOut, stdErr))) }
+}
+
+private val outputDir by lazy {
+    File("build/reports/wiretap").apply { mkdirs() }
 }
 
 private class TeeOutputStream(private val primary: OutputStream, private val secondary: OutputStream) : OutputStream() {

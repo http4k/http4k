@@ -40,7 +40,13 @@ class RenderTestReportsTest {
 
         handler(Request(Method.GET, "/"))
 
-        val file = renderTestReport("TestClass.test method", "com/example", traceStore, logStore, transactionStore)
+        val file = renderTestReport(
+            "TestClass.test method",
+            "com/example",
+            traceStore,
+            logStore,
+            transactionStore
+        )
 
         assertThat(file.name, equalTo("TestClass.test-method.html"))
         assertThat(file.parentFile.path.endsWith("com/example"), equalTo(true))
@@ -56,7 +62,13 @@ class RenderTestReportsTest {
 
     @Test
     fun `renders empty report when no traces recorded`() {
-        val file = renderTestReport("Empty.test", "com/example", TraceStore.InMemory(), LogStore.InMemory(), TransactionStore.InMemory())
+        val file = renderTestReport(
+            "Empty.test",
+            "com/example",
+            TraceStore.InMemory(),
+            LogStore.InMemory(),
+            TransactionStore.InMemory()
+        )
 
         val content = file.readText()
         assertThat("should be standalone HTML", content.contains("<!DOCTYPE html>"), equalTo(true))
@@ -67,7 +79,15 @@ class RenderTestReportsTest {
 
     @Test
     fun `renders stdout and stderr tabs with captured output`() {
-        val file = renderTestReport("Output.test", "com/example", TraceStore.InMemory(), LogStore.InMemory(), TransactionStore.InMemory(), stdOut = "stdout line", stdErr = "stderr line")
+        val file = renderTestReport(
+            "Output.test",
+            "com/example",
+            TraceStore.InMemory(),
+            LogStore.InMemory(),
+            TransactionStore.InMemory(),
+            stdOut = "stdout line",
+            stdErr = "stderr line"
+        )
         val content = file.readText()
 
         assertThat("should contain stdout tab", content.contains("stdout-tab"), equalTo(true))
@@ -94,7 +114,13 @@ class RenderTestReportsTest {
             Direction.Inbound
         )
 
-        val file = renderTestReport("Traffic.test", "com/example", traceStore, logStore, transactionStore)
+        val file = renderTestReport(
+            "Traffic.test",
+            "com/example",
+            traceStore,
+            logStore,
+            transactionStore
+        )
         val content = file.readText()
 
         assertThat("should contain traffic tab", content.contains("traffic-tab"), equalTo(true))

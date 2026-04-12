@@ -1,0 +1,51 @@
+# MyTest.calls downstream
+
+## Inbound Requests
+
+#### POST /api/data → myapp.com
+
+**Request**
+
+```http
+POST /api/data HTTP/1.1
+Content-Type: application/json
+Host: myapp.com
+
+{
+    "name": "test",
+    "value": 42
+}
+```
+
+**Response**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name": "test",
+    "value": 42
+}
+```
+
+## Outbound Requests
+
+#### DELETE /foobar → downstream.example.com
+
+**Request**
+
+```http
+DELETE https://downstream.example.com/foobar HTTP/1.1
+Host: downstream.example.com
+```
+
+**Response**
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: text/plain
+
+something went wrong
+```

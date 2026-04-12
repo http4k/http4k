@@ -28,7 +28,7 @@ class CallToolSpanModifiersTest {
 
     @Test
     fun `sets error attributes on response with isError`() {
-        CallToolSpanModifiers.response(span, asJsonObject(mapOf("isError" to true)))
+        CallToolSpanModifiers.response(span, asJsonObject(mapOf("result" to mapOf("isError" to true))))
 
         assertThat(spanData.status.statusCode, equalTo(ERROR))
         assertThat(spanData.attributes.get(stringKey("error.type")), equalTo("tool_error"))

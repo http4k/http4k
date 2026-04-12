@@ -5,14 +5,17 @@
 package org.http4k.wiretap.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
+import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.model.ToolName
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
@@ -41,6 +44,10 @@ class McpInterceptTest {
             assertThat(
                 resources().read(ResourceRequest(Uri.of("ui://a-ui"))).coerce<ResourceResponse.Ok>().list.first().uri,
                 equalTo(Uri.of("ui://a-ui"))
+            )
+            assertThat(
+                tools().call(ToolName.of("non_app")).coerce<ToolResponse.Ok>().content?.first().toString(),
+                containsSubstring("hello")
             )
             assertThat(tools().list().coerce<List<McpTool>>().size, greaterThan(0))
             assertThat(prompts().list().coerce<List<McpPrompt>>().size, greaterThan(0))

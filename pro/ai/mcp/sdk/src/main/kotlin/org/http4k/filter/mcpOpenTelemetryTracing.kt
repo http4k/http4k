@@ -44,7 +44,12 @@ fun McpFilters.OpenTelemetryTracing(
 
             val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
 
-            val span = tracer.spanBuilder(req.json.method)
+            val targetName = req.json.params
+                ?.let { McpJson.fields(it).toMap()["name"] }
+                ?.let { McpJson.text(it) }
+            val spanName = if (targetName != null) "${req.json.method} $targetName" else req.json.method
+
+            val span = tracer.spanBuilder(spanName)
                 .setParent(parentContext)
                 .setSpanKind(SERVER)
                 .setAttribute("mcp.method.name", req.json.method)
@@ -83,6 +88,7 @@ fun McpFilters.OpenTelemetryTracing(
 
 val defaultMcpOtelSpanModifiers = listOf(
     CallToolSpanModifiers,
+    CompletionSpanModifiers,
     GetPromptSpanModifiers,
     ReadResourceSpanModifiers
 )

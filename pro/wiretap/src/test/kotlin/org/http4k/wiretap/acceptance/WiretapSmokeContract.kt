@@ -30,7 +30,7 @@ interface WiretapSmokeContract : PortBasedTest {
     @Test
     fun `can boot and count tools`() {
         Wiretap(target).testMcpClient(Request(POST, "_wiretap/mcp")).use {
-            assertThat(it.tools().list().coerce<List<McpTool>>().size, equalTo(17))
+            assertThat(it.tools().list().coerce<List<McpTool>>().size, equalTo(18))
         }
     }
 
