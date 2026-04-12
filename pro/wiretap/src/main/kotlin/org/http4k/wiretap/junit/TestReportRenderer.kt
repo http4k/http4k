@@ -21,7 +21,7 @@ class TestReportRenderer(
     private val traceStore: TraceStore,
     private val logStore: LogStore,
     private val transactionStore: TransactionStore,
-    private val clock: Clock = Clock.systemUTC()
+    private val clock: Clock
 ) {
     operator fun invoke(testName: String, stdOut: String = "", stdErr: String = ""): String {
         val html = Templates()

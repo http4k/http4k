@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiretap: TestClass.testMethod</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="https://http4k.org/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://http4k.org/favicon-16.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>:root {
+    --color-text: #212529;
+    --color-text-muted: #6c757d;
+    --color-text-mid: #495057;
+    --color-placeholder: #adb5bd;
+    --color-border: #dee2e6;
+    --color-border-subtle: #f0f0f0;
+    --color-bg-light: #f8f9fa;
+    --color-bg-hover: #e9ecef;
+    --color-primary: #0d6efd;
+    --color-link: #0A53BE;
+    --color-danger: #dc3545;
+    --color-success: #198754;
+    --color-warning: #ffc107;
+    --color-orange: #fd7e14;
+    --color-inbound: #0FA8E8;
+    --color-outbound: #6f42c1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    background: #fff;
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    background: url("https://www.http4k.org/images/pipes-hero.svg"), linear-gradient(135deg, #59AFF5 0%, #2096F3 50%, #61C0FF 100%);
+    background-size: cover;
+    background-position: center;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.app-nav {
+    display: flex;
+    gap: 4px;
+}
+
+.app-nav .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.app-nav .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.app-nav .nav-link-active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.app-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-logo {
+    height: 36px;
+}
+
+.app-header-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.top-tabs {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    background: var(--color-bg-light);
+    border-bottom: 1px solid #dee2e6;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.top-add-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--color-bg-light);
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.top-add-tab .form-control-sm {
+    font-size: 13px;
+    width: 200px;
+}
+
+.top-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.form-select-sm,
+.form-control-sm {
+    font-size: 13px;
+    flex: 1;
+    min-width: 0;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.app-layout {
+    flex: 1;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    color: #212529;
+    border: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background: #e9ecef;
+}
+
+.tab-btn.active {
+    background: #e9ecef;
+    font-weight: 600;
+}
+
+.add-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    color: #6c757d;
+    border: 1px dashed #dee2e6;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.add-tab-btn:hover {
+    color: #212529;
+    border-color: #adb5bd;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--color-bg-light);
+    color: var(--color-text-muted);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.action-btn:hover {
+    color: var(--color-text);
+    background: var(--color-bg-hover);
+}
+
+.action-btn-primary:hover {
+    color: #0b5ed7;
+    background: #e7f0ff;
+}
+
+.action-btn-danger:hover {
+    color: var(--color-danger);
+    background: #fee2e2;
+}
+
+.list-header {
+    display: grid;
+    grid-template-columns: var(--grid-cols, 30px 90px 70px 60px minmax(80px, 1fr) minmax(80px, 2fr) 50px 60px);
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6c757d;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.col-resize-handle {
+    position: absolute;
+    right: -4px;
+    top: 0;
+    bottom: 0;
+    width: 7px;
+    cursor: col-resize;
+    z-index: 1;
+}
+
+.col-resize-handle:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.list-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tx-row {
+    display: grid;
+    grid-template-columns: var(--grid-cols, 30px 90px 70px 60px minmax(80px, 1fr) minmax(80px, 2fr) 50px 60px);
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.tx-row:hover {
+    background: #f8f9fa;
+}
+
+.tx-row.selected {
+    background: #f0f0f0;
+}
+
+.dir-in {
+    color: var(--color-inbound);
+}
+
+.dir-out {
+    color: var(--color-outbound);
+}
+
+.status-2xx, .status-3xx, .status-4xx, .status-5xx {
+    font-weight: 600;
+}
+
+.status-2xx {
+    color: var(--color-success);
+}
+
+.status-3xx {
+    color: var(--color-warning);
+}
+
+.status-4xx {
+    color: var(--color-orange);
+}
+
+.status-5xx {
+    color: var(--color-danger);
+}
+
+.method {
+    font-weight: 600;
+}
+
+.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-placeholder);
+    font-size: 14px;
+}
+
+.section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.code-block {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-y: auto;
+}
+
+.detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.detail-section {
+    margin-bottom: 16px;
+}
+
+.detail-section h3 {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.detail-section pre,
+.mcp-client-message pre {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: auto;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    vertical-align: top;
+}
+
+.data-table td:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.header-table {
+    font-size: 13px;
+}
+
+.header-table td:first-child {
+    color: var(--color-link);
+    width: 200px;
+}
+
+.detail-toolbar {
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.detail-toolbar .uri {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-in {
+    color: var(--color-inbound);
+}
+
+.badge-out {
+    color: var(--color-outbound);
+}
+
+.uri-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.filterable {
+    cursor: pointer;
+}
+
+.filterable:hover {
+    text-decoration: underline;
+}
+
+.duration {
+    color: #6c757d;
+    font-size: 12px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.detail-content hr {
+    border: none;
+    border-top: 1px solid #dee2e6;
+    margin: 16px 0;
+}
+
+.trace-link-btn {
+    background: #e8f4fd;
+    color: #0A53BE;
+    border: 1px solid #b6d4fe;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: monospace;
+}
+
+.trace-link-btn:hover {
+    background: #cfe2ff;
+    border-color: #0A53BE;
+}
+
+.timestamp {
+    color: #6c757d;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Chaos row highlight */
+.tx-row-chaos {
+    background: #fffde7;
+}
+
+.tx-row-chaos:hover {
+    background: #fff9c4;
+}
+
+/* Chaos page */
+.chaos-page {
+    padding: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.chaos-status-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.chaos-engine-status {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chaos-engine-status h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+    min-width: 70px;
+}
+
+.chaos-description {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.badge-chaos {
+    display: inline-block;
+    background: #dc3545;
+    color: #fff;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.badge-chaos-active,
+.badge-chaos-inactive,
+.badge-trace {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-chaos-active {
+    background: var(--color-danger);
+    color: #fff;
+}
+
+.badge-chaos-inactive {
+    background: var(--color-bg-hover);
+    color: var(--color-text-muted);
+}
+
+.badge-trace {
+    background: #e8f4fd;
+    color: var(--color-link);
+}
+
+.chaos-sections {
+    display: flex;
+    gap: 24px;
+}
+
+.chaos-section {
+    flex: 1;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.chaos-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 20px;
+    align-items: start;
+}
+
+.chaos-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chaos-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chaos-form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.chaos-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-self: end;
+}
+
+/* Traces page */
+.trace-list-header {
+    display: grid;
+    grid-template-columns: var(--grid-cols, 100px 80px 1fr 120px 50px 70px);
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6c757d;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.trace-row {
+    display: grid;
+    grid-template-columns: var(--grid-cols, 100px 80px 1fr 120px 50px 70px);
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.trace-service-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #6c757d;
+}
+
+.trace-row:hover {
+    background: #f8f9fa;
+}
+
+.trace-row.selected {
+    background: #f0f0f0;
+}
+
+.trace-id {
+    font-family: monospace;
+    font-size: 12px;
+    color: #0A53BE;
+}
+
+.trace-root-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.trace-span-count {
+    text-align: center;
+    color: #6c757d;
+}
+
+.trace-id-detail {
+    font-family: monospace;
+    font-size: 13px;
+}
+
+/* Gantt chart */
+.gantt-chart {
+    padding: 0;
+}
+
+.gantt-total-duration {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    font-variant-numeric: tabular-nums;
+}
+
+.gantt-timeline-header {
+    display: flex;
+    align-items: stretch;
+    font-size: 10px;
+    color: #adb5bd;
+    border-bottom: 1px solid #dee2e6;
+    padding: 4px 0;
+}
+
+.gantt-label-col {
+    width: 300px;
+    min-width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    overflow: hidden;
+}
+
+.gantt-timeline-col {
+    flex: 1;
+    position: relative;
+    min-height: 20px;
+}
+
+.gantt-tick {
+    position: absolute;
+    top: 2px;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #adb5bd;
+}
+
+.gantt-row {
+    display: flex;
+    align-items: stretch;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 28px;
+}
+
+.gantt-row:hover {
+    background: #f8f9fa;
+}
+
+.gantt-span-name {
+    font-weight: 600;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.gantt-gridlines {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+}
+
+.gantt-gridline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #f0f0f0;
+}
+
+.gantt-bar {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 3px;
+    min-width: 2px;
+    border: 1px solid;
+}
+
+.gantt-bar-SERVER {
+    background: #a8d4f0;
+    border-color: #0A53BE;
+}
+
+.gantt-bar-CLIENT {
+    background: #dcc8f0;
+    border-color: #6f42c1;
+}
+
+.gantt-bar-INTERNAL {
+    background: #d5d8dc;
+    border-color: #6c757d;
+}
+
+.gantt-bar-PRODUCER {
+    background: #ffe8a1;
+    border-color: #856404;
+}
+
+.gantt-bar-CONSUMER {
+    background: #b8e6c4;
+    border-color: #155724;
+}
+
+.span-kind {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.badge-span-SERVER {
+    background: #e8f4fd;
+    color: #0A53BE;
+}
+
+.badge-span-CLIENT {
+    background: #f3e8fd;
+    color: #6f42c1;
+}
+
+.badge-span-INTERNAL {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.badge-span-PRODUCER {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-span-CONSUMER {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Gantt detail panel */
+.gantt-detail {
+    display: none;
+    background: var(--color-bg-light);
+    border-bottom: 1px solid #dee2e6;
+    padding: 12px 16px;
+}
+
+.gantt-detail.expanded {
+    display: block;
+}
+
+.gantt-detail-columns {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.gantt-detail-columns:last-child {
+    margin-bottom: 0;
+}
+
+.gantt-detail-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.span-detail-section {
+    margin-bottom: 12px;
+}
+
+.span-detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.span-detail-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.span-detail-table {
+    font-size: 12px;
+}
+
+.span-detail-table td {
+    padding: 2px 8px 2px 0;
+}
+
+.span-detail-table td:first-child {
+    color: var(--color-text-muted);
+    width: 180px;
+}
+
+.span-detail-table code {
+    font-size: 11px;
+    background: #e9ecef;
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+
+/* Span-level events section */
+.span-events-section,
+.span-links-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #dee2e6;
+}
+
+.span-events-section h4,
+.span-links-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+/* Span-level links */
+.span-link {
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.span-link:last-child {
+    border-bottom: none;
+}
+
+.span-link-trace {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.span-link-attrs {
+    margin-top: 4px;
+}
+
+/* Sequence Diagram */
+.sequence-diagram {
+    margin-top: 16px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.sequence-diagram-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.sequence-diagram .mermaid:not([data-processed]) {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+}
+
+.sequence-diagram .mermaid[data-processed] {
+    display: flex;
+    justify-content: center;
+}
+
+/* Panel resize handle */
+.panel-resize-handle {
+    height: 5px;
+    background: #dee2e6;
+    cursor: row-resize;
+    flex-shrink: 0;
+}
+
+.panel-resize-handle:hover {
+    background: #adb5bd;
+}
+
+/* Traffic vertical layout */
+.traffic-layout {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    overflow: visible;
+}
+
+.traffic-list {
+    height: 250px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.traffic-detail-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.detail-req-resp {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.detail-req-resp-col {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+}
+
+.detail-col-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #0d6efd;
+    text-transform: uppercase;
+}
+
+/* Otel traces vertical layout */
+.otel-layout {
+    display: flex;
+    flex-direction: column;
+}
+
+.otel-trace-list {
+    height: 250px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.otel-detail-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+
+/* Severity badges */
+.badge-severity-info, .badge-severity-INFO {
+    background: #d1e7dd;
+    color: #0f5132;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.badge-severity-warn, .badge-severity-WARN {
+    background: #fff3cd;
+    color: #664d03;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.badge-severity-error, .badge-severity-ERROR {
+    background: #f8d7da;
+    color: #842029;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* Expandable detail tables (shared by events and logs) */
+.span-logs-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #dee2e6;
+}
+
+.span-logs-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.span-event-table,
+.span-log-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+
+.span-event-table thead th,
+.span-log-table thead th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.span-event-row,
+.span-log-row {
+    cursor: pointer;
+}
+
+.span-event-row td,
+.span-log-row td {
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.span-event-row:hover td,
+.span-log-row:hover td {
+    background: var(--color-bg-hover);
+}
+
+.span-log-body {
+    font-weight: 600;
+}
+
+.span-event-detail-row,
+.span-log-detail-row {
+    display: none;
+}
+
+.span-event-detail-row.expanded,
+.span-log-detail-row.expanded {
+    display: table-row;
+}
+
+.span-event-detail-row td,
+.span-log-detail-row td {
+    padding: 8px 8px 8px 16px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.span-log-detail-columns {
+    display: flex;
+    gap: 24px;
+}
+
+.span-log-detail-section {
+    flex: 1;
+    margin-bottom: 8px;
+}
+
+.span-log-detail-section h5 {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    margin: 0 0 4px;
+}
+
+.span-event-fields,
+.span-log-fields {
+    margin-top: 4px;
+}
+
+/* Trace-level orphan logs section */
+.trace-logs-section {
+    padding: 12px 16px;
+    border-top: 1px solid #dee2e6;
+}
+
+.trace-logs-section h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Replay badge */
+.badge-replay {
+    display: inline-block;
+    background: #0d6efd;
+    color: #fff;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.tx-row-replay {
+    background: #f0f4ff;
+}
+
+.tx-row-replay:hover {
+    background: #e0eaff;
+}
+
+/* Client page */
+.client-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.client-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.client-method {
+}
+
+.client-url {
+    flex: 1;
+    font-family: monospace;
+}
+
+.client-request-section {
+    height: 280px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.client-form {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+}
+
+.client-form-columns {
+    display: flex;
+    gap: 24px;
+}
+
+.client-form-columns .client-section {
+    flex: 1;
+    min-width: 0;
+}
+
+.client-detail-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.client-section h4 {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.client-headers {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.client-header-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.client-header-row input {
+    flex: 1;
+}
+
+.client-remove-header {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.client-add-header {
+    align-self: flex-start;
+    margin-top: 2px;
+}
+
+.client-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.client-section-header h4 {
+    margin-bottom: 0;
+}
+
+.client-content-type {
+}
+
+.client-body {
+    font-family: monospace;
+    font-size: 13px;
+}
+
+/* ── Overview page ── */
+
+.mcp-logo {
+    width: 28px;
+    height: 28px;
+}
+
+.mcp-status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: mcp-pulse 2s ease-in-out infinite;
+    vertical-align: middle;
+}
+
+@keyframes mcp-pulse {
+    0%, 100% {
+        box-shadow: 0 0 4px rgba(34, 197, 94, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+    }
+}
+
+.mcp-url {
+    text-decoration: none;
+}
+
+.mcp-url:hover code {
+    text-decoration: underline;
+}
+
+.mcp-url code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #495057;
+}
+
+.mcp-copy-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 2px 4px;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 4px;
+}
+
+.mcp-copy-btn:hover {
+    color: #212529;
+    background: #e9ecef;
+}
+
+.overview-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.overview-metrics {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.metric-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.metric-icon {
+    font-size: 28px;
+    color: #6c757d;
+    flex-shrink: 0;
+}
+
+.metric-body {
+    min-width: 0;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #212529;
+}
+
+.metric-label {
+    font-size: 13px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-sub {
+    margin-top: 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 12px;
+}
+
+.overview-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.chart-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.chart-card h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 16px;
+}
+
+.chart-container {
+    position: relative;
+    height: 220px;
+}
+
+.overview-traffic-chart {
+    margin-bottom: 24px;
+}
+
+.chart-card-wide {
+    width: 100%;
+}
+
+.chart-container-wide {
+    height: 180px;
+}
+
+/* ── MCP Client panel ── */
+
+.mcp-client-subnav {
+    display: flex;
+    gap: 2px;
+    padding: 8px 16px;
+    background: var(--color-bg-light);
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.mcp-client-tab {
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.mcp-client-tab:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.mcp-client-tab-active {
+    background: #0d6efd;
+    color: #fff !important;
+}
+
+.mcp-client-tab-active:hover {
+    background: #0b5ed7;
+}
+
+.mcp-client-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.mcp-client-list {
+    width: 320px;
+    min-width: 280px;
+    border-right: 1px solid #dee2e6;
+    overflow-y: auto;
+    background: var(--color-bg-light);
+}
+
+.mcp-client-list-header {
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    background: var(--color-bg-light);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.mcp-client-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    cursor: pointer;
+}
+
+.mcp-client-item:hover {
+    background: var(--color-bg-hover);
+}
+
+.mcp-client-item-active {
+    background: #e7f0ff;
+    border-left: 3px solid #0d6efd;
+}
+
+.mcp-client-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.mcp-client-item-desc {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mcp-client-item-uri {
+    font-size: 11px;
+    color: #adb5bd;
+    margin-top: 2px;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mcp-client-detail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mcp-client-detail > .empty {
+    padding: 20px;
+}
+
+.mcp-client-detail-form {
+    padding: 20px;
+    height: auto;
+    overflow-y: visible;
+}
+
+.mcp-app-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.mcp-client-detail-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.mcp-client-detail-header p {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 16px;
+}
+
+.mcp-client-detail-form .client-section {
+    margin-bottom: 16px;
+}
+
+.mcp-client-detail .client-detail-panel {
+    padding: 16px 20px;
+    overflow-y: auto;
+}
+
+.mcp-client-field {
+    margin-bottom: 10px;
+}
+
+.mcp-client-field small {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.mcp-client-result {
+    margin-top: 16px;
+}
+
+.mcp-client-result > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.mcp-client-message {
+    margin-bottom: 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.mcp-client-message pre {
+    font-size: 12px;
+    word-break: break-word;
+    padding: 10px;
+}
+
+.mcp-client-detail-form > .action-btn {
+    margin-top: 12px;
+    align-self: flex-start;
+}
+
+.mcp-client-detail-form code {
+    background: var(--color-bg-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.mcp-client-field > label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.mcp-client-field input[type="text"],
+.mcp-client-field select {
+    margin-top: 4px;
+}
+
+.mcp-client-field input[type="checkbox"] {
+    margin-top: 6px;
+}
+
+.args-mode-bar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.args-mode-tab {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #6c757d;
+    background: transparent;
+    user-select: none;
+}
+
+.args-mode-tab:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.args-mode-tab-active {
+    background: #0d6efd;
+    color: #fff !important;
+}
+
+.args-mode-tab-active:hover {
+    background: #0b5ed7;
+}
+
+.mcp-client-role {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #e9ecef;
+    color: #495057;
+}
+
+#swagger-ui {
+    .schemes-server-container {
+        display: none;
+    }
+
+    .title > span {
+        display: none;
+    }
+
+    .main > a {
+        display: none;
+    }
+
+    .main.title {
+        display: none;
+    }
+
+    .expand-operation {
+        display: none;
+    }
+}
+
+    .trace-link-btn, a.action-btn { display: none; }
+    </style>
+</head>
+<body>
+<header class="app-header">
+    <div class="app-header-brand">
+        <a href="https://http4k.org" target="_blank"><img class="app-logo" src="https://www.http4k.org/images/logo.png" alt="http4k"></a>
+        <span class="app-header-title">Wiretap</span>
+    </div>
+</header>
+<h2 class="p-3">TestClass.testMethod</h2>
+<ul class="nav nav-tabs px-3" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#traces-tab" type="button" role="tab">Traces</button>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane show active" id="traces-tab" role="tabpanel">
+        <div class="app-layout otel-layout" style="grid-template-columns: 1fr;">
+            <div class="otel-detail-panel">
+                <div id="trace-detail-panel" class="detail-content">
+    <div class="detail-toolbar">
+        <span class="badge badge-trace">TRACE</span>
+        <span class="trace-id-detail" title="00000000000000000000000000000001">00000000</span>
+        <span class="gantt-total-duration">1ms</span>
+        <a href="/_wiretap/traffic?trace=00000000000000000000000000000001" class="trace-link-btn">Traffic</a>
+        <a href="/_wiretap/otel/markdown/00000000000000000000000000000001" class="action-btn" download="trace-00000000000000000000000000000001.md">Export Markdown</a>
+    </div>
+    <div class="gantt-chart">
+        <div class="gantt-timeline-header">
+            <div class="gantt-label-col"></div>
+            <div class="gantt-timeline-col">
+                <span class="gantt-tick" style="left: 0%">0%</span>
+                <span class="gantt-tick" style="left: 25%">25%</span>
+                <span class="gantt-tick" style="left: 50%">50%</span>
+                <span class="gantt-tick" style="left: 75%">75%</span>
+                <span class="gantt-tick" style="left: 100%">100%</span>
+            </div>
+        </div>
+        <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+            <div class="gantt-label-col" style="padding-left: 0em;">
+                <span class="span-kind badge-span-SERVER">SERVER</span>
+                <span class="gantt-span-name">GET /</span>
+                <span class="duration">1ms</span>
+            </div>
+            <div class="gantt-timeline-col">
+                <div class="gantt-gridlines">
+                    <div class="gantt-gridline" style="left: 25%"></div>
+                    <div class="gantt-gridline" style="left: 50%"></div>
+                    <div class="gantt-gridline" style="left: 75%"></div>
+                </div>
+                <div class="gantt-bar gantt-bar-SERVER" style="left: 0%; width: 100%;" title="GET / (1ms)"></div>
+            </div>
+        </div>
+        <div id="span-detail-aaaaaaaaaaaaaaaa" class="gantt-detail">
+            <div class="gantt-detail-columns">
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Span Info</h4>
+                        <table class="data-table span-detail-table">
+                            <tr>
+                                <td>Name</td>
+                                <td>GET /</td>
+                            </tr>
+                            <tr>
+                                <td>Span ID</td>
+                                <td><code title="aaaaaaaaaaaaaaaa">aaaaaaaa</code></td>
+                            </tr>
+                            <tr>
+                                <td>Parent Span ID</td>
+                                <td><code title="0000000000000000">00000000</code></td>
+                            </tr>
+                            <tr>
+                                <td>Kind</td>
+                                <td>SERVER</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>OK</td>
+                            </tr>
+                            <tr>
+                                <td>Duration</td>
+                                <td>1ms</td>
+                            </tr>
+                            <tr>
+                                <td>Service</td>
+                                <td>app1</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Resource Attributes</h4>
+                        <table class="data-table span-detail-table">
+                            <tr>
+                                <td>service.name</td>
+                                <td>app1</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="trace-diagrams-panel" data-init="@get('/_wiretap/otel/diagrams/00000000000000000000000000000001')"></div>
+</div>
+
+            </div>
+            <div class="trace-diagrams">
+<ul class="nav nav-tabs px-3 pt-3" role="tablist">
+        <li class="nav-item">
+        <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-diagram-tab="interaction" type="button" role="tab">Interactions</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-diagram-tab="timing" type="button" role="tab">Timing</button>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">sequenceDiagram
+    participant wiretap
+    participant app1
+    wiretap->>app1: GET /
+    app1-->>wiretap: OK (1ms)</pre>
+            <pre class="mermaid-source" style="display:none">sequenceDiagram
+    participant wiretap
+    participant app1
+    wiretap->>app1: GET /
+    app1-->>wiretap: OK (1ms)</pre>
+        </div>
+    </div>
+    <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(wiretap, "wiretap")
+    System(app1, "app1")
+    Rel_D(wiretap, app1, " ")</pre>
+            <pre class="mermaid-source" style="display:none">C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(wiretap, "wiretap")
+    System(app1, "app1")
+    Rel_D(wiretap, app1, " ")</pre>
+        </div>
+    </div>
+    <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
+        <div class="timing-table" style="padding: 1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Operation</th>
+                        <th>Kind</th>
+                        <th style="text-align: right;">Duration</th>
+                        <th style="width: 30%;">% of Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>app1</td>
+                        <td>GET /</td>
+                        <td>SERVER</td>
+                        <td style="text-align: right;">1ms</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+                                    <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+                                </div>
+                                <span style="min-width: 3rem; text-align: right;">100%</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+(function() {
+    var container = document.currentScript.previousElementSibling;
+
+    function hidePanes() {
+        var firstPane = container.querySelector('[data-diagram-pane]');
+        container.querySelectorAll('[data-diagram-pane]').forEach(function(p) {
+            if (p !== firstPane) p.classList.remove('show', 'active');
+        });
+    }
+
+    var total = container.querySelectorAll('.mermaid').length;
+    if (total === 0) {
+        hidePanes();
+    } else {
+        var check = setInterval(function() {
+            if (container.querySelectorAll('.mermaid[data-processed]').length >= total) {
+                clearInterval(check);
+                hidePanes();
+            }
+        }, 50);
+    }
+})();
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-diagram-tab]');
+    if (!btn) return;
+    var container = btn.closest('.trace-diagrams');
+    var tabName = btn.getAttribute('data-diagram-tab');
+    container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
+    container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
+    btn.classList.add('active');
+    var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
+    if (pane) pane.classList.add('show', 'active');
+});
+</script>
+
+        </div>
+        <div class="app-layout otel-layout" style="grid-template-columns: 1fr; border-top: 3px solid #dee2e6; margin-top: 1.5rem; padding-top: 1.5rem;">
+            <div class="otel-detail-panel">
+                <div id="trace-detail-panel" class="detail-content">
+    <div class="detail-toolbar">
+        <span class="badge badge-trace">TRACE</span>
+        <span class="trace-id-detail" title="00000000000000000000000000000002">00000000</span>
+        <span class="gantt-total-duration">1ms</span>
+        <a href="/_wiretap/traffic?trace=00000000000000000000000000000002" class="trace-link-btn">Traffic</a>
+        <a href="/_wiretap/otel/markdown/00000000000000000000000000000002" class="action-btn" download="trace-00000000000000000000000000000002.md">Export Markdown</a>
+    </div>
+    <div class="gantt-chart">
+        <div class="gantt-timeline-header">
+            <div class="gantt-label-col"></div>
+            <div class="gantt-timeline-col">
+                <span class="gantt-tick" style="left: 0%">0%</span>
+                <span class="gantt-tick" style="left: 25%">25%</span>
+                <span class="gantt-tick" style="left: 50%">50%</span>
+                <span class="gantt-tick" style="left: 75%">75%</span>
+                <span class="gantt-tick" style="left: 100%">100%</span>
+            </div>
+        </div>
+        <div class="gantt-row" onclick="this.nextElementSibling.classList.toggle('expanded')">
+            <div class="gantt-label-col" style="padding-left: 0em;">
+                <span class="span-kind badge-span-SERVER">SERVER</span>
+                <span class="gantt-span-name">GET /other</span>
+                <span class="duration">1ms</span>
+            </div>
+            <div class="gantt-timeline-col">
+                <div class="gantt-gridlines">
+                    <div class="gantt-gridline" style="left: 25%"></div>
+                    <div class="gantt-gridline" style="left: 50%"></div>
+                    <div class="gantt-gridline" style="left: 75%"></div>
+                </div>
+                <div class="gantt-bar gantt-bar-SERVER" style="left: 0%; width: 100%;" title="GET /other (1ms)"></div>
+            </div>
+        </div>
+        <div id="span-detail-bbbbbbbbbbbbbbbb" class="gantt-detail">
+            <div class="gantt-detail-columns">
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Span Info</h4>
+                        <table class="data-table span-detail-table">
+                            <tr>
+                                <td>Name</td>
+                                <td>GET /other</td>
+                            </tr>
+                            <tr>
+                                <td>Span ID</td>
+                                <td><code title="bbbbbbbbbbbbbbbb">bbbbbbbb</code></td>
+                            </tr>
+                            <tr>
+                                <td>Parent Span ID</td>
+                                <td><code title="0000000000000000">00000000</code></td>
+                            </tr>
+                            <tr>
+                                <td>Kind</td>
+                                <td>SERVER</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>OK</td>
+                            </tr>
+                            <tr>
+                                <td>Duration</td>
+                                <td>1ms</td>
+                            </tr>
+                            <tr>
+                                <td>Service</td>
+                                <td>app1</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="gantt-detail-col">
+                    <div class="span-detail-section">
+                        <h4>Resource Attributes</h4>
+                        <table class="data-table span-detail-table">
+                            <tr>
+                                <td>service.name</td>
+                                <td>app1</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="trace-diagrams-panel" data-init="@get('/_wiretap/otel/diagrams/00000000000000000000000000000002')"></div>
+</div>
+
+            </div>
+            <div class="trace-diagrams">
+<ul class="nav nav-tabs px-3 pt-3" role="tablist">
+        <li class="nav-item">
+        <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-diagram-tab="interaction" type="button" role="tab">Interactions</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-diagram-tab="timing" type="button" role="tab">Timing</button>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">sequenceDiagram
+    participant wiretap
+    participant app1
+    wiretap->>app1: GET /other
+    app1-->>wiretap: OK (1ms)</pre>
+            <pre class="mermaid-source" style="display:none">sequenceDiagram
+    participant wiretap
+    participant app1
+    wiretap->>app1: GET /other
+    app1-->>wiretap: OK (1ms)</pre>
+        </div>
+    </div>
+    <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
+        <div class="sequence-diagram">
+            <div class="sequence-diagram-toolbar">
+                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+            </div>
+            <pre class="mermaid">C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(wiretap, "wiretap")
+    System(app1, "app1")
+    Rel_D(wiretap, app1, " ")</pre>
+            <pre class="mermaid-source" style="display:none">C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(wiretap, "wiretap")
+    System(app1, "app1")
+    Rel_D(wiretap, app1, " ")</pre>
+        </div>
+    </div>
+    <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
+        <div class="timing-table" style="padding: 1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Operation</th>
+                        <th>Kind</th>
+                        <th style="text-align: right;">Duration</th>
+                        <th style="width: 30%;">% of Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>app1</td>
+                        <td>GET /other</td>
+                        <td>SERVER</td>
+                        <td style="text-align: right;">1ms</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+                                    <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+                                </div>
+                                <span style="min-width: 3rem; text-align: right;">100%</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+(function() {
+    var container = document.currentScript.previousElementSibling;
+
+    function hidePanes() {
+        var firstPane = container.querySelector('[data-diagram-pane]');
+        container.querySelectorAll('[data-diagram-pane]').forEach(function(p) {
+            if (p !== firstPane) p.classList.remove('show', 'active');
+        });
+    }
+
+    var total = container.querySelectorAll('.mermaid').length;
+    if (total === 0) {
+        hidePanes();
+    } else {
+        var check = setInterval(function() {
+            if (container.querySelectorAll('.mermaid[data-processed]').length >= total) {
+                clearInterval(check);
+                hidePanes();
+            }
+        }, 50);
+    }
+})();
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-diagram-tab]');
+    if (!btn) return;
+    var container = btn.closest('.trace-diagrams');
+    var tabName = btn.getAttribute('data-diagram-tab');
+    container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
+    container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
+    btn.classList.add('active');
+    var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
+    if (pane) pane.classList.add('show', 'active');
+});
+</script>
+
+        </div>
+    </div>
+</div>
+<footer style="text-align: center; padding: 2rem 0 1rem; font-size: 0.85rem; color: #6c757d;">
+    Generated by http4k Wiretap · <a href="https://wiretap.http4k.org" target="_blank" style="color: #6c757d;">wiretap.http4k.org</a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function copyCurl(btn) {
+    var pre = btn.closest('.detail-toolbar').querySelector('.curl-data');
+    if (pre) {
+        navigator.clipboard.writeText(pre.textContent).then(function() {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = orig; }, 1500);
+        });
+    }
+}
+function copyMermaid(btn) {
+    var container = btn.closest('.sequence-diagram');
+    var pre = container && (container.querySelector('.mermaid-source') || container.querySelector('.mermaid'));
+    if (pre) {
+        navigator.clipboard.writeText(pre.textContent.trim()).then(function() {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = orig; }, 1500);
+        });
+    }
+}
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-on\\:click]');
+    if (btn) {
+        var fn = btn.getAttribute('data-on:click');
+        if (fn.indexOf('copyCurl') === 0) copyCurl(btn);
+        if (fn.indexOf('copyMermaid') === 0) copyMermaid(btn);
+    }
+});
+</script>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    themeVariables: {
+        primaryColor: '#e8f4fd',
+        primaryBorderColor: '#0A53BE',
+        primaryTextColor: '#212529',
+        lineColor: '#212529',
+        signalColor: '#212529',
+        signalTextColor: '#212529',
+        actorBkg: '#e8f4fd',
+        actorBorder: '#0A53BE',
+        actorTextColor: '#212529',
+        actorLineColor: '#6c757d',
+        background: '#f8f9fa',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    }
+});
+
+const nodes = document.querySelectorAll('.mermaid');
+if (nodes.length > 0) mermaid.run({ nodes });
+</script>
+</body>
+</html>

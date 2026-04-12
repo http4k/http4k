@@ -4,28 +4,21 @@
  */
 package org.http4k.wiretap.junit
 
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import io.opentelemetry.api.trace.SpanKind
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
-import org.http4k.filter.OpenTelemetryTracing
-import org.http4k.filter.ServerFilters
-import org.http4k.routing.bind
-import org.http4k.routing.routes
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
 import org.http4k.util.FixedClock
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.LogStore
-import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
-import org.http4k.wiretap.otel.WiretapOpenTelemetry
+import org.http4k.wiretap.otel.testSpanData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
@@ -33,27 +26,23 @@ import java.time.Duration
 @ExtendWith(ApprovalTest::class)
 class TestReportRendererTest {
 
-    private val app = routes("/" bind Method.GET to { Response(OK).body("hello") })
-
-    private fun renderer(
-        traceStore: TraceStore = TraceStore.InMemory(),
-        logStore: LogStore = LogStore.InMemory(),
-        transactionStore: TransactionStore = TransactionStore.InMemory()
-    ) = TestReportRenderer(traceStore, logStore, transactionStore, FixedClock)
+    private val traceStore = TraceStore.InMemory()
+    private val logStore = LogStore.InMemory()
+    private val transactionStore = TransactionStore.InMemory()
+    private val renderer = TestReportRenderer(traceStore, logStore, transactionStore, FixedClock)
 
     @Test
     fun `renders empty report`(approver: Approver) {
-        approver.assertApproved(renderer()("Empty.test"))
+        approver.assertApproved(renderer("Empty.test"))
     }
 
     @Test
     fun `renders stdout and stderr tabs`(approver: Approver) {
-        approver.assertApproved(renderer()("Output.test", stdOut = "stdout line", stdErr = "stderr line"))
+        approver.assertApproved(renderer("Output.test", stdOut = "stdout line", stdErr = "stderr line"))
     }
 
     @Test
     fun `renders traffic tab with recorded transactions`(approver: Approver) {
-        val transactionStore = TransactionStore.InMemory()
         transactionStore.record(
             HttpTransaction(
                 request = Request(Method.GET, "/api/test"),
@@ -64,23 +53,18 @@ class TestReportRendererTest {
             Direction.Inbound
         )
 
-        approver.assertApproved(renderer(transactionStore = transactionStore)("Traffic.test"))
+        approver.assertApproved(renderer("Traffic.test"))
     }
 
     @Test
-    fun `renders multiple traces into a single report`() {
-        val traceStore = TraceStore.InMemory()
-        val logStore = LogStore.InMemory()
-        val handler = ServerFilters.OpenTelemetryTracing(WiretapOpenTelemetry(traceStore, logStore, FixedClock)).then(app)
+    fun `renders multiple traces into a single report`(approver: Approver) {
+        recordSpan("00000000000000000000000000000001", "aaaaaaaaaaaaaaaa", "GET /", SpanKind.SERVER, "app1")
+        recordSpan("00000000000000000000000000000002", "bbbbbbbbbbbbbbbb", "GET /other", SpanKind.SERVER, "app1")
 
-        handler(Request(Method.GET, "/"))
-        handler(Request(Method.GET, "/"))
+        approver.assertApproved(renderer("TestClass.testMethod"))
+    }
 
-        assertThat(traceStore.traces(Ascending).size, equalTo(2))
-
-        val content = renderer(traceStore, logStore)("TestClass.testMethod")
-        traceStore.traces(Ascending).keys.forEach { traceId ->
-            assertThat("report contains trace $traceId", content.contains(traceId.value), equalTo(true))
-        }
+    private fun recordSpan(traceId: String, spanId: String, name: String, kind: SpanKind, serviceName: String) {
+        traceStore.record(testSpanData(traceId, spanId, name, kind = kind, serviceName = serviceName))
     }
 }

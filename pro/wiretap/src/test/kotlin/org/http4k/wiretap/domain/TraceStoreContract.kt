@@ -6,15 +6,10 @@ package org.http4k.wiretap.domain
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.api.trace.SpanContext
-import io.opentelemetry.api.trace.SpanKind
-import io.opentelemetry.api.trace.TraceFlags
-import io.opentelemetry.api.trace.TraceState
-import io.opentelemetry.sdk.testing.trace.TestSpanData
 import io.opentelemetry.sdk.trace.data.SpanData
-import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.domain.Ordering.Descending
+import org.http4k.wiretap.otel.testSpanData
 import org.junit.jupiter.api.Test
 
 interface TraceStoreContract {
@@ -22,18 +17,7 @@ interface TraceStoreContract {
     val store: TraceStore
 
     fun span(traceId: String, spanId: String = "1234567890abcdef", name: String = "test"): SpanData =
-
-        TestSpanData.builder()
-            .setSpanContext(
-                SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault())
-            )
-            .setName(name)
-            .setKind(SpanKind.SERVER)
-            .setStartEpochNanos(1000)
-            .setEndEpochNanos(2000)
-            .setHasEnded(true)
-            .setStatus(StatusData.ok())
-            .build()
+        testSpanData(traceId, spanId, name)
 
     @Test
     fun `record and get returns spans for trace`() {

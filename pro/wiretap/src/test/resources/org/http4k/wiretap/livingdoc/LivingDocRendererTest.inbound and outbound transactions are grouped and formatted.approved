@@ -4,25 +4,33 @@
 
 #### POST /api/data → myapp.com
 
-**Request**
+**Request** `POST /api/data HTTP/1.1`
 
-```http
-POST /api/data HTTP/1.1
-Content-Type: application/json
-Host: myapp.com
+| Header | Value |
+|---|---|
+| Content-Type | application/json |
+| Host | myapp.com |
 
+<details><summary>Body</summary>
+
+```json
 {
     "name": "test",
     "value": 42
 }
 ```
 
-**Response**
+</details>
 
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
+**Response** `HTTP/1.1 200 OK`
 
+| Header | Value |
+|---|---|
+| Content-Type | application/json |
+
+<details><summary>Body</summary>
+
+```json
 {
     "id": 1,
     "name": "test",
@@ -30,22 +38,28 @@ Content-Type: application/json
 }
 ```
 
+</details>
+
 ## Outbound Requests
 
 #### DELETE /foobar → downstream.example.com
 
-**Request**
+**Request** `DELETE https://downstream.example.com/foobar HTTP/1.1`
 
-```http
-DELETE https://downstream.example.com/foobar HTTP/1.1
-Host: downstream.example.com
+| Header | Value |
+|---|---|
+| Host | downstream.example.com |
+
+**Response** `HTTP/1.1 500 Internal Server Error`
+
+| Header | Value |
+|---|---|
+| Content-Type | text/plain |
+
+<details><summary>Body</summary>
+
 ```
-
-**Response**
-
-```http
-HTTP/1.1 500 Internal Server Error
-Content-Type: text/plain
-
 something went wrong
 ```
+
+</details>

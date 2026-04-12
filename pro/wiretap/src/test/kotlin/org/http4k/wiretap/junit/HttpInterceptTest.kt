@@ -16,6 +16,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.Ordering.Descending
+import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -23,9 +25,12 @@ import testRequest
 
 class HttpInterceptTest {
 
+    private val traceStore = TraceStore.InMemory()
+    private val transactionStore = TransactionStore.InMemory()
+
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(Always) {
+    val intercept = Intercept(Always, traceStore = traceStore, transactionStore = transactionStore) {
         val myClient: HttpHandler = { Response(OK).body("downstream") }
         val methodAsFilter: Filter = { http(it) }
         App(methodAsFilter.then(myClient), "test app 1", otel("test app 1"))
@@ -41,7 +46,7 @@ class HttpInterceptTest {
     fun `captures both server and client spans`(http: HttpHandler) {
         http(testRequest())
 
-        val spans = intercept.traceStore.traces(Descending).values.first()
+        val spans = traceStore.traces(Descending).values.first()
         assertThat(spans.any { it.kind == SpanKind.SERVER }, equalTo(true))
         assertThat(spans.any { it.kind == SpanKind.CLIENT }, equalTo(true))
     }
@@ -50,7 +55,7 @@ class HttpInterceptTest {
     fun `captures traffic for each request`(http: HttpHandler) {
         http(testRequest())
 
-        val traffic = intercept.transactionStore.list(Descending)
+        val traffic = transactionStore.list(Descending)
         assertThat(traffic.size, equalTo(3))
 
         val inbound = traffic.filter { it.direction == Direction.Inbound }
@@ -60,14 +65,4 @@ class HttpInterceptTest {
         val outbound = traffic.filter { it.direction == Direction.Outbound }
         assertThat(outbound.size, equalTo(2))
     }
-
-    @Test
-    fun `captures stdout and stderr during test execution`(http: HttpHandler) {
-        http(testRequest())
-
-        assertThat("stdout has event JSON", intercept.capturedStdOut.contains("user-42"), equalTo(true))
-        assertThat("stderr has app warning", intercept.capturedStdErr.contains("downstream warning"), equalTo(true))
-    }
-
-
 }

@@ -29,6 +29,7 @@ import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.domain.Ordering.Descending
+import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -36,16 +37,18 @@ import wiretap.examples.McpServerWithOtelTracing
 
 class GlobalOTelInterceptTest : PortBasedTest {
 
+    private val traceStore = TraceStore.InMemory()
+
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(renderMode = Always)
+    val intercept = Intercept(renderMode = Always, traceStore = traceStore) { http() }
 
     @Test
     fun `http traces are captured via GlobalOpenTelemetry without explicit otel wiring`(http: HttpHandler) {
         val app = App(http)
         app(Request(GET, "/test"))
 
-        val traces = intercept.traceStore.traces(Descending)
+        val traces = traceStore.traces(Descending)
         assertThat(traces.size, greaterThan(0))
     }
 
@@ -114,7 +117,7 @@ class GlobalOTelInterceptTest : PortBasedTest {
         }
         parentSpan.end()
 
-        val traces = intercept.traceStore.traces(Descending)
+        val traces = traceStore.traces(Descending)
         assertThat(traces.size, greaterThan(0))
 
         val spans = traces.values.first()
@@ -126,7 +129,7 @@ class GlobalOTelInterceptTest : PortBasedTest {
         val app = App(http)
         app(Request(GET, "/other"))
 
-        val traces = intercept.traceStore.traces(Descending)
+        val traces = traceStore.traces(Descending)
         assertThat(traces.size, greaterThan(0))
     }
 }

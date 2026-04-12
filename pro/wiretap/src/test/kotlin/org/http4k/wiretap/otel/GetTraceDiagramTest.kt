@@ -6,14 +6,7 @@ package org.http4k.wiretap.otel
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.trace.SpanContext
 import io.opentelemetry.api.trace.SpanKind
-import io.opentelemetry.api.trace.TraceFlags
-import io.opentelemetry.api.trace.TraceState
-import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.sdk.testing.trace.TestSpanData
 import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -43,25 +36,7 @@ class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
         endNanos: Long = 2000000,
         status: StatusData = StatusData.ok()
     ) {
-        val builder = TestSpanData.builder()
-            .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
-            .setParentSpanContext(
-                SpanContext.create(traceId, parentSpanId, TraceFlags.getSampled(), TraceState.getDefault())
-            )
-            .setName(name)
-            .setKind(kind)
-            .setStartEpochNanos(startNanos)
-            .setEndEpochNanos(endNanos)
-            .setHasEnded(true)
-            .setStatus(status)
-
-        if (serviceName.isNotEmpty()) {
-            builder.setResource(
-                Resource.create(Attributes.of(AttributeKey.stringKey("service.name"), serviceName))
-            )
-        }
-
-        traceStore.record(builder.build())
+        traceStore.record(testSpanData(traceId, spanId, name, parentSpanId, kind, serviceName, startNanos, endNanos, status))
     }
 
     @Test

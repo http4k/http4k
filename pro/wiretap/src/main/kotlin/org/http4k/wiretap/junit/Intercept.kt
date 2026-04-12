@@ -15,8 +15,6 @@ import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.core.extend
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
-import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.ResponseFilters
 import org.http4k.wiretap.Context
 import org.http4k.wiretap.domain.Direction.Inbound
@@ -56,10 +54,16 @@ class Intercept @JvmOverloads constructor(
     private val random: Random = SecureRandom(byteArrayOf()),
     private val serverName: String = "http4k-server",
     private val baseUrl: Uri = Uri.of(""),
+    private val traceStore: TraceStore = TraceStore.InMemory(),
+    private val logStore: LogStore = LogStore.InMemory(),
+    private val transactionStore: TransactionStore = TransactionStore.InMemory(),
     private val appFn: Context.() -> HttpHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     companion object {
+        /**
+         * Intercept a simple HttpHandler.
+         */
         fun http(
             renderMode: RenderMode = OnFailure,
             redirectFilter: Filter = Filter.NoOp,
@@ -68,8 +72,19 @@ class Intercept @JvmOverloads constructor(
             serverName: String = "http4k-server",
             baseUrl: Uri = Uri.of(""),
             appFn: Context.() -> HttpHandler
-        ) = Intercept(renderMode, redirectFilter, clock, random, serverName, baseUrl, appFn)
+        ) = Intercept(
+            renderMode,
+            redirectFilter,
+            clock,
+            random,
+            serverName,
+            baseUrl,
+            appFn = appFn
+        )
 
+        /**
+         * Intercept a PolyHandler.
+         */
         fun poly(
             renderMode: RenderMode = OnFailure,
             redirectFilter: Filter = Filter.NoOp,
@@ -78,25 +93,19 @@ class Intercept @JvmOverloads constructor(
             serverName: String = "http4k-server",
             baseUrl: Uri = Uri.of(""),
             appFn: Context.() -> PolyHandler
-        ) = Intercept(renderMode, redirectFilter, clock, random, serverName, baseUrl, { appFn().http!! })
+        ) = Intercept(
+            renderMode,
+            redirectFilter,
+            clock,
+            random,
+            serverName,
+            baseUrl,
+            appFn = { appFn().http!! })
     }
+
     @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
 
-    constructor(app: HttpHandler, renderMode: RenderMode = OnFailure, serverName: String = "http4k-server",)
-        : this(
-        renderMode = renderMode,
-        random = SecureRandom(byteArrayOf()),
-        appFn = { ClientFilters.OpenTelemetryTracing(otel(serverName)).then(app) })
-
     private val state = AtomicReference<TestState>()
-
-    internal val traceStore get() = state.get().traceStore
-    internal val logStore get() = state.get().logStore
-
-    internal val transactionStore get() = state.get().transactionStore
-
-    internal val capturedStdOut get() = state.get().stdOutCapture.toString()
-    internal val capturedStdErr get() = state.get().stdErrCapture.toString()
 
     private var originalOut: PrintStream? = null
     private var originalErr: PrintStream? = null
@@ -122,23 +131,19 @@ class Intercept @JvmOverloads constructor(
         System.setOut(PrintStream(TeeOutputStream(originalOut!!, stdOutCapture)))
         System.setErr(PrintStream(TeeOutputStream(originalErr!!, stdErrCapture)))
 
-        val traceStore = TraceStore.InMemory()
-        val logStore = LogStore.InMemory()
-        val txStore = TransactionStore.InMemory()
-
         GlobalOpenTelemetry.resetForTest()
         GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock, serverName))
 
         val outboundChaos = ChaosEngine()
-        val clientFilter = ResponseFilters.ReportHttpTransaction(clock) { tx -> txStore.record(tx, Outbound) }
+        val clientFilter = ResponseFilters.ReportHttpTransaction(clock) { tx -> transactionStore.record(tx, Outbound) }
             .then(outboundChaos)
         val setup = Context(clientFilter, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
 
         val app = redirectFilter
-            .then(ResponseFilters.ReportHttpTransaction(clock) { tx -> txStore.record(tx, Inbound) })
+            .then(ResponseFilters.ReportHttpTransaction(clock) { tx -> transactionStore.record(tx, Inbound) })
             .then(setup.appFn())
 
-        state.set(TestState(app, outboundChaos, traceStore, logStore, txStore, stdOutCapture, stdErrCapture))
+        state.set(TestState(app, outboundChaos, stdOutCapture, stdErrCapture))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
@@ -158,7 +163,7 @@ class Intercept @JvmOverloads constructor(
         val testClass = context.requiredTestClass
         val testName = "${testClass.simpleName}.${context.requiredTestMethod.name}"
         val packageDir = testClass.packageName.replace('.', '/')
-        val (_, _, traceStore, logStore, transactionStore, stdOutCapture, stdErrCapture) = state.get()
+        val (_, _, stdOutCapture, stdErrCapture) = state.get()
         val fileName = testName.replace(' ', '-')
         val dir = File(outputDir, packageDir).apply { mkdirs() }
 
@@ -177,9 +182,6 @@ class Intercept @JvmOverloads constructor(
     private data class TestState(
         val http: HttpHandler,
         val outboundChaos: ChaosEngine,
-        val traceStore: TraceStore,
-        val logStore: LogStore,
-        val transactionStore: TransactionStore,
         val stdOutCapture: ByteArrayOutputStream,
         val stdErrCapture: ByteArrayOutputStream
     )

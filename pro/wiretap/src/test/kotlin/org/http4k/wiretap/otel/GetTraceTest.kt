@@ -13,9 +13,7 @@ import io.opentelemetry.api.trace.SpanContext
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.TraceFlags
 import io.opentelemetry.api.trace.TraceState
-import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.testing.logs.TestLogRecordData
-import io.opentelemetry.sdk.testing.trace.TestSpanData
 import io.opentelemetry.sdk.trace.data.EventData
 import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
@@ -51,28 +49,7 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
         events: List<EventData> = emptyList(),
         attributes: Attributes = Attributes.empty()
     ) {
-        val builder = TestSpanData.builder()
-            .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
-            .setParentSpanContext(
-                SpanContext.create(traceId, parentSpanId, TraceFlags.getSampled(), TraceState.getDefault())
-            )
-            .setName(name)
-            .setKind(kind)
-            .setStartEpochNanos(startNanos)
-            .setEndEpochNanos(endNanos)
-            .setHasEnded(true)
-            .setStatus(status)
-            .setAttributes(attributes)
-            .setEvents(events)
-            .setTotalRecordedEvents(events.size)
-
-        if (serviceName.isNotEmpty()) {
-            builder.setResource(
-                Resource.create(Attributes.of(AttributeKey.stringKey("service.name"), serviceName))
-            )
-        }
-
-        traceStore.record(builder.build())
+        traceStore.record(testSpanData(traceId, spanId, name, parentSpanId, kind, serviceName, startNanos, endNanos, status, events, attributes))
     }
 
     @Test

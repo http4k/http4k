@@ -10,40 +10,56 @@ import org.http4k.core.Response
 import org.http4k.wiretap.domain.WiretapTransaction
 import org.http4k.wiretap.util.formatBody
 
+private val filteredHeaders = setOf("content-length", "traceparent", "tracestate")
+
 fun renderTransaction(wtx: WiretapTransaction): String {
     val req = wtx.transaction.request
     val resp = wtx.transaction.response
     val host = req.header("Host") ?: req.uri.authority
-    val label = "${req.method} ${req.uri.path}" + if (host.isNullOrEmpty()) "" else " → $host"
+    val label = "${req.method} ${req.uri.path}" + if (host.isEmpty()) "" else " → $host"
 
     return buildString {
         appendLine()
         appendLine("#### $label")
         appendLine()
-        appendLine("**Request**")
+        appendHttpBlock("Request", req)
         appendLine()
-        append(renderHttpBlock(req))
-        appendLine()
-        appendLine("**Response**")
-        appendLine()
-        append(renderHttpBlock(resp))
+        appendHttpBlock("Response", resp)
     }
 }
 
-private fun renderHttpBlock(message: HttpMessage) = buildString {
-    appendLine("```http")
-    when (message) {
-        is Request -> appendLine("${message.method} ${message.uri} HTTP/1.1")
-        is Response -> appendLine("HTTP/1.1 ${message.status}")
+private fun StringBuilder.appendHttpBlock(label: String, message: HttpMessage) {
+    val headerLine = when (message) {
+        is Request -> "${message.method} ${message.uri} HTTP/1.1"
+        is Response -> "HTTP/1.1 ${message.status}"
+        else -> ""
     }
-    message.headers
-        .filter { it.first.lowercase() !in setOf("content-length", "traceparent", "tracestate") }
-        .forEach { (name, value) -> appendLine("$name: $value") }
+    appendLine("**$label** `$headerLine`")
+
+    val headers = message.headers.filter { it.first.lowercase() !in filteredHeaders }
+    if (headers.isNotEmpty()) {
+        appendLine()
+        appendLine("| Header | Value |")
+        appendLine("|---|---|")
+        headers.forEach { (name, value) -> appendLine("| $name | $value |") }
+    }
+
     val body = message.bodyString()
     val contentType = message.header("Content-Type") ?: ""
     if (body.isNotBlank()) {
+        val lang = when {
+            contentType.contains("json") -> "json"
+            contentType.contains("xml") -> "xml"
+            contentType.contains("html") -> "html"
+            else -> ""
+        }
         appendLine()
+        appendLine("<details><summary>Body</summary>")
+        appendLine()
+        appendLine("```$lang")
         appendLine(formatBody(body, contentType))
+        appendLine("```")
+        appendLine()
+        appendLine("</details>")
     }
-    appendLine("```")
 }

@@ -4,12 +4,6 @@
  */
 package org.http4k.wiretap.otel
 
-import io.opentelemetry.api.trace.SpanContext
-import io.opentelemetry.api.trace.SpanKind
-import io.opentelemetry.api.trace.TraceFlags
-import io.opentelemetry.api.trace.TraceState
-import io.opentelemetry.sdk.testing.trace.TestSpanData
-import io.opentelemetry.sdk.trace.data.StatusData
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.testing.Approver
@@ -28,17 +22,7 @@ class ListTracesTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
     override val function = ListTraces(traceStore, Clock.systemUTC())
 
     private fun recordSpan(traceId: String, spanId: String = "1234567890abcdef", name: String = "test") {
-        traceStore.record(
-            TestSpanData.builder()
-                .setSpanContext(SpanContext.create(traceId, spanId, TraceFlags.getSampled(), TraceState.getDefault()))
-                .setName(name)
-                .setKind(SpanKind.SERVER)
-                .setStartEpochNanos(1000000)
-                .setEndEpochNanos(2000000)
-                .setHasEnded(true)
-                .setStatus(StatusData.ok())
-                .build()
-        )
+        traceStore.record(testSpanData(traceId, spanId, name))
     }
 
     @Test
