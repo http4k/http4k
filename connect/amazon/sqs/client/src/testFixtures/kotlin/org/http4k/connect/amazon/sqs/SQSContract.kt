@@ -17,12 +17,10 @@ import org.http4k.connect.amazon.sqs.model.ReceiptHandle
 import org.http4k.connect.amazon.sqs.model.SQSMessageId
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
-import java.util.UUID
 
 interface SQSContract : AwsContract {
     val sqs

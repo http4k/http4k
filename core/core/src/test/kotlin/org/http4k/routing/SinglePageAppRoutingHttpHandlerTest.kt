@@ -17,7 +17,6 @@ import org.http4k.filter.ServerFilters.Cors
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {

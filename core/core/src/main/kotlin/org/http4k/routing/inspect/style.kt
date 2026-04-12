@@ -2,8 +2,7 @@ package org.http4k.routing.inspect
 
 import org.http4k.routing.inspect.EscapeMode.Ansi
 import org.http4k.routing.inspect.ForegroundColour.Default
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
 
 fun String.styled(style: TextStyle, escapeMode: EscapeMode = Ansi) = escapeMode(this, style)
 

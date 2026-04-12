@@ -3,7 +3,6 @@ package org.http4k.connect.anthropic.action
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.SystemPrompt
-import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.model.Temperature
 import org.http4k.connect.anthropic.ToolChoice
 

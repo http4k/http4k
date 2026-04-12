@@ -1,10 +1,10 @@
 package org.http4k.connect.amazon.sqs.model
 
-import se.ansman.kotshi.JsonSerializable
 import com.squareup.moshi.Json
 import org.http4k.connect.amazon.core.model.DataType
 import org.http4k.connect.amazon.core.model.MessageFieldsDto
 import org.http4k.connect.model.Base64Blob
+import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class SQSMessage(

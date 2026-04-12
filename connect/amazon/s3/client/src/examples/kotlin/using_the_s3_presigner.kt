@@ -4,7 +4,6 @@ import org.http4k.connect.amazon.s3.model.BucketKey
 import org.http4k.connect.amazon.s3.model.BucketName
 import org.http4k.connect.amazon.s3.model.S3BucketPreSigner
 import org.http4k.core.Uri
-import java.time.Clock
 import java.time.Duration
 
 fun main() {

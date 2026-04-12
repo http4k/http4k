@@ -12,7 +12,6 @@ import org.http4k.core.body.form
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.Cookies
 import org.http4k.filter.ClientFilters.FollowRedirects
-import org.http4k.filter.debug
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test

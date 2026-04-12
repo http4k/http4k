@@ -7,8 +7,6 @@ import dev.langchain4j.model.output.Response
 import org.http4k.ai.model.ModelName
 import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.OpenAIModels.DALL_E_2
-import org.http4k.connect.openai.Quality
-import org.http4k.connect.openai.Style
 import org.http4k.connect.openai.User
 import org.http4k.connect.openai.action.ImageData
 import org.http4k.connect.openai.action.ImageResponseFormat

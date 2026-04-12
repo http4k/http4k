@@ -25,9 +25,7 @@ import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.HttpTimeoutException
 import java.nio.ByteBuffer
-import java.util.Locale
 import java.util.Locale.ROOT
-import java.util.Locale.getDefault
 
 /**
  * Basic JDK-based Client.

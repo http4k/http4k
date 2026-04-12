@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Random
 
 class KtorCIOTest :
     ServerContract({ _, stopMode -> KtorCIO(Random().nextInt(1000) + 8745, stopMode) }, ClientForServerTesting()) {

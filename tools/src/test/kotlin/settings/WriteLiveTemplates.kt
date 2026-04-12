@@ -8,8 +8,8 @@ import org.http4k.core.Status
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 import java.io.File
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
+import java.util.Locale.getDefault
 
 data class Template(val name: String, val description: String, val value: String, val variables: List<String> = emptyList()) : ViewModel
 

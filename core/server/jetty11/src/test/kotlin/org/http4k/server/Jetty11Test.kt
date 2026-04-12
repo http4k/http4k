@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.testingStopMode
 import org.junit.jupiter.api.Test
 
 class Jetty11Test : ServerContract(::Jetty11, ClientForServerTesting()) {

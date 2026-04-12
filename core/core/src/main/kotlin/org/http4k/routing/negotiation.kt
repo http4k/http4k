@@ -1,6 +1,5 @@
 package org.http4k.routing
 
-import org.http4k.core.ContentEncodingName
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.PriorityList
@@ -8,10 +7,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.preferred
 import org.http4k.core.with
-import org.http4k.lens.ACCEPT_ENCODING
 import org.http4k.lens.ACCEPT_LANGUAGE
 import org.http4k.lens.BiDiLens
-import org.http4k.lens.CONTENT_ENCODING
 import org.http4k.lens.CONTENT_LANGUAGE
 import org.http4k.lens.Header
 import org.http4k.lens.Lens

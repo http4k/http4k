@@ -10,7 +10,7 @@ import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.util.*
+import java.util.Date
 
 @ExtendWith(ApprovalTest::class)
 class JakartaMailExtensionsTest {

@@ -10,7 +10,6 @@ import org.http4k.connect.amazon.model.Record
 import org.http4k.connect.amazon.model.S3DestinationConfiguration
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.Test
 import java.util.UUID
 

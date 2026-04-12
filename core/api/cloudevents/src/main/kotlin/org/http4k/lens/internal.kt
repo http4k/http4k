@@ -14,8 +14,7 @@ import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage
 import org.http4k.lens.Header.CONTENT_TYPE
 import java.nio.ByteBuffer
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 

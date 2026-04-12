@@ -7,7 +7,6 @@ import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Playwright.create
 import org.http4k.core.HttpHandler
 import org.http4k.core.PolyHandler
-import org.http4k.core.Uri
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.server.ServerConfig

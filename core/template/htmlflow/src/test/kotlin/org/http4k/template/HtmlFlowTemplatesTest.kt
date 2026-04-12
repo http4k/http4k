@@ -2,7 +2,6 @@ package org.http4k.template
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
 import org.http4k.template.contract.HtmlFlowTemplatesContract
 import org.http4k.template.contract.HtmlFlowViewModelContract
 import org.junit.jupiter.api.Test

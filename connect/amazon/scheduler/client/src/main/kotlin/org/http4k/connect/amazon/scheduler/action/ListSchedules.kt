@@ -6,10 +6,10 @@ import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.scheduler.SchedulerAction
-import org.http4k.connect.amazon.scheduler.model.ScheduleSummary
 import org.http4k.connect.amazon.scheduler.model.ScheduleGroupName
 import org.http4k.connect.amazon.scheduler.model.ScheduleName
 import org.http4k.connect.amazon.scheduler.model.ScheduleState
+import org.http4k.connect.amazon.scheduler.model.ScheduleSummary
 import org.http4k.core.Method
 import org.http4k.core.Uri
 import org.http4k.core.query

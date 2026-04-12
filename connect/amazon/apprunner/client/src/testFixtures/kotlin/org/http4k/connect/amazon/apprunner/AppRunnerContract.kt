@@ -6,7 +6,6 @@ import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.apprunner.action.SourceConfiguration
 import org.http4k.connect.amazon.apprunner.model.ServiceName
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.Test
 
 interface AppRunnerContract : AwsContract {

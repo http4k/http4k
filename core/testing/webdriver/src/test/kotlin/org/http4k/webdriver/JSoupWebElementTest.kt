@@ -10,9 +10,6 @@ import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Response.Companion.invoke
-import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.basicAuthentication
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test

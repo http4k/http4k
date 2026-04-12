@@ -5,11 +5,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import org.http4k.bridge.KtorToHttp4kApplicationPlugin
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request

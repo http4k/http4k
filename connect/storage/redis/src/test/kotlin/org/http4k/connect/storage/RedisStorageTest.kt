@@ -8,8 +8,8 @@ import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.protocol.CommandArgs
 import io.mockk.every
 import io.mockk.mockk
-import org.http4k.util.assumeDockerDaemonRunning
 import org.http4k.core.Uri
+import org.http4k.util.assumeDockerDaemonRunning
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container

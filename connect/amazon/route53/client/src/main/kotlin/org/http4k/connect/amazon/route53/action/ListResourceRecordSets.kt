@@ -8,7 +8,6 @@ import org.http4k.connect.amazon.route53.model.HostedZoneId
 import org.http4k.connect.amazon.route53.model.ListResourceRecordSetsResponse
 import org.http4k.connect.amazon.route53.model.ResourceRecordSet
 import org.http4k.core.Method
-import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.query
 

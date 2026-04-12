@@ -3,7 +3,6 @@ package org.http4k.events
 import org.http4k.core.Method
 import org.http4k.core.Uri
 import org.http4k.core.WsTransaction
-import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
 import org.http4k.websocket.WsStatus
 

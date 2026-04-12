@@ -1,9 +1,9 @@
 package org.http4k.server
 
-import io.ktor.server.application.*
+import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import org.http4k.bridge.KtorToHttp4kApplicationPlugin
 import org.http4k.bridge.asHttp4k
 import org.http4k.bridge.fromHttp4K
 import org.http4k.core.HttpHandler

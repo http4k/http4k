@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.cookie.Cookie
 import org.http4k.format.Jackson
-import org.http4k.format.Jackson.asA
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDateTime

@@ -3,7 +3,6 @@ package org.http4k.security.oauth.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
-import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET

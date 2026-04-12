@@ -3,7 +3,6 @@ package org.http4k.ai.llm.chat
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.orThrow
-import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.llm.chat.ChatResponseFormat.Text
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.model.ModelParams

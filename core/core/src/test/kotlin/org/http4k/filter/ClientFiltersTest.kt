@@ -35,7 +35,6 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
-import org.http4k.lens.location
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.ResponseWithContext
 import org.http4k.routing.bind

@@ -1,6 +1,5 @@
 package org.http4k.ai.llm.image
 
-import org.http4k.ai.llm.OpenAIApi
 import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment

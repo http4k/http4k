@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
 import dev.langchain4j.data.document.DefaultDocument
-import dev.langchain4j.data.document.Document
 import dev.langchain4j.data.document.DocumentParser
 import dev.langchain4j.data.document.Metadata
 import org.http4k.config.Environment

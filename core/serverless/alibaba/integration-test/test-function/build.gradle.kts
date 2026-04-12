@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.internal.backend.common.serialization.metadata.DynamicTypeDeserializer.id
-
 description = "Testing against a functions deployed to ACF"
 
 plugins {

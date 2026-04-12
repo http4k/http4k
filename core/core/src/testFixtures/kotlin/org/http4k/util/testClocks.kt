@@ -4,7 +4,6 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
-import java.time.ZoneId.systemDefault
 
 class TickingClock : Clock() {
     private var ticks = 0L

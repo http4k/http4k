@@ -13,7 +13,7 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsMessage.Mode.Binary
 import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsStatus
-import java.util.*
+import java.util.Optional
 
 class HelidonToHttp4kWebSocketListener(private val ws: WsHandler) : WsListener {
 

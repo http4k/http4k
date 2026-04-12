@@ -3,9 +3,9 @@ package org.http4k.core
 import org.http4k.filter.MaxAgeTtl
 import org.http4k.filter.StaleIfErrorTtl
 import org.http4k.filter.StaleWhenRevalidateTtl
-import kotlin.time.Duration as KotlinDuration
 import kotlin.time.toJavaDuration
 import java.time.Duration as JavaDuration
+import kotlin.time.Duration as KotlinDuration
 
 fun Response.public() = addCacheability(Cacheability.public)
 

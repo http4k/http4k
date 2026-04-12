@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.isA
 import org.http4k.ai.model.MaxTokens
-import org.http4k.ai.model.ModelName
 import org.http4k.connect.ResourceLoader
 import org.http4k.connect.TestResources
 import org.http4k.connect.anthropic.action.Content

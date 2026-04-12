@@ -6,6 +6,7 @@ import org.http4k.connect.amazon.iamidentitycenter.model.ClientId
 import org.http4k.connect.amazon.iamidentitycenter.model.ClientSecret
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisterClient
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
+import org.http4k.connect.model.Timestamp
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -14,7 +15,6 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.routing.bind
 import java.time.Clock
-import org.http4k.connect.model.Timestamp
 
 fun registerClient(clock: Clock) = "/client/register" bind Method.POST to { req: Request ->
     val request = Body.auto<RegisterClient>().toLens()(req)

@@ -20,7 +20,6 @@ import com.squareup.kotlinpoet.ksp.toTypeName
 import dev.forkhandles.result4k.Result4k
 import org.http4k.connect.PagedAction
 import org.http4k.connect.RemoteFailure
-import java.util.Locale
 import java.util.Locale.ROOT
 
 class Http4kConnectActionVisitor(private val log: (Any?) -> Unit) :

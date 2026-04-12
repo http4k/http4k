@@ -39,7 +39,10 @@ import org.http4k.connect.lmstudio.action.ResponseFormat
 import org.http4k.connect.lmstudio.action.Tool
 import org.http4k.connect.lmstudio.action.ToolCall
 import org.http4k.connect.lmstudio.chatCompletion
-import org.http4k.connect.openai.*
+import org.http4k.connect.openai.content_filter
+import org.http4k.connect.openai.length
+import org.http4k.connect.openai.stop
+import org.http4k.connect.openai.tool_calls
 import org.http4k.connect.orThrow
 import org.http4k.core.Uri
 

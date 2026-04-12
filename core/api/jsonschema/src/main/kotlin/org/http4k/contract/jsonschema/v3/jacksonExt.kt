@@ -3,7 +3,6 @@ package org.http4k.contract.jsonschema.v3
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson

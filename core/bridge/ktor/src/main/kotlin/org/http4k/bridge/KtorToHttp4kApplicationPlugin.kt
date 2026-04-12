@@ -6,7 +6,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.server.application.createApplicationPlugin
-import io.ktor.server.application.hooks.*
+import io.ktor.server.application.hooks.ResponseBodyReadyForSend
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.request.header
@@ -16,9 +16,9 @@ import io.ktor.server.request.uri
 import io.ktor.server.response.ApplicationResponse
 import io.ktor.server.response.header
 import io.ktor.server.response.respondOutputStream
-import io.ktor.server.routing.*
-import io.ktor.util.*
-import io.ktor.utils.io.*
+import io.ktor.server.routing.RoutingFailureStatusCode
+import io.ktor.util.AttributeKey
+import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method

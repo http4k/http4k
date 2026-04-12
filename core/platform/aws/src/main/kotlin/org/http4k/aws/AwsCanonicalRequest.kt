@@ -5,8 +5,7 @@ import org.http4k.core.Uri
 import org.http4k.core.toParameters
 import org.http4k.filter.CanonicalPayload
 import org.http4k.urlEncoded
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
 
 internal data class AwsCanonicalRequest(val value: String, val signedHeaders: String, val payloadHash: String) {
     companion object {

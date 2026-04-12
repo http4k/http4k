@@ -2,7 +2,6 @@ package org.http4k.connect.azure
 
 import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
-import org.http4k.config.Environment
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey
 import org.http4k.filter.debug

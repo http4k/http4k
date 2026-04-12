@@ -1,4 +1,4 @@
-import java.util.*
+import java.util.Locale
 
 fun main() {
     //generated from ./gradlew refreshVersions

@@ -9,7 +9,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.StorageClass
 import software.amazon.awssdk.services.s3.model.Tier
-import java.util.*
+import java.util.UUID
 
 class AwsSdkV2ComptibilityTest {
 

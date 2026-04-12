@@ -13,9 +13,7 @@ import org.http4k.connect.amazon.sns.model.MessageAttribute
 import org.http4k.connect.amazon.sns.model.TopicName
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 interface SNSContract : AwsContract {
     val sns

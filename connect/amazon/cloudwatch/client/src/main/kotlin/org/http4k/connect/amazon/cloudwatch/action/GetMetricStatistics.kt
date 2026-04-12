@@ -4,10 +4,10 @@ import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.amazon.cloudwatch.CloudWatchAction
 import org.http4k.connect.amazon.cloudwatch.model.DataPoint
 import org.http4k.connect.amazon.cloudwatch.model.Dimension
-import org.http4k.connect.amazon.cloudwatch.model.PercentileExtendedStatistic
 import org.http4k.connect.amazon.cloudwatch.model.MetricName
 import org.http4k.connect.amazon.cloudwatch.model.MetricUnit
 import org.http4k.connect.amazon.cloudwatch.model.Namespace
+import org.http4k.connect.amazon.cloudwatch.model.PercentileExtendedStatistic
 import org.http4k.connect.amazon.cloudwatch.model.Statistic
 import se.ansman.kotshi.JsonSerializable
 import java.time.Instant

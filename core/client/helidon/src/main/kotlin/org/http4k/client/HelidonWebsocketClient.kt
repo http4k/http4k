@@ -9,7 +9,6 @@ import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WebsocketFactory
-import org.http4k.websocket.WsClient as Http4kWsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsMessage.Mode.Binary
@@ -18,8 +17,8 @@ import org.http4k.websocket.WsStatus
 import org.http4k.websocket.toWsClient
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import org.http4k.websocket.WsClient as Http4kWsClient
 
 class HelidonWebsocketClient(
     private val timeout: Duration = Duration.ofSeconds(5)

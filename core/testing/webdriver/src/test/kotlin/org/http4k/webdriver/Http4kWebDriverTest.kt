@@ -19,7 +19,7 @@ import org.openqa.selenium.Cookie
 import java.io.File
 import java.net.URI
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import org.http4k.core.cookie.Cookie as HCookie
 
 class Http4kWebDriverTest {

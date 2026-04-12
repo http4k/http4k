@@ -12,7 +12,6 @@ import org.http4k.sse.SseHandler
 import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import org.junit.jupiter.api.Test
-import java.awt.SystemColor.control
 
 class SseRebindProtectionTest {
 

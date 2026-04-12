@@ -5,7 +5,7 @@ import org.http4k.server.ClientForServerTesting
 import org.http4k.server.KtorNetty
 import org.http4k.streaming.StreamingContract
 import org.http4k.streaming.StreamingTestConfiguration
-import java.util.*
+import java.util.Random
 
 class KtorNettyStreamingTest : StreamingContract(
     StreamingTestConfiguration(multiplier = 4)

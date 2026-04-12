@@ -1,7 +1,6 @@
 package integration
 
 import org.http4k.client.JettyClient
-import org.http4k.server.ServerConfig
 import org.http4k.testing.ServerBackend.Apache
 import org.http4k.testing.ServerBackend.Apache4
 import org.http4k.testing.ServerBackend.Helidon
@@ -15,7 +14,6 @@ import org.http4k.testing.ServerBackend.SunHttp
 import org.http4k.testing.ServerBackend.SunHttpLoom
 import org.http4k.testing.ServerBackend.Undertow
 import org.junit.jupiter.api.Disabled
-import java.time.Duration
 
 class ApacheServerStopTest : ServerStopContract(Apache, JettyClient(), {
     enableImmediateStop()

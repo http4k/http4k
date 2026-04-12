@@ -5,7 +5,6 @@ import org.http4k.connect.amazon.containercredentials.ContainerCredentials
 import org.http4k.connect.amazon.containercredentials.Http
 import org.http4k.connect.amazon.containercredentials.action.getCredentials
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

@@ -6,7 +6,6 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.routing.body
 import org.http4k.sse.SseMessage
 import org.http4k.websocket.WsMessage
 import java.io.InputStream

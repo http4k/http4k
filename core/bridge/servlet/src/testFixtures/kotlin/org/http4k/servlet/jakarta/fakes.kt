@@ -11,8 +11,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import java.util.*
 import java.util.Collections.enumeration
+import java.util.Enumeration
 
 class FakeJakartaHttpServletRequest(private val request: Request) :
     HttpServletRequest by mock<HttpServletRequest>() {

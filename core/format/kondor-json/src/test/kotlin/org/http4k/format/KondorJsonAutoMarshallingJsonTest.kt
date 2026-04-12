@@ -4,8 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import com.ubertob.kondor.json.JAny
-import com.ubertob.kondor.json.JBigDecimal
-import com.ubertob.kondor.json.JBigInteger
 import com.ubertob.kondor.json.JField
 import com.ubertob.kondor.json.JInt
 import com.ubertob.kondor.json.JMap

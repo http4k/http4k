@@ -11,8 +11,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.queries
 import org.http4k.core.toUrlFormEncoded
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
 
 /**
  * Function loader for ApiGatewayV2 Lambdas

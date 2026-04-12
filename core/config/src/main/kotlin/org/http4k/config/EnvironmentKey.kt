@@ -9,8 +9,8 @@ import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.int
 import org.http4k.lens.mapWithNewMeta
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
+import java.util.Locale.getDefault
 
 /**
  * This models the key used to get a value out of the Environment using the standard Lens mechanic. Note that if your

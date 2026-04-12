@@ -8,7 +8,6 @@ import org.http4k.connect.amazon.s3.S3BucketAction
 import org.http4k.connect.amazon.s3.model.BucketKey
 import org.http4k.connect.amazon.s3.model.StorageClass
 import org.http4k.connect.asRemoteFailure
-import org.http4k.core.Headers
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response

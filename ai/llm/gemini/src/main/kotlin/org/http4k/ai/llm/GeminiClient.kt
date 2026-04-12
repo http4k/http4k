@@ -8,7 +8,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.ServerFilters
 
 /**
  * Gemini integration

@@ -2,8 +2,10 @@ package org.http4k.tracing.renderer
 
 import org.http4k.core.Status
 import org.http4k.tracing.Actor
-import org.http4k.tracing.ActorType
-import org.http4k.tracing.ActorType.*
+import org.http4k.tracing.ActorType.Database
+import org.http4k.tracing.ActorType.Human
+import org.http4k.tracing.ActorType.Queue
+import org.http4k.tracing.ActorType.System
 import org.http4k.tracing.BiDirectional
 import org.http4k.tracing.FireAndForget
 import org.http4k.tracing.RequestResponse

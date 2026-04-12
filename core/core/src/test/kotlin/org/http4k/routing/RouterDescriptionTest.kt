@@ -4,10 +4,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.lens.BiDiPathLens
-import org.http4k.lens.Path
-import org.http4k.lens.int
-import org.http4k.lens.string
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved

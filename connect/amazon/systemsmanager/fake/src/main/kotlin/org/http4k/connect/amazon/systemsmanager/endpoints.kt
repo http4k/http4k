@@ -7,8 +7,8 @@ import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.systemsmanager.action.DeleteParameter
 import org.http4k.connect.amazon.systemsmanager.action.GetParameter
 import org.http4k.connect.amazon.systemsmanager.action.GetParameters
-import org.http4k.connect.amazon.systemsmanager.action.ParameterValue
 import org.http4k.connect.amazon.systemsmanager.action.GetParametersResult
+import org.http4k.connect.amazon.systemsmanager.action.ParameterValue
 import org.http4k.connect.amazon.systemsmanager.action.PutParameter
 import org.http4k.connect.amazon.systemsmanager.action.PutParameterResult
 import org.http4k.connect.amazon.systemsmanager.model.Parameter

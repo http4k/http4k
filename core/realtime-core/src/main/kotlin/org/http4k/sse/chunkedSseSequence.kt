@@ -1,9 +1,9 @@
 package org.http4k.sse
 
+import org.http4k.sse.SseParseState.AfterCRLF
+import org.http4k.sse.SseParseState.AfterSingleLineBreak
 import org.http4k.sse.SseParseState.Collecting
 import org.http4k.sse.SseParseState.ConsumingTrailingLineBreak
-import org.http4k.sse.SseParseState.AfterSingleLineBreak
-import org.http4k.sse.SseParseState.AfterCRLF
 import java.io.InputStream
 
 sealed class SseParseState {

@@ -2,7 +2,6 @@ package org.http4k.connect.amazon.dynamodb
 
 import org.http4k.connect.amazon.FakeAwsContract
 import org.http4k.connect.amazon.dynamodb.endpoints.FakeS3BucketSource
-import org.http4k.connect.amazon.fakeAwsEnvironment
 import org.http4k.connect.amazon.s3.model.BucketName
 
 class FakeImportTableFromS3Test : ImportTableFromS3Contract, FakeAwsContract {

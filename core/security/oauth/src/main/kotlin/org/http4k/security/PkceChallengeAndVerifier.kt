@@ -2,7 +2,7 @@ package org.http4k.security
 
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.util.*
+import java.util.Base64
 import kotlin.random.Random
 import kotlin.random.asKotlinRandom
 

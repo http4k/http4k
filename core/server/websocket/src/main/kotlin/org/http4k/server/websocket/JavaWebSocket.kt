@@ -21,7 +21,6 @@ import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class JavaWebSocket(

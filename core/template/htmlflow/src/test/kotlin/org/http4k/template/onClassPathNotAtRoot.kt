@@ -4,7 +4,6 @@ import htmlflow.HtmlFlow
 import htmlflow.HtmlView
 import htmlflow.dyn
 import htmlflow.html
-import org.http4k.template.OnClasspath
 import org.xmlet.htmlapifaster.body
 import org.xmlet.htmlapifaster.li
 import org.xmlet.htmlapifaster.span

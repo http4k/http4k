@@ -9,7 +9,6 @@ import blaise.endpoints.GetHistory
 import blaise.endpoints.GetMessageForm
 import blaise.endpoints.Index
 import blaise.endpoints.SendUserMessage
-import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.llm.chat.AnthropicAI
 import org.http4k.ai.llm.chat.Chat

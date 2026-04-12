@@ -3,11 +3,11 @@ package org.http4k.connect.anthropic.action
 import dev.forkhandles.result4k.map
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.SystemPrompt
 import org.http4k.ai.model.Temperature
+import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.anthropic.AnthropicAIAction

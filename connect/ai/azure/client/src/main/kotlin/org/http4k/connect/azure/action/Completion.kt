@@ -1,8 +1,8 @@
 package org.http4k.connect.azure.action
 
 import org.http4k.ai.model.MaxTokens
-import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.model.Temperature
+import org.http4k.ai.model.UserPrompt
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.azure.AzureAIMoshi.autoBody
 import org.http4k.core.Method.POST

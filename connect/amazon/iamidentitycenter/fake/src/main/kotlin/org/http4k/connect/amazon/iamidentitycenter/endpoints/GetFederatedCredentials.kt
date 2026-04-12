@@ -1,12 +1,12 @@
 package org.http4k.connect.amazon.iamidentitycenter.endpoints
 
 import org.http4k.connect.amazon.core.model.AccessKeyId
-import org.http4k.connect.model.Timestamp
 import org.http4k.connect.amazon.core.model.SecretAccessKey
 import org.http4k.connect.amazon.core.model.SessionToken
 import org.http4k.connect.amazon.iamidentitycenter.IAMIdentityCenterMoshi
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.FederatedCredentials
 import org.http4k.connect.amazon.iamidentitycenter.sso.action.RoleCredentials
+import org.http4k.connect.model.Timestamp
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response

@@ -15,7 +15,6 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
-import org.http4k.ai.mcp.server.protocol.ClientTracking
 import org.http4k.ai.mcp.testing.capabilities.TestingCompletions
 import org.http4k.ai.mcp.testing.capabilities.TestingElicitations
 import org.http4k.ai.mcp.testing.capabilities.TestingPrompts

@@ -2,7 +2,6 @@ package org.http4k.connect.amazon.core.model
 
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.collections.plus
 import kotlin.io.path.readLines
 
 /**

@@ -3,7 +3,6 @@ package org.http4k.connect.amazon.iamidentitycenter
 import org.http4k.connect.amazon.FakeAwsContract
 import org.http4k.core.HttpHandler
 import org.http4k.routing.reverseProxy
-import java.io.File
 import kotlin.io.path.Path
 
 class FakeIAMIdentityCenterTest : IAMIdentityCenterContract, FakeAwsContract {

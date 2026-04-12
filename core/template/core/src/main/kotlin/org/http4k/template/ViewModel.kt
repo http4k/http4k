@@ -4,7 +4,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
-import java.io.File
 
 interface ViewModel {
     /**

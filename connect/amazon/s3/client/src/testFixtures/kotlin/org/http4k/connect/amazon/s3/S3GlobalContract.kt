@@ -7,10 +7,8 @@ import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.s3.model.BucketName
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 interface S3GlobalContract : AwsContract {
     private val s3

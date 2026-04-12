@@ -17,7 +17,6 @@ import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.URI
 import java.net.UnknownHostException
-import java.net.http.HttpTimeoutException
 import java.nio.ByteBuffer
 import java.time.Duration
 import java.time.Duration.ZERO

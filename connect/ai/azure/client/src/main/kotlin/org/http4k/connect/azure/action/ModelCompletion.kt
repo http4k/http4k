@@ -1,8 +1,8 @@
 package org.http4k.connect.azure.action
 
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.azure.AzureAIAction
 import org.http4k.connect.azure.AzureAIMoshi
-import org.http4k.ai.util.toCompletionSequence
 import org.http4k.core.Response
 
 interface ModelCompletion : AzureAIAction<Sequence<CompletionResponse>> {

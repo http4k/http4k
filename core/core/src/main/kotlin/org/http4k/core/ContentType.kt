@@ -1,9 +1,7 @@
 package org.http4k.core
 
 import java.nio.charset.Charset
-import java.util.Locale
 import java.util.Locale.ROOT
-import java.util.Locale.getDefault
 import kotlin.text.Charsets.UTF_8
 
 data class ContentType(val value: String, val directives: Parameters = emptyList()) {

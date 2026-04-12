@@ -11,11 +11,11 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.QualifiedContent
 import org.http4k.core.Credentials
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Parameter
+import org.http4k.core.QualifiedContent
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with

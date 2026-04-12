@@ -8,6 +8,7 @@ import org.http4k.ai.model.ResponseId
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.Temperature
+import org.http4k.ai.util.toCompletionSequence
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.lmstudio.LmStudioAction
 import org.http4k.connect.lmstudio.LmStudioMoshi
@@ -18,7 +19,6 @@ import org.http4k.connect.lmstudio.TokenId
 import org.http4k.connect.lmstudio.User
 import org.http4k.connect.lmstudio.action.Detail.auto
 import org.http4k.connect.model.Timestamp
-import org.http4k.ai.util.toCompletionSequence
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response

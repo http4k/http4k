@@ -1,7 +1,6 @@
 package org.http4k.connect.amazon.route53.model
 
 import dev.forkhandles.values.StringValue
-import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.maxLength

@@ -34,8 +34,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.security.Security
 import java.io.InputStream
-import java.util.Locale
-import java.util.Locale.*
+import java.util.Locale.ROOT
 
 /**
  * Contract renderer for OpenApi2 format JSON. Note that for the JSON schema generation, auto-naming of

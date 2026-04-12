@@ -19,7 +19,6 @@ import org.http4k.connect.amazon.evidently.model.ProjectName
 import org.http4k.connect.amazon.evidently.model.VariationConfig
 import org.http4k.connect.amazon.evidently.model.VariationName
 import org.http4k.connect.successValue
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.PATCH
 import org.http4k.core.Method.POST
@@ -27,9 +26,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CONFLICT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
-import org.http4k.lens.StringBiDiMappings.uuid
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 interface EvidentlyContract : AwsContract {
     private val evidently

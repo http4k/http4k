@@ -7,8 +7,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.junit.jupiter.api.Assumptions.assumeTrue
-import java.lang.Runtime.getRuntime
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant

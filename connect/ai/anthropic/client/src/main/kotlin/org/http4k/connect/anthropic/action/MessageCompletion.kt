@@ -4,12 +4,12 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.UserPrompt
 import org.http4k.ai.model.ResponseId
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.SystemPrompt
 import org.http4k.ai.model.Temperature
+import org.http4k.ai.model.UserPrompt
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.anthropic.AnthropicAIAction
 import org.http4k.connect.anthropic.AnthropicAIMoshi

@@ -2,12 +2,10 @@ package org.http4k.connect.langchain
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.startsWith
-import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler
 import dev.langchain4j.model.openai.OpenAiChatModel
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel
-import dev.langchain4j.model.openai.internal.chat.AssistantMessage
 import dev.langchain4j.model.openai.internal.chat.ChatCompletionChoice
 import dev.langchain4j.model.openai.internal.chat.ChatCompletionResponse
 import dev.langchain4j.model.openai.internal.chat.Delta

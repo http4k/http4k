@@ -13,7 +13,6 @@ import org.http4k.datastar.DatastarEvent.PatchSignals
 import org.http4k.datastar.Element
 import org.http4k.datastar.MorphMode
 import org.http4k.datastar.MorphMode.outer
-import org.http4k.datastar.MorphMode.outer
 import org.http4k.datastar.Selector
 import org.http4k.datastar.Signal
 import org.http4k.sse.SseEventId

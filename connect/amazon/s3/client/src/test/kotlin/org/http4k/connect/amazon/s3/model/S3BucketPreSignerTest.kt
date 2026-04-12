@@ -7,7 +7,6 @@ import org.http4k.core.Uri
 import org.http4k.hamkrest.hasHost
 import org.http4k.hamkrest.hasUriPath
 import org.junit.jupiter.api.Test
-import java.time.Clock
 import java.time.Duration
 
 

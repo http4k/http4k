@@ -2,9 +2,7 @@ package org.http4k.core
 
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.util.loadMetaResource
-import java.util.Locale
 import java.util.Locale.ROOT
-import java.util.Locale.getDefault
 
 class MimeTypes private constructor(private val map: Map<String, ContentType>) {
     fun forFile(file: String): ContentType =

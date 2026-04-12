@@ -8,9 +8,6 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.ksp.toClassName
-import com.squareup.kotlinpoet.ksp.toTypeName
-import java.util.Locale
 import java.util.Locale.ROOT
 
 class Http4kConnectApiClientVisitor(private val log: (Any?) -> Unit) :

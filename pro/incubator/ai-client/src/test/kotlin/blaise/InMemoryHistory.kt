@@ -1,6 +1,10 @@
 package blaise
 
-import blaise.HistoryItem.*
+import blaise.HistoryItem.Ai
+import blaise.HistoryItem.ToolApproved
+import blaise.HistoryItem.ToolConsent
+import blaise.HistoryItem.ToolDenied
+import blaise.HistoryItem.User
 import org.http4k.ai.llm.model.Content
 import org.http4k.ai.llm.tools.ToolRequest
 import org.http4k.ai.model.RequestId

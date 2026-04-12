@@ -5,11 +5,9 @@ import org.http4k.connect.Action
 import org.http4k.connect.Http4kConnectAction
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.sqs.SQSAction
-import org.http4k.connect.amazon.sqs.model.SQSMessageId
 import org.http4k.core.Uri
-import java.time.ZonedDateTime
-
 import se.ansman.kotshi.JsonSerializable
+import java.time.ZonedDateTime
 
 @Http4kConnectAction
 @JsonSerializable

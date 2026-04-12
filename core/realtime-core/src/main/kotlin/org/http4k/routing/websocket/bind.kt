@@ -3,7 +3,6 @@ package org.http4k.routing.websocket
 import org.http4k.core.UriTemplate
 import org.http4k.routing.Router
 import org.http4k.routing.RoutingWsHandler
-import org.http4k.routing.SimpleSseRouteMatcher
 import org.http4k.routing.SimpleWsRouteMatcher
 import org.http4k.routing.TemplatedWsRoute
 import org.http4k.websocket.WsHandler

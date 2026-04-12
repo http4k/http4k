@@ -2,8 +2,6 @@ package org.http4k.template.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
-import org.http4k.format.Jackson.pretty
 import org.http4k.template.AtRoot
 import org.http4k.template.Feature
 import org.http4k.template.Item

@@ -11,7 +11,6 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.with
-import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.routing.RequestWithContext
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal

@@ -1,10 +1,10 @@
 package org.http4k.connect.kafka.rest
 
 import org.http4k.client.JavaHttpClient
-import org.http4k.util.assumeDockerDaemonRunning
 import org.http4k.connect.kafka.rest.v2.KafkaRestV2Contract
 import org.http4k.core.Uri
 import org.http4k.util.PortBasedTest
+import org.http4k.util.assumeDockerDaemonRunning
 import org.junit.jupiter.api.Disabled
 
 class LocalKafkaRestTest : KafkaRestV2Contract, PortBasedTest {
