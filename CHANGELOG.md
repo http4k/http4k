@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.42.0.1 (uncut)
+**http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
+
 ### v6.42.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Better support for custom MCP app resource loading. Rename of `RenderMcpApp` parameters might break anything using named params.

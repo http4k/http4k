@@ -22,9 +22,11 @@ object CallToolSpanModifiers : McpOpenTelemetrySpanModifiers {
 
     override fun response(sb: Span, response: McpNodeType) {
         val result = McpJson.fields(response).toMap()["result"] ?: return
-        McpJson.fields(result).toMap()["isError"]?.let {
-            sb.setStatus(StatusCode.ERROR)
-            sb.setAttribute("error.type", "tool_error")
-        }
+        McpJson.fields(result).toMap()["isError"]
+            ?.takeIf { runCatching { McpJson.bool(it) }.getOrDefault(false) }
+            ?.let {
+                sb.setStatus(StatusCode.ERROR)
+                sb.setAttribute("error.type", "tool_error")
+            }
     }
 }
