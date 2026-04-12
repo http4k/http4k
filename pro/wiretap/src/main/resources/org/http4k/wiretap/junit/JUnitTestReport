@@ -91,7 +91,7 @@ function copyCurl(btn) {
     }
 }
 function copyMermaid(btn) {
-    var container = btn.closest('.sequence-diagram') || btn.closest('.otel-detail-panel') || btn.closest('.otel-layout');
+    var container = btn.closest('.sequence-diagram');
     var pre = container && (container.querySelector('.mermaid-source') || container.querySelector('.mermaid'));
     if (pre) {
         navigator.clipboard.writeText(pre.textContent.trim()).then(function() {
