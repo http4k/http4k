@@ -154,17 +154,16 @@ data: elements             if (p !== firstPane) p.classList.remove('show', 'acti
 data: elements         });
 data: elements     }
 data: elements 
-data: elements     var unprocessed = container.querySelectorAll('.mermaid:not([data-processed])');
-data: elements     if (unprocessed.length === 0) {
+data: elements     var total = container.querySelectorAll('.mermaid').length;
+data: elements     if (total === 0) {
 data: elements         hidePanes();
 data: elements     } else {
-data: elements         var observer = new MutationObserver(function() {
-data: elements             if (container.querySelectorAll('.mermaid:not([data-processed])').length === 0) {
-data: elements                 observer.disconnect();
+data: elements         var check = setInterval(function() {
+data: elements             if (container.querySelectorAll('.mermaid[data-processed]').length >= total) {
+data: elements                 clearInterval(check);
 data: elements                 hidePanes();
 data: elements             }
-data: elements         });
-data: elements         observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-processed'] });
+data: elements         }, 50);
 data: elements     }
 data: elements })();
 data: elements document.addEventListener('click', function(e) {

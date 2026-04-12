@@ -119,17 +119,16 @@
         });
     }
 
-    var unprocessed = container.querySelectorAll('.mermaid:not([data-processed])');
-    if (unprocessed.length === 0) {
+    var total = container.querySelectorAll('.mermaid').length;
+    if (total === 0) {
         hidePanes();
     } else {
-        var observer = new MutationObserver(function() {
-            if (container.querySelectorAll('.mermaid:not([data-processed])').length === 0) {
-                observer.disconnect();
+        var check = setInterval(function() {
+            if (container.querySelectorAll('.mermaid[data-processed]').length >= total) {
+                clearInterval(check);
                 hidePanes();
             }
-        });
-        observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-processed'] });
+        }, 50);
     }
 })();
 document.addEventListener('click', function(e) {
