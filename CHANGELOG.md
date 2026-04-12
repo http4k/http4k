@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.42.0.0 (uncut)
+- **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Better support for custom MCP app resource loading. Rename of `RenderMcpApp` parameters might break anything using named params.
 - **http4k-ai-mcp-sdk**: [Fix] Include tool and prompt names in OTel traces.
 - **http4k-ai-mcp-sdk**: Add better OTel support for MCP tracing span modifiers. We have extrapolated from the OTel semantic conventions here and are following the spec so some of these are not official values.
