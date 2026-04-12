@@ -1,33 +1,34 @@
+<div class="trace-diagrams">
 <ul class="nav nav-tabs px-3 pt-3" role="tablist">
     <#if sequenceDiagram?has_content>
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sequence-tab" type="button" role="tab">Sequence</button>
+        <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
     </li>
     </#if>
     <#if interactionDiagram?has_content>
     <li class="nav-item">
-        <button class="nav-link<#if !sequenceDiagram?has_content> active</#if>" data-bs-toggle="tab" data-bs-target="#interaction-tab" type="button" role="tab">Interactions</button>
+        <button class="nav-link<#if !sequenceDiagram?has_content> active</#if>" data-diagram-tab="interaction" type="button" role="tab">Interactions</button>
     </li>
     </#if>
     <#if timingEntries?has_content>
     <li class="nav-item">
-        <button class="nav-link<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> active</#if>" data-bs-toggle="tab" data-bs-target="#timing-tab" type="button" role="tab">Timing</button>
+        <button class="nav-link<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> active</#if>" data-diagram-tab="timing" type="button" role="tab">Timing</button>
     </li>
     </#if>
     <#if errorTrace?has_content>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#error-tab" type="button" role="tab">Errors</button>
+        <button class="nav-link" data-diagram-tab="error" type="button" role="tab">Errors</button>
     </li>
     </#if>
     <#if criticalPath?has_content>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#critical-path-tab" type="button" role="tab">Critical Path</button>
+        <button class="nav-link" data-diagram-tab="critical-path" type="button" role="tab">Critical Path</button>
     </li>
     </#if>
 </ul>
 <div class="tab-content">
     <#if sequenceDiagram?has_content>
-    <div class="tab-pane show active" id="sequence-tab" role="tabpanel">
+    <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -38,7 +39,7 @@
     </div>
     </#if>
     <#if interactionDiagram?has_content>
-    <div class="tab-pane<#if !sequenceDiagram?has_content> show active</#if>" id="interaction-tab" role="tabpanel">
+    <div class="tab-pane<#if !sequenceDiagram?has_content> show active</#if>" data-diagram-pane="interaction" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -49,7 +50,7 @@
     </div>
     </#if>
     <#if timingEntries?has_content>
-    <div class="tab-pane<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> show active</#if>" id="timing-tab" role="tabpanel">
+    <div class="tab-pane<#if !sequenceDiagram?has_content && !interactionDiagram?has_content> show active</#if>" data-diagram-pane="timing" role="tabpanel">
         <div class="timing-table" style="padding: 1rem;">
             <table class="data-table">
                 <thead>
@@ -84,7 +85,7 @@
     </div>
     </#if>
     <#if errorTrace?has_content>
-    <div class="tab-pane" id="error-tab" role="tabpanel">
+    <div class="tab-pane" data-diagram-pane="error" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -95,7 +96,7 @@
     </div>
     </#if>
     <#if criticalPath?has_content>
-    <div class="tab-pane" id="critical-path-tab" role="tabpanel">
+    <div class="tab-pane" data-diagram-pane="critical-path" role="tabpanel">
         <div class="sequence-diagram">
             <div class="sequence-diagram-toolbar">
                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -106,21 +107,24 @@
     </div>
     </#if>
 </div>
+</div>
 <script>
-document.addEventListener('shown.bs.tab', function(e) {
-    var target = e.target.getAttribute('data-bs-target');
-    if (!target) return;
-    var pane = document.querySelector(target);
-    if (!pane) return;
-    pane.querySelectorAll('.mermaid[data-processed]').forEach(function(el) {
-        var source = el.closest('.sequence-diagram');
-        source = source && source.querySelector('.mermaid-source');
-        if (source) {
-            el.removeAttribute('data-processed');
-            el.textContent = source.textContent;
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-diagram-tab]');
+    if (!btn) return;
+    var container = btn.closest('.trace-diagrams');
+    var tabName = btn.getAttribute('data-diagram-tab');
+    container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
+    container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
+    btn.classList.add('active');
+    var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
+    if (pane) {
+        pane.classList.add('show', 'active');
+        if (!pane.hasAttribute('data-rendered')) {
+            var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
+            if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
+            pane.setAttribute('data-rendered', 'true');
         }
-    });
-    var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
-    if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
+    }
 });
 </script>

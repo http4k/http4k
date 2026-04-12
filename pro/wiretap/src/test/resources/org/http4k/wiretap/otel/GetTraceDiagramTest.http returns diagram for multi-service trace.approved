@@ -1,20 +1,21 @@
 event: datastar-patch-elements
+data: elements <div class="trace-diagrams">
 data: elements <ul class="nav nav-tabs px-3 pt-3" role="tablist">
 data: elements         <li class="nav-item">
-data: elements         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sequence-tab" type="button" role="tab">Sequence</button>
+data: elements         <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
 data: elements     </li>
 data: elements     <li class="nav-item">
-data: elements         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#interaction-tab" type="button" role="tab">Interactions</button>
+data: elements         <button class="nav-link" data-diagram-tab="interaction" type="button" role="tab">Interactions</button>
 data: elements     </li>
 data: elements     <li class="nav-item">
-data: elements         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#timing-tab" type="button" role="tab">Timing</button>
+data: elements         <button class="nav-link" data-diagram-tab="timing" type="button" role="tab">Timing</button>
 data: elements     </li>
 data: elements     <li class="nav-item">
-data: elements         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#critical-path-tab" type="button" role="tab">Critical Path</button>
+data: elements         <button class="nav-link" data-diagram-tab="critical-path" type="button" role="tab">Critical Path</button>
 data: elements     </li>
 data: elements </ul>
 data: elements <div class="tab-content">
-data: elements     <div class="tab-pane show active" id="sequence-tab" role="tabpanel">
+data: elements     <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
 data: elements         <div class="sequence-diagram">
 data: elements             <div class="sequence-diagram-toolbar">
 data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -37,7 +38,7 @@ data: elements     backend-->>frontend: OK (3ms)
 data: elements     frontend-->>wiretap: OK (4ms)</pre>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div class="tab-pane" id="interaction-tab" role="tabpanel">
+data: elements     <div class="tab-pane" data-diagram-pane="interaction" role="tabpanel">
 data: elements         <div class="sequence-diagram">
 data: elements             <div class="sequence-diagram-toolbar">
 data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -58,7 +59,7 @@ data: elements     Rel_D(wiretap, frontend, " ")
 data: elements     Rel_D(frontend, backend, " ")</pre>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div class="tab-pane" id="timing-tab" role="tabpanel">
+data: elements     <div class="tab-pane" data-diagram-pane="timing" role="tabpanel">
 data: elements         <div class="timing-table" style="padding: 1rem;">
 data: elements             <table class="data-table">
 data: elements                 <thead>
@@ -117,7 +118,7 @@ data: elements                 </tbody>
 data: elements             </table>
 data: elements         </div>
 data: elements     </div>
-data: elements     <div class="tab-pane" id="critical-path-tab" role="tabpanel">
+data: elements     <div class="tab-pane" data-diagram-pane="critical-path" role="tabpanel">
 data: elements         <div class="sequence-diagram">
 data: elements             <div class="sequence-diagram-toolbar">
 data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
@@ -141,23 +142,27 @@ data: elements     frontend-->>wiretap: OK (4ms)</pre>
 data: elements         </div>
 data: elements     </div>
 data: elements </div>
+data: elements </div>
 data: elements <script>
-data: elements document.addEventListener('shown.bs.tab', function(e) {
-data: elements     var target = e.target.getAttribute('data-bs-target');
-data: elements     if (!target) return;
-data: elements     var pane = document.querySelector(target);
-data: elements     if (!pane) return;
-data: elements     pane.querySelectorAll('.mermaid[data-processed]').forEach(function(el) {
-data: elements         var source = el.closest('.sequence-diagram');
-data: elements         source = source && source.querySelector('.mermaid-source');
-data: elements         if (source) {
-data: elements             el.removeAttribute('data-processed');
-data: elements             el.textContent = source.textContent;
+data: elements document.addEventListener('click', function(e) {
+data: elements     var btn = e.target.closest('[data-diagram-tab]');
+data: elements     if (!btn) return;
+data: elements     var container = btn.closest('.trace-diagrams');
+data: elements     var tabName = btn.getAttribute('data-diagram-tab');
+data: elements     container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
+data: elements     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
+data: elements     btn.classList.add('active');
+data: elements     var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
+data: elements     if (pane) {
+data: elements         pane.classList.add('show', 'active');
+data: elements         if (!pane.hasAttribute('data-rendered')) {
+data: elements             var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
+data: elements             if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
+data: elements             pane.setAttribute('data-rendered', 'true');
 data: elements         }
-data: elements     });
-data: elements     var toRender = pane.querySelectorAll('.mermaid:not([data-processed])');
-data: elements     if (toRender.length > 0 && typeof mermaid !== 'undefined') mermaid.run({ nodes: toRender });
+data: elements     }
 data: elements });
 data: elements </script>
+data: elements 
 data: selector #trace-diagrams-panel
 
