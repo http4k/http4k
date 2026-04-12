@@ -285,5 +285,5 @@
         </table>
     </div>
     </#if>
-    <div id="trace-diagram-panel" data-init="@get('/_wiretap/otel/diagram/${detail.traceId}')"></div>
+    <div id="trace-diagrams-panel" data-init="@get('/_wiretap/otel/diagrams/${detail.traceId}')"></div>
 </div>

@@ -40,7 +40,6 @@ fun RenderMcpApp(
     extraCapabilities: List<ServerCapability> = emptyList(),
     mcpAppHandler: McpAppHandler
 ) = RenderMcpApp(name, description, uiUri, extraCapabilities, toolVisibility, mimeType) {
-    println(mcpAppHandler(it))
     ResourceResponse.Ok(Resource.Content.Text(mcpAppHandler(it), uiUri, mimeType, Content.Meta(ui = meta)))
 }
 

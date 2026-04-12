@@ -1,0 +1,5 @@
+C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(frontend, "frontend")
+    System(backend, "backend")
+    Rel_D(frontend, backend, " ")

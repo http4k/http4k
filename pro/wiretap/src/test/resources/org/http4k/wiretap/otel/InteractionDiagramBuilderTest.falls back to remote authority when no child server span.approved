@@ -1,0 +1,5 @@
+C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(myapp, "myapp")
+    System(externalapicom8080, "external.api.com:8080")
+    Rel_D(myapp, externalapicom8080, " ")

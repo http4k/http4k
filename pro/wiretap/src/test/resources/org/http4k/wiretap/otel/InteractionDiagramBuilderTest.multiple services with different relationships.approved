@@ -1,0 +1,11 @@
+C4Context
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+    System(wiretap, "wiretap")
+    System(frontend, "frontend")
+    System(backend, "backend")
+    System(unknown, "unknown")
+    System(apiexamplecom, "api.example.com")
+    Rel_D(wiretap, frontend, " ")
+    Rel_D(frontend, backend, " ")
+    Rel_D(backend, unknown, " ")
+    Rel_D(backend, apiexamplecom, " ")

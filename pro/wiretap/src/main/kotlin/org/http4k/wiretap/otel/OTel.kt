@@ -18,7 +18,7 @@ fun OTel(traceStore: TraceStore, logStore: LogStore, clock: Clock) = object : Wi
     private val functions = listOf(
         ListTraces(traceStore, clock),
         GetTrace(traceStore, logStore, clock),
-        GetTraceDiagram(traceStore),
+        GetTraceDiagrams(traceStore),
     )
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

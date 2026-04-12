@@ -13,6 +13,9 @@ import org.http4k.wiretap.domain.SequenceDiagram
 import org.http4k.wiretap.domain.SequenceMessage
 import org.http4k.wiretap.domain.SpanDetail
 import org.http4k.wiretap.domain.TraceDetail
+import org.http4k.wiretap.domain.httpStatusCode
+import org.http4k.wiretap.domain.isError
+import org.http4k.wiretap.domain.remoteAuthority
 
 fun TraceDetail.toSequenceDiagram(): SequenceDiagram {
     if (spans.isEmpty()) return SequenceDiagram(emptyList(), emptyList())
@@ -121,23 +124,6 @@ private fun SpanDetail.clientLabel(): String {
 }
 
 private fun SpanDetail.responseLabel() = "${httpStatusCode()?.toString() ?: statusCode} (${durationMs}ms)"
-
-private fun SpanDetail.isError() = httpStatusCode()?.let { it >= 500 } ?: (statusCode == "ERROR")
-
-private fun SpanDetail.httpStatusCode(): Int? =
-    attributes.firstOrNull { it.key == OpenTelemetrySemanticConventions.statusCode || it.key == LegacyHttp4kConventions.statusCode }
-        ?.value?.toIntOrNull()
-
-private fun SpanDetail.remoteAuthority() = attributes
-    .firstOrNull {
-        it.key == OpenTelemetrySemanticConventions.clientUrl ||
-            it.key == LegacyHttp4kConventions.clientUrl
-    }
-    ?.value
-    ?.let { Uri.of(it) }
-    ?.authority
-    ?.ifEmpty { null }
-    ?: "unknown"
 
 private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
 

@@ -1,9 +1,129 @@
 event: datastar-patch-elements
-data: elements <div class="sequence-diagram">
-data: elements     <div class="sequence-diagram-toolbar">
-data: elements         <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+data: elements <div class="trace-diagrams">
+data: elements <ul class="nav nav-tabs px-3 pt-3" role="tablist">
+data: elements         <li class="nav-item">
+data: elements         <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
+data: elements     </li>
+data: elements     <li class="nav-item">
+data: elements         <button class="nav-link" data-diagram-tab="interaction" type="button" role="tab">Interactions</button>
+data: elements     </li>
+data: elements     <li class="nav-item">
+data: elements         <button class="nav-link" data-diagram-tab="timing" type="button" role="tab">Timing</button>
+data: elements     </li>
+data: elements     <li class="nav-item">
+data: elements         <button class="nav-link" data-diagram-tab="critical-path" type="button" role="tab">Critical Path</button>
+data: elements     </li>
+data: elements </ul>
+data: elements <div class="tab-content">
+data: elements     <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
+data: elements         <div class="sequence-diagram">
+data: elements             <div class="sequence-diagram-toolbar">
+data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+data: elements             </div>
+data: elements             <pre class="mermaid">sequenceDiagram
+data: elements     participant wiretap
+data: elements     participant frontend
+data: elements     participant backend
+data: elements     wiretap->>frontend: GET /
+data: elements     frontend->>backend: GET /api
+data: elements     backend-->>frontend: OK (3ms)
+data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements             <pre class="mermaid-source" style="display:none">sequenceDiagram
+data: elements     participant wiretap
+data: elements     participant frontend
+data: elements     participant backend
+data: elements     wiretap->>frontend: GET /
+data: elements     frontend->>backend: GET /api
+data: elements     backend-->>frontend: OK (3ms)
+data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements         </div>
 data: elements     </div>
-data: elements     <pre class="mermaid">sequenceDiagram
+data: elements     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
+data: elements         <div class="sequence-diagram">
+data: elements             <div class="sequence-diagram-toolbar">
+data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+data: elements             </div>
+data: elements             <pre class="mermaid">C4Context
+data: elements     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+data: elements     System(wiretap, "wiretap")
+data: elements     System(frontend, "frontend")
+data: elements     System(backend, "backend")
+data: elements     Rel_D(wiretap, frontend, " ")
+data: elements     Rel_D(frontend, backend, " ")</pre>
+data: elements             <pre class="mermaid-source" style="display:none">C4Context
+data: elements     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+data: elements     System(wiretap, "wiretap")
+data: elements     System(frontend, "frontend")
+data: elements     System(backend, "backend")
+data: elements     Rel_D(wiretap, frontend, " ")
+data: elements     Rel_D(frontend, backend, " ")</pre>
+data: elements         </div>
+data: elements     </div>
+data: elements     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
+data: elements         <div class="timing-table" style="padding: 1rem;">
+data: elements             <table class="data-table">
+data: elements                 <thead>
+data: elements                     <tr>
+data: elements                         <th>Service</th>
+data: elements                         <th>Operation</th>
+data: elements                         <th>Kind</th>
+data: elements                         <th style="text-align: right;">Duration</th>
+data: elements                         <th style="width: 30%;">% of Total</th>
+data: elements                     </tr>
+data: elements                 </thead>
+data: elements                 <tbody>
+data: elements                     <tr>
+data: elements                         <td>frontend</td>
+data: elements                         <td>GET /</td>
+data: elements                         <td>SERVER</td>
+data: elements                         <td style="text-align: right;">4ms</td>
+data: elements                         <td>
+data: elements                             <div style="display: flex; align-items: center; gap: 0.5rem;">
+data: elements                                 <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+data: elements                                     <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+data: elements                                 </div>
+data: elements                                 <span style="min-width: 3rem; text-align: right;">100%</span>
+data: elements                             </div>
+data: elements                         </td>
+data: elements                     </tr>
+data: elements                     <tr>
+data: elements                         <td>frontend</td>
+data: elements                         <td>GET /api</td>
+data: elements                         <td>CLIENT</td>
+data: elements                         <td style="text-align: right;">3ms</td>
+data: elements                         <td>
+data: elements                             <div style="display: flex; align-items: center; gap: 0.5rem;">
+data: elements                                 <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+data: elements                                     <div style="width: 75%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+data: elements                                 </div>
+data: elements                                 <span style="min-width: 3rem; text-align: right;">75%</span>
+data: elements                             </div>
+data: elements                         </td>
+data: elements                     </tr>
+data: elements                     <tr>
+data: elements                         <td>backend</td>
+data: elements                         <td>GET /api</td>
+data: elements                         <td>SERVER</td>
+data: elements                         <td style="text-align: right;">2ms</td>
+data: elements                         <td>
+data: elements                             <div style="display: flex; align-items: center; gap: 0.5rem;">
+data: elements                                 <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+data: elements                                     <div style="width: 50%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+data: elements                                 </div>
+data: elements                                 <span style="min-width: 3rem; text-align: right;">50%</span>
+data: elements                             </div>
+data: elements                         </td>
+data: elements                     </tr>
+data: elements                 </tbody>
+data: elements             </table>
+data: elements         </div>
+data: elements     </div>
+data: elements     <div class="tab-pane show active" data-diagram-pane="critical-path" role="tabpanel">
+data: elements         <div class="sequence-diagram">
+data: elements             <div class="sequence-diagram-toolbar">
+data: elements                 <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+data: elements             </div>
+data: elements             <pre class="mermaid">sequenceDiagram
 data: elements     participant wiretap
 data: elements     participant frontend
 data: elements     participant backend
@@ -11,7 +131,7 @@ data: elements     wiretap->>frontend: GET /
 data: elements     frontend->>backend: GET /api
 data: elements     backend-->>frontend: OK (3ms)
 data: elements     frontend-->>wiretap: OK (4ms)</pre>
-data: elements     <pre class="mermaid-source" style="display:none">sequenceDiagram
+data: elements             <pre class="mermaid-source" style="display:none">sequenceDiagram
 data: elements     participant wiretap
 data: elements     participant frontend
 data: elements     participant backend
@@ -19,7 +139,45 @@ data: elements     wiretap->>frontend: GET /
 data: elements     frontend->>backend: GET /api
 data: elements     backend-->>frontend: OK (3ms)
 data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements         </div>
+data: elements     </div>
 data: elements </div>
+data: elements </div>
+data: elements <script>
+data: elements (function() {
+data: elements     var container = document.currentScript.previousElementSibling;
 data: elements 
-data: selector #trace-diagram-panel
+data: elements     function hidePanes() {
+data: elements         var firstPane = container.querySelector('[data-diagram-pane]');
+data: elements         container.querySelectorAll('[data-diagram-pane]').forEach(function(p) {
+data: elements             if (p !== firstPane) p.classList.remove('show', 'active');
+data: elements         });
+data: elements     }
+data: elements 
+data: elements     var total = container.querySelectorAll('.mermaid').length;
+data: elements     if (total === 0) {
+data: elements         hidePanes();
+data: elements     } else {
+data: elements         var check = setInterval(function() {
+data: elements             if (container.querySelectorAll('.mermaid[data-processed]').length >= total) {
+data: elements                 clearInterval(check);
+data: elements                 hidePanes();
+data: elements             }
+data: elements         }, 50);
+data: elements     }
+data: elements })();
+data: elements document.addEventListener('click', function(e) {
+data: elements     var btn = e.target.closest('[data-diagram-tab]');
+data: elements     if (!btn) return;
+data: elements     var container = btn.closest('.trace-diagrams');
+data: elements     var tabName = btn.getAttribute('data-diagram-tab');
+data: elements     container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
+data: elements     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
+data: elements     btn.classList.add('active');
+data: elements     var pane = container.querySelector('[data-diagram-pane="' + tabName + '"]');
+data: elements     if (pane) pane.classList.add('show', 'active');
+data: elements });
+data: elements </script>
+data: elements 
+data: selector #trace-diagrams-panel
 

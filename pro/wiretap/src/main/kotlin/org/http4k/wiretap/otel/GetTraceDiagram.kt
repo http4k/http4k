@@ -10,7 +10,6 @@ import org.http4k.ai.mcp.model.value
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.datastar.Selector
 import org.http4k.lens.Path
@@ -25,41 +24,44 @@ import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.util.Json
 
-fun GetTraceDiagram(traceStore: TraceStore) = object : WiretapFunction {
-    private fun lookup(traceId: OtelTraceId): String? {
+fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
+    private fun lookup(traceId: OtelTraceId): TraceDiagramsView? {
         val spans = traceStore.get(traceId)
         if (spans.isEmpty()) return null
-
-        val detail = spans.toTraceDetail(traceId)
-        val diagram = detail.toSequenceDiagram()
-        if (diagram.messages.isEmpty()) return null
-
-        return diagram.toMermaid()
+        return spans.toTraceDetail(traceId).toTraceDiagramsView()
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "/diagram/{traceId}" bind GET to { req ->
+        "/diagrams/{traceId}" bind GET to { req ->
             val traceId = Path.value(OtelTraceId).of("traceId")(req)
-            when (val mermaid = lookup(traceId)) {
-                null -> Response(NOT_FOUND)
+            when (val view = lookup(traceId)) {
+                null -> Response(OK)
                 else -> Response(OK).datastarElements(
-                    elements(TraceDiagramView(mermaid)),
-                    selector = Selector.of("#trace-diagram-panel")
+                    elements(view),
+                    selector = Selector.of("#trace-diagrams-panel")
                 )
             }
         }
 
     override fun mcp(): ToolCapability {
-        val traceId = Tool.Arg.value(OtelTraceId).required("trace_id", "The trace ID to get the sequence diagram for")
+        val traceId = Tool.Arg.value(OtelTraceId).required("trace_id", "The trace ID to get diagrams for")
 
         return Tool(
-            "get_trace_diagram",
-            "Get the Mermaid sequence diagram for a specific OpenTelemetry trace",
+            "get_trace_diagrams",
+            "Get all diagrams (sequence, interaction, timing, errors, critical path) for a specific OpenTelemetry trace",
             traceId
         ) bind { req ->
-            when (val mermaid = lookup(traceId(req))) {
-                null -> ToolResponse.Error("No diagram available for this trace")
-                else -> Json.asToolResponse(mapOf("mermaid" to mermaid))
+            when (val view = lookup(traceId(req))) {
+                null -> ToolResponse.Error("No trace data available")
+                else -> Json.asToolResponse(
+                    mapOf(
+                        "sequence" to view.sequenceDiagram,
+                        "interaction" to view.interactionDiagram,
+                        "timing" to view.timingEntries,
+                        "errorTrace" to view.errorTrace,
+                        "criticalPath" to view.criticalPath
+                    ).filterValues { it is String && it.isNotEmpty() || it is List<*> && it.isNotEmpty() }
+                )
             }
         }
     }

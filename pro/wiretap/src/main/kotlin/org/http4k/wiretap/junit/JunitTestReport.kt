@@ -6,7 +6,7 @@ package org.http4k.wiretap.junit
 
 import org.http4k.template.ViewModel
 
-data class TraceEntry(val traceId: String, val ganttHtml: String, val diagramHtml: String)
+data class TraceEntry(val traceId: String, val ganttHtml: String, val diagramsHtml: String)
 
 data class TrafficEntry(val trafficHtml: String)
 
