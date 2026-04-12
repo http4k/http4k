@@ -1,7 +1,0 @@
-<div class="sequence-diagram">
-    <div class="sequence-diagram-toolbar">
-        <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
-    </div>
-    <pre class="mermaid">${mermaidDiagram?no_esc}</pre>
-    <pre class="mermaid-source" style="display:none">${mermaidDiagram?no_esc}</pre>
-</div>

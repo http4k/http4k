@@ -188,7 +188,7 @@ class Intercept @JvmOverloads constructor(
 }
 
 private val outputDir by lazy {
-    File("build/reports/wiretap").apply { mkdirs() }
+    File("build/reports/http4k/wiretap").apply { mkdirs() }
 }
 
 private class TeeOutputStream(private val primary: OutputStream, private val secondary: OutputStream) : OutputStream() {

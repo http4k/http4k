@@ -18,7 +18,6 @@ import org.http4k.lens.value
 import org.http4k.routing.bind
 import org.http4k.template.DatastarElementRenderer
 import org.http4k.template.TemplateRenderer
-import org.http4k.template.ViewModel
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.TraceStore
@@ -66,5 +65,3 @@ fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
         }
     }
 }
-
-data class TraceDiagramView(val mermaidDiagram: String) : ViewModel
