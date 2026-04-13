@@ -5,7 +5,7 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.Client
-import org.http4k.ai.mcp.model.Prompt
+import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpPrompt.Get
@@ -29,6 +29,6 @@ private class InMemoryPrompts(capabilities: Iterable<PromptCapability>) : Observ
     override fun list(mcp: McpPrompt.List.Request, client: Client, http: Request) =
         McpPrompt.List.Response(items.map(PromptCapability::toPrompt))
 
-    override fun invoke(name: Prompt) = items.find { it.toPrompt().name == name } ?: throw McpException(MethodNotFound)
+    override fun invoke(name: PromptName) = items.find { it.name == name.value } ?: throw McpException(MethodNotFound)
 }
 
