@@ -15,6 +15,7 @@ import org.http4k.testing.Approver
 import org.http4k.wiretap.HttpWiretapFunctionContract
 import org.http4k.wiretap.McpWiretapFunctionContract
 import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import org.junit.jupiter.api.Test
 
 class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
@@ -23,7 +24,7 @@ class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
 
     private val traceStore = TraceStore.InMemory()
 
-    override val function = GetTraceDiagrams(traceStore)
+    override val function = GetTraceDiagrams(traceStore, defaultTraceReportTabs)
 
     private fun recordSpan(
         traceId: String,

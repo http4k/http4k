@@ -39,6 +39,8 @@ import org.http4k.wiretap.mcp_api.DebugRequestPrompt
 import org.http4k.wiretap.mcp_api.WiretapMcp
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
+import org.http4k.wiretap.otel.breakdown.TabContentRenderer
+import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import org.http4k.wiretap.proxy.Proxy
 import org.http4k.wiretap.traffic.Traffic
 import org.http4k.wiretap.util.CatchAndReportErrors
@@ -67,7 +69,8 @@ object Wiretap {
         clock: Clock = Clock.systemUTC(),
         random: Random = SecureRandom(byteArrayOf()),
         bodyHydration: BodyHydration = All,
-        livingDocSections: List<LivingDocSection> = defaultLivingDocSections
+        livingDocSections: List<LivingDocSection> = defaultLivingDocSections,
+        traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs
     ): PolyHandler {
 
         val html = Templates()
@@ -101,7 +104,7 @@ object Wiretap {
         val baseFunctions = listOf(
             Traffic(transactionStore, viewStore, clock),
             Chaos(inboundChaos, outboundChaos),
-            OTel(traceStore, logStore, transactionStore, clock, livingDocSections),
+            OTel(traceStore, logStore, transactionStore, clock, livingDocSections, traceReportTabs),
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),

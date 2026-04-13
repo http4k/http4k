@@ -21,15 +21,16 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.otel.breakdown.TabContentRenderer
 import org.http4k.wiretap.otel.breakdown.TraceBreakdownView
 import org.http4k.wiretap.otel.breakdown.renderTraceBreakdownView
 import org.http4k.wiretap.util.Json
 
-fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
+fun GetTraceDiagrams(traceStore: TraceStore, traceReportTabs: List<TabContentRenderer>) = object : WiretapFunction {
     private fun lookup(traceId: OtelTraceId, html: TemplateRenderer): TraceBreakdownView? {
         val spans = traceStore.get(traceId)
         if (spans.isEmpty()) return null
-        return html.renderTraceBreakdownView(spans.toTraceDetail(traceId))
+        return html.renderTraceBreakdownView(spans.toTraceDetail(traceId), traceReportTabs)
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

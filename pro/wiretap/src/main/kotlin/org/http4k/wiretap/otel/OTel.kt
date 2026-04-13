@@ -14,6 +14,8 @@ import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.livingdoc.LivingDocSection
+import org.http4k.wiretap.otel.breakdown.TabContentRenderer
+import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import java.time.Clock
 
 fun OTel(
@@ -21,12 +23,13 @@ fun OTel(
     logStore: LogStore,
     transactionStore: TransactionStore,
     clock: Clock,
-    livingDocSections: List<LivingDocSection>
+    livingDocSections: List<LivingDocSection>,
+    traceReportTabs: List<TabContentRenderer>
 ) = object : WiretapFunction {
     private val functions = listOf(
         ListTraces(traceStore, clock),
         GetTrace(traceStore, logStore, clock),
-        GetTraceDiagrams(traceStore),
+        GetTraceDiagrams(traceStore, traceReportTabs),
         GetTraceMarkdown(traceStore, transactionStore, livingDocSections),
     )
 
