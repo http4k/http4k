@@ -1,0 +1,31 @@
+<div class="timing-table" style="padding: 1rem;">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Operation</th>
+                <th>Kind</th>
+                <th style="text-align: right;">Duration</th>
+                <th style="width: 30%;">% of Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <#list timingEntries as entry>
+            <tr<#if entry.error> style="color: #dc3545;"</#if>>
+                <td>${entry.serviceName}</td>
+                <td>${entry.operation}</td>
+                <td>${entry.kind}</td>
+                <td style="text-align: right;">${entry.durationMs}ms</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+                            <div style="width: ${entry.percentOfTotal}%; background: <#if entry.error>#e57373<#else>#90a4ae</#if>; height: 100%; border-radius: 4px;"></div>
+                        </div>
+                        <span style="min-width: 3rem; text-align: right;">${entry.percentOfTotal?string("0.#")}%</span>
+                    </div>
+                </td>
+            </tr>
+            </#list>
+        </tbody>
+    </table>
+</div>

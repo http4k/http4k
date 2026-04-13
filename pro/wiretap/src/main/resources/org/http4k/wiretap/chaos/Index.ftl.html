@@ -1,8 +1,8 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle="Chaos">
 <body data-signals="${initialSignals}">
 <#assign navChaos=true>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 <div class="chaos-page">
     <div id="chaos-status" class="chaos-status-panel" data-init="@get('/_wiretap/chaos/status')">
     </div>

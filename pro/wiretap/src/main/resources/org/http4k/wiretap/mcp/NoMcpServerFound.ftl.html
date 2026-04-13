@@ -1,11 +1,11 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle="MCP">
 <body class="d-flex flex-column h-100" data-signals="${initialSignals}">
 <#assign navMCP=true>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 
 <div class="empty" style="flex: 1; font-size: 24px;">No MCP Server Found</div>
 
-<#include "/org/http4k/wiretap/footer">
+<#include "/org/http4k/wiretap/footer.ftl.html">
 </body>
 </@layout.page>

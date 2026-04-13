@@ -1,8 +1,8 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle=pageTitle>
 <body data-signals="${initialSignals}">
 <#assign navInbound=navInbound!false navOutbound=navOutbound!false>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 <div class="client-page">
     <div class="client-request-section">
         <form class="client-toolbar" data-on:submit__prevent="@post('${basePath?no_esc}send')">
@@ -30,7 +30,7 @@
                     <h4>Headers</h4>
                     <div id="client-headers" class="client-headers">
                         <#assign rows=initialHeaderRows.rows basePath=initialHeaderRows.basePath showAdd=initialHeaderRows.showAdd>
-                        <#include "/org/http4k/wiretap/client/HeaderRowsView">
+                        <#include "/org/http4k/wiretap/client/HeaderRowsView.ftl.html">
                     </div>
                 </div>
                 <div class="client-section">
@@ -56,6 +56,6 @@
         <div id="detail-panel" class="empty">Send a request to see the response</div>
     </div>
 </div>
-<#include "/org/http4k/wiretap/footer">
+<#include "/org/http4k/wiretap/footer.ftl.html">
 </body>
 </@layout.page>

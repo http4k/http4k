@@ -1,8 +1,8 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle="Traffic">
 <body data-signals="${initialSignals}">
 <#assign navTraffic=true>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 <div class="top-tabs" id="tab-bar" data-init="@get('/_wiretap/traffic/views')"></div>
 <div class="top-add-tab" data-show="$showAddView">
     <input type="text" class="form-control form-control-sm" placeholder="Tab name..." data-bind="name">
@@ -54,6 +54,6 @@
     <div id="detail-panel" class="empty">Select a transaction</div>
     </#if>
 </div>
-<#include "/org/http4k/wiretap/footer">
+<#include "/org/http4k/wiretap/footer.ftl.html">
 </body>
 </@layout.page>

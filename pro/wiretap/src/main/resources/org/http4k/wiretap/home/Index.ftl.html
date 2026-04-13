@@ -1,8 +1,8 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle="Overview">
 <body>
 <#assign navOverview=true>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="app-layout">
     <div class="overview-page">
@@ -12,6 +12,6 @@
     </div>
 </div>
 </div>
-<#include "/org/http4k/wiretap/footer">
+<#include "/org/http4k/wiretap/footer.ftl.html">
 </body>
 </@layout.page>

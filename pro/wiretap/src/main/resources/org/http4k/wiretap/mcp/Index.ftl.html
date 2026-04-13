@@ -1,8 +1,8 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle="MCP">
 <body class="d-flex flex-column h-100" data-signals="${initialSignals}">
 <#assign navMCP=true>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 
 <div class="mcp-client-subnav">
     <div class="mcp-client-tab" data-class-mcp-client-tab-active="$activeTab==='tools'"
@@ -25,6 +25,6 @@
 <div class="app-layout mcp-client-layout" id="mcp-content" data-init="@get('/_wiretap/mcp/tools')">
 </div>
 
-<#include "/org/http4k/wiretap/footer">
+<#include "/org/http4k/wiretap/footer.ftl.html">
 </body>
 </@layout.page>

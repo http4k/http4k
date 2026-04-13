@@ -1,8 +1,8 @@
-<#import "/org/http4k/wiretap/layout" as layout>
+<#import "/org/http4k/wiretap/layout.ftl.html" as layout>
 <@layout.page pageTitle="OTel">
 <body data-signals="${initialSignals}">
 <#assign navOTel=true>
-<#include "/org/http4k/wiretap/header">
+<#include "/org/http4k/wiretap/header.ftl.html">
 <div class="app-layout otel-layout">
     <div class="otel-trace-list">
         <div class="trace-list-header">
@@ -48,6 +48,6 @@ window._mermaidRender = async function() {
 };
 window._mermaidRender();
 </script>
-<#include "/org/http4k/wiretap/footer">
+<#include "/org/http4k/wiretap/footer.ftl.html">
 </body>
 </@layout.page>
