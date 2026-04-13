@@ -59,9 +59,9 @@ import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
-import org.http4k.ai.mcp.server.capability.ServerCancellations
-import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerRoots
+import org.http4k.ai.mcp.server.capability.cancellations
+import org.http4k.ai.mcp.server.capability.initializer
+import org.http4k.ai.mcp.server.capability.roots
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.logger
@@ -148,12 +148,12 @@ class McpProtocolTest {
 
     @Test
     fun `update roots`() {
-        val roots = ServerRoots()
+        val roots = roots()
 
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 roots = roots,
                 random = random
             ),
@@ -177,7 +177,7 @@ class McpProtocolTest {
 
     @Test
     fun `handles cancellations`() {
-        val cancellations = ServerCancellations()
+        val cancellations = cancellations()
 
         val id = McpMessageId.of(123456789)
 
@@ -191,7 +191,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 cancellations = cancellations,
                 random = random
             ),
@@ -215,7 +215,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 prompts = prompts(
                     listOf(
                         prompt bind {
@@ -277,7 +277,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 resources = res,
                 random = random
             ),
@@ -350,7 +350,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 resources = res,
                 random = random
             ),
@@ -439,7 +439,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 tools = tools,
                 random = random
             ),
@@ -545,7 +545,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 logger = logger,
                 random = random
             ),
@@ -588,7 +588,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 completions = completions,
                 random = random
             ),
@@ -626,7 +626,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 completions = completions,
                 random = random
             ),
@@ -687,7 +687,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 tools = tools(listOf(tool bind { Ok("") })),
                 random = random
             ),
@@ -723,7 +723,7 @@ class McpProtocolTest {
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 tools = tools(listOf(tool bind {
                     Ok(
                         McpJson.asFormatString(

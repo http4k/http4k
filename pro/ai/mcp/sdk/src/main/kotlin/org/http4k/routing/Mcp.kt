@@ -20,7 +20,7 @@ import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.ai.mcp.server.capability.ServerCapability
-import org.http4k.ai.mcp.server.capability.ServerInitializer
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.capability.completions
@@ -160,7 +160,7 @@ fun mcpStdIo(
     mcpFilter: McpFilter = McpFilter.NoOp,
 ) = McpProtocol(
     StdIoMcpSessions(writer),
-    ServerInitializer(SimpleInitializeHandler(metadata)),
+    initializer(SimpleInitializeHandler(metadata)),
     tools(capabilities.filterIsInstance<ToolCapability>()),
     resources(capabilities.filterIsInstance<ResourceCapability>()),
     prompts(capabilities.filterIsInstance<PromptCapability>()),

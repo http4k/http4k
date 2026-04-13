@@ -18,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 fun resources(vararg resources: ResourceCapability): ObservableResources = resources(resources.toList())
 
-fun resources(list: Iterable<ResourceCapability>): ObservableResources = ServerResources(list)
+fun resources(list: Iterable<ResourceCapability>): ObservableResources = InMemoryResources(list)
 
-private class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list),
+private class InMemoryResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list),
     ObservableResources {
 
     private val subscriptions = ConcurrentHashMap<Pair<Uri, Session>, Set<(Uri) -> Unit>>()

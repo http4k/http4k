@@ -43,7 +43,7 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.server.capability.ServerInitializer
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.prompts
@@ -105,7 +105,7 @@ abstract class McpClientContract<T> : PortBasedTest {
     ) {
         val protocol = McpProtocol(
             clientSessions(),
-            ServerInitializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
+            initializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
             tools = tools,
             resources = resources,
             tasks = tasks,

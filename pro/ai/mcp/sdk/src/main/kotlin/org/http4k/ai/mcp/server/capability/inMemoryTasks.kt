@@ -16,9 +16,9 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import java.util.concurrent.CopyOnWriteArrayList
 
-fun tasks(storage: TaskStorage = TaskStorage.InMemory()): Tasks = ServerTasks(storage)
+fun tasks(storage: TaskStorage = TaskStorage.InMemory()): Tasks = InMemoryTasks(storage)
 
-private class ServerTasks(private val storage: TaskStorage = TaskStorage.InMemory()) : Tasks {
+private class InMemoryTasks(private val storage: TaskStorage = TaskStorage.InMemory()) : Tasks {
     private val callbacks = CopyOnWriteArrayList<TaskUpdateCallback>()
 
     override fun get(session: Session, req: McpTask.Get.Request, client: Client, http: Request): McpTask.Get.Response {

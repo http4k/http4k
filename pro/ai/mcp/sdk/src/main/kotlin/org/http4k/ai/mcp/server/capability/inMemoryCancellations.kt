@@ -9,7 +9,7 @@ import org.http4k.ai.mcp.server.protocol.CancellationCallback
 import org.http4k.ai.mcp.server.protocol.Cancellations
 import java.util.concurrent.CopyOnWriteArrayList
 
-class ServerCancellations : Cancellations {
+fun cancellations() = object : Cancellations {
     private val callbacks = CopyOnWriteArrayList<CancellationCallback>()
 
     override fun onCancel(callback: CancellationCallback) {

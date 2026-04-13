@@ -26,7 +26,7 @@ import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.capability.ServerInitializer
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.prompts
@@ -130,7 +130,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
 
         val protocol = McpProtocol(
             HttpSessions(sessionProvider = SessionProvider.Random(Random(0))).apply { start() },
-            ServerInitializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
+            initializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
             tools,
             resources(
                 Resource.Static(

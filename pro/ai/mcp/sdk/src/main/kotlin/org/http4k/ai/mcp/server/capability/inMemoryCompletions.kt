@@ -12,17 +12,16 @@ import org.http4k.ai.mcp.server.protocol.Completions
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 
-fun completions(vararg tools: CompletionCapability): Completions = completions(tools.toList())
+fun completions(vararg capabilities: CompletionCapability): Completions = completions(capabilities.toList())
 
-fun completions(list: Iterable<CompletionCapability>): Completions = ServerCompletions(list)
-
-private class ServerCompletions(private val bindings: Iterable<CompletionCapability>) : Completions {
+fun completions(capabilities: Iterable<CompletionCapability>): Completions = object : Completions {
 
     override fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
-        bindings.find { it.toReference() == mcp.ref }
+        capabilities.find { it.toReference() == mcp.ref }
             ?.complete(mcp, client, http)
             ?: throw McpException(InvalidParams)
 
-    override fun invoke(p1: Reference) = bindings.find { it.toReference() == p1 }
+    override fun invoke(p1: Reference) = capabilities.find { it.toReference() == p1 }
         ?: throw McpException(InvalidParams)
 }
+

@@ -47,7 +47,7 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.server.capability.ServerInitializer
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.prompts
@@ -125,7 +125,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 prompts = serverPrompts, random = random
             ), NoMcpSecurity
         ).testMcpClient()
@@ -180,7 +180,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 resources = serverResources,
                 random = random
             ),
@@ -236,7 +236,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 resources = serverResources,
                 random = random
             ),
@@ -284,7 +284,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 tools = serverTools,
                 random = random
             ),
@@ -356,7 +356,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 completions = serverCompletions,
                 random = random
             ),
@@ -389,7 +389,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 completions = serverCompletions,
                 random = random
             ),
@@ -433,7 +433,7 @@ class TestMcpClientTest {
         val mcp = HttpStreamingMcp(
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
-                ServerInitializer(SimpleInitializeHandler(metadata)),
+                initializer(SimpleInitializeHandler(metadata)),
                 tools = tools(
                     Tool("sample", "description") bind {
                         val samplingRequest = it.client.sample(

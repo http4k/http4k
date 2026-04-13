@@ -11,7 +11,9 @@ import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.server.protocol.Roots
 import org.http4k.ai.mcp.util.ObservableList
 
-class ServerRoots : ObservableList<Root>(emptyList()), Roots {
+fun roots(): Roots = InMemoryRoots()
+
+private class InMemoryRoots : ObservableList<Root>(emptyList()), Roots {
     override fun update(req: McpRoot.List.Response): CompletionStatus {
         items = req.roots
         return Finished

@@ -16,9 +16,9 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 
 fun tools(vararg tools: ToolCapability): Tools = tools(tools.toList())
 
-fun tools(list: Iterable<ToolCapability>): Tools = ServerTools(list)
+fun tools(list: Iterable<ToolCapability>): Tools = InMemoryTools(list)
 
-private class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
+private class InMemoryTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
     override fun list(req: McpTool.List.Request, client: Client, http: Request): McpTool.List.Response =
         McpTool.List.Response(items.map(ToolCapability::toTool))
 

@@ -33,11 +33,11 @@ import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
-import org.http4k.ai.mcp.server.capability.ServerCancellations
+import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.server.capability.completions
-import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerRoots
+import org.http4k.ai.mcp.server.capability.initializer
+import org.http4k.ai.mcp.server.capability.roots
 import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
@@ -74,8 +74,8 @@ class McpProtocol<Transport>(
     private val prompts: Prompts = prompts(),
     private val completions: Completions = completions(),
     private val logger: Logger = logger(),
-    private val roots: Roots = ServerRoots(),
-    private val cancellations: Cancellations = ServerCancellations(),
+    private val roots: Roots = roots(),
+    private val cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
     private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
@@ -88,7 +88,7 @@ class McpProtocol<Transport>(
         vararg capabilities: ServerCapability,
     ) : this(
         sessions,
-        ServerInitializer(SimpleInitializeHandler(metaData)),
+        initializer(SimpleInitializeHandler(metaData)),
         tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
@@ -102,7 +102,7 @@ class McpProtocol<Transport>(
         vararg capabilities: ServerCapability,
     ) : this(
         sessions,
-        ServerInitializer(initializeHandler),
+        initializer(initializeHandler),
         tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),

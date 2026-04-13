@@ -11,9 +11,7 @@ import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 
-fun logger(): Logger = ServerLogger()
-
-private class ServerLogger : Logger {
+fun logger(): Logger = object : Logger {
 
     private val logLevels = ConcurrentHashMap<Session, LogLevel>()
     private val subscriptions = ConcurrentHashMap<Session, LogFunction>()
