@@ -20,13 +20,13 @@ import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.ai.mcp.server.capability.ServerCapability
-import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerPrompts
-import org.http4k.ai.mcp.server.capability.ServerResources
-import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
@@ -161,10 +161,10 @@ fun mcpStdIo(
 ) = McpProtocol(
     StdIoMcpSessions(writer),
     ServerInitializer(SimpleInitializeHandler(metadata)),
-    ServerTools(capabilities.filterIsInstance<ToolCapability>()),
-    ServerResources(capabilities.filterIsInstance<ResourceCapability>()),
-    ServerPrompts(capabilities.filterIsInstance<PromptCapability>()),
-    ServerCompletions(capabilities.filterIsInstance<CompletionCapability>()),
+    tools(capabilities.filterIsInstance<ToolCapability>()),
+    resources(capabilities.filterIsInstance<ResourceCapability>()),
+    prompts(capabilities.filterIsInstance<PromptCapability>()),
+    completions(capabilities.filterIsInstance<CompletionCapability>()),
     mcpFilter = mcpFilter,
 ).apply {
     executor.schedule({

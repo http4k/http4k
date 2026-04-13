@@ -47,12 +47,12 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerPrompts
-import org.http4k.ai.mcp.server.capability.ServerResources
-import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
+import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -112,8 +112,7 @@ class TestMcpClientTest {
         val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title", icons = icons)
 
-        val serverPrompts = ServerPrompts(
-            listOf(
+        val serverPrompts = prompts(
                 prompt bind {
                     PromptResponse.Ok(
                         listOf(
@@ -122,7 +121,6 @@ class TestMcpClientTest {
                         "description",
                     )
                 }
-            )
         )
         val mcp = HttpStreamingMcp(
             McpProtocol(
@@ -177,7 +175,7 @@ class TestMcpClientTest {
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description", icons = icons)
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val serverResources = ServerResources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
+        val serverResources = resources(resource bind { ResourceResponse.Ok(listOf(content)) })
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
@@ -233,7 +231,7 @@ class TestMcpClientTest {
             )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), uri)
 
-        val serverResources = ServerResources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
+        val serverResources = resources(resource bind { ResourceResponse.Ok(listOf(content)) })
 
         val mcp = HttpStreamingMcp(
             McpProtocol(
@@ -274,7 +272,7 @@ class TestMcpClientTest {
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val serverTools = ServerTools(listOf(tool bind {
+        val serverTools = tools(listOf(tool bind {
             MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
                 it.client.progress(p, 1, 5.0)
                 it.client.progress(p, 2, 5.0)
@@ -351,7 +349,7 @@ class TestMcpClientTest {
     @Test
     fun `deal with completions`() {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
-        val serverCompletions = ServerCompletions(
+        val serverCompletions = completions(
             listOf(ref bind { CompletionResponse.Ok(listOf("values"), 1, true) })
         )
 
@@ -378,7 +376,7 @@ class TestMcpClientTest {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
 
         val progress = Progress("hello", 1, 1.0)
-        val serverCompletions = ServerCompletions(
+        val serverCompletions = completions(
             listOf(ref bind {
                 MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
                     it.client.progress(p, progress.progress, progress.total)
@@ -436,7 +434,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 ServerInitializer(SimpleInitializeHandler(metadata)),
-                tools = ServerTools(
+                tools = tools(
                     Tool("sample", "description") bind {
                         val samplingRequest = it.client.sample(
                             SamplingRequest(

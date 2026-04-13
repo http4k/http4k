@@ -5,13 +5,16 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.core.Request
+import org.http4k.core.Uri
 
 /**
  * Handles protocol traffic for resources features and subscriptions.
  */
-interface Resources {
+interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler {
 
     fun listResources(req: McpResource.List.Request, client: Client, http: Request): McpResource.List.Response
 

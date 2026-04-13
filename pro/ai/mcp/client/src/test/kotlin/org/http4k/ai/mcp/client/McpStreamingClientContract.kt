@@ -30,9 +30,9 @@ import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.server.capability.ServerResources
-import org.http4k.ai.mcp.server.capability.ServerTasks
-import org.http4k.ai.mcp.server.capability.ServerTools
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tasks
+import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
@@ -65,7 +65,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
             SamplingResponse.Ok(model, Assistant, listOf(Content.Text("world")), StopReason.of("foobar"))
         )
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("sample", "description") bind {
                 val received = it.client.sample(
                     SamplingRequest(listOf(), MaxTokens.of(1)),
@@ -103,7 +103,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
         val response = StreamingFooBar().apply { foo = "foo" }
         val elicitationId = ElicitationId.of("test-elicitation-123")
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("elicit", "description") bind {
                 val request = ElicitationRequest.Form("foobar", output, progressToken = MetaKey.progressToken<Any>().toLens()(it.meta))
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
@@ -164,7 +164,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
         val now = Instant.now()
         val expectedTask = Task(taskId, TaskStatus.working, "Processing elicitation...", now, now)
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("elicit-task", "description") bind {
                 val request = ElicitationRequest.Form("foobar", output, progressToken = MetaKey.progressToken<Any>().toLens()(it.meta))
                 val received = it.client.elicit(request, Duration.ofSeconds(1))
@@ -192,7 +192,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
 
     @Test
     fun `can do progress`() {
-        val tools = ServerTools(
+        val tools = tools(
             Tool("progress", "description") bind {
                 it.client.progress(MetaKey.progressToken<Any>().toLens()(it.meta) ?: "unknown", 1, 2.0)
                 Ok(listOf(Content.Text("")))
@@ -221,7 +221,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
         val receivedTask = AtomicReference<Task>()
         val latch = CountDownLatch(1)
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("start-task", "starts a task") bind {
                 it.client.updateTask(workingTask)
                 Ok(Content.Text("started"))
@@ -251,7 +251,7 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
         val receivedMeta = AtomicReference<Meta>()
         val latch = CountDownLatch(1)
 
-        val serverTasks = ServerTasks()
+        val serverTasks = tasks()
         serverTasks.onUpdate { t, m ->
             receivedTask.set(t)
             receivedMeta.set(m)
@@ -273,13 +273,13 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
     fun `can subscribe to resource updates`() {
         val resourceUri = Uri.of("test://resource/1")
 
-        val resources = ServerResources(
+        val resources = resources(
             Resource.Static(resourceUri, ResourceName.of("test-resource"), "A test resource") bind {
                 ResourceResponse.Ok(listOf(Resource.Content.Text("content", resourceUri)))
             }
         )
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("trigger-update", "triggers a resource update") bind {
                 resources.triggerUpdated(resourceUri)
                 Ok(Content.Text("triggered"))

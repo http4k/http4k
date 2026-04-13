@@ -26,12 +26,12 @@ import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerPrompts
-import org.http4k.ai.mcp.server.capability.ServerResources
-import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
+import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -124,7 +124,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
     @Test
     fun `resume a stream`() {
         val toolArg = Tool.Arg.string().required("name")
-        val tools = ServerTools(Tool("reverse", "description", toolArg) bind {
+        val tools = tools(Tool("reverse", "description", toolArg) bind {
             Ok(listOf(Content.Text(toolArg(it).reversed())))
         })
 
@@ -132,7 +132,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
             HttpSessions(sessionProvider = SessionProvider.Random(Random(0))).apply { start() },
             ServerInitializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
             tools,
-            ServerResources(
+            resources(
                 Resource.Static(
                     Uri.of("https://http4k.org"),
                     ResourceName.of("HTTP4K"),
@@ -140,10 +140,10 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
                 ) bind {
                     ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of(""))))
                 }),
-            ServerPrompts(Prompt(PromptName.of("prompt"), "description1") bind {
+            prompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse.Ok(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),
-            ServerCompletions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
+            completions(Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
                 CompletionResponse.Ok(listOf("1", "2"))
             })
         )

@@ -2,13 +2,18 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.ai.mcp.server.protocol
+package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.model.LogLevel
+import org.http4k.ai.mcp.server.protocol.LogFunction
+import org.http4k.ai.mcp.server.protocol.Logger
+import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 
-class ServerLogger : Logger {
+fun logger(): Logger = ServerLogger()
+
+private class ServerLogger : Logger {
 
     private val logLevels = ConcurrentHashMap<Session, LogLevel>()
     private val subscriptions = ConcurrentHashMap<Session, LogFunction>()

@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class ServerTasksTest {
 
-    private val tasks = ServerTasks()
+    private val tasks = tasks()
     private val session1 = Session(SessionId.of("session-1"))
     private val session2 = Session(SessionId.of("session-2"))
     private val testRequest = Request(GET, "/test")

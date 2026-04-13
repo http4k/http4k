@@ -5,6 +5,8 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.ResourceRequest
+import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
@@ -67,8 +69,13 @@ class DirectoryResources(
         )
     )
 
-    override fun read(req: McpResource.Read.Request, client: Client, http: Request): McpResource.Read.Response {
-        val path = req.uri.toString().substringAfter("file://")
+    override fun invoke(resourceRequest: ResourceRequest) = ResourceResponse.Ok(load(resourceRequest.uri))
+
+    override fun read(req: McpResource.Read.Request, client: Client, http: Request) =
+        McpResource.Read.Response(load(req.uri))
+
+    private fun load(uri: Uri): List<Resource.Content> {
+        val path = uri.toString().substringAfter("file://")
         when {
             path.contains(separatorChar) && recursive == Flat -> throw McpException(InvalidParams)
 
@@ -77,21 +84,20 @@ class DirectoryResources(
                 val contentType = mimeTypes.forFile(file.name)
 
                 return when {
-                    file.isFile && file.exists() -> McpResource.Read.Response(
+                    file.isFile && file.exists() ->
                         listOf(
                             when {
                                 isText(contentType.withNoDirectives()) -> Resource.Content.Text(
                                     file.readText(),
-                                    req.uri,
+                                    uri,
                                     MimeType.of(contentType)
                                 )
 
                                 else -> Resource.Content.Blob(
-                                    Base64Blob.encode(file.readBytes()), req.uri, MimeType.of(contentType)
+                                    Base64Blob.encode(file.readBytes()), uri, MimeType.of(contentType)
                                 )
                             }
                         )
-                    )
 
                     else -> throw McpException(InvalidParams)
                 }
@@ -106,6 +112,11 @@ class DirectoryResources(
         size = null,
         annotations = null
     )
+
+    override var items: Iterable<ResourceCapability>
+        get() = throw UnsupportedOperationException()
+        set(value) = throw UnsupportedOperationException()
+
 
     companion object {
         val DEFAULT_TEXT_TYPES =

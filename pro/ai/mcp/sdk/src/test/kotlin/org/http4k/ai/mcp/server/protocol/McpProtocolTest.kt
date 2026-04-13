@@ -60,13 +60,14 @@ import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.server.capability.ServerCancellations
-import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerPrompts
-import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerRoots
-import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
+import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.logger
+import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.ai.mcp.server.sse.SseMcp
@@ -215,7 +216,7 @@ class McpProtocolTest {
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
                 ServerInitializer(SimpleInitializeHandler(metadata)),
-                prompts = ServerPrompts(
+                prompts = prompts(
                     listOf(
                         prompt bind {
                             PromptResponse.Ok(
@@ -271,13 +272,13 @@ class McpProtocolTest {
         )
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 
-        val resources = ServerResources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
+        val res = resources(listOf(resource bind { ResourceResponse.Ok(listOf(content)) }))
 
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
                 ServerInitializer(SimpleInitializeHandler(metadata)),
-                resources = resources,
+                resources = res,
                 random = random
             ),
             NoMcpSecurity
@@ -313,7 +314,7 @@ class McpProtocolTest {
 
             assertNextMessage(ServerMessage.Response.Empty)
 
-            resources.triggerUpdated(resource.uri)
+            res.triggerUpdated(resource.uri)
 
             assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
 
@@ -321,7 +322,7 @@ class McpProtocolTest {
 
             assertNextMessage(ServerMessage.Response.Empty)
 
-            resources.triggerUpdated(resource.uri)
+            res.triggerUpdated(resource.uri)
 
             assertNoResponse()
         }
@@ -339,7 +340,7 @@ class McpProtocolTest {
                 IMAGE_GIF, Size.of(1), Annotations(listOf(Assistant), Priority.of(1.0)), null, icons
             )
 
-        val resources = ServerResources(listOf(resource bind {
+        val res = resources(listOf(resource bind {
             ResourceResponse.Ok(
                 listOf(
                     Resource.Content.Blob(Base64Blob.encode("image"), it.uri)
@@ -350,7 +351,7 @@ class McpProtocolTest {
             McpProtocol(
                 SseSessions(SessionProvider.Random(Random(0))),
                 ServerInitializer(SimpleInitializeHandler(metadata)),
-                resources = resources,
+                resources = res,
                 random = random
             ),
             NoMcpSecurity
@@ -420,8 +421,7 @@ class McpProtocolTest {
         val content =
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
-        val tools = ServerTools(
-            listOf(
+        val tools = tools(
                 unstructuredTool bind {
                     val stringArg1 = stringArg(it)
                     val intArg1 = intArg(it)
@@ -433,7 +433,7 @@ class McpProtocolTest {
 
                     Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
                 },
-                structuredTool bind { Ok().with(output of FooBar("bar")) })
+            structuredTool bind { Ok().with(output of FooBar("bar")) }
         )
 
         val mcp = SseMcp(
@@ -541,7 +541,7 @@ class McpProtocolTest {
 
     @Test
     fun `deal with logger`() {
-        val logger = ServerLogger()
+        val logger = logger()
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
@@ -574,15 +574,15 @@ class McpProtocolTest {
     @Test
     fun `deal with completions`() {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
-        val completions = ServerCompletions(
-            listOf(ref bind {
+        val completions = completions(
+            ref bind {
                 MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
                     it.client.progress(p, 1, 5.0, "d1")
                     it.client.progress(p, 2, 5.0, "d2")
                 }
 
                 CompletionResponse.Ok(listOf("values"), 1, true)
-            })
+            }
         )
 
         val mcp = SseMcp(
@@ -619,7 +619,7 @@ class McpProtocolTest {
     @Test
     fun `can handle batched messages`() {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
-        val completions = ServerCompletions(
+        val completions = completions(
             listOf(ref bind { CompletionResponse.Ok(listOf("values"), 1, true) })
         )
 
@@ -688,7 +688,7 @@ class McpProtocolTest {
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
                 ServerInitializer(SimpleInitializeHandler(metadata)),
-                tools = ServerTools(listOf(tool bind { Ok("") })),
+                tools = tools(listOf(tool bind { Ok("") })),
                 random = random
             ),
             NoMcpSecurity
@@ -724,7 +724,7 @@ class McpProtocolTest {
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
                 ServerInitializer(SimpleInitializeHandler(metadata)),
-                tools = ServerTools(listOf(tool bind {
+                tools = tools(listOf(tool bind {
                     Ok(
                         McpJson.asFormatString(
                             mapOf(

@@ -43,16 +43,21 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.server.capability.ServerCompletions
 import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerPrompts
-import org.http4k.ai.mcp.server.capability.ServerResources
-import org.http4k.ai.mcp.server.capability.ServerTasks
-import org.http4k.ai.mcp.server.capability.ServerTools
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
+import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tasks
+import org.http4k.ai.mcp.server.capability.tools
+import org.http4k.ai.mcp.server.protocol.Completions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.protocol.Prompts
+import org.http4k.ai.mcp.server.protocol.Resources
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
+import org.http4k.ai.mcp.server.protocol.Tasks
+import org.http4k.ai.mcp.server.protocol.Tools
 import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.ai.mcp.server.sessions.SessionEventTracking
 import org.http4k.ai.mcp.server.sessions.SessionProvider
@@ -91,11 +96,11 @@ abstract class McpClientContract<T> : PortBasedTest {
     val sessionProvider = SessionProvider.Random(Random(0))
 
     fun withMcpServer(
-        tools: ServerTools = ServerTools(),
-        resources: ServerResources = ServerResources(),
-        prompts: ServerPrompts = ServerPrompts(),
-        completions: ServerCompletions = ServerCompletions(),
-        tasks: ServerTasks = ServerTasks(),
+        tools: Tools = tools(),
+        resources: Resources = resources(),
+        prompts: Prompts = prompts(),
+        completions: Completions = completions(),
+        tasks: Tasks = tasks(),
         test: McpClient.() -> Unit
     ) {
         val protocol = McpProtocol(
@@ -135,7 +140,7 @@ abstract class McpClientContract<T> : PortBasedTest {
 
     @Test
     fun `can list and get prompts`() {
-        val prompts = ServerPrompts(
+        val prompts = prompts(
             Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse.Ok(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }
@@ -153,7 +158,7 @@ abstract class McpClientContract<T> : PortBasedTest {
 
     @Test
     fun `can list and read resources`() {
-        val resources = ServerResources(
+        val resources = resources(
             Resource.Static(
                 Uri.of("https://http4k.org"),
                 ResourceName.of("HTTP4K"),
@@ -182,7 +187,7 @@ abstract class McpClientContract<T> : PortBasedTest {
 
     @Test
     fun `can complete references`() {
-        val completions = ServerCompletions(
+        val completions = completions(
             Reference.ResourceTemplate(Uri.of("https://http4k.org")) bind {
                 CompletionResponse.Ok(listOf("1", "2"))
             }
@@ -207,7 +212,7 @@ abstract class McpClientContract<T> : PortBasedTest {
         val toolArg = Tool.Arg.string().required("name")
         val output = Tool.Output.auto(FooBar("bar")).toLens()
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("reverse", "description", toolArg) bind {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             },
@@ -235,7 +240,7 @@ abstract class McpClientContract<T> : PortBasedTest {
         if (!doesNotifications) return
 
         val toolArg = Tool.Arg.string().required("name")
-        val tools = ServerTools(
+        val tools = tools(
             Tool("reverse", "description", toolArg) bind {
                 ToolResponse.Ok(listOf(Content.Text(toolArg(it).reversed())))
             }
@@ -244,9 +249,7 @@ abstract class McpClientContract<T> : PortBasedTest {
         withMcpServer(tools = tools) {
             val latch = CountDownLatch(1)
 
-            tools().onChange {
-                latch.countDown()
-            }
+            tools().onChange { latch.countDown() }
 
             assertThat(tools().list().coerce<List<McpTool>>().size, equalTo(1))
 
@@ -266,7 +269,7 @@ abstract class McpClientContract<T> : PortBasedTest {
         val completedTask = Task(taskId, TaskStatus.completed, "Done", now, now)
         val expectedResult = mapOf("answer" to "42", "status" to "success")
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("start-task", "starts a task") bind {
                 it.client.updateTask(workingTask)
                 ToolResponse.Ok(Content.Text("started"))
@@ -303,7 +306,7 @@ abstract class McpClientContract<T> : PortBasedTest {
     @Test
     fun `tool can return error response`() {
         val toolArg = Tool.Arg.string().required("name")
-        val tools = ServerTools(
+        val tools = tools(
             Tool("failing", "description", toolArg) bind { ToolResponse.Error("oh no") }
         )
 
@@ -331,7 +334,7 @@ abstract class McpClientContract<T> : PortBasedTest {
             message = "Authorization required"
         )
 
-        val tools = ServerTools(
+        val tools = tools(
             Tool("needs-auth", "tool that requires authorization") bind {
                 elicitationRequired
             }

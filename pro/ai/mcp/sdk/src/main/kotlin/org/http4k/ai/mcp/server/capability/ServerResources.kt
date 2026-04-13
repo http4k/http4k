@@ -5,6 +5,7 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.server.protocol.ObservableResources
@@ -15,10 +16,12 @@ import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import java.util.concurrent.ConcurrentHashMap
 
+fun resources(vararg resources: ResourceCapability): ObservableResources = resources(resources.toList())
 
-class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list),
+fun resources(list: Iterable<ResourceCapability>): ObservableResources = ServerResources(list)
+
+private class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list),
     ObservableResources {
-    constructor(vararg list: ResourceCapability) : this(list.toList())
 
     private val subscriptions = ConcurrentHashMap<Pair<Uri, Session>, Set<(Uri) -> Unit>>()
 
@@ -27,6 +30,11 @@ class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<Resou
             callbacks.forEach { it(uri) }
         }
     }
+
+    override fun invoke(p1: ResourceRequest) = items
+        .find { it.matches(p1.uri) }
+        ?.invoke(p1)
+        ?: throw McpException(InvalidParams)
 
     override fun listResources(req: McpResource.List.Request, client: Client, http: Request) =
         McpResource.List.Response(
@@ -54,8 +62,9 @@ class ServerResources(list: Iterable<ResourceCapability>) : ObservableList<Resou
     }
 
     override fun remove(session: Session) {
-        super.remove(session)
+        super<ObservableList>.remove(session)
         subscriptions.keys.removeIf { it.second == session }
     }
 }
+
 

@@ -35,15 +35,16 @@ import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.ai.mcp.server.capability.ServerCancellations
 import org.http4k.ai.mcp.server.capability.ServerCapability
-import org.http4k.ai.mcp.server.capability.ServerCompletions
+import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.ServerInitializer
-import org.http4k.ai.mcp.server.capability.ServerPrompts
-import org.http4k.ai.mcp.server.capability.ServerResources
 import org.http4k.ai.mcp.server.capability.ServerRoots
-import org.http4k.ai.mcp.server.capability.ServerTasks
-import org.http4k.ai.mcp.server.capability.ServerTools
+import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.ai.mcp.server.capability.logger
+import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.util.McpJson
@@ -59,6 +60,7 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.log
 import kotlin.random.Random
 
 /**
@@ -67,14 +69,14 @@ import kotlin.random.Random
 class McpProtocol<Transport>(
     private val sessions: Sessions<Transport>,
     private val initializer: Initializer,
-    private val tools: Tools = ServerTools(),
-    private val resources: Resources = ServerResources(),
-    private val prompts: Prompts = ServerPrompts(),
-    private val completions: Completions = ServerCompletions(),
-    private val logger: Logger = ServerLogger(),
+    private val tools: Tools = tools(),
+    private val resources: Resources = resources(),
+    private val prompts: Prompts = prompts(),
+    private val completions: Completions = completions(),
+    private val logger: Logger = logger(),
     private val roots: Roots = ServerRoots(),
     private val cancellations: Cancellations = ServerCancellations(),
-    private val tasks: Tasks = ServerTasks(),
+    private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
     private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     private val random: Random = Random,
@@ -87,10 +89,10 @@ class McpProtocol<Transport>(
     ) : this(
         sessions,
         ServerInitializer(SimpleInitializeHandler(metaData)),
-        ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        ServerPrompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
+        resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
+        prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
+        completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
         mcpFilter = mcpFilter,
     )
     constructor(
@@ -101,10 +103,10 @@ class McpProtocol<Transport>(
     ) : this(
         sessions,
         ServerInitializer(initializeHandler),
-        ServerTools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        ServerResources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        ServerPrompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        ServerCompletions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
+        resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
+        prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
+        completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
         mcpFilter = mcpFilter,
     )
 
@@ -355,37 +357,31 @@ class McpProtocol<Transport>(
             )
         }
 
-        if (prompts is ObservableCapability) {
-            prompts.onChange(session) {
-                sessions.request(
-                    context,
-                    McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
-                )
-            }
+        prompts.onChange(session) {
+            sessions.request(
+                context,
+                McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
+            )
         }
 
-        if (resources is ObservableCapability) {
-            resources.onChange(session) {
-                sessions.request(
-                    context,
-                    McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
-                )
-            }
+        resources.onChange(session) {
+            sessions.request(
+                context,
+                McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
+            )
         }
 
-        if (tools is ObservableCapability) {
-            tools.onChange(session) {
-                sessions.request(
-                    context,
-                    McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
-                )
-            }
+        tools.onChange(session) {
+            sessions.request(
+                context,
+                McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
+            )
         }
 
         sessions.onClose(context) {
-            if (prompts is ObservableCapability) prompts.remove(session)
-            if (resources is ObservableCapability) resources.remove(session)
-            if (tools is ObservableCapability) tools.remove(session)
+            prompts.remove(session)
+            resources.remove(session)
+            tools.remove(session)
             logger.unsubscribe(session)
             tasks.remove(session)
         }

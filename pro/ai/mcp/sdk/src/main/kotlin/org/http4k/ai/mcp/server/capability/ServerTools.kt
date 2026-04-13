@@ -9,13 +9,16 @@ import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.Tools
 import org.http4k.ai.mcp.util.ObservableList
+import org.http4k.ai.model.ToolName
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 
+fun tools(vararg tools: ToolCapability): Tools = tools(tools.toList())
 
-class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
-    constructor(vararg list: ToolCapability) : this(list.toList())
+fun tools(list: Iterable<ToolCapability>): Tools = ServerTools(list)
 
+private class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
     override fun list(req: McpTool.List.Request, client: Client, http: Request): McpTool.List.Response =
         McpTool.List.Response(items.map(ToolCapability::toTool))
 
@@ -23,5 +26,7 @@ class ServerTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapabilit
         .find { it.toTool().name == req.name }
         ?.call(req, client, http)
         ?: throw McpException(InvalidParams)
+
+    override fun invoke(name: ToolName) = items.find { it.toTool().name == name } ?: throw McpException(MethodNotFound)
 }
 

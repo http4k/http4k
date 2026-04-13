@@ -5,18 +5,24 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.PromptHandler
+import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpPrompt.Get
 import org.http4k.ai.mcp.server.protocol.Prompts
+import org.http4k.ai.mcp.server.protocol.Tools
 import org.http4k.ai.mcp.util.ObservableList
+import org.http4k.ai.model.ToolName
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 
+fun prompts(vararg tools: PromptCapability): Prompts = prompts(tools.toList())
 
-class ServerPrompts(bindings: Iterable<PromptCapability>) : ObservableList<PromptCapability>(bindings), Prompts {
+fun prompts(list: Iterable<PromptCapability>): Prompts = ServerPrompts(list)
 
-    constructor(vararg bindings: PromptCapability) : this(bindings.toList())
+private class ServerPrompts(bindings: Iterable<PromptCapability>) : ObservableList<PromptCapability>(bindings), Prompts {
 
     override fun get(req: Get.Request, client: Client, http: Request) = items
         .find { it.toPrompt().name == req.name }
@@ -25,5 +31,7 @@ class ServerPrompts(bindings: Iterable<PromptCapability>) : ObservableList<Promp
 
     override fun list(mcp: McpPrompt.List.Request, client: Client, http: Request) =
         McpPrompt.List.Response(items.map(PromptCapability::toPrompt))
+
+    override fun invoke(name: Prompt) = items.find { it.toPrompt().name == name } ?: throw McpException(MethodNotFound)
 }
 
