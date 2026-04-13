@@ -8,11 +8,11 @@ import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.WiretapTransaction
 
 object SpanEventsSection : LivingDocSection {
-    override fun render(detail: TraceDetail, transactions: List<WiretapTransaction>): String {
+    override fun renderMarkdown(detail: TraceDetail, transactions: List<WiretapTransaction>): MarkdownContent {
         val spansWithEvents = detail.spans.filter { it.events.isNotEmpty() }
-        if (spansWithEvents.isEmpty()) return ""
+        if (spansWithEvents.isEmpty()) return MarkdownContent.empty
 
-        return buildString {
+        return MarkdownContent.of(buildString {
             appendLine()
             appendLine("### Events")
             spansWithEvents.forEach { span ->
@@ -24,6 +24,6 @@ object SpanEventsSection : LivingDocSection {
                     }
                 }
             }
-        }
+        })
     }
 }

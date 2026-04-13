@@ -1,0 +1,17 @@
+# String.toString
+
+## Inbound Requests
+
+#### GET /
+
+**Request** `GET / HTTP/1.1`
+
+**Response** `HTTP/1.1 200 OK`
+
+<details><summary>Body</summary>
+
+```
+hello
+```
+
+</details>

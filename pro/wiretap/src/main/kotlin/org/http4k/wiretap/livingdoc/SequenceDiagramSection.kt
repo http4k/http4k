@@ -10,15 +10,15 @@ import org.http4k.wiretap.otel.toMermaid
 import org.http4k.wiretap.otel.toSequenceDiagram
 
 object SequenceDiagramSection : LivingDocSection {
-    override fun render(detail: TraceDetail, transactions: List<WiretapTransaction>): String {
+    override fun renderMarkdown(detail: TraceDetail, transactions: List<WiretapTransaction>): MarkdownContent {
         val diagram = detail.toSequenceDiagram()
-        if (diagram.messages.isEmpty()) return ""
+        if (diagram.messages.isEmpty()) return MarkdownContent.empty
 
-        return buildString {
+        return MarkdownContent.of(buildString {
             appendLine()
             appendLine("```mermaid")
             appendLine(diagram.toMermaid())
             appendLine("```")
-        }
+        })
     }
 }

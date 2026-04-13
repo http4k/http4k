@@ -9,14 +9,14 @@ import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.WiretapTransaction
 
 object OutboundHttpSection : LivingDocSection {
-    override fun render(detail: TraceDetail, transactions: List<WiretapTransaction>): String {
+    override fun renderMarkdown(detail: TraceDetail, transactions: List<WiretapTransaction>): MarkdownContent {
         val outbound = transactions.filter { it.direction == Direction.Outbound }
-        if (outbound.isEmpty()) return ""
+        if (outbound.isEmpty()) return MarkdownContent.empty
 
-        return buildString {
+        return MarkdownContent.of(buildString {
             appendLine()
             appendLine("### Outbound")
             outbound.forEach { append(renderTransaction(it)) }
-        }
+        })
     }
 }

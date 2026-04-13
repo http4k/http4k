@@ -9,10 +9,10 @@ import org.http4k.wiretap.domain.WiretapTransaction
 import org.http4k.wiretap.util.formatBody
 
 object McpDetailSection : LivingDocSection {
-    override fun render(detail: TraceDetail, transactions: List<WiretapTransaction>): String {
+    override fun renderMarkdown(detail: TraceDetail, transactions: List<WiretapTransaction>): MarkdownContent {
         val mcpSpan = detail.spans.firstOrNull { span ->
             span.attributes.any { it.key == "mcp.method.name" }
-        } ?: return ""
+        } ?: return MarkdownContent.empty
 
         val args = mcpSpan.attributes.firstOrNull {
             it.key in setOf("gen_ai.tool.call.arguments", "gen_ai.prompt.arguments", "gen_ai.completion.arguments")
@@ -26,9 +26,9 @@ object McpDetailSection : LivingDocSection {
             )
         }
 
-        if (args == null && result == null) return ""
+        if (args == null && result == null) return MarkdownContent.empty
 
-        return buildString {
+        return MarkdownContent.of(buildString {
             if (args != null) {
                 appendLine()
                 appendLine("### Arguments")
@@ -45,6 +45,6 @@ object McpDetailSection : LivingDocSection {
                 appendLine(formatBody(result.value, "application/json"))
                 appendLine("```")
             }
-        }
+        })
     }
 }

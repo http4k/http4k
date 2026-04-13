@@ -88,8 +88,8 @@ class LivingDocRenderer(
         appendLine("## $traceLabel")
 
         sections.forEach { section ->
-            val content = section.render(detail, transactions)
-            if (content.isNotEmpty()) append(content)
+            val content = section.renderMarkdown(detail, transactions)
+            if (content.value.isNotEmpty()) append(content.value + "\n\n")
         }
     }
 

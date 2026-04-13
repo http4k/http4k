@@ -25,7 +25,7 @@ class TestReportRenderer(
 ) {
     operator fun invoke(testName: String, stdOut: String = "", stdErr: String = ""): String {
         val html = Templates()
-        val css = Intercept::class.java.classLoader.getResourceAsStream("public/wiretap.css")
+        val css = TestReportRenderer::class.java.classLoader.getResourceAsStream("public/wiretap.css")
             ?.bufferedReader()?.readText() ?: ""
 
         val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->

@@ -7,6 +7,9 @@ package org.http4k.wiretap.livingdoc
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.WiretapTransaction
 
+/**
+ * A section of the LivingDoc report to render when generating a report.
+ */
 fun interface LivingDocSection {
-    fun render(detail: TraceDetail, transactions: List<WiretapTransaction>): String
+    fun renderMarkdown(detail: TraceDetail, transactions: List<WiretapTransaction>): MarkdownContent
 }
