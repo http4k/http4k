@@ -18,6 +18,7 @@ import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
+import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import org.http4k.wiretap.otel.testSpanData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,7 +30,13 @@ class TestReportRendererTest {
     private val traceStore = TraceStore.InMemory()
     private val logStore = LogStore.InMemory()
     private val transactionStore = TransactionStore.InMemory()
-    private val renderer = TestReportRenderer(traceStore, logStore, transactionStore, FixedClock)
+    private val renderer = TestReportRenderer(
+        traceStore,
+        logStore,
+        transactionStore,
+        FixedClock,
+        defaultTraceReportTabs + listOf()
+    )
 
     @Test
     fun `renders empty report`(approver: Approver) {

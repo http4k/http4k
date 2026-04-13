@@ -29,6 +29,8 @@ import org.http4k.wiretap.livingdoc.LivingDocRenderer
 import org.http4k.wiretap.livingdoc.LivingDocRenderer.Companion.defaultLivingDocSections
 import org.http4k.wiretap.livingdoc.LivingDocSection
 import org.http4k.wiretap.otel.WiretapOpenTelemetry
+import org.http4k.wiretap.otel.breakdown.TabContentRenderer
+import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -60,6 +62,7 @@ class Intercept @JvmOverloads constructor(
     private val logStore: LogStore = LogStore.InMemory(),
     private val transactionStore: TransactionStore = TransactionStore.InMemory(),
     private val livingDocsSections: List<LivingDocSection> = defaultLivingDocSections,
+    private val traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs,
     private val reportDir: File = outputDir,
     private val appFn: Context.() -> HttpHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
@@ -172,7 +175,13 @@ class Intercept @JvmOverloads constructor(
         val dir = File(reportDir, packageDir).apply { mkdirs() }
 
         val livingDocRenderer = LivingDocRenderer(traceStore, transactionStore, livingDocsSections)
-        val testReportRenderer = TestReportRenderer(traceStore, logStore, transactionStore, clock)
+        val testReportRenderer = TestReportRenderer(
+            traceStore,
+            logStore,
+            transactionStore,
+            clock,
+            traceReportTabs
+        )
 
         File(dir, "${fileName}.md").writeText(livingDocRenderer(testName))
 

@@ -11,8 +11,9 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.otel.TraceDetailView
-import org.http4k.wiretap.otel.toTraceDetail
+import org.http4k.wiretap.otel.breakdown.TabContentRenderer
 import org.http4k.wiretap.otel.breakdown.renderTraceBreakdownView
+import org.http4k.wiretap.otel.toTraceDetail
 import org.http4k.wiretap.traffic.TransactionDetailView
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
@@ -21,8 +22,10 @@ class TestReportRenderer(
     private val traceStore: TraceStore,
     private val logStore: LogStore,
     private val transactionStore: TransactionStore,
-    private val clock: Clock
+    private val clock: Clock,
+    private val tabRenderers: List<TabContentRenderer>
 ) {
+
     operator fun invoke(testName: String, stdOut: String = "", stdErr: String = ""): String {
         val html = Templates()
         val css = TestReportRenderer::class.java.classLoader.getResourceAsStream("public/wiretap.css")
@@ -31,7 +34,11 @@ class TestReportRenderer(
         val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
             val detail = spans.toTraceDetail(traceId)
             val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(clock) }.groupBy { it.spanId }
-            TraceEntry(traceId.value, html(TraceDetailView(detail, logsBySpan)), html(html.renderTraceBreakdownView(detail)))
+            TraceEntry(
+                traceId.value, html(TraceDetailView(detail, logsBySpan)), html(
+                    html.renderTraceBreakdownView(detail, tabRenderers)
+                )
+            )
         }
 
         val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->

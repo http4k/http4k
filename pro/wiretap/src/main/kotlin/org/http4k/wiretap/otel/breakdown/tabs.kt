@@ -4,4 +4,4 @@
  */
 package org.http4k.wiretap.otel.breakdown
 
-val defaultTabs = listOf(SequenceDiagramTab, InteractionDiagramTab, TimingTab, ErrorTraceTab, CriticalPathTab)
+val defaultTraceReportTabs = listOf(SequenceDiagramTab, InteractionDiagramTab, TimingTab, ErrorTraceTab, CriticalPathTab)
