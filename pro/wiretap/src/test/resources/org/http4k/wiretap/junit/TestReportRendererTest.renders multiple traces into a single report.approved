@@ -1839,68 +1839,68 @@ body {
 <div class="tab-content">
     <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
         <div class="sequence-diagram">
-            <div class="sequence-diagram-toolbar">
-                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
-            </div>
-            <pre class="mermaid">sequenceDiagram
+    <div class="sequence-diagram-toolbar">
+        <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+    </div>
+    <pre class="mermaid">sequenceDiagram
     participant wiretap
     participant app1
     wiretap->>app1: GET /
     app1-->>wiretap: OK (1ms)</pre>
-            <pre class="mermaid-source" style="display:none">sequenceDiagram
+    <pre class="mermaid-source" style="display:none">sequenceDiagram
     participant wiretap
     participant app1
     wiretap->>app1: GET /
     app1-->>wiretap: OK (1ms)</pre>
-        </div>
+</div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
         <div class="sequence-diagram">
-            <div class="sequence-diagram-toolbar">
-                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
-            </div>
-            <pre class="mermaid">C4Context
+    <div class="sequence-diagram-toolbar">
+        <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+    </div>
+    <pre class="mermaid">C4Context
     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
     System(wiretap, "wiretap")
     System(app1, "app1")
     Rel_D(wiretap, app1, " ")</pre>
-            <pre class="mermaid-source" style="display:none">C4Context
+    <pre class="mermaid-source" style="display:none">C4Context
     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
     System(wiretap, "wiretap")
     System(app1, "app1")
     Rel_D(wiretap, app1, " ")</pre>
-        </div>
+</div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
         <div class="timing-table" style="padding: 1rem;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th>Operation</th>
-                        <th>Kind</th>
-                        <th style="text-align: right;">Duration</th>
-                        <th style="width: 30%;">% of Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>app1</td>
-                        <td>GET /</td>
-                        <td>SERVER</td>
-                        <td style="text-align: right;">1ms</td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
-                                    <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
-                                </div>
-                                <span style="min-width: 3rem; text-align: right;">100%</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Operation</th>
+                <th>Kind</th>
+                <th style="text-align: right;">Duration</th>
+                <th style="width: 30%;">% of Total</th>
+            </tr>
+        </thead>
+        <tbody>
+                        <tr>
+                <td>app1</td>
+                <td>GET /</td>
+                <td>SERVER</td>
+                <td style="text-align: right;">1ms</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+                            <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+                        </div>
+                        <span style="min-width: 3rem; text-align: right;">100%</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
     </div>
 </div>
 </div>
@@ -2047,68 +2047,68 @@ document.addEventListener('click', function(e) {
 <div class="tab-content">
     <div class="tab-pane show active" data-diagram-pane="sequence" role="tabpanel">
         <div class="sequence-diagram">
-            <div class="sequence-diagram-toolbar">
-                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
-            </div>
-            <pre class="mermaid">sequenceDiagram
+    <div class="sequence-diagram-toolbar">
+        <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+    </div>
+    <pre class="mermaid">sequenceDiagram
     participant wiretap
     participant app1
     wiretap->>app1: GET /other
     app1-->>wiretap: OK (1ms)</pre>
-            <pre class="mermaid-source" style="display:none">sequenceDiagram
+    <pre class="mermaid-source" style="display:none">sequenceDiagram
     participant wiretap
     participant app1
     wiretap->>app1: GET /other
     app1-->>wiretap: OK (1ms)</pre>
-        </div>
+</div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
         <div class="sequence-diagram">
-            <div class="sequence-diagram-toolbar">
-                <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
-            </div>
-            <pre class="mermaid">C4Context
+    <div class="sequence-diagram-toolbar">
+        <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
+    </div>
+    <pre class="mermaid">C4Context
     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
     System(wiretap, "wiretap")
     System(app1, "app1")
     Rel_D(wiretap, app1, " ")</pre>
-            <pre class="mermaid-source" style="display:none">C4Context
+    <pre class="mermaid-source" style="display:none">C4Context
     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
     System(wiretap, "wiretap")
     System(app1, "app1")
     Rel_D(wiretap, app1, " ")</pre>
-        </div>
+</div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
         <div class="timing-table" style="padding: 1rem;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th>Operation</th>
-                        <th>Kind</th>
-                        <th style="text-align: right;">Duration</th>
-                        <th style="width: 30%;">% of Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>app1</td>
-                        <td>GET /other</td>
-                        <td>SERVER</td>
-                        <td style="text-align: right;">1ms</td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
-                                    <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
-                                </div>
-                                <span style="min-width: 3rem; text-align: right;">100%</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Operation</th>
+                <th>Kind</th>
+                <th style="text-align: right;">Duration</th>
+                <th style="width: 30%;">% of Total</th>
+            </tr>
+        </thead>
+        <tbody>
+                        <tr>
+                <td>app1</td>
+                <td>GET /other</td>
+                <td>SERVER</td>
+                <td style="text-align: right;">1ms</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="flex: 1; background: #e9ecef; border-radius: 4px; height: 8px;">
+                            <div style="width: 100%; background: #90a4ae; height: 100%; border-radius: 4px;"></div>
+                        </div>
+                        <span style="min-width: 3rem; text-align: right;">100%</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
     </div>
 </div>
 </div>

@@ -24,16 +24,16 @@ import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.util.Json
 
 fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
-    private fun lookup(traceId: OtelTraceId): TraceBreakdownView? {
+    private fun lookup(traceId: OtelTraceId, html: TemplateRenderer): TraceBreakdownView? {
         val spans = traceStore.get(traceId)
         if (spans.isEmpty()) return null
-        return spans.toTraceDetail(traceId).toTraceBreakdownView()
+        return spans.toTraceDetail(traceId).toTraceBreakdownView(html)
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/diagrams/{traceId}" bind GET to { req ->
             val traceId = Path.value(OtelTraceId).of("traceId")(req)
-            when (val view = lookup(traceId)) {
+            when (val view = lookup(traceId, html)) {
                 null -> Response(OK)
                 else -> Response(OK).datastarElements(
                     elements(view),
@@ -50,15 +50,18 @@ fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
             "Get all diagrams (sequence, interaction, timing, errors, critical path) for a specific OpenTelemetry trace",
             traceId
         ) bind { req ->
-            when (val view = lookup(traceId(req))) {
+            val detail = traceStore.get(traceId(req)).let { spans ->
+                if (spans.isEmpty()) null else spans.toTraceDetail(traceId(req))
+            }
+            when (detail) {
                 null -> ToolResponse.Error("No trace data available")
                 else -> Json.asToolResponse(
                     mapOf(
-                        "sequence" to view.sequenceDiagram,
-                        "interaction" to view.interactionDiagram,
-                        "timing" to view.timingEntries,
-                        "errorTrace" to view.errorTrace,
-                        "criticalPath" to view.criticalPath
+                        "sequence" to detail.toSequenceDiagram().toMermaid(),
+                        "interaction" to detail.toInteractionDiagram(),
+                        "timing" to detail.toTimingTable(),
+                        "errorTrace" to detail.toErrorTrace(),
+                        "criticalPath" to detail.toCriticalPath()
                     ).filterValues { it is String && it.isNotEmpty() || it is List<*> && it.isNotEmpty() }
                 )
             }

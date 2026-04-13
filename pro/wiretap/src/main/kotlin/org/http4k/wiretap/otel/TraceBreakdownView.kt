@@ -4,21 +4,30 @@
  */
 package org.http4k.wiretap.otel
 
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.TraceDetail
 
-data class TraceBreakdownView(
-    val sequenceDiagram: String,
-    val interactionDiagram: String,
-    val timingEntries: List<TimingEntry>,
-    val errorTrace: String,
-    val criticalPath: String
-) : ViewModel
+data class Tab(val id: String, val name: String, val content: String)
 
-fun TraceDetail.toTraceBreakdownView() = TraceBreakdownView(
-    sequenceDiagram = toSequenceDiagram().toMermaid(),
-    interactionDiagram = toInteractionDiagram(),
-    timingEntries = toTimingTable(),
-    errorTrace = toErrorTrace(),
-    criticalPath = toCriticalPath()
-)
+fun interface TabContentRenderer {
+    fun render(renderer: TemplateRenderer): Tab?
+}
+
+data class TraceBreakdownView(val tabs: List<Tab>) : ViewModel
+
+fun TraceDetail.toTraceBreakdownView(renderer: TemplateRenderer, extraTabs: List<TabContentRenderer> = emptyList()) =
+    TraceBreakdownView(
+        tabs = listOfNotNull(
+            toSequenceDiagram().toMermaid().takeIf { it.isNotEmpty() }
+                ?.let { Tab("sequence", "Sequence", renderer(MermaidDiagramView(it))) },
+            toInteractionDiagram().takeIf { it.isNotEmpty() }
+                ?.let { Tab("interaction", "Interactions", renderer(MermaidDiagramView(it))) },
+            toTimingTable().takeIf { it.isNotEmpty() }
+                ?.let { Tab("timing", "Timing", renderer(TimingTableView(it))) },
+            toErrorTrace().takeIf { it.isNotEmpty() }
+                ?.let { Tab("error", "Errors", renderer(MermaidDiagramView(it))) },
+            toCriticalPath().takeIf { it.isNotEmpty() }
+                ?.let { Tab("critical-path", "Critical Path", renderer(MermaidDiagramView(it))) },
+        ) + extraTabs.mapNotNull { it.render(renderer) }
+    )

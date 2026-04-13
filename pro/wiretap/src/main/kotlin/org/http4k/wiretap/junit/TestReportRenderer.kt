@@ -31,7 +31,7 @@ class TestReportRenderer(
         val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
             val detail = spans.toTraceDetail(traceId)
             val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(clock) }.groupBy { it.spanId }
-            TraceEntry(traceId.value, html(TraceDetailView(detail, logsBySpan)), html(detail.toTraceBreakdownView()))
+            TraceEntry(traceId.value, html(TraceDetailView(detail, logsBySpan)), html(detail.toTraceBreakdownView(html)))
         }
 
         val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->
