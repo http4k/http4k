@@ -31,7 +31,6 @@ import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.ViewStore
 import org.http4k.wiretap.home.GetStats
 import org.http4k.wiretap.home.McpCapabilities
-import org.http4k.wiretap.livingdoc.LivingDocRenderer
 import org.http4k.wiretap.livingdoc.LivingDocRenderer.Companion.defaultLivingDocSections
 import org.http4k.wiretap.livingdoc.LivingDocSection
 import org.http4k.wiretap.mcp.Mcp
@@ -102,7 +101,7 @@ object Wiretap {
         val baseFunctions = listOf(
             Traffic(transactionStore, viewStore, clock),
             Chaos(inboundChaos, outboundChaos),
-            OTel(traceStore, logStore, transactionStore, clock),
+            OTel(traceStore, logStore, transactionStore, clock, livingDocSections),
             InboundClient(clock, transactionStore, proxy),
             OutboundClient(outboundHttp, clock, transactionStore),
             OpenApi(),

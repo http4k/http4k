@@ -25,10 +25,13 @@ import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.livingdoc.LivingDocRenderer
+import org.http4k.wiretap.livingdoc.LivingDocSection
 import org.http4k.wiretap.util.Json
 
-fun GetTraceMarkdown(traceStore: TraceStore, transactionStore: TransactionStore) = object : WiretapFunction {
-    private val renderer = LivingDocRenderer(traceStore, transactionStore)
+fun GetTraceMarkdown(traceStore: TraceStore,
+                     transactionStore: TransactionStore,
+                     livingDocSections: List<LivingDocSection>) = object : WiretapFunction {
+    private val renderer = LivingDocRenderer(traceStore, transactionStore, livingDocSections)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
         "/markdown/{traceId}" bind GET to { req ->
