@@ -27,7 +27,7 @@ fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
     private fun lookup(traceId: OtelTraceId, html: TemplateRenderer): TraceBreakdownView? {
         val spans = traceStore.get(traceId)
         if (spans.isEmpty()) return null
-        return spans.toTraceDetail(traceId).toTraceBreakdownView(html)
+        return html.renderTraceBreakdownView(spans.toTraceDetail(traceId))
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

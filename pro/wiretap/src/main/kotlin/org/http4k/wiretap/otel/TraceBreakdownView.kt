@@ -11,23 +11,47 @@ import org.http4k.wiretap.domain.TraceDetail
 data class Tab(val id: String, val name: String, val content: String)
 
 fun interface TabContentRenderer {
-    fun render(renderer: TemplateRenderer): Tab?
+    fun render(detail: TraceDetail, renderer: TemplateRenderer): Tab?
 }
 
 data class TraceBreakdownView(val tabs: List<Tab>) : ViewModel
 
-fun TraceDetail.toTraceBreakdownView(renderer: TemplateRenderer, extraTabs: List<TabContentRenderer> = emptyList()) =
+object SequenceDiagramTab : TabContentRenderer {
+    override fun render(detail: TraceDetail, renderer: TemplateRenderer) =
+        detail.toSequenceDiagram().toMermaid().takeIf { it.isNotEmpty() }
+            ?.let { Tab("sequence", "Sequence", renderer(MermaidDiagramView(it))) }
+}
+
+object InteractionDiagramTab : TabContentRenderer {
+    override fun render(detail: TraceDetail, renderer: TemplateRenderer) =
+        detail.toInteractionDiagram().takeIf { it.isNotEmpty() }
+            ?.let { Tab("interaction", "Interactions", renderer(MermaidDiagramView(it))) }
+}
+
+object TimingTab : TabContentRenderer {
+    override fun render(detail: TraceDetail, renderer: TemplateRenderer) =
+        detail.toTimingTable().takeIf { it.isNotEmpty() }
+            ?.let { Tab("timing", "Timing", renderer(TimingTableView(it))) }
+}
+
+object ErrorTraceTab : TabContentRenderer {
+    override fun render(detail: TraceDetail, renderer: TemplateRenderer) =
+        detail.toErrorTrace().takeIf { it.isNotEmpty() }
+            ?.let { Tab("error", "Errors", renderer(MermaidDiagramView(it))) }
+}
+
+object CriticalPathTab : TabContentRenderer {
+    override fun render(detail: TraceDetail, renderer: TemplateRenderer) =
+        detail.toCriticalPath().takeIf { it.isNotEmpty() }
+            ?.let { Tab("critical-path", "Critical Path", renderer(MermaidDiagramView(it))) }
+}
+
+val defaultTabs = listOf(SequenceDiagramTab, InteractionDiagramTab, TimingTab, ErrorTraceTab, CriticalPathTab)
+
+fun TemplateRenderer.renderTraceBreakdownView(
+    detail: TraceDetail,
+    extraTabs: List<TabContentRenderer> = emptyList()
+) =
     TraceBreakdownView(
-        tabs = listOfNotNull(
-            toSequenceDiagram().toMermaid().takeIf { it.isNotEmpty() }
-                ?.let { Tab("sequence", "Sequence", renderer(MermaidDiagramView(it))) },
-            toInteractionDiagram().takeIf { it.isNotEmpty() }
-                ?.let { Tab("interaction", "Interactions", renderer(MermaidDiagramView(it))) },
-            toTimingTable().takeIf { it.isNotEmpty() }
-                ?.let { Tab("timing", "Timing", renderer(TimingTableView(it))) },
-            toErrorTrace().takeIf { it.isNotEmpty() }
-                ?.let { Tab("error", "Errors", renderer(MermaidDiagramView(it))) },
-            toCriticalPath().takeIf { it.isNotEmpty() }
-                ?.let { Tab("critical-path", "Critical Path", renderer(MermaidDiagramView(it))) },
-        ) + extraTabs.mapNotNull { it.render(renderer) }
+        tabs = (defaultTabs + extraTabs).mapNotNull { it.render(detail, this) }
     )
