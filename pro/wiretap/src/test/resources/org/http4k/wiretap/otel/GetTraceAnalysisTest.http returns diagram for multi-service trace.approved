@@ -1,5 +1,5 @@
 event: datastar-patch-elements
-data: elements <div class="trace-diagrams">
+data: elements <div class="trace-analysis">
 data: elements <ul class="nav nav-tabs px-3 pt-3" role="tablist">
 data: elements         <li class="nav-item">
 data: elements         <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
@@ -169,7 +169,7 @@ data: elements })();
 data: elements document.addEventListener('click', function(e) {
 data: elements     var btn = e.target.closest('[data-diagram-tab]');
 data: elements     if (!btn) return;
-data: elements     var container = btn.closest('.trace-diagrams');
+data: elements     var container = btn.closest('.trace-analysis');
 data: elements     var tabName = btn.getAttribute('data-diagram-tab');
 data: elements     container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
 data: elements     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
@@ -179,5 +179,5 @@ data: elements     if (pane) pane.classList.add('show', 'active');
 data: elements });
 data: elements </script>
 data: elements 
-data: selector #trace-diagrams-panel
+data: selector #trace-analysis-panel
 

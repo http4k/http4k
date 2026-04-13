@@ -1,4 +1,4 @@
-<div class="trace-diagrams">
+<div class="trace-analysis">
 <ul class="nav nav-tabs px-3 pt-3" role="tablist">
     <#list tabs as tab>
     <li class="nav-item">
@@ -40,7 +40,7 @@
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-diagram-tab]');
     if (!btn) return;
-    var container = btn.closest('.trace-diagrams');
+    var container = btn.closest('.trace-analysis');
     var tabName = btn.getAttribute('data-diagram-tab');
     container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });

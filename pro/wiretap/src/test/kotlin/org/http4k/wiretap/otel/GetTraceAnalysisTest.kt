@@ -18,13 +18,13 @@ import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import org.junit.jupiter.api.Test
 
-class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
+class GetTraceAnalysisTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
-    override val toolName = "get_trace_diagrams"
+    override val toolName = "get_trace_analysis"
 
     private val traceStore = TraceStore.InMemory()
 
-    override val function = GetTraceDiagrams(traceStore, defaultTraceReportTabs)
+    override val function = GetTraceAnalysis(traceStore, defaultTraceReportTabs)
 
     private fun recordSpan(
         traceId: String,
@@ -46,19 +46,19 @@ class GetTraceDiagramTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
         recordSpan(traceId, spanId = "aaaaaaaaaaaaaaaa", name = "GET /", kind = SpanKind.SERVER, serviceName = "frontend", startNanos = 1000000, endNanos = 5000000)
         recordSpan(traceId, spanId = "bbbbbbbbbbbbbbbb", parentSpanId = "aaaaaaaaaaaaaaaa", name = "GET /api", kind = SpanKind.CLIENT, serviceName = "frontend", startNanos = 1500000, endNanos = 4500000)
         recordSpan(traceId, spanId = "cccccccccccccccc", parentSpanId = "bbbbbbbbbbbbbbbb", name = "GET /api", kind = SpanKind.SERVER, serviceName = "backend", startNanos = 2000000, endNanos = 4000000)
-        approver.assertApproved(httpClient()(Request(GET, "/diagrams/$traceId")))
+        approver.assertApproved(httpClient()(Request(GET, "/analysis/$traceId")))
     }
 
     @Test
     fun `http returns empty 200 for unknown trace`() {
-        val response = httpClient()(Request(GET, "/diagrams/00000000000000000000000000000099"))
+        val response = httpClient()(Request(GET, "/analysis/00000000000000000000000000000099"))
         assertThat(response.status, equalTo(OK))
     }
 
     @Test
     fun `http returns empty 200 for single-service trace without diagram`() {
         recordSpan("00000000000000000000000000000001")
-        val response = httpClient()(Request(GET, "/diagrams/00000000000000000000000000000001"))
+        val response = httpClient()(Request(GET, "/analysis/00000000000000000000000000000001"))
         assertThat(response.status, equalTo(OK))
     }
 

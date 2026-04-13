@@ -29,7 +29,7 @@ fun OTel(
     private val functions = listOf(
         ListTraces(traceStore, clock),
         GetTrace(traceStore, logStore, clock),
-        GetTraceDiagrams(traceStore, traceReportTabs),
+        GetTraceAnalysis(traceStore, traceReportTabs),
         GetTraceMarkdown(traceStore, transactionStore, livingDocSections),
     )
 

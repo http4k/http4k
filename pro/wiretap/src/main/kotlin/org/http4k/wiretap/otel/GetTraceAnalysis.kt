@@ -26,7 +26,7 @@ import org.http4k.wiretap.otel.breakdown.TraceBreakdownView
 import org.http4k.wiretap.otel.breakdown.renderTraceBreakdownView
 import org.http4k.wiretap.util.Json
 
-fun GetTraceDiagrams(traceStore: TraceStore, traceReportTabs: List<TabContentRenderer>) = object : WiretapFunction {
+fun GetTraceAnalysis(traceStore: TraceStore, traceReportTabs: List<TabContentRenderer>) = object : WiretapFunction {
     private fun lookup(traceId: OtelTraceId, html: TemplateRenderer): TraceBreakdownView? {
         val spans = traceStore.get(traceId)
         if (spans.isEmpty()) return null
@@ -34,23 +34,23 @@ fun GetTraceDiagrams(traceStore: TraceStore, traceReportTabs: List<TabContentRen
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
-        "/diagrams/{traceId}" bind GET to { req ->
+        "/analysis/{traceId}" bind GET to { req ->
             val traceId = Path.value(OtelTraceId).of("traceId")(req)
             when (val view = lookup(traceId, html)) {
                 null -> Response(OK)
                 else -> Response(OK).datastarElements(
                     elements(view),
-                    selector = Selector.of("#trace-diagrams-panel")
+                    selector = Selector.of("#trace-analysis-panel")
                 )
             }
         }
 
     override fun mcp(): ToolCapability {
-        val traceId = Tool.Arg.value(OtelTraceId).required("trace_id", "The trace ID to get diagrams for")
+        val traceId = Tool.Arg.value(OtelTraceId).required("trace_id", "The trace ID to get analysis for")
 
         return Tool(
-            "get_trace_diagrams",
-            "Get all diagrams (sequence, interaction, timing, errors, critical path) for a specific OpenTelemetry trace",
+            "get_trace_analysis",
+            "Get analysis (sequence, interaction, timing, errors, critical path) for a specific OpenTelemetry trace",
             traceId
         ) bind { req ->
             val detail = traceStore.get(traceId(req)).let { spans ->

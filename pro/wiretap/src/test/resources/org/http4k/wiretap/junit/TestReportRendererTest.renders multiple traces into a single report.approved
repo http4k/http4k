@@ -1820,11 +1820,11 @@ body {
             </div>
         </div>
     </div>
-    <div id="trace-diagrams-panel" data-init="@get('/_wiretap/otel/diagrams/00000000000000000000000000000001')"></div>
+    <div id="trace-analysis-panel" data-init="@get('/_wiretap/otel/analysis/00000000000000000000000000000001')"></div>
 </div>
 
             </div>
-            <div class="trace-diagrams">
+            <div class="trace-analysis">
 <ul class="nav nav-tabs px-3 pt-3" role="tablist">
         <li class="nav-item">
         <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
@@ -1930,7 +1930,7 @@ body {
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-diagram-tab]');
     if (!btn) return;
-    var container = btn.closest('.trace-diagrams');
+    var container = btn.closest('.trace-analysis');
     var tabName = btn.getAttribute('data-diagram-tab');
     container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
@@ -2028,11 +2028,11 @@ document.addEventListener('click', function(e) {
             </div>
         </div>
     </div>
-    <div id="trace-diagrams-panel" data-init="@get('/_wiretap/otel/diagrams/00000000000000000000000000000002')"></div>
+    <div id="trace-analysis-panel" data-init="@get('/_wiretap/otel/analysis/00000000000000000000000000000002')"></div>
 </div>
 
             </div>
-            <div class="trace-diagrams">
+            <div class="trace-analysis">
 <ul class="nav nav-tabs px-3 pt-3" role="tablist">
         <li class="nav-item">
         <button class="nav-link active" data-diagram-tab="sequence" type="button" role="tab">Sequence</button>
@@ -2138,7 +2138,7 @@ document.addEventListener('click', function(e) {
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-diagram-tab]');
     if (!btn) return;
-    var container = btn.closest('.trace-diagrams');
+    var container = btn.closest('.trace-analysis');
     var tabName = btn.getAttribute('data-diagram-tab');
     container.querySelectorAll('[data-diagram-tab]').forEach(function(b) { b.classList.remove('active'); });
     container.querySelectorAll('[data-diagram-pane]').forEach(function(p) { p.classList.remove('show', 'active'); });
