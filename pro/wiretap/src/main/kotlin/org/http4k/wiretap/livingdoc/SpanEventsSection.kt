@@ -6,6 +6,7 @@ package org.http4k.wiretap.livingdoc
 
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.WiretapTransaction
+import org.http4k.wiretap.util.MarkdownContent
 
 object SpanEventsSection : LivingDocSection {
     override fun renderMarkdown(detail: TraceDetail, transactions: List<WiretapTransaction>): MarkdownContent {
