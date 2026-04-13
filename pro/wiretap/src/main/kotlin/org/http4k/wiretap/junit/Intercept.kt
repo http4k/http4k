@@ -171,8 +171,9 @@ class Intercept @JvmOverloads constructor(
         val fileName = testName.replace(' ', '-')
         val dir = File(reportDir, packageDir).apply { mkdirs() }
 
-        File(dir, "${fileName}.md")
-            .writeText(LivingDocRenderer(traceStore, transactionStore, livingDocsSections)(testName))
+        val livingDocRenderer = LivingDocRenderer(traceStore, transactionStore, livingDocsSections)
+
+        File(dir, "${fileName}.md").writeText(livingDocRenderer(testName))
 
         val htmlFile = File(dir, "${fileName}.html").apply {
             writeText(TestReportRenderer(traceStore, logStore, transactionStore, clock)(testName, stdOutCapture.toString(), stdErrCapture.toString()))
