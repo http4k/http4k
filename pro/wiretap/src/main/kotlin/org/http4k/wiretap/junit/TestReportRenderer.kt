@@ -12,7 +12,7 @@ import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.otel.TraceDetailView
 import org.http4k.wiretap.otel.toTraceDetail
-import org.http4k.wiretap.otel.toTraceDiagramsView
+import org.http4k.wiretap.otel.toTraceBreakdownView
 import org.http4k.wiretap.traffic.TransactionDetailView
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
@@ -31,9 +31,7 @@ class TestReportRenderer(
         val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
             val detail = spans.toTraceDetail(traceId)
             val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(clock) }.groupBy { it.spanId }
-            val ganttHtml = html(TraceDetailView(detail, logsBySpan))
-            val diagramsHtml = html(detail.toTraceDiagramsView())
-            TraceEntry(traceId.value, ganttHtml, diagramsHtml)
+            TraceEntry(traceId.value, html(TraceDetailView(detail, logsBySpan)), html(detail.toTraceBreakdownView()))
         }
 
         val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->

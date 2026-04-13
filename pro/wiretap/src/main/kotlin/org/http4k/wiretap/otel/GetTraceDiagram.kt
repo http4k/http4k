@@ -24,10 +24,10 @@ import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.util.Json
 
 fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {
-    private fun lookup(traceId: OtelTraceId): TraceDiagramsView? {
+    private fun lookup(traceId: OtelTraceId): TraceBreakdownView? {
         val spans = traceStore.get(traceId)
         if (spans.isEmpty()) return null
-        return spans.toTraceDetail(traceId).toTraceDiagramsView()
+        return spans.toTraceDetail(traceId).toTraceBreakdownView()
     }
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =

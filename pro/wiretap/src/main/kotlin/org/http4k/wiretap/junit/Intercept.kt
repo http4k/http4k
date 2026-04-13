@@ -172,11 +172,12 @@ class Intercept @JvmOverloads constructor(
         val dir = File(reportDir, packageDir).apply { mkdirs() }
 
         val livingDocRenderer = LivingDocRenderer(traceStore, transactionStore, livingDocsSections)
+        val testReportRenderer = TestReportRenderer(traceStore, logStore, transactionStore, clock)
 
         File(dir, "${fileName}.md").writeText(livingDocRenderer(testName))
 
         val htmlFile = File(dir, "${fileName}.html").apply {
-            writeText(TestReportRenderer(traceStore, logStore, transactionStore, clock)(testName, stdOutCapture.toString(), stdErrCapture.toString()))
+            writeText(testReportRenderer(testName, stdOutCapture.toString(), stdErrCapture.toString()))
         }
 
         println("Wiretap report: file://${htmlFile.absolutePath}")

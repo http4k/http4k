@@ -7,7 +7,7 @@ package org.http4k.wiretap.otel
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.TraceDetail
 
-data class TraceDiagramsView(
+data class TraceBreakdownView(
     val sequenceDiagram: String,
     val interactionDiagram: String,
     val timingEntries: List<TimingEntry>,
@@ -15,13 +15,10 @@ data class TraceDiagramsView(
     val criticalPath: String
 ) : ViewModel
 
-fun TraceDetail.toTraceDiagramsView(): TraceDiagramsView {
-    val sequence = toSequenceDiagram()
-    return TraceDiagramsView(
-        sequenceDiagram = if (sequence.messages.isNotEmpty()) sequence.toMermaid() else "",
-        interactionDiagram = toInteractionDiagram(),
-        timingEntries = toTimingTable(),
-        errorTrace = toErrorTrace(),
-        criticalPath = toCriticalPath()
-    )
-}
+fun TraceDetail.toTraceBreakdownView() = TraceBreakdownView(
+    sequenceDiagram = toSequenceDiagram().toMermaid(),
+    interactionDiagram = toInteractionDiagram(),
+    timingEntries = toTimingTable(),
+    errorTrace = toErrorTrace(),
+    criticalPath = toCriticalPath()
+)
