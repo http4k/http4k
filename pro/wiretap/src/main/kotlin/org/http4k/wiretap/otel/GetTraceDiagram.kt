@@ -21,6 +21,8 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.wiretap.WiretapFunction
 import org.http4k.wiretap.domain.OtelTraceId
 import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.otel.breakdown.TraceBreakdownView
+import org.http4k.wiretap.otel.breakdown.renderTraceBreakdownView
 import org.http4k.wiretap.util.Json
 
 fun GetTraceDiagrams(traceStore: TraceStore) = object : WiretapFunction {

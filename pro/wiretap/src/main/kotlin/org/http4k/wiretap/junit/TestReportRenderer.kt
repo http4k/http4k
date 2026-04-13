@@ -12,7 +12,7 @@ import org.http4k.wiretap.domain.toDetail
 import org.http4k.wiretap.domain.toSummary
 import org.http4k.wiretap.otel.TraceDetailView
 import org.http4k.wiretap.otel.toTraceDetail
-import org.http4k.wiretap.otel.renderTraceBreakdownView
+import org.http4k.wiretap.otel.breakdown.renderTraceBreakdownView
 import org.http4k.wiretap.traffic.TransactionDetailView
 import org.http4k.wiretap.util.Templates
 import java.time.Clock
