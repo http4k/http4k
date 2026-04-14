@@ -35,21 +35,16 @@ fun RenderMcpApp(
     name: String,
     description: String,
     uiUri: Uri,
-    extraCapabilities: List<ServerCapability>,
+    capabilities: List<ServerCapability>,
     toolVisibility: List<McpAppVisibility>? = null,
     mimeType: MimeType = MIME_TYPE,
     resourceHandler: ResourceHandler,
 ) = capabilities(
     listOf(
-        Tool(
-            name,
-            description,
-            meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uiUri, toolVisibility))
-        ) bind {
-            ToolResponse.Ok(listOf())
-        },
+        Tool(name, description, meta = Meta(MetaKey.auto(McpAppMeta).toLens() of McpAppMeta(uiUri, toolVisibility)))
+            bind { ToolResponse.Ok(listOf()) },
         Static(uiUri, ResourceName.of(name), description, mimeType) bind resourceHandler
-    ) + extraCapabilities
+    ) + capabilities
 )
 
 /**
@@ -63,8 +58,28 @@ fun RenderMcpApp(
     meta: McpAppResourceMeta = McpAppResourceMeta(),
     toolVisibility: List<McpAppVisibility>? = null,
     mimeType: MimeType = MIME_TYPE,
-    extraCapabilities: List<ServerCapability> = emptyList(),
+    capabilities: List<ServerCapability> = emptyList(),
     resourceHandler: (ResourceRequest) -> String
-) = RenderMcpApp(name, description, uiUri, extraCapabilities, toolVisibility, mimeType) {
+) = RenderMcpApp(name, description, uiUri, capabilities, toolVisibility, mimeType) {
     ResourceResponse.Ok(Resource.Content.Text(resourceHandler(it), uiUri, mimeType, Content.Meta(ui = meta)))
 }
+
+/**
+ * Creates a combined Tool and Resource capability for MCP Apps.
+ * The Tool triggers UI display, and the Resource serves the UI content.
+ */
+fun RenderMcpApp(
+    name: String,
+    description: String,
+    toolVisibility: List<McpAppVisibility>? = null,
+    capabilities: List<ServerCapability> = emptyList(),
+    mcpAppResourceHandler: McpAppViewModelResourceHandler
+) = RenderMcpApp(
+    name,
+    description,
+    mcpAppResourceHandler.uiUri,
+    capabilities,
+    toolVisibility,
+    mcpAppResourceHandler.mimeType,
+    mcpAppResourceHandler
+)

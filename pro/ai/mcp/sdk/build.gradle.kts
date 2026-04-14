@@ -11,16 +11,20 @@ dependencies {
     api(project(":http4k-ai-mcp-client"))
     api(project(":http4k-security-oauth"))
     implementation(project(":http4k-ops-opentelemetry"))
+    implementation(project(":http4k-template-core"))
 
     testImplementation(testFixtures(project(":http4k-ops-opentelemetry")))
     testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))
+
+    implementation(project(":http4k-template-core"))
 
     testImplementation(libs.jsoup)
     testImplementation(libs.fs4k)
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-jetty"))
+    testImplementation(project(":http4k-template-handlebars"))
     testImplementation(project(":http4k-config"))
     testImplementation(project(":http4k-security-oauth"))
     testImplementation(project(":http4k-testing-approval"))
