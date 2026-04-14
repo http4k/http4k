@@ -10,28 +10,36 @@ import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.ServerMessage.Response
 import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.jsonrpc.JsonRpcResult
 import kotlin.reflect.KClass
 
-
 class AdaptingMcpHandler(private val onError: (Throwable) -> Unit) {
-    operator fun <IN : ClientMessage.Request> invoke(clazz: KClass<IN>, fn: (IN, Client) -> Response, client: Client) =
+    operator fun <IN : ClientMessage.Request> invoke(clazz: KClass<IN>, fn: (IN, Client) -> Response, client: Client): McpHandler =
         { req: McpRequest ->
-            McpResponse(
-                req.json.runCatching { req.json.fromJsonRpc(clazz) }
-                    .mapCatching { fn(it, client) }
-                    .map { it.toJsonRpc(req.json.id) }
-                    .recover {
-                        when (it) {
-                            is McpException -> it.error.toJsonRpc(req.json.id)
-                            else -> {
-                                onError(it)
-                                ErrorMessage.InternalError.toJsonRpc(req.json.id)
+            when (val jsonRpc = req.json) {
+                is JsonRpcRequest<McpNodeType> -> McpResponse(
+                    jsonRpc.runCatching { jsonRpc.fromJsonRpc(clazz) }
+                        .mapCatching { fn(it, client) }
+                        .map { it.toJsonRpc(jsonRpc.id) }
+                        .recover {
+                            when (it) {
+                                is McpException -> it.error.toJsonRpc(jsonRpc.id)
+                                else -> {
+                                    onError(it)
+                                    ErrorMessage.InternalError.toJsonRpc(jsonRpc.id)
+                                }
                             }
                         }
-                    }
-                    .getOrElse { InvalidRequest.toJsonRpc(req.json.id) }
-            )
+                        .getOrElse { InvalidRequest.toJsonRpc(jsonRpc.id) }
+                )
+
+                // TODO - make this actually do something!
+                is JsonRpcResult<*> -> McpResponse(InvalidRequest.toJsonRpc(null))
+            }
+
     }
 }

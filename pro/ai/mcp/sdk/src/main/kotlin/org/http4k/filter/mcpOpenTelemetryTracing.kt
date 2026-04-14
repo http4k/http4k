@@ -15,6 +15,8 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
@@ -33,54 +35,59 @@ fun McpFilters.OpenTelemetryTracing(
 
     return McpFilter { next ->
         { req ->
-            val spanModifiers = spanModifierMap[McpRpcMethod.of(req.json.method)]
+            when(val jsonRpc = req.json) {
+                is JsonRpcRequest<McpNodeType> -> {
+                    val spanModifiers = spanModifierMap[McpRpcMethod.of(jsonRpc.method)]
 
-            val transportSpan = Span.current()
+                    val transportSpan = Span.current()
 
-            val metaFields = req.json.params
-                ?.let { McpJson.fields(it).toMap()["_meta"] }
-                ?.let { McpJson.fields(it).toMap() }
-                ?: emptyMap()
+                    val metaFields = jsonRpc.params
+                        ?.let { McpJson.fields(it).toMap()["_meta"] }
+                        ?.let { McpJson.fields(it).toMap() }
+                        ?: emptyMap()
 
-            val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
+                    val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
 
-            val targetName = req.json.params
-                ?.let { McpJson.fields(it).toMap()["name"] }
-                ?.let { McpJson.text(it) }
-            val spanName = if (targetName != null) "${req.json.method} $targetName" else req.json.method
+                    val targetName = jsonRpc.params
+                        ?.let { McpJson.fields(it).toMap()["name"] }
+                        ?.let { McpJson.text(it) }
+                    val spanName = if (targetName != null) "${jsonRpc.method} $targetName" else jsonRpc.method
 
-            val span = tracer.spanBuilder(spanName)
-                .setParent(parentContext)
-                .setSpanKind(SERVER)
-                .setAttribute("mcp.method.name", req.json.method)
-                .setAttribute("mcp.session.id", req.session.id.value)
-                .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
-                .apply {
-                    req.json.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
-                    if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
-                }
-                .startSpan()
-
-            spanModifiers?.forEach { it.request(span, req.json.params ?: McpJson.obj()) }
-
-            try {
-                span.makeCurrent().use { next(req) }
-                    .also { resp ->
-                        spanModifiers?.forEach { it.response(span, resp.json) }
-
-                        val error = McpJson.fields(resp.json).toMap()["error"]
-                        if (error != null) {
-                            span.setStatus(ERROR)
-                            val code = McpJson.fields(error).toMap()["code"]
-                            if (code != null) span.setAttribute("error.type", McpJson.compact(code))
+                    val span = tracer.spanBuilder(spanName)
+                        .setParent(parentContext)
+                        .setSpanKind(SERVER)
+                        .setAttribute("mcp.method.name", jsonRpc.method)
+                        .setAttribute("mcp.session.id", req.session.id.value)
+                        .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
+                        .apply {
+                            jsonRpc.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
+                            if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
                         }
+                        .startSpan()
+
+                    spanModifiers?.forEach { it.request(span, jsonRpc.params ?: McpJson.obj()) }
+
+                    try {
+                        span.makeCurrent().use { next(req) }
+                            .also { resp ->
+                                spanModifiers?.forEach { it.response(span, resp.json) }
+
+                                val error = McpJson.fields(resp.json).toMap()["error"]
+                                if (error != null) {
+                                    span.setStatus(ERROR)
+                                    val code = McpJson.fields(error).toMap()["code"]
+                                    if (code != null) span.setAttribute("error.type", McpJson.compact(code))
+                                }
+                            }
+                    } catch (e: Throwable) {
+                        span.setStatus(ERROR)
+                        span.setAttribute("error.type", e.javaClass.name)
+                        throw e
+                    } finally {
+                        span.end()
                     }
-            } catch (e: Throwable) {
-                span.setStatus(ERROR)
-                span.setAttribute("error.type", e.javaClass.name)
-                throw e
-            } finally {
-                span.end()
+                }
+                is JsonRpcResult<*> -> next(req)
             }
         }
     }
