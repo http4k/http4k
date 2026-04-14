@@ -115,6 +115,8 @@ class McpProtocol<Transport>(
 
         val payload = McpJson.fields(rawPayload).toMap()
 
+        val context = ClientCall(session)
+
         val response = when {
             payload["method"] != null -> {
                 val jsonReq = JsonRpcRequest(McpJson, payload)
@@ -123,56 +125,60 @@ class McpProtocol<Transport>(
 
                 when (McpRpcMethod.of(jsonReq.method)) {
                     McpInitialize.Method ->
-                        respond<McpInitialize.Request>(transport, session, { it, _ ->
+                        respond<McpInitialize.Request>(transport, mcpRequest, context) { it, _ ->
                             assign(Subscription(session), transport, httpReq)
                             handleInitialize(it, httpReq, session)
-                        }, mcpRequest)
+                        }
 
 
                     McpCompletion.Method ->
-                        respond<McpCompletion.Request>(transport, session, { it, c ->
+                        respond<McpCompletion.Request>(transport, mcpRequest, context) { it, c ->
                             completions.complete(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpPing.Method ->
-                        respond<McpPing.Request>(transport, session, { _, _ ->
+                        respond<McpPing.Request>(transport, mcpRequest, context) { _, _ ->
                             ServerMessage.Response.Empty
-                        }, mcpRequest)
+                        }
 
 
                     McpPrompt.Get.Method ->
-                        respond<McpPrompt.Get.Request>(transport, session, { it, c ->
+                        respond<McpPrompt.Get.Request>(transport, mcpRequest, context) { it, c ->
                             prompts.get(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpPrompt.List.Method ->
-                        respond<McpPrompt.List.Request>(transport, session, { it, c ->
+                        respond<McpPrompt.List.Request>(transport, mcpRequest, context) { it, c ->
                             prompts.list(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpResource.ListTemplates.Method ->
-                        respond<McpResource.ListTemplates.Request>(transport, session, { it, c ->
+                        respond<McpResource.ListTemplates.Request>(
+                            transport,
+                            mcpRequest,
+                            context
+                        ) { it, c ->
                             resources.listTemplates(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpResource.List.Method ->
-                        respond<McpResource.List.Request>(transport, session, { it, c ->
+                        respond<McpResource.List.Request>(transport, mcpRequest, context) { it, c ->
                             resources.listResources(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpResource.Read.Method -> {
-                        respond<McpResource.Read.Request>(transport, session, { it, c ->
+                        respond<McpResource.Read.Request>(transport, mcpRequest, context) { it, c ->
                             resources.read(it, c, httpReq)
-                        }, mcpRequest)
+                        }
                     }
 
                     McpResource.Subscribe.Method -> {
-                        respond<McpResource.Subscribe.Request>(transport, session, { _, _ ->
+                        respond<McpResource.Subscribe.Request>(transport, mcpRequest, context) { _, _ ->
                             when (resources) {
                                 is ObservableResources -> {
                                     val subscribeRequest = jsonReq.fromJsonRpc(McpResource.Subscribe.Request::class)
@@ -186,18 +192,18 @@ class McpProtocol<Transport>(
                                 }
                             }
                             ServerMessage.Response.Empty
-                        }, mcpRequest)
+                        }
                     }
 
                     McpLogging.SetLevel.Method ->
-                        respond<McpLogging.SetLevel.Request>(transport, session, { _, _ ->
+                        respond<McpLogging.SetLevel.Request>(transport, mcpRequest, context) { _, _ ->
                             logger.setLevel(session, jsonReq.fromJsonRpc(McpLogging.SetLevel.Request::class).level)
                             ServerMessage.Response.Empty
-                        }, mcpRequest)
+                        }
 
 
                     McpResource.Unsubscribe.Method ->
-                        respond<McpResource.Unsubscribe.Request>(transport, session, { _, _ ->
+                        respond<McpResource.Unsubscribe.Request>(transport, mcpRequest, context) { _, _ ->
                             when (resources) {
                                 is ObservableResources -> resources.unsubscribe(
                                     session,
@@ -205,7 +211,7 @@ class McpProtocol<Transport>(
                                 )
                             }
                             ServerMessage.Response.Empty
-                        }, mcpRequest)
+                        }
 
 
                     McpInitialize.Initialized.Method -> ok()
@@ -225,7 +231,7 @@ class McpProtocol<Transport>(
 
                                 sessions.respond(
                                     transport,
-                                    ClientCall(session),
+                                    context,
                                     McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
                                 )
                             }
@@ -234,39 +240,39 @@ class McpProtocol<Transport>(
                     }
 
                     McpTool.Call.Method ->
-                        respond<McpTool.Call.Request>(transport, session, { it, c ->
+                        respond<McpTool.Call.Request>(transport, mcpRequest, context) { it, c ->
                             tools.call(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpTool.List.Method ->
-                        respond<McpTool.List.Request>(transport, session, { it, c ->
+                        respond<McpTool.List.Request>(transport, mcpRequest, context) { it, c ->
                             tools.list(it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpTask.Get.Method ->
-                        respond<McpTask.Get.Request>(transport, session, { it, c ->
+                        respond<McpTask.Get.Request>(transport, mcpRequest, context) { it, c ->
                             tasks.get(session, it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpTask.Result.Method ->
-                        respond<McpTask.Result.Request>(transport, session, { it, c ->
+                        respond<McpTask.Result.Request>(transport, mcpRequest, context) { it, c ->
                             tasks.result(session, it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpTask.Cancel.Method ->
-                        respond<McpTask.Cancel.Request>(transport, session, { it, c ->
+                        respond<McpTask.Cancel.Request>(transport, mcpRequest, context) { it, c ->
                             tasks.cancel(session, it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpTask.List.Method ->
-                        respond<McpTask.List.Request>(transport, session, { it, c ->
+                        respond<McpTask.List.Request>(transport, mcpRequest, context) { it, c ->
                             tasks.list(session, it, c, httpReq)
-                        }, mcpRequest)
+                        }
 
 
                     McpTask.Status.Method -> {
@@ -274,12 +280,13 @@ class McpProtocol<Transport>(
                         ok()
                     }
 
-                    else -> sessions.respond(transport, ClientCall(session), MethodNotFound.toJsonRpc(jsonReq.id))
+                    else -> sessions.respond(transport, context, MethodNotFound.toJsonRpc(jsonReq.id))
                 }
             }
 
             else -> {
                 val jsonResult = JsonRpcResult(McpJson, payload)
+                McpRequest(session, jsonResult, httpReq)
                 when {
                     jsonResult.isError() -> ok()
                     else -> with(McpJson) {
@@ -302,11 +309,10 @@ class McpProtocol<Transport>(
 
     private inline fun <reified IN : ClientMessage.Request> respond(
         transport: Transport,
-        session: Session,
-        noinline fn: (IN, Client) -> ServerMessage.Response,
-        mcpRequest: McpRequest
+        mcpRequest: McpRequest,
+        callCtx: ClientCall,
+        noinline fn: (IN, Client) -> ServerMessage.Response
     ): Result4k<McpNodeType, McpNodeType> {
-        val callCtx = ClientCall(session)
         val client = clientFor(callCtx)
 
         val handler = mcpFilter
