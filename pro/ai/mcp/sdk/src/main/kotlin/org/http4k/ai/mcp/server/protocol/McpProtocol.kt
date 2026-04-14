@@ -283,7 +283,7 @@ class McpProtocol<Transport>(
                 when {
                     jsonResult.isError() -> ok()
                     else -> with(McpJson) {
-                        val id = jsonResult.id?.let<McpNodeType, McpMessageId> { McpMessageId.parse(compact(it)) }
+                        val id = jsonResult.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
                             null -> error()
                             else -> clientTracking[session]?.processResult(id, jsonResult)?.let { ok() }
