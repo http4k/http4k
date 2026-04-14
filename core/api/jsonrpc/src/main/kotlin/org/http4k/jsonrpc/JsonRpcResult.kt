@@ -8,7 +8,7 @@ import org.http4k.format.JsonType.Null
 import org.http4k.format.JsonType.Number
 import org.http4k.format.JsonType.Object
 
-class JsonRpcResult<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
+class JsonRpcResult<NODE>(json: Json<NODE>, fields: Map<String, NODE>) : JsonRpcMessage<NODE>(fields) {
     private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
         json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
     }

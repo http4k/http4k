@@ -3,7 +3,7 @@ package org.http4k.jsonrpc
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 
-class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
+class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) : JsonRpcMessage<NODE>(fields) {
     private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
         json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
     }
