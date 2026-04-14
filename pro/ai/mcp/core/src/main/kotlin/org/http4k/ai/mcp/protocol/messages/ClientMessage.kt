@@ -5,8 +5,8 @@
 package org.http4k.ai.mcp.protocol.messages
 
 sealed interface ClientMessage {
-    interface Request : ClientMessage, McpRequest
-    interface Response : ClientMessage, McpResponse
-    interface Notification : ClientMessage, McpNotification
+    interface Request : ClientMessage, McpWireRequest
+    interface Response : ClientMessage, McpWireResponse
+    interface Notification : ClientMessage, McpWireNotification
 }
 
