@@ -14,6 +14,10 @@ import org.http4k.server.asServer
 /**
  * Convenience function to create a server from a single capability
  */
-fun ServerCapability.asServer(cfg: PolyServerConfig) = mcp(
-    ServerMetaData(name, "1.0.0"), NoMcpSecurity, this
-).asServer(cfg)
+fun ServerCapability.asServer(cfg: PolyServerConfig, name: String = "http4k-mcp") = listOf(this).asServer(cfg, name)
+
+/**
+ * Convenience function to create a server from a multiple capabilities
+ */
+fun Iterable<ServerCapability>.asServer(config: PolyServerConfig, name: String = "http4k-mcp") =
+    mcp(ServerMetaData(name, "0.0.0"), NoMcpSecurity, *toList().toTypedArray()).asServer(config)

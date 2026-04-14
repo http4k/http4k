@@ -14,7 +14,7 @@ import org.http4k.core.Uri
 /**
  * Handles protocol traffic for resources features and subscriptions.
  */
-interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler {
+interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler, Iterable<ResourceCapability> {
 
     fun listResources(req: McpResource.List.Request, client: Client, http: Request): McpResource.List.Response
 

@@ -14,7 +14,7 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 
 fun completions(vararg capabilities: CompletionCapability): Completions = completions(capabilities.toList())
 
-fun completions(capabilities: Iterable<CompletionCapability>): Completions = object : Completions {
+fun completions(capabilities: Iterable<CompletionCapability>): Completions = object : Completions, Iterable<CompletionCapability> by capabilities {
 
     override fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
         capabilities.find { it.toReference() == mcp.ref }

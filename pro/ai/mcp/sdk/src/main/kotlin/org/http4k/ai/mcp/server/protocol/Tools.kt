@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ToolHandler
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.capability.ToolCapability
-import org.http4k.ai.mcp.util.Observable
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Request
 

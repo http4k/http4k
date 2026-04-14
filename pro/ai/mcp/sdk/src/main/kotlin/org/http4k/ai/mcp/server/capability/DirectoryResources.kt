@@ -117,6 +117,7 @@ class DirectoryResources(
         get() = throw UnsupportedOperationException()
         set(value) = throw UnsupportedOperationException()
 
+    override fun iterator() = items.iterator()
 
     companion object {
         val DEFAULT_TEXT_TYPES =

@@ -19,7 +19,7 @@ import org.http4k.server.asServer
 import java.time.Instant
 
 /**
- * This example demonstrates how to create an minimal MCP tool server using the SSE-only protocol.
+ * This example demonstrates how to create an minimal MCP tool server.
  */
 fun main() {
     mcp(
