@@ -30,7 +30,7 @@ fun UIApp(): PolyHandler {
         RenderMcpApp(
             "show_ui",
             "shows the UI",
-            mcpAppResourceHandler = McpAppViewModelResourceHandler(
+            resourceHandler = McpAppViewModelResourceHandler(
                 Uri.of("ui://a-ui"),
                 renderer,
                 McpAppResourceMeta(

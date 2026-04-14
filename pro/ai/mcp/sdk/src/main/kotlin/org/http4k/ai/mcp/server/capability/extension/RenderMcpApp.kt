@@ -73,13 +73,13 @@ fun RenderMcpApp(
     description: String,
     toolVisibility: List<McpAppVisibility>? = null,
     capabilities: List<ServerCapability> = emptyList(),
-    mcpAppResourceHandler: McpAppViewModelResourceHandler
+    resourceHandler: McpAppViewModelResourceHandler
 ) = RenderMcpApp(
     name,
     description,
-    mcpAppResourceHandler.uiUri,
+    resourceHandler.uiUri,
     capabilities,
     toolVisibility,
-    mcpAppResourceHandler.mimeType,
-    mcpAppResourceHandler
+    resourceHandler.mimeType,
+    resourceHandler
 )
