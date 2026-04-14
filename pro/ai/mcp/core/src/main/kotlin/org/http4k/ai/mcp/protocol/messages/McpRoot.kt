@@ -25,6 +25,6 @@ object McpRoot {
         override val Method = McpRpcMethod.of("notifications/roots/list_changed")
 
         @JsonSerializable
-        data object Notification : ClientMessage.Notification
+        data class Notification(override val _meta: Meta = Meta.default) : ClientMessage.Notification
     }
 }
