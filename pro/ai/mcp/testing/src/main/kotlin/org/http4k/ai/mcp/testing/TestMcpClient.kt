@@ -64,7 +64,7 @@ class TestMcpClient(
             )
         )
 
-        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification).toList()
+        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification()).toList()
         return initResponse.first()
             .nextEvent<McpInitialize.Response, McpInitialize.Response> { this }.map { it.second }
     }

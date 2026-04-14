@@ -50,7 +50,7 @@ data class McpTool(
             override val Method: McpRpcMethod = of("notifications/tools/list_changed")
 
             @JsonSerializable
-            data object Notification : ServerMessage.Notification
+            data class Notification(override val _meta: Meta = Meta.default) : ServerMessage.Notification
         }
     }
 

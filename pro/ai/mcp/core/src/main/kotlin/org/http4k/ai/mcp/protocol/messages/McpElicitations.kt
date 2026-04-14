@@ -54,6 +54,9 @@ object McpElicitations : McpRpc {
         override val Method = McpRpcMethod.of("notifications/elicitation/complete")
 
         @JsonSerializable
-        data class Notification(val elicitationId: ElicitationId) : ServerMessage.Notification
+        data class Notification(
+            val elicitationId: ElicitationId,
+            override val _meta: Meta = Meta.default
+        ) : ServerMessage.Notification
     }
 }

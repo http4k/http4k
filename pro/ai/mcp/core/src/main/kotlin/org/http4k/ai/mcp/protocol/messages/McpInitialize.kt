@@ -21,7 +21,8 @@ object McpInitialize : McpRpc {
     data class Request(
         val clientInfo: VersionedMcpEntity,
         val capabilities: ClientCapabilities = All,
-        val protocolVersion: ProtocolVersion = LATEST_VERSION
+        val protocolVersion: ProtocolVersion = LATEST_VERSION,
+        override val _meta: Meta = Meta.default,
     ) : ClientMessage.Request
 
     @JsonSerializable
@@ -37,6 +38,8 @@ object McpInitialize : McpRpc {
         override val Method = McpRpcMethod.of("notifications/initialized")
 
         @JsonSerializable
-        data object Notification : ClientMessage.Notification
+        data class Notification(
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Notification
     }
 }

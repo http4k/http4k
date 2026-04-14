@@ -342,21 +342,21 @@ class McpProtocol<Transport>(
         prompts.onChange(session) {
             sessions.request(
                 context,
-                McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
+                McpPrompt.List.Changed.Notification().toJsonRpc(McpPrompt.List.Changed)
             )
         }
 
         resources.onChange(session) {
             sessions.request(
                 context,
-                McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
+                McpResource.List.Changed.Notification().toJsonRpc(McpResource.List.Changed)
             )
         }
 
         tools.onChange(session) {
             sessions.request(
                 context,
-                McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
+                McpTool.List.Changed.Notification().toJsonRpc(McpTool.List.Changed)
             )
         }
 

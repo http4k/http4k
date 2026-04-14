@@ -140,7 +140,7 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpPing, McpPing.Request)
+            mcp.sendToMcp(McpPing, McpPing.Request())
 
             assertNextMessage(ServerMessage.Response.Empty)
         }
@@ -163,7 +163,7 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification)
+            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification())
 
             assertNextMessage(McpRoot.List, McpRoot.List.Request(), McpMessageId.of(7425097216252813))
 
@@ -535,7 +535,7 @@ class McpProtocolTest {
 
             tools.items = emptyList()
 
-            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification)
+            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification())
         }
     }
 
@@ -740,7 +740,7 @@ class McpProtocolTest {
             McpInitialize.Response(metadata.entity, metadata.capabilities, LATEST_VERSION, metadata.instructions)
         )
 
-        mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
+        mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification())
     }
 
     private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
