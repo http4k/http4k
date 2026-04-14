@@ -31,7 +31,7 @@ fun McpApp() = mcp(
                 connectDomains = listOf(Domain.of("https://connect.com")),
                 frameDomains = listOf(Domain.of("https://frame.com"))
             )
-        )
+        ),
     ) { "hello world" },
     Tool("standard_tool", "") bind { Ok("hello") },
 )
