@@ -616,44 +616,6 @@ class McpProtocolTest {
         }
     }
 
-    @Test
-    fun `can handle batched messages`() {
-        val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
-        val completions = completions(
-            listOf(ref bind { CompletionResponse.Ok(listOf("values"), 1, true) })
-        )
-
-        val mcp = SseMcp(
-            McpProtocol(
-                SseSessions(SessionProvider.Random(random)),
-                initializer(SimpleInitializeHandler(metadata)),
-                completions = completions,
-                random = random
-            ),
-            NoMcpSecurity
-        )
-
-        with(mcp.testSseClient(Request(GET, "/sse"))) {
-            assertInitializeLoop(mcp)
-
-            with(McpJson) {
-                mcp.sendToMcp(
-                    array(
-                        listOf(
-                            renderRequest(McpPrompt.List, McpPrompt.List.Request()),
-                            renderRequest(McpResource.List, McpResource.List.Request()),
-                            renderRequest(McpTool.List, McpTool.List.Request()),
-                        )
-                    )
-                )
-            }
-
-            assertNextMessage(McpPrompt.List.Response(listOf()))
-            assertNextMessage(McpResource.List.Response(listOf()))
-            assertNextMessage(McpTool.List.Response(listOf()))
-        }
-    }
-
     data class Bar(val name: String)
     data class Foo(val foo: Int?, val bar: Bar, val baz: Boolean?)
 
