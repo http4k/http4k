@@ -48,13 +48,13 @@ import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpLogging
-import org.http4k.ai.mcp.protocol.messages.McpNotification
+import org.http4k.ai.mcp.protocol.messages.McpWireNotification
 import org.http4k.ai.mcp.protocol.messages.McpPing
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
-import org.http4k.ai.mcp.protocol.messages.McpRequest
+import org.http4k.ai.mcp.protocol.messages.McpWireRequest
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpResponse
+import org.http4k.ai.mcp.protocol.messages.McpWireResponse
 import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -747,11 +747,11 @@ class McpProtocolTest {
         assertNextMessage(with(McpJson) { renderError(error, number(1)) })
     }
 
-    private fun TestSseClient.assertNextMessage(input: McpResponse) {
+    private fun TestSseClient.assertNextMessage(input: McpWireResponse) {
         assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
     }
 
-    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpNotification) {
+    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpWireNotification) {
         assertNextMessage(with(McpJson) {
             renderRequest(
                 hasMethod.Method.value,
@@ -761,7 +761,7 @@ class McpProtocolTest {
         })
     }
 
-    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpRequest, id: Any) {
+    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpWireRequest, id: Any) {
         assertNextMessage(with(McpJson) {
             renderRequest(
                 hasMethod.Method.value,
