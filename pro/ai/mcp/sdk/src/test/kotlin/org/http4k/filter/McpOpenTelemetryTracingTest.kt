@@ -104,7 +104,7 @@ class McpOpenTelemetryTracingTest {
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         val handler = filter.then {
-            McpResponse(McpJson.renderError(ErrorMessage.InternalError, it.json.id))
+            McpResponse(McpJson.renderError(ErrorMessage.InternalError, (it.json as JsonRpcRequest).id))
         }
 
         val session = Session(SessionId.of("test-session"))
