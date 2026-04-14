@@ -11,5 +11,5 @@ object McpPing : McpRpc {
     override val Method = of("ping")
 
     @JsonSerializable
-    data object Request : ClientMessage.Request, ServerMessage.Notification
+    data object Request : ClientMessage.Request, ServerMessage.Request
 }
