@@ -14,5 +14,5 @@ class CapabilityPack(private vararg val bindings: ServerCapability) : ServerCapa
     override val name = bindings.joinToString("-") { it.name }
 }
 
-fun capabilities(vararg bindings: ServerCapability) = CapabilityPack(*bindings)
+fun capabilities(vararg bindings: ServerCapability): ServerCapability = CapabilityPack(*bindings)
 fun capabilities(bindings: List<ServerCapability>) = capabilities(*bindings.toTypedArray())
