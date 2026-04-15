@@ -131,7 +131,7 @@ object Wiretap {
                 )
             )
 
-        return poly(listOf(http) + mcpRoutes)
+        return poly(listOf(http), mcpRoutes)
     }
 
 }

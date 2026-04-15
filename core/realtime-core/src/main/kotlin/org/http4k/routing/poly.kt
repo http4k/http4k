@@ -16,9 +16,9 @@ fun poly(vararg routes: RoutingHandler<*, *, *>) = PolyHandler(
     routes.filterIsInstance<RoutingSseHandler>().flatMap { it.routes }.takeIf { it.isNotEmpty() }?.let { RoutingSseHandler(it) },
 )
 
-fun poly(routes: List<RoutingHandler<*, *, *>>) = poly(*routes.toTypedArray())
+fun poly(vararg routes: List<RoutingHandler<*, *, *>>) = poly(*routes.flatMap { it }.toTypedArray())
 
-infix fun String.bind(poly: PolyHandler) =
+infix fun String.bind(poly: PolyHandler): List<RoutingHandler<out Any, out (Nothing) -> (Nothing) -> Any?, *>> =
     listOfNotNull(
         poly.http?.let {
             when (it) {
