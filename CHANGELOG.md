@@ -3,12 +3,14 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.43.0.0 (uncut)
+### v6.43.0.0 
+- **http4k-***: Upgrade versions
 - **http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] `ServerTools` and co are now constructed via `tools()`. Simply replace the calls - the as the rest of the behaviour is unchanges.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Externalised Progress Token so that you need
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Drop support for JsonRpc batching as it is not supported by the MCP spec.
   to pass it directly into progress calls. This makes it explicit that callers without progress tokens will not be able to track progress.
+- **http4k-core**: [Unlikely Break] `FollowRedirects` no longer follows HTTPS to HTTP redirects, preventing possible credential leakage over unencrypted connections.
 - **http4k-security-oauth**: Validate OAuth discovery metadata per RFC 8414 §3.3 (issuer same-origin check) and RFC 9728 §3.3 (resource field same-origin and path validation).
 
 ### v6.42.0.0

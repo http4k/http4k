@@ -59,6 +59,8 @@ class ClientFiltersTest {
             "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(INTERNAL_SERVER_ERROR)
             "/absolute-redirect" -> Response(MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
             "/redirect-with-charset" -> Response(MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
+            "/https-to-http" -> Response(MOVED_PERMANENTLY).header("location", "http://example.com/destination")
+            "/http-to-https" -> Response(MOVED_PERMANENTLY).header("location", "https://example.com/absolute-target")
             "/destination" -> Response(OK).body("destination")
             "/ok" -> Response(OK).body("ok")
             "/ok-with-no-body" -> Response(OK).body(request.body)
@@ -185,6 +187,21 @@ class ClientFiltersTest {
         } catch (e: IllegalStateException) {
             assertThat(e.message, equalTo("Too many redirections"))
         }
+    }
+
+    @Test
+    fun `does not follow HTTPS to HTTP redirect`() {
+        val response = followRedirects(Request(GET, "https://myhost/https-to-http"))
+        assertThat(response.status, equalTo(MOVED_PERMANENTLY))
+        assertThat(response.header("location"), equalTo("http://example.com/destination"))
+    }
+
+    @Test
+    fun `follows HTTP to HTTPS redirect`() {
+        assertThat(
+            followRedirects(Request(GET, "http://myhost/http-to-https")),
+            equalTo(Response(OK).body("absolute"))
+        )
     }
 
     @BeforeEach

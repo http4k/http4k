@@ -177,13 +177,22 @@ object ClientFilters {
             next(request).let {
                 if (it.isRedirection()) {
                     if (attempt == 10) throw IllegalStateException("Too many redirections")
-                    it.assureBodyIsConsumed()
-                    makeRequest(
-                        next,
-                        request.bodyForStatus(it.status).toNewLocation(it.location()),
-                        attempt + 1,
-                        it.resolveInitialUriTemplate(responseUriTemplate, attempt)
-                    )
+                    val redirectUri = request.newLocation(it.location())
+                    when {
+                        request.uri.scheme.equals("https", ignoreCase = true) &&
+                            redirectUri.scheme.equals("http", ignoreCase = true) ->
+                            it.withUriTemplate(responseUriTemplate)
+
+                        else -> {
+                            it.assureBodyIsConsumed()
+                            makeRequest(
+                                next,
+                                request.bodyForStatus(it.status).toNewLocation(redirectUri),
+                                attempt + 1,
+                                it.resolveInitialUriTemplate(responseUriTemplate, attempt)
+                            )
+                        }
+                    }
                 } else it.withUriTemplate(responseUriTemplate)
             }
 
@@ -208,8 +217,7 @@ object ClientFilters {
             else -> ResponseWithContext(this, uriTemplate)
         }
 
-        private fun Request.toNewLocation(location: String): Request {
-            val newUri = newLocation(location)
+        private fun Request.toNewLocation(newUri: Uri): Request {
             val redirect = ensureValidMethodForRedirect().uri(newUri)
 
             return when {
