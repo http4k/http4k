@@ -63,7 +63,7 @@ javax-servlet-api = "4.0.1"
 jetbrains-exposed = "1.2.0"
 jetty-bom = "12.1.8"
 # frozen to 11.0.26
-jetty11-bom = "11.0.26"
+jetty11-bom = "11.0.28"
 joda-time = "2.14.1"
 jose4j = "0.9.6"
 json = "20251224"
