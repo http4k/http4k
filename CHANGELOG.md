@@ -6,7 +6,6 @@ changes with their rationale when appropriate:
 ### v6.43.0.0 
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-kms**: [CVE upgrade] Bouncy Castle upgrade to 1.84 [Advisory](https://github.com/http4k/http4k/security/dependabot/194)
-- **http4k-server-jetty11**: [CVE upgrade] Jetty 11 upgrade to 11.0.28 [Advisory](https://github.com/http4k/http4k/security/dependabot/191)
 - **http4k-template-thymeleaf**: [CVE upgrade] Thymeleaf upgrade to 3.1.4.RELEASE [Advisory](https://github.com/thymeleaf/thymeleaf/security/advisories/GHSA-r4v4-5mwr-2fwr)
 - **http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] `ServerTools` and co are now constructed via `tools()`. Simply replace the calls - the as the rest of the behaviour is unchanges.
