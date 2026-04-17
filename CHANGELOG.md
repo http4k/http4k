@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.43.0.0 
 - **http4k-***: Upgrade versions
+- **http4k-template-thymeleaf**: [CVE upgrade] Thymeleaf upgrade to 3.1.4.RELEASE [Advisory](https://github.com/thymeleaf/thymeleaf/security/advisories/GHSA-r4v4-5mwr-2fwr)
 - **http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] `ServerTools` and co are now constructed via `tools()`. Simply replace the calls - the as the rest of the behaviour is unchanges.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Externalised Progress Token so that you need
