@@ -116,7 +116,7 @@ interface CognitoContract : AwsContract {
 
             val protectedPath = "/getit"
 
-            val cognito = SetBaseUriFrom(Uri.of("https://cognito"))
+            val cognito = SetBaseUriFrom(Uri.of("http://cognito"))
                 .then(http)
 
             val app = App(
@@ -310,7 +310,7 @@ private fun App(
 
     val oauthProvider = OAuthProvider(
         OAuthProviderConfig(
-            Uri.of("https://cognito"),
+            Uri.of("http://cognito"),
             "/oauth2/authorize", "/oauth2/token",
             credentials
         ),
