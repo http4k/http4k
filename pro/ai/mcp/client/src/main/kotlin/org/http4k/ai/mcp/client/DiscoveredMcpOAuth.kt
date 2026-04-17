@@ -77,7 +77,7 @@ fun ClientFilters.DiscoveredMcpOAuth(
         val resourceMetadataUriWithSchema = if (resourceMetadataUri.scheme == "") resourceUri.path(resourceMetadataUri.path) else resourceMetadataUri
 
         return ClientFilters.AutoDiscoveryOAuthToken(
-            fromProtectedResource(resourceMetadataUriWithSchema),
+            fromProtectedResource(resourceMetadataUriWithSchema, resourceUri),
             clientCredentials,
             next,
             clock,

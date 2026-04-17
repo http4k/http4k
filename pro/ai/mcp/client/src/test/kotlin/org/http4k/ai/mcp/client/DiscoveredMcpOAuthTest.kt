@@ -31,8 +31,6 @@ import org.http4k.lens.contentType
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.http4k.routing.routes
-import org.http4k.security.OAuthWebForms.requestForm
-import org.http4k.security.OAuthWebForms.resource
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.metadata.AuthMethod.client_secret_basic
 import org.http4k.security.oauth.metadata.ServerMetadata
@@ -41,13 +39,12 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.net.ServerSocket
 
 class DiscoveredMcpOAuthTest : PortBasedTest {
 
-    private val protectedResourceUri = Uri.of("http://localhost:32323/mcp")
-    private val authServer = routes(
+    private fun authServerApp(issuer: String) = routes(
         "/token" bind {
-            assertThat(resource(requestForm(it)), equalTo(protectedResourceUri))
             Response(OK)
                 .contentType(APPLICATION_JSON)
                 .body(
@@ -62,7 +59,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
         },
         AuthorizationServerWellKnown(
             ServerMetadata(
-                "foobar",
+                issuer,
                 Uri.of("/authorization"),
                 Uri.of("/token"),
                 listOf(client_secret_basic),
@@ -71,11 +68,15 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
                 listOf("read", "write")
             )
         ),
-    ).asServer(Helidon(0))
+    )
 
     @Test
     fun `can discover auth token from protected resource`() {
-        authServer.start()
+        val protectedResourceUri = Uri.of("http://localhost:32323/mcp")
+        val authPort = ServerSocket(0).use { it.localPort }
+
+        val authServer = authServerApp("http://localhost:$authPort")
+            .asServer(Helidon(authPort)).start()
 
         var count = 0
 

@@ -9,6 +9,7 @@ changes with their rationale when appropriate:
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Externalised Progress Token so that you need
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Drop support for JsonRpc batching as it is not supported by the MCP spec.
   to pass it directly into progress calls. This makes it explicit that callers without progress tokens will not be able to track progress.
+- **http4k-security-oauth**: Validate OAuth discovery metadata per RFC 8414 §3.3 (issuer same-origin check) and RFC 9728 §3.3 (resource field same-origin and path validation).
 
 ### v6.42.0.0
 - **http4k-***: Upgrade versions

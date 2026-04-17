@@ -80,6 +80,17 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
         .appendIfNotBlank(fragment, "#", fragment).toString()
 }
 
+fun Uri.isSameOrigin(other: Uri): Boolean {
+    fun Uri.effectivePort() = port ?: when (scheme.lowercase()) {
+        "https" -> 443
+        "http" -> 80
+        else -> null
+    }
+    return scheme.equals(other.scheme, ignoreCase = true) &&
+        host.equals(other.host, ignoreCase = true) &&
+        effectivePort() == other.effectivePort()
+}
+
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
 fun Uri.removeQueries(prefix: String= "") =
