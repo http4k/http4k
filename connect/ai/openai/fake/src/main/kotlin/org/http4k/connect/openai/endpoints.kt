@@ -9,6 +9,7 @@ import org.http4k.connect.openai.OpenAIMoshi.asFormatString
 import org.http4k.connect.openai.OpenAIMoshi.autoBody
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
+import org.http4k.connect.openai.action.ChoiceLogProbs
 import org.http4k.connect.openai.action.CompletionResponse
 import org.http4k.connect.openai.action.CreateEmbeddings
 import org.http4k.connect.openai.action.Embedding
@@ -20,6 +21,8 @@ import org.http4k.connect.openai.action.ImageResponseFormat.b64_json
 import org.http4k.connect.openai.action.ImageResponseFormat.url
 import org.http4k.connect.openai.action.Model
 import org.http4k.connect.openai.action.Models
+import org.http4k.connect.openai.action.TokenLogProb
+import org.http4k.connect.openai.action.TopLogProb
 import org.http4k.connect.openai.action.Usage
 import org.http4k.connect.storage.Storage
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
@@ -102,6 +105,7 @@ fun chatCompletion(clock: Clock, completionGenerators: Map<ModelName, ChatComple
         { request ->
             val chatRequest = autoBody<ChatCompletion>().toLens()(request.convertSimpleMessageToArrayOfMessages())
             val choices = (completionGenerators[chatRequest.model] ?: ChatCompletionGenerator.LoremIpsum())(chatRequest)
+                .let { if (chatRequest.logprobs == true) it.map { c -> c.withSyntheticLogProbs(chatRequest.top_logprobs) } else it }
 
             when {
                 chatRequest.stream -> {
@@ -137,6 +141,34 @@ fun chatCompletion(clock: Clock, completionGenerators: Map<ModelName, ChatComple
                 )
             }
         }
+
+// Keep fake logprobs deterministic so request/response tests stay stable.
+private fun Choice.withSyntheticLogProbs(topN: Int?): Choice {
+    val content = message.content ?: return this
+    val tokens = content.split(" ").filter { it.isNotEmpty() }
+    return copy(
+        logprobs = ChoiceLogProbs(
+            content = tokens.map { token ->
+                val logprob = -0.001 * (token.hashCode().absoluteValue % 1000 + 1)
+                val bytes = token.toByteArray().map { it.toInt() and 0xFF }
+                TokenLogProb(
+                    token = token,
+                    logprob = logprob,
+                    bytes = bytes,
+                    top_logprobs = topN?.let {
+                        (0 until it).map { i ->
+                            TopLogProb(
+                                token = if (i == 0) token else "alt_${token}_$i",
+                                logprob = logprob - i,
+                                bytes = bytes
+                            )
+                        }
+                    }
+                )
+            }
+        )
+    )
+}
 
 private fun Request.convertSimpleMessageToArrayOfMessages(): Request {
     val node = OpenAIMoshi.parse(bodyString()) as MoshiObject

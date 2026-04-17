@@ -27,13 +27,14 @@ import org.http4k.connect.openai.action.Message.Companion.ToolCallResult
 import org.http4k.connect.openai.action.Message.Companion.ToolCalls
 import org.http4k.connect.openai.action.Message.Companion.User
 import org.http4k.connect.openai.action.MessageContent
+import org.http4k.connect.openai.action.JsonSchemaSpec
 import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
 import org.http4k.connect.openai.action.Tool
 import org.http4k.connect.openai.action.ToolCall
 import java.util.UUID
 
 fun ChatResponseFormat.toOpenAI() = when (this) {
-    is Json -> JsonSchema(null, LLMJson.convert(schema))
+    is Json -> JsonSchema(JsonSchemaSpec(name = "response", schema = LLMJson.convert(schema)))
     Text -> null
 }
 
