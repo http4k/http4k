@@ -9,9 +9,10 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.recover
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
+import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.x402.PaymentCheck.Free
 import org.http4k.ai.mcp.x402.PaymentCheck.Required
 import org.http4k.connect.RemoteFailure
@@ -45,11 +46,24 @@ fun McpFilters.X402PaymentRequired(
                                 .flatMap { response ->
                                     facilitator(Settle(payment, matched))
                                         .map { response }
-                                        .mapFailure { RemoteFailure(it.method, it.uri, it.status, "Settlement failed: ${it.message}") }
+                                        .mapFailure {
+                                            RemoteFailure(
+                                                it.method,
+                                                it.uri,
+                                                it.status,
+                                                "Settlement failed: ${it.message}"
+                                            )
+                                        }
                                 }
-                                .recover { throw McpException(ErrorMessage(402, it.message ?: "Payment failed")) }
-                        } ?: throw McpException(ErrorMessage(402, "Unsupported payment scheme/network"))
-                } ?: throw McpException(ErrorMessage(402, "Payment required"))
+                                .recover {
+                                    McpResponse(
+                                        ErrorMessage(402, it.message ?: "Payment failed").toJsonRpc(req.json.id)
+                                    )
+                                }
+                            } ?: McpResponse(
+                            ErrorMessage(402, "Unsupported payment scheme/network").toJsonRpc(req.json.id)
+                        )
+                    } ?: McpResponse(ErrorMessage(402, "Payment required").toJsonRpc(req.json.id))
             }
         }
     }

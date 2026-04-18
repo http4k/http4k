@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.43.0.1 (uncut)
+- **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
+
 ### v6.43.0.0 
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-kms**: [CVE upgrade] Bouncy Castle upgrade to 1.84 [Advisory](https://github.com/http4k/http4k/security/dependabot/194)

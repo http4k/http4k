@@ -6,8 +6,8 @@ package org.http4k.ai.mcp.x402
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.server.protocol.Session
@@ -36,11 +36,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
 import org.http4k.format.MoshiNode
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class X402McpFilterTest {
 
@@ -91,13 +91,10 @@ class X402McpFilterTest {
     }
 
     @Test
-    fun `request without payment in meta throws McpException`() {
-        val exception = assertThrows<McpException> {
-            handler(mcpRequest())
-        }
+    fun `request without payment in meta returns payment required error`() {
+        val result = handler(mcpRequest())
 
-        assertThat(exception.error.code, equalTo(402))
-        assertThat(exception.error.message, equalTo("Payment required"))
+        assertThat(result, equalTo(McpResponse(ErrorMessage(402, "Payment required").toJsonRpc(asJsonObject(1)))))
     }
 
     @Test
@@ -108,7 +105,7 @@ class X402McpFilterTest {
     }
 
     @Test
-    fun `request with unsupported scheme or network throws McpException`() {
+    fun `request with unsupported scheme or network returns error`() {
         val unmatchedPayload = PaymentPayload(
             x402Version = 2,
             scheme = PaymentScheme.of("unknown-scheme"),
@@ -118,12 +115,9 @@ class X402McpFilterTest {
             description = "MCP request"
         )
 
-        val exception = assertThrows<McpException> {
-            handler(mcpRequest(unmatchedPayload))
-        }
+        val result = handler(mcpRequest(unmatchedPayload))
 
-        assertThat(exception.error.code, equalTo(402))
-        assertThat(exception.error.message, equalTo("Unsupported payment scheme/network"))
+        assertThat(result, equalTo(McpResponse(ErrorMessage(402, "Unsupported payment scheme/network").toJsonRpc(asJsonObject(1)))))
     }
 
     @Test
@@ -162,7 +156,7 @@ class X402McpFilterTest {
     }
 
     @Test
-    fun `settlement failure suppresses tool content and throws McpException`() {
+    fun `settlement failure suppresses tool content and returns error`() {
         val verifyPassSettleFail = routes(
             "/verify" bind POST to {
                 Response(OK).json(VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer")))
@@ -175,12 +169,9 @@ class X402McpFilterTest {
             PaymentCheck.Required(listOf(requirements))
         }.then { McpResponse(McpJson.nullNode()) }
 
-        val exception = assertThrows<McpException> {
-            handler(mcpRequest(signedPayload))
-        }
+        val result = handler(mcpRequest(signedPayload))
 
-        assertThat(exception.error.code, equalTo(402))
-        assertThat(exception.error.message, equalTo("Settlement failed: Settlement rejected"))
+        assertThat(result, equalTo(McpResponse(ErrorMessage(402, "Settlement failed: Settlement rejected").toJsonRpc(asJsonObject(1)))))
     }
 
     @Test

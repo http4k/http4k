@@ -8,7 +8,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -19,6 +18,9 @@ import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
+import org.http4k.format.Json
+import org.http4k.format.renderError
+import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.connect.mpp.model.Challenge
 import org.http4k.connect.mpp.model.ChallengeId
 import org.http4k.connect.mpp.model.ChargeRequest
@@ -37,7 +39,6 @@ import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
 import org.http4k.format.MoshiNode
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.Instant
 
 class MppMcpFilterTest {
@@ -93,19 +94,10 @@ class MppMcpFilterTest {
     }
 
     @Test
-    fun `request without credential throws McpException with -32042 and challenges`() {
-        val exception = assertThrows<McpException> {
-            handler(mcpRequest())
-        }
+    fun `request without credential returns error with -32042 and challenges`() {
+        val result = handler(mcpRequest())
 
-        assertThat(exception.error.code, equalTo(-32042))
-        assertThat(exception.error.message, equalTo("Payment required"))
-
-        val data = exception.error.data(McpJson)!!
-        val dataStr = McpJson.asFormatString(data)
-        assertThat(dataStr.contains("\"challenges\""), equalTo(true))
-        assertThat(dataStr.contains("\"challenge-123\""), equalTo(true))
-        assertThat(dataStr.contains("\"amount\""), equalTo(true))
+        assertThat(result, equalTo(McpResponse(mppErrorResponse(-32042, "Payment required", listOf(challenge)))))
     }
 
     @Test
@@ -116,21 +108,14 @@ class MppMcpFilterTest {
     }
 
     @Test
-    fun `verification failure throws McpException with -32043 and challenges`() {
+    fun `verification failure returns error with -32043 and challenges`() {
         val failingVerifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
         val failHandler = McpFilters.MppPaymentRequired(failingVerifier) { MppPaymentCheck.Required(listOf(challenge)) }
             .then { McpResponse(McpJson.nullNode()) }
 
-        val exception = assertThrows<McpException> {
-            failHandler(mcpRequest(credential))
-        }
+        val result = failHandler(mcpRequest(credential))
 
-        assertThat(exception.error.code, equalTo(-32043))
-        assertThat(exception.error.message, equalTo("bad signature"))
-
-        val data = exception.error.data(McpJson)!!
-        val dataStr = McpJson.asFormatString(data)
-        assertThat(dataStr.contains("\"challenges\""), equalTo(true))
+        assertThat(result, equalTo(McpResponse(mppErrorResponse(-32043, "bad signature", listOf(challenge)))))
     }
 
     @Test
@@ -142,4 +127,14 @@ class MppMcpFilterTest {
 
         assertThat(result, equalTo(McpResponse(McpJson.nullNode())))
     }
+
+    private fun mppErrorResponse(code: Int, message: String, challenges: List<Challenge>) =
+        McpJson.renderError(
+            object : ErrorMessage(code, message) {
+                @Suppress("UNCHECKED_CAST")
+                override fun <NODE> data(json: Json<NODE>): NODE =
+                    MppMoshi.asJsonObject(mapOf("challenges" to challenges)) as NODE
+            },
+            asJsonObject(1)
+        )
 }
