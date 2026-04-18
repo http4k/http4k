@@ -3,8 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.43.0.1 (uncut)
+### v6.44.0.0 (uncut)
 - **http4k-***: Upgrade versions, including Kotlin to 2.3.21
+- **http4k-ai-mcp-sdk**: [Break] `McpHandler` now handles `JsonRpcResult` as well as `JsonRpcRequest`, through a new sealed supertype `JsonRpcMessage`. Any custom McpHandlers will need adjusting.
+- **http4k-ai-mcp-sdk**: [Break] All MCP Message objects have _meta fields now. Conversion from `object` to class.
 - **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
 - **http4k-testing-chaos**: Add `ReturnResponse` behaviour. H/T @jamieredding.
 - **http4k-connect-amazon-dynamodb-fake** [Fix] Condition expression to be properly evaluated when item is missing. H/T @oharaandrew314
@@ -16,8 +18,6 @@ changes with their rationale when appropriate:
 - **http4k-ai-mcp-sdk**: [Fix] All Tool Calls in OTel are mistakenly tagged as errors.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] `ServerTools` and co are now constructed via `tools()`. Simply replace the calls - the as the rest of the behaviour is unchanges.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Externalised Progress Token so that you need
-- **http4k-ai-mcp-sdk**: [Break] `McpHandler` now handles `JsonRpcResult` as well as `JsonRpcRequest`, through a new sealed supertype `JsonRpcMessage`. Any custom McpHandlers will need adjusting.
-- **http4k-ai-mcp-sdk**: [Break] All MCP Message objects have _meta fields now. Conversion from `object` to class.
 - **http4k-ai-mcp-sdk**: [Unlikely Break] Drop support for JsonRpc batching as it is not supported by the MCP spec.
   to pass it directly into progress calls. This makes it explicit that callers without progress tokens will not be able to track progress.
 - **http4k-core**: [Unlikely Break] `FollowRedirects` no longer follows HTTPS to HTTP redirects, preventing possible credential leakage over unencrypted connections.
