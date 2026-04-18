@@ -26,7 +26,3 @@ fun McpFilter.then(next: McpHandler) = this(next)
 fun McpFilter.then(next: McpFilter) = McpFilter { this(next(it)) }
 
 typealias MatchedHandler = (Client) -> McpHandler
-
-interface RoutingMcpHandler {
-    operator fun invoke(request: McpRequest): MatchedHandler?
-}
