@@ -286,7 +286,7 @@ class McpProtocol<Transport>(
 
             else -> {
                 val jsonResult = JsonRpcResult(McpJson, payload)
-                McpRequest(session, jsonResult, httpReq)
+//                McpRequest(session, jsonResult, httpReq)
                 when {
                     jsonResult.isError() -> ok()
                     else -> with(McpJson) {
