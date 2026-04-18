@@ -20,6 +20,8 @@ import org.http4k.filter.McpFilters
 import org.http4k.format.Json
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.JsonRpcRequest
+import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.lens.MetaKey
 
 private const val PAYMENT_REQUIRED_CODE = -32042
@@ -30,28 +32,37 @@ fun McpFilters.MppPaymentRequired(
     check: (McpRequest) -> MppPaymentCheck,
 ) = McpFilter { next ->
     { req ->
-        when (val result = check(req)) {
-            is Free -> next(req)
-            is Required -> {
-                val params = req.json.params as? MoshiObject
-                val metaNode = params?.attributes?.get("_meta") as? MoshiObject
-                val meta = Meta(metaNode ?: MoshiObject())
+        val json = req.json
+        when (json) {
+            is JsonRpcRequest<*> -> when (val result = check(req)) {
+                is Free -> next(req)
+                is Required -> {
+                    val params = json.params as? MoshiObject
+                    val metaNode = params?.attributes?.get("_meta") as? MoshiObject
+                    val meta = Meta(metaNode ?: MoshiObject())
 
-                MetaKey.mppCredential().toLens()(meta)
-                    ?.let { credential ->
-                        verifier.verify(credential)
-                            .map { next(req) }
-                            .recover {
-                                McpResponse(
-                                    MppErrorMessage(VERIFICATION_FAILED_CODE, it.message ?: "Verification failed", result.challenges)
-                                        .toJsonRpc(req.json.id)
-                                )
-                            }
-                    } ?: McpResponse(
-                    MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
-                        .toJsonRpc(req.json.id)
-                )
+                    MetaKey.mppCredential().toLens()(meta)
+                        ?.let { credential ->
+                            verifier.verify(credential)
+                                .map { next(req) }
+                                .recover {
+                                    McpResponse(
+                                        MppErrorMessage(
+                                            VERIFICATION_FAILED_CODE,
+                                            it.message ?: "Verification failed",
+                                            result.challenges
+                                        )
+                                            .toJsonRpc(json.id)
+                                    )
+                                }
+                        } ?: McpResponse(
+                        MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
+                            .toJsonRpc(json.id)
+                    )
+                }
             }
+
+            is JsonRpcResult<*> -> next(req)
         }
     }
 }
