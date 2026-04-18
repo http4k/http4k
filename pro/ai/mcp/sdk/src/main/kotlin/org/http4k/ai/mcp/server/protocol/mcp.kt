@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import org.http4k.jsonrpc.JsonRpcRequest
@@ -24,5 +23,3 @@ val McpFilter.Companion.NoOp: McpFilter get() = { it }
 fun McpFilter.then(next: McpHandler) = this(next)
 
 fun McpFilter.then(next: McpFilter) = McpFilter { this(next(it)) }
-
-typealias MatchedHandler = (Client) -> McpHandler
