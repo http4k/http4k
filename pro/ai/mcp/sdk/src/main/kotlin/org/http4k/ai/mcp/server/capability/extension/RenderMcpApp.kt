@@ -34,8 +34,8 @@ import org.http4k.routing.bind
 fun RenderMcpApp(
     name: String,
     description: String,
-    uiUri: Uri,
-    capabilities: List<ServerCapability>,
+    uiUri: Uri = name.toFriendlyUiUri(),
+    capabilities: List<ServerCapability> = emptyList(),
     toolVisibility: List<McpAppVisibility>? = null,
     mimeType: MimeType = MIME_TYPE,
     resourceHandler: ResourceHandler,
@@ -54,7 +54,7 @@ fun RenderMcpApp(
 fun RenderMcpApp(
     name: String,
     description: String,
-    uiUri: Uri,
+    uiUri: Uri = name.toFriendlyUiUri(),
     meta: McpAppResourceMeta = McpAppResourceMeta(),
     toolVisibility: List<McpAppVisibility>? = null,
     mimeType: MimeType = MIME_TYPE,
@@ -71,8 +71,8 @@ fun RenderMcpApp(
 fun RenderMcpApp(
     name: String,
     description: String,
-    toolVisibility: List<McpAppVisibility>? = null,
     capabilities: List<ServerCapability> = emptyList(),
+    toolVisibility: List<McpAppVisibility>? = null,
     resourceHandler: McpAppViewModelResourceHandler
 ) = RenderMcpApp(
     name,
@@ -83,3 +83,5 @@ fun RenderMcpApp(
     resourceHandler.mimeType,
     resourceHandler
 )
+
+private fun String.toFriendlyUiUri(): Uri = Uri.of("ui://${this.filter { it.isLetterOrDigit() }}")
