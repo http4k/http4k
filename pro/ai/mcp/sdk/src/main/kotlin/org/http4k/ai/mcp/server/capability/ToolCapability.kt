@@ -37,7 +37,7 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
 
-class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : ServerCapability, ToolHandler {
+data class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : ServerCapability, ToolHandler {
     override val name = tool.name.value
 
     fun toTool() = McpTool(
@@ -93,7 +93,6 @@ class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler)
 
     override fun invoke(p1: ToolRequest) = handler(p1)
 }
-
 
 private fun Map<String, MoshiNode>.coerceIntoRawTypes() =
     mapNotNull { it.value.asString()?.let { value -> it.key to value } }.toMap()
