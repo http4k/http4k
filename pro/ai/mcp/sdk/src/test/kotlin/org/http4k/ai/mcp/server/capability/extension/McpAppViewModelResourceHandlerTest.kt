@@ -24,7 +24,7 @@ class McpAppViewModelResourceHandlerTest {
     @Test
     fun `can create an resource renderer with a template renderer`() {
         val uiUri = Uri.of("ui://foobar")
-        val handler = McpAppViewModelResourceHandler(uiUri, { "hello" }) { Foo }
+        val handler = McpAppViewModelResourceHandler({ "hello" }) { Foo }
 
         assertThat(
             handler(ResourceRequest(uiUri)),

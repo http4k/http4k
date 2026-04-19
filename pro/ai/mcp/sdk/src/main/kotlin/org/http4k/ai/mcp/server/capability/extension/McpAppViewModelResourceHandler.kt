@@ -20,12 +20,11 @@ import org.http4k.template.ViewModel
  * Renders a ViewModel into a ResourceResponse for use when rendering an MCP App.
  */
 data class McpAppViewModelResourceHandler(
-    val uiUri: Uri,
     private val renderer: TemplateRenderer,
     val meta: McpAppResourceMeta = McpAppResourceMeta(),
     val mimeType: MimeType = MIME_TYPE,
     private val fn: (ResourceRequest) -> ViewModel
 ) : ResourceHandler {
     override fun invoke(p1: ResourceRequest) =
-        ResourceResponse.Ok(Resource.Content.Text(renderer(fn(p1)), uiUri, mimeType, Content.Meta(ui = meta)))
+        ResourceResponse.Ok(Resource.Content.Text(renderer(fn(p1)), p1.uri, mimeType, Content.Meta(ui = meta)))
 }

@@ -71,17 +71,18 @@ fun RenderMcpApp(
 fun RenderMcpApp(
     name: String,
     description: String,
+    uiUri: Uri = name.toFriendlyUiUri(),
     capabilities: List<ServerCapability> = emptyList(),
     toolVisibility: List<McpAppVisibility>? = null,
     resourceHandler: McpAppViewModelResourceHandler
 ) = RenderMcpApp(
     name,
     description,
-    resourceHandler.uiUri,
+    uiUri,
     capabilities,
     toolVisibility,
     resourceHandler.mimeType,
     resourceHandler
 )
 
-private fun String.toFriendlyUiUri(): Uri = Uri.of("ui://${this.filter { it.isLetterOrDigit() }}")
+private fun String.toFriendlyUiUri(): Uri = Uri.of("ui://${filter { it.isLetterOrDigit() }}")
