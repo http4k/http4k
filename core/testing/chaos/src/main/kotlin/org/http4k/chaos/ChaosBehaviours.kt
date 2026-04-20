@@ -196,7 +196,7 @@ object ChaosBehaviours {
     object ReturnResponse {
         operator fun invoke(response: Response) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = { response }
-            override fun toString() = "ReturnResponse ($response)"
+            override fun toString() = "ReturnResponse(${response.status.code})"
         }
     }
 
@@ -234,6 +234,8 @@ internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
     "overflow" -> StackOverflow()
     "block" -> BlockThread()
     "none" -> None()
+    "response" -> ChaosBehaviours.ReturnResponse(asResponse())
+
     else -> throw IllegalArgumentException("unknown behaviour")
 }
 
@@ -243,4 +245,16 @@ private fun Body.snipTo(limit: Long): Body {
     return Body(object : InputStream() {
         override fun read() = if (left-- > 0) original.read() else -1
     }, limit)
+}
+
+private fun JsonNode.asResponse(): Response {
+    var response = Response(Status(nonNullable("status"), "x-http4k-chaos"))
+    asNullable<Map<String, String>>("headers")?.map { (key, value) -> key to value }?.let {
+        response = response.headers(it)
+    }
+    asNullable<String>("body")?.let {
+        response = response.body(it)
+    }
+
+    return response
 }
