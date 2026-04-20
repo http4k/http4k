@@ -3,8 +3,8 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isNullOrBlank
 import com.natpryce.hamkrest.matches
-import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import org.http4k.chaos.ChaosBehaviours.KillProcess
 import org.http4k.chaos.ChaosBehaviours.Latency
@@ -122,21 +122,37 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
 }
 
 class ReturnResponseTest : ChaosBehaviourContract() {
-    private val description = """ReturnResponse (HTTP/1.1 500 Internal Server Error"""
+    private val description = "ReturnResponse (HTTP/1.1 500 x-http4k-chaos\r\nx-name: value\r\nx-other: another-value\r\n\r\na returned body)"
 
     @Test
-    fun `should return response `() {
-        val expected = Response(INTERNAL_SERVER_ERROR)
+    fun `should return response`() {
+        val expected = Response(INTERNAL_SERVER_ERROR.description("x-http4k-chaos"))
+            .body("a returned body")
+            .header("x-name", "value")
+            .header("x-other", "another-value")
         val returnResponse = ChaosBehaviours.ReturnResponse(expected)
-        assertThat(returnResponse.toString(), startsWith(description))
+        assertThat(returnResponse.toString(), equalTo(description))
 
         val injectedResponse = returnResponse.then { response }(request)
         assertEquals(expected, injectedResponse)
     }
 
     @Test
-    @Disabled("not supported remotely")
     override fun `deserialises from JSON`() {
+        assertBehaviour("""{"type":"response","status":500,"body":"a returned body", "headers": {"x-name": "value", "x-other": "another-value"}}""",
+            description,
+            hasStatus(INTERNAL_SERVER_ERROR.description("x-http4k-chaos"))
+                .and(hasBody("a returned body"))
+                .and(hasHeader("x-name", equalTo("value")))
+                .and(hasHeader("x-other", equalTo("another-value"))))
+    }
+
+    @Test
+    fun `deserialises response with minimum JSON`() {
+        assertBehaviour("""{"type":"response","status":500}""",
+            "ReturnResponse (HTTP/1.1 500 x-http4k-chaos\r\n\r\n\r\n)",
+            hasStatus(INTERNAL_SERVER_ERROR.description("x-http4k-chaos"))
+                .and(hasBody(isNullOrBlank)))
     }
 }
 
