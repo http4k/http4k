@@ -122,19 +122,20 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
 }
 
 class ReturnResponseTest : ChaosBehaviourContract() {
-    private val description = "ReturnResponse (HTTP/1.1 500 x-http4k-chaos\r\nx-name: value\r\nx-other: another-value\r\n\r\na returned body)"
+    private val description = "ReturnResponse(500)"
 
     @Test
     fun `should return response`() {
-        val expected = Response(INTERNAL_SERVER_ERROR.description("x-http4k-chaos"))
-            .body("a returned body")
+        val expected = Response(INTERNAL_SERVER_ERROR)
             .header("x-name", "value")
             .header("x-other", "another-value")
+            .body("a returned body")
+
         val returnResponse = ChaosBehaviours.ReturnResponse(expected)
         assertThat(returnResponse.toString(), equalTo(description))
 
         val injectedResponse = returnResponse.then { response }(request)
-        assertEquals(expected, injectedResponse)
+        assertThat(injectedResponse, equalTo(expected))
     }
 
     @Test
@@ -150,7 +151,7 @@ class ReturnResponseTest : ChaosBehaviourContract() {
     @Test
     fun `deserialises response with minimum JSON`() {
         assertBehaviour("""{"type":"response","status":500}""",
-            "ReturnResponse (HTTP/1.1 500 x-http4k-chaos\r\n\r\n\r\n)",
+            description,
             hasStatus(INTERNAL_SERVER_ERROR.description("x-http4k-chaos"))
                 .and(hasBody(isNullOrBlank)))
     }

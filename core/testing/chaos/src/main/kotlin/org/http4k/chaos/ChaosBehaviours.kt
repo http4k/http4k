@@ -196,7 +196,7 @@ object ChaosBehaviours {
     object ReturnResponse {
         operator fun invoke(response: Response) = object : Behaviour() {
             override fun invoke(next: HttpHandler): HttpHandler = { response }
-            override fun toString() = "ReturnResponse ($response)"
+            override fun toString() = "ReturnResponse(${response.status.code})"
         }
     }
 

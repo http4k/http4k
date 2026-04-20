@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.43.0.1 (uncut)
 - **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
+- **http4k-testing-chaos**: Add `ReturnResponse` behaviour. H/T @jamieredding.
 
 ### v6.43.0.0 
 - **http4k-***: Upgrade versions
