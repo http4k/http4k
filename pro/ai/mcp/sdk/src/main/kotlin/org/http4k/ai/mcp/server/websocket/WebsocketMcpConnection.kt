@@ -34,7 +34,6 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
             val context = Subscription(sessionState.session)
 
             with(protocol) {
-                assign(context, ws, req)
                 var firstCall = true
 
                 ws.onMessage { msg ->
