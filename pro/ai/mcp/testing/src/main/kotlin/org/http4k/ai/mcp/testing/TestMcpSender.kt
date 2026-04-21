@@ -87,7 +87,6 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
 
         if (sessionId.get() == null && newSessionId != null) {
             sessionId.set(Header.MCP_SESSION_ID(client.response))
-            id.set(0)
         }
 
         require(client.response.status == OK)

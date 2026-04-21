@@ -72,7 +72,6 @@ class WebsocketMcpClient(
 
     override fun endpoint(it: Event) {
         endpoint.set(it.data)
-        id.set(0)
     }
 
     private val endpoint = AtomicReference<String>()
