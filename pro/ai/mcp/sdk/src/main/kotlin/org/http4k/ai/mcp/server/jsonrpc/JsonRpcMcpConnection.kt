@@ -4,9 +4,6 @@
  */
 package org.http4k.ai.mcp.server.jsonrpc
 
-import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.server.asHttp
 import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -27,16 +24,9 @@ import org.http4k.routing.bind
 fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: Request ->
     when (val sessionState = protocol.retrieveSession(req)) {
         is ValidSessionState -> {
-            with(protocol) {
-                handleInitialize(
-                    McpInitialize.Request(VersionedMcpEntity(sessionState.session.id.value, "0.0.0"), All),
-                    req,
-                    sessionState.session
-                )
-                receive(Unit, sessionState, req).asHttp(OK)
+            protocol.receive(Unit, sessionState, req).asHttp(OK)
                     .with(Header.MCP_SESSION_ID of sessionState.session.id)
             }
-        }
 
         InvalidSessionState -> Response(NOT_FOUND)
     }

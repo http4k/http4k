@@ -36,10 +36,9 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
         POST to { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
-                    is ValidSessionState -> {
+                    is ValidSessionState ->
                         receive(FakeSse(req), sessionState, req).asHttp(OK)
                             .with(Header.MCP_SESSION_ID of sessionState.session.id)
-                    }
 
                     InvalidSessionState -> Response(NOT_FOUND)
                 }
