@@ -39,7 +39,6 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
 
                 ws.onMessage { msg ->
                     executor.submit {
-                        println(msg.bodyString())
                         receive(ws, sessionToUse(firstCall, protocol, req, sessionState), req.body(msg.bodyString()))
                         firstCall = false
                     }
