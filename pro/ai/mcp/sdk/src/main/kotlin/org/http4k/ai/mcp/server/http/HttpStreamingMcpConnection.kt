@@ -12,10 +12,11 @@ import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.accepted
 import org.http4k.lens.Header
@@ -49,12 +50,16 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
                         }
 
                         POST -> sse.use { receive(it, session, req) }
+                        DELETE -> {
+                            end(Subscription(session))
+                            sse.close()
+                        }
 
                         else -> sse.close()
                     }
                 }
             }
 
-            is InvalidSession -> SseResponse(BAD_REQUEST) { it.close() }
+            is InvalidSession -> SseResponse(NOT_FOUND) { it.close() }
         }
     })
