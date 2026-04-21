@@ -310,21 +310,6 @@ class McpProtocol<Transport>(
         }
     }
 
-    private inline fun <reified IN : ClientMessage.Request> respond(
-        transport: Transport,
-        mcpRequest: McpRequest,
-        callCtx: ClientCall,
-        noinline fn: (IN, Client) -> ServerMessage.Response
-    ): McpResponse {
-        val client = clientFor(callCtx)
-
-        val handler = mcpFilter
-            .then(AssignAndCloseSession(sessions, transport))
-            .then(AdaptingMcpHandler(onError)(IN::class, fn, client))
-
-        return handler(mcpRequest)
-    }
-
     private fun clientFor(context: ClientRequestContext): SessionBasedClient = SessionBasedClient(
         { sessions.request(context, it) },
         context.session,
@@ -390,4 +375,20 @@ class McpProtocol<Transport>(
         sessions.assign(context, transport, connectRequest)
 
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
+
+    private inline fun <reified IN : ClientMessage.Request> respond(
+        transport: Transport,
+        mcpRequest: McpRequest,
+        callCtx: ClientCall,
+        noinline fn: (IN, Client) -> ServerMessage.Response
+    ): McpResponse {
+        val client = clientFor(callCtx)
+
+        val handler = mcpFilter
+            .then(AssignAndCloseSession(sessions, transport))
+            .then(AdaptingMcpHandler(onError)(IN::class, fn, client))
+
+        return handler(mcpRequest)
+    }
+
 }
