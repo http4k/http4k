@@ -7,10 +7,10 @@ package org.http4k.ai.mcp.server.jsonrpc
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.server.asHttp
 import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.Session
-import org.http4k.ai.mcp.util.asHttp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND

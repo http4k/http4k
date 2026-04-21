@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.server.stdio
 
-import dev.forkhandles.result4k.Success
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.Session
@@ -23,7 +22,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
     }
 
     override fun respond(transport: Unit, context: ClientRequestContext, message: McpNodeType) =
-        Success(message)
+        message
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) = fn()
 

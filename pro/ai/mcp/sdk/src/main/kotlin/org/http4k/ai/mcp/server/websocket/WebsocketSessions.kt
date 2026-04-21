@@ -4,8 +4,6 @@
  */
 package org.http4k.ai.mcp.server.websocket
 
-import dev.forkhandles.result4k.Result4k
-import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
@@ -42,9 +40,9 @@ class WebsocketSessions(
         transport: Websocket,
         context: ClientRequestContext,
         message: McpNodeType
-    ): Result4k<McpNodeType, McpNodeType> {
+    ): McpNodeType {
         transport.sendAndStore(message, context.session)
-        return Success(message)
+        return message
     }
 
     override fun request(context: ClientRequestContext, message: McpNodeType) =

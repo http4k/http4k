@@ -4,8 +4,6 @@
  */
 package org.http4k.ai.mcp.server.http
 
-import dev.forkhandles.result4k.Result4k
-import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
@@ -45,9 +43,9 @@ class HttpSessions(
         }
     }
 
-    override fun respond(transport: Sse, context: ClientRequestContext, message: McpNodeType): Result4k<McpNodeType, McpNodeType> {
+    override fun respond(transport: Sse, context: ClientRequestContext, message: McpNodeType): McpNodeType {
         transport.sendAndStore(message, context.session)
-        return Success(message)
+        return message
     }
 
     private fun Sse.sendAndStore(message: McpNodeType, session: Session) {
