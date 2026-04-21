@@ -45,20 +45,21 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
-import kotlin.random.Random
 
 abstract class AbstractMcpClient(
     private val clientInfo: VersionedMcpEntity,
     private val capabilities: ClientCapabilities,
     protected val protocolVersion: ProtocolVersion = LATEST_VERSION,
     private val defaultTimeout: Duration,
-    private val random: Random
 ) : McpClient {
     private val running = AtomicBoolean(false)
     protected val requests = ConcurrentHashMap<McpMessageId, CountDownLatch>()
     private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
     protected val messageQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<McpNodeType>>()
+
+    protected val id = AtomicLong(0)
 
     override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response> {
         val startLatch = CountDownLatch(1)
@@ -111,7 +112,7 @@ abstract class AbstractMcpClient(
                     McpInitialize,
                     McpInitialize.Request(clientInfo, capabilities, protocolVersion),
                     defaultTimeout,
-                    McpMessageId.random(random)
+                    McpMessageId.of(id.incrementAndGet()),
                 )
                     .flatMap { reqId ->
                         val next = findQueue(reqId)
@@ -136,12 +137,12 @@ abstract class AbstractMcpClient(
     }
 
     override fun tools(): McpClient.Tools =
-        ClientTools(::findQueue, ::tidyUp, ::sendMessage, random, defaultTimeout) { rpc, callback ->
+        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun prompts(): McpClient.Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random) { rpc, callback ->
+        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
@@ -161,15 +162,15 @@ abstract class AbstractMcpClient(
         }
 
     override fun resources(): McpClient.Resources =
-        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random) { rpc, callback ->
+        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
     override fun completions(): McpClient.Completions =
-        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, random)
+        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())})
 
     override fun tasks(): McpClient.Tasks =
-        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, random, defaultTimeout) { rpc, callback ->
+        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout) { rpc, callback ->
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 

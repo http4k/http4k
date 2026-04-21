@@ -28,6 +28,7 @@ import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.McpEntity
+import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
@@ -63,6 +64,7 @@ import org.http4k.lens.accept
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -77,6 +79,8 @@ class HttpNonStreamingMcpClient(
 ) : McpClient {
 
     private val _sessionId = AtomicReference<SessionId>()
+
+    private val id = AtomicLong(0)
 
     override val sessionId get() = _sessionId.get()
 
@@ -193,12 +197,17 @@ class HttpNonStreamingMcpClient(
 
     private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
         val response = this(
-            message.toHttpRequest(protocolVersion, baseUri, rpc)
+            message.toHttpRequest(protocolVersion, baseUri, rpc, McpMessageId.of(id.incrementAndGet()))
                 .with(Header.MCP_SESSION_ID of sessionId)
                 .accept(TEXT_EVENT_STREAM)
         )
 
-        _sessionId.set(Header.MCP_SESSION_ID(response))
+        val newSessionId = Header.MCP_SESSION_ID(response)
+
+        if(newSessionId != sessionId) {
+            id.set(0)
+            _sessionId.set(newSessionId)
+        }
 
         return when {
             response.status.successful -> resultFrom { SseMessage.parse(response.bodyString()) as Event }

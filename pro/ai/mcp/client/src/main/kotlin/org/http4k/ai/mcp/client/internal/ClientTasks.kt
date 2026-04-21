@@ -15,13 +15,12 @@ import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.util.McpNodeType
 import java.time.Duration
-import kotlin.random.Random
 
 internal class ClientTasks(
     private val queueFor: (McpMessageId) -> Iterable<McpNodeType>,
     private val tidyUp: (McpMessageId) -> Unit,
     private val sender: McpRpcSender,
-    private val random: Random,
+    private val id: () -> McpMessageId,
     private val defaultTimeout: Duration,
     private val register: ((McpRpc, McpCallback<*>) -> Any)? = null
 ) : McpClient.Tasks {
@@ -35,7 +34,7 @@ internal class ClientTasks(
     override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) = sender(
         McpTask.Get, McpTask.Get.Request(taskId),
         overrideDefaultTimeout ?: defaultTimeout,
-        McpMessageId.random(random)
+        id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTask.Get.Response>() }
@@ -44,7 +43,7 @@ internal class ClientTasks(
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpTask.List, McpTask.List.Request(),
         overrideDefaultTimeout ?: defaultTimeout,
-        McpMessageId.random(random)
+        id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTask.List.Response>() }
@@ -53,7 +52,7 @@ internal class ClientTasks(
     override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) = sender(
         McpTask.Cancel, McpTask.Cancel.Request(taskId),
         overrideDefaultTimeout ?: defaultTimeout,
-        McpMessageId.random(random)
+        id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTask.Cancel.Response>() }
@@ -62,7 +61,7 @@ internal class ClientTasks(
     override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) = sender(
         McpTask.Result, McpTask.Result.Request(taskId),
         overrideDefaultTimeout ?: defaultTimeout,
-        McpMessageId.random(random)
+        id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTask.Result.Response>() }
@@ -72,7 +71,7 @@ internal class ClientTasks(
         sender(
             McpTask.Status, McpTask.Status.Notification(task, meta),
             overrideDefaultTimeout ?: defaultTimeout,
-            McpMessageId.random(random)
+            id()
         )
     }
 }

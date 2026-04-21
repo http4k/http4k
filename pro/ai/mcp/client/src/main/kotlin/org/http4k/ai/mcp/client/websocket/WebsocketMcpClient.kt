@@ -44,7 +44,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.random.Random
 
 /**
  * WS connection MCP client.
@@ -61,8 +60,7 @@ class WebsocketMcpClient(
     protocolVersion: ProtocolVersion = LATEST_VERSION,
     title: String? = null,
     defaultTimeout: Duration = Duration.ofSeconds(1),
-    random: Random = Random
-) : AbstractMcpClient(VersionedMcpEntity(name, version, title), capabilities, protocolVersion, defaultTimeout, random) {
+) : AbstractMcpClient(VersionedMcpEntity(name, version, title), capabilities, protocolVersion, defaultTimeout) {
     private val wsClient by lazy {
         websocketFactory.blocking(
             wsRequest.uri,
@@ -74,6 +72,7 @@ class WebsocketMcpClient(
 
     override fun endpoint(it: Event) {
         endpoint.set(it.data)
+        id.set(0)
     }
 
     private val endpoint = AtomicReference<String>()

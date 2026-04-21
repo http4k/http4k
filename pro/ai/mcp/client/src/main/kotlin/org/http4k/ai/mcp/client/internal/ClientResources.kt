@@ -17,14 +17,13 @@ import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Uri
 import java.time.Duration
-import kotlin.random.Random
 
 internal class ClientResources(
     private val queueFor: (McpMessageId) -> Iterable<McpNodeType>,
     private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
-    private val random: Random,
+    private val id: () -> McpMessageId,
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Resources {
 
@@ -44,7 +43,7 @@ internal class ClientResources(
             McpResource.Subscribe,
             McpResource.Subscribe.Request(uri),
             defaultTimeout,
-            McpMessageId.random(random)
+            id()
         )
         subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
     }
@@ -54,7 +53,7 @@ internal class ClientResources(
             McpResource.Unsubscribe,
             McpResource.Unsubscribe.Request(uri),
             defaultTimeout,
-            McpMessageId.random(random)
+            id()
         )
         subscriptions -= uri
     }
@@ -62,7 +61,7 @@ internal class ClientResources(
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpResource.List, McpResource.List.Request(),
         overrideDefaultTimeout ?: defaultTimeout,
-        McpMessageId.random(random)
+        id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpResource.List.Response>() }
@@ -71,7 +70,7 @@ internal class ClientResources(
     override fun listTemplates(overrideDefaultTimeout: Duration?) = sender(
         McpResource.ListTemplates, McpResource.ListTemplates.Request(),
         overrideDefaultTimeout ?: defaultTimeout,
-        McpMessageId.random(random)
+        id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpResource.ListTemplates.Response>() }
@@ -82,7 +81,7 @@ internal class ClientResources(
             McpResource.Read,
             McpResource.Read.Request(request.uri, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
-            McpMessageId.random(random)
+            id()
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpResource.Read.Response>() }

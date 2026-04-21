@@ -43,7 +43,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.random.Random
 
 /**
  * SSE connection MCP client.
@@ -56,8 +55,7 @@ class SseMcpClient(
     capabilities: ClientCapabilities = All,
     protocolVersion: ProtocolVersion = LATEST_VERSION,
     defaultTimeout: Duration = Duration.ofMillis(100),
-    random: Random = Random
-) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout, random) {
+) : AbstractMcpClient(VersionedMcpEntity(name, version), capabilities, protocolVersion, defaultTimeout) {
 
     private val http = SetHostFrom(sseRequest.uri).then(http)
 
