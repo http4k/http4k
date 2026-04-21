@@ -111,7 +111,7 @@ class McpProtocol<Transport>(
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
     fun receive(transport: Transport, session: Session, httpReq: Request): Result4k<McpNodeType, McpNodeType> {
-        val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return error() }
+        val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return Success(ErrorMessage.ParseError.toJsonRpc(null)) }
 
         val payload = McpJson.fields(rawPayload).toMap()
 
@@ -292,7 +292,7 @@ class McpProtocol<Transport>(
                     else -> with(McpJson) {
                         val id = jsonResult.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
-                            null -> error()
+                            null -> Success(ErrorMessage.ParseError.toJsonRpc(null))
                             else -> clientTracking[session]?.processResult(id, jsonResult)?.let { ok() }
                                 ?: error()
                         }
