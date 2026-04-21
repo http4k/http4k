@@ -45,7 +45,7 @@ fun McpFilters.MppPaymentRequired(
                             verifier.verify(credential)
                                 .map { next(req) }
                                 .recover {
-                                    McpResponse(
+                                    McpResponse.Ok(
                                         MppErrorMessage(
                                             VERIFICATION_FAILED_CODE,
                                             it.message ?: "Verification failed",
@@ -54,7 +54,7 @@ fun McpFilters.MppPaymentRequired(
                                             .toJsonRpc(json.id)
                                     )
                                 }
-                        } ?: McpResponse(
+                        } ?: McpResponse.Ok(
                         MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
                             .toJsonRpc(json.id)
                     )

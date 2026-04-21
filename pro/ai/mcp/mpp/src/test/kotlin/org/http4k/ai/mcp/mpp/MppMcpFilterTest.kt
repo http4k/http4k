@@ -10,7 +10,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.server.protocol.McpRequest
-import org.http4k.ai.mcp.server.protocol.McpResponse
+import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
@@ -18,9 +18,6 @@ import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
-import org.http4k.format.Json
-import org.http4k.format.renderError
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.connect.mpp.model.Challenge
 import org.http4k.connect.mpp.model.ChallengeId
 import org.http4k.connect.mpp.model.ChargeRequest
@@ -37,7 +34,10 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
+import org.http4k.format.Json
 import org.http4k.format.MoshiNode
+import org.http4k.format.renderError
+import org.http4k.jsonrpc.ErrorMessage
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -68,7 +68,7 @@ class MppMcpFilterTest {
     }
 
     private val handler = McpFilters.MppPaymentRequired(verifier) { MppPaymentCheck.Required(listOf(challenge)) }
-        .then { McpResponse(McpJson.nullNode()) }
+        .then { Ok(McpJson.nullNode()) }
 
     private fun mcpRequest(cred: Credential? = null) = McpRequest(
         Session(SessionId.of("test-session")),
@@ -97,35 +97,35 @@ class MppMcpFilterTest {
     fun `request without credential returns error with -32042 and challenges`() {
         val result = handler(mcpRequest())
 
-        assertThat(result, equalTo(McpResponse(mppErrorResponse(-32042, "Payment required", listOf(challenge)))))
+        assertThat(result, equalTo(Ok(mppErrorResponse(-32042, "Payment required", listOf(challenge)))))
     }
 
     @Test
     fun `request with valid credential succeeds`() {
         val result = handler(mcpRequest(credential))
 
-        assertThat(result, equalTo(McpResponse(McpJson.nullNode())))
+        assertThat(result, equalTo(Ok(McpJson.nullNode())))
     }
 
     @Test
     fun `verification failure returns error with -32043 and challenges`() {
         val failingVerifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
         val failHandler = McpFilters.MppPaymentRequired(failingVerifier) { MppPaymentCheck.Required(listOf(challenge)) }
-            .then { McpResponse(McpJson.nullNode()) }
+            .then { Ok(McpJson.nullNode()) }
 
         val result = failHandler(mcpRequest(credential))
 
-        assertThat(result, equalTo(McpResponse(mppErrorResponse(-32043, "bad signature", listOf(challenge)))))
+        assertThat(result, equalTo(Ok(mppErrorResponse(-32043, "bad signature", listOf(challenge)))))
     }
 
     @Test
     fun `request passes through without payment when check returns Free`() {
         val freeHandler = McpFilters.MppPaymentRequired(verifier) { MppPaymentCheck.Free }
-            .then { McpResponse(McpJson.nullNode()) }
+            .then { Ok(McpJson.nullNode()) }
 
         val result = freeHandler(mcpRequest())
 
-        assertThat(result, equalTo(McpResponse(McpJson.nullNode())))
+        assertThat(result, equalTo(Ok(McpJson.nullNode())))
     }
 
     private fun mppErrorResponse(code: Int, message: String, challenges: List<Challenge>) =
