@@ -109,18 +109,18 @@ class McpProtocol<Transport>(
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
     fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
-        val rawPayload =
-            runCatching { parse(httpReq.bodyString()) }.getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
+        val rawPayload = runCatching { parse(httpReq.bodyString()) }
+            .getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
 
         val payload = McpJson.fields(rawPayload).toMap()
-
-        val context = ClientCall(sessionState.session)
 
         val mcpRequest = McpRequest(
             sessionState.session,
             if (payload["method"] != null) JsonRpcRequest(McpJson, payload) else JsonRpcResult(McpJson, payload),
             httpReq
         )
+
+        val context = ClientCall(sessionState.session)
 
         return when (mcpRequest.json) {
             is JsonRpcRequest<McpNodeType> -> {
@@ -136,7 +136,6 @@ class McpProtocol<Transport>(
                         respond<McpCompletion.Request>(transport, mcpRequest, context) { it, c ->
                             completions.complete(it, c, httpReq)
                         }
-
 
                     method == McpPing.Method ->
                         respond<McpPing.Request>(transport, mcpRequest, context) { _, _ ->
