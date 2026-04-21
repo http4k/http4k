@@ -12,6 +12,8 @@ import org.http4k.ai.mcp.server.sse.sessionId
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.routing.bindWs
 import org.http4k.sse.SseMessage
 import org.http4k.websocket.Websocket
@@ -27,14 +29,25 @@ import java.util.concurrent.Executors
 fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { req: Request ->
     when (val sessionState = protocol.retrieveSession(req)) {
         is ValidSessionState -> WsResponse { ws ->
-            val executor = Executors.newCachedThreadPool()
+            val executor = Executors.newVirtualThreadPerTaskExecutor()
+
+            val context = Subscription(sessionState.session)
 
             with(protocol) {
-                assign(Subscription(sessionState.session), ws, req)
+                assign(context, ws, req)
+                var firstCall = true
+
                 ws.onMessage { msg ->
-                    executor.submit { receive(ws, sessionState, req.body(msg.bodyString())) }
+                    executor.submit {
+                        println(msg.bodyString())
+                        receive(ws, sessionToUse(firstCall, protocol, req, sessionState), req.body(msg.bodyString()))
+                        firstCall = false
+                    }
                 }
-                ws.onClose { executor.shutdown() }
+                ws.onClose {
+                    protocol.end(context)
+                    executor.shutdown()
+                }
                 ws.send(
                     WsMessage(
                         SseMessage.Event(
@@ -49,4 +62,14 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
 
         InvalidSessionState -> WsResponse { it.close(REFUSE) }
     }
+}
+
+private fun sessionToUse(
+    isFirst: Boolean,
+    protocol: McpProtocol<Websocket>,
+    req: Request,
+    sessionState: ValidSessionState
+) = when {
+    isFirst -> sessionState
+    else -> protocol.retrieveSession(req.with(Header.MCP_SESSION_ID of sessionState.session.id)) as? ValidSessionState ?: sessionState
 }

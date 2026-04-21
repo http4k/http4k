@@ -122,8 +122,6 @@ class McpProtocol<Transport>(
             httpReq
         )
 
-        println(mcpRequest)
-
         return when (mcpRequest.json) {
             is JsonRpcRequest<McpNodeType> -> {
                 val method = McpRpcMethod.of(mcpRequest.json.method)
