@@ -32,8 +32,7 @@ fun McpFilters.MppPaymentRequired(
     check: (McpRequest) -> MppPaymentCheck,
 ) = McpFilter { next ->
     { req ->
-        val json = req.json
-        when (json) {
+        when (val json = req.json) {
             is JsonRpcRequest<*> -> when (val result = check(req)) {
                 is Free -> next(req)
                 is Required -> {
