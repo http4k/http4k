@@ -62,7 +62,7 @@ class McpOpenTelemetryTracingTest {
 
         val handler = filter.then {
             capturedSpan = (Span.current() as ReadableSpan).toSpanData()
-            McpResponse(McpJson.nullNode())
+            McpResponse.Ok(McpJson.nullNode())
         }
 
         val session = Session(SessionId.of("test-session-123"))
@@ -104,7 +104,7 @@ class McpOpenTelemetryTracingTest {
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         val handler = filter.then {
-            McpResponse(McpJson.renderError(ErrorMessage.InternalError, (it.json as JsonRpcRequest).id))
+            McpResponse.Ok(McpJson.renderError(ErrorMessage.InternalError, (it.json as JsonRpcRequest).id))
         }
 
         val session = Session(SessionId.of("test-session"))
@@ -120,7 +120,7 @@ class McpOpenTelemetryTracingTest {
     @Test
     fun `links to transport span when present`() {
         val mcpHandler =
-            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse(McpJson.nullNode()) }
+            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse.Ok(McpJson.nullNode()) }
 
         val poly = PolyFilters.OpenTelemetryTracing(openTelemetry).then(
             PolyHandler(http = { req ->
@@ -156,7 +156,7 @@ class McpOpenTelemetryTracingTest {
 
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
 
-        val handler = filter.then { McpResponse(McpJson.nullNode()) }
+        val handler = filter.then { McpResponse.Ok(McpJson.nullNode()) }
 
         val parentTraceId = "0af7651916cd43dd8448eb211c80319c"
         val parentSpanId = "b7ad6b7169203331"
@@ -197,7 +197,7 @@ class McpOpenTelemetryTracingTest {
 
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
 
-        val handler = filter.then { McpResponse(McpJson.nullNode()) }
+        val handler = filter.then { McpResponse.Ok(McpJson.nullNode()) }
 
         handler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), Request.Companion(POST, "/mcp")))
 
@@ -215,7 +215,7 @@ class McpOpenTelemetryTracingTest {
             )
         )
         val handler = filter.then {
-            McpResponse(McpJson.nullNode())
+            McpResponse.Ok(McpJson.nullNode())
         }
 
         handler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), Request.Companion(POST, "/mcp")))

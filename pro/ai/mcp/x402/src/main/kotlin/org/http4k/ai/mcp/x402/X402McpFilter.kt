@@ -60,14 +60,14 @@ fun McpFilters.X402PaymentRequired(
                                                 }
                                         }
                                         .recover {
-                                            McpResponse(
+                                            McpResponse.Ok(
                                                 ErrorMessage(402, it.message ?: "Payment failed").toJsonRpc(json.id)
                                             )
                                         }
-                                } ?: McpResponse(
+                                } ?: McpResponse.Ok(
                                 ErrorMessage(402, "Unsupported payment scheme/network").toJsonRpc(json.id)
                             )
-                        } ?: McpResponse(ErrorMessage(402, "Payment required").toJsonRpc(json.id))
+                        } ?: McpResponse.Ok(ErrorMessage(402, "Payment required").toJsonRpc(json.id))
                 }
             }
 

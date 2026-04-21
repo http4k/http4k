@@ -13,6 +13,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.server.protocol.McpFilter
+import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.jsonrpc.JsonRpcRequest
@@ -70,13 +71,15 @@ fun McpFilters.OpenTelemetryTracing(
                     try {
                         span.makeCurrent().use { next(req) }
                             .also { resp ->
-                                spanModifiers?.forEach { it.response(span, resp.json) }
+                                if (resp is McpResponse.Ok) {
+                                    spanModifiers?.forEach { it.response(span, resp.json) }
 
-                                val error = McpJson.fields(resp.json).toMap()["error"]
-                                if (error != null) {
-                                    span.setStatus(ERROR)
-                                    val code = McpJson.fields(error).toMap()["code"]
-                                    if (code != null) span.setAttribute("error.type", McpJson.compact(code))
+                                    val error = McpJson.fields(resp.json).toMap()["error"]
+                                    if (error != null) {
+                                        span.setStatus(ERROR)
+                                        val code = McpJson.fields(error).toMap()["code"]
+                                        if (code != null) span.setAttribute("error.type", McpJson.compact(code))
+                                    }
                                 }
                             }
                     } catch (e: Throwable) {

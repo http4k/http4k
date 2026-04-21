@@ -44,9 +44,9 @@ import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult.Accepted
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult.Processed
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult.Unknown
+import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
+import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
+import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.mcp.util.McpJson.parse
@@ -108,8 +108,9 @@ class McpProtocol<Transport>(
 
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
-    fun receive(transport: Transport, session: Session, httpReq: Request): McpProtocolResult {
-        val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return Processed(ErrorMessage.ParseError.toJsonRpc(null)) }
+    fun receive(transport: Transport, session: Session, httpReq: Request): McpResponse {
+        val rawPayload =
+            runCatching { parse(httpReq.bodyString()) }.getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
 
         val payload = McpJson.fields(rawPayload).toMap()
 
@@ -283,7 +284,7 @@ class McpProtocol<Transport>(
                         Accepted
                     }
 
-                    else -> Processed(
+                    else -> Ok(
                         sessions.respond(
                             transport,
                             context,
@@ -299,7 +300,7 @@ class McpProtocol<Transport>(
                     else -> with(McpJson) {
                         val id = mcpRequest.json.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
-                            null -> Processed(ErrorMessage.ParseError.toJsonRpc(null))
+                            null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
                             else -> clientTracking[session]?.processResult(id, mcpRequest.json)?.let { Accepted }
                                 ?: Unknown
                         }
@@ -314,14 +315,14 @@ class McpProtocol<Transport>(
         mcpRequest: McpRequest,
         callCtx: ClientCall,
         noinline fn: (IN, Client) -> ServerMessage.Response
-    ): Processed {
+    ): McpResponse {
         val client = clientFor(callCtx)
 
         val handler = mcpFilter
             .then(AssignAndCloseSession(sessions, transport))
             .then(AdaptingMcpHandler(onError)(IN::class, fn, client))
 
-        return Processed(handler(mcpRequest).json)
+        return handler(mcpRequest)
     }
 
     private fun clientFor(context: ClientRequestContext): SessionBasedClient = SessionBasedClient(
@@ -389,10 +390,4 @@ class McpProtocol<Transport>(
         sessions.assign(context, transport, connectRequest)
 
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
-}
-
-sealed interface McpProtocolResult {
-    data class Processed(val json: McpNodeType) : McpProtocolResult
-    object Accepted : McpProtocolResult
-    object Unknown : McpProtocolResult
 }

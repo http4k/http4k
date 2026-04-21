@@ -6,10 +6,10 @@ package org.http4k.ai.mcp.server
 
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.server.capability.ServerCapability
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult.Accepted
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult.Processed
-import org.http4k.ai.mcp.server.protocol.McpProtocolResult.Unknown
+import org.http4k.ai.mcp.server.protocol.McpResponse
+import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
+import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
+import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
@@ -44,9 +44,9 @@ fun Iterable<ServerCapability>.asMcp(name: String = "http4k-mcp") =
     mcp(ServerMetaData(name, "0.0.0"), NoMcpSecurity, *toList().toTypedArray())
 
 
-fun McpProtocolResult.asHttp(status: Status) =
+fun McpResponse.asHttp(status: Status) =
     when (val response = this) {
-        is Processed -> response.json.asHttp(status)
+        is Ok -> response.json.asHttp(status)
         is Accepted -> McpJson.nullNode().asHttp(ACCEPTED)
         is Unknown -> McpJson.nullNode().asHttp(NOT_FOUND)
     }

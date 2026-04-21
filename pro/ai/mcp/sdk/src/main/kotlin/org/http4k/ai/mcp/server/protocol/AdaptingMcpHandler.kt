@@ -21,7 +21,7 @@ class AdaptingMcpHandler(private val onError: (Throwable) -> Unit) {
     operator fun <IN : ClientMessage.Request> invoke(clazz: KClass<IN>, fn: (IN, Client) -> Response, client: Client): McpHandler =
         { req: McpRequest ->
             when (val jsonRpc = req.json) {
-                is JsonRpcRequest<McpNodeType> -> McpResponse(
+                is JsonRpcRequest<McpNodeType> -> McpResponse.Ok(
                     jsonRpc.runCatching { jsonRpc.fromJsonRpc(clazz) }
                         .mapCatching { fn(it, client) }
                         .map { it.toJsonRpc(jsonRpc.id) }
@@ -38,7 +38,7 @@ class AdaptingMcpHandler(private val onError: (Throwable) -> Unit) {
                 )
 
                 // TODO - make this actually do something!
-                is JsonRpcResult<*> -> McpResponse(InvalidRequest.toJsonRpc(null))
+                is JsonRpcResult<*> -> McpResponse.Ok(InvalidRequest.toJsonRpc(null))
             }
 
     }
