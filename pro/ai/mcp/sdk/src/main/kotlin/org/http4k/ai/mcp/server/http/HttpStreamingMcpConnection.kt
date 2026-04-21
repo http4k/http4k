@@ -38,9 +38,10 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
                 )
             ) { sse ->
                 with(protocol) {
+                    val context = Subscription(sessionState.session)
                     when (req.method) {
                         GET -> {
-                            assign(Subscription(sessionState.session), sse, req)
+                            assign(context, sse, req)
                             handleInitialize(
                                 McpInitialize.Request(VersionedMcpEntity(sessionState.session.id.value, "0.0.0"), All),
                                 req,
@@ -51,7 +52,7 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
 
                         POST -> sse.use { receive(it, sessionState, req) }
                         DELETE -> {
-                            end(Subscription(sessionState.session))
+                            end(context)
                             sse.close()
                         }
 
