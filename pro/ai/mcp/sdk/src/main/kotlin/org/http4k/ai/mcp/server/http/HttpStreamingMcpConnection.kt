@@ -4,9 +4,6 @@
  */
 package org.http4k.ai.mcp.server.http
 
-import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -30,6 +27,7 @@ import org.http4k.sse.SseResponse
 
 fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp") =
     path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
+
         when (val sessionState = protocol.retrieveSession(req)) {
             is ValidSessionState -> SseResponse(
                 OK, listOf(
@@ -38,21 +36,16 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
                 )
             ) { sse ->
                 with(protocol) {
-                    val context = Subscription(sessionState.session)
+                    val subscription = Subscription(sessionState.session)
                     when (req.method) {
                         GET -> {
-                            assign(context, sse, req)
-                            handleInitialize(
-                                McpInitialize.Request(VersionedMcpEntity(sessionState.session.id.value, "0.0.0"), All),
-                                req,
-                                sessionState.session
-                            )
+                            protocol.subscribe(subscription, sse, req)
                             sse.send(Event("ping", ""))
                         }
 
                         POST -> sse.use { receive(it, sessionState, req) }
                         DELETE -> {
-                            end(context)
+                            unsubscribe(subscription)
                             sse.close()
                         }
 

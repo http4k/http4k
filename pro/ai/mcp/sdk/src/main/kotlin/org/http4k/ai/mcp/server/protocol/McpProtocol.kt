@@ -113,17 +113,16 @@ class McpProtocol<Transport>(
         val rawPayload = runCatching { parse(httpReq.bodyString()) }
             .getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
 
-        val mcpRequest = toMcpRequest(rawPayload, sessionState, httpReq)
+        val mcpRequest = rawPayload.toMcpRequest(sessionState, httpReq)
 
         return responseFor(mcpRequest, sessionState, transport)
     }
 
-    private fun toMcpRequest(
-        rawPayload: MoshiNode,
+    private fun MoshiNode.toMcpRequest(
         sessionState: ValidSessionState,
         httpReq: Request
     ): McpRequest {
-        val payload = McpJson.fields(rawPayload).toMap()
+        val payload = McpJson.fields(this).toMap()
 
         return McpRequest(
             sessionState.session,
@@ -145,7 +144,6 @@ class McpProtocol<Transport>(
                 when {
                     sessionState is NewSession || method == McpInitialize.Method ->
                         respond<McpInitialize.Request>(transport, mcpRequest, context) { it, _ ->
-                            assign(Subscription(sessionState.session), transport, mcpRequest.http)
                             handleInitialize(it, mcpRequest.http, sessionState.session)
                         }
 
@@ -340,35 +338,45 @@ class McpProtocol<Transport>(
         { clientTracking[context.session] ?: throw McpException(ErrorMessage.InternalError) }
     )
 
-    fun handleInitialize(request: McpInitialize.Request, http: Request, session: Session): McpInitialize.Response {
-        val response = initializer(request, http)
+    private fun handleInitialize(
+        request: McpInitialize.Request,
+        http: Request,
+        session: Session
+    ): McpInitialize.Response = initializer(request, http)
+        .also { clientTracking[session] = ClientTracking(request) }
 
-        clientTracking[session] = ClientTracking(request)
+    fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 
-        val context = Subscription(session)
+    fun unsubscribe(context: Subscription) {
+        clientTracking.remove(context.session)
+        sessions.end(context)
+    }
 
-        logger.subscribe(session, error) { data, level, logger ->
+    fun subscribe(context: Subscription, transport: Transport, connectRequest: Request) {
+        sessions.assign(context, transport, connectRequest)
+
+        logger.subscribe(context.session, error) { data, level, logger ->
             sessions.request(
                 context,
                 McpLogging.LoggingMessage.Notification(data, level, logger).toJsonRpc(McpLogging.LoggingMessage)
             )
         }
 
-        prompts.onChange(session) {
+        prompts.onChange(context.session) {
             sessions.request(
                 context,
                 McpPrompt.List.Changed.Notification().toJsonRpc(McpPrompt.List.Changed)
             )
         }
 
-        resources.onChange(session) {
+        resources.onChange(context.session) {
             sessions.request(
                 context,
                 McpResource.List.Changed.Notification().toJsonRpc(McpResource.List.Changed)
             )
         }
 
-        tools.onChange(session) {
+        tools.onChange(context.session) {
             sessions.request(
                 context,
                 McpTool.List.Changed.Notification().toJsonRpc(McpTool.List.Changed)
@@ -376,24 +384,13 @@ class McpProtocol<Transport>(
         }
 
         sessions.onClose(context) {
-            prompts.remove(session)
-            resources.remove(session)
-            tools.remove(session)
-            logger.unsubscribe(session)
-            tasks.remove(session)
+            prompts.remove(context.session)
+            resources.remove(context.session)
+            tools.remove(context.session)
+            logger.unsubscribe(context.session)
+            tasks.remove(context.session)
         }
-        return response
     }
-
-    fun retrieveSession(req: Request) = sessions.retrieveSession(req)
-
-    fun end(context: ClientRequestContext) {
-        if (context is Subscription) clientTracking.remove(context.session)
-        sessions.end(context)
-    }
-
-    fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request) =
-        sessions.assign(context, transport, connectRequest)
 
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
 
@@ -403,11 +400,9 @@ class McpProtocol<Transport>(
         callCtx: ClientCall,
         noinline fn: (IN, Client) -> ServerMessage.Response
     ): McpResponse {
-        val client = clientFor(callCtx)
-
         val handler = mcpFilter
             .then(AssignAndCloseSession(sessions, transport))
-            .then(AdaptingMcpHandler(onError)(IN::class, fn, client))
+            .then(AdaptingMcpHandler(onError)(IN::class, fn, clientFor(callCtx)))
 
         return handler(mcpRequest)
     }

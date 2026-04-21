@@ -52,6 +52,15 @@ internal inline fun <reified T : Any> Sequence<SseMessage.Event>.nextNotificatio
     return McpJson.convert<McpNodeType, T>(request.params ?: McpJson.nullNode())
 }
 
+internal inline fun <reified T : Any> SseMessage.Event.toNotification(mcpRpc: McpRpc): T {
+    val fields = McpJson.fields(McpJson.parse(data)).toMap()
+    require(fields.containsKey("method") && McpJson.text(fields["method"]!!) == mcpRpc.Method.value) {
+        "Expected ${mcpRpc.Method.value}"
+    }
+    val request = JsonRpcRequest(McpJson, fields)
+    return McpJson.convert<McpNodeType, T>(request.params ?: McpJson.nullNode())
+}
+
 fun TestMcpClient.useClient(fn: TestMcpClient.() -> Unit) {
     use {
         it.start()

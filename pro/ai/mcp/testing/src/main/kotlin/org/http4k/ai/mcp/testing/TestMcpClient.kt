@@ -65,6 +65,9 @@ class TestMcpClient(
         )
 
         sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification()).toList()
+
+        sender.startEventStream()
+
         return initResponse.first()
             .nextEvent<McpInitialize.Response, McpInitialize.Response> { this }.map { it.second }
     }
@@ -85,5 +88,7 @@ class TestMcpClient(
 
     override fun tasks() = tasks
 
-    override fun close() {}
+    override fun close() {
+        sender.stopEventStream()
+    }
 }

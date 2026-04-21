@@ -13,7 +13,7 @@ import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.ai.mcp.testing.toNotification
 import org.http4k.core.Uri
 import java.time.Duration
 
@@ -32,14 +32,16 @@ class TestingResources(
      * Expect a resource list notification to be made and process it
      */
     fun expectNotification() =
-        sender.stream().nextNotification<McpResource.List.Changed.Notification>(McpResource.List.Changed)
+        sender.lastEvent()
+            .toNotification<McpResource.List.Changed.Notification>(McpResource.List.Changed)
             .also { changeNotifications.forEach { it() } }
 
     /**
      * Expect a resource updated notification to be made and process it
      */
     fun expectSubscriptionNotification(uri: Uri) =
-        sender.stream().nextNotification<McpResource.Updated.Notification>(McpResource.Updated)
+        sender.lastEvent()
+            .toNotification<McpResource.Updated.Notification>(McpResource.Updated)
             .also {
                 require(it.uri == uri) { "Expected notification for $uri, but got ${it.uri}" }
                 subscriptions[it.uri]?.forEach { it() }

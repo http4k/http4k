@@ -17,7 +17,7 @@ import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.ai.mcp.testing.toNotification
 import org.http4k.lens.MetaKey
 import org.http4k.lens.progressToken
 import java.time.Duration
@@ -36,7 +36,8 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
     }
 
     fun expectCompleteNotification(elicitationId: ElicitationId) =
-        sender.stream().nextNotification<McpElicitations.Complete.Notification>(McpElicitations.Complete)
+        sender.lastEvent()
+            .toNotification<McpElicitations.Complete.Notification>(McpElicitations.Complete)
             .also { onComplete.forEach { it(elicitationId) } }
 
     init {

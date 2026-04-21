@@ -24,16 +24,48 @@ import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.sse.SseMessage
 import org.http4k.testing.testSseClient
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
     private val outbound = mutableMapOf<McpRpcMethod, MutableList<(SseMessage.Event) -> Unit>>()
+    private val streamEvents = CopyOnWriteArrayList<SseMessage.Event>()
+    private val newEvent = Semaphore(0)
+    private var streamThread: Thread? = null
 
     fun on(mcpRpc: McpRpc, fn: (SseMessage.Event) -> Unit) {
         outbound.getOrPut(mcpRpc.Method) { mutableListOf() }.add(fn)
+    }
+
+    fun startEventStream() {
+        val connected = CountDownLatch(1)
+        streamThread = thread(isDaemon = true) {
+            val events = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
+            connected.countDown()
+            events.forEach { event ->
+                outbound[event.mcpMethod()]?.forEach { it(event) }
+                streamEvents.add(event)
+                newEvent.release()
+            }
+        }
+        connected.await(5, SECONDS)
+    }
+
+    fun lastEvent(): SseMessage.Event {
+        newEvent.drainPermits()
+        newEvent.tryAcquire(5, SECONDS)
+        return streamEvents.last()
+    }
+
+    fun stopEventStream() {
+        streamThread?.interrupt()
     }
 
     private fun filterOut(events: Sequence<SseMessage.Event>, mpcRpc: McpRpc) = events
@@ -58,8 +90,6 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     private var id = AtomicInteger(0)
 
     var sessionId = AtomicReference<SessionId>()
-
-    fun stream() = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
 
     operator fun invoke(mcpRpc: McpRpc, input: ClientMessage.Request) =
         filterOut(

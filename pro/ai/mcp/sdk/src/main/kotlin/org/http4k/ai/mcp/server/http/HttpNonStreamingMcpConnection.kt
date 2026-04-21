@@ -58,7 +58,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
                     is ValidSessionState -> {
-                        end(Subscription(sessionState.session))
+                        unsubscribe(Subscription(sessionState.session))
                         Response(ACCEPTED).contentType(ContentType.TEXT_EVENT_STREAM)
                             .with(Header.MCP_SESSION_ID of sessionState.session.id)
                     }

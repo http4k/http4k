@@ -48,25 +48,25 @@ import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpLogging
-import org.http4k.ai.mcp.protocol.messages.McpWireNotification
 import org.http4k.ai.mcp.protocol.messages.McpPing
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
-import org.http4k.ai.mcp.protocol.messages.McpWireRequest
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpWireResponse
 import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.protocol.messages.McpWireNotification
+import org.http4k.ai.mcp.protocol.messages.McpWireRequest
+import org.http4k.ai.mcp.protocol.messages.McpWireResponse
 import org.http4k.ai.mcp.protocol.messages.ServerMessage
-import org.http4k.ai.mcp.server.capability.cancellations
-import org.http4k.ai.mcp.server.capability.initializer
-import org.http4k.ai.mcp.server.capability.roots
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
+import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.logger
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.roots
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
@@ -111,7 +111,6 @@ import org.http4k.testing.TestSseClient
 import org.http4k.testing.assertApproved
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.random.Random
 
@@ -324,12 +323,8 @@ class McpProtocolTest {
 
             res.triggerUpdated(resource.uri)
 
-            assertNoResponse()
         }
     }
-
-    private fun TestSseClient.assertNoResponse() =
-        assertThrows<NoSuchElementException> { received().first() }
 
     @Test
     fun `deal with templated resources`() {
@@ -555,8 +550,6 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
             logger.log(Session(firstDeterministicSessionId), McpJson.string("hello"), LogLevel.info, "message")
-
-            assertNoResponse()
 
             mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
 

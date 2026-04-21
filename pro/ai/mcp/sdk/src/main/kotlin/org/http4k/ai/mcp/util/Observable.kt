@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 abstract class Observable<T> : ObservableCapability<T> {
 
-
     protected val callbacks = ConcurrentHashMap<Session, () -> Any>()
 
     override fun onChange(session: Session, handler: () -> Any) {

@@ -31,31 +31,35 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
         is ValidSessionState -> WsResponse { ws ->
             val executor = Executors.newVirtualThreadPerTaskExecutor()
 
-            val context = Subscription(sessionState.session)
+            val subscription = Subscription(sessionState.session)
 
-            with(protocol) {
-                var firstCall = true
+            protocol.subscribe(subscription, ws, req)
 
-                ws.onMessage { msg ->
-                    executor.submit {
-                        receive(ws, sessionToUse(firstCall, protocol, req, sessionState), req.body(msg.bodyString()))
-                        firstCall = false
-                    }
-                }
-                ws.onClose {
-                    protocol.end(context)
-                    executor.shutdown()
-                }
-                ws.send(
-                    WsMessage(
-                        SseMessage.Event(
-                            "endpoint",
-                            Request(GET, "/message").with(sessionId of sessionState.session.id).uri.toString()
-                        )
-                            .toMessage()
+            var firstCall = true
+
+            ws.onMessage { msg ->
+                executor.submit {
+                    protocol.receive(
+                        ws,
+                        sessionToUse(firstCall, protocol, req, sessionState),
+                        req.body(msg.bodyString())
                     )
-                )
+                    firstCall = false
+                }
             }
+            ws.onClose {
+                protocol.unsubscribe(subscription)
+                executor.shutdown()
+            }
+            ws.send(
+                WsMessage(
+                    SseMessage.Event(
+                        "endpoint",
+                        Request(GET, "/message").with(sessionId of sessionState.session.id).uri.toString()
+                    )
+                        .toMessage()
+                )
+            )
         }
 
         InvalidSessionState -> WsResponse { it.close(REFUSE) }

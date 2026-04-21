@@ -14,7 +14,7 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.ai.mcp.testing.toNotification
 import java.time.Duration
 
 class TestingPrompts(
@@ -30,7 +30,8 @@ class TestingPrompts(
      * Expected a list changed notification to be received and process it
      */
     fun expectNotification() {
-        sender.stream().nextNotification<McpPrompt.List.Changed.Notification>(McpPrompt.List.Changed)
+        sender.lastEvent()
+            .toNotification<McpPrompt.List.Changed.Notification>(McpPrompt.List.Changed)
             .also { notifications.forEach { it() } }
     }
 
