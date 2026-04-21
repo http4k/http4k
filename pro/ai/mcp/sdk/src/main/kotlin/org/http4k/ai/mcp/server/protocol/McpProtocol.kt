@@ -115,19 +115,22 @@ class McpProtocol<Transport>(
 
         val context = ClientCall(session)
 
-        val response: McpProtocolResult = when {
-            payload["method"] != null -> {
-                val jsonReq = JsonRpcRequest(McpJson, payload)
+        val mcpRequest = McpRequest(
+            session, when {
+                payload["method"] != null -> JsonRpcRequest(McpJson, payload)
+                else -> JsonRpcResult(McpJson, payload)
+            }, httpReq
+        )
 
-                val mcpRequest = McpRequest(session, jsonReq, httpReq)
-
+        return when (mcpRequest.json) {
+            is JsonRpcRequest<McpNodeType> -> {
+                val jsonReq = mcpRequest.json
                 when (McpRpcMethod.of(jsonReq.method)) {
                     McpInitialize.Method ->
                         respond<McpInitialize.Request>(transport, mcpRequest, context) { it, _ ->
                             assign(Subscription(session), transport, httpReq)
                             handleInitialize(it, httpReq, session)
                         }
-
 
                     McpCompletion.Method ->
                         respond<McpCompletion.Request>(transport, mcpRequest, context) { it, c ->
@@ -179,7 +182,8 @@ class McpProtocol<Transport>(
                         respond<McpResource.Subscribe.Request>(transport, mcpRequest, context) { _, _ ->
                             when (resources) {
                                 is ObservableResources -> {
-                                    val subscribeRequest = jsonReq.fromJsonRpc(McpResource.Subscribe.Request::class)
+                                    val subscribeRequest =
+                                        jsonReq.fromJsonRpc(McpResource.Subscribe.Request::class)
                                     resources.subscribe(session, subscribeRequest) {
                                         sessions.request(
                                             Subscription(session),
@@ -195,7 +199,10 @@ class McpProtocol<Transport>(
 
                     McpLogging.SetLevel.Method ->
                         respond<McpLogging.SetLevel.Request>(transport, mcpRequest, context) { _, _ ->
-                            logger.setLevel(session, jsonReq.fromJsonRpc(McpLogging.SetLevel.Request::class).level)
+                            logger.setLevel(
+                                session,
+                                jsonReq.fromJsonRpc(McpLogging.SetLevel.Request::class).level
+                            )
                             ServerMessage.Response.Empty
                         }
 
@@ -278,27 +285,30 @@ class McpProtocol<Transport>(
                         Accepted
                     }
 
-                    else -> Processed(sessions.respond(transport, context, MethodNotFound.toJsonRpc(jsonReq.id)))
+                    else -> Processed(
+                        sessions.respond(
+                            transport,
+                            context,
+                            MethodNotFound.toJsonRpc(jsonReq.id)
+                        )
+                    )
                 }
             }
 
-            else -> {
-                val jsonResult = JsonRpcResult(McpJson, payload)
+            is JsonRpcResult<McpNodeType> -> {
                 when {
-                    jsonResult.isError() -> Accepted
+                    mcpRequest.json.isError() -> Accepted
                     else -> with(McpJson) {
-                        val id = jsonResult.id?.let { McpMessageId.parse(compact(it)) }
+                        val id = mcpRequest.json.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
                             null -> Processed(ErrorMessage.ParseError.toJsonRpc(null))
-                            else -> clientTracking[session]?.processResult(id, jsonResult)?.let { Accepted }
+                            else -> clientTracking[session]?.processResult(id, mcpRequest.json)?.let { Accepted }
                                 ?: Unknown
                         }
                     }
                 }
             }
         }
-
-        return response
     }
 
     private inline fun <reified IN : ClientMessage.Request> respond(
