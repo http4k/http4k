@@ -125,12 +125,11 @@ class McpProtocol<Transport>(
     ): McpRequest {
         val payload = McpJson.fields(rawPayload).toMap()
 
-        val mcpRequest = McpRequest(
+        return McpRequest(
             sessionState.session,
             if (payload["method"] != null) JsonRpcRequest(McpJson, payload) else JsonRpcResult(McpJson, payload),
             httpReq
         )
-        return mcpRequest
     }
 
     private fun responseFor(
