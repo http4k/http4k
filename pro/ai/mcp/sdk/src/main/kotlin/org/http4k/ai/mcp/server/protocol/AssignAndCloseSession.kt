@@ -11,7 +11,9 @@ fun <Transport> AssignAndCloseSession(sessions: Sessions<Transport>, transport: 
         val context = ClientCall(it.session)
         try {
             sessions.assign(context, transport, it.http)
-            next(it)
+            next(it).also {
+                sessions.respond(transport, context, it.json)
+            }
         } finally {
             sessions.end(context)
         }

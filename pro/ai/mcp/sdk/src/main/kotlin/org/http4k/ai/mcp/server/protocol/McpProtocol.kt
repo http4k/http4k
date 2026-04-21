@@ -313,7 +313,7 @@ class McpProtocol<Transport>(
             .then(AssignAndCloseSession(sessions, transport))
             .then(AdaptingMcpHandler(onError)(IN::class, fn, client))
 
-        return Processed(sessions.respond(transport, callCtx, handler(mcpRequest).json))
+        return Processed(handler(mcpRequest).json)
     }
 
     private fun clientFor(context: ClientRequestContext): SessionBasedClient = SessionBasedClient(
