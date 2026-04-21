@@ -116,10 +116,9 @@ class McpProtocol<Transport>(
         val context = ClientCall(session)
 
         val mcpRequest = McpRequest(
-            session, when {
-                payload["method"] != null -> JsonRpcRequest(McpJson, payload)
-                else -> JsonRpcResult(McpJson, payload)
-            }, httpReq
+            session,
+            if (payload["method"] != null) JsonRpcRequest(McpJson, payload) else JsonRpcResult(McpJson, payload),
+            httpReq
         )
 
         return when (mcpRequest.json) {
