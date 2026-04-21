@@ -124,8 +124,7 @@ class McpProtocol<Transport>(
 
         return when (mcpRequest.json) {
             is JsonRpcRequest<McpNodeType> -> {
-                val jsonReq = mcpRequest.json
-                when (McpRpcMethod.of(jsonReq.method)) {
+                when (McpRpcMethod.of(mcpRequest.json.method)) {
                     McpInitialize.Method ->
                         respond<McpInitialize.Request>(transport, mcpRequest, context) { it, _ ->
                             assign(Subscription(session), transport, httpReq)
@@ -183,7 +182,7 @@ class McpProtocol<Transport>(
                             when (resources) {
                                 is ObservableResources -> {
                                     val subscribeRequest =
-                                        jsonReq.fromJsonRpc(McpResource.Subscribe.Request::class)
+                                        mcpRequest.json.fromJsonRpc(McpResource.Subscribe.Request::class)
                                     resources.subscribe(session, subscribeRequest) {
                                         sessions.request(
                                             Subscription(session),
@@ -201,7 +200,7 @@ class McpProtocol<Transport>(
                         respond<McpLogging.SetLevel.Request>(transport, mcpRequest, context) { _, _ ->
                             logger.setLevel(
                                 session,
-                                jsonReq.fromJsonRpc(McpLogging.SetLevel.Request::class).level
+                                mcpRequest.json.fromJsonRpc(McpLogging.SetLevel.Request::class).level
                             )
                             ServerMessage.Response.Empty
                         }
@@ -212,7 +211,7 @@ class McpProtocol<Transport>(
                             when (resources) {
                                 is ObservableResources -> resources.unsubscribe(
                                     session,
-                                    jsonReq.fromJsonRpc(McpResource.Unsubscribe.Request::class)
+                                    mcpRequest.json.fromJsonRpc(McpResource.Unsubscribe.Request::class)
                                 )
                             }
                             ServerMessage.Response.Empty
@@ -222,7 +221,7 @@ class McpProtocol<Transport>(
                     McpInitialize.Initialized.Method -> Accepted
 
                     McpCancelled.Method -> {
-                        cancellations.cancel(jsonReq.fromJsonRpc(McpCancelled.Notification::class))
+                        cancellations.cancel(mcpRequest.json.fromJsonRpc(McpCancelled.Notification::class))
                         Accepted
                     }
 
@@ -281,7 +280,7 @@ class McpProtocol<Transport>(
 
 
                     McpTask.Status.Method -> {
-                        tasks.update(session, jsonReq.fromJsonRpc(McpTask.Status.Notification::class))
+                        tasks.update(session, mcpRequest.json.fromJsonRpc(McpTask.Status.Notification::class))
                         Accepted
                     }
 
@@ -289,7 +288,7 @@ class McpProtocol<Transport>(
                         sessions.respond(
                             transport,
                             context,
-                            MethodNotFound.toJsonRpc(jsonReq.id)
+                            MethodNotFound.toJsonRpc(mcpRequest.json.id)
                         )
                     )
                 }
