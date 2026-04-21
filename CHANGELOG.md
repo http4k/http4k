@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - **http4k-***: Upgrade versions, including Kotlin to 2.3.21
 - **http4k-ai-mcp-sdk**: [Break] `McpHandler` now handles `JsonRpcResult` as well as `JsonRpcRequest`, through a new sealed supertype `JsonRpcMessage`. Any custom McpHandlers will need adjusting.
 - **http4k-ai-mcp-sdk**: [Break] All MCP Message objects have _meta fields now. Conversion from `object` to class.
+- **http4k-ai-mcp-testing**: [Break] Test MCP Clients now need to be started in all tests. This allows for handshaking and forces compliance with the MCP spec. You can use `TestMcpClient.useClient()` to get a pre-started instance.
 - **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
 - **http4k-testing-chaos**: Add `ReturnResponse` behaviour. H/T @jamieredding.
 - **http4k-connect-amazon-dynamodb-fake** [Fix] Condition expression to be properly evaluated when item is missing. H/T @oharaandrew314

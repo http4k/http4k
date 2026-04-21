@@ -22,7 +22,8 @@ class AdaptingMcpHandler(private val onError: (Throwable) -> Unit) {
         { req: McpRequest ->
             when (val jsonRpc = req.json) {
                 is JsonRpcRequest<McpNodeType> -> McpResponse.Ok(
-                    jsonRpc.runCatching { jsonRpc.fromJsonRpc(clazz) }
+                    jsonRpc.runCatching {
+                        jsonRpc.fromJsonRpc(clazz) }
                         .mapCatching { fn(it, client) }
                         .map { it.toJsonRpc(jsonRpc.id) }
                         .recover {

@@ -33,7 +33,7 @@ interface McpWiretapFunctionContract {
         function.mcp()
     ).testMcpClient(Request.Companion(Method.GET, "/mcp"))
 
-    fun callTool(args: Map<String, Any>) = mcpClient().tools().call(
+    fun callTool(args: Map<String, Any>) = mcpClient().apply { start() }.tools().call(
         ToolName.of(toolName),
         ToolRequest(args)
     )
