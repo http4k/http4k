@@ -5,9 +5,9 @@
 package org.http4k.ai.mcp.server.websocket
 
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.ai.mcp.server.protocol.InvalidSession
+import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.server.protocol.ValidSessionState
 import org.http4k.ai.mcp.server.sse.sessionId
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -25,21 +25,21 @@ import java.util.concurrent.Executors
  * ws("/path" bind <WsCommandHandler>
  */
 fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { req: Request ->
-    when (val session = protocol.retrieveSession(req)) {
-        is Session -> WsResponse { ws ->
+    when (val sessionState = protocol.retrieveSession(req)) {
+        is ValidSessionState -> WsResponse { ws ->
             val executor = Executors.newCachedThreadPool()
 
             with(protocol) {
-                assign(Subscription(session), ws, req)
+                assign(Subscription(sessionState.session), ws, req)
                 ws.onMessage { msg ->
-                    executor.submit { receive(ws, session, req.body(msg.bodyString())) }
+                    executor.submit { receive(ws, sessionState, req.body(msg.bodyString())) }
                 }
                 ws.onClose { executor.shutdown() }
                 ws.send(
                     WsMessage(
                         SseMessage.Event(
                             "endpoint",
-                            Request(GET, "/message").with(sessionId of session.id).uri.toString()
+                            Request(GET, "/message").with(sessionId of sessionState.session.id).uri.toString()
                         )
                             .toMessage()
                     )
@@ -47,6 +47,6 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
             }
         }
 
-        is InvalidSession -> WsResponse { it.close(REFUSE) }
+        InvalidSessionState -> WsResponse { it.close(REFUSE) }
     }
 }

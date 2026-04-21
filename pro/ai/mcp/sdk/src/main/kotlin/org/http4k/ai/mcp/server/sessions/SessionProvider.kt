@@ -5,6 +5,8 @@
 package org.http4k.ai.mcp.server.sessions
 
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.server.protocol.ExistingSession
+import org.http4k.ai.mcp.server.protocol.NewSession
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.SessionState
 import org.http4k.core.Request
@@ -25,12 +27,10 @@ fun interface SessionProvider {
          */
         fun Random(random: Random) =
             SessionProvider { connectRequest, sessionId ->
-                Session(
                     when (sessionId) {
-                        null -> SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())
-                        else -> sessionId
+                        null -> NewSession(Session(SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())))
+                        else -> ExistingSession(Session(sessionId))
                     }
-                )
             }
     }
 }

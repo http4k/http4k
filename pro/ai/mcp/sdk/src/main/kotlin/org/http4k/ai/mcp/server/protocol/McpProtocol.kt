@@ -108,16 +108,16 @@ class McpProtocol<Transport>(
 
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
-    fun receive(transport: Transport, session: Session, httpReq: Request): McpResponse {
+    fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
         val rawPayload =
             runCatching { parse(httpReq.bodyString()) }.getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
 
         val payload = McpJson.fields(rawPayload).toMap()
 
-        val context = ClientCall(session)
+        val context = ClientCall(sessionState.session)
 
         val mcpRequest = McpRequest(
-            session,
+            sessionState.session,
             if (payload["method"] != null) JsonRpcRequest(McpJson, payload) else JsonRpcResult(McpJson, payload),
             httpReq
         )
@@ -127,8 +127,8 @@ class McpProtocol<Transport>(
                 when (McpRpcMethod.of(mcpRequest.json.method)) {
                     McpInitialize.Method ->
                         respond<McpInitialize.Request>(transport, mcpRequest, context) { it, _ ->
-                            assign(Subscription(session), transport, httpReq)
-                            handleInitialize(it, httpReq, session)
+                            assign(Subscription(sessionState.session), transport, httpReq)
+                            handleInitialize(it, httpReq, sessionState.session)
                         }
 
                     McpCompletion.Method ->
@@ -183,9 +183,9 @@ class McpProtocol<Transport>(
                                 is ObservableResources -> {
                                     val subscribeRequest =
                                         mcpRequest.json.fromJsonRpc(McpResource.Subscribe.Request::class)
-                                    resources.subscribe(session, subscribeRequest) {
+                                    resources.subscribe(sessionState.session, subscribeRequest) {
                                         sessions.request(
-                                            Subscription(session),
+                                            Subscription(sessionState.session),
                                             Notification(subscribeRequest.uri)
                                                 .toJsonRpc(McpResource.Updated)
                                         )
@@ -199,7 +199,7 @@ class McpProtocol<Transport>(
                     McpLogging.SetLevel.Method ->
                         respond<McpLogging.SetLevel.Request>(transport, mcpRequest, context) { _, _ ->
                             logger.setLevel(
-                                session,
+                                sessionState.session,
                                 mcpRequest.json.fromJsonRpc(McpLogging.SetLevel.Request::class).level
                             )
                             ServerMessage.Response.Empty
@@ -210,7 +210,7 @@ class McpProtocol<Transport>(
                         respond<McpResource.Unsubscribe.Request>(transport, mcpRequest, context) { _, _ ->
                             when (resources) {
                                 is ObservableResources -> resources.unsubscribe(
-                                    session,
+                                    sessionState.session,
                                     mcpRequest.json.fromJsonRpc(McpResource.Unsubscribe.Request::class)
                                 )
                             }
@@ -228,7 +228,7 @@ class McpProtocol<Transport>(
                     McpProgress.Method -> Accepted
 
                     McpRoot.Changed.Method -> {
-                        clientTracking[session]?.let {
+                        clientTracking[sessionState.session]?.let {
                             if (it.supportsRoots) {
                                 val messageId = McpMessageId.random(random)
                                 it.trackRequest(messageId) { roots.update(it.fromJsonRpc(McpRoot.List.Response::class)) }
@@ -257,30 +257,30 @@ class McpProtocol<Transport>(
 
                     McpTask.Get.Method ->
                         respond<McpTask.Get.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.get(session, it, c, httpReq)
+                            tasks.get(sessionState.session, it, c, httpReq)
                         }
 
 
                     McpTask.Result.Method ->
                         respond<McpTask.Result.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.result(session, it, c, httpReq)
+                            tasks.result(sessionState.session, it, c, httpReq)
                         }
 
 
                     McpTask.Cancel.Method ->
                         respond<McpTask.Cancel.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.cancel(session, it, c, httpReq)
+                            tasks.cancel(sessionState.session, it, c, httpReq)
                         }
 
 
                     McpTask.List.Method ->
                         respond<McpTask.List.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.list(session, it, c, httpReq)
+                            tasks.list(sessionState.session, it, c, httpReq)
                         }
 
 
                     McpTask.Status.Method -> {
-                        tasks.update(session, mcpRequest.json.fromJsonRpc(McpTask.Status.Notification::class))
+                        tasks.update(sessionState.session, mcpRequest.json.fromJsonRpc(McpTask.Status.Notification::class))
                         Accepted
                     }
 
@@ -301,7 +301,7 @@ class McpProtocol<Transport>(
                         val id = mcpRequest.json.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
                             null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
-                            else -> clientTracking[session]?.processResult(id, mcpRequest.json)?.let { Accepted }
+                            else -> clientTracking[sessionState.session]?.processResult(id, mcpRequest.json)?.let { Accepted }
                                 ?: Unknown
                         }
                     }

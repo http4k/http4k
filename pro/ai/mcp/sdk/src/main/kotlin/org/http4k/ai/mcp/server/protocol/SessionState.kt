@@ -11,6 +11,15 @@ import org.http4k.ai.mcp.protocol.SessionId
  */
 sealed interface SessionState
 
-data class Session(val id: SessionId) : SessionState
+sealed interface ValidSessionState : SessionState {
+    val session: Session
+}
 
-data object InvalidSession : SessionState
+data class ExistingSession(override val session: Session) : ValidSessionState
+
+data class NewSession(override val session: Session) : ValidSessionState
+
+data object InvalidSessionState
+
+data class Session(val id: SessionId)
+

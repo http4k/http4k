@@ -8,9 +8,9 @@ import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.server.asHttp
-import org.http4k.ai.mcp.server.protocol.InvalidSession
+import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.server.protocol.ValidSessionState
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -25,19 +25,19 @@ import org.http4k.routing.bind
  * via JSON RPC result messages.
  */
 fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: Request ->
-    when (val session = protocol.retrieveSession(req)) {
-        is Session -> {
+    when (val sessionState = protocol.retrieveSession(req)) {
+        is ValidSessionState -> {
             with(protocol) {
                 handleInitialize(
-                    McpInitialize.Request(VersionedMcpEntity(session.id.value, "0.0.0"), All),
+                    McpInitialize.Request(VersionedMcpEntity(sessionState.session.id.value, "0.0.0"), All),
                     req,
-                    session
+                    sessionState.session
                 )
-                receive(Unit, session, req).asHttp(OK)
-                    .with(Header.MCP_SESSION_ID of session.id)
+                receive(Unit, sessionState, req).asHttp(OK)
+                    .with(Header.MCP_SESSION_ID of sessionState.session.id)
             }
         }
 
-        is InvalidSession -> Response(NOT_FOUND)
+        InvalidSessionState -> Response(NOT_FOUND)
     }
 }

@@ -6,6 +6,7 @@ package org.http4k.ai.mcp.server.stdio
 
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
+import org.http4k.ai.mcp.server.protocol.ExistingSession
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.util.McpJson
@@ -27,7 +28,7 @@ class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) = fn()
 
     override fun retrieveSession(connectRequest: Request) =
-        Session(SessionId.of(UUID.randomUUID().toString()))
+        ExistingSession(Session(SessionId.of(UUID.randomUUID().toString())))
 
     override fun transportFor(context: ClientRequestContext) {
         error("not implemented")
