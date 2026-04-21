@@ -52,6 +52,7 @@ import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
+import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.JsonRpcRequest
@@ -112,6 +113,16 @@ class McpProtocol<Transport>(
         val rawPayload = runCatching { parse(httpReq.bodyString()) }
             .getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
 
+        val mcpRequest = toMcpRequest(rawPayload, sessionState, httpReq)
+
+        return responseFor(mcpRequest, sessionState, transport)
+    }
+
+    private fun toMcpRequest(
+        rawPayload: MoshiNode,
+        sessionState: ValidSessionState,
+        httpReq: Request
+    ): McpRequest {
         val payload = McpJson.fields(rawPayload).toMap()
 
         val mcpRequest = McpRequest(
@@ -119,7 +130,14 @@ class McpProtocol<Transport>(
             if (payload["method"] != null) JsonRpcRequest(McpJson, payload) else JsonRpcResult(McpJson, payload),
             httpReq
         )
+        return mcpRequest
+    }
 
+    private fun responseFor(
+        mcpRequest: McpRequest,
+        sessionState: ValidSessionState,
+        transport: Transport
+    ): McpResponse {
         val context = ClientCall(sessionState.session)
 
         return when (mcpRequest.json) {
@@ -128,13 +146,13 @@ class McpProtocol<Transport>(
                 when {
                     sessionState is NewSession || method == McpInitialize.Method ->
                         respond<McpInitialize.Request>(transport, mcpRequest, context) { it, _ ->
-                            assign(Subscription(sessionState.session), transport, httpReq)
-                            handleInitialize(it, httpReq, sessionState.session)
+                            assign(Subscription(sessionState.session), transport, mcpRequest.http)
+                            handleInitialize(it, mcpRequest.http, sessionState.session)
                         }
 
                     method == McpCompletion.Method ->
                         respond<McpCompletion.Request>(transport, mcpRequest, context) { it, c ->
-                            completions.complete(it, c, httpReq)
+                            completions.complete(it, c, mcpRequest.http)
                         }
 
                     method == McpPing.Method ->
@@ -145,13 +163,13 @@ class McpProtocol<Transport>(
 
                     method == McpPrompt.Get.Method ->
                         respond<McpPrompt.Get.Request>(transport, mcpRequest, context) { it, c ->
-                            prompts.get(it, c, httpReq)
+                            prompts.get(it, c, mcpRequest.http)
                         }
 
 
                     method == McpPrompt.List.Method ->
                         respond<McpPrompt.List.Request>(transport, mcpRequest, context) { it, c ->
-                            prompts.list(it, c, httpReq)
+                            prompts.list(it, c, mcpRequest.http)
                         }
 
 
@@ -161,19 +179,19 @@ class McpProtocol<Transport>(
                             mcpRequest,
                             context
                         ) { it, c ->
-                            resources.listTemplates(it, c, httpReq)
+                            resources.listTemplates(it, c, mcpRequest.http)
                         }
 
 
                     method == McpResource.List.Method ->
                         respond<McpResource.List.Request>(transport, mcpRequest, context) { it, c ->
-                            resources.listResources(it, c, httpReq)
+                            resources.listResources(it, c, mcpRequest.http)
                         }
 
 
                     method == McpResource.Read.Method -> {
                         respond<McpResource.Read.Request>(transport, mcpRequest, context) { it, c ->
-                            resources.read(it, c, httpReq)
+                            resources.read(it, c, mcpRequest.http)
                         }
                     }
 
@@ -245,42 +263,45 @@ class McpProtocol<Transport>(
 
                     method == McpTool.Call.Method ->
                         respond<McpTool.Call.Request>(transport, mcpRequest, context) { it, c ->
-                            tools.call(it, c, httpReq)
+                            tools.call(it, c, mcpRequest.http)
                         }
 
 
                     method == McpTool.List.Method ->
                         respond<McpTool.List.Request>(transport, mcpRequest, context) { it, c ->
-                            tools.list(it, c, httpReq)
+                            tools.list(it, c, mcpRequest.http)
                         }
 
 
                     method == McpTask.Get.Method ->
                         respond<McpTask.Get.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.get(sessionState.session, it, c, httpReq)
+                            tasks.get(sessionState.session, it, c, mcpRequest.http)
                         }
 
 
                     method == McpTask.Result.Method ->
                         respond<McpTask.Result.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.result(sessionState.session, it, c, httpReq)
+                            tasks.result(sessionState.session, it, c, mcpRequest.http)
                         }
 
 
                     method == McpTask.Cancel.Method ->
                         respond<McpTask.Cancel.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.cancel(sessionState.session, it, c, httpReq)
+                            tasks.cancel(sessionState.session, it, c, mcpRequest.http)
                         }
 
 
                     method == McpTask.List.Method ->
                         respond<McpTask.List.Request>(transport, mcpRequest, context) { it, c ->
-                            tasks.list(sessionState.session, it, c, httpReq)
+                            tasks.list(sessionState.session, it, c, mcpRequest.http)
                         }
 
 
                     method == McpTask.Status.Method -> {
-                        tasks.update(sessionState.session, mcpRequest.json.fromJsonRpc(McpTask.Status.Notification::class))
+                        tasks.update(
+                            sessionState.session,
+                            mcpRequest.json.fromJsonRpc(McpTask.Status.Notification::class)
+                        )
                         Accepted
                     }
 
@@ -301,7 +322,8 @@ class McpProtocol<Transport>(
                         val id = mcpRequest.json.id?.let { McpMessageId.parse(compact(it)) }
                         when (id) {
                             null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
-                            else -> clientTracking[sessionState.session]?.processResult(id, mcpRequest.json)?.let { Accepted }
+                            else -> clientTracking[sessionState.session]?.processResult(id, mcpRequest.json)
+                                ?.let { Accepted }
                                 ?: Unknown
                         }
                     }

@@ -92,8 +92,12 @@ class WebsocketMcpClient(
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean
     ): Result<McpMessageId, McpError> {
-        val latch =
-            CountDownLatch(if (message is ClientMessage.Notification || message is ClientMessage.Response) 0 else 1)
+        val latch = CountDownLatch(
+            when (message) {
+                is ClientMessage.Notification, is ClientMessage.Response -> 0
+                else -> 1
+            }
+        )
 
         return resultFrom {
             requests[messageId] = latch
