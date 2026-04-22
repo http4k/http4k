@@ -229,7 +229,7 @@ class McpProtocol<Transport>(
                 }
             }
 
-            is JsonRpcResult<McpNodeType> -> handleResult(mcpRequest, sessionState)
+            is JsonRpcResult<McpNodeType> -> handleResult(mcpRequest.json, sessionState)
         }
     }
 
@@ -249,18 +249,15 @@ class McpProtocol<Transport>(
         return Accepted
     }
 
-    private fun handleResult(mcpRequest: McpRequest, sessionState: ValidSessionState): McpResponse {
-        val result = mcpRequest.json as JsonRpcResult<McpNodeType>
-        return when {
-            result.isError() -> Accepted
-            else -> with(McpJson) {
-                val id = result.id?.let { McpMessageId.parse(compact(it)) }
-                when (id) {
-                    null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
-                    else -> clientTracking[sessionState.session]?.processResult(id, result)
-                        ?.let { Accepted }
-                        ?: Unknown
-                }
+    private fun handleResult(result: JsonRpcResult<McpNodeType>, sessionState: ValidSessionState) = when {
+        result.isError() -> Accepted
+        else -> with(McpJson) {
+            val id = result.id?.let { McpMessageId.parse(compact(it)) }
+            when (id) {
+                null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
+                else -> clientTracking[sessionState.session]?.processResult(id, result)
+                    ?.let { Accepted }
+                    ?: Unknown
             }
         }
     }
