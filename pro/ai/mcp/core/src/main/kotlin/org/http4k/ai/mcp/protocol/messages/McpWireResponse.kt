@@ -4,4 +4,4 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-sealed interface McpWireResponse
+sealed interface McpWireResponse : McpWireMessage
