@@ -109,6 +109,87 @@ class McpProtocol<Transport>(
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
     private val handlerFactory = AdaptingMcpHandlerFactory(onError)
 
+    private val requestHandlers: Map<McpRpcMethod, McpHandler> = mapOf(
+        McpPing.Method to adapted<McpPing.Request> { _, _ ->
+            ServerMessage.Response.Empty
+        },
+        McpCompletion.Method to adapted<McpCompletion.Request> { req, mcp ->
+            completions.complete(req, clientFor(mcp.session), mcp.http)
+        },
+        McpPrompt.Get.Method to adapted<McpPrompt.Get.Request> { req, mcp ->
+            prompts.get(req, clientFor(mcp.session), mcp.http)
+        },
+        McpPrompt.List.Method to adapted<McpPrompt.List.Request> { req, mcp ->
+            prompts.list(req, clientFor(mcp.session), mcp.http)
+        },
+        McpResource.ListTemplates.Method to adapted<McpResource.ListTemplates.Request> { req, mcp ->
+            resources.listTemplates(req, clientFor(mcp.session), mcp.http)
+        },
+        McpResource.List.Method to adapted<McpResource.List.Request> { req, mcp ->
+            resources.listResources(req, clientFor(mcp.session), mcp.http)
+        },
+        McpResource.Read.Method to adapted<McpResource.Read.Request> { req, mcp ->
+            resources.read(req, clientFor(mcp.session), mcp.http)
+        },
+        McpResource.Subscribe.Method to adapted<McpResource.Subscribe.Request> { req, mcp ->
+            when (resources) {
+                is ObservableResources -> resources.subscribe(mcp.session, req) {
+                    sessions.request(
+                        Subscription(mcp.session),
+                        Notification(req.uri).toJsonRpc(McpResource.Updated)
+                    )
+                }
+            }
+            ServerMessage.Response.Empty
+        },
+        McpResource.Unsubscribe.Method to adapted<McpResource.Unsubscribe.Request> { req, mcp ->
+            when (resources) {
+                is ObservableResources -> resources.unsubscribe(mcp.session, req)
+            }
+            ServerMessage.Response.Empty
+        },
+        McpLogging.SetLevel.Method to adapted<McpLogging.SetLevel.Request> { req, mcp ->
+            logger.setLevel(mcp.session, req.level)
+            ServerMessage.Response.Empty
+        },
+        McpTool.Call.Method to adapted<McpTool.Call.Request> { req, mcp ->
+            tools.call(req, clientFor(mcp.session), mcp.http)
+        },
+        McpTool.List.Method to adapted<McpTool.List.Request> { req, mcp ->
+            tools.list(req, clientFor(mcp.session), mcp.http)
+        },
+        McpTask.Get.Method to adapted<McpTask.Get.Request> { req, mcp ->
+            tasks.get(mcp.session, req, clientFor(mcp.session), mcp.http)
+        },
+        McpTask.Result.Method to adapted<McpTask.Result.Request> { req, mcp ->
+            tasks.result(mcp.session, req, clientFor(mcp.session), mcp.http)
+        },
+        McpTask.Cancel.Method to adapted<McpTask.Cancel.Request> { req, mcp ->
+            tasks.cancel(mcp.session, req, clientFor(mcp.session), mcp.http)
+        },
+        McpTask.List.Method to adapted<McpTask.List.Request> { req, mcp ->
+            tasks.list(mcp.session, req, clientFor(mcp.session), mcp.http)
+        },
+    )
+
+    private val notificationHandlers: Map<McpRpcMethod, McpHandler> = mapOf(
+        McpInitialize.Initialized.Method to { _ -> Accepted },
+        McpProgress.Method to { _ -> Accepted },
+        McpCancelled.Method to { mcp ->
+            cancellations.cancel(
+                (mcp.json as JsonRpcRequest<McpNodeType>).fromJsonRpc(McpCancelled.Notification::class)
+            )
+            Accepted
+        },
+        McpTask.Status.Method to { mcp ->
+            tasks.update(
+                mcp.session,
+                (mcp.json as JsonRpcRequest<McpNodeType>).fromJsonRpc(McpTask.Status.Notification::class)
+            )
+            Accepted
+        },
+    )
+
     fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
         val rawPayload = runCatching { parse(httpReq.bodyString()) }
             .getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
@@ -123,195 +204,71 @@ class McpProtocol<Transport>(
         sessionState: ValidSessionState,
         transport: Transport
     ): McpResponse {
-
-        val filter = mcpFilter
-            .then(AssignAndCloseSession(sessions, transport))
+        val filter = mcpFilter.then(AssignAndCloseSession(sessions, transport))
 
         return when (mcpRequest.json) {
             is JsonRpcRequest<McpNodeType> -> {
                 val method = McpRpcMethod.of(mcpRequest.json.method)
                 when {
                     sessionState is NewSession || method == McpInitialize.Method ->
-                        respond<McpInitialize.Request>(filter, mcpRequest) {
-                            handleInitialize(it, mcpRequest.http, sessionState.session)
-                        }
+                        filter.then(adapted<McpInitialize.Request> { req, mcp ->
+                            handleInitialize(req, mcp.http, mcp.session)
+                        })(mcpRequest)
 
-                    method == McpCompletion.Method ->
-                        respond<McpCompletion.Request>(filter, mcpRequest) {
-                            completions.complete(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
+                    method == McpRoot.Changed.Method -> handleRootChanged(mcpRequest, transport)
 
-                    method == McpPing.Method ->
-                        respond<McpPing.Request>(filter, mcpRequest) {
-                            ServerMessage.Response.Empty
-                        }
-
-
-                    method == McpPrompt.Get.Method ->
-                        respond<McpPrompt.Get.Request>(filter, mcpRequest) {
-                            prompts.get(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpPrompt.List.Method ->
-                        respond<McpPrompt.List.Request>(filter, mcpRequest) {
-                            prompts.list(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpResource.ListTemplates.Method ->
-                        respond<McpResource.ListTemplates.Request>(filter, mcpRequest) {
-                            resources.listTemplates(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpResource.List.Method ->
-                        respond<McpResource.List.Request>(filter, mcpRequest) {
-                            resources.listResources(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpResource.Read.Method -> {
-                        respond<McpResource.Read.Request>(filter, mcpRequest) {
-                            resources.read(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-                    }
-
-                    method == McpResource.Subscribe.Method -> {
-                        respond<McpResource.Subscribe.Request>(filter, mcpRequest) {
-                            when (resources) {
-                                is ObservableResources -> {
-                                    val subscribeRequest =
-                                        mcpRequest.json.fromJsonRpc(McpResource.Subscribe.Request::class)
-                                    resources.subscribe(sessionState.session, subscribeRequest) {
-                                        sessions.request(
-                                            Subscription(sessionState.session),
-                                            Notification(subscribeRequest.uri)
-                                                .toJsonRpc(McpResource.Updated)
-                                        )
-                                    }
-                                }
-                            }
-                            ServerMessage.Response.Empty
-                        }
-                    }
-
-                    method == McpLogging.SetLevel.Method ->
-                        respond<McpLogging.SetLevel.Request>(filter, mcpRequest) {
-                            logger.setLevel(
-                                sessionState.session,
-                                mcpRequest.json.fromJsonRpc(McpLogging.SetLevel.Request::class).level
+                    else -> requestHandlers[method]?.let { filter.then(it)(mcpRequest) }
+                        ?: notificationHandlers[method]?.invoke(mcpRequest)
+                        ?: Ok(
+                            sessions.respond(
+                                transport,
+                                ClientCall(mcpRequest.session),
+                                MethodNotFound.toJsonRpc(mcpRequest.json.id)
                             )
-                            ServerMessage.Response.Empty
-                        }
-
-
-                    method == McpResource.Unsubscribe.Method ->
-                        respond<McpResource.Unsubscribe.Request>(filter, mcpRequest) {
-                            when (resources) {
-                                is ObservableResources -> resources.unsubscribe(
-                                    sessionState.session,
-                                    mcpRequest.json.fromJsonRpc(McpResource.Unsubscribe.Request::class)
-                                )
-                            }
-                            ServerMessage.Response.Empty
-                        }
-
-
-                    method == McpInitialize.Initialized.Method -> Accepted
-
-                    method == McpCancelled.Method -> {
-                        cancellations.cancel(mcpRequest.json.fromJsonRpc(McpCancelled.Notification::class))
-                        Accepted
-                    }
-
-                    method == McpProgress.Method -> Accepted
-
-                    method == McpRoot.Changed.Method -> {
-                        clientTracking[sessionState.session]?.let {
-                            if (it.supportsRoots) {
-                                val messageId = McpMessageId.random(random)
-                                it.trackRequest(messageId) { roots.update(it.fromJsonRpc(McpRoot.List.Response::class)) }
-
-                                sessions.respond(
-                                    transport,
-                                    ClientCall(sessionState.session),
-                                    McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
-                                )
-                            }
-                        }
-                        Accepted
-                    }
-
-                    method == McpTool.Call.Method ->
-                        respond<McpTool.Call.Request>(filter, mcpRequest) {
-                            tools.call(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpTool.List.Method ->
-                        respond<McpTool.List.Request>(filter, mcpRequest) {
-                            tools.list(it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpTask.Get.Method ->
-                        respond<McpTask.Get.Request>(filter, mcpRequest) {
-                            tasks.get(sessionState.session, it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpTask.Result.Method ->
-                        respond<McpTask.Result.Request>(filter, mcpRequest) {
-                            tasks.result(sessionState.session, it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpTask.Cancel.Method ->
-                        respond<McpTask.Cancel.Request>(filter, mcpRequest) {
-                            tasks.cancel(sessionState.session, it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpTask.List.Method ->
-                        respond<McpTask.List.Request>(filter, mcpRequest) {
-                            tasks.list(sessionState.session, it, clientFor(sessionState.session), mcpRequest.http)
-                        }
-
-
-                    method == McpTask.Status.Method -> {
-                        tasks.update(
-                            sessionState.session,
-                            mcpRequest.json.fromJsonRpc(McpTask.Status.Notification::class)
                         )
-                        Accepted
-                    }
-
-                    else -> Ok(
-                        sessions.respond(
-                            transport,
-                            ClientCall(sessionState.session),
-                            MethodNotFound.toJsonRpc(mcpRequest.json.id)
-                        )
-                    )
                 }
             }
 
-            is JsonRpcResult<McpNodeType> -> {
-                when {
-                    mcpRequest.json.isError() -> Accepted
-                    else -> with(McpJson) {
-                        val id = mcpRequest.json.id?.let { McpMessageId.parse(compact(it)) }
-                        when (id) {
-                            null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
-                            else -> clientTracking[sessionState.session]?.processResult(id, mcpRequest.json)
-                                ?.let { Accepted }
-                                ?: Unknown
-                        }
-                    }
+            is JsonRpcResult<McpNodeType> -> handleResult(mcpRequest, sessionState)
+        }
+    }
+
+    private fun handleRootChanged(mcpRequest: McpRequest, transport: Transport): McpResponse {
+        clientTracking[mcpRequest.session]?.let {
+            if (it.supportsRoots) {
+                val messageId = McpMessageId.random(random)
+                it.trackRequest(messageId) { roots.update(it.fromJsonRpc(McpRoot.List.Response::class)) }
+
+                sessions.respond(
+                    transport,
+                    ClientCall(mcpRequest.session),
+                    McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
+                )
+            }
+        }
+        return Accepted
+    }
+
+    private fun handleResult(mcpRequest: McpRequest, sessionState: ValidSessionState): McpResponse {
+        val result = mcpRequest.json as JsonRpcResult<McpNodeType>
+        return when {
+            result.isError() -> Accepted
+            else -> with(McpJson) {
+                val id = result.id?.let { McpMessageId.parse(compact(it)) }
+                when (id) {
+                    null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
+                    else -> clientTracking[sessionState.session]?.processResult(id, result)
+                        ?.let { Accepted }
+                        ?: Unknown
                 }
             }
         }
+    }
+
+    private inline fun <reified IN : ClientMessage.Request> adapted(
+        crossinline fn: (IN, McpRequest) -> ServerMessage.Response
+    ): McpHandler = { mcpRequest ->
+        handlerFactory(IN::class) { fn(it, mcpRequest) }(mcpRequest)
     }
 
     private fun clientFor(session: Session): SessionBasedClient = SessionBasedClient(
@@ -378,13 +335,6 @@ class McpProtocol<Transport>(
     }
 
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
-
-    private inline fun <reified IN : ClientMessage.Request> respond(
-        filter: McpFilter,
-        mcpRequest: McpRequest,
-        noinline fn: (IN) -> ServerMessage.Response
-    ): McpResponse = filter
-        .then(handlerFactory(IN::class, fn))(mcpRequest)
 }
 
 private fun MoshiNode.toMcpRequest(
