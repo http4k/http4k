@@ -17,7 +17,7 @@ import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.jsonrpc.JsonRpcResult
 import kotlin.reflect.KClass
 
-class AdaptingMcpHandler(private val onError: (Throwable) -> Unit) {
+class AdaptingMcpHandlerFactory(private val onError: (Throwable) -> Unit) {
     operator fun <IN : ClientMessage.Request> invoke(clazz: KClass<IN>, fn: (IN, Client) -> Response, client: Client): McpHandler =
         { req: McpRequest ->
             when (val jsonRpc = req.json) {

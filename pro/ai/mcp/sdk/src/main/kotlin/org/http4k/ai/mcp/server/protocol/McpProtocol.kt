@@ -142,6 +142,7 @@ class McpProtocol<Transport>(
             .then(AssignAndCloseSession(sessions, transport))
 
         val client = clientFor(context)
+
         return when (mcpRequest.json) {
             is JsonRpcRequest<McpNodeType> -> {
                 val method = McpRpcMethod.of(mcpRequest.json.method)
@@ -400,6 +401,6 @@ class McpProtocol<Transport>(
         client: Client,
         noinline fn: (IN, Client) -> ServerMessage.Response
     ): McpResponse = filter
-        .then(AdaptingMcpHandler(onError)(IN::class, fn, client))(mcpRequest)
+        .then(AdaptingMcpHandlerFactory(onError)(IN::class, fn, client))(mcpRequest)
 
 }
