@@ -109,7 +109,7 @@ class McpProtocol<Transport>(
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
     private val handlerFactory = AdaptingMcpHandlerFactory(onError)
 
-    private val requestHandlers: Map<McpRpcMethod, McpHandler> = mapOf(
+    private val handlers: Map<McpRpcMethod, McpHandler> = mapOf(
         McpPing.Method to adapted<McpPing.Request> { _, _ ->
             ServerMessage.Response.Empty
         },
@@ -170,9 +170,6 @@ class McpProtocol<Transport>(
         McpTask.List.Method to adapted<McpTask.List.Request> { req, mcp ->
             tasks.list(mcp.session, req, clientFor(mcp.session), mcp.http)
         },
-    )
-
-    private val notificationHandlers: Map<McpRpcMethod, McpHandler> = mapOf(
         McpInitialize.Initialized.Method to { _ -> Accepted },
         McpProgress.Method to { _ -> Accepted },
         McpCancelled.Method to { mcp ->
@@ -217,8 +214,7 @@ class McpProtocol<Transport>(
 
                     method == McpRoot.Changed.Method -> handleRootChanged(mcpRequest, transport)
 
-                    else -> requestHandlers[method]?.let { filter.then(it)(mcpRequest) }
-                        ?: notificationHandlers[method]?.invoke(mcpRequest)
+                    else -> handlers[method]?.let { filter.then(it)(mcpRequest) }
                         ?: Ok(
                             sessions.respond(
                                 transport,
