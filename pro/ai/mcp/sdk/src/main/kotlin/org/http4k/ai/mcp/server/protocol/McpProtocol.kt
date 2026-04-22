@@ -74,7 +74,7 @@ class McpProtocol<Transport>(
     private val cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
-    private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
+    onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     private val random: Random = Random,
 ) {
     constructor(
@@ -107,6 +107,7 @@ class McpProtocol<Transport>(
     )
 
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
+    private val handlerFactory = AdaptingMcpHandlerFactory(onError)
 
     fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
         val rawPayload = runCatching { parse(httpReq.bodyString()) }
@@ -383,7 +384,7 @@ class McpProtocol<Transport>(
         mcpRequest: McpRequest,
         noinline fn: (IN) -> ServerMessage.Response
     ): McpResponse = filter
-        .then(AdaptingMcpHandlerFactory(onError)(IN::class, fn))(mcpRequest)
+        .then(handlerFactory(IN::class, fn))(mcpRequest)
 }
 
 private fun MoshiNode.toMcpRequest(
