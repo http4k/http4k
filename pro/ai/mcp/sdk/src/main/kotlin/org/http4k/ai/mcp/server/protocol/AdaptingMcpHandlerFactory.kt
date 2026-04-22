@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.ServerMessage.Response
@@ -18,13 +17,13 @@ import org.http4k.jsonrpc.JsonRpcResult
 import kotlin.reflect.KClass
 
 class AdaptingMcpHandlerFactory(private val onError: (Throwable) -> Unit) {
-    operator fun <IN : ClientMessage.Request> invoke(clazz: KClass<IN>, fn: (IN, Client) -> Response, client: Client): McpHandler =
+    operator fun <IN : ClientMessage.Request> invoke(clazz: KClass<IN>, fn: (IN) -> Response): McpHandler =
         { req: McpRequest ->
             when (val jsonRpc = req.json) {
                 is JsonRpcRequest<McpNodeType> -> McpResponse.Ok(
                     jsonRpc.runCatching {
                         jsonRpc.fromJsonRpc(clazz) }
-                        .mapCatching { fn(it, client) }
+                        .mapCatching(fn)
                         .map { it.toJsonRpc(jsonRpc.id) }
                         .recover {
                             when (it) {
