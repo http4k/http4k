@@ -45,7 +45,7 @@ data class McpPrompt(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val messages: kotlin.collections.List<Message>,
@@ -68,7 +68,7 @@ data class McpPrompt(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val prompts: kotlin.collections.List<McpPrompt>,

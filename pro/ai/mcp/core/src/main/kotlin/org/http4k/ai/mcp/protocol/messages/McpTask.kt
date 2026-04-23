@@ -19,7 +19,7 @@ import java.time.Instant
 object McpTask {
     object Create {
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val task: Task,
@@ -42,7 +42,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val task: Task,
@@ -65,7 +65,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: ResponseResult, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: ResponseResult, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class ResponseResult(
                 val result: Map<String, Any>?,
@@ -88,7 +88,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 override val _meta: Meta = Meta.default
@@ -110,7 +110,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val tasks: kotlin.collections.List<Task>,

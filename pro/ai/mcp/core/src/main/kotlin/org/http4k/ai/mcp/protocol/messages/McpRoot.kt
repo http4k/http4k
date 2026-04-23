@@ -23,7 +23,7 @@ object McpRoot {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(val roots: kotlin.collections.List<Root>, override val _meta: Meta = Meta.default) :
                 ClientMessage.Response, HasMeta

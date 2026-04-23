@@ -72,7 +72,7 @@ data class McpResource internal constructor(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val contents: kotlin.collections.List<Resource.Content>,
@@ -95,7 +95,7 @@ data class McpResource internal constructor(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val resources: kotlin.collections.List<McpResource>,
@@ -130,7 +130,7 @@ data class McpResource internal constructor(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val resourceTemplates: kotlin.collections.List<McpResource>,

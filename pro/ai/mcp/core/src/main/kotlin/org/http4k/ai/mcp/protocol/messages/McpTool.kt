@@ -46,7 +46,7 @@ data class McpTool(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val tools: kotlin.collections.List<McpTool>,
@@ -83,7 +83,7 @@ data class McpTool(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val content: kotlin.collections.List<Content>? = null,

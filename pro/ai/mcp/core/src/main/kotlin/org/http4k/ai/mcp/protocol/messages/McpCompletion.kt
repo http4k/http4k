@@ -30,7 +30,7 @@ object McpCompletion : McpRpc {
     }
 
     @JsonSerializable
-    data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+    data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
         @JsonSerializable
         data class Result(
             val completion: Completion,
