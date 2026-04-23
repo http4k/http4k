@@ -45,8 +45,8 @@ class TestingPrompts(
         name: PromptName,
         request: PromptRequest,
         overrideDefaultTimeout: Duration?
-    ) = sender(McpPrompt.Get, McpPrompt.Get.Request(name, request, request.meta)).first()
-        .nextEvent<PromptResponse, McpPrompt.Get.Response> { PromptResponse.Ok(messages, description) }
+    ) = sender(McpPrompt.Get, McpPrompt.Get.Params(name, request, request.meta)).first()
+        .nextEvent<PromptResponse, McpPrompt.Get.Result> { PromptResponse.Ok(messages, description) }
         .map { it.second }
         .flatMapFailure { toPromptErrorOrFailure(it) }
 }

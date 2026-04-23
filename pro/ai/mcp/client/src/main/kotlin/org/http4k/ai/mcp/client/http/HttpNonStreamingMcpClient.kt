@@ -128,7 +128,7 @@ class HttpNonStreamingMcpClient(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
+        ) = http.send<McpPrompt.Get.Response.Result>(McpPrompt.Get, McpPrompt.Get.Request.Params(name, request))
             .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
             .flatMapFailure { toPromptErrorOrFailure(it) }
     }

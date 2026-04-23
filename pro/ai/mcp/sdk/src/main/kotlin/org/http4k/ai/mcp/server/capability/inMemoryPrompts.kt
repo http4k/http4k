@@ -20,7 +20,7 @@ fun prompts(vararg capabilities: PromptCapability): Prompts = prompts(capabiliti
 fun prompts(capabilities: Iterable<PromptCapability>): Prompts = InMemoryPrompts(capabilities)
 
 private class InMemoryPrompts(capabilities: Iterable<PromptCapability>) : ObservableList<PromptCapability>(capabilities), Prompts {
-    override fun get(req: Get.Request, client: Client, http: Request) = items
+    override fun get(req: Get.Request.Params, client: Client, http: Request) = items
         .find { it.toPrompt().name == req.name }
         ?.get(req, client, http)
         ?: throw McpException(InvalidParams)

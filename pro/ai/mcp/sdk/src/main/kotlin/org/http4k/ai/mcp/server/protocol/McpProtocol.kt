@@ -116,7 +116,7 @@ class McpProtocol<Transport>(
         McpCompletion.Method to adapted<McpCompletion.Request> { req, mcp ->
             completions.complete(req, clientFor(mcp.session), mcp.http)
         },
-        McpPrompt.Get.Method to adapted<McpPrompt.Get.Request> { req, mcp ->
+        McpPrompt.Get.Method to adapted<McpPrompt.Get.Request.Params> { req, mcp ->
             prompts.get(req, clientFor(mcp.session), mcp.http)
         },
         McpPrompt.List.Method to adapted<McpPrompt.List.Request> { req, mcp ->

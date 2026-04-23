@@ -228,8 +228,8 @@ class HttpStreamingMcpClient(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send(McpPrompt.Get, McpPrompt.Get.Request(name, request))
-            .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response>() }
+        ) = http.send(McpPrompt.Get, McpPrompt.Get.Request.Params(name, request))
+            .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response.Result>() }
             .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
             .flatMapFailure { toPromptErrorOrFailure(it) }
     }

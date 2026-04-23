@@ -32,7 +32,7 @@ class GetPromptDetailSpanModifiersTest {
 
     @Test
     fun `sets arguments from request`(approver: Approver) {
-        val request = McpPrompt.Get.Request(PromptName.of("my-prompt"), mapOf("city" to "London"))
+        val request = McpPrompt.Get.Request.Params(PromptName.of("my-prompt"), mapOf("city" to "London"))
         GetPromptDetailSpanModifiers.request(span, asJsonObject(request))
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.prompt.arguments"))!!, APPLICATION_JSON)
@@ -40,7 +40,7 @@ class GetPromptDetailSpanModifiersTest {
 
     @Test
     fun `sets result from response`(approver: Approver) {
-        val response = McpPrompt.Get.Response(listOf(Message(Role.Assistant, Content.Text("hello world"))))
+        val response = McpPrompt.Get.Response.Result(listOf(Message(Role.Assistant, Content.Text("hello world"))))
         GetPromptDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.prompt.result"))!!, APPLICATION_JSON)
@@ -48,7 +48,7 @@ class GetPromptDetailSpanModifiersTest {
 
     @Test
     fun `no result attribute when response has no messages`() {
-        val response = McpPrompt.Get.Response(emptyList())
+        val response = McpPrompt.Get.Response.Result(emptyList())
         GetPromptDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         // empty list is still serialized, so attribute should be set

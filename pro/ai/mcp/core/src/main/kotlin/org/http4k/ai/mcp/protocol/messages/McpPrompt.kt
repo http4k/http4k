@@ -10,7 +10,9 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
+import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
+import se.ansman.kotshi.PolymorphicLabel
 
 @JsonSerializable
 data class McpPrompt(
@@ -32,18 +34,25 @@ data class McpPrompt(
         override val Method = of("prompts/get")
 
         @JsonSerializable
-        data class Request(
-            val name: PromptName,
-            val arguments: Map<String, String> = emptyMap(),
-            override val _meta: Meta = Meta.default
-        ) : ClientMessage.Request, HasMeta
+        @PolymorphicLabel("prompts/get")
+        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            @JsonSerializable
+            data class Params(
+                val name: PromptName,
+                val arguments: Map<String, String> = emptyMap(),
+                override val _meta: Meta = Meta.default
+            ) : ClientMessage.Request, HasMeta
+        }
 
         @JsonSerializable
-        data class Response(
-            val messages: kotlin.collections.List<Message>,
-            val description: String? = null,
-            override val _meta: Meta = Meta.default
-        ) : ServerMessage.Response, HasMeta
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+            @JsonSerializable
+            data class Result(
+                val messages: kotlin.collections.List<Message>,
+                val description: String? = null,
+                override val _meta: Meta = Meta.default
+            ) : ServerMessage.Response, HasMeta
+        }
     }
 
     object List : McpRpc {

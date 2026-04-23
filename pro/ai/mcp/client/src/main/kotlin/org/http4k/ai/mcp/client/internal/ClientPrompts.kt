@@ -43,12 +43,12 @@ internal class ClientPrompts(
     override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpPrompt.Get,
-            McpPrompt.Get.Request(name, request, request.meta),
+            McpPrompt.Get.Request.Params(name, request, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
             id()
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .flatMap { it.first().asOrFailure<McpPrompt.Get.Response>() }
+            .flatMap { it.first().asOrFailure<McpPrompt.Get.Response.Result>() }
             .map { Ok(it.messages, it.description) as PromptResponse }
             .flatMapFailure { toPromptErrorOrFailure(it) }
 }

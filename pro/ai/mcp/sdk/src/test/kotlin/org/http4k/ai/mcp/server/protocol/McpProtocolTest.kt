@@ -247,16 +247,16 @@ class McpProtocolTest {
                 )
             )
 
-            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(prompt.name, mapOf("name" to "123")))
+            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request.Params(prompt.name, mapOf("name" to "123")))
 
             assertNextMessage(
-                McpPrompt.Get.Response(
+                McpPrompt.Get.Response.Result(
                     listOf(Message(Assistant, Content.Text("321"))),
                     "description"
                 )
             )
 
-            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request(prompt.name, mapOf("name" to "notAnInt")))
+            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request.Params(prompt.name, mapOf("name" to "notAnInt")))
 
             assertNextMessage(InvalidParams)
         }
