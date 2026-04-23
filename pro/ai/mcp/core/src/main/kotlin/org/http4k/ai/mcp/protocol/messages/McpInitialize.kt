@@ -49,7 +49,7 @@ object McpInitialize : McpRpc {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/initialized")
-        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Initialized.Method
 
             @JsonSerializable

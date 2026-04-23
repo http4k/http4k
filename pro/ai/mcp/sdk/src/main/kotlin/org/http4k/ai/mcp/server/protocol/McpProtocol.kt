@@ -161,7 +161,7 @@ class McpProtocol<Transport>(
                     is McpPrompt.List.Request -> Ok(
                         McpPrompt.List.Response(
                             prompts.list(
-                                msg.params,
+                                msg.params ?: McpPrompt.List.Request.Params(),
                                 clientFor(mcp.session),
                                 mcp.http
                             ), msg.id
@@ -171,7 +171,7 @@ class McpProtocol<Transport>(
                     is McpResource.ListTemplates.Request -> Ok(
                         McpResource.ListTemplates.Response(
                             resources.listTemplates(
-                                msg.params,
+                                msg.params ?: McpResource.ListTemplates.Request.Params(),
                                 clientFor(mcp.session),
                                 mcp.http
                             ), msg.id
@@ -181,7 +181,7 @@ class McpProtocol<Transport>(
                     is McpResource.List.Request -> Ok(
                         McpResource.List.Response(
                             resources.listResources(
-                                msg.params,
+                                msg.params ?: McpResource.List.Request.Params(),
                                 clientFor(mcp.session),
                                 mcp.http
                             ), msg.id
@@ -235,7 +235,7 @@ class McpProtocol<Transport>(
                     is McpTool.List.Request -> Ok(
                         McpTool.List.Response(
                             tools.list(
-                                msg.params,
+                                msg.params ?: McpTool.List.Request.Params(),
                                 clientFor(mcp.session),
                                 mcp.http
                             ), msg.id

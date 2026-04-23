@@ -14,7 +14,7 @@ object McpPing : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("ping")
-    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+    data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpPing.Method
 
         @JsonSerializable
