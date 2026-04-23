@@ -11,6 +11,7 @@ import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
@@ -60,7 +61,7 @@ fun McpFilters.OpenTelemetryTracing(
                 .setAttribute("mcp.session.id", req.session.id.value)
                 .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
                 .apply {
-                    req.message.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
+                    req.message.id?.let { setAttribute("jsonrpc.request.id", it.toString()) }
                     if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
                 }
                 .startSpan()
@@ -71,13 +72,13 @@ fun McpFilters.OpenTelemetryTracing(
                 span.makeCurrent().use { next(req) }
                     .also { resp ->
                         if (resp is McpResponse.Ok) {
-                            spanModifiers?.forEach { it.response(span, resp.json) }
+                            val responseNode = McpJson.asJsonObject(resp.message)
+                            spanModifiers?.forEach { it.response(span, responseNode) }
 
-                            val error = McpJson.fields(resp.json).toMap()["error"]
-                            if (error != null) {
+                            if (resp.message is McpJsonRpcErrorResponse) {
                                 span.setStatus(ERROR)
-                                val code = McpJson.fields(error).toMap()["code"]
-                                if (code != null) span.setAttribute("error.type", McpJson.compact(code))
+                                val code = McpJson.textValueOf(resp.message.error, "code")
+                                if (code != null) span.setAttribute("error.type", code)
                             }
                         }
                     }

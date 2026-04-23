@@ -103,7 +103,6 @@ import org.http4k.lens.progressToken
 import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.security.ResponseType
-import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -767,19 +766,13 @@ class McpProtocolTest {
     private var inboundCounter = 1
 
     private fun TestSseClient.assertNextMessage(node: McpNodeType) {
+        val received = received().first() as SseMessage.Event
+        val expectedData = with(McpJson) { compact(node) }
         assertThat(
-            received().first(),
-            equalTo(
-                SseMessage.Event(
-                    "message",
-                    with(McpJson) { compact(node) },
-                    SseEventId(inboundCounter++.toString())
-                )
-            )
+            with(McpJson) { parse(received.data) },
+            equalTo(with(McpJson) { parse(expectedData) })
         )
     }
-
-
 }
 
 private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) =

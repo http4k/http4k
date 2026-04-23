@@ -9,7 +9,7 @@ import dev.forkhandles.result4k.recover
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.mpp.MppPaymentCheck.Free
 import org.http4k.ai.mcp.mpp.MppPaymentCheck.Required
-import org.http4k.ai.mcp.protocol.messages.toJsonRpc
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -44,24 +44,24 @@ fun McpFilters.MppPaymentRequired(
                             .map { next(req) }
                             .recover {
                                 McpResponse.Ok(
-                                    MppErrorMessage(
-                                        VERIFICATION_FAILED_CODE,
-                                        it.message ?: "Verification failed",
-                                        result.challenges
+                                    McpJsonRpcErrorResponse(
+                                        req.message.id,
+                                        MppErrorMessage(VERIFICATION_FAILED_CODE, it.message ?: "Verification failed", result.challenges)
                                     )
-                                        .toJsonRpc(req.message.id)
                                 )
                             }
                     } ?: McpResponse.Ok(
-                    MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
-                        .toJsonRpc(req.message.id)
+                    McpJsonRpcErrorResponse(
+                        req.message.id,
+                        MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
+                    )
                 )
             }
         }
     }
 }
 
-private class MppErrorMessage(
+internal class MppErrorMessage(
     code: Int,
     message: String,
     private val challenges: List<Challenge>

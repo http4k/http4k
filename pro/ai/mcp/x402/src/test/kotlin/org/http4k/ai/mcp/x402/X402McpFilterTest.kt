@@ -8,8 +8,9 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.server.protocol.Session
@@ -67,7 +68,7 @@ class X402McpFilterTest {
     )
 
     private val handler = McpFilters.X402PaymentRequired(fakeFacilitator.client()) { PaymentCheck.Required(listOf(requirements)) }
-        .then { McpResponse.Ok(McpJson.nullNode()) }
+        .then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
     private fun mcpRequest(payment: PaymentPayload? = null): McpRequest {
         val metaFields = payment?.let {
@@ -90,14 +91,14 @@ class X402McpFilterTest {
     fun `request without payment in meta returns payment required error`() {
         val result = handler(mcpRequest())
 
-        assertThat(result, equalTo(McpResponse.Ok(ErrorMessage(402, "Payment required").toJsonRpc(asJsonObject(1)))))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Payment required")))))
     }
 
     @Test
     fun `request with valid payment succeeds`() {
         val result = handler(mcpRequest(signedPayload))
 
-        assertThat(result, equalTo(McpResponse.Ok(McpJson.nullNode())))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
     }
 
     @Test
@@ -113,7 +114,7 @@ class X402McpFilterTest {
 
         val result = handler(mcpRequest(unmatchedPayload))
 
-        assertThat(result, equalTo(McpResponse.Ok(ErrorMessage(402, "Unsupported payment scheme/network").toJsonRpc(asJsonObject(1)))))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Unsupported payment scheme/network")))))
     }
 
     @Test
@@ -144,11 +145,11 @@ class X402McpFilterTest {
         )
         val multiHandler = McpFilters.X402PaymentRequired(multiFacilitator.client()) {
             PaymentCheck.Required(listOf(requirements, altRequirements))
-        }.then { McpResponse.Ok(McpJson.nullNode()) }
+        }.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = multiHandler(mcpRequest(solPayload))
 
-        assertThat(result, equalTo(McpResponse.Ok(McpJson.nullNode())))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
     }
 
     @Test
@@ -163,20 +164,20 @@ class X402McpFilterTest {
         )
         val handler = McpFilters.X402PaymentRequired(X402Facilitator.Http(Uri.of(""), verifyPassSettleFail)) {
             PaymentCheck.Required(listOf(requirements))
-        }.then { McpResponse.Ok(McpJson.nullNode()) }
+        }.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = handler(mcpRequest(signedPayload))
 
-        assertThat(result, equalTo(McpResponse.Ok(ErrorMessage(402, "Settlement failed: Settlement rejected").toJsonRpc(asJsonObject(1)))))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement rejected")))))
     }
 
     @Test
     fun `request passes through without payment when check returns Free`() {
         val freeHandler = McpFilters.X402PaymentRequired(fakeFacilitator.client()) { PaymentCheck.Free }
-            .then { McpResponse.Ok(McpJson.nullNode()) }
+            .then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = freeHandler(mcpRequest())
 
-        assertThat(result, equalTo(McpResponse.Ok(McpJson.nullNode())))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
     }
 }

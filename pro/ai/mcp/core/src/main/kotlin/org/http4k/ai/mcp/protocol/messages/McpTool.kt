@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.model.ToolAnnotations
 import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.ai.model.ToolName
 import org.http4k.format.MoshiNode
 import se.ansman.kotshi.JsonSerializable
@@ -37,7 +36,7 @@ data class McpTool(
 
         @JsonSerializable
         @PolymorphicLabel("tools/list")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = List.Method
 
             @JsonSerializable
@@ -48,7 +47,7 @@ data class McpTool(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val tools: kotlin.collections.List<McpTool>,
@@ -62,7 +61,7 @@ data class McpTool(
 
             @JsonSerializable
             @PolymorphicLabel("notifications/tools/list_changed")
-            data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
                 override val method = Changed.Method
 
                 @JsonSerializable
@@ -76,7 +75,7 @@ data class McpTool(
 
         @JsonSerializable
         @PolymorphicLabel("tools/call")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Call.Method
 
             @JsonSerializable
@@ -89,7 +88,7 @@ data class McpTool(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val content: kotlin.collections.List<Content>? = null,

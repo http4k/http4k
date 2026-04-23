@@ -59,8 +59,7 @@ internal class ClientSampling(
                         is Error -> throw McpException(DomainError(response.message))
                     }
                     sender(
-                        McpSampling,
-                        protocolResponse,
+                        McpSampling.Response(protocolResponse, requestId),
                         timeout,
                         requestId
                     )

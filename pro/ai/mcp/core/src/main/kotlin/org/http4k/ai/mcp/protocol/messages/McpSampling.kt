@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.model.ToolChoice
 import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role
@@ -29,7 +28,7 @@ object McpSampling : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("sampling/createMessage")
-    data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpSampling.Method
 
         @JsonSerializable
@@ -50,7 +49,7 @@ object McpSampling : McpRpc {
     }
 
     @JsonSerializable
-    data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+    data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
         @JsonSerializable
         data class Result(
             val model: ModelName? = null,

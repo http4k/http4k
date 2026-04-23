@@ -10,7 +10,6 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -35,7 +34,7 @@ data class McpPrompt(
 
         @JsonSerializable
         @PolymorphicLabel("prompts/get")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Get.Method
 
             @JsonSerializable
@@ -47,7 +46,7 @@ data class McpPrompt(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val messages: kotlin.collections.List<Message>,
@@ -62,7 +61,7 @@ data class McpPrompt(
 
         @JsonSerializable
         @PolymorphicLabel("prompts/list")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = List.Method
 
             @JsonSerializable
@@ -72,7 +71,7 @@ data class McpPrompt(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val prompts: kotlin.collections.List<McpPrompt>,
@@ -85,7 +84,7 @@ data class McpPrompt(
 
             @JsonSerializable
             @PolymorphicLabel("notifications/prompts/list_changed")
-            data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
                 override val method = Changed.Method
 
                 @JsonSerializable

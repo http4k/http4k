@@ -7,7 +7,6 @@ package org.http4k.ai.mcp.protocol.messages
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ProgressToken
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -16,7 +15,7 @@ object McpProgress : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("notifications/progress")
-    data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+    data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpProgress.Method
 
         @JsonSerializable

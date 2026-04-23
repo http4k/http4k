@@ -21,7 +21,7 @@ object McpElicitations : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("elicitation/create")
-    data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpElicitations.Method
 
         @JsonSerializable
@@ -49,7 +49,7 @@ object McpElicitations : McpRpc {
     }
 
     @JsonSerializable
-    data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+    data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
         @JsonSerializable
         data class Result(
             val action: ElicitationAction? = null,
@@ -64,7 +64,7 @@ object McpElicitations : McpRpc {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/elicitation/complete")
-        data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Complete.Method
 
             @JsonSerializable

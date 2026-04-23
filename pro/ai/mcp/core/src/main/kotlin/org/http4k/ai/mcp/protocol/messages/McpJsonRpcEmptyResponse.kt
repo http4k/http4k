@@ -4,14 +4,7 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
-import se.ansman.kotshi.Polymorphic
 
 @JsonSerializable
-@Polymorphic("method")
-sealed class McpJsonRpcRequest : McpJsonRpcMessage() {
-    abstract val method: McpRpcMethod
-    abstract val id: Any?
-}
-
+data class McpJsonRpcEmptyResponse(override val id: Any?, val result: Map<String, Any> = emptyMap(), val jsonrpc: String = "2.0") : McpJsonRpcResponse()

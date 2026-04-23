@@ -46,7 +46,7 @@ fun Iterable<ServerCapability>.asMcp(name: String = "http4k-mcp") =
 
 fun McpResponse.asHttp(status: Status) =
     when (val response = this) {
-        is Ok -> response.json.asHttp(status)
+        is Ok -> McpJson.asJsonObject(response.message).asHttp(status)
         is Accepted -> McpJson.nullNode().asHttp(ACCEPTED)
         is Unknown -> McpJson.nullNode().asHttp(NOT_FOUND)
     }

@@ -10,6 +10,8 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
@@ -37,10 +39,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
-import org.http4k.format.Json
 import org.http4k.format.MoshiObject
-import org.http4k.format.renderError
-import org.http4k.jsonrpc.ErrorMessage
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -71,7 +70,7 @@ class MppMcpFilterTest {
     }
 
     private val handler = McpFilters.MppPaymentRequired(verifier) { MppPaymentCheck.Required(listOf(challenge)) }
-        .then { Ok(McpJson.nullNode()) }
+        .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
     private fun mcpRequest(cred: Credential? = null): McpRequest {
         val metaFields = cred?.let {
@@ -101,14 +100,14 @@ class MppMcpFilterTest {
     fun `request with valid credential succeeds`() {
         val result = handler(mcpRequest(credential))
 
-        assertThat(result, equalTo(Ok(McpJson.nullNode())))
+        assertThat(result, equalTo(Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
     }
 
     @Test
     fun `verification failure returns error with -32043 and challenges`() {
         val failingVerifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
         val failHandler = McpFilters.MppPaymentRequired(failingVerifier) { MppPaymentCheck.Required(listOf(challenge)) }
-            .then { Ok(McpJson.nullNode()) }
+            .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = failHandler(mcpRequest(credential))
 
@@ -118,20 +117,13 @@ class MppMcpFilterTest {
     @Test
     fun `request passes through without payment when check returns Free`() {
         val freeHandler = McpFilters.MppPaymentRequired(verifier) { MppPaymentCheck.Free }
-            .then { Ok(McpJson.nullNode()) }
+            .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = freeHandler(mcpRequest())
 
-        assertThat(result, equalTo(Ok(McpJson.nullNode())))
+        assertThat(result, equalTo(Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
     }
 
     private fun mppErrorResponse(code: Int, message: String, challenges: List<Challenge>) =
-        McpJson.renderError(
-            object : ErrorMessage(code, message) {
-                @Suppress("UNCHECKED_CAST")
-                override fun <NODE> data(json: Json<NODE>): NODE =
-                    MppMoshi.asJsonObject(mapOf("challenges" to challenges)) as NODE
-            },
-            asJsonObject(1)
-        )
+        McpJsonRpcErrorResponse(asJsonObject(1), MppErrorMessage(code, message, challenges))
 }

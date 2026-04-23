@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
@@ -63,7 +62,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/read")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Read.Method
 
             @JsonSerializable
@@ -74,7 +73,7 @@ data class McpResource internal constructor(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val contents: kotlin.collections.List<Resource.Content>,
@@ -88,7 +87,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/list")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = List.Method
 
             @JsonSerializable
@@ -99,7 +98,7 @@ data class McpResource internal constructor(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val resources: kotlin.collections.List<McpResource>,
@@ -113,7 +112,7 @@ data class McpResource internal constructor(
 
             @JsonSerializable
             @PolymorphicLabel("notifications/resources/list_changed")
-            data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
                 override val method = Changed.Method
 
                 @JsonSerializable
@@ -127,7 +126,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/templates/list")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = ListTemplates.Method
 
             @JsonSerializable
@@ -138,7 +137,7 @@ data class McpResource internal constructor(
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val resourceTemplates: kotlin.collections.List<McpResource>,
@@ -153,7 +152,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("notifications/resources/updated")
-        data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Updated.Method
 
             @JsonSerializable
@@ -167,7 +166,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/subscribe")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Subscribe.Method
 
             @JsonSerializable
@@ -183,7 +182,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/unsubscribe")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Unsubscribe.Method
 
             @JsonSerializable

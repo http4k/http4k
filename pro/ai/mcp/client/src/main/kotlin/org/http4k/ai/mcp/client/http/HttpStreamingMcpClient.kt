@@ -57,15 +57,15 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -85,7 +85,6 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.MCP_SESSION_ID
@@ -97,6 +96,7 @@ import org.http4k.sse.chunkedSseSequence
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.Long.Companion.MAX_VALUE
 import kotlin.concurrent.thread
@@ -119,11 +119,17 @@ class HttpStreamingMcpClient(
 
     override val sessionId get() = _sessionId.get()
 
+    private val id = AtomicLong(0)
+
+    private fun nextId() = McpMessageId.of(id.incrementAndGet())
+
     override fun start(overrideDefaultTimeout: Duration?) = http.send(
-        McpInitialize, McpInitialize.Request.Params(
-            VersionedMcpEntity(name, version),
-            capabilities,
-            protocolVersion
+        McpInitialize.Request(
+            McpInitialize.Request.Params(
+                VersionedMcpEntity(name, version),
+                capabilities,
+                protocolVersion
+            ), nextId()
         )
     )
         .flatMap { it.first().asAOrFailure<McpInitialize.Response.Result>() }
@@ -146,10 +152,10 @@ class HttpStreamingMcpClient(
                     .filterIsInstance<Success<MoshiObject>>()
                     .map { it.value }
                     .filter { it["method"] != null }
-                    .forEach {
-                        val message = JsonRpcRequest(McpJson, it.attributes)
-                        val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                        callbacks[McpRpcMethod.of(message.method)]?.any { it(message, id) }
+                    .forEach { obj ->
+                        val message = asA<McpJsonRpcRequest>(compact(obj))
+                        val id = message.id?.let { idVal -> asA<McpMessageId>(compact(McpJson.asJsonObject(idVal))) }
+                        callbacks[message.method]?.any { it(message, id) }
                     }
             }
 
@@ -175,7 +181,7 @@ class HttpStreamingMcpClient(
         }
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send(McpTool.List, McpTool.List.Request.Params())
+            http.send(McpTool.List.Request(McpTool.List.Request.Params(), nextId()))
                 .flatMap { it.first().asAOrFailure<McpTool.List.Response.Result>() }
                 .map { it.tools }
 
@@ -185,11 +191,12 @@ class HttpStreamingMcpClient(
             overrideDefaultTimeout: Duration?
         ): Result<ToolResponse, McpError> {
             val incoming = http.send(
-                McpTool.Call,
-                McpTool.Call.Request.Params(
-                    name,
-                    request.mapValues { McpJson.asJsonObject(it.value) },
-                    request.meta
+                McpTool.Call.Request(
+                    McpTool.Call.Request.Params(
+                        name,
+                        request.mapValues { McpJson.asJsonObject(it.value) },
+                        request.meta
+                    ), nextId()
                 )
             )
             return incoming
@@ -198,10 +205,9 @@ class HttpStreamingMcpClient(
                         when ((McpJson.parse(it.data) as MoshiObject)["method"]) {
                             null -> it
                             else -> {
-                                val message =
-                                    JsonRpcRequest(McpJson, (McpJson.parse(it.data) as MoshiObject).attributes)
-                                val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                                callbacks[McpRpcMethod.of(message.method)]?.any { it(message, id) }
+                                val message = asA<McpJsonRpcRequest>(it.data)
+                                val id = message.id?.let { idVal -> asA<McpMessageId>(compact(McpJson.asJsonObject(idVal))) }
+                                callbacks[message.method]?.any { it(message, id) }
                                 null
                             }
                         }
@@ -220,7 +226,7 @@ class HttpStreamingMcpClient(
         }
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send(McpPrompt.List, McpPrompt.List.Request.Params())
+            http.send(McpPrompt.List.Request(McpPrompt.List.Request.Params(), nextId()))
                 .flatMap { it.first().asAOrFailure<McpPrompt.List.Response.Result>() }
                 .map { it.prompts }
 
@@ -228,7 +234,7 @@ class HttpStreamingMcpClient(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send(McpPrompt.Get, McpPrompt.Get.Request.Params(name, request))
+        ) = http.send(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request), nextId()))
             .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response.Result>() }
             .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
             .flatMapFailure { toPromptErrorOrFailure(it) }
@@ -251,9 +257,7 @@ class HttpStreamingMcpClient(
                         )
                     }
                     http.send(
-                        McpElicitations,
-                        response.toProtocol(),
-                        requestId
+                        McpElicitations.Response(response.toProtocol(), requestId)
                     )
                 }
             )
@@ -273,9 +277,7 @@ class HttpStreamingMcpClient(
                         )
                     }
                     http.send(
-                        McpElicitations,
-                        response.toProtocol(),
-                        requestId
+                        McpElicitations.Response(response.toProtocol(), requestId)
                     )
                 }
             )
@@ -327,9 +329,7 @@ class HttpStreamingMcpClient(
                             is Error -> throw McpException(DomainError(response.message))
                         }
                         http.send(
-                            McpSampling,
-                            protocolResponse,
-                            requestId
+                            McpSampling.Response(protocolResponse, requestId)
                         )
                     }
                 })
@@ -347,19 +347,19 @@ class HttpStreamingMcpClient(
         }
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send(McpResource.List, McpResource.List.Request.Params())
+            http.send(McpResource.List.Request(McpResource.List.Request.Params(), nextId()))
                 .flatMap { it.first().asAOrFailure<McpResource.List.Response.Result>() }
                 .map { it.resources }
 
         override fun listTemplates(overrideDefaultTimeout: Duration?) =
-            http.send(McpResource.ListTemplates, McpResource.ListTemplates.Request.Params())
+            http.send(McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), nextId()))
                 .flatMap { it.first().asAOrFailure<McpResource.ListTemplates.Response.Result>() }
                 .map { it.resourceTemplates }
 
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send(McpResource.Read, McpResource.Read.Request.Params(request.uri))
+        ) = http.send(McpResource.Read.Request(McpResource.Read.Request.Params(request.uri), nextId()))
             .flatMap { it.first().asAOrFailure<McpResource.Read.Response.Result>() }
             .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
             .flatMapFailure { toResourceErrorOrFailure(it) }
@@ -369,19 +369,19 @@ class HttpStreamingMcpClient(
                 McpCallback(McpResource.Updated.Notification.Params::class) { notification, _ ->
                     subscriptions[notification.uri]?.forEach { it() }
                 })
-            http.send(McpResource.Subscribe, McpResource.Subscribe.Request.Params(uri))
+            http.send(McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), nextId()))
             subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
         }
 
         override fun unsubscribe(uri: Uri) {
-            http.send(McpResource.Unsubscribe, McpResource.Unsubscribe.Request.Params(uri))
+            http.send(McpResource.Unsubscribe.Request(McpResource.Unsubscribe.Request.Params(uri), nextId()))
             subscriptions -= uri
         }
     }
 
     override fun completions() = object : McpClient.Completions {
         override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
-            http.send(McpCompletion, McpCompletion.Request.Params(ref, request.argument))
+            http.send(McpCompletion.Request(McpCompletion.Request.Params(ref, request.argument), nextId()))
                 .flatMap { it.first().asAOrFailure<McpCompletion.Response.Result>() }
                 .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) as CompletionResponse } }
                 .flatMapFailure { toCompletionErrorOrFailure(it) }
@@ -400,39 +400,37 @@ class HttpStreamingMcpClient(
         }
 
         override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.Get, McpTask.Get.Request.Params(taskId))
+            http.send(McpTask.Get.Request(McpTask.Get.Request.Params(taskId), nextId()))
                 .flatMap { it.first().asAOrFailure<McpTask.Get.Response.Result>() }
                 .map { it.task }
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.List, McpTask.List.Request.Params())
+            http.send(McpTask.List.Request(McpTask.List.Request.Params(), nextId()))
                 .flatMap { it.first().asAOrFailure<McpTask.List.Response.Result>() }
                 .map { it.tasks }
 
         override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.Cancel, McpTask.Cancel.Request.Params(taskId))
+            http.send(McpTask.Cancel.Request(McpTask.Cancel.Request.Params(taskId), nextId()))
                 .flatMap { it.first().asAOrFailure<McpTask.Cancel.Response.Result>() }
                 .map { }
 
         override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.Result, McpTask.Result.Request.Params(taskId))
+            http.send(McpTask.Result.Request(McpTask.Result.Request.Params(taskId), nextId()))
                 .flatMap { it.first().asAOrFailure<McpTask.Result.Response.ResponseResult>() }
                 .map { it.result }
 
         override fun update(task: org.http4k.ai.mcp.model.Task, meta: Meta, overrideDefaultTimeout: Duration?) {
-            http.send(McpTask.Status, McpTask.Status.Notification.Params(task, meta))
+            http.send(McpTask.Status.Notification(McpTask.Status.Notification.Params(task, meta)))
         }
     }
 
     override fun close() {}
 
     private fun HttpHandler.send(
-        rpc: McpRpc,
-        message: ClientMessage,
-        messageId: McpMessageId? = null
+        message: McpJsonRpcMessage
     ): McpResult<Sequence<Event>> {
         val response = this(
-            message.toHttpRequest(protocolVersion, baseUri, rpc, messageId)
+            message.toHttpRequest(protocolVersion, baseUri)
                 .accept(TEXT_EVENT_STREAM)
                 .with(Header.MCP_SESSION_ID of sessionId)
         )

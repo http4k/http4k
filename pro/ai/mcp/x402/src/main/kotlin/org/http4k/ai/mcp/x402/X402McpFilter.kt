@@ -9,7 +9,7 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.recover
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.protocol.messages.toJsonRpc
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -59,13 +59,13 @@ fun McpFilters.X402PaymentRequired(
                                     }
                                     .recover {
                                         McpResponse.Ok(
-                                            ErrorMessage(402, it.message ?: "Payment failed").toJsonRpc(id)
+                                            McpJsonRpcErrorResponse(id, ErrorMessage(402, it.message ?: "Payment failed"))
                                         )
                                     }
                             } ?: McpResponse.Ok(
-                            ErrorMessage(402, "Unsupported payment scheme/network").toJsonRpc(id)
+                            McpJsonRpcErrorResponse(id, ErrorMessage(402, "Unsupported payment scheme/network"))
                         )
-                    } ?: McpResponse.Ok(ErrorMessage(402, "Payment required").toJsonRpc(id))
+                    } ?: McpResponse.Ok(McpJsonRpcErrorResponse(id, ErrorMessage(402, "Payment required")))
             }
         }
     }

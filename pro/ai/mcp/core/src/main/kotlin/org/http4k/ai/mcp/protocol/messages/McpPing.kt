@@ -6,7 +6,6 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -15,7 +14,7 @@ object McpPing : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("ping")
-    data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpPing.Method
 
         @JsonSerializable

@@ -10,7 +10,6 @@ import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.connect.model.TimeToLive
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
@@ -19,7 +18,7 @@ import java.time.Instant
 object McpTask {
     object Create {
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val task: Task,
@@ -33,7 +32,7 @@ object McpTask {
 
         @JsonSerializable
         @PolymorphicLabel("tasks/get")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Get.Method
 
             @JsonSerializable
@@ -44,7 +43,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val task: Task,
@@ -58,7 +57,7 @@ object McpTask {
 
         @JsonSerializable
         @PolymorphicLabel("tasks/result")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Result.Method
 
             @JsonSerializable
@@ -69,7 +68,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: ResponseResult, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: ResponseResult, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class ResponseResult(
                 val result: Map<String, Any>?,
@@ -83,7 +82,7 @@ object McpTask {
 
         @JsonSerializable
         @PolymorphicLabel("tasks/cancel")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Cancel.Method
 
             @JsonSerializable
@@ -94,7 +93,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 override val _meta: Meta = Meta.default
@@ -107,7 +106,7 @@ object McpTask {
 
         @JsonSerializable
         @PolymorphicLabel("tasks/list")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = List.Method
 
             @JsonSerializable
@@ -118,7 +117,7 @@ object McpTask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(
                 val tasks: kotlin.collections.List<Task>,
@@ -133,7 +132,7 @@ object McpTask {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/tasks/status")
-        data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Status.Method
 
             @JsonSerializable

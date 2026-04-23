@@ -32,21 +32,24 @@ internal class ClientPrompts(
         })
     }
 
-    override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpPrompt.List,
-        McpPrompt.List.Request.Params(), overrideDefaultTimeout ?: defaultTimeout, id()
-    )
+    override fun list(overrideDefaultTimeout: Duration?) = id().let { messageId ->
+        sender(
+            McpPrompt.List.Request(McpPrompt.List.Request.Params(), messageId),
+            overrideDefaultTimeout ?: defaultTimeout, messageId
+        )
+    }
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpPrompt.List.Response.Result>() }
         .map { it.prompts }
 
     override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =
-        sender(
-            McpPrompt.Get,
-            McpPrompt.Get.Request.Params(name, request, request.meta),
-            overrideDefaultTimeout ?: defaultTimeout,
-            id()
-        )
+        id().let { messageId ->
+            sender(
+                McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request, request.meta), messageId),
+                overrideDefaultTimeout ?: defaultTimeout,
+                messageId
+            )
+        }
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpPrompt.Get.Response.Result>() }
             .map { Ok(it.messages, it.description) as PromptResponse }

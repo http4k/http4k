@@ -10,7 +10,6 @@ import org.http4k.ai.mcp.model.CompletionContext
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -19,7 +18,7 @@ object McpCompletion : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("completion/complete")
-    data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpCompletion.Method
 
         @JsonSerializable
@@ -32,7 +31,7 @@ object McpCompletion : McpRpc {
     }
 
     @JsonSerializable
-    data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+    data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
         @JsonSerializable
         data class Result(
             val completion: Completion,

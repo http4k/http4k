@@ -13,6 +13,8 @@ import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpPing
@@ -23,8 +25,6 @@ import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.ServerMessage
-import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
@@ -107,13 +107,13 @@ class McpProtocol<Transport>(
     fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }
-            .getOrElse { return Ok(ErrorMessage.ParseError.toJsonRpc(null)) }
+            .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
 
         val payload = McpJson.fields(rawPayload).toMap()
 
         return if (payload["method"] != null) {
             val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
-                .getOrElse { return Ok(ErrorMessage.InvalidRequest.toJsonRpc(payload["id"])) }
+                .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
             responseFor(McpRequest(sessionState.session, message, httpReq), transport)
         } else {
             handleResult(JsonRpcResult(McpJson, payload), sessionState)
@@ -127,42 +127,164 @@ class McpProtocol<Transport>(
             val msg = mcp.message
             runCatching {
                 when (msg) {
-                    is McpInitialize.Request -> respond(msg) { handleInitialize(msg.params, mcp.http, mcp.session) }
-                    is McpPing.Request -> respond(msg) { ServerMessage.Response.Empty }
-                    is McpCompletion.Request -> respond(msg) { completions.complete(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpPrompt.Get.Request -> respond(msg) { prompts.get(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpPrompt.List.Request -> respond(msg) { prompts.list(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpResource.ListTemplates.Request -> respond(msg) { resources.listTemplates(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpResource.List.Request -> respond(msg) { resources.listResources(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpResource.Read.Request -> respond(msg) { resources.read(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpResource.Subscribe.Request -> respond(msg) {
-                        when (resources) {
-                            is ObservableResources -> resources.subscribe(mcp.session, msg.params) {
-                                sessions.request(
-                                    Subscription(mcp.session),
-                                    McpResource.Updated.Notification.Params(msg.params.uri).toJsonRpc(McpResource.Updated)
-                                )
-                            }
-                        }
-                        ServerMessage.Response.Empty
-                    }
-                    is McpResource.Unsubscribe.Request -> respond(msg) {
-                        when (resources) {
-                            is ObservableResources -> resources.unsubscribe(mcp.session, msg.params)
-                        }
-                        ServerMessage.Response.Empty
-                    }
-                    is McpLogging.SetLevel.Request -> respond(msg) {
-                        logger.setLevel(mcp.session, msg.params.level)
-                        ServerMessage.Response.Empty
-                    }
-                    is McpTool.Call.Request -> respond(msg) { tools.call(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpTool.List.Request -> respond(msg) { tools.list(msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpTask.Get.Request -> respond(msg) { tasks.get(mcp.session, msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpTask.Result.Request -> respond(msg) { tasks.result(mcp.session, msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpTask.Cancel.Request -> respond(msg) { tasks.cancel(mcp.session, msg.params, clientFor(mcp.session), mcp.http) }
-                    is McpTask.List.Request -> respond(msg) { tasks.list(mcp.session, msg.params, clientFor(mcp.session), mcp.http) }
+                    is McpInitialize.Request -> Ok(
+                        McpInitialize.Response(
+                            handleInitialize(
+                                msg.params,
+                                mcp.http,
+                                mcp.session
+                            ), msg.id
+                        )
+                    )
 
+                    is McpPing.Request -> Ok(McpJsonRpcEmptyResponse(msg.id))
+                    is McpCompletion.Request -> Ok(
+                        McpCompletion.Response(
+                            completions.complete(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpPrompt.Get.Request -> Ok(
+                        McpPrompt.Get.Response(
+                            prompts.get(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpPrompt.List.Request -> Ok(
+                        McpPrompt.List.Response(
+                            prompts.list(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpResource.ListTemplates.Request -> Ok(
+                        McpResource.ListTemplates.Response(
+                            resources.listTemplates(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpResource.List.Request -> Ok(
+                        McpResource.List.Response(
+                            resources.listResources(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpResource.Read.Request -> Ok(
+                        McpResource.Read.Response(
+                            resources.read(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpResource.Subscribe.Request -> {
+                        if (resources is ObservableResources) resources.subscribe(mcp.session, msg.params) {
+                            sessions.request(
+                                Subscription(mcp.session),
+                                asJsonObject(
+                                    McpResource.Updated.Notification(
+                                        McpResource.Updated.Notification.Params(msg.params.uri)
+                                    )
+                                )
+                            )
+                        }
+                        Ok(McpJsonRpcEmptyResponse(msg.id))
+                    }
+
+                    is McpResource.Unsubscribe.Request -> {
+                        if (resources is ObservableResources) resources.unsubscribe(mcp.session, msg.params)
+                        Ok(McpJsonRpcEmptyResponse(msg.id))
+                    }
+
+                    is McpLogging.SetLevel.Request -> {
+                        logger.setLevel(mcp.session, msg.params.level)
+                        Ok(McpJsonRpcEmptyResponse(msg.id))
+                    }
+
+                    is McpTool.Call.Request -> Ok(
+                        McpTool.Call.Response(
+                            tools.call(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpTool.List.Request -> Ok(
+                        McpTool.List.Response(
+                            tools.list(
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpTask.Get.Request -> Ok(
+                        McpTask.Get.Response(
+                            tasks.get(
+                                mcp.session,
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpTask.Result.Request -> Ok(
+                        McpTask.Result.Response(
+                            tasks.result(
+                                mcp.session,
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpTask.Cancel.Request -> Ok(
+                        McpTask.Cancel.Response(
+                            tasks.cancel(
+                                mcp.session,
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
+
+                    is McpTask.List.Request -> Ok(
+                        McpTask.List.Response(
+                            tasks.list(
+                                mcp.session,
+                                msg.params,
+                                clientFor(mcp.session),
+                                mcp.http
+                            ), msg.id
+                        )
+                    )
                     is McpInitialize.Initialized.Notification -> Accepted
                     is McpProgress.Notification -> Accepted
                     is McpCancelled.Notification -> { cancellations.cancel(msg.params); Accepted }
@@ -182,17 +304,17 @@ class McpProtocol<Transport>(
         }(mcpRequest)
     }
 
-    private fun respond(msg: McpJsonRpcRequest, fn: () -> ServerMessage.Response) =
-        Ok(fn().toJsonRpc(msg.id))
-
-    private fun handleError(e: Throwable, id: McpNodeType?): McpResponse = Ok(
-        when (e) {
-            is McpException -> e.error.toJsonRpc(id)
-            else -> {
-                onError(e)
-                ErrorMessage.InternalError.toJsonRpc(id)
+    private fun handleError(e: Throwable, id: Any?): McpResponse = Ok(
+        McpJsonRpcErrorResponse(
+            id,
+            when (e) {
+                is McpException -> e.error
+                else -> {
+                    onError(e)
+                    ErrorMessage.InternalError
+                }
             }
-        }
+        )
     )
 
     private fun handleRootChanged(session: Session, transport: Transport) {
@@ -204,7 +326,7 @@ class McpProtocol<Transport>(
                 sessions.respond(
                     transport,
                     ClientCall(session),
-                    McpRoot.List.Request.Params().toJsonRpc(McpRoot.List, asJsonObject(messageId))
+                    McpJson.asJsonObject(McpRoot.List.Request(McpRoot.List.Request.Params(), messageId))
                 )
             }
         }
@@ -215,7 +337,7 @@ class McpProtocol<Transport>(
         else -> with(McpJson) {
             val id = result.id?.let { McpMessageId.parse(compact(it)) }
             when (id) {
-                null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
+                null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
                 else -> clientTracking[sessionState.session]
                     ?.processResult(id, result.result ?: nullNode())
                     ?.let { Accepted }
@@ -253,28 +375,36 @@ class McpProtocol<Transport>(
         logger.subscribe(context.session, error) { data, level, logger ->
             sessions.request(
                 context,
-                McpLogging.LoggingMessage.Notification.Params(data, level, logger).toJsonRpc(McpLogging.LoggingMessage)
+                McpJson.asJsonObject(
+                    McpLogging.LoggingMessage.Notification(
+                        McpLogging.LoggingMessage.Notification.Params(
+                            data,
+                            level,
+                            logger
+                        )
+                    )
+                )
             )
         }
 
         prompts.onChange(context.session) {
             sessions.request(
                 context,
-                McpPrompt.List.Changed.Notification.Params().toJsonRpc(McpPrompt.List.Changed)
+                McpJson.asJsonObject(McpPrompt.List.Changed.Notification(McpPrompt.List.Changed.Notification.Params()))
             )
         }
 
         resources.onChange(context.session) {
             sessions.request(
                 context,
-                McpResource.List.Changed.Notification.Params().toJsonRpc(McpResource.List.Changed)
+                McpJson.asJsonObject(McpResource.List.Changed.Notification(McpResource.List.Changed.Notification.Params()))
             )
         }
 
         tools.onChange(context.session) {
             sessions.request(
                 context,
-                McpTool.List.Changed.Notification.Params().toJsonRpc(McpTool.List.Changed)
+                McpJson.asJsonObject(McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params()))
             )
         }
 

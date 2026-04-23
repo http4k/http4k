@@ -54,8 +54,7 @@ internal class ClientElicitations(
                 val timeout = overrideDefaultTimeout ?: defaultTimeout
 
                 sender(
-                    McpElicitations,
-                    response.toProtocol(),
+                    McpElicitations.Response(response.toProtocol(), requestId),
                     timeout,
                     requestId
                 )
@@ -81,8 +80,7 @@ internal class ClientElicitations(
                 val timeout = overrideDefaultTimeout ?: defaultTimeout
 
                 sender(
-                    McpElicitations,
-                    response.toProtocol(),
+                    McpElicitations.Response(response.toProtocol(), requestId),
                     timeout,
                     requestId
                 )

@@ -4,9 +4,7 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.ai.mcp.util.McpNodeType
-
-sealed interface McpJsonRpcResponse : McpJsonRpcMessage {
-    val id: McpNodeType?
+sealed class McpJsonRpcResponse : McpJsonRpcMessage() {
+    abstract val id: Any?
 }
 

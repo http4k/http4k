@@ -25,11 +25,13 @@ internal class ClientCompletions(
     private val id: () -> McpMessageId,
 ) : McpClient.Completions {
     override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
-        sender(
-            McpCompletion, McpCompletion.Request.Params(ref, request.argument, request.context, request.meta),
-            overrideDefaultTimeout ?: defaultTimeout,
-            id()
-        )
+        id().let { messageId ->
+            sender(
+                McpCompletion.Request(McpCompletion.Request.Params(ref, request.argument, request.context, request.meta), messageId),
+                overrideDefaultTimeout ?: defaultTimeout,
+                messageId
+            )
+        }
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpCompletion.Response.Result>() }
             .map { Ok(it.completion.values, it.completion.total, it.completion.hasMore) as CompletionResponse }

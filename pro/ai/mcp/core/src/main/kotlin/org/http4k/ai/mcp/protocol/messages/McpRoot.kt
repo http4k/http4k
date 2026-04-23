@@ -7,7 +7,6 @@ package org.http4k.ai.mcp.protocol.messages
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Root
 import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -17,7 +16,7 @@ object McpRoot {
 
         @JsonSerializable
         @PolymorphicLabel("roots/list")
-        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = List.Method
 
             @JsonSerializable
@@ -25,7 +24,7 @@ object McpRoot {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(val roots: kotlin.collections.List<Root>, override val _meta: Meta = Meta.default) :
                 ClientMessage.Response, HasMeta
@@ -37,7 +36,7 @@ object McpRoot {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/roots/list_changed")
-        data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Changed.Method
 
             @JsonSerializable

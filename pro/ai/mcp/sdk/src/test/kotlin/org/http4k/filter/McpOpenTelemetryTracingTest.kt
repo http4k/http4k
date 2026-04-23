@@ -24,6 +24,8 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -41,7 +43,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.MoshiObject
-import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
@@ -68,7 +69,7 @@ class McpOpenTelemetryTracingTest {
 
         val handler = filter.then {
             capturedSpan = (Span.current() as ReadableSpan).toSpanData()
-            McpResponse.Ok(McpJson.nullNode())
+            McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
         }
 
         val session = Session(SessionId.of("test-session-123"))
@@ -106,7 +107,7 @@ class McpOpenTelemetryTracingTest {
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         val handler = filter.then {
-            McpResponse.Ok(McpJson.renderError(ErrorMessage.InternalError, it.message.id))
+            McpResponse.Ok(McpJsonRpcErrorResponse(it.message.id, ErrorMessage.InternalError))
         }
 
         handler(mcpRequest())
@@ -119,7 +120,7 @@ class McpOpenTelemetryTracingTest {
     @Test
     fun `links to transport span when present`() {
         val mcpHandler =
-            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse.Ok(McpJson.nullNode()) }
+            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val poly = PolyFilters.OpenTelemetryTracing(openTelemetry).then(
             PolyHandler(http = { req ->
@@ -155,7 +156,7 @@ class McpOpenTelemetryTracingTest {
 
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
 
-        val handler = filter.then { McpResponse.Ok(McpJson.nullNode()) }
+        val handler = filter.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val parentTraceId = "0af7651916cd43dd8448eb211c80319c"
         val parentSpanId = "b7ad6b7169203331"
@@ -164,7 +165,7 @@ class McpOpenTelemetryTracingTest {
             "traceparent" to asJsonObject("00-$parentTraceId-$parentSpanId-01"),
             "tracestate" to asJsonObject("congo=t61rcWkgMzE")
         ))
-        val message = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test"), _meta = meta), asJsonObject(1))
+        val message = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test"), _meta = meta), "1")
 
         handler(mcpRequest(message = message))
 
@@ -186,7 +187,7 @@ class McpOpenTelemetryTracingTest {
 
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
 
-        val handler = filter.then { McpResponse.Ok(McpJson.nullNode()) }
+        val handler = filter.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         handler(mcpRequest())
 
@@ -204,7 +205,7 @@ class McpOpenTelemetryTracingTest {
             )
         )
         val handler = filter.then {
-            McpResponse.Ok(McpJson.nullNode())
+            McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
         }
 
         handler(mcpRequest())
@@ -221,7 +222,7 @@ class McpOpenTelemetryTracingTest {
 
     private fun mcpRequest(
         session: Session = Session(SessionId.of("test-session")),
-        message: McpTool.Call.Request = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), asJsonObject(1)),
+        message: McpTool.Call.Request = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), "1"),
         http: Request = Request(POST, "/mcp")
     ) = McpRequest(session, message, with(McpJson) { http.json(message) }.with(Header.MCP_PROTOCOL_VERSION of ProtocolVersion.LATEST_VERSION))
 

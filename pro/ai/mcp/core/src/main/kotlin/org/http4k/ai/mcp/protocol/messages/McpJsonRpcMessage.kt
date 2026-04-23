@@ -4,6 +4,4 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-sealed interface McpJsonRpcMessage {
-    val jsonrpc get() = "2.0"
-}
+sealed class McpJsonRpcMessage

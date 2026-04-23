@@ -32,26 +32,32 @@ internal class ClientTools(
         })
     }
 
-    override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpTool.List, McpTool.List.Request.Params(),
-        overrideDefaultTimeout ?: defaultTimeout,
-        id()
-    )
+    override fun list(overrideDefaultTimeout: Duration?) = id().let { messageId ->
+        sender(
+            McpTool.List.Request(McpTool.List.Request.Params(), messageId),
+            overrideDefaultTimeout ?: defaultTimeout,
+            messageId
+        )
+    }
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
         .flatMap { it.first().asOrFailure<McpTool.List.Response.Result>() }
         .map { it.tools }
 
     override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?) =
-        sender(
-            McpTool.Call,
-            McpTool.Call.Request.Params(
-                name,
-                request.mapValues { McpJson.asJsonObject(it.value) },
-                request.meta
-            ),
-            overrideDefaultTimeout ?: defaultTimeout,
-            id()
-        )
+        id().let { messageId ->
+            sender(
+                McpTool.Call.Request(
+                    McpTool.Call.Request.Params(
+                        name,
+                        request.mapValues { McpJson.asJsonObject(it.value) },
+                        request.meta
+                    ),
+                    messageId
+                ),
+                overrideDefaultTimeout ?: defaultTimeout,
+                messageId
+            )
+        }
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpTool.Call.Response.Result>() }
             .map { toToolResponseOrError(it) }

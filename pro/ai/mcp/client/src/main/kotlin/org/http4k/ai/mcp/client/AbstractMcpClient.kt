@@ -29,14 +29,12 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
-import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
@@ -80,17 +78,18 @@ abstract class AbstractMcpClient(
 
                             when {
                                 data["method"] != null -> {
-                                    val message = JsonRpcRequest(this, data.attributes)
-                                    val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                                    callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
+                                    val message = asA<McpJsonRpcRequest>(it.data)
+                                    val id = message.id?.let { asA<McpMessageId>(compact(asJsonObject(it))) }
+                                    callbacks[message.method]?.forEach { it(message, id) }
                                 }
 
                                 else -> {
-                                    val message = JsonRpcResult(this, data.attributes)
-                                    val id = asA<McpMessageId>(compact(message.id ?: nullNode()))
+                                    val id = data["id"]?.let { asA<McpMessageId>(compact(it)) }
+                                        ?: error("no id in result: $data")
+                                    val isError = data["error"] != null
                                     messageQueues[id]?.offer(data) ?: error("no queue for $id: $data")
                                     val latch = requests[id] ?: error("no request found for $id: $data")
-                                    if (message.isError()) requests.remove(id)
+                                    if (isError) requests.remove(id)
                                     latch.countDown()
                                 }
                             }
@@ -108,11 +107,11 @@ abstract class AbstractMcpClient(
         }
             .mapFailure { Timeout }
             .flatMap {
+                val messageId = McpMessageId.of(id.incrementAndGet())
                 sendMessage(
-                    McpInitialize,
-                    McpInitialize.Request.Params(clientInfo, capabilities, protocolVersion),
+                    McpInitialize.Request(McpInitialize.Request.Params(clientInfo, capabilities, protocolVersion), messageId),
                     defaultTimeout,
-                    McpMessageId.of(id.incrementAndGet()),
+                    messageId,
                 )
                     .flatMap { reqId ->
                         val next = findQueue(reqId)
@@ -123,7 +122,7 @@ abstract class AbstractMcpClient(
                             null -> Failure(Timeout)
                             else -> next
                                 .flatMap { input ->
-                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification.Params())
+                                    notify(McpInitialize.Initialized.Notification(McpInitialize.Initialized.Notification.Params()))
                                         .map { input }
                                         .also { tidyUp(reqId) }
                                 }
@@ -174,11 +173,10 @@ abstract class AbstractMcpClient(
             callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
         }
 
-    protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit>
+    protected abstract fun notify(message: McpJsonRpcMessage): McpResult<Unit>
 
     protected abstract fun sendMessage(
-        rpc: McpRpc,
-        message: ClientMessage,
+        message: McpJsonRpcMessage,
         timeout: Duration,
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean = { true }

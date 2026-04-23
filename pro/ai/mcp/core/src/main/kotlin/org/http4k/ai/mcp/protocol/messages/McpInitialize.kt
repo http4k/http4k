@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.ServerCapabilities
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -21,7 +20,7 @@ object McpInitialize : McpRpc {
 
     @JsonSerializable
     @PolymorphicLabel("initialize")
-    data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpInitialize.Method
 
         @JsonSerializable
@@ -34,7 +33,7 @@ object McpInitialize : McpRpc {
     }
 
     @JsonSerializable
-    data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResponse {
+    data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
         @JsonSerializable
         data class Result(
             val serverInfo: VersionedMcpEntity,
@@ -50,7 +49,7 @@ object McpInitialize : McpRpc {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/initialized")
-        data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = Initialized.Method
 
             @JsonSerializable
