@@ -27,17 +27,17 @@ internal class ClientPrompts(
     private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Prompts {
     override fun onChange(fn: () -> Unit) {
-        register(McpPrompt.List, McpCallback(McpPrompt.List.Changed.Notification::class) { _, _ ->
+        register(McpPrompt.List, McpCallback(McpPrompt.List.Changed.Notification.Params::class) { _, _ ->
             fn()
         })
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpPrompt.List,
-        McpPrompt.List.Request(), overrideDefaultTimeout ?: defaultTimeout, id()
+        McpPrompt.List.Request.Params(), overrideDefaultTimeout ?: defaultTimeout, id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpPrompt.List.Response>() }
+        .flatMap { it.first().asOrFailure<McpPrompt.List.Response.Result>() }
         .map { it.prompts }
 
     override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =

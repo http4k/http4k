@@ -13,7 +13,7 @@ import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
 
-class ClientTracking(initialize: McpInitialize.Request) {
+class ClientTracking(initialize: McpInitialize.Request.Params) {
     val supportsSampling = initialize.capabilities.sampling != null
     val supportsRoots = initialize.capabilities.roots?.listChanged == true
     val supportsElicitation = initialize.capabilities.elicitation != null

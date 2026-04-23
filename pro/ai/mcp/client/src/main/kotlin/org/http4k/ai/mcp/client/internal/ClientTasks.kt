@@ -26,50 +26,50 @@ internal class ClientTasks(
 ) : McpClient.Tasks {
 
     override fun onUpdate(fn: (Task, Meta) -> Unit) {
-        register?.invoke(McpTask.Status, McpCallback(McpTask.Status.Notification::class) { notification, _ ->
+        register?.invoke(McpTask.Status, McpCallback(McpTask.Status.Notification.Params::class) { notification, _ ->
             fn(notification.toTask(), notification._meta)
         })
     }
 
     override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) = sender(
-        McpTask.Get, McpTask.Get.Request(taskId),
+        McpTask.Get, McpTask.Get.Request.Params(taskId),
         overrideDefaultTimeout ?: defaultTimeout,
         id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.Get.Response>() }
+        .flatMap { it.first().asOrFailure<McpTask.Get.Response.Result>() }
         .map { it.task }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpTask.List, McpTask.List.Request(),
+        McpTask.List, McpTask.List.Request.Params(),
         overrideDefaultTimeout ?: defaultTimeout,
         id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.List.Response>() }
+        .flatMap { it.first().asOrFailure<McpTask.List.Response.Result>() }
         .map { it.tasks }
 
     override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) = sender(
-        McpTask.Cancel, McpTask.Cancel.Request(taskId),
+        McpTask.Cancel, McpTask.Cancel.Request.Params(taskId),
         overrideDefaultTimeout ?: defaultTimeout,
         id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.Cancel.Response>() }
+        .flatMap { it.first().asOrFailure<McpTask.Cancel.Response.Result>() }
         .map { }
 
     override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) = sender(
-        McpTask.Result, McpTask.Result.Request(taskId),
+        McpTask.Result, McpTask.Result.Request.Params(taskId),
         overrideDefaultTimeout ?: defaultTimeout,
         id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.Result.Response>() }
+        .flatMap { it.first().asOrFailure<McpTask.Result.Response.ResponseResult>() }
         .map { it.result }
 
     override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) {
         sender(
-            McpTask.Status, McpTask.Status.Notification(task, meta),
+            McpTask.Status, McpTask.Status.Notification.Params(task, meta),
             overrideDefaultTimeout ?: defaultTimeout,
             id()
         )

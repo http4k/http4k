@@ -60,7 +60,7 @@ class SessionBasedClient(
         return when {
             tracking.supportsElicitation -> {
                 tracking.trackRequest(id) {
-                    with(it.fromJsonRpc(McpElicitations.Response::class)) {
+                    with(it.fromJsonRpc(McpElicitations.Response.Result::class)) {
                         val t = task
                         val response = when {
                             t != null -> ElicitationResponse.Task(t)
@@ -72,14 +72,14 @@ class SessionBasedClient(
                 }
 
                 val protocolRequest = when (request) {
-                    is Form -> McpElicitations.Request.Form(
+                    is Form -> McpElicitations.Request.Params.Form(
                         request.message,
                         request.requestedSchema,
                         Meta(MetaKey.progressToken<Any>().toLens() of request.progressToken),
                         request.task
                     )
 
-                    is Url -> McpElicitations.Request.Url(
+                    is Url -> McpElicitations.Request.Params.Url(
                         request.message,
                         request.url,
                         request.elicitationId,
@@ -108,7 +108,7 @@ class SessionBasedClient(
         return when {
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
-                    with(it.fromJsonRpc(McpSampling.Response::class)) {
+                    with(it.fromJsonRpc(McpSampling.Response.Result::class)) {
                         val t = task
                         val response = when {
                             t != null -> SamplingResponse.Task(t)
@@ -125,7 +125,7 @@ class SessionBasedClient(
 
                 with(request) {
                     sendToClient(
-                        McpSampling.Request(
+                        McpSampling.Request.Params(
                             messages,
                             maxTokens,
                             systemPrompt,
@@ -170,7 +170,7 @@ class SessionBasedClient(
 
     override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) {
         sendToClient(
-            McpProgress.Notification(progressToken, progress, total, description)
+            McpProgress.Notification.Params(progressToken, progress, total, description)
                 .toJsonRpc(McpProgress)
         )
     }
@@ -178,7 +178,7 @@ class SessionBasedClient(
     override fun log(data: Any, level: LogLevel, logger: String?) {
         if (level >= this.logger.levelFor(session)) {
             sendToClient(
-                McpLogging.LoggingMessage.Notification(McpJson.asJsonObject(data), level, logger)
+                McpLogging.LoggingMessage.Notification.Params(McpJson.asJsonObject(data), level, logger)
                     .toJsonRpc(McpLogging.LoggingMessage)
             )
         }
@@ -186,13 +186,13 @@ class SessionBasedClient(
 
     override fun elicitationComplete(elicitationId: ElicitationId) {
         sendToClient(
-            McpElicitations.Complete.Notification(elicitationId)
+            McpElicitations.Complete.Notification.Params(elicitationId)
                 .toJsonRpc(McpElicitations.Complete)
         )
     }
 
     override fun updateTask(task: Task, meta: Meta, timeout: Duration?) {
-        val notification = McpTask.Status.Notification(task, meta)
+        val notification = McpTask.Status.Notification.Params(task, meta)
         tasks.update(session, notification)
         sendToClient(notification.toJsonRpc(McpTask.Status))
     }

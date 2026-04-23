@@ -31,22 +31,22 @@ class TestingPrompts(
      */
     fun expectNotification() {
         sender.lastEvent()
-            .toNotification<McpPrompt.List.Changed.Notification>(McpPrompt.List.Changed)
+            .toNotification<McpPrompt.List.Changed.Notification.Params>(McpPrompt.List.Changed)
             .also { notifications.forEach { it() } }
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
         McpPrompt.List,
-        McpPrompt.List.Request()
+        McpPrompt.List.Request.Params()
     ).first()
-        .nextEvent<List<McpPrompt>, McpPrompt.List.Response> { prompts }.map { it.second }
+        .nextEvent<List<McpPrompt>, McpPrompt.List.Response.Result> { prompts }.map { it.second }
 
     override fun get(
         name: PromptName,
         request: PromptRequest,
         overrideDefaultTimeout: Duration?
-    ) = sender(McpPrompt.Get, McpPrompt.Get.Params(name, request, request.meta)).first()
-        .nextEvent<PromptResponse, McpPrompt.Get.Result> { PromptResponse.Ok(messages, description) }
+    ) = sender(McpPrompt.Get, McpPrompt.Get.Request.Params(name, request, request.meta)).first()
+        .nextEvent<PromptResponse, McpPrompt.Get.Response.Result> { PromptResponse.Ok(messages, description) }
         .map { it.second }
         .flatMapFailure { toPromptErrorOrFailure(it) }
 }

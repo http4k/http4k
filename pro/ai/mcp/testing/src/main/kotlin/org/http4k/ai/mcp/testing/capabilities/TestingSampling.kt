@@ -31,7 +31,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
     init {
         sender.on(McpSampling) { event ->
             val (id, req) =
-                event.nextEvent<SamplingRequest, McpSampling.Request> {
+                event.nextEvent<SamplingRequest, McpSampling.Request.Params> {
                     SamplingRequest(
                         messages, maxTokens,
                         systemPrompt, includeContext,
@@ -45,14 +45,14 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
             onSampling.forEach { handler ->
                 handler(req).forEach { response ->
                     val protocolResponse = when (response) {
-                        is Ok -> McpSampling.Response(
+                        is Ok -> McpSampling.Response.Result(
                             response.model,
                             response.stopReason,
                             response.role,
                             response.content
                         )
 
-                        is Task -> McpSampling.Response(task = response.task)
+                        is Task -> McpSampling.Response.Result(task = response.task)
                         is Error -> throw McpException(DomainError(response.message))
                     }
                     sender(protocolResponse, id!!)

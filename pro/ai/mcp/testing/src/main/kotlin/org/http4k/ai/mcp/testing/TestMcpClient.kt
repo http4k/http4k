@@ -56,20 +56,20 @@ class TestMcpClient(
 
     override val sessionId = sender.sessionId.get()
 
-    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response> {
+    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response.Result> {
         val initResponse = sender(
-            McpInitialize, McpInitialize.Request(
+            McpInitialize, McpInitialize.Request.Params(
                 VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
                 clientCapabilities, protocolVersion
             )
         )
 
-        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification()).toList()
+        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification.Params()).toList()
 
         sender.startEventStream()
 
         return initResponse.first()
-            .nextEvent<McpInitialize.Response, McpInitialize.Response> { this }.map { it.second }
+            .nextEvent<McpInitialize.Response.Result, McpInitialize.Response.Result> { this }.map { it.second }
     }
 
     override fun tools() = tools

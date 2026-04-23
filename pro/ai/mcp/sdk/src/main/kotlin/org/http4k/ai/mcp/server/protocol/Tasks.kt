@@ -16,17 +16,17 @@ import org.http4k.core.Request
  * All operations are scoped by session.
  */
 interface Tasks {
-    fun get(session: Session, req: McpTask.Get.Request, client: Client, http: Request): McpTask.Get.Response
+    fun get(session: Session, req: McpTask.Get.Request.Params, client: Client, http: Request): McpTask.Get.Response.Result
 
-    fun result(session: Session, req: McpTask.Result.Request, client: Client, http: Request): McpTask.Result.Response
+    fun result(session: Session, req: McpTask.Result.Request.Params, client: Client, http: Request): McpTask.Result.Response.ResponseResult
 
-    fun cancel(session: Session, req: McpTask.Cancel.Request, client: Client, http: Request): McpTask.Cancel.Response
+    fun cancel(session: Session, req: McpTask.Cancel.Request.Params, client: Client, http: Request): McpTask.Cancel.Response.Result
 
-    fun list(session: Session, req: McpTask.List.Request, client: Client, http: Request): McpTask.List.Response
+    fun list(session: Session, req: McpTask.List.Request.Params, client: Client, http: Request): McpTask.List.Response.Result
 
     fun onUpdate(callback: TaskUpdateCallback)
 
-    fun update(session: Session, notification: McpTask.Status.Notification)
+    fun update(session: Session, notification: McpTask.Status.Notification.Params)
 
     fun storeResult(session: Session, taskId: TaskId, result: Map<String, Any>)
 

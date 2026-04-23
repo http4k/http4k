@@ -59,21 +59,32 @@ data class McpPrompt(
         override val Method = of("prompts/list")
 
         @JsonSerializable
-        data class Request(
-            override val _meta: Meta = Meta.default
-        ) : ClientMessage.Request, HasMeta
+        @PolymorphicLabel("prompts/list")
+        data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            @JsonSerializable
+            data class Params(
+                override val _meta: Meta = Meta.default
+            ) : ClientMessage.Request, HasMeta
+        }
 
         @JsonSerializable
-        data class Response(
-            val prompts: kotlin.collections.List<McpPrompt>,
-            override val _meta: Meta = Meta.default
-        ) : ServerMessage.Response, HasMeta
+        data class Response(val result: Result, override val id: McpNodeType?) : McpJsonRpcResonse {
+            @JsonSerializable
+            data class Result(
+                val prompts: kotlin.collections.List<McpPrompt>,
+                override val _meta: Meta = Meta.default
+            ) : ServerMessage.Response, HasMeta
+        }
 
         object Changed : McpRpc {
             override val Method: McpRpcMethod = of("notifications/prompts/list_changed")
 
             @JsonSerializable
-            data class Notification(override val _meta: Meta = Meta.default) : ServerMessage.Notification
+            @PolymorphicLabel("notifications/prompts/list_changed")
+            data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+                @JsonSerializable
+                data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Notification
+            }
         }
     }
 }

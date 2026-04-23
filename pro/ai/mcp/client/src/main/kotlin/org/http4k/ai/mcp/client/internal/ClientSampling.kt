@@ -26,7 +26,7 @@ internal class ClientSampling(
 
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
         register(McpSampling,
-            McpCallback(McpSampling.Request::class) { request, requestId ->
+            McpCallback(McpSampling.Request.Params::class) { request, requestId ->
                 if (requestId == null) return@McpCallback
 
                 val responses = fn(
@@ -48,14 +48,14 @@ internal class ClientSampling(
 
                 responses.forEach { response ->
                     val protocolResponse = when (response) {
-                        is Ok -> McpSampling.Response(
+                        is Ok -> McpSampling.Response.Result(
                             response.model,
                             response.stopReason,
                             response.role,
                             response.content
                         )
 
-                        is Task -> McpSampling.Response(task = response.task)
+                        is Task -> McpSampling.Response.Result(task = response.task)
                         is Error -> throw McpException(DomainError(response.message))
                     }
                     sender(

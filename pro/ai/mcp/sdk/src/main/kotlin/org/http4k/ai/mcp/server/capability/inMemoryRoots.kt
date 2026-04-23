@@ -14,7 +14,7 @@ import org.http4k.ai.mcp.util.ObservableList
 fun roots(): Roots = InMemoryRoots()
 
 private class InMemoryRoots : ObservableList<Root>(emptyList()), Roots {
-    override fun update(req: McpRoot.List.Response): CompletionStatus {
+    override fun update(req: McpRoot.List.Response.Result): CompletionStatus {
         items = req.roots
         return Finished
     }

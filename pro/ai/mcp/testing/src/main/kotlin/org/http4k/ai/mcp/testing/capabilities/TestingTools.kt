@@ -33,12 +33,12 @@ class TestingTools(
      */
     fun expectNotification() =
         sender.lastEvent()
-            .toNotification<McpTool.List.Changed.Notification>(McpTool.List.Changed)
+            .toNotification<McpTool.List.Changed.Notification.Params>(McpTool.List.Changed)
             .also { notifications.forEach { it() } }
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpTool.List, McpTool.List.Request()).first()
-            .nextEvent<List<McpTool>, McpTool.List.Response>(fun McpTool.List.Response.() = tools)
+        sender(McpTool.List, McpTool.List.Request.Params()).first()
+            .nextEvent<List<McpTool>, McpTool.List.Response.Result>(fun McpTool.List.Response.Result.() = tools)
             .map { it.second }
 
     override fun call(
@@ -46,12 +46,12 @@ class TestingTools(
         request: ToolRequest,
         overrideDefaultTimeout: Duration?
     ) = sender(
-        McpTool.Call, McpTool.Call.Request(
+        McpTool.Call, McpTool.Call.Request.Params(
             name,
             request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
         )
     ).last()
-        .nextEvent<ToolResponse, McpTool.Call.Response> { toToolResponseOrError(this) }
+        .nextEvent<ToolResponse, McpTool.Call.Response.Result> { toToolResponseOrError(this) }
         .map { it.second }
         .flatMapFailure { toToolElicitationRequiredOrError(it) }
 }

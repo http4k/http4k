@@ -30,7 +30,7 @@ class CallToolDetailSpanModifiersTest {
 
     @Test
     fun `sets arguments from request`(approver: Approver) {
-        val request = McpTool.Call.Request(ToolName.of("my-tool"), mapOf("city" to McpJson.string("London")))
+        val request = McpTool.Call.Request.Params(ToolName.of("my-tool"), mapOf("city" to McpJson.string("London")))
         CallToolDetailSpanModifiers.request(span, asJsonObject(request))
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.tool.call.arguments"))!!, APPLICATION_JSON)
@@ -38,7 +38,7 @@ class CallToolDetailSpanModifiersTest {
 
     @Test
     fun `sets result from response`(approver: Approver) {
-        val response = McpTool.Call.Response(content = listOf(Content.Text("hello")))
+        val response = McpTool.Call.Response.Result(content = listOf(Content.Text("hello")))
         CallToolDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.tool.call.result"))!!, APPLICATION_JSON)
@@ -46,7 +46,7 @@ class CallToolDetailSpanModifiersTest {
 
     @Test
     fun `no result attribute when response has no content`() {
-        val response = McpTool.Call.Response()
+        val response = McpTool.Call.Response.Result()
         CallToolDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.tool.call.result")), equalTo(null))

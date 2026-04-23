@@ -16,7 +16,7 @@ fun cancellations() = object : Cancellations {
         callbacks += callback
     }
 
-    override fun cancel(cancellation: McpCancelled.Notification) {
+    override fun cancel(cancellation: McpCancelled.Notification.Params) {
         callbacks.forEach { it(cancellation.requestId, cancellation.reason, cancellation._meta) }
     }
 }

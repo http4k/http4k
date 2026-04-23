@@ -27,24 +27,24 @@ internal class ClientTools(
 ) : McpClient.Tools {
 
     override fun onChange(fn: () -> Unit) {
-        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification::class) { _, _ ->
+        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification.Params::class) { _, _ ->
             fn()
         })
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpTool.List, McpTool.List.Request(),
+        McpTool.List, McpTool.List.Request.Params(),
         overrideDefaultTimeout ?: defaultTimeout,
         id()
     )
         .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTool.List.Response>() }
+        .flatMap { it.first().asOrFailure<McpTool.List.Response.Result>() }
         .map { it.tools }
 
     override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?) =
         sender(
             McpTool.Call,
-            McpTool.Call.Request(
+            McpTool.Call.Request.Params(
                 name,
                 request.mapValues { McpJson.asJsonObject(it.value) },
                 request.meta
@@ -53,7 +53,7 @@ internal class ClientTools(
             id()
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }
+            .flatMap { it.first().asOrFailure<McpTool.Call.Response.Result>() }
             .map { toToolResponseOrError(it) }
             .flatMapFailure { toToolElicitationRequiredOrError(it) }
 }

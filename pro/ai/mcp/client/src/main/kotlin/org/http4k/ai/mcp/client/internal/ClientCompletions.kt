@@ -26,12 +26,12 @@ internal class ClientCompletions(
 ) : McpClient.Completions {
     override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
         sender(
-            McpCompletion, McpCompletion.Request(ref, request.argument, request.context, request.meta),
+            McpCompletion, McpCompletion.Request.Params(ref, request.argument, request.context, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
             id()
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
+            .flatMap { it.first().asOrFailure<McpCompletion.Response.Result>() }
             .map { Ok(it.completion.values, it.completion.total, it.completion.hasMore) as CompletionResponse }
             .flatMapFailure { toCompletionErrorOrFailure(it) }
 }

@@ -25,8 +25,8 @@ private class InMemoryPrompts(capabilities: Iterable<PromptCapability>) : Observ
         ?.get(req, client, http)
         ?: throw McpException(InvalidParams)
 
-    override fun list(mcp: McpPrompt.List.Request, client: Client, http: Request) =
-        McpPrompt.List.Response(items.map(PromptCapability::toPrompt))
+    override fun list(mcp: McpPrompt.List.Request.Params, client: Client, http: Request) =
+        McpPrompt.List.Response.Result(items.map(PromptCapability::toPrompt))
 
     override fun invoke(name: PromptName) = items.find { it.name == name.value } ?: throw McpException(MethodNotFound)
 }

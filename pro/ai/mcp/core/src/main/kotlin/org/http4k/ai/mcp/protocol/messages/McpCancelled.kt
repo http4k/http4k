@@ -7,16 +7,22 @@ package org.http4k.ai.mcp.protocol.messages
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
+import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
+import se.ansman.kotshi.PolymorphicLabel
 
 object McpCancelled : McpRpc {
     override val Method = McpRpcMethod.of("notifications/cancelled")
 
     @JsonSerializable
-    data class Notification(
-        val requestId: McpMessageId,
-        val reason: String? = null,
-        override val _meta: Meta = Meta.default,
-    ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta
+    @PolymorphicLabel("notifications/cancelled")
+    data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        @JsonSerializable
+        data class Params(
+            val requestId: McpMessageId,
+            val reason: String? = null,
+            override val _meta: Meta = Meta.default,
+        ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta
+    }
 }
 

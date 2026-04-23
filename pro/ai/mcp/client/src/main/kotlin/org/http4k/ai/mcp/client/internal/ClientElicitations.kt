@@ -32,14 +32,14 @@ internal class ClientElicitations(
     override fun onComplete(fn: (ElicitationId) -> Unit) {
         register(
             McpElicitations.Complete,
-            McpCallback(McpElicitations.Complete.Notification::class) { notification, _ ->
+            McpCallback(McpElicitations.Complete.Notification.Params::class) { notification, _ ->
                 fn(notification.elicitationId)
             })
     }
 
     override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
         register(McpElicitations,
-            McpCallback(McpElicitations.Request.Form::class) { request, requestId ->
+            McpCallback(McpElicitations.Request.Params.Form::class) { request, requestId ->
                 if (requestId == null) return@McpCallback
 
                 val response = fn(
@@ -65,7 +65,7 @@ internal class ClientElicitations(
 
         register(
             McpElicitations,
-            McpCallback(McpElicitations.Request.Url::class) { request, requestId ->
+            McpCallback(McpElicitations.Request.Params.Url::class) { request, requestId ->
                 if (requestId == null) return@McpCallback
 
                 val response = fn(
@@ -93,8 +93,8 @@ internal class ClientElicitations(
 }
 
 private fun ElicitationResponse.toProtocol() = when (this) {
-    is Ok -> McpElicitations.Response(action, content, _meta = _meta)
-    is Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
+    is Ok -> McpElicitations.Response.Result(action, content, _meta = _meta)
+    is Task -> McpElicitations.Response.Result(content = McpJson.nullNode(), task = task)
     is Error -> throw McpException(DomainError(message))
 }
 

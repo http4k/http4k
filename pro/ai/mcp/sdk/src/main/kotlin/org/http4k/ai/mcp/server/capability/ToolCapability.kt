@@ -51,7 +51,7 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
         tool.meta ?: Meta.default
     )
 
-    fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
+    fun call(mcp: McpTool.Call.Request.Params, client: Client, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
@@ -66,21 +66,21 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
             .get()
             .let {
                 when (it) {
-                    is Ok -> McpTool.Call.Response(
+                    is Ok -> McpTool.Call.Response.Result(
                         content = it.content,
                         structuredContent = it.structuredContent?.let(McpJson::convert),
                         isError = false,
                         _meta = it.meta
                     )
 
-                    is Error -> McpTool.Call.Response(
+                    is Error -> McpTool.Call.Response.Result(
                         content = it.content,
                         structuredContent = it.structuredContent?.let(McpJson::convert),
                         isError = true,
                         _meta = it.meta
                     )
 
-                    is Task -> McpTool.Call.Response(
+                    is Task -> McpTool.Call.Response.Result(
                         task = it.task,
                         _meta = it.meta
                     )

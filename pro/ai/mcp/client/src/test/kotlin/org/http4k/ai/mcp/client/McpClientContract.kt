@@ -43,9 +43,9 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tasks
@@ -325,7 +325,7 @@ abstract class McpClientContract<T> : PortBasedTest {
 
         val elicitationRequired = ToolResponse.ElicitationRequired(
             elicitations = listOf(
-                McpElicitations.Request.Url(
+                McpElicitations.Request.Params.Url(
                     message = "Please authorize access",
                     url = elicitationUrl,
                     elicitationId = elicitationId

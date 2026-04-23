@@ -14,7 +14,7 @@ internal class ClientRequestProgress(
 ) : McpClient.RequestProgress {
 
     override fun onProgress(fn: (Progress) -> Unit) {
-        register(McpProgress, McpCallback(McpProgress.Notification::class) { n, _ ->
+        register(McpProgress, McpCallback(McpProgress.Notification.Params::class) { n, _ ->
             fn(Progress(n.progressToken, n.progress, n.total, n.description))
         })
     }

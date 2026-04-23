@@ -58,12 +58,12 @@ class ToolCapabilityTest {
         val capability = ToolCapability(tool) { ToolResponse.Task(task) }
 
         val response = capability.call(
-            McpTool.Call.Request(tool.name),
+            McpTool.Call.Request.Params(tool.name),
             NoOp,
             Request(GET, "/")
         )
 
-        assertThat(response, equalTo(McpTool.Call.Response(task = task)))
+        assertThat(response, equalTo(McpTool.Call.Response.Result(task = task)))
     }
 
     @Test
@@ -75,7 +75,7 @@ class ToolCapabilityTest {
         val capability = ToolCapability(tool) { ToolResponse.Error(content, structured) }
 
         val response = capability.call(
-            McpTool.Call.Request(tool.name),
+            McpTool.Call.Request.Params(tool.name),
             NoOp,
             Request(GET, "/")
         )

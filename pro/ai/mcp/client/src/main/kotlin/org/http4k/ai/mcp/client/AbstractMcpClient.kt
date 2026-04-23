@@ -61,7 +61,7 @@ abstract class AbstractMcpClient(
 
     protected val id = AtomicLong(0)
 
-    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response> {
+    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response.Result> {
         val startLatch = CountDownLatch(1)
 
         thread(isDaemon = true) {
@@ -110,20 +110,20 @@ abstract class AbstractMcpClient(
             .flatMap {
                 sendMessage(
                     McpInitialize,
-                    McpInitialize.Request(clientInfo, capabilities, protocolVersion),
+                    McpInitialize.Request.Params(clientInfo, capabilities, protocolVersion),
                     defaultTimeout,
                     McpMessageId.of(id.incrementAndGet()),
                 )
                     .flatMap { reqId ->
                         val next = findQueue(reqId)
                             .poll(defaultTimeout.toMillis(), MILLISECONDS)
-                            ?.asOrFailure<McpInitialize.Response>()
+                            ?.asOrFailure<McpInitialize.Response.Result>()
 
                         when (next) {
                             null -> Failure(Timeout)
                             else -> next
                                 .flatMap { input ->
-                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification())
+                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification.Params())
                                         .map { input }
                                         .also { tidyUp(reqId) }
                                 }

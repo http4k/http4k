@@ -139,7 +139,7 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpPing, McpPing.Request())
+            mcp.sendToMcp(McpPing, McpPing.Request.Params())
 
             assertNextMessage(ServerMessage.Response.Empty)
         }
@@ -162,13 +162,13 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification())
+            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification.Params())
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request(), McpMessageId.of(7425097216252813))
+            assertNextMessage(McpRoot.List, McpRoot.List.Request.Params(), McpMessageId.of(7425097216252813))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(newRoots), McpMessageId.of(7425097216252813))
+            mcp.sendToMcp(McpRoot.List.Response.Result(newRoots), McpMessageId.of(7425097216252813))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -200,7 +200,7 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpCancelled, McpCancelled.Notification(id, "test cancellation"))
+            mcp.sendToMcp(McpCancelled, McpCancelled.Notification.Params(id, "test cancellation"))
             assertThat(cancelled, equalTo(true))
         }
     }
@@ -233,10 +233,10 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpPrompt.List, McpPrompt.List.Request())
+            mcp.sendToMcp(McpPrompt.List, McpPrompt.List.Request.Params())
 
             assertNextMessage(
-                McpPrompt.List.Response(
+                McpPrompt.List.Response.Result(
                     listOf(
                         McpPrompt(
                             PromptName.of("prompt"), "description", "title",
@@ -286,10 +286,10 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
+            mcp.sendToMcp(McpResource.List, McpResource.List.Request.Params())
 
             assertNextMessage(
-                McpResource.List.Response(
+                McpResource.List.Response.Result(
                     listOf(
                         McpResource(
                             resource.uri,
@@ -305,19 +305,19 @@ class McpProtocolTest {
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(resource.uri))
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(resource.uri))
 
-            assertNextMessage(McpResource.Read.Response(listOf(content)))
+            assertNextMessage(McpResource.Read.Response.Result(listOf(content)))
 
-            mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request(resource.uri))
+            mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request.Params(resource.uri))
 
             assertNextMessage(ServerMessage.Response.Empty)
 
             res.triggerUpdated(resource.uri)
 
-            assertNextMessage(McpResource.Updated, McpResource.Updated.Notification(resource.uri))
+            assertNextMessage(McpResource.Updated, McpResource.Updated.Notification.Params(resource.uri))
 
-            mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request(resource.uri))
+            mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request.Params(resource.uri))
 
             assertNextMessage(ServerMessage.Response.Empty)
 
@@ -355,14 +355,14 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpResource.List, McpResource.List.Request())
+            mcp.sendToMcp(McpResource.List, McpResource.List.Request.Params())
 
-            assertNextMessage(McpResource.List.Response(listOf()))
+            assertNextMessage(McpResource.List.Response.Result(listOf()))
 
-            mcp.sendToMcp(McpResource.ListTemplates, McpResource.ListTemplates.Request(null))
+            mcp.sendToMcp(McpResource.ListTemplates, McpResource.ListTemplates.Request.Params(null))
 
             assertNextMessage(
-                McpResource.ListTemplates.Response(
+                McpResource.ListTemplates.Response.Result(
                     listOf(
                         McpResource(
                             resource.uriTemplate,
@@ -378,10 +378,10 @@ class McpProtocolTest {
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://www.http4k.org/bob")))
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(Uri.of("https://www.http4k.org/bob")))
 
             assertNextMessage(
-                McpResource.Read.Response(
+                McpResource.Read.Response.Result(
                     listOf(
                         Resource.Content.Blob(
                             Base64Blob.encode("image"),
@@ -391,11 +391,11 @@ class McpProtocolTest {
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("https://not-http4k/bob")))
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(Uri.of("https://not-http4k/bob")))
 
             assertNextMessage(InvalidParams)
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request(Uri.of("otherprotocol://www.http4k.org/bob")))
+            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(Uri.of("otherprotocol://www.http4k.org/bob")))
 
             assertNextMessage(InvalidParams)
         }
@@ -444,10 +444,10 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpTool.List, McpTool.List.Request())
+            mcp.sendToMcp(McpTool.List, McpTool.List.Request.Params())
 
             assertNextMessage(
-                McpTool.List.Response(
+                McpTool.List.Response.Result(
                     listOf(
                         McpTool(
                             ToolName.of("unstructured"), "description", "title",
@@ -493,21 +493,21 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(
+                McpTool.Call.Request.Params(
                     unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(MetaKey.progressToken<String>().toLens() of progressToken)
                 )
             )
 
-            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
-            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 2, 5.0, "d2"))
-            assertNextMessage(McpTool.Call.Response(listOf(content, Content.Text("foo123"))))
+            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 1, 5.0, "d1"))
+            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 2, 5.0, "d2"))
+            assertNextMessage(McpTool.Call.Response.Result(listOf(content, Content.Text("foo123"))))
 
             val progress2 = "123"
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(
+                McpTool.Call.Request.Params(
                     unstructuredTool.name,
                     mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
                     Meta(MetaKey.progressToken<String>().toLens() of progress2)
@@ -518,11 +518,11 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpTool.Call,
-                McpTool.Call.Request(structuredTool.name, mapOf(), Meta(MetaKey.progressToken<String>().toLens() of progress2))
+                McpTool.Call.Request.Params(structuredTool.name, mapOf(), Meta(MetaKey.progressToken<String>().toLens() of progress2))
             )
 
             assertNextMessage(
-                McpTool.Call.Response(
+                McpTool.Call.Response.Result(
                     listOf(Content.Text("""{"foo":"bar"}""")),
                     mapOf("foo" to "bar"),
                 )
@@ -530,7 +530,7 @@ class McpProtocolTest {
 
             tools.items = emptyList()
 
-            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification())
+            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification.Params())
         }
     }
 
@@ -551,7 +551,7 @@ class McpProtocolTest {
             assertInitializeLoop(mcp)
             logger.log(Session(firstDeterministicSessionId), McpJson.string("hello"), LogLevel.info, "message")
 
-            mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request(LogLevel.debug))
+            mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request.Params(LogLevel.debug))
 
             assertNextMessage(ServerMessage.Response.Empty)
 
@@ -559,7 +559,7 @@ class McpProtocolTest {
 
             assertNextMessage(
                 McpLogging.LoggingMessage,
-                McpLogging.LoggingMessage.Notification(McpJson.string("hello"), LogLevel.info)
+                McpLogging.LoggingMessage.Notification.Params(McpJson.string("hello"), LogLevel.info)
             )
         }
     }
@@ -595,17 +595,17 @@ class McpProtocolTest {
 
             mcp.sendToMcp(
                 McpCompletion,
-                McpCompletion.Request(
+                McpCompletion.Request.Params(
                     ref, CompletionArgument("arg", "value"),
                     CompletionContext(mapOf("foo" to "bar")),
                     Meta(MetaKey.progressToken<String>().toLens() of progressToken)
                 )
             )
 
-            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 1, 5.0, "d1"))
-            assertNextMessage(McpProgress, McpProgress.Notification(progressToken, 2, 5.0, "d2"))
+            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 1, 5.0, "d1"))
+            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 2, 5.0, "d2"))
 
-            assertNextMessage(McpCompletion.Response(Completion(listOf("values"), 1, true)))
+            assertNextMessage(McpCompletion.Response.Result(Completion(listOf("values"), 1, true)))
         }
     }
 
@@ -653,7 +653,7 @@ class McpProtocolTest {
             assertInitializeLoop(mcp)
 
             with(McpJson) {
-                mcp.sendToMcp(renderRequest(McpTool.List, McpTool.List.Request()))
+                mcp.sendToMcp(renderRequest(McpTool.List, McpTool.List.Request.Params()))
 
                 approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
             }
@@ -700,7 +700,7 @@ class McpProtocolTest {
             with(McpJson) {
                 mcp.sendToMcp(
                     renderRequest(
-                        McpTool.Call, McpTool.Call.Request(
+                        McpTool.Call, McpTool.Call.Request.Params(
                             tool.name,
                             mapOf(
                                 objectValueArg.meta.name to asJsonObject(example),
@@ -723,17 +723,17 @@ class McpProtocolTest {
         )
 
         mcp.sendToMcp(
-            McpInitialize, McpInitialize.Request(
+            McpInitialize, McpInitialize.Request.Params(
                 VersionedMcpEntity(clientName, Version.of("1")),
                 ClientCapabilities(), LATEST_VERSION
             )
         )
 
         assertNextMessage(
-            McpInitialize.Response(metadata.entity, metadata.capabilities, LATEST_VERSION, metadata.instructions)
+            McpInitialize.Response.Result(metadata.entity, metadata.capabilities, LATEST_VERSION, metadata.instructions)
         )
 
-        mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification())
+        mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification.Params())
     }
 
     private fun TestSseClient.assertNextMessage(error: ErrorMessage) {

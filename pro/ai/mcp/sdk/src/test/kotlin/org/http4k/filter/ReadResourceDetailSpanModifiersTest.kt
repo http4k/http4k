@@ -27,7 +27,7 @@ class ReadResourceDetailSpanModifiersTest {
 
     @Test
     fun `sets result from response`(approver: Approver) {
-        val response = McpResource.Read.Response(listOf(Resource.Content.Text("article content", Uri.of("docs://test"))))
+        val response = McpResource.Read.Response.Result(listOf(Resource.Content.Text("article content", Uri.of("docs://test"))))
         ReadResourceDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.resource.result"))!!, APPLICATION_JSON)

@@ -28,7 +28,7 @@ class CompletionDetailSpanModifiersTest {
 
     @Test
     fun `sets arguments from request`(approver: Approver) {
-        val request = McpCompletion.Request(
+        val request = McpCompletion.Request.Params(
             ref = org.http4k.ai.mcp.model.Reference.Prompt("my-prompt"),
             argument = CompletionArgument("city", "Lon")
         )
@@ -39,7 +39,7 @@ class CompletionDetailSpanModifiersTest {
 
     @Test
     fun `sets result from response`(approver: Approver) {
-        val response = McpCompletion.Response(Completion("London", "Los Angeles"))
+        val response = McpCompletion.Response.Result(Completion("London", "Los Angeles"))
         CompletionDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.completion.result"))!!, APPLICATION_JSON)

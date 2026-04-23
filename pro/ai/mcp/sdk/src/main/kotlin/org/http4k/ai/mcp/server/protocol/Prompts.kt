@@ -16,5 +16,5 @@ import org.http4k.core.Request
  */
 interface Prompts : ObservableCapability<PromptCapability>, (PromptName) -> PromptHandler, Iterable<PromptCapability> {
     fun get(req: McpPrompt.Get.Request.Params, client: Client, http: Request): McpPrompt.Get.Response.Result
-    fun list(mcp: McpPrompt.List.Request, client: Client, http: Request): McpPrompt.List.Response
+    fun list(mcp: McpPrompt.List.Request.Params, client: Client, http: Request): McpPrompt.List.Response.Result
 }

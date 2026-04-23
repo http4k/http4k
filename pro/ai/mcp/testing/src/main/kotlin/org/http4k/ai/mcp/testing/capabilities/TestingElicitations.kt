@@ -37,23 +37,23 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
 
     fun expectCompleteNotification(elicitationId: ElicitationId) =
         sender.lastEvent()
-            .toNotification<McpElicitations.Complete.Notification>(McpElicitations.Complete)
+            .toNotification<McpElicitations.Complete.Notification.Params>(McpElicitations.Complete)
             .also { onComplete.forEach { it(elicitationId) } }
 
     init {
         sender.on(McpElicitations) { event ->
-            val result = event.nextEvent<McpElicitations.Request, McpElicitations.Request> { this }.valueOrNull()!!
+            val result = event.nextEvent<McpElicitations.Request.Params, McpElicitations.Request.Params> { this }.valueOrNull()!!
             val (id, protocolRequest) = result
 
             val domainRequest = when (protocolRequest) {
-                is McpElicitations.Request.Form -> ElicitationRequest.Form(
+                is McpElicitations.Request.Params.Form -> ElicitationRequest.Form(
                     protocolRequest.message,
                     protocolRequest.requestedSchema,
                     MetaKey.progressToken<Any>().toLens()(protocolRequest._meta),
                     protocolRequest.task
                 )
 
-                is McpElicitations.Request.Url -> ElicitationRequest.Url(
+                is McpElicitations.Request.Params.Url -> ElicitationRequest.Url(
                     protocolRequest.message,
                     protocolRequest.url,
                     protocolRequest.elicitationId,
@@ -64,8 +64,8 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
 
             onElicitation.forEach { handler ->
                 val protocolResponse = when (val response = handler(domainRequest)) {
-                    is Ok -> McpElicitations.Response(response.action, response.content, _meta = response._meta)
-                    is Task -> McpElicitations.Response(task = response.task)
+                    is Ok -> McpElicitations.Response.Result(response.action, response.content, _meta = response._meta)
+                    is Task -> McpElicitations.Response.Result(task = response.task)
                     is Error -> throw McpException(DomainError(response.message))
                 }
                 sender(protocolResponse, id!!)

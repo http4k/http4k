@@ -16,7 +16,7 @@ fun completions(vararg capabilities: CompletionCapability): Completions = comple
 
 fun completions(capabilities: Iterable<CompletionCapability>): Completions = object : Completions, Iterable<CompletionCapability> by capabilities {
 
-    override fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
+    override fun complete(mcp: McpCompletion.Request.Params, client: Client, http: Request) =
         capabilities.find { it.toReference() == mcp.ref }
             ?.complete(mcp, client, http)
             ?: throw McpException(InvalidParams)

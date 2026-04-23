@@ -12,5 +12,5 @@ import org.http4k.ai.mcp.protocol.messages.McpRoot
  * Handles protocol traffic for client provided roots.
  */
 interface Roots : Iterable<Root> {
-    fun update(req: McpRoot.List.Response): CompletionStatus
+    fun update(req: McpRoot.List.Response.Result): CompletionStatus
 }

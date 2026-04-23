@@ -48,7 +48,7 @@ class GetPromptDetailSpanModifiersTest {
 
     @Test
     fun `no result attribute when response has no messages`() {
-        val response = McpPrompt.Get.Response.Result(emptyList())
+            val response = McpPrompt.Get.Response.Result(emptyList())
         GetPromptDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         // empty list is still serialized, so attribute should be set
