@@ -36,6 +36,8 @@ data class McpPrompt(
         @JsonSerializable
         @PolymorphicLabel("prompts/get")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Get.Method
+
             @JsonSerializable
             data class Params(
                 val name: PromptName,
@@ -61,6 +63,8 @@ data class McpPrompt(
         @JsonSerializable
         @PolymorphicLabel("prompts/list")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = List.Method
+
             @JsonSerializable
             data class Params(
                 override val _meta: Meta = Meta.default
@@ -82,6 +86,8 @@ data class McpPrompt(
             @JsonSerializable
             @PolymorphicLabel("notifications/prompts/list_changed")
             data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+                override val method = Changed.Method
+
                 @JsonSerializable
                 data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Notification
             }

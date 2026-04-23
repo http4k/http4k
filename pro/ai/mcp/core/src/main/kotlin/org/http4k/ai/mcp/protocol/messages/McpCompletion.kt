@@ -20,6 +20,8 @@ object McpCompletion : McpRpc {
     @JsonSerializable
     @PolymorphicLabel("completion/complete")
     data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        override val method = McpCompletion.Method
+
         @JsonSerializable
         data class Params(
             val ref: Reference,

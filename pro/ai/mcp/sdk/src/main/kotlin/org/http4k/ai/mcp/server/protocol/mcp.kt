@@ -4,11 +4,11 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
-import org.http4k.jsonrpc.JsonRpcMessage
 
-data class McpRequest(val session: Session, val json: JsonRpcMessage<McpNodeType>, val http: Request)
+data class McpRequest(val session: Session, val message: McpJsonRpcRequest, val http: Request)
 
 sealed interface McpResponse {
     data class Ok(val json: McpNodeType) : McpResponse

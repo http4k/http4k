@@ -18,6 +18,8 @@ object McpLogging {
         @JsonSerializable
         @PolymorphicLabel("logging/setLevel")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = SetLevel.Method
+
             @JsonSerializable
             data class Params(
                 val level: LogLevel,
@@ -32,6 +34,8 @@ object McpLogging {
         @JsonSerializable
         @PolymorphicLabel("notifications/message")
         data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            override val method = LoggingMessage.Method
+
             @JsonSerializable
             data class Params(
                 val data: McpNodeType,

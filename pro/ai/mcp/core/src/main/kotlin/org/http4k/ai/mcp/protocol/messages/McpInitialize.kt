@@ -22,6 +22,8 @@ object McpInitialize : McpRpc {
     @JsonSerializable
     @PolymorphicLabel("initialize")
     data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        override val method = McpInitialize.Method
+
         @JsonSerializable
         data class Params(
             val clientInfo: VersionedMcpEntity,
@@ -49,6 +51,8 @@ object McpInitialize : McpRpc {
         @JsonSerializable
         @PolymorphicLabel("notifications/initialized")
         data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            override val method = Initialized.Method
+
             @JsonSerializable
             data class Params(
                 override val _meta: Meta = Meta.default

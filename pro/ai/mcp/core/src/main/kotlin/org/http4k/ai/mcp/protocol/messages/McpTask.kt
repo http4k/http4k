@@ -34,6 +34,8 @@ object McpTask {
         @JsonSerializable
         @PolymorphicLabel("tasks/get")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Get.Method
+
             @JsonSerializable
             data class Params(
                 val taskId: TaskId,
@@ -57,6 +59,8 @@ object McpTask {
         @JsonSerializable
         @PolymorphicLabel("tasks/result")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Result.Method
+
             @JsonSerializable
             data class Params(
                 val taskId: TaskId,
@@ -80,6 +84,8 @@ object McpTask {
         @JsonSerializable
         @PolymorphicLabel("tasks/cancel")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Cancel.Method
+
             @JsonSerializable
             data class Params(
                 val taskId: TaskId,
@@ -102,6 +108,8 @@ object McpTask {
         @JsonSerializable
         @PolymorphicLabel("tasks/list")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = List.Method
+
             @JsonSerializable
             data class Params(
                 override val cursor: Cursor? = null,
@@ -126,6 +134,8 @@ object McpTask {
         @JsonSerializable
         @PolymorphicLabel("notifications/tasks/status")
         data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            override val method = Status.Method
+
             @JsonSerializable
             data class Params(
                 val taskId: TaskId,

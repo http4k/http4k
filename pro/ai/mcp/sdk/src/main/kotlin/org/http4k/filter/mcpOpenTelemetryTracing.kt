@@ -11,13 +11,11 @@ import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
-import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
@@ -36,61 +34,59 @@ fun McpFilters.OpenTelemetryTracing(
 
     return McpFilter { next ->
         { req ->
-            when(val jsonRpc = req.json) {
-                is JsonRpcRequest<McpNodeType> -> {
-                    val spanModifiers = spanModifierMap[McpRpcMethod.of(jsonRpc.method)]
+            val method = req.message.method
+            val rawParams = McpJson.fields(parse(req.http.bodyString())).toMap()["params"]
 
-                    val transportSpan = Span.current()
+            val spanModifiers = spanModifierMap[method]
 
-                    val metaFields = jsonRpc.params
-                        ?.let { McpJson.fields(it).toMap()["_meta"] }
-                        ?.let { McpJson.fields(it).toMap() }
-                        ?: emptyMap()
+            val transportSpan = Span.current()
 
-                    val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
+            val metaFields = rawParams
+                ?.let { McpJson.fields(it).toMap()["_meta"] }
+                ?.let { McpJson.fields(it).toMap() }
+                ?: emptyMap()
 
-                    val targetName = jsonRpc.params
-                        ?.let { McpJson.fields(it).toMap()["name"] }
-                        ?.let { McpJson.text(it) }
-                    val spanName = if (targetName != null) "${jsonRpc.method} $targetName" else jsonRpc.method
+            val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
 
-                    val span = tracer.spanBuilder(spanName)
-                        .setParent(parentContext)
-                        .setSpanKind(SERVER)
-                        .setAttribute("mcp.method.name", jsonRpc.method)
-                        .setAttribute("mcp.session.id", req.session.id.value)
-                        .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
-                        .apply {
-                            jsonRpc.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
-                            if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
-                        }
-                        .startSpan()
+            val targetName = rawParams
+                ?.let { McpJson.fields(it).toMap()["name"] }
+                ?.let { McpJson.text(it) }
+            val spanName = if (targetName != null) "${method.value} $targetName" else method.value
 
-                    spanModifiers?.forEach { it.request(span, jsonRpc.params ?: McpJson.obj()) }
-
-                    try {
-                        span.makeCurrent().use { next(req) }
-                            .also { resp ->
-                                if (resp is McpResponse.Ok) {
-                                    spanModifiers?.forEach { it.response(span, resp.json) }
-
-                                    val error = McpJson.fields(resp.json).toMap()["error"]
-                                    if (error != null) {
-                                        span.setStatus(ERROR)
-                                        val code = McpJson.fields(error).toMap()["code"]
-                                        if (code != null) span.setAttribute("error.type", McpJson.compact(code))
-                                    }
-                                }
-                            }
-                    } catch (e: Throwable) {
-                        span.setStatus(ERROR)
-                        span.setAttribute("error.type", e.javaClass.name)
-                        throw e
-                    } finally {
-                        span.end()
-                    }
+            val span = tracer.spanBuilder(spanName)
+                .setParent(parentContext)
+                .setSpanKind(SERVER)
+                .setAttribute("mcp.method.name", method.value)
+                .setAttribute("mcp.session.id", req.session.id.value)
+                .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
+                .apply {
+                    req.message.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
+                    if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
                 }
-                is JsonRpcResult<*> -> next(req)
+                .startSpan()
+
+            spanModifiers?.forEach { it.request(span, rawParams ?: McpJson.obj()) }
+
+            try {
+                span.makeCurrent().use { next(req) }
+                    .also { resp ->
+                        if (resp is McpResponse.Ok) {
+                            spanModifiers?.forEach { it.response(span, resp.json) }
+
+                            val error = McpJson.fields(resp.json).toMap()["error"]
+                            if (error != null) {
+                                span.setStatus(ERROR)
+                                val code = McpJson.fields(error).toMap()["code"]
+                                if (code != null) span.setAttribute("error.type", McpJson.compact(code))
+                            }
+                        }
+                    }
+            } catch (e: Throwable) {
+                span.setStatus(ERROR)
+                span.setAttribute("error.type", e.javaClass.name)
+                throw e
+            } finally {
+                span.end()
             }
         }
     }

@@ -17,6 +17,8 @@ object McpProgress : McpRpc {
     @JsonSerializable
     @PolymorphicLabel("notifications/progress")
     data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        override val method = McpProgress.Method
+
         @JsonSerializable
         data class Params(
             val progressToken: ProgressToken,

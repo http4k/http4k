@@ -30,6 +30,8 @@ object McpSampling : McpRpc {
     @JsonSerializable
     @PolymorphicLabel("sampling/createMessage")
     data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+        override val method = McpSampling.Method
+
         @JsonSerializable
         data class Params(
             val messages: List<Message>,

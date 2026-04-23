@@ -64,6 +64,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         @PolymorphicLabel("resources/read")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Read.Method
+
             @JsonSerializable
             data class Params(
                 val uri: Uri,
@@ -87,6 +89,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         @PolymorphicLabel("resources/list")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = List.Method
+
             @JsonSerializable
             data class Params(
                 override val cursor: Cursor? = null,
@@ -110,6 +114,8 @@ data class McpResource internal constructor(
             @JsonSerializable
             @PolymorphicLabel("notifications/resources/list_changed")
             data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+                override val method = Changed.Method
+
                 @JsonSerializable
                 data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Notification
             }
@@ -122,6 +128,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         @PolymorphicLabel("resources/templates/list")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = ListTemplates.Method
+
             @JsonSerializable
             data class Params(
                 override val cursor: Cursor? = null,
@@ -146,6 +154,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         @PolymorphicLabel("notifications/resources/updated")
         data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            override val method = Updated.Method
+
             @JsonSerializable
             data class Params(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification,
                 HasMeta
@@ -158,6 +168,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         @PolymorphicLabel("resources/subscribe")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Subscribe.Method
+
             @JsonSerializable
             data class Params(
                 val uri: Uri,
@@ -172,6 +184,8 @@ data class McpResource internal constructor(
         @JsonSerializable
         @PolymorphicLabel("resources/unsubscribe")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = Unsubscribe.Method
+
             @JsonSerializable
             data class Params(
                 val uri: Uri,

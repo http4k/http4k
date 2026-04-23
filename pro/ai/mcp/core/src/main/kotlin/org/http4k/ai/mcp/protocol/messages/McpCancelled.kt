@@ -17,6 +17,8 @@ object McpCancelled : McpRpc {
     @JsonSerializable
     @PolymorphicLabel("notifications/cancelled")
     data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+        override val method = McpCancelled.Method
+
         @JsonSerializable
         data class Params(
             val requestId: McpMessageId,

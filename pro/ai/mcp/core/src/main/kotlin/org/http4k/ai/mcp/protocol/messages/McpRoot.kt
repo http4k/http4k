@@ -18,6 +18,8 @@ object McpRoot {
         @JsonSerializable
         @PolymorphicLabel("roots/list")
         data class Request(val params: Params, override val id: McpNodeType?) : McpJsonRpcRequest() {
+            override val method = List.Method
+
             @JsonSerializable
             data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Request, HasMeta
         }
@@ -36,6 +38,8 @@ object McpRoot {
         @JsonSerializable
         @PolymorphicLabel("notifications/roots/list_changed")
         data class Notification(val params: Params, override val id: McpNodeType? = null) : McpJsonRpcRequest() {
+            override val method = Changed.Method
+
             @JsonSerializable
             data class Params(override val _meta: Meta = Meta.default) : ClientMessage.Notification
         }

@@ -7,6 +7,7 @@ package org.http4k.ai.mcp.x402
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -14,6 +15,7 @@ import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
+import org.http4k.ai.model.ToolName
 import org.http4k.connect.x402.FakeX402Facilitator
 import org.http4k.connect.x402.Http
 import org.http4k.connect.x402.X402Facilitator
@@ -35,9 +37,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
-import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -67,26 +67,26 @@ class X402McpFilterTest {
     private val handler = McpFilters.X402PaymentRequired(fakeFacilitator.client()) { PaymentCheck.Required(listOf(requirements)) }
         .then { McpResponse.Ok(McpJson.nullNode()) }
 
-    private fun mcpRequest(payment: PaymentPayload? = null) = McpRequest(
-        Session(SessionId.of("test-session")),
-        jsonRpcRequest(payment),
-        Request(POST, "/mcp")
-    )
-
-    private fun jsonRpcRequest(payment: PaymentPayload? = null): JsonRpcRequest<MoshiNode> {
+    private fun mcpRequest(payment: PaymentPayload? = null): McpRequest {
         val meta = payment?.let {
             mapOf("x402/payment" to McpJson.parse(X402Moshi.asFormatString(it)))
         } ?: emptyMap()
 
-        return JsonRpcRequest(
-            McpJson, mapOf(
-                "jsonrpc" to asJsonObject("2.0"),
-                "method" to asJsonObject("tools/call"),
-                "id" to asJsonObject(1),
-                "params" to asJsonObject(
-                    mapOf("_meta" to asJsonObject(meta))
+        val body = McpJson.asFormatString(
+            asJsonObject(
+                mapOf(
+                    "jsonrpc" to "2.0",
+                    "method" to "tools/call",
+                    "id" to 1,
+                    "params" to mapOf("name" to "test", "_meta" to meta)
                 )
             )
+        )
+
+        return McpRequest(
+            Session(SessionId.of("test-session")),
+            McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), asJsonObject(1)),
+            Request(POST, "/mcp").body(body)
         )
     }
 
