@@ -15,7 +15,6 @@ import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpNodeType
 import java.time.Duration
 
@@ -25,12 +24,10 @@ internal class ClientPrompts(
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
     private val id: () -> McpMessageId,
-    private val register: (McpRpc, McpCallback<*>) -> Any
+    private val register: McpCallbackRegistry
 ) : McpClient.Prompts {
     override fun onChange(fn: () -> Unit) {
-        register(McpPrompt.List, McpCallback(McpPrompt.List.Changed.Notification.Params::class) { _, _ ->
-            fn()
-        })
+        register.on(McpPrompt.List.Changed.Notification::class) { _, _ -> fn() }
     }
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpPrompt>> {

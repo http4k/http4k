@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
@@ -25,13 +24,11 @@ internal class ClientTools(
     private val sender: McpRpcSender,
     private val id: () -> McpMessageId,
     private val defaultTimeout: Duration,
-    private val register: (McpRpc, McpCallback<*>) -> Any
+    private val register: McpCallbackRegistry
 ) : McpClient.Tools {
 
     override fun onChange(fn: () -> Unit) {
-        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification.Params::class) { _, _ ->
-            fn()
-        })
+        register.on(McpTool.List.Changed.Notification::class) { _, _ -> fn() }
     }
 
     override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {

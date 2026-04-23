@@ -33,7 +33,7 @@ import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.asAOrFailure
-import org.http4k.ai.mcp.client.internal.McpCallback
+import org.http4k.ai.mcp.client.internal.McpCallbackRegistry
 import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
@@ -51,7 +51,6 @@ import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.SessionId
@@ -60,6 +59,8 @@ import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
+import org.http4k.ai.mcp.protocol.messages.McpElicitations.Request.Params.Form
+import org.http4k.ai.mcp.protocol.messages.McpElicitations.Request.Params.Url
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
@@ -113,7 +114,7 @@ class HttpStreamingMcpClient(
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
     private val notificationSseReconnectionMode: ReconnectionMode = Immediate
 ) : McpClient {
-    private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
+    private val registry = McpCallbackRegistry()
 
     private val _sessionId = AtomicReference<SessionId>()
 
@@ -152,11 +153,7 @@ class HttpStreamingMcpClient(
                     .filterIsInstance<Success<MoshiObject>>()
                     .map { it.value }
                     .filter { it["method"] != null }
-                    .forEach { obj ->
-                        val message = asA<McpJsonRpcRequest>(compact(obj))
-                        val id = message.id?.let { McpMessageId.of(it.toString().toLong()) }
-                        callbacks[message.method]?.any { it(message, id) }
-                    }
+                    .forEach { registry.dispatch(asA<McpJsonRpcRequest>(compact(it))) }
             }
 
             latch.await(overrideDefaultTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)
@@ -165,19 +162,15 @@ class HttpStreamingMcpClient(
 
     override fun progress() = object : McpClient.RequestProgress {
         override fun onProgress(fn: (Progress) -> Unit) {
-            callbacks.getOrPut(McpProgress.Method) { mutableListOf() }.add(
-                McpCallback(McpProgress.Notification.Params::class) { n, _ ->
-                    fn(Progress(n.progressToken, n.progress, n.total, n.description))
-                }
-            )
+            registry.on(McpProgress.Notification::class) { n, _ ->
+                fn(Progress(n.params.progressToken, n.params.progress, n.params.total, n.params.description))
+            }
         }
     }
 
     override fun tools() = object : McpClient.Tools {
         override fun onChange(fn: () -> Unit) {
-            callbacks.getOrPut(McpTool.List.Changed.Method) { mutableListOf() }.add(
-                McpCallback(McpPrompt.List.Changed.Notification.Params::class) { _, _ -> fn() }
-            )
+            registry.on(McpTool.List.Changed.Notification::class) { _, _ -> fn() }
         }
 
         override fun list(overrideDefaultTimeout: Duration?) =
@@ -205,9 +198,7 @@ class HttpStreamingMcpClient(
                         when ((McpJson.parse(it.data) as MoshiObject)["method"]) {
                             null -> it
                             else -> {
-                                val message = asA<McpJsonRpcRequest>(it.data)
-                                val id = message.id?.let { idVal -> asA<McpMessageId>(compact(McpJson.asJsonObject(idVal))) }
-                                callbacks[message.method]?.any { it(message, id) }
+                                registry.dispatch(asA<McpJsonRpcRequest>(it.data))
                                 null
                             }
                         }
@@ -220,9 +211,7 @@ class HttpStreamingMcpClient(
 
     override fun prompts() = object : McpClient.Prompts {
         override fun onChange(fn: () -> Unit) {
-            callbacks.getOrPut(McpPrompt.List.Changed.Method) { mutableListOf() }.add(
-                McpCallback(McpPrompt.List.Changed.Notification.Params::class) { _, _ -> fn() }
-            )
+            registry.on(McpPrompt.List.Changed.Notification::class) { _, _ -> fn() }
         }
 
         override fun list(overrideDefaultTimeout: Duration?) =
@@ -242,97 +231,81 @@ class HttpStreamingMcpClient(
 
     override fun elicitations() = object : McpClient.Elicitations {
         override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
-            callbacks.getOrPut(McpElicitations.Method) { mutableListOf() }.add(
-                McpCallback(McpElicitations.Request.Params.Form::class) { request, requestId ->
-                    if (requestId == null) return@McpCallback
+            registry.on(McpElicitations.Request::class) { req, requestId ->
+                if (requestId == null) return@on
+                val request = req.params
 
-                    val response = with(request) {
-                        fn(
-                            ElicitationRequest.Form(
-                                message,
-                                requestedSchema,
-                                MetaKey.progressToken<Any>().toLens()(_meta),
-                                task
-                            )
+                val response = when (request) {
+                    is Form -> fn(
+                        ElicitationRequest.Form(
+                            request.message,
+                            request.requestedSchema,
+                            MetaKey.progressToken<Any>().toLens()(request._meta),
+                            request.task
                         )
-                    }
-                    http.send(
-                        McpElicitations.Response(response.toProtocol(), requestId)
+                    )
+
+                    is Url -> fn(
+                        ElicitationRequest.Url(
+                            request.message,
+                            request.url,
+                            request.elicitationId,
+                            MetaKey.progressToken<Any>().toLens()(request._meta),
+                            request.task
+                        )
                     )
                 }
-            )
-            callbacks.getOrPut(McpElicitations.Method) { mutableListOf() }.add(
-                McpCallback(McpElicitations.Request.Params.Url::class) { request, requestId ->
-                    if (requestId == null) return@McpCallback
-
-                    val response = with(request) {
-                        fn(
-                            ElicitationRequest.Url(
-                                message,
-                                url,
-                                elicitationId,
-                                MetaKey.progressToken<Any>().toLens()(_meta),
-                                task
-                            )
-                        )
-                    }
-                    http.send(
-                        McpElicitations.Response(response.toProtocol(), requestId)
-                    )
-                }
-            )
+                http.send(
+                    McpElicitations.Response(response.toProtocol(), requestId)
+                )
+            }
         }
 
         override fun onComplete(fn: (ElicitationId) -> Unit) {
-            callbacks.getOrPut(McpElicitations.Complete.Method) { mutableListOf() }.add(
-                McpCallback(McpElicitations.Complete.Notification.Params::class) { notification, _ ->
-                    fn(notification.elicitationId)
-                }
-            )
+            registry.on(McpElicitations.Complete.Notification::class) { notification, _ ->
+                fn(notification.params.elicitationId)
+            }
         }
     }
 
     override fun sampling() = object : McpClient.Sampling {
         override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
-            callbacks.getOrPut(McpSampling.Method) { mutableListOf() }.add(
-                McpCallback(McpSampling.Request.Params::class) { request, requestId ->
-                    if (requestId == null) return@McpCallback
+            registry.on(McpSampling.Request::class) { req, requestId ->
+                if (requestId == null) return@on
+                val request = req.params
 
-                    val responses =
-                        with(request) {
-                            fn(
-                                SamplingRequest(
-                                    messages,
-                                    maxTokens,
-                                    systemPrompt,
-                                    includeContext,
-                                    temperature,
-                                    stopSequences,
-                                    modelPreferences,
-                                    metadata,
-                                    tools ?: emptyList(),
-                                    toolChoice,
-                                    MetaKey.progressToken<Any>().toLens()(_meta)
-                                )
-                            )
-                        }
-                    responses.forEach { response ->
-                        val protocolResponse = when (response) {
-                            is SamplingResponse.Ok -> McpSampling.Response.Result(
-                                response.model,
-                                response.stopReason,
-                                response.role,
-                                response.content
-                            )
-
-                            is SamplingResponse.Task -> McpSampling.Response.Result(task = response.task)
-                            is Error -> throw McpException(DomainError(response.message))
-                        }
-                        http.send(
-                            McpSampling.Response(protocolResponse, requestId)
+                val responses = fn(
+                    SamplingRequest(
+                        request.messages,
+                        request.maxTokens,
+                        request.systemPrompt,
+                        request.includeContext,
+                        request.temperature,
+                        request.stopSequences,
+                        request.modelPreferences,
+                        request.metadata,
+                        request.tools ?: emptyList(),
+                        request.toolChoice,
+                        MetaKey.progressToken<Any>().toLens()(request._meta)
+                    )
+                )
+                responses.forEach { response ->
+                    val protocolResponse = when (response) {
+                        is SamplingResponse.Ok -> McpSampling.Response.Result(
+                            response.model,
+                            response.stopReason,
+                            response.role,
+                            response.content
                         )
+
+                        is SamplingResponse.Task -> McpSampling.Response.Result(task = response.task)
+                        is Error -> throw McpException(DomainError(response.message))
                     }
-                })
+                    http.send(
+                        McpSampling.Response(protocolResponse, requestId)
+                    )
+                }
+            }
         }
     }
 
@@ -341,9 +314,7 @@ class HttpStreamingMcpClient(
         private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
 
         override fun onChange(fn: () -> Unit) {
-            callbacks.getOrPut(McpResource.List.Changed.Method) { mutableListOf() }.add(
-                McpCallback(McpResource.List.Changed.Notification.Params::class) { _, _ -> fn() }
-            )
+            registry.on(McpResource.List.Changed.Notification::class) { _, _ -> fn() }
         }
 
         override fun list(overrideDefaultTimeout: Duration?) =
@@ -365,10 +336,9 @@ class HttpStreamingMcpClient(
             .flatMapFailure { toResourceErrorOrFailure(it) }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) {
-            callbacks.getOrPut(McpResource.Updated.Method) { mutableListOf() }.add(
-                McpCallback(McpResource.Updated.Notification.Params::class) { notification, _ ->
-                    subscriptions[notification.uri]?.forEach { it() }
-                })
+            registry.on(McpResource.Updated.Notification::class) { notification, _ ->
+                subscriptions[notification.params.uri]?.forEach { it() }
+            }
             http.send(McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), nextId()))
             subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
         }
@@ -389,14 +359,9 @@ class HttpStreamingMcpClient(
 
     override fun tasks() = object : McpClient.Tasks {
         override fun onUpdate(fn: (org.http4k.ai.mcp.model.Task, Meta) -> Unit) {
-            callbacks.getOrPut(McpTask.Status.Method) { mutableListOf() }.add(
-                McpCallback(McpTask.Status.Notification.Params::class) { notification, _ ->
-                    fn(
-                        notification.toTask(),
-                        notification._meta
-                    )
-                }
-            )
+            registry.on(McpTask.Status.Notification::class) { notification, _ ->
+                fn(notification.params.toTask(), notification.params._meta)
+            }
         }
 
         override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =

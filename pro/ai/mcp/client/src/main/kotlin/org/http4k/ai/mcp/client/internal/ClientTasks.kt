@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.util.McpNodeType
 import java.time.Duration
@@ -23,13 +22,13 @@ internal class ClientTasks(
     private val sender: McpRpcSender,
     private val id: () -> McpMessageId,
     private val defaultTimeout: Duration,
-    private val register: ((McpRpc, McpCallback<*>) -> Any)? = null
+    private val register: McpCallbackRegistry? = null
 ) : McpClient.Tasks {
 
     override fun onUpdate(fn: (Task, Meta) -> Unit) {
-        register?.invoke(McpTask.Status, McpCallback(McpTask.Status.Notification.Params::class) { notification, _ ->
-            fn(notification.toTask(), notification._meta)
-        })
+        register?.on(McpTask.Status.Notification::class) { notification, _ ->
+            fn(notification.params.toTask(), notification.params._meta)
+        }
     }
 
     override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?): McpResult<Task> {

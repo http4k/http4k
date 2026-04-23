@@ -21,11 +21,10 @@ import org.http4k.ai.mcp.client.internal.ClientResources
 import org.http4k.ai.mcp.client.internal.ClientSampling
 import org.http4k.ai.mcp.client.internal.ClientTasks
 import org.http4k.ai.mcp.client.internal.ClientTools
-import org.http4k.ai.mcp.client.internal.McpCallback
+import org.http4k.ai.mcp.client.internal.McpCallbackRegistry
 import org.http4k.ai.mcp.client.internal.asOrFailure
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
@@ -54,7 +53,7 @@ abstract class AbstractMcpClient(
 ) : McpClient {
     private val running = AtomicBoolean(false)
     protected val requests = ConcurrentHashMap<McpMessageId, CountDownLatch>()
-    private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
+    private val registry = McpCallbackRegistry()
     protected val messageQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<McpNodeType>>()
 
     protected val id = AtomicLong(0)
@@ -77,19 +76,14 @@ abstract class AbstractMcpClient(
                             val data = parse(it.data) as MoshiObject
 
                             when {
-                                data["method"] != null -> {
-                                    val message = asA<McpJsonRpcRequest>(it.data)
-                                    val id = message.id?.let { asA<McpMessageId>(compact(asJsonObject(it))) }
-                                    callbacks[message.method]?.forEach { it(message, id) }
-                                }
+                                data["method"] != null -> registry.dispatch(asA<McpJsonRpcRequest>(it.data))
 
                                 else -> {
                                     val id = data["id"]?.let { asA<McpMessageId>(compact(it)) }
                                         ?: error("no id in result: $data")
-                                    val isError = data["error"] != null
                                     messageQueues[id]?.offer(data) ?: error("no queue for $id: $data")
                                     val latch = requests[id] ?: error("no request found for $id: $data")
-                                    if (isError) requests.remove(id)
+                                    if (data["error"] != null) requests.remove(id)
                                     latch.countDown()
                                 }
                             }
@@ -136,42 +130,28 @@ abstract class AbstractMcpClient(
     }
 
     override fun tools(): McpClient.Tools =
-        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout, registry)
 
     override fun prompts(): McpClient.Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, registry)
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage, registry)
 
     override fun elicitations(): McpClient.Elicitations =
-        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage, registry)
 
     override fun progress(): McpClient.RequestProgress =
-        ClientRequestProgress { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientRequestProgress(registry)
 
     override fun resources(): McpClient.Resources =
-        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, registry)
 
     override fun completions(): McpClient.Completions =
         ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())})
 
     override fun tasks(): McpClient.Tasks =
-        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout, registry)
 
     protected abstract fun notify(message: McpJsonRpcMessage): McpResult<Unit>
 

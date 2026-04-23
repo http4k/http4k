@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.ResourceResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Uri
 import java.time.Duration
@@ -25,21 +24,19 @@ internal class ClientResources(
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
     private val id: () -> McpMessageId,
-    private val register: (McpRpc, McpCallback<*>) -> Any
+    private val register: McpCallbackRegistry
 ) : McpClient.Resources {
 
     private val subscriptions = mutableMapOf<Uri, MutableList<() -> Unit>>()
 
     override fun onChange(fn: () -> Unit) {
-        register(McpResource.List, McpCallback(McpResource.List.Changed.Notification.Params::class) { _, _ ->
-            fn()
-        })
+        register.on(McpResource.List.Changed.Notification::class) { _, _ -> fn() }
     }
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
-        register(McpResource.Updated, McpCallback(McpResource.Updated.Notification.Params::class) { notification, _ ->
-            subscriptions[notification.uri]?.forEach { it() }
-        })
+        register.on(McpResource.Updated.Notification::class) { notification, _ ->
+            subscriptions[notification.params.uri]?.forEach { it() }
+        }
         val messageId = id()
         sender(
             McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), messageId),
