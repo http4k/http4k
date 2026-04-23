@@ -11,7 +11,7 @@ import se.ansman.kotshi.Polymorphic
 
 @JsonSerializable
 @Polymorphic("method")
-sealed class McpJsonRpcRequest {
+sealed class McpJsonRpcRequest : McpJsonRpcMessage {
     abstract val method: McpRpcMethod
     abstract val id: McpNodeType?
 }

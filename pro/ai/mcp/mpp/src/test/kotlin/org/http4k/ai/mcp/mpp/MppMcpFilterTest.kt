@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
@@ -37,6 +38,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
 import org.http4k.format.Json
+import org.http4k.format.MoshiObject
 import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage
 import org.junit.jupiter.api.Test
@@ -72,25 +74,19 @@ class MppMcpFilterTest {
         .then { Ok(McpJson.nullNode()) }
 
     private fun mcpRequest(cred: Credential? = null): McpRequest {
-        val meta = cred?.let {
-            mapOf("org.paymentauth/credential" to McpJson.parse(MppMoshi.asFormatString(it)))
-        } ?: emptyMap()
+        val metaFields = cred?.let {
+            MoshiObject("org.paymentauth/credential" to McpJson.parse(MppMoshi.asFormatString(it)))
+        } ?: MoshiObject()
 
-        val body = McpJson.asFormatString(
-            asJsonObject(
-                mapOf(
-                    "jsonrpc" to "2.0",
-                    "method" to "tools/call",
-                    "id" to 1,
-                    "params" to mapOf("name" to "test", "_meta" to meta)
-                )
-            )
+        val message = McpTool.Call.Request(
+            McpTool.Call.Request.Params(ToolName.of("test"), _meta = Meta(metaFields)),
+            asJsonObject(1)
         )
 
         return McpRequest(
             Session(SessionId.of("test-session")),
-            McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), asJsonObject(1)),
-            Request(POST, "/mcp").body(body)
+            message,
+            with(McpJson) { Request(POST, "/mcp").json(message) }
         )
     }
 

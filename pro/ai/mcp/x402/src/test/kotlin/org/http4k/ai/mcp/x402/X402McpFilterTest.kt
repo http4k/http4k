@@ -6,6 +6,7 @@ package org.http4k.ai.mcp.x402
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
@@ -37,6 +38,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
+import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -68,25 +70,19 @@ class X402McpFilterTest {
         .then { McpResponse.Ok(McpJson.nullNode()) }
 
     private fun mcpRequest(payment: PaymentPayload? = null): McpRequest {
-        val meta = payment?.let {
-            mapOf("x402/payment" to McpJson.parse(X402Moshi.asFormatString(it)))
-        } ?: emptyMap()
+        val metaFields = payment?.let {
+            MoshiObject("x402/payment" to McpJson.parse(X402Moshi.asFormatString(it)))
+        } ?: MoshiObject()
 
-        val body = McpJson.asFormatString(
-            asJsonObject(
-                mapOf(
-                    "jsonrpc" to "2.0",
-                    "method" to "tools/call",
-                    "id" to 1,
-                    "params" to mapOf("name" to "test", "_meta" to meta)
-                )
-            )
+        val message = McpTool.Call.Request(
+            McpTool.Call.Request.Params(ToolName.of("test"), _meta = Meta(metaFields)),
+            asJsonObject(1)
         )
 
         return McpRequest(
             Session(SessionId.of("test-session")),
-            McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), asJsonObject(1)),
-            Request(POST, "/mcp").body(body)
+            message,
+            with(McpJson) { Request(POST, "/mcp").json(message) }
         )
     }
 

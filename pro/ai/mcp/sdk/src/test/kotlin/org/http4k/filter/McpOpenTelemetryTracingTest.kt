@@ -20,7 +20,9 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
+import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
@@ -37,8 +39,12 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.format.MoshiObject
 import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.junit.jupiter.api.Test
 
 class McpOpenTelemetryTracingTest {
@@ -154,10 +160,13 @@ class McpOpenTelemetryTracingTest {
         val parentTraceId = "0af7651916cd43dd8448eb211c80319c"
         val parentSpanId = "b7ad6b7169203331"
 
-        val body = """{"jsonrpc":"2.0","method":"tools/call","id":1,"params":{"name":"test","_meta":{"traceparent":"00-$parentTraceId-$parentSpanId-01","tracestate":"congo=t61rcWkgMzE"}}}"""
-        val message = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), asJsonObject(1))
+        val meta = Meta(MoshiObject(
+            "traceparent" to asJsonObject("00-$parentTraceId-$parentSpanId-01"),
+            "tracestate" to asJsonObject("congo=t61rcWkgMzE")
+        ))
+        val message = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test"), _meta = meta), asJsonObject(1))
 
-        handler(McpRequest(Session(SessionId.of("test-session")), message, Request(POST, "/mcp").body(body).header("Mcp-Protocol-Version", "2025-11-25")))
+        handler(mcpRequest(message = message))
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.spanContext.traceId, equalTo(parentTraceId))
@@ -212,15 +221,9 @@ class McpOpenTelemetryTracingTest {
 
     private fun mcpRequest(
         session: Session = Session(SessionId.of("test-session")),
+        message: McpTool.Call.Request = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), asJsonObject(1)),
         http: Request = Request(POST, "/mcp")
-    ): McpRequest {
-        val body = """{"jsonrpc":"2.0","method":"tools/call","id":1,"params":{"name":"test"}}"""
-        val message = McpTool.Call.Request(
-            McpTool.Call.Request.Params(ToolName.of("test")),
-            asJsonObject(1)
-        )
-        return McpRequest(session, message, http.body(body).header("Mcp-Protocol-Version", "2025-11-25"))
-    }
+    ) = McpRequest(session, message, with(McpJson) { http.json(message) }.with(Header.MCP_PROTOCOL_VERSION of ProtocolVersion.LATEST_VERSION))
 
     private fun spanModifier(
         requestAttribute: Pair<String, String>,
