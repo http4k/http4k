@@ -233,7 +233,7 @@ class McpProtocol<Transport>(
         clientTracking[mcpRequest.session]?.let {
             if (it.supportsRoots) {
                 val messageId = McpMessageId.random(random)
-                it.trackRequest(messageId) { roots.update(it.fromJsonRpc(McpRoot.List.Response.Result::class)) }
+                it.trackRequest(messageId) { roots.update(McpJson.asA<McpRoot.List.Response.Result>(McpJson.compact(it))) }
 
                 sessions.respond(
                     transport,
@@ -251,7 +251,8 @@ class McpProtocol<Transport>(
             val id = result.id?.let { McpMessageId.parse(compact(it)) }
             when (id) {
                 null -> Ok(ErrorMessage.ParseError.toJsonRpc(null))
-                else -> clientTracking[sessionState.session]?.processResult(id, result)
+                else -> clientTracking[sessionState.session]
+                    ?.processResult(id, result.result ?: nullNode())
                     ?.let { Accepted }
                     ?: Unknown
             }

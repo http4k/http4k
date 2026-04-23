@@ -30,7 +30,6 @@ import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.McpTask
-import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
 import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
@@ -60,7 +59,7 @@ class SessionBasedClient(
         return when {
             tracking.supportsElicitation -> {
                 tracking.trackRequest(id) {
-                    with(it.fromJsonRpc(McpElicitations.Response.Result::class)) {
+                    with(McpJson.asA<McpElicitations.Response.Result>(McpJson.compact(it))) {
                         val t = task
                         val response = when {
                             t != null -> ElicitationResponse.Task(t)
@@ -108,7 +107,7 @@ class SessionBasedClient(
         return when {
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
-                    with(it.fromJsonRpc(McpSampling.Response.Result::class)) {
+                    with(McpJson.asA<McpSampling.Response.Result>(McpJson.compact(it))) {
                         val t = task
                         val response = when {
                             t != null -> SamplingResponse.Task(t)
