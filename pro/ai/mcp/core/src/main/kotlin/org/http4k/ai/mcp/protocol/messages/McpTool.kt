@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.model.ToolAnnotations
 import org.http4k.ai.mcp.model.ToolExecution
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.ai.model.ToolName
 import org.http4k.format.MoshiNode
@@ -32,12 +31,11 @@ data class McpTool(
     val _meta: Meta = Meta.default
 ) {
     object List {
-        val Method = of("tools/list")
 
         @JsonSerializable
         @PolymorphicLabel("tools/list")
         data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = List.Method
+            override val method = of("tools/list")
 
             @JsonSerializable
             data class Params(
@@ -57,12 +55,11 @@ data class McpTool(
         }
 
         data object Changed {
-            val Method: McpRpcMethod = of("notifications/tools/list_changed")
 
             @JsonSerializable
             @PolymorphicLabel("notifications/tools/list_changed")
             data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-                override val method = Changed.Method
+                override val method = of("notifications/tools/list_changed")
 
                 @JsonSerializable
                 data class Params(override val _meta: Meta = Meta.default) : HasMeta
@@ -71,12 +68,11 @@ data class McpTool(
     }
 
     object Call {
-        val Method = of("tools/call")
 
         @JsonSerializable
         @PolymorphicLabel("tools/call")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Call.Method
+            override val method = of("tools/call")
 
             @JsonSerializable
             data class Params(

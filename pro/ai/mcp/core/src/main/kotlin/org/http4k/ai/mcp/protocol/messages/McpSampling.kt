@@ -24,12 +24,11 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpSampling {
-    val Method = McpRpcMethod.of("sampling/createMessage")
 
     @JsonSerializable
     @PolymorphicLabel("sampling/createMessage")
     data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpSampling.Method
+        override val method = McpRpcMethod.of("sampling/createMessage")
 
         @JsonSerializable
         data class Params(
@@ -61,4 +60,3 @@ object McpSampling {
         ) : HasMeta
     }
 }
-

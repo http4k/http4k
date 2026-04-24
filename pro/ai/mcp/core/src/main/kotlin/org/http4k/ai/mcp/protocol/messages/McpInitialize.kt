@@ -16,12 +16,11 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpInitialize {
-    val Method = McpRpcMethod.of("initialize")
 
     @JsonSerializable
     @PolymorphicLabel("initialize")
     data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpInitialize.Method
+        override val method = McpRpcMethod.of("initialize")
 
         @JsonSerializable
         data class Params(
@@ -45,12 +44,11 @@ object McpInitialize {
     }
 
     data object Initialized {
-        val Method = McpRpcMethod.of("notifications/initialized")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/initialized")
         data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Initialized.Method
+            override val method = McpRpcMethod.of("notifications/initialized")
 
             @JsonSerializable
             data class Params(

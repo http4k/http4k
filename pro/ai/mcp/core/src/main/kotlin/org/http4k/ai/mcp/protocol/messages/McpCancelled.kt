@@ -11,12 +11,11 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpCancelled {
-    val Method = McpRpcMethod.of("notifications/cancelled")
 
     @JsonSerializable
     @PolymorphicLabel("notifications/cancelled")
     data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpCancelled.Method
+        override val method = McpRpcMethod.of("notifications/cancelled")
 
         @JsonSerializable
         data class Params(
@@ -26,4 +25,3 @@ object McpCancelled {
         ) : HasMeta
     }
 }
-

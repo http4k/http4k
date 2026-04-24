@@ -12,12 +12,11 @@ import se.ansman.kotshi.PolymorphicLabel
 
 object McpRoot {
     object List {
-        val Method = McpRpcMethod.of("roots/list")
 
         @JsonSerializable
         @PolymorphicLabel("roots/list")
         data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = List.Method
+            override val method = McpRpcMethod.of("roots/list")
 
             @JsonSerializable
             data class Params(override val _meta: Meta = Meta.default) : HasMeta
@@ -32,12 +31,11 @@ object McpRoot {
     }
 
     data object Changed {
-        val Method = McpRpcMethod.of("notifications/roots/list_changed")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/roots/list_changed")
         data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Changed.Method
+            override val method = McpRpcMethod.of("notifications/roots/list_changed")
 
             @JsonSerializable
             data class Params(override val _meta: Meta = Meta.default) : HasMeta

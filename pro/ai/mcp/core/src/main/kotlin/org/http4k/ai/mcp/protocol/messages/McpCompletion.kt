@@ -14,12 +14,11 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpCompletion {
-    val Method = McpRpcMethod.of("completion/complete")
 
     @JsonSerializable
     @PolymorphicLabel("completion/complete")
     data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpCompletion.Method
+        override val method = McpRpcMethod.of("completion/complete")
 
         @JsonSerializable
         data class Params(

@@ -11,12 +11,11 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpProgress {
-    val Method = of("notifications/progress")
 
     @JsonSerializable
     @PolymorphicLabel("notifications/progress")
     data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpProgress.Method
+        override val method = of("notifications/progress")
 
         @JsonSerializable
         data class Params(

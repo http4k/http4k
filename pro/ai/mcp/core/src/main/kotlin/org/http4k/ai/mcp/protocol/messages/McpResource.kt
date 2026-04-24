@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
@@ -58,12 +57,11 @@ data class McpResource internal constructor(
     ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons, _meta)
 
     object Read {
-        val Method = of("resources/read")
 
         @JsonSerializable
         @PolymorphicLabel("resources/read")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Read.Method
+            override val method = of("resources/read")
 
             @JsonSerializable
             data class Params(
@@ -83,12 +81,11 @@ data class McpResource internal constructor(
     }
 
     object List {
-        val Method = of("resources/list")
 
         @JsonSerializable
         @PolymorphicLabel("resources/list")
         data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = List.Method
+            override val method = of("resources/list")
 
             @JsonSerializable
             data class Params(
@@ -108,12 +105,11 @@ data class McpResource internal constructor(
         }
 
         data object Changed {
-            val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
             @JsonSerializable
             @PolymorphicLabel("notifications/resources/list_changed")
             data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-                override val method = Changed.Method
+                override val method = of("notifications/resources/list_changed")
 
                 @JsonSerializable
                 data class Params(override val _meta: Meta = Meta.default) : HasMeta
@@ -122,12 +118,11 @@ data class McpResource internal constructor(
     }
 
     object ListTemplates {
-        val Method = of("resources/templates/list")
 
         @JsonSerializable
         @PolymorphicLabel("resources/templates/list")
         data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = ListTemplates.Method
+            override val method = of("resources/templates/list")
 
             @JsonSerializable
             data class Params(
@@ -148,12 +143,11 @@ data class McpResource internal constructor(
     }
 
     data object Updated {
-        val Method: McpRpcMethod = of("notifications/resources/updated")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/resources/updated")
         data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Updated.Method
+            override val method = of("notifications/resources/updated")
 
             @JsonSerializable
             data class Params(val uri: Uri, override val _meta: Meta = Meta.default) : HasMeta
@@ -161,12 +155,11 @@ data class McpResource internal constructor(
     }
 
     object Subscribe {
-        val Method = of("resources/subscribe")
 
         @JsonSerializable
         @PolymorphicLabel("resources/subscribe")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Subscribe.Method
+            override val method = of("resources/subscribe")
 
             @JsonSerializable
             data class Params(
@@ -177,12 +170,11 @@ data class McpResource internal constructor(
     }
 
     object Unsubscribe {
-        val Method = of("resources/unsubscribe")
 
         @JsonSerializable
         @PolymorphicLabel("resources/unsubscribe")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Unsubscribe.Method
+            override val method = of("resources/unsubscribe")
 
             @JsonSerializable
             data class Params(

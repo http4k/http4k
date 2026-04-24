@@ -13,12 +13,11 @@ import se.ansman.kotshi.PolymorphicLabel
 
 object McpLogging {
     object SetLevel {
-        val Method = McpRpcMethod.of("logging/setLevel")
 
         @JsonSerializable
         @PolymorphicLabel("logging/setLevel")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = SetLevel.Method
+            override val method = McpRpcMethod.of("logging/setLevel")
 
             @JsonSerializable
             data class Params(
@@ -29,12 +28,11 @@ object McpLogging {
     }
 
     object LoggingMessage {
-        val Method = McpRpcMethod.of("notifications/message")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/message")
         data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = LoggingMessage.Method
+            override val method = McpRpcMethod.of("notifications/message")
 
             @JsonSerializable
             data class Params(

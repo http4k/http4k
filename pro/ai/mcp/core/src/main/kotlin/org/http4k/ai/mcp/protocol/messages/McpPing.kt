@@ -10,12 +10,11 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpPing {
-    val Method = of("ping")
 
     @JsonSerializable
     @PolymorphicLabel("ping")
     data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpPing.Method
+        override val method = of("ping")
 
         @JsonSerializable
         data class Params(override val _meta: Meta = Meta.default) : HasMeta

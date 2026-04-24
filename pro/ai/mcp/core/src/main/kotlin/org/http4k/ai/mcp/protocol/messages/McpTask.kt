@@ -28,12 +28,11 @@ object McpTask {
     }
 
     object Get {
-        val Method = of("tasks/get")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/get")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Get.Method
+            override val method = of("tasks/get")
 
             @JsonSerializable
             data class Params(
@@ -53,12 +52,11 @@ object McpTask {
     }
 
     object Result {
-        val Method = of("tasks/result")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/result")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Result.Method
+            override val method = of("tasks/result")
 
             @JsonSerializable
             data class Params(
@@ -78,12 +76,11 @@ object McpTask {
     }
 
     object Cancel {
-        val Method = of("tasks/cancel")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/cancel")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Cancel.Method
+            override val method = of("tasks/cancel")
 
             @JsonSerializable
             data class Params(
@@ -102,12 +99,11 @@ object McpTask {
     }
 
     object List {
-        val Method = of("tasks/list")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/list")
         data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = List.Method
+            override val method = of("tasks/list")
 
             @JsonSerializable
             data class Params(
@@ -128,12 +124,11 @@ object McpTask {
     }
 
     object Status {
-        val Method = of("notifications/tasks/status")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/tasks/status")
         data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Status.Method
+            override val method = of("notifications/tasks/status")
 
             @JsonSerializable
             data class Params(

@@ -17,12 +17,11 @@ import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpElicitations {
-    val Method = McpRpcMethod.of("elicitation/create")
 
     @JsonSerializable
     @PolymorphicLabel("elicitation/create")
     data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpElicitations.Method
+        override val method = McpRpcMethod.of("elicitation/create")
 
         @JsonSerializable
         @Polymorphic("mode")
@@ -60,12 +59,11 @@ object McpElicitations {
     }
 
     object Complete {
-        val Method = McpRpcMethod.of("notifications/elicitation/complete")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/elicitation/complete")
         data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = Complete.Method
+            override val method = McpRpcMethod.of("notifications/elicitation/complete")
 
             @JsonSerializable
             data class Params(
