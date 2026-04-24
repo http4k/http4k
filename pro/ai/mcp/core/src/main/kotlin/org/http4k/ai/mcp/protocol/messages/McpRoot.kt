@@ -11,8 +11,8 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpRoot {
-    object List : McpRpc {
-        override val Method = McpRpcMethod.of("roots/list")
+    object List {
+        val Method = McpRpcMethod.of("roots/list")
 
         @JsonSerializable
         @PolymorphicLabel("roots/list")
@@ -31,8 +31,8 @@ object McpRoot {
         }
     }
 
-    data object Changed : McpRpc {
-        override val Method = McpRpcMethod.of("notifications/roots/list_changed")
+    data object Changed {
+        val Method = McpRpcMethod.of("notifications/roots/list_changed")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/roots/list_changed")

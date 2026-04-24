@@ -57,8 +57,8 @@ data class McpResource internal constructor(
         _meta: Meta = Meta.default
     ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons, _meta)
 
-    object Read : McpRpc {
-        override val Method = of("resources/read")
+    object Read {
+        val Method = of("resources/read")
 
         @JsonSerializable
         @PolymorphicLabel("resources/read")
@@ -82,8 +82,8 @@ data class McpResource internal constructor(
         }
     }
 
-    object List : McpRpc {
-        override val Method = of("resources/list")
+    object List {
+        val Method = of("resources/list")
 
         @JsonSerializable
         @PolymorphicLabel("resources/list")
@@ -107,8 +107,8 @@ data class McpResource internal constructor(
             ) : PaginatedResponse, HasMeta
         }
 
-        data object Changed : McpRpc {
-            override val Method: McpRpcMethod = of("notifications/resources/list_changed")
+        data object Changed {
+            val Method: McpRpcMethod = of("notifications/resources/list_changed")
 
             @JsonSerializable
             @PolymorphicLabel("notifications/resources/list_changed")
@@ -121,8 +121,8 @@ data class McpResource internal constructor(
         }
     }
 
-    object ListTemplates : McpRpc {
-        override val Method = of("resources/templates/list")
+    object ListTemplates {
+        val Method = of("resources/templates/list")
 
         @JsonSerializable
         @PolymorphicLabel("resources/templates/list")
@@ -147,8 +147,8 @@ data class McpResource internal constructor(
         }
     }
 
-    data object Updated : McpRpc {
-        override val Method: McpRpcMethod = of("notifications/resources/updated")
+    data object Updated {
+        val Method: McpRpcMethod = of("notifications/resources/updated")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/resources/updated")
@@ -160,8 +160,8 @@ data class McpResource internal constructor(
         }
     }
 
-    object Subscribe : McpRpc {
-        override val Method = of("resources/subscribe")
+    object Subscribe {
+        val Method = of("resources/subscribe")
 
         @JsonSerializable
         @PolymorphicLabel("resources/subscribe")
@@ -176,8 +176,8 @@ data class McpResource internal constructor(
         }
     }
 
-    object Unsubscribe : McpRpc {
-        override val Method = of("resources/unsubscribe")
+    object Unsubscribe {
+        val Method = of("resources/unsubscribe")
 
         @JsonSerializable
         @PolymorphicLabel("resources/unsubscribe")

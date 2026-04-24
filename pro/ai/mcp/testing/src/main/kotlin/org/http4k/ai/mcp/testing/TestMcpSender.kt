@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.json
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
@@ -39,8 +38,8 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     private val newEvent = Semaphore(0)
     private var streamThread: Thread? = null
 
-    fun on(mcpRpc: McpRpc, fn: (SseMessage.Event) -> Unit) {
-        outbound.getOrPut(mcpRpc.Method) { mutableListOf() }.add(fn)
+    fun on(method: McpRpcMethod, fn: (SseMessage.Event) -> Unit) {
+        outbound.getOrPut(method) { mutableListOf() }.add(fn)
     }
 
     fun startEventStream() {

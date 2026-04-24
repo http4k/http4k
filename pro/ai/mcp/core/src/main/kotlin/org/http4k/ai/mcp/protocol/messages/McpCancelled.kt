@@ -10,8 +10,8 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpCancelled : McpRpc {
-    override val Method = McpRpcMethod.of("notifications/cancelled")
+object McpCancelled {
+    val Method = McpRpcMethod.of("notifications/cancelled")
 
     @JsonSerializable
     @PolymorphicLabel("notifications/cancelled")

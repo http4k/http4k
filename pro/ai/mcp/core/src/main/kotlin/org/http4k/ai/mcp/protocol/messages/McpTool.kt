@@ -31,8 +31,8 @@ data class McpTool(
     val execution: ToolExecution? = null,
     val _meta: Meta = Meta.default
 ) {
-    object List : McpRpc {
-        override val Method = of("tools/list")
+    object List {
+        val Method = of("tools/list")
 
         @JsonSerializable
         @PolymorphicLabel("tools/list")
@@ -56,8 +56,8 @@ data class McpTool(
             ) : PaginatedResponse, HasMeta
         }
 
-        data object Changed : McpRpc {
-            override val Method: McpRpcMethod = of("notifications/tools/list_changed")
+        data object Changed {
+            val Method: McpRpcMethod = of("notifications/tools/list_changed")
 
             @JsonSerializable
             @PolymorphicLabel("notifications/tools/list_changed")
@@ -70,8 +70,8 @@ data class McpTool(
         }
     }
 
-    object Call : McpRpc {
-        override val Method = of("tools/call")
+    object Call {
+        val Method = of("tools/call")
 
         @JsonSerializable
         @PolymorphicLabel("tools/call")

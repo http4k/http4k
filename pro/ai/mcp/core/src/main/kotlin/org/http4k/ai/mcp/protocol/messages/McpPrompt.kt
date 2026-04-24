@@ -29,8 +29,8 @@ data class McpPrompt(
         val required: Boolean? = null
     )
 
-    object Get : McpRpc {
-        override val Method = of("prompts/get")
+    object Get {
+        val Method = of("prompts/get")
 
         @JsonSerializable
         @PolymorphicLabel("prompts/get")
@@ -56,8 +56,8 @@ data class McpPrompt(
         }
     }
 
-    object List : McpRpc {
-        override val Method = of("prompts/list")
+    object List {
+        val Method = of("prompts/list")
 
         @JsonSerializable
         @PolymorphicLabel("prompts/list")
@@ -79,8 +79,8 @@ data class McpPrompt(
             ) : HasMeta
         }
 
-        object Changed : McpRpc {
-            override val Method: McpRpcMethod = of("notifications/prompts/list_changed")
+        object Changed {
+            val Method: McpRpcMethod = of("notifications/prompts/list_changed")
 
             @JsonSerializable
             @PolymorphicLabel("notifications/prompts/list_changed")

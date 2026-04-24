@@ -29,7 +29,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
     }
 
     init {
-        sender.on(McpSampling) { event ->
+        sender.on(McpSampling.Method) { event ->
             val (id, req) =
                 event.nextEvent<SamplingRequest, McpSampling.Request.Params> {
                     SamplingRequest(

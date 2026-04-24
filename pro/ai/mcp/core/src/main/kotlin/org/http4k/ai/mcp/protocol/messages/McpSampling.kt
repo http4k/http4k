@@ -23,8 +23,8 @@ import org.http4k.ai.model.Temperature
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpSampling : McpRpc {
-    override val Method = McpRpcMethod.of("sampling/createMessage")
+object McpSampling {
+    val Method = McpRpcMethod.of("sampling/createMessage")
 
     @JsonSerializable
     @PolymorphicLabel("sampling/createMessage")

@@ -12,8 +12,8 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpLogging {
-    object SetLevel : McpRpc {
-        override val Method = McpRpcMethod.of("logging/setLevel")
+    object SetLevel {
+        val Method = McpRpcMethod.of("logging/setLevel")
 
         @JsonSerializable
         @PolymorphicLabel("logging/setLevel")
@@ -28,8 +28,8 @@ object McpLogging {
         }
     }
 
-    object LoggingMessage : McpRpc {
-        override val Method = McpRpcMethod.of("notifications/message")
+    object LoggingMessage {
+        val Method = McpRpcMethod.of("notifications/message")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/message")

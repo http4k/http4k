@@ -9,8 +9,8 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpPing : McpRpc {
-    override val Method = of("ping")
+object McpPing {
+    val Method = of("ping")
 
     @JsonSerializable
     @PolymorphicLabel("ping")

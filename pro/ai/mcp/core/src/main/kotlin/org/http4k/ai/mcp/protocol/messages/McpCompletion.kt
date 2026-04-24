@@ -13,8 +13,8 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpCompletion : McpRpc {
-    override val Method = McpRpcMethod.of("completion/complete")
+object McpCompletion {
+    val Method = McpRpcMethod.of("completion/complete")
 
     @JsonSerializable
     @PolymorphicLabel("completion/complete")

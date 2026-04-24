@@ -10,8 +10,8 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpProgress : McpRpc {
-    override val Method = of("notifications/progress")
+object McpProgress {
+    val Method = of("notifications/progress")
 
     @JsonSerializable
     @PolymorphicLabel("notifications/progress")

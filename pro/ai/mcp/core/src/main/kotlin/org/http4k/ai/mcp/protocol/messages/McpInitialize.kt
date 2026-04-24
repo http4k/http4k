@@ -15,8 +15,8 @@ import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpInitialize : McpRpc {
-    override val Method = McpRpcMethod.of("initialize")
+object McpInitialize {
+    val Method = McpRpcMethod.of("initialize")
 
     @JsonSerializable
     @PolymorphicLabel("initialize")
@@ -44,8 +44,8 @@ object McpInitialize : McpRpc {
         ) : HasMeta
     }
 
-    data object Initialized : McpRpc {
-        override val Method = McpRpcMethod.of("notifications/initialized")
+    data object Initialized {
+        val Method = McpRpcMethod.of("notifications/initialized")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/initialized")

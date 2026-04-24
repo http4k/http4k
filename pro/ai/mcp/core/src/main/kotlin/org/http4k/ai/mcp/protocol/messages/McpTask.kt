@@ -27,8 +27,8 @@ object McpTask {
         }
     }
 
-    object Get : McpRpc {
-        override val Method = of("tasks/get")
+    object Get {
+        val Method = of("tasks/get")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/get")
@@ -52,8 +52,8 @@ object McpTask {
         }
     }
 
-    object Result : McpRpc {
-        override val Method = of("tasks/result")
+    object Result {
+        val Method = of("tasks/result")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/result")
@@ -77,8 +77,8 @@ object McpTask {
         }
     }
 
-    object Cancel : McpRpc {
-        override val Method = of("tasks/cancel")
+    object Cancel {
+        val Method = of("tasks/cancel")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/cancel")
@@ -101,8 +101,8 @@ object McpTask {
         }
     }
 
-    object List : McpRpc {
-        override val Method = of("tasks/list")
+    object List {
+        val Method = of("tasks/list")
 
         @JsonSerializable
         @PolymorphicLabel("tasks/list")
@@ -127,8 +127,8 @@ object McpTask {
         }
     }
 
-    object Status : McpRpc {
-        override val Method = of("notifications/tasks/status")
+    object Status {
+        val Method = of("notifications/tasks/status")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/tasks/status")

@@ -16,8 +16,8 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 
-object McpElicitations : McpRpc {
-    override val Method = McpRpcMethod.of("elicitation/create")
+object McpElicitations {
+    val Method = McpRpcMethod.of("elicitation/create")
 
     @JsonSerializable
     @PolymorphicLabel("elicitation/create")
@@ -59,8 +59,8 @@ object McpElicitations : McpRpc {
         ) : HasMeta
     }
 
-    object Complete : McpRpc {
-        override val Method = McpRpcMethod.of("notifications/elicitation/complete")
+    object Complete {
+        val Method = McpRpcMethod.of("notifications/elicitation/complete")
 
         @JsonSerializable
         @PolymorphicLabel("notifications/elicitation/complete")
