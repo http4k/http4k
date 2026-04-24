@@ -154,7 +154,7 @@ class HttpStreamingMcpClient(
                     .filter { it["method"] != null }
                     .forEach { obj ->
                         val message = asA<McpJsonRpcRequest>(compact(obj))
-                        val id = message.id?.let { idVal -> asA<McpMessageId>(compact(McpJson.asJsonObject(idVal))) }
+                        val id = message.id?.let { McpMessageId.of(it.toString().toLong()) }
                         callbacks[message.method]?.any { it(message, id) }
                     }
             }
