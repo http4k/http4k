@@ -7,6 +7,7 @@ package org.http4k.ai.mcp.client.internal
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
+import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ResourceResponse.Ok
@@ -39,59 +40,59 @@ internal class ClientResources(
         register(McpResource.Updated, McpCallback(McpResource.Updated.Notification.Params::class) { notification, _ ->
             subscriptions[notification.uri]?.forEach { it() }
         })
-        id().let { messageId ->
-            sender(
-                McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), messageId),
-                defaultTimeout,
-                messageId
-            )
-        }
+        val messageId = id()
+        sender(
+            McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), messageId),
+            defaultTimeout,
+            messageId
+        )
         subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
     }
 
     override fun unsubscribe(uri: Uri) {
-        id().let { messageId ->
-            sender(
-                McpResource.Unsubscribe.Request(McpResource.Unsubscribe.Request.Params(uri), messageId),
-                defaultTimeout,
-                messageId
-            )
-        }
+        val messageId = id()
+        sender(
+            McpResource.Unsubscribe.Request(McpResource.Unsubscribe.Request.Params(uri), messageId),
+            defaultTimeout,
+            messageId
+        )
         subscriptions -= uri
     }
 
-    override fun list(overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpResource>> {
+        val messageId = id()
+        return sender(
             McpResource.List.Request(McpResource.List.Request.Params(), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpResource.List.Response.Result>() }
+            .map { it.resources }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpResource.List.Response.Result>() }
-        .map { it.resources }
 
-    override fun listTemplates(overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun listTemplates(overrideDefaultTimeout: Duration?): McpResult<List<McpResource>> {
+        val messageId = id()
+        return sender(
             McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpResource.ListTemplates.Response.Result>() }
+            .map { it.resourceTemplates }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpResource.ListTemplates.Response.Result>() }
-        .map { it.resourceTemplates }
 
-    override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
-        id().let { messageId ->
-            sender(
-                McpResource.Read.Request(McpResource.Read.Request.Params(request.uri, request.meta), messageId),
-                overrideDefaultTimeout ?: defaultTimeout,
-                messageId
-            )
-        }
+    override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?): McpResult<ResourceResponse> {
+        val messageId = id()
+        return sender(
+            McpResource.Read.Request(McpResource.Read.Request.Params(request.uri, request.meta), messageId),
+            overrideDefaultTimeout ?: defaultTimeout,
+            messageId
+        )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpResource.Read.Response.Result>() }
             .map { Ok(it.contents) as ResourceResponse }
             .flatMapFailure { toResourceErrorOrFailure(it) }
+    }
 }

@@ -6,6 +6,7 @@ package org.http4k.ai.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.map
+import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
@@ -31,57 +32,60 @@ internal class ClientTasks(
         })
     }
 
-    override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?): McpResult<Task> {
+        val messageId = id()
+        return sender(
             McpTask.Get.Request(McpTask.Get.Request.Params(taskId), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTask.Get.Response.Result>() }
+            .map { it.task }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.Get.Response.Result>() }
-        .map { it.task }
 
-    override fun list(overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun list(overrideDefaultTimeout: Duration?): McpResult<List<Task>> {
+        val messageId = id()
+        return sender(
             McpTask.List.Request(McpTask.List.Request.Params(), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTask.List.Response.Result>() }
+            .map { it.tasks }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.List.Response.Result>() }
-        .map { it.tasks }
 
-    override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?): McpResult<Unit> {
+        val messageId = id()
+        return sender(
             McpTask.Cancel.Request(McpTask.Cancel.Request.Params(taskId), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTask.Cancel.Response.Result>() }
+            .map { }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.Cancel.Response.Result>() }
-        .map { }
 
-    override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?): McpResult<Map<String, Any>> {
+        val messageId = id()
+        return sender(
             McpTask.Result.Request(McpTask.Result.Request.Params(taskId), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTask.Result.Response.ResponseResult>() }
+            .map { it.result }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTask.Result.Response.ResponseResult>() }
-        .map { it.result }
 
     override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) {
-        id().let { messageId ->
-            sender(
-                McpTask.Status.Notification(McpTask.Status.Notification.Params(task, meta), messageId),
-                overrideDefaultTimeout ?: defaultTimeout,
-                messageId
-            )
-        }
+        val messageId = id()
+        sender(
+            McpTask.Status.Notification(McpTask.Status.Notification.Params(task, meta), messageId),
+            overrideDefaultTimeout ?: defaultTimeout,
+            messageId
+        )
     }
 }

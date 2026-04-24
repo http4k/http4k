@@ -7,7 +7,9 @@ package org.http4k.ai.mcp.client.internal
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
+import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.messages.McpRpc
@@ -32,34 +34,35 @@ internal class ClientTools(
         })
     }
 
-    override fun list(overrideDefaultTimeout: Duration?) = id().let { messageId ->
-        sender(
+    override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {
+        val messageId = id()
+        return sender(
             McpTool.List.Request(McpTool.List.Request.Params(), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
             messageId
         )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTool.List.Response.Result>() }
+            .map { it.tools }
     }
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTool.List.Response.Result>() }
-        .map { it.tools }
 
-    override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?) =
-        id().let { messageId ->
-            sender(
-                McpTool.Call.Request(
-                    McpTool.Call.Request.Params(
-                        name,
-                        request.mapValues { McpJson.asJsonObject(it.value) },
-                        request.meta
-                    ),
-                    messageId
+    override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?): McpResult<ToolResponse> {
+        val messageId = id()
+        return sender(
+            McpTool.Call.Request(
+                McpTool.Call.Request.Params(
+                    name,
+                    request.mapValues { McpJson.asJsonObject(it.value) },
+                    request.meta
                 ),
-                overrideDefaultTimeout ?: defaultTimeout,
                 messageId
-            )
-        }
+            ),
+            overrideDefaultTimeout ?: defaultTimeout,
+            messageId
+        )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpTool.Call.Response.Result>() }
             .map { toToolResponseOrError(it) }
             .flatMapFailure { toToolElicitationRequiredOrError(it) }
+    }
 }
