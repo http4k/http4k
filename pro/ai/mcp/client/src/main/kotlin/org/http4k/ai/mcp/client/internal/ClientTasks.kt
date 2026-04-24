@@ -68,7 +68,7 @@ internal class ClientTasks(
             .map { }
     }
 
-    override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?): McpResult<Map<String, Any>> {
+    override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?): McpResult<Map<String, Any>?> {
         val messageId = id()
         return sender(
             McpTask.Result.Request(McpTask.Result.Request.Params(taskId), messageId),
