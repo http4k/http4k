@@ -8,13 +8,13 @@ import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.testing.TestMcpSender
-import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.ai.mcp.testing.toMessage
 
 class TestingRequestProgress(sender: TestMcpSender) : McpClient.RequestProgress {
 
     init {
         sender.on(McpProgress.Notification::class) { event ->
-            listOf(event).asSequence().nextNotification<McpProgress.Notification.Params>(McpProgress.Method)
+            event.toMessage<McpProgress.Notification>().params
                 .also { n -> progress.forEach { it(Progress(n.progressToken, n.progress, n.total, n.description)) } }
         }
     }

@@ -14,7 +14,7 @@ import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.toNotification
+import org.http4k.ai.mcp.testing.toMessage
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.model.ToolName
 import java.time.Duration
@@ -33,7 +33,7 @@ class TestingTools(
      */
     fun expectNotification() =
         sender.lastEvent()
-            .toNotification<McpTool.List.Changed.Notification.Params>(McpTool.List.Changed.Method)
+            .toMessage<McpTool.List.Changed.Notification>().params
             .also { notifications.forEach { it() } }
 
     override fun list(overrideDefaultTimeout: Duration?) =

@@ -12,7 +12,7 @@ import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.toNotification
+import org.http4k.ai.mcp.testing.toMessage
 import java.time.Duration
 
 class TestingTasks(
@@ -26,7 +26,7 @@ class TestingTasks(
 
     fun expectNotification() =
         sender.lastEvent()
-            .toNotification<McpTask.Status.Notification.Params>(McpTask.Status.Method)
+            .toMessage<McpTask.Status.Notification>().params
             .also {
                 it.let { notification ->
                     notifications.forEach { fn ->
