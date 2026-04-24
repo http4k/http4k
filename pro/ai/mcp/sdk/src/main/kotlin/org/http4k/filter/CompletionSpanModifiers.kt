@@ -5,19 +5,19 @@
 package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
+import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
-import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 
-object CompletionSpanModifiers : McpOpenTelemetrySpanModifiers {
-    override val method = McpCompletion.Method
-
-    override fun request(sb: Span, request: McpNodeType) {
-        sb.setAttribute("gen_ai.operation.name", "complete")
-        val ref = McpJson.fields(request).toMap()["ref"] ?: return
-        val refFields = McpJson.fields(ref).toMap()
-        val refLabel = refFields["name"]?.let { McpJson.text(it) }
-            ?: refFields["uri"]?.let { McpJson.text(it) }
-        if (refLabel != null) sb.setAttribute("mcp.completion.ref", refLabel)
+object CompletionSpanModifiers : McpOpenTelemetrySpanModifier {
+    override operator fun invoke(sb: Span, request: McpJsonRpcRequest) {
+        if (request is McpCompletion.Request) {
+            sb.setAttribute("gen_ai.operation.name", "complete")
+            val refLabel = when (val ref = request.params.ref) {
+                is Reference.Prompt -> ref.name
+                is Reference.ResourceTemplate -> ref.uri.toString()
+            }
+            sb.setAttribute("mcp.completion.ref", refLabel)
+        }
     }
 }

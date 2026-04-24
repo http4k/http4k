@@ -43,22 +43,19 @@ import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpPing
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpRoot
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.McpWireNotification
-import org.http4k.ai.mcp.protocol.messages.McpWireRequest
-import org.http4k.ai.mcp.protocol.messages.McpWireResponse
-import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.completions
@@ -74,7 +71,6 @@ import org.http4k.ai.mcp.server.sse.SseMcp
 import org.http4k.ai.mcp.server.sse.SseSessions
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.auto
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.Role
 import org.http4k.ai.model.Role.Companion.Assistant
@@ -92,10 +88,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.MoshiInteger
 import org.http4k.format.MoshiString
-import org.http4k.format.renderError
-import org.http4k.format.renderRequest
-import org.http4k.format.renderResult
-import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.MetaKey
 import org.http4k.lens.int
@@ -138,9 +130,9 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpPing, McpPing.Request.Params())
+            mcp.sendToMcp(McpPing.Request(McpPing.Request.Params(), 1))
 
-            assertNextMessage(ServerMessage.Response.Empty)
+            assertNextMessage(McpJsonRpcEmptyResponse(1))
         }
     }
 
@@ -161,13 +153,13 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpRoot.Changed, McpRoot.Changed.Notification.Params())
+            mcp.sendToMcp(McpRoot.Changed.Notification())
 
-            assertNextMessage(McpRoot.List, McpRoot.List.Request.Params(), McpMessageId.of(7425097216252813))
+            assertNextMessage(McpRoot.List.Request(McpRoot.List.Request.Params(), 7425097216252813))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response.Result(newRoots), McpMessageId.of(7425097216252813))
+            mcp.sendToMcp(McpRoot.List.Response(McpRoot.List.Response.Result(newRoots), 7425097216252813))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -199,7 +191,7 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpCancelled, McpCancelled.Notification.Params(id, "test cancellation"))
+            mcp.sendToMcp(McpCancelled.Notification(McpCancelled.Notification.Params(id, "test cancellation")))
             assertThat(cancelled, equalTo(true))
         }
     }
@@ -232,32 +224,36 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpPrompt.List, McpPrompt.List.Request.Params())
+            mcp.sendToMcp(McpPrompt.List.Request(McpPrompt.List.Request.Params(), 1))
 
             assertNextMessage(
-                McpPrompt.List.Response.Result(
-                    listOf(
-                        McpPrompt(
-                            PromptName.of("prompt"), "description", "title",
-                            listOf(McpPrompt.Argument("name", "description", "title", true)),
-                            icons
+                McpPrompt.List.Response(
+                    McpPrompt.List.Response.Result(
+                        listOf(
+                            McpPrompt(
+                                PromptName.of("prompt"), "description", "title",
+                                listOf(McpPrompt.Argument("name", "description", "title", true)),
+                                icons
+                            )
                         )
-                    )
+                    ), 1
                 )
             )
 
-            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request.Params(prompt.name, mapOf("name" to "123")))
+            mcp.sendToMcp(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(prompt.name, mapOf("name" to "123")), 1))
 
             assertNextMessage(
-                McpPrompt.Get.Response.Result(
-                    listOf(Message(Assistant, Content.Text("321"))),
-                    "description"
+                McpPrompt.Get.Response(
+                    McpPrompt.Get.Response.Result(
+                        listOf(Message(Assistant, Content.Text("321"))),
+                        "description"
+                    ), 1
                 )
             )
 
-            mcp.sendToMcp(McpPrompt.Get, McpPrompt.Get.Request.Params(prompt.name, mapOf("name" to "notAnInt")))
+            mcp.sendToMcp(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(prompt.name, mapOf("name" to "notAnInt")), 1))
 
-            assertNextMessage(InvalidParams)
+            assertNextMessage(McpJsonRpcErrorResponse(1, InvalidParams))
         }
     }
 
@@ -285,40 +281,42 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpResource.List, McpResource.List.Request.Params())
+            mcp.sendToMcp(McpResource.List.Request(McpResource.List.Request.Params(), 1))
 
             assertNextMessage(
-                McpResource.List.Response.Result(
-                    listOf(
-                        McpResource(
-                            resource.uri,
-                            ResourceName.of("HTTP4K"),
-                            "description",
-                            IMAGE_GIF,
-                            Size.of(1),
-                            Annotations(listOf(Assistant), Priority.of(1.0)),
-                            null,
-                            icons
+                McpResource.List.Response(
+                    McpResource.List.Response.Result(
+                        listOf(
+                            McpResource(
+                                resource.uri,
+                                ResourceName.of("HTTP4K"),
+                                "description",
+                                IMAGE_GIF,
+                                Size.of(1),
+                                Annotations(listOf(Assistant), Priority.of(1.0)),
+                                null,
+                                icons
+                            )
                         )
-                    )
+                    ), 1
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(resource.uri))
+            mcp.sendToMcp(McpResource.Read.Request(McpResource.Read.Request.Params(resource.uri), 1))
 
-            assertNextMessage(McpResource.Read.Response.Result(listOf(content)))
+            assertNextMessage(McpResource.Read.Response(McpResource.Read.Response.Result(listOf(content)), 1))
 
-            mcp.sendToMcp(McpResource.Subscribe, McpResource.Subscribe.Request.Params(resource.uri))
+            mcp.sendToMcp(McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(resource.uri), 1))
 
-            assertNextMessage(ServerMessage.Response.Empty)
+            assertNextMessage(McpJsonRpcEmptyResponse(1))
 
             res.triggerUpdated(resource.uri)
 
-            assertNextMessage(McpResource.Updated, McpResource.Updated.Notification.Params(resource.uri))
+            assertNextMessage(McpResource.Updated.Notification(McpResource.Updated.Notification.Params(resource.uri)))
 
-            mcp.sendToMcp(McpResource.Unsubscribe, McpResource.Unsubscribe.Request.Params(resource.uri))
+            mcp.sendToMcp(McpResource.Unsubscribe.Request(McpResource.Unsubscribe.Request.Params(resource.uri), 1))
 
-            assertNextMessage(ServerMessage.Response.Empty)
+            assertNextMessage(McpJsonRpcEmptyResponse(1))
 
             res.triggerUpdated(resource.uri)
 
@@ -354,49 +352,53 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpResource.List, McpResource.List.Request.Params())
+            mcp.sendToMcp(McpResource.List.Request(McpResource.List.Request.Params(), 1))
 
-            assertNextMessage(McpResource.List.Response.Result(listOf()))
+            assertNextMessage(McpResource.List.Response(McpResource.List.Response.Result(listOf()), 1))
 
-            mcp.sendToMcp(McpResource.ListTemplates, McpResource.ListTemplates.Request.Params(null))
+            mcp.sendToMcp(McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(null), 1))
 
             assertNextMessage(
-                McpResource.ListTemplates.Response.Result(
-                    listOf(
-                        McpResource(
-                            resource.uriTemplate,
-                            ResourceName.of("HTTP4K"),
-                            "description",
-                            IMAGE_GIF,
-                            Size.of(1),
-                            Annotations(listOf(Assistant), Priority.of(1.0)),
-                            null,
-                            icons
+                McpResource.ListTemplates.Response(
+                    McpResource.ListTemplates.Response.Result(
+                        listOf(
+                            McpResource(
+                                resource.uriTemplate,
+                                ResourceName.of("HTTP4K"),
+                                "description",
+                                IMAGE_GIF,
+                                Size.of(1),
+                                Annotations(listOf(Assistant), Priority.of(1.0)),
+                                null,
+                                icons
+                            )
                         )
-                    )
+                    ), 1
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(Uri.of("https://www.http4k.org/bob")))
+            mcp.sendToMcp(McpResource.Read.Request(McpResource.Read.Request.Params(Uri.of("https://www.http4k.org/bob")), 1))
 
             assertNextMessage(
-                McpResource.Read.Response.Result(
-                    listOf(
-                        Resource.Content.Blob(
-                            Base64Blob.encode("image"),
-                            Uri.of("https://www.http4k.org/bob")
+                McpResource.Read.Response(
+                    McpResource.Read.Response.Result(
+                        listOf(
+                            Resource.Content.Blob(
+                                Base64Blob.encode("image"),
+                                Uri.of("https://www.http4k.org/bob")
+                            )
                         )
-                    )
+                    ), 1
                 )
             )
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(Uri.of("https://not-http4k/bob")))
+            mcp.sendToMcp(McpResource.Read.Request(McpResource.Read.Request.Params(Uri.of("https://not-http4k/bob")), 1))
 
-            assertNextMessage(InvalidParams)
+            assertNextMessage(McpJsonRpcErrorResponse(1, InvalidParams))
 
-            mcp.sendToMcp(McpResource.Read, McpResource.Read.Request.Params(Uri.of("otherprotocol://www.http4k.org/bob")))
+            mcp.sendToMcp(McpResource.Read.Request(McpResource.Read.Request.Params(Uri.of("otherprotocol://www.http4k.org/bob")), 1))
 
-            assertNextMessage(InvalidParams)
+            assertNextMessage(McpJsonRpcErrorResponse(1, InvalidParams))
         }
     }
 
@@ -443,93 +445,100 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            mcp.sendToMcp(McpTool.List, McpTool.List.Request.Params())
+            mcp.sendToMcp(McpTool.List.Request(McpTool.List.Request.Params(), 1))
 
             assertNextMessage(
-                McpTool.List.Response.Result(
-                    listOf(
-                        McpTool(
-                            ToolName.of("unstructured"), "description", "title",
-                            mapOf(
-                                "type" to "object",
-                                "required" to listOf("foo"),
-                                "properties" to mapOf(
-                                    "foo" to mapOf("type" to "string", "description" to "description1"),
-                                    "bar" to mapOf("type" to "integer", "description" to "description2")
-                                )
-                            ),
-                            null,
-                            null,
-                            icons
-                        ),
-                        McpTool(
-                            ToolName.of("structured"), "description", "title",
-                            mapOf(
-                                "type" to "object",
-                                "required" to listOf<String>(),
-                                "properties" to emptyMap<String, Any>()
-                            ),
-                            mapOf(
-                                "properties" to mapOf(
-                                    "foo" to mapOf(
-                                        "example" to "bar",
-                                        "type" to "string",
-                                        "nullable" to false
-                                    ),
+                McpTool.List.Response(
+                    McpTool.List.Response.Result(
+                        listOf(
+                            McpTool(
+                                ToolName.of("unstructured"), "description", "title",
+                                mapOf(
+                                    "type" to "object",
+                                    "required" to listOf("foo"),
+                                    "properties" to mapOf(
+                                        "foo" to mapOf("type" to "string", "description" to "description1"),
+                                        "bar" to mapOf("type" to "integer", "description" to "description2")
+                                    )
                                 ),
-                                "example" to mapOf("foo" to "bar"),
-                                "type" to "object",
-                                "required" to listOf("foo")
+                                null,
+                                null,
+                                icons
                             ),
-                            null,
-                            icons
+                            McpTool(
+                                ToolName.of("structured"), "description", "title",
+                                mapOf(
+                                    "type" to "object",
+                                    "required" to listOf<String>(),
+                                    "properties" to emptyMap<String, Any>()
+                                ),
+                                mapOf(
+                                    "properties" to mapOf(
+                                        "foo" to mapOf(
+                                            "example" to "bar",
+                                            "type" to "string",
+                                            "nullable" to false
+                                        ),
+                                    ),
+                                    "example" to mapOf("foo" to "bar"),
+                                    "type" to "object",
+                                    "required" to listOf("foo")
+                                ),
+                                null,
+                                icons
+                            )
                         )
-                    )
+                    ), 1
                 )
             )
 
             val progressToken = "123"
 
             mcp.sendToMcp(
-                McpTool.Call,
-                McpTool.Call.Request.Params(
-                    unstructuredTool.name,
-                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(MetaKey.progressToken<String>().toLens() of progressToken)
+                McpTool.Call.Request(
+                    McpTool.Call.Request.Params(
+                        unstructuredTool.name,
+                        mapOf("foo" to MoshiString("foo"), "bar" to MoshiInteger(123)), Meta(MetaKey.progressToken<String>().toLens() of progressToken)
+                    ), 1
                 )
             )
 
-            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 1, 5.0, "d1"))
-            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 2, 5.0, "d2"))
-            assertNextMessage(McpTool.Call.Response.Result(listOf(content, Content.Text("foo123"))))
+            assertNextMessage(McpProgress.Notification(McpProgress.Notification.Params(progressToken, 1, 5.0, "d1")))
+            assertNextMessage(McpProgress.Notification(McpProgress.Notification.Params(progressToken, 2, 5.0, "d2")))
+            assertNextMessage(McpTool.Call.Response(McpTool.Call.Response.Result(listOf(content, Content.Text("foo123"))), 1))
 
             val progress2 = "123"
 
             mcp.sendToMcp(
-                McpTool.Call,
-                McpTool.Call.Request.Params(
-                    unstructuredTool.name,
-                    mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
-                    Meta(MetaKey.progressToken<String>().toLens() of progress2)
+                McpTool.Call.Request(
+                    McpTool.Call.Request.Params(
+                        unstructuredTool.name,
+                        mapOf("foo" to MoshiString("foo"), "bar" to MoshiString("notAnInt")),
+                        Meta(MetaKey.progressToken<String>().toLens() of progress2)
+                    ), 1
                 )
             )
 
-            assertNextMessage(InvalidParams)
+            assertNextMessage(McpJsonRpcErrorResponse(1, InvalidParams))
 
             mcp.sendToMcp(
-                McpTool.Call,
-                McpTool.Call.Request.Params(structuredTool.name, mapOf(), Meta(MetaKey.progressToken<String>().toLens() of progress2))
+                McpTool.Call.Request(
+                    McpTool.Call.Request.Params(structuredTool.name, mapOf(), Meta(MetaKey.progressToken<String>().toLens() of progress2)), 1
+                )
             )
 
             assertNextMessage(
-                McpTool.Call.Response.Result(
-                    listOf(Content.Text("""{"foo":"bar"}""")),
-                    mapOf("foo" to "bar"),
+                McpTool.Call.Response(
+                    McpTool.Call.Response.Result(
+                        listOf(Content.Text("""{"foo":"bar"}""")),
+                        mapOf("foo" to "bar"),
+                    ), 1
                 )
             )
 
             tools.items = emptyList()
 
-            assertNextMessage(McpTool.List.Changed, McpTool.List.Changed.Notification.Params())
+            assertNextMessage(McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params()))
         }
     }
 
@@ -550,15 +559,16 @@ class McpProtocolTest {
             assertInitializeLoop(mcp)
             logger.log(Session(firstDeterministicSessionId), McpJson.string("hello"), LogLevel.info, "message")
 
-            mcp.sendToMcp(McpLogging.SetLevel, McpLogging.SetLevel.Request.Params(LogLevel.debug))
+            mcp.sendToMcp(McpLogging.SetLevel.Request(McpLogging.SetLevel.Request.Params(LogLevel.debug), 1))
 
-            assertNextMessage(ServerMessage.Response.Empty)
+            assertNextMessage(McpJsonRpcEmptyResponse(1))
 
             logger.log(Session(firstDeterministicSessionId), McpJson.string("hello"), LogLevel.info)
 
             assertNextMessage(
-                McpLogging.LoggingMessage,
-                McpLogging.LoggingMessage.Notification.Params(McpJson.string("hello"), LogLevel.info)
+                McpLogging.LoggingMessage.Notification(
+                    McpLogging.LoggingMessage.Notification.Params(McpJson.string("hello"), LogLevel.info)
+                )
             )
         }
     }
@@ -593,18 +603,19 @@ class McpProtocolTest {
             val progressToken = "progress"
 
             mcp.sendToMcp(
-                McpCompletion,
-                McpCompletion.Request.Params(
-                    ref, CompletionArgument("arg", "value"),
-                    CompletionContext(mapOf("foo" to "bar")),
-                    Meta(MetaKey.progressToken<String>().toLens() of progressToken)
+                McpCompletion.Request(
+                    McpCompletion.Request.Params(
+                        ref, CompletionArgument("arg", "value"),
+                        CompletionContext(mapOf("foo" to "bar")),
+                        Meta(MetaKey.progressToken<String>().toLens() of progressToken)
+                    ), 1
                 )
             )
 
-            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 1, 5.0, "d1"))
-            assertNextMessage(McpProgress, McpProgress.Notification.Params(progressToken, 2, 5.0, "d2"))
+            assertNextMessage(McpProgress.Notification(McpProgress.Notification.Params(progressToken, 1, 5.0, "d1")))
+            assertNextMessage(McpProgress.Notification(McpProgress.Notification.Params(progressToken, 2, 5.0, "d2")))
 
-            assertNextMessage(McpCompletion.Response.Result(Completion(listOf("values"), 1, true)))
+            assertNextMessage(McpCompletion.Response(McpCompletion.Response.Result(Completion(listOf("values"), 1, true)), 1))
         }
     }
 
@@ -651,11 +662,9 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            with(McpJson) {
-                mcp.sendToMcp(renderRequest(McpTool.List, McpTool.List.Request.Params()))
+            mcp.sendToMcp(McpTool.List.Request(McpTool.List.Request.Params(), 1))
 
-                approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
-            }
+            approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
         }
     }
 
@@ -696,20 +705,18 @@ class McpProtocolTest {
         with(mcp.testSseClient(Request(GET, "/sse"))) {
             assertInitializeLoop(mcp)
 
-            with(McpJson) {
-                mcp.sendToMcp(
-                    renderRequest(
-                        McpTool.Call, McpTool.Call.Request.Params(
-                            tool.name,
-                            mapOf(
-                                objectValueArg.meta.name to asJsonObject(example),
-                                listObjectValueArg.meta.name to asJsonObject(listOf(Bar("123"))),
-                            )
+            mcp.sendToMcp(
+                McpTool.Call.Request(
+                    McpTool.Call.Request.Params(
+                        tool.name,
+                        mapOf(
+                            objectValueArg.meta.name to McpJson.asJsonObject(example),
+                            listObjectValueArg.meta.name to McpJson.asJsonObject(listOf(Bar("123"))),
                         )
-                    )
+                    ), 1
                 )
-                approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
-            }
+            )
+            approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
         }
     }
 
@@ -722,52 +729,26 @@ class McpProtocolTest {
         )
 
         mcp.sendToMcp(
-            McpInitialize, McpInitialize.Request.Params(
-                VersionedMcpEntity(clientName, Version.of("1")),
-                ClientCapabilities(), LATEST_VERSION
+            McpInitialize.Request(
+                McpInitialize.Request.Params(
+                    VersionedMcpEntity(clientName, Version.of("1")),
+                    ClientCapabilities(), LATEST_VERSION
+                ), 1
             )
         )
 
         assertNextMessage(
-            McpInitialize.Response.Result(metadata.entity, metadata.capabilities, LATEST_VERSION, metadata.instructions)
+            McpInitialize.Response(
+                McpInitialize.Response.Result(metadata.entity, metadata.capabilities, LATEST_VERSION, metadata.instructions), 1
+            )
         )
 
-        mcp.sendToMcp(McpInitialize.Initialized, McpInitialize.Initialized.Notification.Params())
+        mcp.sendToMcp(McpInitialize.Initialized.Notification())
     }
 
-    private fun TestSseClient.assertNextMessage(error: ErrorMessage) {
-        assertNextMessage(with(McpJson) { renderError(error, number(1)) })
-    }
-
-    private fun TestSseClient.assertNextMessage(input: McpWireResponse) {
-        assertNextMessage(with(McpJson) { renderResult(asJsonObject(input), number(1)) })
-    }
-
-    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, notification: McpWireNotification) {
-        assertNextMessage(with(McpJson) {
-            renderRequest(
-                hasMethod.Method.value,
-                asJsonObject(notification),
-                nullNode()
-            )
-        })
-    }
-
-    private fun TestSseClient.assertNextMessage(hasMethod: McpRpc, input: McpWireRequest, id: Any) {
-        assertNextMessage(with(McpJson) {
-            renderRequest(
-                hasMethod.Method.value,
-                asJsonObject(input),
-                asJsonObject(id)
-            )
-        })
-    }
-
-    private var inboundCounter = 1
-
-    private fun TestSseClient.assertNextMessage(node: McpNodeType) {
+    private fun TestSseClient.assertNextMessage(input: McpJsonRpcMessage) {
         val received = received().first() as SseMessage.Event
-        val expectedData = with(McpJson) { compact(node) }
+        val expectedData = McpJson.asFormatString(input)
         assertThat(
             with(McpJson) { parse(received.data) },
             equalTo(with(McpJson) { parse(expectedData) })
@@ -775,27 +756,11 @@ class McpProtocolTest {
     }
 }
 
-private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Request) =
-    sendToMcp(with(McpJson) { renderRequest(hasMethod, input) })
-
-fun McpJson.renderRequest(hasMethod: McpRpc, input: ClientMessage.Request, id: Int = 1) =
-    renderRequest(hasMethod.Method.value, asJsonObject(input), number(id))
-
-private fun PolyHandler.sendToMcp(hasMethod: ClientMessage.Response, id: Any) =
-    sendToMcp(with(McpJson) {
-        renderResult(asJsonObject(hasMethod), asJsonObject(id))
-    })
-
-var outboundMessageCounter = 0
-private fun PolyHandler.sendToMcp(hasMethod: McpRpc, input: ClientMessage.Notification) =
-    sendToMcp(with(McpJson) {
-        renderRequest(hasMethod.Method.value, asJsonObject(input), number(outboundMessageCounter++))
-    })
-
-private fun PolyHandler.sendToMcp(body: McpNodeType) =
+private fun PolyHandler.sendToMcp(input: McpJsonRpcMessage) =
     assertThat(
         http!!(
-            Request(POST, "/message?sessionId=$firstDeterministicSessionId").body(McpJson.compact(body))
+            Request(POST, "/message?sessionId=$firstDeterministicSessionId")
+                .body(McpJson.asFormatString(input))
         ).status.successful, equalTo(true)
     )
 

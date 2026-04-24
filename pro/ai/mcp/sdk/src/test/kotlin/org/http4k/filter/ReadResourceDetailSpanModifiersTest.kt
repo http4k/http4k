@@ -9,10 +9,8 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Uri
-import org.http4k.format.renderResult
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
@@ -27,8 +25,11 @@ class ReadResourceDetailSpanModifiersTest {
 
     @Test
     fun `sets result from response`(approver: Approver) {
-        val response = McpResource.Read.Response.Result(listOf(Resource.Content.Text("article content", Uri.of("docs://test"))))
-        ReadResourceDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
+        val response = McpResource.Read.Response(
+            McpResource.Read.Response.Result(listOf(Resource.Content.Text("article content", Uri.of("docs://test")))),
+            id = 1
+        )
+        ReadResourceDetailSpanModifiers(span, response)
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.resource.result"))!!, APPLICATION_JSON)
     }

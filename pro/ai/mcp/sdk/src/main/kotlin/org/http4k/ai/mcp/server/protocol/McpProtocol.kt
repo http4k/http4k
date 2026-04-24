@@ -347,7 +347,7 @@ class McpProtocol<Transport>(
     }
 
     private fun clientFor(session: Session): SessionBasedClient = SessionBasedClient(
-        { sessions.request(ClientCall(session), it) },
+        { sessions.request(ClientCall(session), asJsonObject(it)) },
         session,
         logger,
         tasks,

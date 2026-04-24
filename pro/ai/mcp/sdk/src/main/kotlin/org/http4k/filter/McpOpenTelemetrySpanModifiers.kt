@@ -5,11 +5,10 @@
 package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
-import org.http4k.ai.mcp.protocol.McpRpcMethod
-import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 
-interface McpOpenTelemetrySpanModifiers {
-    val method: McpRpcMethod
-    fun request(sb: Span, request: McpNodeType) {}
-    fun response(sb: Span, response: McpNodeType) {}
+interface McpOpenTelemetrySpanModifier {
+    operator fun invoke(sb: Span, request: McpJsonRpcRequest) {}
+    operator fun invoke(sb: Span, response: McpJsonRpcResponse) {}
 }

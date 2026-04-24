@@ -26,7 +26,7 @@ class TestingTasks(
 
     fun expectNotification() =
         sender.lastEvent()
-            .toNotification<McpTask.Status.Notification.Params>(McpTask.Status)
+            .toNotification<McpTask.Status.Notification.Params>(McpTask.Status.Method)
             .also {
                 it.let { notification ->
                     notifications.forEach { fn ->
@@ -39,26 +39,26 @@ class TestingTasks(
             }
 
     override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-        sender(McpTask.Get, McpTask.Get.Request.Params(taskId)).first()
+        sender(McpTask.Get.Request(McpTask.Get.Request.Params(taskId), sender.nextId())).first()
             .nextEvent<Task, McpTask.Get.Response.Result> { task }
             .map { it.second }
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpTask.List, McpTask.List.Request.Params()).first()
+        sender(McpTask.List.Request(McpTask.List.Request.Params(), sender.nextId())).first()
             .nextEvent<List<Task>, McpTask.List.Response.Result> { tasks }
             .map { it.second }
 
     override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-        sender(McpTask.Cancel, McpTask.Cancel.Request.Params(taskId)).first()
+        sender(McpTask.Cancel.Request(McpTask.Cancel.Request.Params(taskId), sender.nextId())).first()
             .nextEvent<Unit, McpTask.Cancel.Response.Result> { }
             .map { it.second }
 
     override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-        sender(McpTask.Result, McpTask.Result.Request.Params(taskId)).first()
+        sender(McpTask.Result.Request(McpTask.Result.Request.Params(taskId), sender.nextId())).first()
             .nextEvent<Map<String, Any>?, McpTask.Result.Response.ResponseResult> { result }
             .map { it.second }
 
     override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) {
-        sender(McpTask.Status, McpTask.Status.Notification.Params(task, meta)).toList()
+        sender(McpTask.Status.Notification(McpTask.Status.Notification.Params(task, meta))).toList()
     }
 }

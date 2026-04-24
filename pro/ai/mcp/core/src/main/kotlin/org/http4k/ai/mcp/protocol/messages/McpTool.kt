@@ -43,7 +43,7 @@ data class McpTool(
             data class Params(
                 override val cursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta, PaginatedRequest
+            ) : HasMeta, PaginatedRequest
         }
 
         @JsonSerializable
@@ -53,7 +53,7 @@ data class McpTool(
                 val tools: kotlin.collections.List<McpTool>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, PaginatedResponse, HasMeta
+            ) : PaginatedResponse, HasMeta
         }
 
         data object Changed : McpRpc {
@@ -65,7 +65,7 @@ data class McpTool(
                 override val method = Changed.Method
 
                 @JsonSerializable
-                data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Notification
+                data class Params(override val _meta: Meta = Meta.default) : HasMeta
             }
         }
     }
@@ -84,7 +84,7 @@ data class McpTool(
                 val arguments: Map<String, MoshiNode> = emptyMap(),
                 override val _meta: Meta = Meta.default,
                 val task: TaskMeta? = null
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -96,7 +96,7 @@ data class McpTool(
                 val isError: Boolean? = false,
                 val task: Task? = null,
                 override val _meta: Meta = Meta.default,
-            ) : ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 }

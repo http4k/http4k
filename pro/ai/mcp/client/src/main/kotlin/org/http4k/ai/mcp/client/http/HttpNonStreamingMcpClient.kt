@@ -49,7 +49,6 @@ import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
@@ -199,7 +198,7 @@ class HttpNonStreamingMcpClient(
 
     override fun close() {}
 
-    private inline fun <reified T : ServerMessage> HttpHandler.send(message: McpJsonRpcRequest): McpResult<T> {
+    private inline fun <reified T : Any> HttpHandler.send(message: McpJsonRpcRequest): McpResult<T> {
         val response = this(
             message.toHttpRequest(protocolVersion, baseUri)
                 .with(Header.MCP_SESSION_ID of sessionId)

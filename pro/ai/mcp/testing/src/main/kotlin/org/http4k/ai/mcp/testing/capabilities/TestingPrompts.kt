@@ -31,13 +31,12 @@ class TestingPrompts(
      */
     fun expectNotification() {
         sender.lastEvent()
-            .toNotification<McpPrompt.List.Changed.Notification.Params>(McpPrompt.List.Changed)
+            .toNotification<McpPrompt.List.Changed.Notification.Params>(McpPrompt.List.Changed.Method)
             .also { notifications.forEach { it() } }
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpPrompt.List,
-        McpPrompt.List.Request.Params()
+        McpPrompt.List.Request(McpPrompt.List.Request.Params(), sender.nextId())
     ).first()
         .nextEvent<List<McpPrompt>, McpPrompt.List.Response.Result> { prompts }.map { it.second }
 
@@ -45,7 +44,7 @@ class TestingPrompts(
         name: PromptName,
         request: PromptRequest,
         overrideDefaultTimeout: Duration?
-    ) = sender(McpPrompt.Get, McpPrompt.Get.Request.Params(name, request, request.meta)).first()
+    ) = sender(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request, request.meta), sender.nextId())).first()
         .nextEvent<PromptResponse, McpPrompt.Get.Response.Result> { PromptResponse.Ok(messages, description) }
         .map { it.second }
         .flatMapFailure { toPromptErrorOrFailure(it) }

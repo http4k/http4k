@@ -10,7 +10,8 @@ import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
-import org.http4k.ai.mcp.util.McpJson.asJsonObject
+import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.model.ToolName
 import org.junit.jupiter.api.Test
 
 class CallToolSpanModifiersTest {
@@ -20,7 +21,7 @@ class CallToolSpanModifiersTest {
 
     @Test
     fun `sets request attributes on span`() {
-        CallToolSpanModifiers.request(span, asJsonObject(mapOf("name" to "my-tool")))
+        CallToolSpanModifiers(span, McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("my-tool")), id = 1))
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("execute_tool"))
         assertThat(spanData.attributes.get(stringKey("gen_ai.tool.name")), equalTo("my-tool"))
@@ -28,7 +29,7 @@ class CallToolSpanModifiersTest {
 
     @Test
     fun `sets error attributes on response with isError`() {
-        CallToolSpanModifiers.response(span, asJsonObject(mapOf("result" to mapOf("isError" to true))))
+        CallToolSpanModifiers(span, McpTool.Call.Response(McpTool.Call.Response.Result(isError = true), id = 1))
 
         assertThat(spanData.status.statusCode, equalTo(ERROR))
         assertThat(spanData.attributes.get(stringKey("error.type")), equalTo("tool_error"))

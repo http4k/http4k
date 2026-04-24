@@ -21,11 +21,12 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -33,7 +34,6 @@ import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -200,8 +200,8 @@ class McpOpenTelemetryTracingTest {
         val filter = McpFilters.OpenTelemetryTracing(
             openTelemetry = openTelemetry,
             spanModifiers = listOf(
-                spanModifier("request-attr-key-1" to "request-attr-value-1", "response-attr-key-1" to "response-attr-value-1", McpTool.Call.Method),
-                spanModifier("request-attr-key-2" to "request-attr-value-2", "response-attr-key-2" to "response-attr-value-2", McpTool.Call.Method),
+                spanModifier("request-attr-key-1" to "request-attr-value-1", "response-attr-key-1" to "response-attr-value-1"),
+                spanModifier("request-attr-key-2" to "request-attr-value-2", "response-attr-key-2" to "response-attr-value-2"),
             )
         )
         val handler = filter.then {
@@ -229,15 +229,12 @@ class McpOpenTelemetryTracingTest {
     private fun spanModifier(
         requestAttribute: Pair<String, String>,
         responseAttribute: Pair<String, String>,
-        method: McpRpcMethod = McpTool.Call.Method
-    ) = object : McpOpenTelemetrySpanModifiers {
-        override val method: McpRpcMethod = method
-
-        override fun request(sb: Span, request: McpNodeType) {
+    ) = object : McpOpenTelemetrySpanModifier {
+        override operator fun invoke(sb: Span, request: McpJsonRpcRequest) {
             sb.setAttribute(requestAttribute.first, requestAttribute.second)
         }
 
-        override fun response(sb: Span, response: McpNodeType) {
+        override operator fun invoke(sb: Span, response: McpJsonRpcResponse) {
             sb.setAttribute(responseAttribute.first, responseAttribute.second)
         }
     }

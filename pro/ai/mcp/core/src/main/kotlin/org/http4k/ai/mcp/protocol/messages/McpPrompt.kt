@@ -42,7 +42,7 @@ data class McpPrompt(
                 val name: PromptName,
                 val arguments: Map<String, String> = emptyMap(),
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -52,7 +52,7 @@ data class McpPrompt(
                 val messages: kotlin.collections.List<Message>,
                 val description: String? = null,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -67,7 +67,7 @@ data class McpPrompt(
             @JsonSerializable
             data class Params(
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -76,7 +76,7 @@ data class McpPrompt(
             data class Result(
                 val prompts: kotlin.collections.List<McpPrompt>,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
 
         object Changed : McpRpc {
@@ -88,7 +88,7 @@ data class McpPrompt(
                 override val method = Changed.Method
 
                 @JsonSerializable
-                data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Notification
+                data class Params(override val _meta: Meta = Meta.default) : HasMeta
             }
         }
     }

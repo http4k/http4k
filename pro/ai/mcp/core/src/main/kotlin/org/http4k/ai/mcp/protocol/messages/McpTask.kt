@@ -23,7 +23,7 @@ object McpTask {
             data class Result(
                 val task: Task,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Response, ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -39,7 +39,7 @@ object McpTask {
             data class Params(
                 val taskId: TaskId,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, ServerMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -48,7 +48,7 @@ object McpTask {
             data class Result(
                 val task: Task,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Response, ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -64,7 +64,7 @@ object McpTask {
             data class Params(
                 val taskId: TaskId,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, ServerMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -73,7 +73,7 @@ object McpTask {
             data class ResponseResult(
                 val result: Map<String, Any>?,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Response, ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -89,7 +89,7 @@ object McpTask {
             data class Params(
                 val taskId: TaskId,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, ServerMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -97,7 +97,7 @@ object McpTask {
             @JsonSerializable
             data class Result(
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Response, ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -113,7 +113,7 @@ object McpTask {
             data class Params(
                 override val cursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, ServerMessage.Request, HasMeta, PaginatedRequest
+            ) : HasMeta, PaginatedRequest
         }
 
         @JsonSerializable
@@ -123,7 +123,7 @@ object McpTask {
                 val tasks: kotlin.collections.List<Task>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Response, ServerMessage.Response, HasMeta, PaginatedResponse
+            ) : HasMeta, PaginatedResponse
         }
     }
 
@@ -145,7 +145,7 @@ object McpTask {
                 val ttl: TimeToLive? = null,
                 val pollInterval: Int? = null,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta {
+            ) : HasMeta {
                 constructor(task: Task, meta: Meta = Meta.default) : this(
                     task.taskId, task.status, task.statusMessage,
                     task.createdAt, task.lastUpdatedAt, task.ttl, task.pollInterval, meta

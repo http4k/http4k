@@ -20,14 +20,14 @@ object McpRoot {
             override val method = List.Method
 
             @JsonSerializable
-            data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Request, HasMeta
+            data class Params(override val _meta: Meta = Meta.default) : HasMeta
         }
 
         @JsonSerializable
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
             @JsonSerializable
             data class Result(val roots: kotlin.collections.List<Root>, override val _meta: Meta = Meta.default) :
-                ClientMessage.Response, HasMeta
+                HasMeta
         }
     }
 
@@ -40,7 +40,7 @@ object McpRoot {
             override val method = Changed.Method
 
             @JsonSerializable
-            data class Params(override val _meta: Meta = Meta.default) : ClientMessage.Notification
+            data class Params(override val _meta: Meta = Meta.default) : HasMeta
         }
     }
 }

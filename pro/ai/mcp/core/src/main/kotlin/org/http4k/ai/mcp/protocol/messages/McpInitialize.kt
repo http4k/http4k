@@ -29,7 +29,7 @@ object McpInitialize : McpRpc {
             val capabilities: ClientCapabilities = All,
             val protocolVersion: ProtocolVersion = LATEST_VERSION,
             override val _meta: Meta = Meta.default,
-        ) : ClientMessage.Request
+        ) : HasMeta
     }
 
     @JsonSerializable
@@ -41,7 +41,7 @@ object McpInitialize : McpRpc {
             val protocolVersion: ProtocolVersion = LATEST_VERSION,
             val instructions: String? = null,
             override val _meta: Meta = Meta.default,
-        ) : HasMeta, ServerMessage.Response
+        ) : HasMeta
     }
 
     data object Initialized : McpRpc {
@@ -55,7 +55,7 @@ object McpInitialize : McpRpc {
             @JsonSerializable
             data class Params(
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Notification
+            ) : HasMeta
         }
     }
 }

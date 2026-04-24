@@ -58,13 +58,15 @@ class TestMcpClient(
 
     override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response.Result> {
         val initResponse = sender(
-            McpInitialize, McpInitialize.Request.Params(
-                VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
-                clientCapabilities, protocolVersion
+            McpInitialize.Request(
+                McpInitialize.Request.Params(
+                    VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
+                    clientCapabilities, protocolVersion
+                ), sender.nextId()
             )
         )
 
-        sender(McpInitialize.Initialized, McpInitialize.Initialized.Notification.Params()).toList()
+        sender(McpInitialize.Initialized.Notification())
 
         sender.startEventStream()
 

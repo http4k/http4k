@@ -69,7 +69,7 @@ data class McpResource internal constructor(
             data class Params(
                 val uri: Uri,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
 
         @JsonSerializable
@@ -78,7 +78,7 @@ data class McpResource internal constructor(
             data class Result(
                 val contents: kotlin.collections.List<Resource.Content>,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -104,7 +104,7 @@ data class McpResource internal constructor(
                 val resources: kotlin.collections.List<McpResource>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, PaginatedResponse, HasMeta
+            ) : PaginatedResponse, HasMeta
         }
 
         data object Changed : McpRpc {
@@ -116,7 +116,7 @@ data class McpResource internal constructor(
                 override val method = Changed.Method
 
                 @JsonSerializable
-                data class Params(override val _meta: Meta = Meta.default) : ServerMessage.Notification
+                data class Params(override val _meta: Meta = Meta.default) : HasMeta
             }
         }
     }
@@ -133,7 +133,7 @@ data class McpResource internal constructor(
             data class Params(
                 override val cursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, PaginatedRequest, HasMeta
+            ) : PaginatedRequest, HasMeta
         }
 
         @JsonSerializable
@@ -143,7 +143,7 @@ data class McpResource internal constructor(
                 val resourceTemplates: kotlin.collections.List<McpResource>,
                 override val nextCursor: Cursor? = null,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Response, PaginatedResponse, HasMeta
+            ) : PaginatedResponse, HasMeta
         }
     }
 
@@ -156,8 +156,7 @@ data class McpResource internal constructor(
             override val method = Updated.Method
 
             @JsonSerializable
-            data class Params(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification,
-                HasMeta
+            data class Params(val uri: Uri, override val _meta: Meta = Meta.default) : HasMeta
         }
     }
 
@@ -173,7 +172,7 @@ data class McpResource internal constructor(
             data class Params(
                 val uri: Uri,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -189,7 +188,7 @@ data class McpResource internal constructor(
             data class Params(
                 val uri: Uri,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
     }
 

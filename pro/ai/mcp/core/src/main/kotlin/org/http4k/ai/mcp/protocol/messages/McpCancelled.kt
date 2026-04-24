@@ -23,7 +23,7 @@ object McpCancelled : McpRpc {
             val requestId: McpMessageId,
             val reason: String? = null,
             override val _meta: Meta = Meta.default,
-        ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta
+        ) : HasMeta
     }
 }
 

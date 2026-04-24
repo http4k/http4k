@@ -33,7 +33,7 @@ class TestingResources(
      */
     fun expectNotification() =
         sender.lastEvent()
-            .toNotification<McpResource.List.Changed.Notification.Params>(McpResource.List.Changed)
+            .toNotification<McpResource.List.Changed.Notification.Params>(McpResource.List.Changed.Method)
             .also { changeNotifications.forEach { it() } }
 
     /**
@@ -41,26 +41,26 @@ class TestingResources(
      */
     fun expectSubscriptionNotification(uri: Uri) =
         sender.lastEvent()
-            .toNotification<McpResource.Updated.Notification.Params>(McpResource.Updated)
+            .toNotification<McpResource.Updated.Notification.Params>(McpResource.Updated.Method)
             .also {
                 require(it.uri == uri) { "Expected notification for $uri, but got ${it.uri}" }
                 subscriptions[it.uri]?.forEach { it() }
             }
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpResource.List, McpResource.List.Request.Params()).first()
+        sender(McpResource.List.Request(McpResource.List.Request.Params(), sender.nextId())).first()
             .nextEvent<List<McpResource>, McpResource.List.Response.Result> {
                  resources
             }.map { it.second }
 
     override fun listTemplates(overrideDefaultTimeout: Duration?) =
-        sender(McpResource.ListTemplates, McpResource.ListTemplates.Request.Params()).first()
+        sender(McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), sender.nextId())).first()
             .nextEvent<List<McpResource>, McpResource.ListTemplates.Response.Result> {
                  resourceTemplates
             }.map { it.second }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
-        sender(McpResource.Read, McpResource.Read.Request.Params(request.uri, request.meta)).first()
+        sender(McpResource.Read.Request(McpResource.Read.Request.Params(request.uri, request.meta), sender.nextId())).first()
             .nextEvent<ResourceResponse, McpResource.Read.Response.Result>( {
                 ResourceResponse.Ok(contents)
             })
@@ -69,12 +69,12 @@ class TestingResources(
 
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
-        sender(McpResource.Subscribe, McpResource.Subscribe.Request.Params(uri))
+        sender(McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), sender.nextId()))
         subscriptions.getOrPut(uri, ::mutableListOf).add(fn)
     }
 
     override fun unsubscribe(uri: Uri) {
-        sender(McpResource.Unsubscribe, McpResource.Unsubscribe.Request.Params(uri))
+        sender(McpResource.Unsubscribe.Request(McpResource.Unsubscribe.Request.Params(uri), sender.nextId()))
         subscriptions -= uri
     }
 }

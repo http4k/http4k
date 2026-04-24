@@ -25,6 +25,6 @@ object McpProgress : McpRpc {
             val total: Double?,
             val description: String?,
             override val _meta: Meta = Meta.default
-        ) : ServerMessage.Notification, ClientMessage.Notification, HasMeta
+        ) : HasMeta
     }
 }

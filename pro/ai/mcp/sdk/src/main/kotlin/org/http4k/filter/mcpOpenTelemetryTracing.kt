@@ -12,6 +12,7 @@ import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
@@ -26,19 +27,15 @@ import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
  */
 fun McpFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
-    spanModifiers: List<McpOpenTelemetrySpanModifiers> = defaultMcpOtelSpanModifiers
+    spanModifiers: List<McpOpenTelemetrySpanModifier> = defaultMcpOtelSpanModifiers
 ): McpFilter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
-
-    val spanModifierMap = spanModifiers.groupBy { it.method }
 
     return McpFilter { next ->
         { req ->
             val method = req.message.method
             val rawParams = McpJson.fields(parse(req.http.bodyString())).toMap()["params"]
-
-            val spanModifiers = spanModifierMap[method]
 
             val transportSpan = Span.current()
 
@@ -66,14 +63,16 @@ fun McpFilters.OpenTelemetryTracing(
                 }
                 .startSpan()
 
-            spanModifiers?.forEach { it.request(span, rawParams ?: McpJson.obj()) }
+            spanModifiers.forEach { it(span, req.message) }
 
             try {
                 span.makeCurrent().use { next(req) }
                     .also { resp ->
                         if (resp is McpResponse.Ok) {
-                            val responseNode = McpJson.asJsonObject(resp.message)
-                            spanModifiers?.forEach { it.response(span, responseNode) }
+                            val message = resp.message
+                            if (message is McpJsonRpcResponse) {
+                                spanModifiers.forEach { it(span, message) }
+                            }
 
                             if (resp.message is McpJsonRpcErrorResponse) {
                                 span.setStatus(ERROR)

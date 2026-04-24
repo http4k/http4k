@@ -18,6 +18,6 @@ object McpPing : McpRpc {
         override val method = McpPing.Method
 
         @JsonSerializable
-        data class Params(override val _meta: Meta = Meta.default) : ClientMessage.Request, ServerMessage.Request
+        data class Params(override val _meta: Meta = Meta.default) : HasMeta
     }
 }

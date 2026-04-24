@@ -37,7 +37,7 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
 
     fun expectCompleteNotification(elicitationId: ElicitationId) =
         sender.lastEvent()
-            .toNotification<McpElicitations.Complete.Notification.Params>(McpElicitations.Complete)
+            .toNotification<McpElicitations.Complete.Notification.Params>(McpElicitations.Complete.Method)
             .also { onComplete.forEach { it(elicitationId) } }
 
     init {
@@ -63,12 +63,12 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
             }
 
             onElicitation.forEach { handler ->
-                val protocolResponse = when (val response = handler(domainRequest)) {
+                val result = when (val response = handler(domainRequest)) {
                     is Ok -> McpElicitations.Response.Result(response.action, response.content, _meta = response._meta)
                     is Task -> McpElicitations.Response.Result(task = response.task)
                     is Error -> throw McpException(DomainError(response.message))
                 }
-                sender(protocolResponse, id!!)
+                sender(McpElicitations.Response(result, id!!.value))
             }
         }
     }

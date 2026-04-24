@@ -44,7 +44,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                 }.valueOrNull()!!
             onSampling.forEach { handler ->
                 handler(req).forEach { response ->
-                    val protocolResponse = when (response) {
+                    val result = when (response) {
                         is Ok -> McpSampling.Response.Result(
                             response.model,
                             response.stopReason,
@@ -55,7 +55,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         is Task -> McpSampling.Response.Result(task = response.task)
                         is Error -> throw McpException(DomainError(response.message))
                     }
-                    sender(protocolResponse, id!!)
+                    sender(McpSampling.Response(result, id!!.value))
                 }
             }
         }

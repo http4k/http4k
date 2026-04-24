@@ -6,27 +6,24 @@ package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.StatusCode
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpNodeType
 
-object CallToolSpanModifiers : McpOpenTelemetrySpanModifiers {
-    override val method = McpTool.Call.Method
-
-    override fun request(sb: Span, request: McpNodeType) {
-        sb.setAttribute("gen_ai.operation.name", "execute_tool")
-        McpJson.fields(request).toMap()["name"]?.let {
-            sb.setAttribute("gen_ai.tool.name", McpJson.text(it))
+object CallToolSpanModifiers : McpOpenTelemetrySpanModifier {
+    override operator fun invoke(sb: Span, request: McpJsonRpcRequest) {
+        if (request is McpTool.Call.Request) {
+            sb.setAttribute("gen_ai.operation.name", "execute_tool")
+            sb.setAttribute("gen_ai.tool.name", request.params.name.value)
         }
     }
 
-    override fun response(sb: Span, response: McpNodeType) {
-        val result = McpJson.fields(response).toMap()["result"] ?: return
-        McpJson.fields(result).toMap()["isError"]
-            ?.takeIf { runCatching { McpJson.bool(it) }.getOrDefault(false) }
-            ?.let {
+    override operator fun invoke(sb: Span, response: McpJsonRpcResponse) {
+        if (response is McpTool.Call.Response) {
+            response.result.isError?.takeIf { it }?.let {
                 sb.setStatus(StatusCode.ERROR)
                 sb.setAttribute("error.type", "tool_error")
             }
+        }
     }
 }

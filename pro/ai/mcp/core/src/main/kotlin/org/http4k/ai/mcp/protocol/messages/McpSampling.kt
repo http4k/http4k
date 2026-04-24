@@ -45,7 +45,7 @@ object McpSampling : McpRpc {
             val toolChoice: ToolChoice = ToolChoice(ToolChoiceMode.auto),
             override val _meta: Meta = Meta.default,
             val task: TaskMeta? = null
-        ) : ServerMessage.Request, HasMeta
+        ) : HasMeta
     }
 
     @JsonSerializable
@@ -56,8 +56,9 @@ object McpSampling : McpRpc {
             val stopReason: StopReason? = null,
             val role: Role? = null,
             val content: List<Content>? = null,
-            val task: Task? = null
-        ) : ClientMessage.Response
+            val task: Task? = null,
+            override val _meta: Meta = Meta.default,
+        ) : HasMeta
     }
 }
 

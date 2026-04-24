@@ -24,7 +24,7 @@ object McpLogging {
             data class Params(
                 val level: LogLevel,
                 override val _meta: Meta = Meta.default
-            ) : ClientMessage.Request, HasMeta
+            ) : HasMeta
         }
     }
 
@@ -42,7 +42,7 @@ object McpLogging {
                 val level: LogLevel,
                 val logger: String? = null,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Notification, HasMeta
+            ) : HasMeta
         }
     }
 }

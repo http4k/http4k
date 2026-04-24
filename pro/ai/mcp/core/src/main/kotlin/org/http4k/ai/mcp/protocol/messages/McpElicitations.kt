@@ -26,7 +26,7 @@ object McpElicitations : McpRpc {
 
         @JsonSerializable
         @Polymorphic("mode")
-        sealed class Params : ServerMessage.Request, HasMeta {
+        sealed class Params : HasMeta {
             @JsonSerializable
             @PolymorphicLabel("form")
             data class Form(
@@ -56,7 +56,7 @@ object McpElicitations : McpRpc {
             val content: McpNodeType? = null,
             val task: Task? = null,
             override val _meta: Meta = Meta.default
-        ) : ClientMessage.Response, HasMeta
+        ) : HasMeta
     }
 
     object Complete : McpRpc {
@@ -71,7 +71,7 @@ object McpElicitations : McpRpc {
             data class Params(
                 val elicitationId: ElicitationId,
                 override val _meta: Meta = Meta.default
-            ) : ServerMessage.Notification
+            ) : HasMeta
         }
     }
 }

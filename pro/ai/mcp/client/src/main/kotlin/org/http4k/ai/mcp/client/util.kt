@@ -13,7 +13,6 @@ import org.http4k.ai.mcp.McpError.Protocol
 import org.http4k.ai.mcp.client.internal.ErrorMessageWithData
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
-import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.json
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -30,7 +29,7 @@ import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.contentType
 import org.http4k.sse.SseMessage.Event
 
-internal inline fun <reified T : ServerMessage> Event.asAOrFailure(): Result<T, McpError> = with(McpJson) {
+internal inline fun <reified T : Any> Event.asAOrFailure(): Result<T, McpError> = with(McpJson) {
     val data = parse(data) as MoshiObject
 
     when {

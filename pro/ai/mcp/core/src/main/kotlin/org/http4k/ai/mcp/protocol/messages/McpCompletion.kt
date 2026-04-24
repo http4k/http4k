@@ -27,7 +27,7 @@ object McpCompletion : McpRpc {
             val argument: CompletionArgument,
             val context: CompletionContext = CompletionContext(),
             override val _meta: Meta = Meta.default
-        ) : ClientMessage.Request, HasMeta
+        ) : HasMeta
     }
 
     @JsonSerializable
@@ -36,6 +36,6 @@ object McpCompletion : McpRpc {
         data class Result(
             val completion: Completion,
             override val _meta: Meta = Meta.default
-        ) : ServerMessage.Response, HasMeta
+        ) : HasMeta
     }
 }
