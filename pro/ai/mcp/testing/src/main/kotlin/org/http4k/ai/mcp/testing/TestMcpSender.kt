@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.testing
 
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
@@ -29,17 +28,18 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
+import kotlin.reflect.KClass
 
 
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
-    private val outbound = mutableMapOf<McpRpcMethod, MutableList<(SseMessage.Event) -> Unit>>()
+    private val outbound = mutableMapOf<KClass<out McpJsonRpcRequest>, MutableList<(SseMessage.Event) -> Unit>>()
     private val streamEvents = CopyOnWriteArrayList<SseMessage.Event>()
     private val newEvent = Semaphore(0)
     private var streamThread: Thread? = null
 
-    fun on(method: McpRpcMethod, fn: (SseMessage.Event) -> Unit) {
-        outbound.getOrPut(method) { mutableListOf() }.add(fn)
+    fun on(type: KClass<out McpJsonRpcRequest>, fn: (SseMessage.Event) -> Unit) {
+        outbound.getOrPut(type) { mutableListOf() }.add(fn)
     }
 
     fun startEventStream() {
@@ -48,7 +48,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
             val events = mcpHandler.callWith(connectRequest.accept(TEXT_EVENT_STREAM).method(GET))
             connected.countDown()
             events.forEach { event ->
-                outbound[event.mcpMethod()]?.forEach { it(event) }
+                event.mcpRequestType()?.let { type -> outbound[type]?.forEach { it(event) } }
                 streamEvents.add(event)
                 newEvent.release()
             }
@@ -66,12 +66,12 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
         streamThread?.interrupt()
     }
 
-    private fun filterOut(events: Sequence<SseMessage.Event>, method: McpRpcMethod) = events
+    private fun filterOut(events: Sequence<SseMessage.Event>, type: KClass<out McpJsonRpcRequest>) = events
         .filter {
             when {
-                it.mcpMethod() == method || it.isResult() || it.isError() -> true
+                it.mcpRequestType() == type || it.isResult() || it.isError() -> true
                 else -> {
-                    outbound[it.mcpMethod()]?.forEach { sub -> sub(it) }
+                    it.mcpRequestType()?.let { t -> outbound[t]?.forEach { sub -> sub(it) } }
                     false
                 }
             }
@@ -80,8 +80,8 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     private fun SseMessage.Event.isResult() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("result")
     private fun SseMessage.Event.isError() = McpJson.fields(McpJson.parse(data)).toMap().containsKey("error")
 
-    private fun SseMessage.Event.mcpMethod() =
-        McpJson.fields(McpJson.parse(data)).toMap()["method"]?.let { McpRpcMethod.of(McpJson.text(it)) }
+    private fun SseMessage.Event.mcpRequestType(): KClass<out McpJsonRpcRequest>? =
+        runCatching { McpJson.asA<McpJsonRpcRequest>(data)::class }.getOrNull()
 
     private var id = AtomicInteger(0)
 
@@ -92,7 +92,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
     operator fun invoke(input: McpJsonRpcRequest) =
         filterOut(
             mcpHandler.callWith(connectRequest.withMcp(input)),
-            input.method
+            input::class
         )
 
     operator fun invoke(input: McpJsonRpcMessage) {

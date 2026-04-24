@@ -41,7 +41,7 @@ class TestingElicitations(private val sender: TestMcpSender) : McpClient.Elicita
             .also { onComplete.forEach { it(elicitationId) } }
 
     init {
-        sender.on(McpElicitations.Method) { event ->
+        sender.on(McpElicitations.Request::class) { event ->
             val result = event.nextEvent<McpElicitations.Request.Params, McpElicitations.Request.Params> { this }.valueOrNull()!!
             val (id, protocolRequest) = result
 
