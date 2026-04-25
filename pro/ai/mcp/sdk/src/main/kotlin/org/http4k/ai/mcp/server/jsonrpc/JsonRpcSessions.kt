@@ -18,10 +18,7 @@ class JsonRpcSessions(
 ) :
     Sessions<Unit> {
 
-    override fun respond(transport: Unit, context: ClientRequestContext, message: McpJsonRpcMessage) =
-        message
-
-    override fun request(context: ClientRequestContext, message: McpJsonRpcMessage) {
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) {
         // Server-to-client notifications are not supported in non-streaming JSON-RPC mode
     }
 

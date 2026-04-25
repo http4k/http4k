@@ -36,16 +36,7 @@ class WebsocketSessions(
 
     private val sessions = ConcurrentHashMap<Session, Websocket>()
 
-    override fun respond(
-        transport: Websocket,
-        context: ClientRequestContext,
-        message: McpJsonRpcMessage
-    ): McpJsonRpcMessage {
-        transport.sendAndStore(message, context.session)
-        return message
-    }
-
-    override fun request(context: ClientRequestContext, message: McpJsonRpcMessage) =
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) =
         when (val ws = sessions[context.session]) {
             null -> Unit
             else -> ws.sendAndStore(message, context.session)

@@ -17,13 +17,10 @@ import java.util.UUID
 
 class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
 
-    override fun request(context: ClientRequestContext, message: McpJsonRpcMessage) = with(writer) {
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) = with(writer) {
         write(McpJson.compact(McpJson.asJsonObject(message)) + "\n")
         flush()
     }
-
-    override fun respond(transport: Unit, context: ClientRequestContext, message: McpJsonRpcMessage) =
-        message
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) = fn()
 

@@ -13,13 +13,9 @@ import org.http4k.core.Request
  */
 interface Sessions<Transport> {
     fun retrieveSession(connectRequest: Request): SessionState
-
-    fun respond(transport: Transport, context: ClientRequestContext, message: McpJsonRpcMessage): McpJsonRpcMessage
     fun transportFor(context: ClientRequestContext): Transport
     fun onClose(context: ClientRequestContext, fn: () -> Unit)
-
-    fun request(context: ClientRequestContext, message: McpJsonRpcMessage)
-
+    fun send(context: ClientRequestContext, message: McpJsonRpcMessage)
     fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request)
     fun end(context: ClientRequestContext)
 }

@@ -36,16 +36,11 @@ class HttpSessions(
 
     private val clientConnections = ConcurrentHashMap<ClientRequestContext, Sse>()
 
-    override fun request(context: ClientRequestContext, message: McpJsonRpcMessage) {
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) {
         when (val sse = clientConnections[context]) {
             null -> {}
             else -> sse.sendAndStore(message, context.session)
         }
-    }
-
-    override fun respond(transport: Sse, context: ClientRequestContext, message: McpJsonRpcMessage): McpJsonRpcMessage {
-        transport.sendAndStore(message, context.session)
-        return message
     }
 
     private fun Sse.sendAndStore(message: McpJsonRpcMessage, session: Session) {

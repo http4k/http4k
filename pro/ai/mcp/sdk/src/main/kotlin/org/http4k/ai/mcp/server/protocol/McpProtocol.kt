@@ -194,7 +194,7 @@ class McpProtocol<Transport>(
 
                 is McpResource.Subscribe.Request -> {
                     if (resources is ObservableResources) resources.subscribe(mcp.session, mcp.message.params) {
-                        sessions.request(
+                        sessions.send(
                             Subscription(mcp.session),
                             McpResource.Updated.Notification(
                                 McpResource.Updated.Notification.Params(mcp.message.params.uri)
@@ -324,7 +324,7 @@ class McpProtocol<Transport>(
                 val messageId = McpMessageId.random(random)
                 it.trackRequest(messageId) { roots.update(McpJson.asA<McpRoot.List.Response.Result>(McpJson.compact(it))) }
 
-                sessions.request(
+                sessions.send(
                     ClientCall(session),
                     McpRoot.List.Request(McpRoot.List.Request.Params(), messageId)
                 )
@@ -347,7 +347,7 @@ class McpProtocol<Transport>(
     }
 
     private fun clientFor(session: Session): SessionBasedClient = SessionBasedClient(
-        { sessions.request(ClientCall(session), it) },
+        { sessions.send(ClientCall(session), it) },
         session,
         logger,
         tasks,
@@ -373,7 +373,7 @@ class McpProtocol<Transport>(
         sessions.assign(context, transport, connectRequest)
 
         logger.subscribe(context.session, error) { data, level, logger ->
-            sessions.request(
+            sessions.send(
                 context,
                 McpLogging.LoggingMessage.Notification(
                     McpLogging.LoggingMessage.Notification.Params(data, level, logger)
@@ -382,21 +382,21 @@ class McpProtocol<Transport>(
         }
 
         prompts.onChange(context.session) {
-            sessions.request(
+            sessions.send(
                 context,
                 McpPrompt.List.Changed.Notification(McpPrompt.List.Changed.Notification.Params())
             )
         }
 
         resources.onChange(context.session) {
-            sessions.request(
+            sessions.send(
                 context,
                 McpResource.List.Changed.Notification(McpResource.List.Changed.Notification.Params())
             )
         }
 
         tools.onChange(context.session) {
-            sessions.request(
+            sessions.send(
                 context,
                 McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params())
             )

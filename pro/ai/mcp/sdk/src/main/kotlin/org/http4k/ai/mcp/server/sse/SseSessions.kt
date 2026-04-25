@@ -32,16 +32,7 @@ class SseSessions(
 
     private val sessions = ConcurrentHashMap<Session, Sse>()
 
-    override fun respond(
-        transport: Sse,
-        context: ClientRequestContext,
-        message: McpJsonRpcMessage
-    ): McpJsonRpcMessage {
-        transport.sendAndStore(message, context.session)
-        return message
-    }
-
-    override fun request(context: ClientRequestContext, message: McpJsonRpcMessage) {
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) {
         when (val sse = sessions[context.session]) {
             null -> {}
             else -> sse.sendAndStore(message, context.session)

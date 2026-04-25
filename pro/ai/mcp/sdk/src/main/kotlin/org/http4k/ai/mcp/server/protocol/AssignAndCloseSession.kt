@@ -13,7 +13,7 @@ fun <Transport> AssignAndCloseSession(sessions: Sessions<Transport>, transport: 
         try {
             sessions.assign(context, transport, it.http)
             next(it).also {
-                if (it is Ok) sessions.respond(transport, context, it.message)
+                if (it is Ok) sessions.send(context, it.message)
             }
         } finally {
             sessions.end(context)
