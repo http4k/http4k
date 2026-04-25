@@ -29,6 +29,7 @@ import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.roots
 import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.tools
+import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
@@ -57,7 +58,7 @@ class McpProtocol<Transport>(
     private val roots: Roots = roots(),
     private val cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
-    private val mcpFilter: McpFilter = McpFilter.NoOp,
+    mcpFilter: McpFilter = McpFilter.NoOp,
     private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     private val random: Random = Random,
 ) {
@@ -92,6 +93,25 @@ class McpProtocol<Transport>(
 
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
+    private val mcpHandler = mcpFilter
+        .then(McpFilters.CatchAll(onError))
+        .then(
+            RoutingMcpHandler(
+                initializer,
+                clientTracking,
+                completions,
+                prompts,
+                resources,
+                tools,
+                logger,
+                tasks,
+                cancellations,
+                roots,
+                random,
+                sessions,
+            )
+        )
+
     fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }
@@ -104,40 +124,28 @@ class McpProtocol<Transport>(
                 val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
                     .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
-                val mcpHandler = mcpFilter
-                    .then(AssignAndCloseSession(sessions, transport))
-                    .then(McpFilters.CatchAll(onError))
-                    .then(handler)
-
-                mcpHandler(McpRequest(sessionState.session, message, httpReq))
+                val context = ClientCall(sessionState.session)
+                try {
+                    sessions.assign(context, transport, httpReq)
+                    val response = mcpHandler(McpRequest(sessionState.session, message, httpReq))
+                    if (response is Ok) sessions.send(context, response.message)
+                    response
+                } finally {
+                    sessions.end(context)
+                }
             }
 
-            else -> handleResult(JsonRpcResult(McpJson, payload), sessionState)
+            else -> handleResult(JsonRpcResult(McpJson, payload), sessionState.session)
         }
     }
 
-    private val handler = RoutingMcpHandler(
-        initializer = initializer,
-        clientTracking = clientTracking,
-        completions = completions,
-        prompts = prompts,
-        resources = resources,
-        tools = tools,
-        logger = logger,
-        tasks = tasks,
-        cancellations = cancellations,
-        roots = roots,
-        random = random,
-        sessions = sessions,
-    )
-
-    private fun handleResult(result: JsonRpcResult<McpNodeType>, sessionState: ValidSessionState) = when {
+    private fun handleResult(result: JsonRpcResult<McpNodeType>, session: Session) = when {
         result.isError() -> Accepted
         else -> with(McpJson) {
             val id = result.id?.let { McpMessageId.parse(compact(it)) }
             when (id) {
                 null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
-                else -> clientTracking[sessionState.session]
+                else -> clientTracking[session]
                     ?.processResult(id, result.result ?: nullNode())
                     ?.let { Accepted }
                     ?: Unknown
