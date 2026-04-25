@@ -207,11 +207,13 @@ fun RoutingMcpHandler(
             is McpInitialize.Initialized.Notification -> McpResponse.Accepted
             is McpProgress.Notification -> McpResponse.Accepted
             is McpCancelled.Notification -> {
-                cancellations.cancel(mcp.message.params); McpResponse.Accepted
+                cancellations.cancel(mcp.message.params)
+                McpResponse.Accepted
             }
 
             is McpTask.Status.Notification -> {
-                tasks.update(mcp.session, mcp.message.params); McpResponse.Accepted
+                tasks.update(mcp.session, mcp.message.params)
+                McpResponse.Accepted
             }
 
             is McpRoot.Changed.Notification -> {
