@@ -8,34 +8,39 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
+import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceRequest
-import org.http4k.ai.mcp.ResourceResponse
+import org.http4k.ai.mcp.ResourceResponse.Ok
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.coerce
+import org.http4k.ai.mcp.model.Prompt
+import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.Resource.Content.Text
+import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.server.capability.capabilities
+import org.http4k.ai.model.Role
 import org.http4k.ai.model.ToolName
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
-import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.routing.reverseProxy
+import org.http4k.routing.bind
 import org.http4k.wiretap.junit.RenderMode.Always
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import wiretap.examples.McpServerWithOtelTracing
 
 class McpInterceptTest {
 
+    private val uri = Uri.of("ui://a-ui")
+
     @RegisterExtension
-    @JvmField
-    val intercept = Intercept.poly(Always) {
-        McpServerWithOtelTracing(
-            reverseProxy(
-                "http4k" to http { Response(OK).body("downstream") },
-                "spring" to http { Response(INTERNAL_SERVER_ERROR).body("downstream") }
-            ), otel("test app 1"))
+    val intercept = Intercept.mcp(Always) {
+        capabilities(
+            Tool("non_app", "") bind { ToolResponse.Ok("hello") },
+            Resource.Static(uri, ResourceName.of("example ui")) bind { Ok(Text("hello world", uri)) },
+            Prompt("prompt", "", Prompt.Arg.required("city")) bind { PromptResponse.Ok(Role.Assistant, "hello") }
+        )
     }
 
     @Test
@@ -43,8 +48,8 @@ class McpInterceptTest {
         mcpClient.run {
             start()
             assertThat(
-                resources().read(ResourceRequest(Uri.of("ui://a-ui"))).coerce<ResourceResponse.Ok>().list.first().uri,
-                equalTo(Uri.of("ui://a-ui"))
+                resources().read(ResourceRequest(uri)).coerce<Ok>().list.first().uri,
+                equalTo(uri)
             )
             assertThat(
                 tools().call(ToolName.of("non_app")).coerce<ToolResponse.Ok>().content?.first().toString(),
