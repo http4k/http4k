@@ -123,6 +123,25 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
             ExpressionAttributeValues = mapOf(":val1" to attrN.asValue(0))
         ).successValue()
     }
+
+    @Test
+    fun `conditional put item - on missing item`() {
+        assertThat(
+        dynamo.putItem(
+            TableName = table,
+            Item = Item(attrS of "hash1", attrN of 1),
+            ConditionExpression = "attribute_exists(#key1)",
+            ExpressionAttributeNames = mapOf("#key1" to attrS.name)
+        ).failureOrNull(), equalTo(
+                RemoteFailure(
+                    method = Method.POST,
+                    uri = Uri.of("/"),
+                    status = Status.BAD_REQUEST,
+                    message = """{"__type":"com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException","Message":"The conditional request failed"}"""
+                )
+            )
+        )
+    }
 }
 
 class FakeDynamoDbPutItemContract : DynamoDbPutItemContract(), DynamoDbSource by FakeDynamoDbSource()
