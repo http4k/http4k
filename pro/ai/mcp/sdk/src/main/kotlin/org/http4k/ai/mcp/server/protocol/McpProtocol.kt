@@ -38,11 +38,9 @@ import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.compact
 import org.http4k.ai.mcp.util.McpJson.nullNode
 import org.http4k.ai.mcp.util.McpJson.parse
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -136,22 +134,15 @@ class McpProtocol<Transport>(
                     sessions.end(context)
                 }
             }
-
-            else -> handleResult(JsonRpcResult(McpJson, payload), sessionState.session)
-        }
-    }
-
-    private fun handleResult(result: JsonRpcResult<McpNodeType>, session: Session) = when {
-        result.isError() -> Accepted
-        else -> {
-            val id = result.id?.let { McpMessageId.parse(compact(it)) }
-            when (id) {
-                null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
-                else -> clientTracking[session]
-                    ?.processResult(id, result.result ?: nullNode())
-                    ?.let { Accepted }
-                    ?: Unknown
-            }
+            payload.containsKey("error") -> Accepted
+            else ->
+                when (val id = payload["id"]) {
+                    null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
+                    else -> clientTracking[sessionState.session]
+                        ?.processResult(McpMessageId.parse(compact(id)), payload["result"] ?: nullNode())
+                        ?.let { Accepted }
+                        ?: Unknown
+                }
         }
     }
 
