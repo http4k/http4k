@@ -5,24 +5,24 @@
 package org.http4k.ai.mcp.server.stdio
 
 import org.http4k.ai.mcp.protocol.SessionId
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.ExistingSession
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import java.io.Writer
 import java.util.UUID
 
 class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
 
-    override fun request(context: ClientRequestContext, message: McpNodeType) = with(writer) {
-        write(McpJson.compact(message) + "\n")
+    override fun request(context: ClientRequestContext, message: McpJsonRpcMessage) = with(writer) {
+        write(McpJson.compact(McpJson.asJsonObject(message)) + "\n")
         flush()
     }
 
-    override fun respond(transport: Unit, context: ClientRequestContext, message: McpNodeType) =
+    override fun respond(transport: Unit, context: ClientRequestContext, message: McpJsonRpcMessage) =
         message
 
     override fun onClose(context: ClientRequestContext, fn: () -> Unit) = fn()

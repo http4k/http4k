@@ -4,7 +4,7 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.core.Request
 
 /**
@@ -14,11 +14,11 @@ import org.http4k.core.Request
 interface Sessions<Transport> {
     fun retrieveSession(connectRequest: Request): SessionState
 
-    fun respond(transport: Transport, context: ClientRequestContext, message: McpNodeType): McpNodeType
+    fun respond(transport: Transport, context: ClientRequestContext, message: McpJsonRpcMessage): McpJsonRpcMessage
     fun transportFor(context: ClientRequestContext): Transport
     fun onClose(context: ClientRequestContext, fn: () -> Unit)
 
-    fun request(context: ClientRequestContext, message: McpNodeType)
+    fun request(context: ClientRequestContext, message: McpJsonRpcMessage)
 
     fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request)
     fun end(context: ClientRequestContext)

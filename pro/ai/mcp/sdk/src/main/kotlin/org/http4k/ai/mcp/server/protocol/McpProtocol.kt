@@ -46,7 +46,6 @@ import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
 import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
@@ -202,10 +201,8 @@ class McpProtocol<Transport>(
                         if (resources is ObservableResources) resources.subscribe(mcp.session, msg.params) {
                             sessions.request(
                                 Subscription(mcp.session),
-                                asJsonObject(
-                                    McpResource.Updated.Notification(
-                                        McpResource.Updated.Notification.Params(msg.params.uri)
-                                    )
+                                McpResource.Updated.Notification(
+                                    McpResource.Updated.Notification.Params(msg.params.uri)
                                 )
                             )
                         }
@@ -326,7 +323,7 @@ class McpProtocol<Transport>(
                 sessions.respond(
                     transport,
                     ClientCall(session),
-                    McpJson.asJsonObject(McpRoot.List.Request(McpRoot.List.Request.Params(), messageId))
+                    McpRoot.List.Request(McpRoot.List.Request.Params(), messageId)
                 )
             }
         }
@@ -347,7 +344,7 @@ class McpProtocol<Transport>(
     }
 
     private fun clientFor(session: Session): SessionBasedClient = SessionBasedClient(
-        { sessions.request(ClientCall(session), asJsonObject(it)) },
+        { sessions.request(ClientCall(session), it) },
         session,
         logger,
         tasks,
@@ -375,14 +372,8 @@ class McpProtocol<Transport>(
         logger.subscribe(context.session, error) { data, level, logger ->
             sessions.request(
                 context,
-                McpJson.asJsonObject(
-                    McpLogging.LoggingMessage.Notification(
-                        McpLogging.LoggingMessage.Notification.Params(
-                            data,
-                            level,
-                            logger
-                        )
-                    )
+                McpLogging.LoggingMessage.Notification(
+                    McpLogging.LoggingMessage.Notification.Params(data, level, logger)
                 )
             )
         }
@@ -390,21 +381,21 @@ class McpProtocol<Transport>(
         prompts.onChange(context.session) {
             sessions.request(
                 context,
-                McpJson.asJsonObject(McpPrompt.List.Changed.Notification(McpPrompt.List.Changed.Notification.Params()))
+                McpPrompt.List.Changed.Notification(McpPrompt.List.Changed.Notification.Params())
             )
         }
 
         resources.onChange(context.session) {
             sessions.request(
                 context,
-                McpJson.asJsonObject(McpResource.List.Changed.Notification(McpResource.List.Changed.Notification.Params()))
+                McpResource.List.Changed.Notification(McpResource.List.Changed.Notification.Params())
             )
         }
 
         tools.onChange(context.session) {
             sessions.request(
                 context,
-                McpJson.asJsonObject(McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params()))
+                McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params())
             )
         }
 
