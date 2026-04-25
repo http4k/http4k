@@ -49,6 +49,7 @@ import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
+import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
@@ -114,7 +115,7 @@ class McpProtocol<Transport>(
             val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
                 .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
-            val mcpHandler = mcpFilter.then(AssignAndCloseSession(sessions, transport)).then(handler)
+            val mcpHandler = mcpFilter.then(AssignAndCloseSession(sessions, transport)).then(McpFilters.CatchAll(onError)).then(handler)
 
             mcpHandler(McpRequest(sessionState.session, message, httpReq))
         } else {
@@ -123,205 +124,190 @@ class McpProtocol<Transport>(
     }
 
     private val handler: McpHandler = { mcp ->
-        runCatching {
-            when (mcp.message) {
-                is McpInitialize.Request -> {
-                    val initialize = initializer(mcp.message.params, mcp.http)
-                    clientTracking[mcp.session] = ClientTracking(mcp.message.params)
-                    Ok(McpInitialize.Response(initialize, mcp.message.id))
-                }
+        when (mcp.message) {
+            is McpInitialize.Request -> {
+                val initialize = initializer(mcp.message.params, mcp.http)
+                clientTracking[mcp.session] = ClientTracking(mcp.message.params)
+                Ok(McpInitialize.Response(initialize, mcp.message.id))
+            }
 
-                is McpPing.Request -> Ok(McpJsonRpcEmptyResponse(mcp.message.id))
-                is McpCompletion.Request -> Ok(
-                    McpCompletion.Response(
-                        completions.complete(
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpPrompt.Get.Request -> Ok(
-                    McpPrompt.Get.Response(
-                        prompts.get(
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpPrompt.List.Request -> Ok(
-                    McpPrompt.List.Response(
-                        prompts.list(
-                            mcp.message.params ?: McpPrompt.List.Request.Params(),
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpResource.ListTemplates.Request -> Ok(
-                    McpResource.ListTemplates.Response(
-                        resources.listTemplates(
-                            mcp.message.params ?: McpResource.ListTemplates.Request.Params(),
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpResource.List.Request -> Ok(
-                    McpResource.List.Response(
-                        resources.listResources(
-                            mcp.message.params ?: McpResource.List.Request.Params(),
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpResource.Read.Request -> Ok(
-                    McpResource.Read.Response(
-                        resources.read(
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpResource.Subscribe.Request -> {
-                    if (resources is ObservableResources) resources.subscribe(mcp.session, mcp.message.params) {
-                        sessions.send(
-                            Subscription(mcp.session),
-                            McpResource.Updated.Notification(
-                                McpResource.Updated.Notification.Params(mcp.message.params.uri)
-                            )
-                        )
-                    }
-                    Ok(McpJsonRpcEmptyResponse(mcp.message.id))
-                }
-
-                is McpResource.Unsubscribe.Request -> {
-                    if (resources is ObservableResources) resources.unsubscribe(mcp.session, mcp.message.params)
-                    Ok(McpJsonRpcEmptyResponse(mcp.message.id))
-                }
-
-                is McpLogging.SetLevel.Request -> {
-                    logger.setLevel(mcp.session, mcp.message.params.level)
-                    Ok(McpJsonRpcEmptyResponse(mcp.message.id))
-                }
-
-                is McpTool.Call.Request -> Ok(
-                    McpTool.Call.Response(
-                        tools.call(
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpTool.List.Request -> Ok(
-                    McpTool.List.Response(
-                        tools.list(
-                            mcp.message.params ?: McpTool.List.Request.Params(),
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpTask.Get.Request -> Ok(
-                    McpTask.Get.Response(
-                        tasks.get(
-                            mcp.session,
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpTask.Result.Request -> Ok(
-                    McpTask.Result.Response(
-                        tasks.result(
-                            mcp.session,
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpTask.Cancel.Request -> Ok(
-                    McpTask.Cancel.Response(
-                        tasks.cancel(
-                            mcp.session,
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpTask.List.Request -> Ok(
-                    McpTask.List.Response(
-                        tasks.list(
-                            mcp.session,
-                            mcp.message.params,
-                            clientFor(mcp.session),
-                            mcp.http
-                        ), mcp.message.id
-                    )
-                )
-
-                is McpInitialize.Initialized.Notification -> Accepted
-                is McpProgress.Notification -> Accepted
-                is McpCancelled.Notification -> {
-                    cancellations.cancel(mcp.message.params); Accepted
-                }
-
-                is McpTask.Status.Notification -> {
-                    tasks.update(mcp.session, mcp.message.params); Accepted
-                }
-
-                is McpRoot.Changed.Notification -> {
-                    roots.changed(
-                        mcp.message.params ?: McpRoot.Changed.Notification.Params(),
+            is McpPing.Request -> Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+            is McpCompletion.Request -> Ok(
+                McpCompletion.Response(
+                    completions.complete(
+                        mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpPrompt.Get.Request -> Ok(
+                McpPrompt.Get.Response(
+                    prompts.get(
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpPrompt.List.Request -> Ok(
+                McpPrompt.List.Response(
+                    prompts.list(
+                        mcp.message.params ?: McpPrompt.List.Request.Params(),
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpResource.ListTemplates.Request -> Ok(
+                McpResource.ListTemplates.Response(
+                    resources.listTemplates(
+                        mcp.message.params ?: McpResource.ListTemplates.Request.Params(),
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpResource.List.Request -> Ok(
+                McpResource.List.Response(
+                    resources.listResources(
+                        mcp.message.params ?: McpResource.List.Request.Params(),
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpResource.Read.Request -> Ok(
+                McpResource.Read.Response(
+                    resources.read(
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpResource.Subscribe.Request -> {
+                if (resources is ObservableResources) resources.subscribe(mcp.session, mcp.message.params) {
+                    sessions.send(
+                        Subscription(mcp.session),
+                        McpResource.Updated.Notification(
+                            McpResource.Updated.Notification.Params(mcp.message.params.uri)
+                        )
                     )
-                    Accepted
                 }
-
-                is McpPrompt.List.Changed.Notification -> Accepted
-                is McpTool.List.Changed.Notification -> Accepted
-                is McpResource.List.Changed.Notification -> Accepted
-                is McpResource.Updated.Notification -> Accepted
-                is McpLogging.LoggingMessage.Notification -> Accepted
-                is McpElicitations.Complete.Notification -> Accepted
-                is McpSampling.Request -> Accepted
-                is McpElicitations.Request -> Accepted
-                is McpRoot.List.Request -> Accepted
+                Ok(McpJsonRpcEmptyResponse(mcp.message.id))
             }
-        }.getOrElse { handleError(it, mcp.message.id) }
+
+            is McpResource.Unsubscribe.Request -> {
+                if (resources is ObservableResources) resources.unsubscribe(mcp.session, mcp.message.params)
+                Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+            }
+
+            is McpLogging.SetLevel.Request -> {
+                logger.setLevel(mcp.session, mcp.message.params.level)
+                Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+            }
+
+            is McpTool.Call.Request -> Ok(
+                McpTool.Call.Response(
+                    tools.call(
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpTool.List.Request -> Ok(
+                McpTool.List.Response(
+                    tools.list(
+                        mcp.message.params ?: McpTool.List.Request.Params(),
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpTask.Get.Request -> Ok(
+                McpTask.Get.Response(
+                    tasks.get(
+                        mcp.session,
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpTask.Result.Request -> Ok(
+                McpTask.Result.Response(
+                    tasks.result(
+                        mcp.session,
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpTask.Cancel.Request -> Ok(
+                McpTask.Cancel.Response(
+                    tasks.cancel(
+                        mcp.session,
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpTask.List.Request -> Ok(
+                McpTask.List.Response(
+                    tasks.list(
+                        mcp.session,
+                        mcp.message.params,
+                        clientFor(mcp.session),
+                        mcp.http
+                    ), mcp.message.id
+                )
+            )
+
+            is McpInitialize.Initialized.Notification -> Accepted
+            is McpProgress.Notification -> Accepted
+            is McpCancelled.Notification -> {
+                cancellations.cancel(mcp.message.params); Accepted
+            }
+
+            is McpTask.Status.Notification -> {
+                tasks.update(mcp.session, mcp.message.params); Accepted
+            }
+
+            is McpRoot.Changed.Notification -> {
+                roots.changed(
+                    mcp.message.params ?: McpRoot.Changed.Notification.Params(),
+                    clientFor(mcp.session),
+                    mcp.http
+                )
+                Accepted
+            }
+
+            is McpPrompt.List.Changed.Notification -> Accepted
+            is McpTool.List.Changed.Notification -> Accepted
+            is McpResource.List.Changed.Notification -> Accepted
+            is McpResource.Updated.Notification -> Accepted
+            is McpLogging.LoggingMessage.Notification -> Accepted
+            is McpElicitations.Complete.Notification -> Accepted
+            is McpSampling.Request -> Accepted
+            is McpElicitations.Request -> Accepted
+            is McpRoot.List.Request -> Accepted
+        }
     }
-
-    private fun handleError(e: Throwable, id: Any?): McpResponse = Ok(
-        McpJsonRpcErrorResponse(
-            id,
-            when (e) {
-                is McpException -> e.error
-                else -> {
-                    onError(e)
-                    ErrorMessage.InternalError
-                }
-            }
-        )
-    )
 
     private fun handleResult(result: JsonRpcResult<McpNodeType>, sessionState: ValidSessionState) = when {
         result.isError() -> Accepted
