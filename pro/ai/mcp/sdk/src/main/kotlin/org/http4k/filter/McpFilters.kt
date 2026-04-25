@@ -15,6 +15,7 @@ object McpFilters {
         {
             runCatching { next(it) }
                 .getOrElse { e ->
+                    e.printStackTrace()
                     Ok(
                         McpJsonRpcErrorResponse(
                             it.message.id,

@@ -109,17 +109,23 @@ class McpProtocol<Transport>(
         val rawPayload = runCatching { parse(body) }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
 
+        val method = McpJson.textValueOf(rawPayload, "method")
         val payload = McpJson.fields(rawPayload).toMap()
 
-        return if (payload["method"] != null) {
-            val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
-                .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
+        return when {
+            method != null -> {
+                val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
+                    .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
-            val mcpHandler = mcpFilter.then(AssignAndCloseSession(sessions, transport)).then(McpFilters.CatchAll(onError)).then(handler)
+                val mcpHandler = mcpFilter
+                    .then(AssignAndCloseSession(sessions, transport))
+                    .then(McpFilters.CatchAll(onError))
+                    .then(handler)
 
-            mcpHandler(McpRequest(sessionState.session, message, httpReq))
-        } else {
-            handleResult(JsonRpcResult(McpJson, payload), sessionState)
+                mcpHandler(McpRequest(sessionState.session, message, httpReq))
+            }
+
+            else -> handleResult(JsonRpcResult(McpJson, payload), sessionState)
         }
     }
 
