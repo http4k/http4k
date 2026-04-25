@@ -97,11 +97,10 @@ class McpProtocol<Transport>(
         val rawPayload = runCatching { parse(body) }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
 
-        val method = McpJson.textValueOf(rawPayload, "method")
         val payload = McpJson.fields(rawPayload).toMap()
 
         return when {
-            method != null -> {
+            McpJson.textValueOf(rawPayload, "method") != null -> {
                 val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
                     .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
