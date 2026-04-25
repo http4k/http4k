@@ -125,11 +125,11 @@ class McpProtocol<Transport>(
     private val handler: McpHandler = { mcp ->
         runCatching {
             when (mcp.message) {
-                is McpInitialize.Request -> Ok(
-                    McpInitialize.Response(
-                        handleInitialize(mcp.message.params, mcp.http, mcp.session), mcp.message.id
-                    )
-                )
+                is McpInitialize.Request -> {
+                    val initialize = initializer(mcp.message.params, mcp.http)
+                    clientTracking[mcp.session] = ClientTracking(mcp.message.params)
+                    Ok(McpInitialize.Response(initialize, mcp.message.id))
+                }
 
                 is McpPing.Request -> Ok(McpJsonRpcEmptyResponse(mcp.message.id))
                 is McpCompletion.Request -> Ok(
@@ -289,7 +289,12 @@ class McpProtocol<Transport>(
                 }
 
                 is McpRoot.Changed.Notification -> {
-                    handleRootChanged(mcp.session); Accepted
+                    roots.changed(
+                        mcp.message.params ?: McpRoot.Changed.Notification.Params(),
+                        clientFor(mcp.session),
+                        mcp.http
+                    )
+                    Accepted
                 }
 
                 is McpPrompt.List.Changed.Notification -> Accepted
@@ -318,20 +323,6 @@ class McpProtocol<Transport>(
         )
     )
 
-    private fun handleRootChanged(session: Session) {
-        clientTracking[session]?.let {
-            if (it.supportsRoots) {
-                val messageId = McpMessageId.random(random)
-                it.trackRequest(messageId) { roots.update(McpJson.asA<McpRoot.List.Response.Result>(McpJson.compact(it))) }
-
-                sessions.send(
-                    ClientCall(session),
-                    McpRoot.List.Request(McpRoot.List.Request.Params(), messageId)
-                )
-            }
-        }
-    }
-
     private fun handleResult(result: JsonRpcResult<McpNodeType>, sessionState: ValidSessionState) = when {
         result.isError() -> Accepted
         else -> with(McpJson) {
@@ -351,16 +342,10 @@ class McpProtocol<Transport>(
         session,
         logger,
         tasks,
+        roots,
         random,
         { clientTracking[session] ?: throw McpException(ErrorMessage.InternalError) }
     )
-
-    private fun handleInitialize(
-        request: McpInitialize.Request.Params,
-        http: Request,
-        session: Session
-    ): McpInitialize.Response.Result = initializer(request, http)
-        .also { clientTracking[session] = ClientTracking(request) }
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 

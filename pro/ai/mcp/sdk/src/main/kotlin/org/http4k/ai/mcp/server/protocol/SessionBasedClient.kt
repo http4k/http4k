@@ -29,6 +29,7 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
+import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.util.McpJson
@@ -46,6 +47,7 @@ class SessionBasedClient(
     private val session: Session,
     private val logger: Logger,
     private val tasks: Tasks,
+    private val roots: Roots,
     private val random: Random,
     private val clientTracking: () -> ClientTracking
 ) : Client {
@@ -184,6 +186,17 @@ class SessionBasedClient(
         }
     }
 
+    override fun requestRoots(meta: Meta) {
+        val tracking = clientTracking()
+        if (tracking.supportsRoots) {
+            val messageId = McpMessageId.random(random)
+            tracking.trackRequest(messageId) { roots.update(McpJson.asA<McpRoot.List.Response.Result>(McpJson.compact(it))) }
+
+            sendToClient(McpRoot.List.Request(McpRoot.List.Request.Params(), McpJson.asJsonObject(messageId)))
+        }
+    }
+
+
     override fun elicitationComplete(elicitationId: ElicitationId) {
         sendToClient(
             McpElicitations.Complete.Notification(
@@ -192,7 +205,7 @@ class SessionBasedClient(
         )
     }
 
-    override fun updateTask(task: Task, meta: Meta, timeout: Duration?) {
+    override fun updateTask(task: Task, meta: Meta) {
         val notification = McpTask.Status.Notification.Params(task, meta)
         tasks.update(session, notification)
         sendToClient(McpTask.Status.Notification(notification))
