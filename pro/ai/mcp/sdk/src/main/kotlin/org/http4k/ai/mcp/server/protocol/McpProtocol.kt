@@ -35,6 +35,8 @@ import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
 import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpJson.compact
+import org.http4k.ai.mcp.util.McpJson.nullNode
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
@@ -120,7 +122,7 @@ class McpProtocol<Transport>(
         val payload = McpJson.fields(rawPayload).toMap()
 
         return when {
-            McpJson.textValueOf(rawPayload, "method") != null -> {
+            payload["method"] != null -> {
                 val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
                     .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
@@ -141,7 +143,7 @@ class McpProtocol<Transport>(
 
     private fun handleResult(result: JsonRpcResult<McpNodeType>, session: Session) = when {
         result.isError() -> Accepted
-        else -> with(McpJson) {
+        else -> {
             val id = result.id?.let { McpMessageId.parse(compact(it)) }
             when (id) {
                 null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
