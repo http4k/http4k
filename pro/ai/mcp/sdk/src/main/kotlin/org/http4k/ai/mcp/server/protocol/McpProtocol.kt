@@ -134,9 +134,9 @@ class McpProtocol<Transport>(
 
                         is NewSession if message is McpInitialize.Request -> {
                             runCatching {
-                                val result = initializer(message.params, httpReq)
+                                val response = Ok(McpInitialize.Response(initializer(message.params, httpReq), message.id))
                                 clientTracking[sessionState.session] = ClientTracking(message.params)
-                                Ok(McpInitialize.Response(result, message.id))
+                                response
                             }.getOrElse { Unknown }
                         }
 
