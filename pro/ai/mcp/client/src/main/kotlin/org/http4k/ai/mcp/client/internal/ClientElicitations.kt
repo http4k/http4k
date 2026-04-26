@@ -16,8 +16,7 @@ import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
-import org.http4k.ai.mcp.protocol.messages.McpElicitations.Request.Params.Form
-import org.http4k.ai.mcp.protocol.messages.McpElicitations.Request.Params.Url
+import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.lens.MetaKey
 import org.http4k.lens.progressToken
@@ -27,20 +26,23 @@ internal class ClientElicitations(
     private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
-    private val register: McpCallbackRegistry
+    private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Elicitations {
 
     override fun onComplete(fn: (ElicitationId) -> Unit) {
-        register.on(McpElicitations.Complete.Notification::class) { notification, _ ->
-            fn(notification.params.elicitationId)
-        }
+        register(
+            McpElicitations.Complete,
+            McpCallback(McpElicitations.Complete.Notification::class) { notification, _ ->
+                fn(notification.elicitationId)
+            })
     }
 
     override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
-        register.on(McpElicitations.Request::class) { req, requestId ->
-            if (requestId == null) return@on
-            val response = when (val request = req.params) {
-                is Form -> fn(
+        register(McpElicitations,
+            McpCallback(McpElicitations.Request.Form::class) { request, requestId ->
+                if (requestId == null) return@McpCallback
+
+                val response = fn(
                     ElicitationRequest.Form(
                         request.message,
                         request.requestedSchema,
@@ -49,7 +51,24 @@ internal class ClientElicitations(
                     )
                 )
 
-                is Url -> fn(
+                val timeout = overrideDefaultTimeout ?: defaultTimeout
+
+                sender(
+                    McpElicitations,
+                    response.toProtocol(),
+                    timeout,
+                    requestId
+                )
+
+                tidyUp(requestId)
+            })
+
+        register(
+            McpElicitations,
+            McpCallback(McpElicitations.Request.Url::class) { request, requestId ->
+                if (requestId == null) return@McpCallback
+
+                val response = fn(
                     ElicitationRequest.Url(
                         request.message,
                         request.url,
@@ -58,24 +77,24 @@ internal class ClientElicitations(
                         request.task
                     )
                 )
-            }
 
-            val timeout = overrideDefaultTimeout ?: defaultTimeout
+                val timeout = overrideDefaultTimeout ?: defaultTimeout
 
-            sender(
-                McpElicitations.Response(response.toProtocol(), requestId),
-                timeout,
-                requestId
-            )
+                sender(
+                    McpElicitations,
+                    response.toProtocol(),
+                    timeout,
+                    requestId
+                )
 
-            tidyUp(requestId)
-        }
+                tidyUp(requestId)
+            })
     }
 }
 
 private fun ElicitationResponse.toProtocol() = when (this) {
-    is Ok -> McpElicitations.Response.Result(action, content, _meta = _meta)
-    is Task -> McpElicitations.Response.Result(content = McpJson.nullNode(), task = task)
+    is Ok -> McpElicitations.Response(action, content, _meta = _meta)
+    is Task -> McpElicitations.Response(content = McpJson.nullNode(), task = task)
     is Error -> throw McpException(DomainError(message))
 }
 

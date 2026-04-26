@@ -22,8 +22,8 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.ClientMessage
+import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.client.Http4kSseClient
 import org.http4k.client.JavaHttpClient
@@ -69,8 +69,8 @@ class SseMcpClient(
         endpoint.set(it.data)
     }
 
-    override fun notify(message: McpJsonRpcMessage): McpResult<Unit> {
-        val response = http(message.toHttpRequest(protocolVersion, Uri.of(endpoint.get())))
+    override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit> {
+        val response = http(mcp.toHttpRequest(protocolVersion, Uri.of(endpoint.get()), rpc))
         return when {
             response.status.successful -> Success(Unit)
             else -> Failure(Http(response))
@@ -78,18 +78,20 @@ class SseMcpClient(
     }
 
     override fun sendMessage(
-        message: McpJsonRpcMessage,
+        rpc: McpRpc,
+        message: ClientMessage,
         timeout: Duration,
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean
     ): McpResult<McpMessageId> {
-        val latch = CountDownLatch(if (message is McpJsonRpcRequest && message.id != null) 1 else 0)
+        val latch =
+            CountDownLatch(if (message is ClientMessage.Notification || message is ClientMessage.Response) 0 else 1)
 
         requests[messageId] = latch
 
         if (messageQueues[messageId] == null) messageQueues[messageId] = LinkedBlockingQueue()
 
-        val response = http(message.toHttpRequest(protocolVersion, Uri.of(endpoint.get())))
+        val response = http(message.toHttpRequest(protocolVersion, Uri.of(endpoint.get()), rpc, messageId))
         return when {
             response.status.successful -> resultFrom {
                 if (!latch.await(timeout.toMillis(), MILLISECONDS)) error("Timeout waiting for init")

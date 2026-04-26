@@ -56,7 +56,7 @@ internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) 
 data class ErrorMessageWithData(override val code: Int, override val message: String, val data: McpNodeType? = null) :
     ErrorMessage(code, message)
 
-fun toToolResponseOrError(response: McpTool.Call.Response.Result): ToolResponse = when (response.isError) {
+fun toToolResponseOrError(response: McpTool.Call.Response): ToolResponse = when (response.isError) {
     true -> Error(response.content, response.structuredContent?.let(McpJson::convert), response._meta)
 
     else -> {
@@ -75,7 +75,7 @@ fun toToolElicitationRequiredOrError(mcpError: McpError): Result<ToolResponse, M
                 return Success(
                     ToolResponse.ElicitationRequired(
                         ((error.data as MoshiObject)["elicitations"] as MoshiArray).elements
-                            .map { McpJson.convert<MoshiNode, McpElicitations.Request.Params.Url>(it) },
+                            .map { McpJson.convert<MoshiNode, McpElicitations.Request.Url>(it) },
                         error.message
                     )
                 )

@@ -15,9 +15,9 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 
 fun initializer(handler: InitializeHandler): Initializer = object : Initializer {
-    override fun invoke(req: McpInitialize.Request.Params, http: Request) =
+    override fun invoke(req: McpInitialize.Request, http: Request) =
         when (val response = handler(InitializeRequest(req.clientInfo, req.capabilities, req.protocolVersion))) {
-            is Ok -> McpInitialize.Response.Result(
+            is Ok -> McpInitialize.Response(
                 response.serverInfo,
                 response.capabilities,
                 response.protocolVersion,

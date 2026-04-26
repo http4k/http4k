@@ -16,7 +16,6 @@ import io.opentelemetry.api.trace.StatusCode
 import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.testMcpClient
-import org.http4k.ai.mcp.testing.useClient
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -55,8 +54,8 @@ class GlobalOTelInterceptTest : PortBasedTest {
 
     @Test
     fun `mcp traces are captured via GlobalOpenTelemetry without explicit otel wiring`() {
-        McpServerWithOtelTracing({ _: Request -> Response(Status.OK) }).testMcpClient().useClient {
-            tools().list().coerce<List<McpTool>>()
+        McpServerWithOtelTracing({ _: Request -> Response(Status.OK) }).testMcpClient().use {
+            it.tools().list().coerce<List<McpTool>>()
         }
     }
 

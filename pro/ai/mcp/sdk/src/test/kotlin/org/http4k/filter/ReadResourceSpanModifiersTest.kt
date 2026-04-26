@@ -9,8 +9,7 @@ import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey.stringKey
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
-import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.core.Uri
+import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.junit.jupiter.api.Test
 
 class ReadResourceSpanModifiersTest {
@@ -20,12 +19,9 @@ class ReadResourceSpanModifiersTest {
 
     @Test
     fun `sets request attributes on span`() {
-        ReadResourceSpanModifiers(span, McpResource.Read.Request(
-            McpResource.Read.Request.Params(Uri.of("file://test")),
-            id = 1
-        ).asMcpRequest())
+        ReadResourceSpanModifiers.request(span, asJsonObject(mapOf("uri" to "file:///test")))
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("read_resource"))
-        assertThat(spanData.attributes.get(stringKey("mcp.resource.uri")), equalTo("file://test"))
+        assertThat(spanData.attributes.get(stringKey("mcp.resource.uri")), equalTo("file:///test"))
     }
 }

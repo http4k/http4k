@@ -9,11 +9,12 @@ import dev.forkhandles.result4k.Success
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.JsonRpcRequest
 import org.http4k.sse.SseMessage
 
 
@@ -38,10 +39,17 @@ inline fun <OUT, reified T : Any> SseMessage.Event.nextEvent(noinline fn: T.() -
     }
 }
 
-internal inline fun <reified T : McpJsonRpcRequest> SseMessage.Event.toMessage(): T {
-    val message = McpJson.asA<McpJsonRpcRequest>(data)
-    require(message is T) { "Expected ${T::class.simpleName} but got ${message::class.simpleName}" }
-    return message
+internal inline fun <reified T : Any> Sequence<SseMessage.Event>.nextNotification(mcpRpc: McpRpc): T {
+    val request = this
+        .map { McpJson.fields(McpJson.parse(it.data)).toMap() }
+        .filter { it.containsKey("method") }
+        .filter { McpJson.text(it["method"]!!) == mcpRpc.Method.value }
+        .map { JsonRpcRequest(McpJson, it) }
+        .lastOrNull()
+
+    require(request != null) { "Expected ${mcpRpc.Method.value}" }
+
+    return McpJson.convert<McpNodeType, T>(request.params ?: McpJson.nullNode())
 }
 
 fun TestMcpClient.useClient(fn: TestMcpClient.() -> Unit) {

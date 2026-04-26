@@ -11,11 +11,9 @@ import io.opentelemetry.api.trace.SpanKind.SERVER
 import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.server.protocol.McpFilter
-import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
@@ -26,53 +24,55 @@ import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
  */
 fun McpFilters.OpenTelemetryTracing(
     openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(),
-    spanModifiers: List<McpOpenTelemetrySpanModifier> = defaultMcpOtelSpanModifiers
+    spanModifiers: List<McpOpenTelemetrySpanModifiers> = defaultMcpOtelSpanModifiers
 ): McpFilter {
     val tracer = openTelemetry.tracerProvider.get(INSTRUMENTATION_NAME)
     val textMapPropagator = openTelemetry.propagators.textMapPropagator
 
+    val spanModifierMap = spanModifiers.groupBy { it.method }
+
     return McpFilter { next ->
         { req ->
-            val method = req.message.method
-            val rawParams = McpJson.fields(parse(req.http.bodyString())).toMap()["params"]
+            val spanModifiers = spanModifierMap[McpRpcMethod.of(req.json.method)]
 
             val transportSpan = Span.current()
 
-            val metaFields = rawParams
+            val metaFields = req.json.params
                 ?.let { McpJson.fields(it).toMap()["_meta"] }
                 ?.let { McpJson.fields(it).toMap() }
                 ?: emptyMap()
 
             val parentContext = textMapPropagator.extract(Context.root(), metaFields, metaTextMapGetter)
 
-            val targetName = rawParams
+            val targetName = req.json.params
                 ?.let { McpJson.fields(it).toMap()["name"] }
                 ?.let { McpJson.text(it) }
-            val spanName = if (targetName != null) "${method.value} $targetName" else method.value
+            val spanName = if (targetName != null) "${req.json.method} $targetName" else req.json.method
 
             val span = tracer.spanBuilder(spanName)
                 .setParent(parentContext)
                 .setSpanKind(SERVER)
-                .setAttribute("mcp.method.name", method.value)
+                .setAttribute("mcp.method.name", req.json.method)
                 .setAttribute("mcp.session.id", req.session.id.value)
                 .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
                 .apply {
-                    req.message.id?.let { setAttribute("jsonrpc.request.id", it.toString()) }
+                    req.json.id?.let { setAttribute("jsonrpc.request.id", McpJson.compact(it)) }
                     if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
                 }
                 .startSpan()
 
-            spanModifiers.forEach { it(span, req) }
+            spanModifiers?.forEach { it.request(span, req.json.params ?: McpJson.obj()) }
 
             try {
                 span.makeCurrent().use { next(req) }
                     .also { resp ->
-                        spanModifiers.forEach { it(span, resp) }
+                        spanModifiers?.forEach { it.response(span, resp.json) }
 
-                        if (resp is McpResponse.Ok && resp.message is McpJsonRpcErrorResponse) {
+                        val error = McpJson.fields(resp.json).toMap()["error"]
+                        if (error != null) {
                             span.setStatus(ERROR)
-                            val code = McpJson.textValueOf(resp.message.error, "code")
-                            if (code != null) span.setAttribute("error.type", code)
+                            val code = McpJson.fields(error).toMap()["code"]
+                            if (code != null) span.setAttribute("error.type", McpJson.compact(code))
                         }
                     }
             } catch (e: Throwable) {

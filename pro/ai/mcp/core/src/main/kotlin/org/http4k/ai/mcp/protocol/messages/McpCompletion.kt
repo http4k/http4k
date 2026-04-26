@@ -11,30 +11,22 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import se.ansman.kotshi.JsonSerializable
-import se.ansman.kotshi.PolymorphicLabel
 
-object McpCompletion {
-
-    @JsonSerializable
-    @PolymorphicLabel("completion/complete")
-    data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-        override val method = McpRpcMethod.of("completion/complete")
-
-        @JsonSerializable
-        data class Params(
-            val ref: Reference,
-            val argument: CompletionArgument,
-            val context: CompletionContext = CompletionContext(),
-            override val _meta: Meta = Meta.default
-        ) : HasMeta
-    }
+object McpCompletion : McpRpc {
+    override val Method = McpRpcMethod.of("completion/complete")
 
     @JsonSerializable
-    data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-        @JsonSerializable
-        data class Result(
-            val completion: Completion,
-            override val _meta: Meta = Meta.default
-        ) : HasMeta
-    }
+    data class Request(
+        val ref: Reference,
+        val argument: CompletionArgument,
+        val context: CompletionContext = CompletionContext(),
+        override val _meta: Meta = Meta.default
+    ) : ClientMessage.Request, HasMeta
+
+    @JsonSerializable
+    data class Response(
+        val completion: Completion,
+        override val _meta: Meta = Meta.default
+    ) : ServerMessage.Response,
+        HasMeta
 }

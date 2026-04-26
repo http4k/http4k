@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.testMcpClient
-import org.http4k.ai.mcp.testing.useClient
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -30,8 +29,8 @@ interface WiretapSmokeContract : PortBasedTest {
 
     @Test
     fun `can boot and count tools`() {
-        Wiretap(target).testMcpClient(Request(POST, "_wiretap/mcp")).useClient {
-            assertThat(tools().list().coerce<List<McpTool>>().size, equalTo(18))
+        Wiretap(target).testMcpClient(Request(POST, "_wiretap/mcp")).use {
+            assertThat(it.tools().list().coerce<List<McpTool>>().size, equalTo(18))
         }
     }
 
@@ -39,10 +38,10 @@ interface WiretapSmokeContract : PortBasedTest {
     fun `transactions through wiretap are stored`() {
         val wiretap = Wiretap(target, clock = FixedClock)
 
-        wiretap.testMcpClient(Request(POST, "_wiretap/mcp")).useClient {
+        wiretap.testMcpClient(Request(POST, "_wiretap/mcp")).use {
             wiretap.http!!(testRequest)
 
-            val call = tools().call(ToolName.of("list_transactions")).coerce<ToolResponse.Ok>()
+            val call = it.tools().call(ToolName.of("list_transactions")).coerce<ToolResponse.Ok>()
 
             val calls = call.content!![0] as Text
             val elements = Json.elements(Json.parse(calls.text))

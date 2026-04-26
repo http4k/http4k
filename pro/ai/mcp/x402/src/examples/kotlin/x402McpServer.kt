@@ -68,7 +68,6 @@ fun main() {
     val paymentLens = MetaKey.x402PaymentPayload().toLens()
 
     mcp.testMcpClient(Request(POST, "/mcp")).use {
-        it.start()
 
         printResult(it.tools().call(ToolName.of("premium_data"), ToolRequest()))
 

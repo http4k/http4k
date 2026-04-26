@@ -13,7 +13,7 @@ import org.http4k.ai.mcp.protocol.messages.McpCancelled
  */
 interface Cancellations {
     fun onCancel(callback: CancellationCallback)
-    fun cancel(cancellation: McpCancelled.Notification.Params)
+    fun cancel(cancellation: McpCancelled.Notification)
 }
 
 fun interface CancellationCallback {

@@ -191,7 +191,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
         }
     }
 
-    private fun toJsonKey(it: Any) = json.textValueOf(json.asJsonObject(MapKey(it)), "keyAsString")!!
+    private fun toJsonKey(it: Any): String {
+        return json.textValueOf(json.asJsonObject(MapKey(it)), "keyAsString")!!
+    }
 }
 
 data class MapKey(val keyAsString: Any)

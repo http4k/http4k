@@ -1,4 +1,5 @@
 {
+  "jsonrpc": "2.0",
   "result": {
     "tools": [
       {
@@ -121,48 +122,6 @@
             }
           }
         },
-        "outputSchema": {
-          "properties": {
-            "foo": {
-              "example": 123,
-              "format": "int32",
-              "type": "integer",
-              "nullable": true
-            },
-            "bar": {
-              "properties": {
-                "name": {
-                  "example": "hello",
-                  "type": "string",
-                  "nullable": false
-                }
-              },
-              "example": {
-                "name": "hello"
-              },
-              "type": "object",
-              "required": [
-                "name"
-              ]
-            },
-            "baz": {
-              "example": true,
-              "type": "boolean",
-              "nullable": true
-            }
-          },
-          "example": {
-            "foo": 123,
-            "bar": {
-              "name": "hello"
-            },
-            "baz": true
-          },
-          "type": "object",
-          "required": [
-            "bar"
-          ]
-        },
         "execution": {
           "taskSupport": "optional"
         },
@@ -173,6 +132,5 @@
     "_meta": {
     }
   },
-  "id": 1,
-  "jsonrpc": "2.0"
+  "id": 1
 }

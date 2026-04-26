@@ -26,13 +26,14 @@ import org.http4k.ai.mcp.model.ProgressToken
 import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
-import org.http4k.ai.mcp.protocol.messages.McpRoot
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.McpTask
+import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
+import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.lens.MetaKey
 import org.http4k.lens.progressToken
@@ -43,11 +44,10 @@ import kotlin.Long.Companion.MAX_VALUE
 import kotlin.random.Random
 
 class SessionBasedClient(
-    private val sendToClient: (McpJsonRpcRequest) -> Unit,
+    private val sendToClient: (McpNodeType) -> Unit,
     private val session: Session,
     private val logger: Logger,
     private val tasks: Tasks,
-    private val roots: Roots,
     private val random: Random,
     private val clientTracking: () -> ClientTracking
 ) : Client {
@@ -60,7 +60,7 @@ class SessionBasedClient(
         return when {
             tracking.supportsElicitation -> {
                 tracking.trackRequest(id) {
-                    with(McpJson.asA<McpElicitations.Response.Result>(McpJson.compact(it))) {
+                    with(it.fromJsonRpc(McpElicitations.Response::class)) {
                         val t = task
                         val response = when {
                             t != null -> ElicitationResponse.Task(t)
@@ -72,14 +72,14 @@ class SessionBasedClient(
                 }
 
                 val protocolRequest = when (request) {
-                    is Form -> McpElicitations.Request.Params.Form(
+                    is Form -> McpElicitations.Request.Form(
                         request.message,
                         request.requestedSchema,
                         Meta(MetaKey.progressToken<Any>().toLens() of request.progressToken),
                         request.task
                     )
 
-                    is Url -> McpElicitations.Request.Params.Url(
+                    is Url -> McpElicitations.Request.Url(
                         request.message,
                         request.url,
                         request.elicitationId,
@@ -88,7 +88,7 @@ class SessionBasedClient(
                     )
                 }
 
-                sendToClient(McpElicitations.Request(protocolRequest, McpJson.asJsonObject(id)))
+                sendToClient(protocolRequest.toJsonRpc(McpElicitations, McpJson.asJsonObject(id)))
 
                 when (val nextMessage = queue.poll(fetchNextTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)) {
                     null -> Failure(Timeout)
@@ -108,7 +108,7 @@ class SessionBasedClient(
         return when {
             tracking.supportsSampling -> {
                 tracking.trackRequest(id) {
-                    with(McpJson.asA<McpSampling.Response.Result>(McpJson.compact(it))) {
+                    with(it.fromJsonRpc(McpSampling.Response::class)) {
                         val t = task
                         val response = when {
                             t != null -> SamplingResponse.Task(t)
@@ -126,7 +126,6 @@ class SessionBasedClient(
                 with(request) {
                     sendToClient(
                         McpSampling.Request(
-                        McpSampling.Request.Params(
                             messages,
                             maxTokens,
                             systemPrompt,
@@ -138,8 +137,7 @@ class SessionBasedClient(
                             tools,
                             toolChoice,
                             _meta = Meta(MetaKey.progressToken<Any>().toLens() of progressToken)
-                        ), McpJson.asJsonObject(id)
-                        ),
+                        ).toJsonRpc(McpSampling, McpJson.asJsonObject(id))
                     )
                 }
 
@@ -172,43 +170,31 @@ class SessionBasedClient(
 
     override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) {
         sendToClient(
-            McpProgress.Notification(McpProgress.Notification.Params(progressToken, progress, total, description))
+            McpProgress.Notification(progressToken, progress, total, description)
+                .toJsonRpc(McpProgress)
         )
     }
 
     override fun log(data: Any, level: LogLevel, logger: String?) {
         if (level >= this.logger.levelFor(session)) {
             sendToClient(
-                McpLogging.LoggingMessage.Notification(
-                    McpLogging.LoggingMessage.Notification.Params(McpJson.asJsonObject(data), level, logger)
-                )
+                McpLogging.LoggingMessage.Notification(McpJson.asJsonObject(data), level, logger)
+                    .toJsonRpc(McpLogging.LoggingMessage)
             )
         }
     }
-
-    override fun requestRoots(meta: Meta) {
-        val tracking = clientTracking()
-        if (tracking.supportsRoots) {
-            val messageId = McpMessageId.random(random)
-            tracking.trackRequest(messageId) { roots.update(McpJson.asA<McpRoot.List.Response.Result>(McpJson.compact(it))) }
-
-            sendToClient(McpRoot.List.Request(McpRoot.List.Request.Params(), McpJson.asJsonObject(messageId)))
-        }
-    }
-
 
     override fun elicitationComplete(elicitationId: ElicitationId) {
         sendToClient(
-            McpElicitations.Complete.Notification(
-            McpElicitations.Complete.Notification.Params(elicitationId)
-            )
+            McpElicitations.Complete.Notification(elicitationId)
+                .toJsonRpc(McpElicitations.Complete)
         )
     }
 
-    override fun updateTask(task: Task, meta: Meta) {
-        val notification = McpTask.Status.Notification.Params(task, meta)
+    override fun updateTask(task: Task, meta: Meta, timeout: Duration?) {
+        val notification = McpTask.Status.Notification(task, meta)
         tasks.update(session, notification)
-        sendToClient(McpTask.Status.Notification(notification))
+        sendToClient(notification.toJsonRpc(McpTask.Status))
     }
 
     override fun storeTaskResult(taskId: TaskId, result: Map<String, Any>) {

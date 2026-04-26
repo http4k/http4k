@@ -30,9 +30,9 @@ class PromptCapability(
         McpPrompt.Argument(it.meta.name, it.meta.description, it.meta.metadata["title"] as String?, it.meta.required)
     }, prompt.icons)
 
-    fun get(mcp: McpPrompt.Get.Request.Params, client: Client, http: Request) = try {
+    fun get(mcp: McpPrompt.Get.Request, client: Client, http: Request) = try {
         when (val result = handler(PromptRequest(mcp.arguments, mcp._meta, client, http))) {
-            is Ok -> McpPrompt.Get.Response.Result(result.messages, result.description)
+            is Ok -> McpPrompt.Get.Response(result.messages, result.description)
             is Error -> throw McpException(DomainError(result.message))
         }
     } catch (e: McpException) {

@@ -12,142 +12,101 @@ import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.connect.model.TimeToLive
 import se.ansman.kotshi.JsonSerializable
-import se.ansman.kotshi.PolymorphicLabel
 import java.time.Instant
 
 object McpTask {
     object Create {
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val task: Task,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Response(
+            val task: Task,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Response, ServerMessage.Response, HasMeta
     }
 
-    object Get {
+    object Get : McpRpc {
+        override val Method = of("tasks/get")
 
         @JsonSerializable
-        @PolymorphicLabel("tasks/get")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("tasks/get")
-
-            @JsonSerializable
-            data class Params(
-                val taskId: TaskId,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Request(
+            val taskId: TaskId,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, ServerMessage.Request, HasMeta
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val task: Task,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Response(
+            val task: Task,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Response, ServerMessage.Response, HasMeta
     }
 
-    object Result {
+    object Result : McpRpc {
+        override val Method = of("tasks/result")
 
         @JsonSerializable
-        @PolymorphicLabel("tasks/result")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("tasks/result")
-
-            @JsonSerializable
-            data class Params(
-                val taskId: TaskId,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Request(
+            val taskId: TaskId,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, ServerMessage.Request, HasMeta
 
         @JsonSerializable
-        data class Response(val result: ResponseResult, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class ResponseResult(
-                val result: Map<String, Any>?,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Response(
+            val result: Map<String, Any>?,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Response, ServerMessage.Response, HasMeta
     }
 
-    object Cancel {
+    object Cancel : McpRpc {
+        override val Method = of("tasks/cancel")
 
         @JsonSerializable
-        @PolymorphicLabel("tasks/cancel")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("tasks/cancel")
-
-            @JsonSerializable
-            data class Params(
-                val taskId: TaskId,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Request(
+            val taskId: TaskId,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, ServerMessage.Request, HasMeta
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Response(
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Response, ServerMessage.Response, HasMeta
     }
 
-    object List {
+    object List : McpRpc {
+        override val Method = of("tasks/list")
 
         @JsonSerializable
-        @PolymorphicLabel("tasks/list")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("tasks/list")
-
-            @JsonSerializable
-            data class Params(
-                override val cursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta, PaginatedRequest
-        }
+        data class Request(
+            override val cursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, ServerMessage.Request, HasMeta, PaginatedRequest
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val tasks: kotlin.collections.List<Task>,
-                override val nextCursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta, PaginatedResponse
-        }
+        data class Response(
+            val tasks: kotlin.collections.List<Task>,
+            override val nextCursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Response, ServerMessage.Response, HasMeta, PaginatedResponse
     }
 
-    object Status {
+    object Status : McpRpc {
+        override val Method = of("notifications/tasks/status")
 
         @JsonSerializable
-        @PolymorphicLabel("notifications/tasks/status")
-        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("notifications/tasks/status")
+        data class Notification(
+            val taskId: TaskId,
+            val status: TaskStatus,
+            val statusMessage: String? = null,
+            val createdAt: Instant,
+            val lastUpdatedAt: Instant,
+            val ttl: TimeToLive? = null,
+            val pollInterval: Int? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Notification, ServerMessage.Notification, HasMeta {
+            constructor(task: Task, meta: Meta = Meta.default) : this(
+                task.taskId, task.status, task.statusMessage,
+                task.createdAt, task.lastUpdatedAt, task.ttl, task.pollInterval, meta
+            )
 
-            @JsonSerializable
-            data class Params(
-                val taskId: TaskId,
-                val status: TaskStatus,
-                val statusMessage: String? = null,
-                val createdAt: Instant,
-                val lastUpdatedAt: Instant,
-                val ttl: TimeToLive? = null,
-                val pollInterval: Int? = null,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta {
-                constructor(task: Task, meta: Meta = Meta.default) : this(
-                    task.taskId, task.status, task.statusMessage,
-                    task.createdAt, task.lastUpdatedAt, task.ttl, task.pollInterval, meta
-                )
-
-                fun toTask() = Task(taskId, status, statusMessage, createdAt, lastUpdatedAt, ttl, pollInterval)
-            }
+            fun toTask() = Task(taskId, status, statusMessage, createdAt, lastUpdatedAt, ttl, pollInterval)
         }
     }
 }

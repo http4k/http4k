@@ -70,7 +70,7 @@ sealed interface ToolResponse {
     data class Task(val task: org.http4k.ai.mcp.model.Task, override val meta: Meta = default) : ToolResponse
 
     data class ElicitationRequired(
-        val elicitations: List<McpElicitations.Request.Params.Url>,
+        val elicitations: List<McpElicitations.Request.Url>,
         val message: String = "This request requires more information.",
         override val meta: Meta = default
     ) : ToolResponse
