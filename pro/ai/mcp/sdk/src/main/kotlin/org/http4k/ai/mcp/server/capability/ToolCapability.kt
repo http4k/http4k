@@ -70,14 +70,14 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
                 when (it) {
                     is Ok -> McpTool.Call.Response.Result(
                         content = it.content,
-                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
                         isError = false,
                         _meta = it.meta
                     )
 
                     is Error -> McpTool.Call.Response.Result(
                         content = it.content,
-                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
                         isError = true,
                         _meta = it.meta
                     )
