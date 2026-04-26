@@ -21,30 +21,30 @@ fun tasks(storage: TaskStorage = TaskStorage.InMemory()): Tasks = InMemoryTasks(
 private class InMemoryTasks(private val storage: TaskStorage = TaskStorage.InMemory()) : Tasks {
     private val callbacks = CopyOnWriteArrayList<TaskUpdateCallback>()
 
-    override fun get(session: Session, req: McpTask.Get.Request.Params, client: Client, http: Request): McpTask.Get.Response.Result {
+    override fun get(session: Session, req: McpTask.Get.Request, client: Client, http: Request): McpTask.Get.Response {
         val task = storage.get(session, req.taskId)
             ?: throw McpException(InvalidParams)
-        return McpTask.Get.Response.Result(task)
+        return McpTask.Get.Response(task)
     }
 
-    override fun result(session: Session, req: McpTask.Result.Request.Params, client: Client, http: Request): McpTask.Result.Response.ResponseResult =
-        McpTask.Result.Response.ResponseResult(storage.resultFor(session, req.taskId))
+    override fun result(session: Session, req: McpTask.Result.Request, client: Client, http: Request): McpTask.Result.Response =
+        McpTask.Result.Response(storage.resultFor(session, req.taskId))
 
-    override fun cancel(session: Session, req: McpTask.Cancel.Request.Params, client: Client, http: Request): McpTask.Cancel.Response.Result {
+    override fun cancel(session: Session, req: McpTask.Cancel.Request, client: Client, http: Request): McpTask.Cancel.Response {
         storage.delete(session, req.taskId)
-        return McpTask.Cancel.Response.Result()
+        return McpTask.Cancel.Response()
     }
 
-    override fun list(session: Session, req: McpTask.List.Request.Params, client: Client, http: Request): McpTask.List.Response.Result {
+    override fun list(session: Session, req: McpTask.List.Request, client: Client, http: Request): McpTask.List.Response {
         val page = storage.list(session, req.cursor)
-        return McpTask.List.Response.Result(page.tasks, page.nextCursor)
+        return McpTask.List.Response(page.tasks, page.nextCursor)
     }
 
     override fun onUpdate(callback: TaskUpdateCallback) {
         callbacks += callback
     }
 
-    override fun update(session: Session, notification: McpTask.Status.Notification.Params) {
+    override fun update(session: Session, notification: McpTask.Status.Notification) {
         val task = notification.toTask()
         storage.store(session, task)
         callbacks.forEach { it(task, notification._meta) }

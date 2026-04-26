@@ -12,11 +12,11 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
+import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
-import se.ansman.kotshi.PolymorphicLabel
 
 @JsonSerializable
 @ExposedCopyVisibility
@@ -56,132 +56,89 @@ data class McpResource internal constructor(
         _meta: Meta = Meta.default
     ) : this(null, uriTemplate, name, description, title, mimeType, size, annotations, icons, _meta)
 
-    object Read {
+    object Read : McpRpc {
+        override val Method = of("resources/read")
 
         @JsonSerializable
-        @PolymorphicLabel("resources/read")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/read")
-
-            @JsonSerializable
-            data class Params(
-                val uri: Uri,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Request(
+            val uri: Uri,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
+        data class Response(
+            val contents: kotlin.collections.List<Resource.Content>,
+            override val _meta: Meta = Meta.default
+        ) : ServerMessage.Response, HasMeta
+    }
+
+    object List : McpRpc {
+        override val Method = of("resources/list")
+
+        @JsonSerializable
+        data class Request(
+            override val cursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : PaginatedRequest, HasMeta
+
+        @JsonSerializable
+        data class Response(
+            val resources: kotlin.collections.List<McpResource>,
+            override val nextCursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ServerMessage.Response, PaginatedResponse, HasMeta
+
+        data object Changed : McpRpc {
+            override val Method: McpRpcMethod = of("notifications/resources/list_changed")
+
             @JsonSerializable
-            data class Result(
-                val contents: kotlin.collections.List<Resource.Content>,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
+            data object Notification : ServerMessage.Notification
         }
     }
 
-    object List {
+    object ListTemplates : McpRpc {
+        override val Method = of("resources/templates/list")
 
         @JsonSerializable
-        @PolymorphicLabel("resources/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/list")
-
-            @JsonSerializable
-            data class Params(
-                override val cursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : PaginatedRequest, HasMeta
-        }
+        data class Request(
+            override val cursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, PaginatedRequest, HasMeta
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val resources: kotlin.collections.List<McpResource>,
-                override val nextCursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : PaginatedResponse, HasMeta
-        }
-
-        data object Changed {
-
-            @JsonSerializable
-            @PolymorphicLabel("notifications/resources/list_changed")
-            data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-                override val method = of("notifications/resources/list_changed")
-
-                @JsonSerializable
-                data class Params(override val _meta: Meta = Meta.default) : HasMeta
-            }
-        }
+        data class Response(
+            val resourceTemplates: kotlin.collections.List<McpResource>,
+            override val nextCursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ServerMessage.Response, PaginatedResponse, HasMeta
     }
 
-    object ListTemplates {
+    data object Updated : McpRpc {
+        override val Method: McpRpcMethod = of("notifications/resources/updated")
 
         @JsonSerializable
-        @PolymorphicLabel("resources/templates/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/templates/list")
-
-            @JsonSerializable
-            data class Params(
-                override val cursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : PaginatedRequest, HasMeta
-        }
-
-        @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val resourceTemplates: kotlin.collections.List<McpResource>,
-                override val nextCursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : PaginatedResponse, HasMeta
-        }
+        data class Notification(val uri: Uri, override val _meta: Meta = Meta.default) : ServerMessage.Notification,
+            HasMeta
     }
 
-    data object Updated {
+    object Subscribe : McpRpc {
+        override val Method = of("resources/subscribe")
 
         @JsonSerializable
-        @PolymorphicLabel("notifications/resources/updated")
-        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("notifications/resources/updated")
-
-            @JsonSerializable
-            data class Params(val uri: Uri, override val _meta: Meta = Meta.default) : HasMeta
-        }
+        data class Request(
+            val uri: Uri,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, HasMeta
     }
 
-    object Subscribe {
+    object Unsubscribe : McpRpc {
+        override val Method = of("resources/unsubscribe")
 
         @JsonSerializable
-        @PolymorphicLabel("resources/subscribe")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/subscribe")
-
-            @JsonSerializable
-            data class Params(
-                val uri: Uri,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
-    }
-
-    object Unsubscribe {
-
-        @JsonSerializable
-        @PolymorphicLabel("resources/unsubscribe")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/unsubscribe")
-
-            @JsonSerializable
-            data class Params(
-                val uri: Uri,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
+        data class Request(
+            val uri: Uri,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, HasMeta
     }
 
 }

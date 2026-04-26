@@ -10,5 +10,5 @@ import org.http4k.ai.mcp.protocol.SessionId
 
 val Header.MCP_SESSION_ID get() = value(SessionId).optional("Mcp-Session-Id")
 
-val Header.MCP_PROTOCOL_VERSION get() = value(ProtocolVersion).defaulted("Mcp-Protocol-Version", LATEST_VERSION)
+val Header.MCP_PROTOCOL_VERSION get() = value(ProtocolVersion).defaulted("MCP-Protocol-Version", LATEST_VERSION)
 

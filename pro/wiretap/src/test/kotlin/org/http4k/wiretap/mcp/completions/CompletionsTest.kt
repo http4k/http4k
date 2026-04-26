@@ -41,7 +41,7 @@ class CompletionsTest {
         }
     ).testMcpClient(Request(GET, "/mcp"))
 
-    private val function = Completions(mcpClient.apply { start() })
+    private val function = Completions(mcpClient)
 
     @Test
     fun `tab content lists prompts and templates separately`() {

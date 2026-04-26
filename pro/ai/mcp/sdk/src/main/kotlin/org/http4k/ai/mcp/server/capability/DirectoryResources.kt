@@ -40,10 +40,10 @@ class DirectoryResources(
     private val isText: (ContentType) -> Boolean = DEFAULT_TEXT_TYPES,
 ) : Resources {
     override fun listResources(
-        req: McpResource.List.Request.Params,
+        req: McpResource.List.Request,
         client: Client,
         http: Request
-    ) = McpResource.List.Response.Result(
+    ) = McpResource.List.Response(
         when (recursive) {
             Flat -> dir.listFiles()?.filter { it.isFile }?.map { it.toResource() }?.asSequence() ?: emptySequence()
             Recursive -> dir.walkTopDown().filter { it.isFile }.map { it.toResource() }
@@ -51,10 +51,10 @@ class DirectoryResources(
     )
 
     override fun listTemplates(
-        req: McpResource.ListTemplates.Request.Params,
+        req: McpResource.ListTemplates.Request,
         client: Client,
         http: Request
-    ) = McpResource.ListTemplates.Response.Result(
+    ) = McpResource.ListTemplates.Response(
         listOf(
             McpResource(
                 ResourceUriTemplate.of(
@@ -71,8 +71,8 @@ class DirectoryResources(
 
     override fun invoke(resourceRequest: ResourceRequest) = ResourceResponse.Ok(load(resourceRequest.uri))
 
-    override fun read(req: McpResource.Read.Request.Params, client: Client, http: Request) =
-        McpResource.Read.Response.Result(load(req.uri))
+    override fun read(req: McpResource.Read.Request, client: Client, http: Request) =
+        McpResource.Read.Response(load(req.uri))
 
     private fun load(uri: Uri): List<Resource.Content> {
         val path = uri.toString().substringAfter("file://")

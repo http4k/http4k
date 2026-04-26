@@ -99,7 +99,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
             ClientFilters.DiscoveredMcpOAuth(Credentials("123", "123"), listOf("read", "write")).then(http),
             ClientCapabilities(),
             notificationSseReconnectionMode = Disconnect,
-        ).apply { start() }.use {
+        ).use {
             assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld0")))
             assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld1")))
         }

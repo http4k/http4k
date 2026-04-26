@@ -17,7 +17,6 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.testMcpClient
-import org.http4k.ai.mcp.testing.useClient
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -58,8 +57,8 @@ class McpServerTest : WiretapSmokeContract {
             assertThat(list.size, equalTo(1))
         }
 
-        wiretap.testMcpClient(Request(POST, "_wiretap/mcp")).useClient {
-            val call = tools().call(ToolName.of("list_transactions")).coerce<Ok>()
+        wiretap.testMcpClient(Request(POST, "_wiretap/mcp")).use {
+            val call = it.tools().call(ToolName.of("list_transactions")).coerce<Ok>()
 
             val calls = call.content!![0] as Text
             val elements = Json.elements(Json.parse(calls.text))

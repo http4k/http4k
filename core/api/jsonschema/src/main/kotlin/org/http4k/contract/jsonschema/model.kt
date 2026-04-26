@@ -54,7 +54,8 @@ class SchemaNode private constructor(
             example: Any?,
             enum: List<String>,
             metadata: FieldMetadata?
-        ) = SchemaNode(
+        ) =
+            SchemaNode(
                 name = name,
                 paramMeta = paramMeta,
                 isNullable = isNullable,
@@ -74,7 +75,7 @@ class SchemaNode private constructor(
             example: Any?,
             metadata: FieldMetadata?
         ): SchemaNode {
-            val paramMeta =
+            val paramMeta: ParamMeta =
                 ArrayParam(items.definitions().map { it.paramMeta }.toSet().firstOrNull() ?: NullParam)
             return SchemaNode(
                 name = name,
@@ -96,19 +97,22 @@ class SchemaNode private constructor(
         fun Object(
             name: String, isNullable: Boolean, properties: Map<String, SchemaNode>,
             example: Any?, metadata: FieldMetadata?
-        ) = SchemaNode(
-            name = name,
-            paramMeta = ObjectParam,
-            isNullable = isNullable,
-            example = example,
-            metadata = metadata,
-            definitions = properties.values.flatMap { it.definitions },
-            arrayItem = ArrayItem.Ref(name, properties.values.flatMap { it.definitions })
-        ).apply {
-            this["type"] = ObjectParam.value
-            this["required"] =
-                properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() }
-            this["properties"] = properties
+        ): SchemaNode {
+            val paramMeta = ObjectParam
+            return SchemaNode(
+                name = name,
+                paramMeta = paramMeta,
+                isNullable = isNullable,
+                example = example,
+                metadata = metadata,
+                definitions = properties.values.flatMap { it.definitions },
+                arrayItem = ArrayItem.Ref(name, properties.values.flatMap { it.definitions })
+            ).apply {
+                this["type"] = paramMeta.value
+                this["required"] =
+                    properties.let { it.filterNot { it.value.isNullable }.takeIf { it.isNotEmpty() }?.keys?.sorted() }
+                this["properties"] = properties
+            }
         }
 
         fun Reference(
@@ -133,17 +137,20 @@ class SchemaNode private constructor(
             isNullable: Boolean,
             additionalProperties: SchemaNode,
             metadata: FieldMetadata?
-        ): SchemaNode = SchemaNode(
-            name,
-            ObjectParam,
-            isNullable,
-            null,
-            metadata,
-            definitions = additionalProperties.definitions,
-            arrayItem = ArrayItem.Ref(name, additionalProperties.definitions)
-        ).apply {
-            this["type"] = ObjectParam.value
-            this["additionalProperties"] = additionalProperties
+        ): SchemaNode {
+            val paramMeta = ObjectParam
+            return SchemaNode(
+                name,
+                paramMeta,
+                isNullable,
+                null,
+                metadata,
+                definitions = additionalProperties.definitions,
+                arrayItem = ArrayItem.Ref(name, additionalProperties.definitions)
+            ).apply {
+                this["type"] = paramMeta.value
+                this["additionalProperties"] = additionalProperties
+            }
         }
     }
 }
@@ -161,7 +168,7 @@ abstract class SchemaSortingMap(private val map: MutableMap<String, Any?>) : Mut
         val SORT_ORDER = listOf(
             "properties",
             "items",
-            $$"$ref",
+            "\$ref",
             "example",
             "enum",
             "additionalProperties",

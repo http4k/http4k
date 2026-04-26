@@ -9,11 +9,10 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.recover
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.x402.PaymentCheck.Free
 import org.http4k.ai.mcp.x402.PaymentCheck.Required
 import org.http4k.connect.RemoteFailure
@@ -33,39 +32,38 @@ fun McpFilters.X402PaymentRequired(
         when (val result = check(req)) {
             is Free -> next(req)
             is Required -> {
-                val rawParams = McpJson.fields(McpJson.parse(req.http.bodyString())).toMap()["params"]
-                val metaNode = (rawParams as? MoshiObject)?.attributes?.get("_meta") as? MoshiObject
+                val params = req.json.params as? MoshiObject
+                val metaNode = params?.attributes?.get("_meta") as? MoshiObject
                 val meta = Meta(metaNode ?: MoshiObject())
-                val id = req.message.id
 
                 MetaKey.x402PaymentPayload().toLens()(meta)
                     ?.let { payment ->
                         result.requirements
                             .firstOrNull { it.scheme == payment.scheme && it.network == payment.network }
                             ?.let { matched ->
-                                facilitator(Verify(payment, matched))
-                                    .map { next(req) }
-                                    .flatMap { response ->
-                                        facilitator(Settle(payment, matched))
-                                            .map { response }
-                                            .mapFailure {
-                                                RemoteFailure(
-                                                    it.method,
-                                                    it.uri,
-                                                    it.status,
-                                                    "Settlement failed: ${it.message}"
-                                                )
-                                            }
-                                    }
-                                    .recover {
-                                        McpResponse.Ok(
-                                            McpJsonRpcErrorResponse(id, ErrorMessage(402, it.message ?: "Payment failed"))
-                                        )
-                                    }
-                            } ?: McpResponse.Ok(
-                            McpJsonRpcErrorResponse(id, ErrorMessage(402, "Unsupported payment scheme/network"))
+                            facilitator(Verify(payment, matched))
+                                .map { next(req) }
+                                .flatMap { response ->
+                                    facilitator(Settle(payment, matched))
+                                        .map { response }
+                                        .mapFailure {
+                                            RemoteFailure(
+                                                it.method,
+                                                it.uri,
+                                                it.status,
+                                                "Settlement failed: ${it.message}"
+                                            )
+                                        }
+                                }
+                                .recover {
+                                    McpResponse(
+                                        ErrorMessage(402, it.message ?: "Payment failed").toJsonRpc(req.json.id)
+                                    )
+                                }
+                            } ?: McpResponse(
+                            ErrorMessage(402, "Unsupported payment scheme/network").toJsonRpc(req.json.id)
                         )
-                    } ?: McpResponse.Ok(McpJsonRpcErrorResponse(id, ErrorMessage(402, "Payment required")))
+                    } ?: McpResponse(ErrorMessage(402, "Payment required").toJsonRpc(req.json.id))
             }
         }
     }

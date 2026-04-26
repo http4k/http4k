@@ -18,9 +18,8 @@ interface Client {
     fun progress(progressToken: ProgressToken, progress: Int, total: Double? = null, description: String? = null)
     fun log(data: Any, level: LogLevel, logger: String? = null)
     fun elicitationComplete(elicitationId: ElicitationId)
-    fun updateTask(task: Task, meta: Meta = Meta.default)
+    fun updateTask(task: Task, meta: Meta = Meta.default, timeout: Duration? = null)
     fun storeTaskResult(taskId: TaskId, result: Map<String, Any>)
-    fun requestRoots(meta: Meta = Meta.default)
 
     companion object {
         object NoOp : Client {
@@ -29,8 +28,7 @@ interface Client {
             override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) = error("NoOp")
             override fun log(data: Any, level: LogLevel, logger: String?) = error("NoOp")
             override fun elicitationComplete(elicitationId: ElicitationId) = error("NoOp")
-            override fun updateTask(task: Task, meta: Meta) = error("NoOp")
-            override fun requestRoots(meta: Meta) = error("NoOp")
+            override fun updateTask(task: Task, meta: Meta, timeout: Duration?) = error("NoOp")
             override fun storeTaskResult(taskId: TaskId, result: Map<String, Any>) = error("NoOp")
         }
     }

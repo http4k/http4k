@@ -20,11 +20,8 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
-import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.protocol.ProtocolVersion
+import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.SessionId
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -32,18 +29,16 @@ import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
-import org.http4k.ai.model.ToolName
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.core.with
-import org.http4k.format.MoshiObject
+import org.http4k.format.renderError
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.lens.Header
-import org.http4k.lens.MCP_PROTOCOL_VERSION
+import org.http4k.jsonrpc.JsonRpcRequest
 import org.junit.jupiter.api.Test
 
 class McpOpenTelemetryTracingTest {
@@ -67,15 +62,16 @@ class McpOpenTelemetryTracingTest {
 
         val handler = filter.then {
             capturedSpan = (Span.current() as ReadableSpan).toSpanData()
-            McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
+            McpResponse(McpJson.nullNode())
         }
 
         val session = Session(SessionId.of("test-session-123"))
+        val jsonReq = jsonRpcRequest()
 
-        handler(mcpRequest(session))
+        handler(McpRequest(session, jsonReq, Request.Companion(POST, "/mcp")))
 
         with(capturedSpan!!) {
-            assertThat(name, equalTo("tools/call test"))
+            assertThat(name, equalTo("tools/call"))
             assertThat(kind, equalTo(SpanKind.SERVER))
             assertThat(attributes.get(AttributeKey.stringKey("mcp.method.name")), equalTo("tools/call"))
             assertThat(attributes.get(AttributeKey.stringKey("mcp.session.id")), equalTo("test-session-123"))
@@ -90,7 +86,10 @@ class McpOpenTelemetryTracingTest {
 
         val handler = filter.then { throw IllegalStateException("boom") }
 
-        runCatching { handler(mcpRequest()) }
+        val session = Session(SessionId.of("test-session"))
+        val jsonReq = jsonRpcRequest()
+
+        runCatching { handler(McpRequest(session, jsonReq, Request.Companion(POST, "/mcp"))) }
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
@@ -105,10 +104,13 @@ class McpOpenTelemetryTracingTest {
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
 
         val handler = filter.then {
-            McpResponse.Ok(McpJsonRpcErrorResponse(it.message.id, ErrorMessage.InternalError))
+            McpResponse(McpJson.renderError(ErrorMessage.InternalError, it.json.id))
         }
 
-        handler(mcpRequest())
+        val session = Session(SessionId.of("test-session"))
+        val jsonReq = jsonRpcRequest()
+
+        handler(McpRequest(session, jsonReq, Request.Companion(POST, "/mcp")))
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
@@ -118,11 +120,11 @@ class McpOpenTelemetryTracingTest {
     @Test
     fun `links to transport span when present`() {
         val mcpHandler =
-            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+            McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry).then { McpResponse(McpJson.nullNode()) }
 
         val poly = PolyFilters.OpenTelemetryTracing(openTelemetry).then(
             PolyHandler(http = { req ->
-                mcpHandler(mcpRequest(http = req))
+                mcpHandler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), req))
                 Response(OK)
             })
         )
@@ -132,8 +134,8 @@ class McpOpenTelemetryTracingTest {
         val spans = spanExporter.finishedSpanItems
         assertThat(spans.size, equalTo(2))
 
-        val transportSpan = spans.first { it.kind == SpanKind.SERVER && it.name != "tools/call test" }
-        val mcpSpan = spans.first { it.name == "tools/call test" }
+        val transportSpan = spans.first { it.kind == SpanKind.SERVER && it.name != "tools/call" }
+        val mcpSpan = spans.first { it.name == "tools/call" }
 
         assertThat(mcpSpan.links.size, equalTo(1))
         assertThat(mcpSpan.links.first().spanContext.traceId, equalTo(transportSpan.spanContext.traceId))
@@ -154,18 +156,28 @@ class McpOpenTelemetryTracingTest {
 
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
 
-        val handler = filter.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+        val handler = filter.then { McpResponse(McpJson.nullNode()) }
 
         val parentTraceId = "0af7651916cd43dd8448eb211c80319c"
         val parentSpanId = "b7ad6b7169203331"
 
-        val meta = Meta(MoshiObject(
-            "traceparent" to asJsonObject("00-$parentTraceId-$parentSpanId-01"),
-            "tracestate" to asJsonObject("congo=t61rcWkgMzE")
-        ))
-        val message = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test"), _meta = meta), "1")
+        val jsonReq = JsonRpcRequest(
+            McpJson, mapOf(
+                "jsonrpc" to asJsonObject("2.0"),
+                "method" to asJsonObject("tools/call"),
+                "id" to asJsonObject(1),
+                "params" to asJsonObject(
+                    mapOf(
+                        "_meta" to mapOf(
+                            "traceparent" to "00-$parentTraceId-$parentSpanId-01",
+                            "tracestate" to "congo=t61rcWkgMzE"
+                        )
+                    )
+                )
+            )
+        )
 
-        handler(mcpRequest(message = message))
+        handler(McpRequest(Session(SessionId.of("test-session")), jsonReq, Request.Companion(POST, "/mcp")))
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.spanContext.traceId, equalTo(parentTraceId))
@@ -185,9 +197,9 @@ class McpOpenTelemetryTracingTest {
 
         val filter = McpFilters.OpenTelemetryTracing(openTelemetry = w3cOpenTelemetry)
 
-        val handler = filter.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+        val handler = filter.then { McpResponse(McpJson.nullNode()) }
 
-        handler(mcpRequest())
+        handler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), Request.Companion(POST, "/mcp")))
 
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.parentSpanId, equalTo(SpanId.getInvalid()))
@@ -198,15 +210,15 @@ class McpOpenTelemetryTracingTest {
         val filter = McpFilters.OpenTelemetryTracing(
             openTelemetry = openTelemetry,
             spanModifiers = listOf(
-                spanModifier("request-attr-key-1" to "request-attr-value-1", "response-attr-key-1" to "response-attr-value-1"),
-                spanModifier("request-attr-key-2" to "request-attr-value-2", "response-attr-key-2" to "response-attr-value-2"),
+                spanModifier("request-attr-key-1" to "request-attr-value-1", "response-attr-key-1" to "response-attr-value-1", McpTool.Call.Method),
+                spanModifier("request-attr-key-2" to "request-attr-value-2", "response-attr-key-2" to "response-attr-value-2", McpTool.Call.Method),
             )
         )
         val handler = filter.then {
-            McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
+            McpResponse(McpJson.nullNode())
         }
 
-        handler(mcpRequest())
+        handler(McpRequest(Session(SessionId.of("test-session")), jsonRpcRequest(), Request.Companion(POST, "/mcp")))
 
         val capturedSpan = spanExporter.finishedSpanItems.single()
         with(capturedSpan!!) {
@@ -218,21 +230,27 @@ class McpOpenTelemetryTracingTest {
         }
     }
 
-    private fun mcpRequest(
-        session: Session = Session(SessionId.of("test-session")),
-        message: McpTool.Call.Request = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), "1"),
-        http: Request = Request(POST, "/mcp")
-    ) = McpRequest(session, message, with(McpJson) { http.json(message) }.with(Header.MCP_PROTOCOL_VERSION of ProtocolVersion.LATEST_VERSION))
+    private fun jsonRpcRequest() = JsonRpcRequest(
+        McpJson, mapOf(
+            "jsonrpc" to asJsonObject("2.0"),
+            "method" to asJsonObject("tools/call"),
+            "id" to asJsonObject(1),
+            "params" to asJsonObject(emptyMap<String, Any>())
+        )
+    )
 
     private fun spanModifier(
         requestAttribute: Pair<String, String>,
         responseAttribute: Pair<String, String>,
-    ) = object : McpOpenTelemetrySpanModifier {
-        override operator fun invoke(sb: Span, request: McpRequest) {
+        method: McpRpcMethod = McpTool.Call.Method
+    ) = object : McpOpenTelemetrySpanModifiers {
+        override val method: McpRpcMethod = method
+
+        override fun request(sb: Span, request: McpNodeType) {
             sb.setAttribute(requestAttribute.first, requestAttribute.second)
         }
 
-        override operator fun invoke(sb: Span, response: McpResponse) {
+        override fun response(sb: Span, response: McpNodeType) {
             sb.setAttribute(responseAttribute.first, responseAttribute.second)
         }
     }

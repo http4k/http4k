@@ -5,9 +5,9 @@
 package org.http4k.ai.mcp.server.sse
 
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
+import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Invalid
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
+import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -23,18 +23,17 @@ import org.http4k.sse.SseResponse
  */
 fun SseOutboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/sse" bind { req: Request ->
-        when (val sessionState = protocol.retrieveSession(req)) {
-            is Valid
- -> SseResponse(OK) {
-                protocol.subscribe(Subscription(sessionState.session), it, req)
+        when (val session = protocol.retrieveSession(req)) {
+            is Session -> SseResponse(OK) {
+                protocol.assign(Subscription(session), it, req)
                 it.send(
                     SseMessage.Event(
                         "endpoint",
-                        Request(GET, "/message").with(sessionId of sessionState.session.id).uri.toString()
+                        Request(GET, "/message").with(sessionId of session.id).uri.toString()
                     )
                 )
             }
 
-            Invalid -> SseResponse(NOT_FOUND) { it.close() }
+            is InvalidSession -> SseResponse(NOT_FOUND) { it.close() }
         }
     }

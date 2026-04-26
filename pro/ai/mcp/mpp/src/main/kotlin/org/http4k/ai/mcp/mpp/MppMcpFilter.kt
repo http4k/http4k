@@ -9,11 +9,10 @@ import dev.forkhandles.result4k.recover
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.mpp.MppPaymentCheck.Free
 import org.http4k.ai.mcp.mpp.MppPaymentCheck.Required
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
 import org.http4k.connect.mpp.model.Challenge
@@ -34,8 +33,8 @@ fun McpFilters.MppPaymentRequired(
         when (val result = check(req)) {
             is Free -> next(req)
             is Required -> {
-                val rawParams = McpJson.fields(McpJson.parse(req.http.bodyString())).toMap()["params"]
-                val metaNode = (rawParams as? MoshiObject)?.attributes?.get("_meta") as? MoshiObject
+                val params = req.json.params as? MoshiObject
+                val metaNode = params?.attributes?.get("_meta") as? MoshiObject
                 val meta = Meta(metaNode ?: MoshiObject())
 
                 MetaKey.mppCredential().toLens()(meta)
@@ -43,25 +42,21 @@ fun McpFilters.MppPaymentRequired(
                         verifier.verify(credential)
                             .map { next(req) }
                             .recover {
-                                McpResponse.Ok(
-                                    McpJsonRpcErrorResponse(
-                                        req.message.id,
-                                        MppErrorMessage(VERIFICATION_FAILED_CODE, it.message ?: "Verification failed", result.challenges)
-                                    )
+                                McpResponse(
+                                    MppErrorMessage(VERIFICATION_FAILED_CODE, it.message ?: "Verification failed", result.challenges)
+                                        .toJsonRpc(req.json.id)
                                 )
                             }
-                    } ?: McpResponse.Ok(
-                    McpJsonRpcErrorResponse(
-                        req.message.id,
-                        MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
-                    )
+                    } ?: McpResponse(
+                    MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
+                        .toJsonRpc(req.json.id)
                 )
             }
         }
     }
 }
 
-internal class MppErrorMessage(
+private class MppErrorMessage(
     code: Int,
     message: String,
     private val challenges: List<Challenge>

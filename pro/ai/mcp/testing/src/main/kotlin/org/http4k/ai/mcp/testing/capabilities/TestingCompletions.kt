@@ -26,14 +26,9 @@ class TestingCompletions(
         request: CompletionRequest,
         overrideDefaultTimeout: Duration?
     ): Result<CompletionResponse, McpError> =
-        sender(
-            McpCompletion.Request(
-                McpCompletion.Request.Params(ref, request.argument, request.context, request.meta),
-                sender.nextId()
-            )
-        )
+        sender(McpCompletion, McpCompletion.Request(ref, request.argument, request.context, request.meta))
             .first()
-            .nextEvent<CompletionResponse, McpCompletion.Response.Result> {
+            .nextEvent<CompletionResponse, McpCompletion.Response> {
                 CompletionResponse.Ok(completion.values, completion.total, completion.hasMore)
             }
             .map { it.second }

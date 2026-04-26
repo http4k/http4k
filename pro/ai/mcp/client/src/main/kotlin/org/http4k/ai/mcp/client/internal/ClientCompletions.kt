@@ -10,7 +10,6 @@ import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
 import org.http4k.ai.mcp.CompletionResponse.Ok
-import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Reference
@@ -25,16 +24,14 @@ internal class ClientCompletions(
     private val sender: McpRpcSender,
     private val id: () -> McpMessageId,
 ) : McpClient.Completions {
-    override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?): McpResult<CompletionResponse> {
-        val messageId = id()
-        return sender(
-            McpCompletion.Request(McpCompletion.Request.Params(ref, request.argument, request.context, request.meta), messageId),
+    override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
+        sender(
+            McpCompletion, McpCompletion.Request(ref, request.argument, request.context, request.meta),
             overrideDefaultTimeout ?: defaultTimeout,
-            messageId
+            id()
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .flatMap { it.first().asOrFailure<McpCompletion.Response.Result>() }
+            .flatMap { it.first().asOrFailure<McpCompletion.Response>() }
             .map { Ok(it.completion.values, it.completion.total, it.completion.hasMore) as CompletionResponse }
             .flatMapFailure { toCompletionErrorOrFailure(it) }
-    }
 }

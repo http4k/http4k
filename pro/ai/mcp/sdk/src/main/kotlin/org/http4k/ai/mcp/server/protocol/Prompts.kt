@@ -15,6 +15,6 @@ import org.http4k.core.Request
  * Handles protocol traffic for prompts features.
  */
 interface Prompts : ObservableCapability<PromptCapability>, (PromptName) -> PromptHandler, Iterable<PromptCapability> {
-    fun get(req: McpPrompt.Get.Request.Params, client: Client, http: Request): McpPrompt.Get.Response.Result
-    fun list(mcp: McpPrompt.List.Request.Params, client: Client, http: Request): McpPrompt.List.Response.Result
+    fun get(req: McpPrompt.Get.Request, client: Client, http: Request): McpPrompt.Get.Response
+    fun list(mcp: McpPrompt.List.Request, client: Client, http: Request): McpPrompt.List.Response
 }

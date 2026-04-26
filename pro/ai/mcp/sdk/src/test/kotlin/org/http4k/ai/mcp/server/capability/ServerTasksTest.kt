@@ -35,15 +35,15 @@ class ServerTasksTest {
         val taskId = TaskId.of("task-1")
         val now = Instant.now()
 
-        tasks.update(session1, McpTask.Status.Notification.Params(
+        tasks.update(session1, McpTask.Status.Notification(
             taskId = taskId,
             status = TaskStatus.working,
             createdAt = now,
             lastUpdatedAt = now
         ))
 
-        val session1Tasks = tasks.list(session1, McpTask.List.Request.Params(), Client.Companion.NoOp, testRequest)
-        val session2Tasks = tasks.list(session2, McpTask.List.Request.Params(), Client.Companion.NoOp, testRequest)
+        val session1Tasks = tasks.list(session1, McpTask.List.Request(), Client.Companion.NoOp, testRequest)
+        val session2Tasks = tasks.list(session2, McpTask.List.Request(), Client.Companion.NoOp, testRequest)
 
         assertThat(session1Tasks.tasks.size, equalTo(1))
         assertThat(session1Tasks.tasks[0].taskId, equalTo(taskId))
@@ -56,24 +56,24 @@ class ServerTasksTest {
         val taskId2 = TaskId.of("task-2")
         val now = Instant.now()
 
-        tasks.update(session1, McpTask.Status.Notification.Params(
+        tasks.update(session1, McpTask.Status.Notification(
             taskId = taskId1,
             status = TaskStatus.working,
             createdAt = now,
             lastUpdatedAt = now
         ))
-        tasks.update(session1, McpTask.Status.Notification.Params(
+        tasks.update(session1, McpTask.Status.Notification(
             taskId = taskId2,
             status = TaskStatus.working,
             createdAt = now,
             lastUpdatedAt = now
         ))
 
-        assertThat(tasks.list(session1, McpTask.List.Request.Params(), Client.Companion.NoOp, testRequest).tasks.size, equalTo(2))
+        assertThat(tasks.list(session1, McpTask.List.Request(), Client.Companion.NoOp, testRequest).tasks.size, equalTo(2))
 
         tasks.remove(session1)
 
-        assertThat(tasks.list(session1, McpTask.List.Request.Params(), Client.Companion.NoOp, testRequest).tasks, isEmpty)
+        assertThat(tasks.list(session1, McpTask.List.Request(), Client.Companion.NoOp, testRequest).tasks, isEmpty)
     }
 
     @Test
@@ -89,7 +89,7 @@ class ServerTasksTest {
             receivedMeta.set(meta)
         }
 
-        val notification = McpTask.Status.Notification.Params(
+        val notification = McpTask.Status.Notification(
             taskId = taskId,
             status = TaskStatus.working,
             statusMessage = "Processing...",

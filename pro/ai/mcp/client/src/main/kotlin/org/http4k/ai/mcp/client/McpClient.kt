@@ -37,7 +37,7 @@ interface McpClient : AutoCloseable {
 
     val sessionId: SessionId
 
-    fun start(overrideDefaultTimeout: Duration? = null): McpResult<McpInitialize.Response.Result>
+    fun start(overrideDefaultTimeout: Duration? = null): McpResult<McpInitialize.Response>
     fun stop() = close()
 
     fun tools(): Tools

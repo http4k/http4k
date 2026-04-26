@@ -19,7 +19,7 @@ import org.http4k.websocket.Websocket
 import java.time.Duration
 
 class WebsocketMcpClientTest : McpStreamingClientContract<Websocket>() {
-    
+
     override val doesNotifications = true
 
     override fun clientSessions() = WebsocketSessions(

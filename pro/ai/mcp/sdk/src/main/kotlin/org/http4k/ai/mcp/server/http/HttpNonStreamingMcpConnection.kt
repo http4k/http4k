@@ -4,18 +4,17 @@
  */
 package org.http4k.ai.mcp.server.http
 
-import org.http4k.ai.mcp.server.asHttp
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
+import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Invalid
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
+import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.util.asHttp
 import org.http4k.core.ContentType
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -35,38 +34,36 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
     path bind routes(
         POST to { req ->
             with(protocol) {
-                when (val sessionState = retrieveSession(req)) {
-                    is Valid
- ->
-                        receive(FakeSse(req), sessionState, req).asHttp(OK)
-                            .with(Header.MCP_SESSION_ID of sessionState.session.id)
+                when (val session = retrieveSession(req)) {
+                    is Session -> {
+                        receive(FakeSse(req), session, req).asHttp(OK)
+                            .with(Header.MCP_SESSION_ID of session.id)
+                    }
 
-                    Invalid -> Response(NOT_FOUND)
+                    is InvalidSession -> Response(NOT_FOUND)
                 }
             }
         },
         GET to { req ->
             with(protocol) {
-                when (val sessionState = retrieveSession(req)) {
-                    is Valid
- -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
-                        .with(Header.MCP_SESSION_ID of sessionState.session.id)
+                when (val session = retrieveSession(req)) {
+                    is Session -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
+                        .with(Header.MCP_SESSION_ID of session.id)
 
-                    Invalid -> Response(NOT_FOUND)
+                    is InvalidSession -> Response(NOT_FOUND)
                 }
             }
         },
         DELETE to { req ->
             with(protocol) {
-                when (val sessionState = retrieveSession(req)) {
-                    is Valid
- -> {
-                        unsubscribe(Subscription(sessionState.session))
-                        Response(ACCEPTED).contentType(ContentType.TEXT_EVENT_STREAM)
-                            .with(Header.MCP_SESSION_ID of sessionState.session.id)
+                when (val session = retrieveSession(req)) {
+                    is Session -> {
+                        end(Subscription(session))
+                        Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
+                            .with(Header.MCP_SESSION_ID of session.id)
                     }
 
-                    Invalid -> Response(NOT_FOUND)
+                    is InvalidSession -> Response(NOT_FOUND)
                 }
             }
         }

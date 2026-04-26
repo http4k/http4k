@@ -15,8 +15,8 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 interface ObservableResources : Resources {
     fun triggerUpdated(uri: Uri): Unit = throw McpException(MethodNotFound)
 
-    fun subscribe(session: Session, req: McpResource.Subscribe.Request.Params, fn: (Uri) -> Unit): Unit =
+    fun subscribe(session: Session, req: McpResource.Subscribe.Request, fn: (Uri) -> Unit): Unit =
         throw McpException(MethodNotFound)
 
-    fun unsubscribe(session: Session, req: McpResource.Unsubscribe.Request.Params): Unit = throw McpException(MethodNotFound)
+    fun unsubscribe(session: Session, req: McpResource.Unsubscribe.Request): Unit = throw McpException(MethodNotFound)
 }

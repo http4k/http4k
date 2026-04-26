@@ -12,11 +12,11 @@ import org.http4k.ai.mcp.model.Task
 import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.model.ToolAnnotations
 import org.http4k.ai.mcp.model.ToolExecution
+import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.ai.model.ToolName
 import org.http4k.format.MoshiNode
 import se.ansman.kotshi.JsonSerializable
-import se.ansman.kotshi.PolymorphicLabel
 
 @JsonSerializable
 data class McpTool(
@@ -30,69 +30,48 @@ data class McpTool(
     val execution: ToolExecution? = null,
     val _meta: Meta = Meta.default
 ) {
-    object List {
+    object List : McpRpc {
+        override val Method = of("tools/list")
 
         @JsonSerializable
-        @PolymorphicLabel("tools/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("tools/list")
-
-            @JsonSerializable
-            data class Params(
-                override val cursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta, PaginatedRequest
-        }
+        data class Request(
+            override val cursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ClientMessage.Request, HasMeta, PaginatedRequest
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val tools: kotlin.collections.List<McpTool>,
-                override val nextCursor: Cursor? = null,
-                override val _meta: Meta = Meta.default
-            ) : PaginatedResponse, HasMeta
-        }
+        data class Response(
+            val tools: kotlin.collections.List<McpTool>,
+            override val nextCursor: Cursor? = null,
+            override val _meta: Meta = Meta.default
+        ) : ServerMessage.Response, PaginatedResponse, HasMeta
 
-        data object Changed {
+        data object Changed : McpRpc {
+            override val Method: McpRpcMethod = of("notifications/tools/list_changed")
 
             @JsonSerializable
-            @PolymorphicLabel("notifications/tools/list_changed")
-            data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-                override val method = of("notifications/tools/list_changed")
-
-                @JsonSerializable
-                data class Params(override val _meta: Meta = Meta.default) : HasMeta
-            }
+            data object Notification : ServerMessage.Notification
         }
     }
 
-    object Call {
+    object Call : McpRpc {
+        override val Method = of("tools/call")
 
         @JsonSerializable
-        @PolymorphicLabel("tools/call")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("tools/call")
-
-            @JsonSerializable
-            data class Params(
-                val name: ToolName,
-                val arguments: Map<String, MoshiNode> = emptyMap(),
-                override val _meta: Meta = Meta.default,
-                val task: TaskMeta? = null
-            ) : HasMeta
-        }
+        data class Request(
+            val name: ToolName,
+            val arguments: Map<String, MoshiNode> = emptyMap(),
+            override val _meta: Meta = Meta.default,
+            val task: TaskMeta? = null
+        ) : ClientMessage.Request, HasMeta
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
-            @JsonSerializable
-            data class Result(
-                val content: kotlin.collections.List<Content>? = null,
-                val structuredContent: Map<String, Any>? = null,
-                val isError: Boolean? = false,
-                val task: Task? = null,
-                override val _meta: Meta = Meta.default,
-            ) : HasMeta
-        }
+        data class Response(
+            val content: kotlin.collections.List<Content>? = null,
+            val structuredContent: Map<String, Any>? = null,
+            val isError: Boolean? = false,
+            val task: Task? = null,
+            override val _meta: Meta = Meta.default,
+        ) : ServerMessage.Response, HasMeta
     }
 }

@@ -4,16 +4,18 @@
  */
 package org.http4k.ai.mcp.server.http
 
+import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
+import org.http4k.ai.mcp.server.protocol.InvalidSession
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Invalid
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
+import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
-import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.accepted
 import org.http4k.lens.Header
@@ -27,34 +29,32 @@ import org.http4k.sse.SseResponse
 
 fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp") =
     path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
-
-        when (val sessionState = protocol.retrieveSession(req)) {
-            is Valid
-                -> SseResponse(
+        when (val session = protocol.retrieveSession(req)) {
+            is Session -> SseResponse(
                 OK, listOf(
                     CONTENT_TYPE.meta.name to TEXT_EVENT_STREAM.withNoDirectives().value,
-                    Header.MCP_SESSION_ID.meta.name to sessionState.session.id.value,
+                    Header.MCP_SESSION_ID.meta.name to session.id.value,
                 )
             ) { sse ->
                 with(protocol) {
-                    val subscription = Subscription(sessionState.session)
                     when (req.method) {
                         GET -> {
-                            protocol.subscribe(subscription, sse, req)
+                            assign(Subscription(session), sse, req)
+                            handleInitialize(
+                                McpInitialize.Request(VersionedMcpEntity(session.id.value, "0.0.0"), All),
+                                req,
+                                session
+                            )
                             sse.send(Event("ping", ""))
                         }
 
-                        POST -> sse.use { receive(it, sessionState, req) }
-                        DELETE -> {
-                            unsubscribe(subscription)
-                            sse.close()
-                        }
+                        POST -> sse.use { receive(it, session, req) }
 
                         else -> sse.close()
                     }
                 }
             }
 
-            Invalid -> SseResponse(NOT_FOUND) { it.close() }
+            is InvalidSession -> SseResponse(BAD_REQUEST) { it.close() }
         }
     })

@@ -13,6 +13,7 @@ import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.DomainError
+import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpSampling
 import java.time.Duration
 
@@ -20,54 +21,55 @@ internal class ClientSampling(
     private val tidyUp: (McpMessageId) -> Unit,
     private val defaultTimeout: Duration,
     private val sender: McpRpcSender,
-    private val register: McpCallbackRegistry
+    private val register: (McpRpc, McpCallback<*>) -> Any
 ) : McpClient.Sampling {
 
     override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
-        register.on(McpSampling.Request::class) { req, requestId ->
-            if (requestId == null) return@on
-            val request = req.params
+        register(McpSampling,
+            McpCallback(McpSampling.Request::class) { request, requestId ->
+                if (requestId == null) return@McpCallback
 
-            val responses = fn(
-                SamplingRequest(
-                    request.messages,
-                    request.maxTokens,
-                    request.systemPrompt,
-                    request.includeContext,
-                    request.temperature,
-                    request.stopSequences,
-                    request.modelPreferences,
-                    request.metadata,
-                    request.tools ?: emptyList(),
-                    request.toolChoice
+                val responses = fn(
+                    SamplingRequest(
+                        request.messages,
+                        request.maxTokens,
+                        request.systemPrompt,
+                        request.includeContext,
+                        request.temperature,
+                        request.stopSequences,
+                        request.modelPreferences,
+                        request.metadata,
+                        request.tools ?: emptyList(),
+                        request.toolChoice
+                    )
                 )
-            )
 
-            val timeout = overrideDefaultTimeout ?: defaultTimeout
+                val timeout = overrideDefaultTimeout ?: defaultTimeout
 
-            responses.forEach { response ->
-                val protocolResponse = when (response) {
-                    is Ok -> McpSampling.Response.Result(
-                        response.model,
-                        response.stopReason,
-                        response.role,
-                        response.content
+                responses.forEach { response ->
+                    val protocolResponse = when (response) {
+                        is Ok -> McpSampling.Response(
+                            response.model,
+                            response.stopReason,
+                            response.role,
+                            response.content
+                        )
+
+                        is Task -> McpSampling.Response(task = response.task)
+                        is Error -> throw McpException(DomainError(response.message))
+                    }
+                    sender(
+                        McpSampling,
+                        protocolResponse,
+                        timeout,
+                        requestId
                     )
 
-                    is Task -> McpSampling.Response.Result(task = response.task)
-                    is Error -> throw McpException(DomainError(response.message))
+                    when (response) {
+                        is Ok -> if (response.stopReason != null) tidyUp(requestId)
+                        else -> tidyUp(requestId)
+                    }
                 }
-                sender(
-                    McpSampling.Response(protocolResponse, requestId),
-                    timeout,
-                    requestId
-                )
-
-                when (response) {
-                    is Ok -> if (response.stopReason != null) tidyUp(requestId)
-                    else -> tidyUp(requestId)
-                }
-            }
-        }
+            })
     }
 }

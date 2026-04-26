@@ -9,9 +9,11 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import org.http4k.ai.mcp.model.Completion
 import org.http4k.ai.mcp.model.CompletionArgument
-import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.format.renderResult
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
@@ -27,24 +29,18 @@ class CompletionDetailSpanModifiersTest {
     @Test
     fun `sets arguments from request`(approver: Approver) {
         val request = McpCompletion.Request(
-            McpCompletion.Request.Params(
-                ref = Reference.Prompt("my-prompt"),
-                argument = CompletionArgument("city", "Lon")
-            ),
-            id = 1
+            ref = org.http4k.ai.mcp.model.Reference.Prompt("my-prompt"),
+            argument = CompletionArgument("city", "Lon")
         )
-        CompletionDetailSpanModifiers(span, request.asMcpRequest())
+        CompletionDetailSpanModifiers.request(span, asJsonObject(request))
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.completion.arguments"))!!, APPLICATION_JSON)
     }
 
     @Test
     fun `sets result from response`(approver: Approver) {
-        val response = McpCompletion.Response(
-            McpCompletion.Response.Result(Completion("London", "Los Angeles")),
-            id = 1
-        )
-        CompletionDetailSpanModifiers(span, response.asMcpResponse())
+        val response = McpCompletion.Response(Completion("London", "Los Angeles"))
+        CompletionDetailSpanModifiers.response(span, McpJson.run { renderResult(asJsonObject(response), number(1)) })
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.completion.result"))!!, APPLICATION_JSON)
     }
