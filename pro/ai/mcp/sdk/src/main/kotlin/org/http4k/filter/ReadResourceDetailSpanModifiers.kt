@@ -17,7 +17,7 @@ import org.http4k.ai.mcp.util.McpJson
 object ReadResourceDetailSpanModifiers : McpOpenTelemetrySpanModifier {
     override operator fun invoke(sb: Span, response: McpResponse) {
         if (response is McpResponse.Ok && response.message is McpResource.Read.Response) {
-            sb.setAttribute("gen_ai.resource.result", McpJson.asFormatString((response.message as McpResource.Read.Response).result.contents))
+            sb.setAttribute("gen_ai.resource.result", McpJson.asFormatString(response.message.result.contents))
         }
     }
 }

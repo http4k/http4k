@@ -5,9 +5,9 @@
 package org.http4k.ai.mcp.server.sse
 
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.ValidSessionState
+import org.http4k.ai.mcp.server.protocol.SessionState.Invalid
+import org.http4k.ai.mcp.server.protocol.SessionState.Valid
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -24,7 +24,8 @@ import org.http4k.sse.SseResponse
 fun SseOutboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/sse" bind { req: Request ->
         when (val sessionState = protocol.retrieveSession(req)) {
-            is ValidSessionState -> SseResponse(OK) {
+            is Valid
+ -> SseResponse(OK) {
                 protocol.subscribe(Subscription(sessionState.session), it, req)
                 it.send(
                     SseMessage.Event(
@@ -34,6 +35,6 @@ fun SseOutboundMcpConnection(protocol: McpProtocol<Sse>) =
                 )
             }
 
-            InvalidSessionState -> SseResponse(NOT_FOUND) { it.close() }
+            Invalid -> SseResponse(NOT_FOUND) { it.close() }
         }
     }

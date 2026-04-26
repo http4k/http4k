@@ -113,7 +113,8 @@ class McpProtocol<Transport>(
             )
         )
 
-    fun receive(transport: Transport, sessionState: ValidSessionState, httpReq: Request): McpResponse {
+    fun receive(transport: Transport, sessionState: SessionState.Valid
+, httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }

@@ -5,9 +5,9 @@
 package org.http4k.ai.mcp.server.websocket
 
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.ValidSessionState
+import org.http4k.ai.mcp.server.protocol.SessionState.Invalid
+import org.http4k.ai.mcp.server.protocol.SessionState.Valid
 import org.http4k.ai.mcp.server.sse.sessionId
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -28,7 +28,8 @@ import java.util.concurrent.Executors
  */
 fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { req: Request ->
     when (val sessionState = protocol.retrieveSession(req)) {
-        is ValidSessionState -> WsResponse { ws ->
+        is Valid
+            -> WsResponse { ws ->
             val executor = Executors.newVirtualThreadPerTaskExecutor()
 
             val subscription = Subscription(sessionState.session)
@@ -62,7 +63,7 @@ fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { re
             )
         }
 
-        InvalidSessionState -> WsResponse { it.close(REFUSE) }
+        Invalid -> WsResponse { it.close(REFUSE) }
     }
 }
 
@@ -70,8 +71,10 @@ private fun sessionToUse(
     isFirst: Boolean,
     protocol: McpProtocol<Websocket>,
     req: Request,
-    sessionState: ValidSessionState
+    sessionState: Valid
+
 ) = when {
     isFirst -> sessionState
-    else -> protocol.retrieveSession(req.with(Header.MCP_SESSION_ID of sessionState.session.id)) as? ValidSessionState ?: sessionState
+    else -> protocol.retrieveSession(req.with(Header.MCP_SESSION_ID of sessionState.session.id)) as? Valid
+        ?: sessionState
 }

@@ -24,7 +24,7 @@ object GetPromptDetailSpanModifiers : McpOpenTelemetrySpanModifier {
 
     override operator fun invoke(sb: Span, response: McpResponse) {
         if (response is McpResponse.Ok && response.message is McpPrompt.Get.Response) {
-            sb.setAttribute("gen_ai.prompt.result", McpJson.asFormatString((response.message as McpPrompt.Get.Response).result.messages))
+            sb.setAttribute("gen_ai.prompt.result", McpJson.asFormatString(response.message.result.messages))
         }
     }
 }

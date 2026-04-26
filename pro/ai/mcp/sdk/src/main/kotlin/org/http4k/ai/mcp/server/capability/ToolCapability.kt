@@ -53,6 +53,7 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
         tool.meta ?: Meta.default
     )
 
+    @Suppress("UNCHECKED_CAST")
     fun call(mcp: McpTool.Call.Request.Params, client: Client, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
             .mapFailure { throw McpException(InvalidParams) }

@@ -6,9 +6,9 @@ package org.http4k.ai.mcp.server.http
 
 import org.http4k.ai.mcp.server.asHttp
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.ValidSessionState
+import org.http4k.ai.mcp.server.protocol.SessionState.Invalid
+import org.http4k.ai.mcp.server.protocol.SessionState.Valid
 import org.http4k.core.ContentType
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -36,34 +36,37 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
         POST to { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
-                    is ValidSessionState ->
+                    is Valid
+ ->
                         receive(FakeSse(req), sessionState, req).asHttp(OK)
                             .with(Header.MCP_SESSION_ID of sessionState.session.id)
 
-                    InvalidSessionState -> Response(NOT_FOUND)
+                    Invalid -> Response(NOT_FOUND)
                 }
             }
         },
         GET to { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
-                    is ValidSessionState -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
+                    is Valid
+ -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
                         .with(Header.MCP_SESSION_ID of sessionState.session.id)
 
-                    InvalidSessionState -> Response(NOT_FOUND)
+                    Invalid -> Response(NOT_FOUND)
                 }
             }
         },
         DELETE to { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
-                    is ValidSessionState -> {
+                    is Valid
+ -> {
                         unsubscribe(Subscription(sessionState.session))
                         Response(ACCEPTED).contentType(ContentType.TEXT_EVENT_STREAM)
                             .with(Header.MCP_SESSION_ID of sessionState.session.id)
                     }
 
-                    InvalidSessionState -> Response(NOT_FOUND)
+                    Invalid -> Response(NOT_FOUND)
                 }
             }
         }

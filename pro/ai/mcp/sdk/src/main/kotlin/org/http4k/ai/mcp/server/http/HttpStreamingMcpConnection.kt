@@ -5,9 +5,9 @@
 package org.http4k.ai.mcp.server.http
 
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
-import org.http4k.ai.mcp.server.protocol.InvalidSessionState
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.ValidSessionState
+import org.http4k.ai.mcp.server.protocol.SessionState.Invalid
+import org.http4k.ai.mcp.server.protocol.SessionState.Valid
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -29,7 +29,8 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
     path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
 
         when (val sessionState = protocol.retrieveSession(req)) {
-            is ValidSessionState -> SseResponse(
+            is Valid
+                -> SseResponse(
                 OK, listOf(
                     CONTENT_TYPE.meta.name to TEXT_EVENT_STREAM.withNoDirectives().value,
                     Header.MCP_SESSION_ID.meta.name to sessionState.session.id.value,
@@ -54,6 +55,6 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
                 }
             }
 
-            InvalidSessionState -> SseResponse(NOT_FOUND) { it.close() }
+            Invalid -> SseResponse(NOT_FOUND) { it.close() }
         }
     })

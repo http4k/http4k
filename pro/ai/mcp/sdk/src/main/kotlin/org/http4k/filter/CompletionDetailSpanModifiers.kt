@@ -24,7 +24,7 @@ object CompletionDetailSpanModifiers : McpOpenTelemetrySpanModifier {
 
     override operator fun invoke(sb: Span, response: McpResponse) {
         if (response is McpResponse.Ok && response.message is McpCompletion.Response) {
-            sb.setAttribute("gen_ai.completion.result", McpJson.asFormatString((response.message as McpCompletion.Response).result.completion))
+            sb.setAttribute("gen_ai.completion.result", McpJson.asFormatString(response.message.result.completion))
         }
     }
 }
