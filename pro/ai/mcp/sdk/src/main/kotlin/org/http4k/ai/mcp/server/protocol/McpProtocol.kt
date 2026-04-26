@@ -35,6 +35,9 @@ import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
 import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.Existing
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.New
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.compact
 import org.http4k.ai.mcp.util.McpJson.nullNode
@@ -113,7 +116,8 @@ class McpProtocol<Transport>(
             )
         )
 
-    fun receive(transport: Transport, sessionState: McpSessionState.Valid
+    fun receive(
+        transport: Transport, sessionState: Valid
 , httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }
@@ -131,9 +135,9 @@ class McpProtocol<Transport>(
                     sessions.assign(context, transport, httpReq)
 
                     val response = when (sessionState) {
-                        is ExistingSession -> mcpHandler(McpRequest(sessionState.session, message, httpReq))
+                        is Existing -> mcpHandler(McpRequest(sessionState.session, message, httpReq))
 
-                        is NewSession if message is McpInitialize.Request -> {
+                        is New if message is McpInitialize.Request -> {
                             runCatching {
                                 val response = Ok(McpInitialize.Response(initializer(message.params, httpReq), message.id))
                                 clientTracking[sessionState.session] = ClientTracking(message.params)

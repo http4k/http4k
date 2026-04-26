@@ -32,9 +32,9 @@ import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.jsonrpc.JsonRpcMcp
 import org.http4k.ai.mcp.server.jsonrpc.JsonRpcSessions
-import org.http4k.ai.mcp.server.protocol.ExistingSession
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.Existing
 import org.http4k.ai.mcp.server.protocol.NoOp
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.security.McpSecurity
@@ -171,7 +171,7 @@ fun mcpStdIo(
     executor.schedule({
         reader.buffered().lineSequence().forEach { it: String ->
             try {
-                receive(Unit, ExistingSession(Session(SessionId.of(UUID(0, 0).toString()))), Request(POST, "").body(it))
+                receive(Unit, Existing(Session(SessionId.of(UUID(0, 0).toString()))), Request(POST, "").body(it))
             } catch (e: Exception) {
                 e.printStackTrace(System.err)
             }
