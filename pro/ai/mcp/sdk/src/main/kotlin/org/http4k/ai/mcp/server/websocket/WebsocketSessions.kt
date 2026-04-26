@@ -43,7 +43,7 @@ class WebsocketSessions(
         }
 
     private fun Websocket.sendAndStore(message: McpJsonRpcMessage, session: Session) {
-        Event("message", McpJson.compact(McpJson.asJsonObject(message)), sessionEventTracking.next(session)).also {
+        Event("message", McpJson.asFormatString(message), sessionEventTracking.next(session)).also {
             send(WsMessage(it.toMessage()))
             eventStore.write(session, it)
         }

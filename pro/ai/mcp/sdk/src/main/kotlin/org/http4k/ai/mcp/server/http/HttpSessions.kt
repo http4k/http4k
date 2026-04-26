@@ -44,7 +44,7 @@ class HttpSessions(
     }
 
     private fun Sse.sendAndStore(message: McpJsonRpcMessage, session: Session) {
-        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(message)), sessionEventTracking.next(session)).also {
+        SseMessage.Event("message", McpJson.asFormatString(message), sessionEventTracking.next(session)).also {
             send(it)
             eventStore.write(session, it)
         }

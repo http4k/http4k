@@ -21,6 +21,8 @@ import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.format.unwrap
 import org.http4k.jsonrpc.ErrorMessage
 import kotlin.random.Random
 
@@ -54,17 +56,17 @@ fun RoutingMcpHandler(
             is McpInitialize.Request -> {
                 val initialize = initializer(mcp.message.params, mcp.http)
                 clientTracking[mcp.session] = ClientTracking(mcp.message.params)
-                McpResponse.Ok(McpInitialize.Response(initialize, mcp.message.id))
+                McpResponse.Ok(McpInitialize.Response(initialize, mcp.message.id?.coerce()))
             }
 
-            is McpPing.Request -> McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+            is McpPing.Request -> McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             is McpCompletion.Request -> McpResponse.Ok(
                 McpCompletion.Response(
                     completions.complete(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -74,7 +76,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -84,7 +86,7 @@ fun RoutingMcpHandler(
                         mcp.message.params ?: McpPrompt.List.Request.Params(),
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -94,7 +96,7 @@ fun RoutingMcpHandler(
                         mcp.message.params ?: McpResource.ListTemplates.Request.Params(),
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -104,7 +106,7 @@ fun RoutingMcpHandler(
                         mcp.message.params ?: McpResource.List.Request.Params(),
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -114,7 +116,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -127,17 +129,17 @@ fun RoutingMcpHandler(
                         )
                     )
                 }
-                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             }
 
             is McpResource.Unsubscribe.Request -> {
                 if (resources is ObservableResources) resources.unsubscribe(mcp.session, mcp.message.params)
-                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             }
 
             is McpLogging.SetLevel.Request -> {
                 logger.setLevel(mcp.session, mcp.message.params.level)
-                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id))
+                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             }
 
             is McpTool.Call.Request -> McpResponse.Ok(
@@ -146,7 +148,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -156,7 +158,7 @@ fun RoutingMcpHandler(
                         mcp.message.params ?: McpTool.List.Request.Params(),
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -167,7 +169,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -178,7 +180,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -189,7 +191,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -200,7 +202,7 @@ fun RoutingMcpHandler(
                         mcp.message.params,
                         clientFor(mcp.session),
                         mcp.http
-                    ), mcp.message.id
+                    ), mcp.message.id?.coerce()
                 )
             )
 
@@ -237,3 +239,5 @@ fun RoutingMcpHandler(
         }
     }
 }
+
+private fun Any.coerce(): Any? = McpJson.asJsonObject(this).unwrap()

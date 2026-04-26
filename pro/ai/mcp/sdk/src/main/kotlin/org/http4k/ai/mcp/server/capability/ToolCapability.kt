@@ -33,6 +33,7 @@ import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiNull
 import org.http4k.format.MoshiObject
 import org.http4k.format.MoshiString
+import org.http4k.format.unwrap
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
@@ -40,11 +41,12 @@ import org.http4k.lens.LensFailure
 data class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : ServerCapability, ToolHandler {
     override val name = tool.name.value
 
+    @Suppress("UNCHECKED_CAST")
     fun toTool() = McpTool(
         tool.name, tool.description,
         tool.title,
-        McpJson.convert(tool.toSchema()),
-        tool.output?.toSchema()?.let { McpJson.convert(it) },
+        tool.toSchema().unwrap() as Map<String, Any>,
+        tool.output?.toSchema()?.let { it.unwrap() as Map<String, Any> },
         tool.annotations,
         tool.icons,
         tool.execution,

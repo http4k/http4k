@@ -18,7 +18,7 @@ import java.util.UUID
 class StdIoMcpSessions(private val writer: Writer) : Sessions<Unit> {
 
     override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) = with(writer) {
-        write(McpJson.compact(McpJson.asJsonObject(message)) + "\n")
+        write(McpJson.asFormatString(message) + "\n")
         flush()
     }
 

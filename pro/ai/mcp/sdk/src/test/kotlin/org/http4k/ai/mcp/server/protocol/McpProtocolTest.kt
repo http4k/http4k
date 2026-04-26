@@ -29,7 +29,8 @@ import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.Root
 import org.http4k.ai.mcp.model.Size
-import org.http4k.ai.mcp.model.TaskSupport
+import org.http4k.ai.mcp.model.TaskSupport.optional
+import org.http4k.ai.mcp.model.TaskSupport.required
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.model.enum
@@ -633,6 +634,7 @@ class McpProtocolTest {
         val dateValueArg = Tool.Arg.value(MaxTokens).optional("aIntValue", "description7")
         val objectValueArg = Tool.Arg.auto(Foo(123, Bar("hello"), true)).optional("complexValue", "description8")
         val listObjectValueArg = Tool.Arg.auto(listOf(Bar("hello"))).optional("listArg", "description9")
+        val output = Tool.Output.auto(Foo(123, Bar("hello"), true)).toLens()
 
         val tool = Tool(
             "name",
@@ -646,14 +648,15 @@ class McpProtocolTest {
             dateValueArg,
             objectValueArg,
             listObjectValueArg,
-            execution = ToolExecution(TaskSupport.optional)
+            output = output,
+            execution = ToolExecution(optional)
         )
 
         val mcp = SseMcp(
             McpProtocol(
                 SseSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                tools = tools(listOf(tool bind { Ok("") })),
+                tools = tools(listOf(tool bind { Ok().with(output of Foo(123, Bar(""), true)) })),
                 random = random
             ),
             NoMcpSecurity
@@ -680,7 +683,7 @@ class McpProtocolTest {
             "description",
             objectValueArg,
             listObjectValueArg,
-            execution = ToolExecution(TaskSupport.required)
+            execution = ToolExecution(required)
         )
 
         val mcp = SseMcp(
@@ -716,7 +719,8 @@ class McpProtocolTest {
                     ), 1
                 )
             )
-            approver.assertApproved((received().first() as SseMessage.Event).data, APPLICATION_JSON)
+            val message = received().first() as SseMessage.Event
+            approver.assertApproved((message).data, APPLICATION_JSON)
         }
     }
 
