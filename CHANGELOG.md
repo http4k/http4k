@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.43.0.1 (uncut)
+- **http4k-***: Upgrade versions, including Kotlin to 2.3.21
 - **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
 - **http4k-testing-chaos**: Add `ReturnResponse` behaviour. H/T @jamieredding.
 - **http4k-connect-amazon-dynamodb-fake** [Fix] Condition expression to be properly evaluated when item is missing. H/T @oharaandrew314
