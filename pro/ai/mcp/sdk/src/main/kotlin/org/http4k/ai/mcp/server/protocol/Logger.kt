@@ -6,7 +6,6 @@ package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.util.McpNodeType
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Logs messages for a session back to the client.

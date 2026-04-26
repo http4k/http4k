@@ -6,21 +6,18 @@ package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
 import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpNodeType
 
 /**
  * Opt-in span modifiers that capture resource read result contents.
  * May contain sensitive data — add to spanModifiers explicitly, not included in defaults.
  * Note: gen_ai.resource.* attributes are http4k custom conventions, not official OTel semantic conventions.
  */
-object ReadResourceDetailSpanModifiers : McpOpenTelemetrySpanModifiers {
-    override val method = McpResource.Read.Method
-
-    override fun response(sb: Span, response: McpNodeType) {
-        val result = McpJson.fields(response).toMap()["result"] ?: return
-        McpJson.fields(result).toMap()["contents"]?.let {
-            sb.setAttribute("gen_ai.resource.result", McpJson.compact(it))
+object ReadResourceDetailSpanModifiers : McpOpenTelemetrySpanModifier {
+    override operator fun invoke(sb: Span, response: McpResponse) {
+        if (response is McpResponse.Ok && response.message is McpResource.Read.Response) {
+            sb.setAttribute("gen_ai.resource.result", McpJson.asFormatString(response.message.result.contents))
         }
     }
 }

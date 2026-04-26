@@ -83,6 +83,8 @@ class StatsTest {
             function.mcp()
         ).testMcpClient(Request(GET, "/mcp"))
 
+        client.start()
+
         val result = client.tools().call(
             ToolName.of("get_stats"),
             ToolRequest(emptyMap())

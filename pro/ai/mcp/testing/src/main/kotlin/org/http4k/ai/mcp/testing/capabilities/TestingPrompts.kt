@@ -14,7 +14,7 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.ai.mcp.testing.toMessage
 import java.time.Duration
 
 class TestingPrompts(
@@ -30,22 +30,22 @@ class TestingPrompts(
      * Expected a list changed notification to be received and process it
      */
     fun expectNotification() {
-        sender.stream().nextNotification<McpPrompt.List.Changed.Notification>(McpPrompt.List.Changed)
+        sender.lastEvent()
+            .toMessage<McpPrompt.List.Changed.Notification>().params
             .also { notifications.forEach { it() } }
     }
 
     override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpPrompt.List,
-        McpPrompt.List.Request()
+        McpPrompt.List.Request(McpPrompt.List.Request.Params(), sender.nextId())
     ).first()
-        .nextEvent<List<McpPrompt>, McpPrompt.List.Response> { prompts }.map { it.second }
+        .nextEvent<List<McpPrompt>, McpPrompt.List.Response.Result> { prompts }.map { it.second }
 
     override fun get(
         name: PromptName,
         request: PromptRequest,
         overrideDefaultTimeout: Duration?
-    ) = sender(McpPrompt.Get, McpPrompt.Get.Request(name, request, request.meta)).first()
-        .nextEvent<PromptResponse, McpPrompt.Get.Response> { PromptResponse.Ok(messages, description) }
+    ) = sender(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request, request.meta), sender.nextId())).first()
+        .nextEvent<PromptResponse, McpPrompt.Get.Response.Result> { PromptResponse.Ok(messages, description) }
         .map { it.second }
         .flatMapFailure { toPromptErrorOrFailure(it) }
 }

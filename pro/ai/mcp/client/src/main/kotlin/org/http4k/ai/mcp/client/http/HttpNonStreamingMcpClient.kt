@@ -42,15 +42,13 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.ServerMessage
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
@@ -84,12 +82,16 @@ class HttpNonStreamingMcpClient(
 
     override val sessionId get() = _sessionId.get()
 
+    private fun nextId() = McpMessageId.of(id.incrementAndGet())
+
     override fun start(overrideDefaultTimeout: Duration?) =
-        http.send<McpInitialize.Response>(
-            McpInitialize, McpInitialize.Request(
-                VersionedMcpEntity(entity, version),
-                ClientCapabilities(*listOf<ClientProtocolCapability>().toTypedArray()),
-                protocolVersion
+        http.send<McpInitialize.Response.Result>(
+            McpInitialize.Request(
+                McpInitialize.Request.Params(
+                    VersionedMcpEntity(entity, version),
+                    ClientCapabilities(*listOf<ClientProtocolCapability>().toTypedArray()),
+                    protocolVersion
+                ), nextId()
             )
         )
 
@@ -102,16 +104,18 @@ class HttpNonStreamingMcpClient(
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send<McpTool.List.Response>(McpTool.List, McpTool.List.Request())
+            http.send<McpTool.List.Response.Result>(McpTool.List.Request(McpTool.List.Request.Params(), nextId()))
                 .map { it.tools }
 
         override fun call(
             name: ToolName,
             request: ToolRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpTool.Call.Response>(
-            McpTool.Call,
-            McpTool.Call.Request(name, request.mapValues { McpJson.asJsonObject(it.value) })
+        ) = http.send<McpTool.Call.Response.Result>(
+            McpTool.Call.Request(
+                McpTool.Call.Request.Params(name, request.mapValues { McpJson.asJsonObject(it.value) }),
+                nextId()
+            )
         )
             .map { toToolResponseOrError(it) }
             .flatMapFailure { toToolElicitationRequiredOrError(it) }
@@ -121,14 +125,14 @@ class HttpNonStreamingMcpClient(
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send<McpPrompt.List.Response>(McpPrompt.List, McpPrompt.List.Request())
+            http.send<McpPrompt.List.Response.Result>(McpPrompt.List.Request(McpPrompt.List.Request.Params(), nextId()))
                 .map { it.prompts }
 
         override fun get(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpPrompt.Get.Response>(McpPrompt.Get, McpPrompt.Get.Request(name, request))
+        ) = http.send<McpPrompt.Get.Response.Result>(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request), nextId()))
             .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
             .flatMapFailure { toPromptErrorOrFailure(it) }
     }
@@ -141,20 +145,19 @@ class HttpNonStreamingMcpClient(
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send<McpResource.List.Response>(McpResource.List, McpResource.List.Request())
+            http.send<McpResource.List.Response.Result>(McpResource.List.Request(McpResource.List.Request.Params(), nextId()))
                 .map { it.resources }
 
         override fun listTemplates(overrideDefaultTimeout: Duration?) =
-            http.send<McpResource.ListTemplates.Response>(
-                McpResource.ListTemplates,
-                McpResource.ListTemplates.Request()
+            http.send<McpResource.ListTemplates.Response.Result>(
+                McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), nextId())
             )
                 .map { it.resourceTemplates }
 
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpResource.Read.Response>(McpResource.Read, McpResource.Read.Request(request.uri))
+        ) = http.send<McpResource.Read.Response.Result>(McpResource.Read.Request(McpResource.Read.Request.Params(request.uri), nextId()))
             .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
             .flatMapFailure { toResourceErrorOrFailure(it) }
 
@@ -165,7 +168,7 @@ class HttpNonStreamingMcpClient(
 
     override fun completions() = object : McpClient.Completions {
         override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
-            http.send<McpCompletion.Response>(McpCompletion, McpCompletion.Request(ref, request.argument))
+            http.send<McpCompletion.Response.Result>(McpCompletion.Request(McpCompletion.Request.Params(ref, request.argument), nextId()))
                 .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) as CompletionResponse } }
                 .flatMapFailure { toCompletionErrorOrFailure(it) }
     }
@@ -174,19 +177,19 @@ class HttpNonStreamingMcpClient(
         override fun onUpdate(fn: (Task, Meta) -> Unit) = throw UnsupportedOperationException()
 
         override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send<McpTask.Get.Response>(McpTask.Get, McpTask.Get.Request(taskId))
+            http.send<McpTask.Get.Response.Result>(McpTask.Get.Request(McpTask.Get.Request.Params(taskId), nextId()))
                 .map { it.task }
 
         override fun list(overrideDefaultTimeout: Duration?) =
-            http.send<McpTask.List.Response>(McpTask.List, McpTask.List.Request())
+            http.send<McpTask.List.Response.Result>(McpTask.List.Request(McpTask.List.Request.Params(), nextId()))
                 .map { it.tasks }
 
         override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send<McpTask.Cancel.Response>(McpTask.Cancel, McpTask.Cancel.Request(taskId))
+            http.send<McpTask.Cancel.Response.Result>(McpTask.Cancel.Request(McpTask.Cancel.Request.Params(taskId), nextId()))
                 .map { }
 
         override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send<McpTask.Result.Response>(McpTask.Result, McpTask.Result.Request(taskId))
+            http.send<McpTask.Result.Response.ResponseResult>(McpTask.Result.Request(McpTask.Result.Request.Params(taskId), nextId()))
                 .map { it.result }
 
         override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) =
@@ -195,9 +198,9 @@ class HttpNonStreamingMcpClient(
 
     override fun close() {}
 
-    private inline fun <reified T : ServerMessage> HttpHandler.send(rpc: McpRpc, message: ClientMessage): McpResult<T> {
+    private inline fun <reified T : Any> HttpHandler.send(message: McpJsonRpcRequest): McpResult<T> {
         val response = this(
-            message.toHttpRequest(protocolVersion, baseUri, rpc, McpMessageId.of(id.incrementAndGet()))
+            message.toHttpRequest(protocolVersion, baseUri)
                 .with(Header.MCP_SESSION_ID of sessionId)
                 .accept(TEXT_EVENT_STREAM)
         )

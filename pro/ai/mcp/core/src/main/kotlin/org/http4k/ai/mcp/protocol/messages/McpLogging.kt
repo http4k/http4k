@@ -9,29 +9,38 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.util.McpNodeType
 import se.ansman.kotshi.JsonSerializable
+import se.ansman.kotshi.PolymorphicLabel
 
 object McpLogging {
-    object SetLevel : McpRpc {
-        override val Method = McpRpcMethod.of("logging/setLevel")
+    object SetLevel {
 
         @JsonSerializable
-        data class Request(
-            val level: LogLevel,
-            override val _meta: Meta = Meta.default
-        ) :
-            ClientMessage.Request,
-            HasMeta
+        @PolymorphicLabel("logging/setLevel")
+        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+            override val method = McpRpcMethod.of("logging/setLevel")
+
+            @JsonSerializable
+            data class Params(
+                val level: LogLevel,
+                override val _meta: Meta = Meta.default
+            ) : HasMeta
+        }
     }
 
-    object LoggingMessage : McpRpc {
-        override val Method = McpRpcMethod.of("notifications/message")
+    object LoggingMessage {
 
         @JsonSerializable
-        data class Notification(
-            val data: McpNodeType,
-            val level: LogLevel,
-            val logger: String? = null,
-            override val _meta: Meta = Meta.default
-        ) : ServerMessage.Notification, HasMeta
+        @PolymorphicLabel("notifications/message")
+        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+            override val method = McpRpcMethod.of("notifications/message")
+
+            @JsonSerializable
+            data class Params(
+                val data: McpNodeType,
+                val level: LogLevel,
+                val logger: String? = null,
+                override val _meta: Meta = Meta.default
+            ) : HasMeta
+        }
     }
 }

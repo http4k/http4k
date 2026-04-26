@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
@@ -47,9 +48,9 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
@@ -109,7 +110,7 @@ class TestMcpClientTest {
     @Test
     fun `deal with prompts`() {
         val intArg = Prompt.Arg.int().required("name", "description", mapOf("title" to "title"))
-        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val icons = listOf(Icon(Uri.of("https://example.com/icon.png")))
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title", icons = icons)
 
         val serverPrompts = prompts(
@@ -171,7 +172,7 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with static resources`() {
-        val icons = listOf(org.http4k.ai.mcp.model.Icon(Uri.of("https://example.com/icon.png")))
+        val icons = listOf(Icon(Uri.of("https://example.com/icon.png")))
         val resource = Resource.Static(Uri.of("https://www.http4k.org"), ResourceName.of("HTTP4K"), "description", icons = icons)
         val content = Resource.Content.Blob(Base64Blob.encode("image"), resource.uri)
 

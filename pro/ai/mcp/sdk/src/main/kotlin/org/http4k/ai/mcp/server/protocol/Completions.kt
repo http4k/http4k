@@ -12,5 +12,5 @@ import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.core.Request
 
 interface Completions : (Reference) -> CompletionHandler, Iterable<CompletionCapability> {
-    fun complete(mcp: McpCompletion.Request, client: Client, http: Request): McpCompletion.Response
+    fun complete(mcp: McpCompletion.Request.Params, client: Client, http: Request): McpCompletion.Response.Result
 }

@@ -15,8 +15,8 @@ import org.http4k.core.Request
  * Handles protocol traffic for server provided tools.
  */
 interface Tools : ObservableCapability<ToolCapability>, Iterable<ToolCapability>, (ToolName) -> ToolHandler {
-    fun list(req: McpTool.List.Request, client: Client, http: Request): McpTool.List.Response
+    fun list(req: McpTool.List.Request.Params, client: Client, http: Request): McpTool.List.Response.Result
 
-    fun call(req: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response
+    fun call(req: McpTool.Call.Request.Params, client: Client, http: Request): McpTool.Call.Response.Result
 }
 

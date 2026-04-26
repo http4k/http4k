@@ -28,6 +28,6 @@ class McpLLMToolsTest : LLMToolsContract {
         Tool(echoTool.name.value, echoTool.description) bind {
             Ok(it["arg"].toString().reversed()) },
     )
-    override val llmTools = McpLLMTools(mcp.testMcpClient())
+    override val llmTools = McpLLMTools(mcp.testMcpClient().also { it.start() })
 
 }

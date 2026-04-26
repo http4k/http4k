@@ -3,8 +3,15 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.43.0.1 (uncut)
+### v6.44.0.0 (uncut)
 - **http4k-***: Upgrade versions, including Kotlin to 2.3.21
+- **http4k-ai-mcp-sdk**: [Break] Unified JSON-RPC message handling. `McpHandler` now takes `McpRequest`/`McpResponse` (sealed: `Ok`/`Accepted`/`Unknown`). Custom `McpHandler` and `McpFilter` implementations will need adjusting.
+- **http4k-ai-mcp-sdk**: [Break] All MCP Message objects have _meta fields now. Conversion from `object` to class.
+- **http4k-ai-mcp-sdk**: [Break] `McpOpenTelemetrySpanModifiers` renamed to `McpOpenTelemetrySpanModifier` (singular). Methods now take `McpRequest`/`McpResponse` instead of `McpJsonRpcRequest`/`McpJsonRpcResponse`, giving access to session and HTTP request context. Dispatch by `method` field removed — modifiers use typed `is` checks instead.
+- **http4k-ai-mcp-sdk**: [Break] `Client.updateTask()` no longer takes a `timeout` parameter. Added `Client.requestRoots()`.
+- **http4k-ai-mcp-sdk**: [Break] `ToolResponse.ElicitationRequired.elicitations` type changed from `List<McpElicitations.Request.Url>` to `List<McpElicitations.Request.Params.Url>`.
+- **http4k-ai-mcp-testing**: [Break] Test MCP Clients now need to be started in all tests. This allows for handshaking and forces compliance with the MCP spec. You can use `TestMcpClient.useClient()` to get a pre-started instance.
+- **http4k-ai-mcp-sdk**: [Fix] Number values in tool schemas serialized correctly.
 - **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
 - **http4k-testing-chaos**: Add `ReturnResponse` behaviour. H/T @jamieredding.
 - **http4k-connect-amazon-dynamodb-fake** [Fix] Condition expression to be properly evaluated when item is missing. H/T @oharaandrew314

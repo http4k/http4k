@@ -33,6 +33,7 @@ import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiNull
 import org.http4k.format.MoshiObject
 import org.http4k.format.MoshiString
+import org.http4k.format.unwrap
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.LensFailure
@@ -40,18 +41,20 @@ import org.http4k.lens.LensFailure
 data class ToolCapability(internal val tool: Tool, internal val handler: ToolHandler) : ServerCapability, ToolHandler {
     override val name = tool.name.value
 
+    @Suppress("UNCHECKED_CAST")
     fun toTool() = McpTool(
         tool.name, tool.description,
         tool.title,
-        McpJson.convert(tool.toSchema()),
-        tool.output?.toSchema()?.let { McpJson.convert(it) },
+        tool.toSchema().unwrap() as Map<String, Any>,
+        tool.output?.toSchema()?.let { it.unwrap() as Map<String, Any> },
         tool.annotations,
         tool.icons,
         tool.execution,
         tool.meta ?: Meta.default
     )
 
-    fun call(mcp: McpTool.Call.Request, client: Client, http: Request) =
+    @Suppress("UNCHECKED_CAST")
+    fun call(mcp: McpTool.Call.Request.Params, client: Client, http: Request) =
         resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
@@ -66,21 +69,21 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
             .get()
             .let {
                 when (it) {
-                    is Ok -> McpTool.Call.Response(
+                    is Ok -> McpTool.Call.Response.Result(
                         content = it.content,
-                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
                         isError = false,
                         _meta = it.meta
                     )
 
-                    is Error -> McpTool.Call.Response(
+                    is Error -> McpTool.Call.Response.Result(
                         content = it.content,
-                        structuredContent = it.structuredContent?.let(McpJson::convert),
+                        structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
                         isError = true,
                         _meta = it.meta
                     )
 
-                    is Task -> McpTool.Call.Response(
+                    is Task -> McpTool.Call.Response.Result(
                         task = it.task,
                         _meta = it.meta
                     )

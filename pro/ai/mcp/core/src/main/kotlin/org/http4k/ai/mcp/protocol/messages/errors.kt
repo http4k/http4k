@@ -17,7 +17,7 @@ data class DomainError(override val message: String) : ErrorMessage(CODE, messag
 
 @JsonSerializable
 data class URLElicitationRequiredError(
-    val elicitations: List<McpElicitations.Request.Url>,
+    val elicitations: List<McpElicitations.Request.Params.Url>,
     override val message: String
 ) : ErrorMessage(CODE, message) {
 

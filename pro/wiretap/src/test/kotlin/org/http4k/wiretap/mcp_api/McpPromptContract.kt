@@ -32,10 +32,10 @@ interface McpPromptContract {
         ServerMetaData("entity", "version"),
         NoMcpSecurity,
         prompt
-    ).testMcpClient(Request.Companion(Method.GET, "/mcp"))
+    ).testMcpClient(Request(Method.GET, "/mcp")).apply { start() }
 
     fun Approver.assertPromptResponse(args: Map<String, String> = emptyMap()) {
-        when (val result = mcpClient().prompts().get(PromptName.Companion.of(promptName), PromptRequest(args))) {
+        when (val result = mcpClient().prompts().get(PromptName.of(promptName), PromptRequest(args))) {
             is Success<PromptResponse> -> assertApproved(
                 Jackson.prettify(Jackson.asFormatString(result.value))
             )

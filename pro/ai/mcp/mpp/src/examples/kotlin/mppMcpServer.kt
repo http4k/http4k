@@ -71,6 +71,7 @@ fun main() {
     val credentialLens = MetaKey.mppCredential().toLens()
 
     mcp.testMcpClient(Request(POST, "/mcp")).use {
+        it.start()
         println("--- calling without payment ---")
         printResult(it.tools().call(ToolName.of("premium_data"), ToolRequest()))
 

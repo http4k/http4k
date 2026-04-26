@@ -7,10 +7,11 @@ package org.http4k.ai.mcp.client.internal
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
+import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.ToolRequest
+import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.messages.McpRpc
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
@@ -23,37 +24,42 @@ internal class ClientTools(
     private val sender: McpRpcSender,
     private val id: () -> McpMessageId,
     private val defaultTimeout: Duration,
-    private val register: (McpRpc, McpCallback<*>) -> Any
+    private val register: McpCallbackRegistry
 ) : McpClient.Tools {
 
     override fun onChange(fn: () -> Unit) {
-        register(McpTool.List.Changed, McpCallback(McpTool.List.Changed.Notification::class) { _, _ ->
-            fn()
-        })
+        register.on(McpTool.List.Changed.Notification::class) { _, _ -> fn() }
     }
 
-    override fun list(overrideDefaultTimeout: Duration?) = sender(
-        McpTool.List, McpTool.List.Request(),
-        overrideDefaultTimeout ?: defaultTimeout,
-        id()
-    )
-        .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-        .flatMap { it.first().asOrFailure<McpTool.List.Response>() }
-        .map { it.tools }
-
-    override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?) =
-        sender(
-            McpTool.Call,
-            McpTool.Call.Request(
-                name,
-                request.mapValues { McpJson.asJsonObject(it.value) },
-                request.meta
-            ),
+    override fun list(overrideDefaultTimeout: Duration?): McpResult<List<McpTool>> {
+        val messageId = id()
+        return sender(
+            McpTool.List.Request(McpTool.List.Request.Params(), messageId),
             overrideDefaultTimeout ?: defaultTimeout,
-            id()
+            messageId
         )
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
-            .flatMap { it.first().asOrFailure<McpTool.Call.Response>() }
+            .flatMap { it.first().asOrFailure<McpTool.List.Response.Result>() }
+            .map { it.tools }
+    }
+
+    override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?): McpResult<ToolResponse> {
+        val messageId = id()
+        return sender(
+            McpTool.Call.Request(
+                McpTool.Call.Request.Params(
+                    name,
+                    request.mapValues { McpJson.asJsonObject(it.value) },
+                    request.meta
+                ),
+                messageId
+            ),
+            overrideDefaultTimeout ?: defaultTimeout,
+            messageId
+        )
+            .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
+            .flatMap { it.first().asOrFailure<McpTool.Call.Response.Result>() }
             .map { toToolResponseOrError(it) }
             .flatMapFailure { toToolElicitationRequiredOrError(it) }
+    }
 }

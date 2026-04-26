@@ -4,10 +4,9 @@
  */
 package org.http4k.ai.mcp.server.websocket
 
-import dev.forkhandles.result4k.Result4k
-import dev.forkhandles.result4k.Success
 import dev.forkhandles.time.executors.SimpleScheduler
 import dev.forkhandles.time.executors.SimpleSchedulerService
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.Session
@@ -16,8 +15,7 @@ import org.http4k.ai.mcp.server.sessions.SessionEventStore
 import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.ai.mcp.server.sessions.SessionEventTracking
 import org.http4k.ai.mcp.server.sessions.SessionProvider
-import org.http4k.ai.mcp.util.McpJson.compact
-import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
@@ -38,23 +36,14 @@ class WebsocketSessions(
 
     private val sessions = ConcurrentHashMap<Session, Websocket>()
 
-    override fun respond(
-        transport: Websocket,
-        context: ClientRequestContext,
-        message: McpNodeType
-    ): Result4k<McpNodeType, McpNodeType> {
-        transport.sendAndStore(message, context.session)
-        return Success(message)
-    }
-
-    override fun request(context: ClientRequestContext, message: McpNodeType) =
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) =
         when (val ws = sessions[context.session]) {
             null -> Unit
             else -> ws.sendAndStore(message, context.session)
         }
 
-    private fun Websocket.sendAndStore(message: McpNodeType, session: Session) {
-        Event("message", compact(message), sessionEventTracking.next(session)).also {
+    private fun Websocket.sendAndStore(message: McpJsonRpcMessage, session: Session) {
+        Event("message", McpJson.asFormatString(message), sessionEventTracking.next(session)).also {
             send(WsMessage(it.toMessage()))
             eventStore.write(session, it)
         }

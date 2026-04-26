@@ -1,5 +1,4 @@
 {
-  "jsonrpc": "2.0",
   "result": {
     "content": [
       {
@@ -11,5 +10,6 @@
     "_meta": {
     }
   },
-  "id": 1
+  "id": 1,
+  "jsonrpc": "2.0"
 }
