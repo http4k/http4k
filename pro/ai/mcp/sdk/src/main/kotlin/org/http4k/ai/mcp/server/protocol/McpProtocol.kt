@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.InitializeHandler
 import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpLogging
@@ -53,14 +54,14 @@ class McpProtocol<Transport>(
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
-    private val completions: Completions = completions(),
+    completions: Completions = completions(),
     private val logger: Logger = logger(),
-    private val roots: Roots = roots(),
-    private val cancellations: Cancellations = cancellations(),
+    roots: Roots = roots(),
+    cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
     mcpFilter: McpFilter = McpFilter.NoOp,
-    private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
-    private val random: Random = Random,
+    onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
+    random: Random = Random,
 ) {
     constructor(
         metaData: ServerMetaData,
@@ -127,7 +128,21 @@ class McpProtocol<Transport>(
                 val context = ClientCall(sessionState.session)
                 try {
                     sessions.assign(context, transport, httpReq)
-                    val response = mcpHandler(McpRequest(sessionState.session, message, httpReq))
+
+                    val response = when (sessionState) {
+                        is ExistingSession -> mcpHandler(McpRequest(sessionState.session, message, httpReq))
+
+                        is NewSession if message is McpInitialize.Request -> {
+                            runCatching {
+                                val result = initializer(message.params, httpReq)
+                                clientTracking[sessionState.session] = ClientTracking(message.params)
+                                Ok(McpInitialize.Response(result, message.id))
+                            }.getOrElse { Unknown }
+                        }
+
+                        else -> Unknown
+                    }
+
                     if (response is Ok) sessions.send(context, response.message)
                     response
                 } finally {

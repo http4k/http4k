@@ -4,12 +4,9 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.core.Request
-import org.http4k.jsonrpc.ErrorMessage
 
 data class McpRequest(val session: Session, val message: McpJsonRpcRequest, val http: Request)
 
@@ -30,23 +27,3 @@ val McpFilter.Companion.NoOp: McpFilter get() = { it }
 fun McpFilter.then(next: McpHandler) = this(next)
 
 fun McpFilter.then(next: McpFilter) = McpFilter { this(next(it)) }
-
-fun CatchErrors(onError: (Throwable) -> Unit = { it.printStackTrace(System.err) }) = McpFilter { next ->
-    { mcp ->
-        runCatching { next(mcp) }
-            .getOrElse { e ->
-                McpResponse.Ok(
-                    McpJsonRpcErrorResponse(
-                        mcp.message.id,
-                        when (e) {
-                            is McpException -> e.error
-                            else -> {
-                                onError(e)
-                                ErrorMessage.InternalError
-                            }
-                        }
-                    )
-                )
-            }
-    }
-}
