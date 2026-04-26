@@ -19,10 +19,10 @@ fun tools(vararg tools: ToolCapability): Tools = tools(tools.toList())
 fun tools(list: Iterable<ToolCapability>): Tools = InMemoryTools(list)
 
 private class InMemoryTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
-    override fun list(req: McpTool.List.Request, client: Client, http: Request): McpTool.List.Response =
-        McpTool.List.Response(items.map(ToolCapability::toTool))
+    override fun list(req: McpTool.List.Request.Params, client: Client, http: Request): McpTool.List.Response.Result =
+        McpTool.List.Response.Result(items.map(ToolCapability::toTool))
 
-    override fun call(req: McpTool.Call.Request, client: Client, http: Request): McpTool.Call.Response = items
+    override fun call(req: McpTool.Call.Request.Params, client: Client, http: Request): McpTool.Call.Response.Result = items
         .find { it.toTool().name == req.name }
         ?.call(req, client, http)
         ?: throw McpException(InvalidParams)

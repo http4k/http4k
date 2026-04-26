@@ -9,21 +9,20 @@ import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.core.Request
-import org.http4k.core.Uri
 
 /**
  * Handles protocol traffic for resources features and subscriptions.
  */
 interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler, Iterable<ResourceCapability> {
 
-    fun listResources(req: McpResource.List.Request, client: Client, http: Request): McpResource.List.Response
+    fun listResources(req: McpResource.List.Request.Params, client: Client, http: Request): McpResource.List.Response.Result
 
     fun listTemplates(
-        req: McpResource.ListTemplates.Request,
+        req: McpResource.ListTemplates.Request.Params,
         client: Client,
         http: Request
-    ): McpResource.ListTemplates.Response
+    ): McpResource.ListTemplates.Response.Result
 
-    fun read(req: McpResource.Read.Request, client: Client, http: Request): McpResource.Read.Response
+    fun read(req: McpResource.Read.Request.Params, client: Client, http: Request): McpResource.Read.Response.Result
 }
 

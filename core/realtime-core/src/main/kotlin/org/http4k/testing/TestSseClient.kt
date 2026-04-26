@@ -8,7 +8,7 @@ import org.http4k.sse.SseClient
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
-import java.util.ArrayDeque
+import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * A class that is used for *offline* testing of a routed Sse, without starting up a Server.
@@ -18,12 +18,9 @@ class TestSseClient internal constructor(sseResponse: SseResponse, request: Requ
     val status = sseResponse.status
     val response = Response(sseResponse.status).headers(sseResponse.headers)
 
-    private val queue = ArrayDeque<() -> SseMessage?>()
+    private val queue = LinkedBlockingQueue<() -> SseMessage?>()
 
-    override fun received() = generateSequence {
-        if (queue.isEmpty()) return@generateSequence null
-        queue.remove()()
-    }
+    override fun received() = generateSequence { queue.take()() }
 
     private val socket = object : PushAdaptingSse(request) {
         init {

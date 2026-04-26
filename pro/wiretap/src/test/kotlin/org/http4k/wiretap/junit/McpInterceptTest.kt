@@ -45,7 +45,7 @@ class McpInterceptTest {
 
     @Test
     fun `can pass through an mcp client`(mcpClient: McpClient) {
-        mcpClient.run {
+        mcpClient.apply {
             start()
             assertThat(
                 resources().read(ResourceRequest(uri)).coerce<Ok>().list.first().uri,

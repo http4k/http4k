@@ -4,12 +4,10 @@
  */
 package org.http4k.ai.mcp.server.jsonrpc
 
-import dev.forkhandles.result4k.Success
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext
-import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
 import org.http4k.ai.mcp.server.sessions.SessionProvider
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
@@ -20,10 +18,7 @@ class JsonRpcSessions(
 ) :
     Sessions<Unit> {
 
-    override fun respond(transport: Unit, context: ClientRequestContext, message: McpNodeType) =
-        Success(message)
-
-    override fun request(context: ClientRequestContext, message: McpNodeType) {
+    override fun send(context: ClientRequestContext, message: McpJsonRpcMessage) {
         // Server-to-client notifications are not supported in non-streaming JSON-RPC mode
     }
 

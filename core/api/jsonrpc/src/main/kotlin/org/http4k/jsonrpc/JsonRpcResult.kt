@@ -21,7 +21,7 @@ class JsonRpcResult<NODE>(json: Json<NODE>, fields: Map<String, NODE>) : JsonRpc
 
     fun isError() = error!= null
 
-    val id: NODE? = fields["id"]?.let {
+    override val id: NODE? = fields["id"]?.let {
         if (!setOf(JsonType.String, Number, Integer, Null).contains(json.typeOf(it))) {
             valid = false
             json.nullNode()

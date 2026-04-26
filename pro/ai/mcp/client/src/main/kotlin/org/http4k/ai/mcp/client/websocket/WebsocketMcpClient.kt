@@ -24,15 +24,13 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
-import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.format.renderRequest
-import org.http4k.format.renderResult
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.sse.SseMessage
@@ -80,39 +78,25 @@ class WebsocketMcpClient(
         get() =
             SessionId.parse(Request(GET, endpoint.get().toString()).query("sessionId") ?: "-")
 
-    override fun notify(rpc: McpRpc, mcp: ClientMessage.Notification) = with(McpJson) {
-        wsClient.send(WsMessage(compact(renderRequest(rpc.Method.value, asJsonObject(mcp), nullNode()))))
+    override fun notify(message: McpJsonRpcMessage) = with(McpJson) {
+        wsClient.send(WsMessage(asFormatString(message)))
         Success(Unit)
     }
 
     override fun sendMessage(
-        rpc: McpRpc,
-        message: ClientMessage,
+        message: McpJsonRpcMessage,
         timeout: Duration,
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean
     ): Result<McpMessageId, McpError> {
-        val latch =
-            CountDownLatch(if (message is ClientMessage.Notification || message is ClientMessage.Response) 0 else 1)
+        val latch = CountDownLatch(if (message is McpJsonRpcRequest && message.id != null) 1 else 0)
 
         return resultFrom {
             requests[messageId] = latch
             messageQueues[messageId] = LinkedBlockingQueue()
 
             with(McpJson) {
-                val payload = asJsonObject(message)
-
-                wsClient
-                    .send(
-                        WsMessage(
-                            compact(
-                                when (message) {
-                                    is ClientMessage.Response -> renderResult(payload, asJsonObject(messageId))
-                                    else -> renderRequest(rpc.Method.value, payload, asJsonObject(messageId))
-                                }
-                            )
-                        )
-                    )
+                wsClient.send(WsMessage(asFormatString(message)))
             }
             messageId
         }

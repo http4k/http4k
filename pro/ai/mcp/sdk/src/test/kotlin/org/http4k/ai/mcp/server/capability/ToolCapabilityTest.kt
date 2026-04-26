@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.util.McpJson.asFormatString
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.format.unwrap
 import org.http4k.security.ResponseType
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -58,12 +59,12 @@ class ToolCapabilityTest {
         val capability = ToolCapability(tool) { ToolResponse.Task(task) }
 
         val response = capability.call(
-            McpTool.Call.Request(tool.name),
+            McpTool.Call.Request.Params(tool.name),
             NoOp,
             Request(GET, "/")
         )
 
-        assertThat(response, equalTo(McpTool.Call.Response(task = task)))
+        assertThat(response, equalTo(McpTool.Call.Response.Result(task = task)))
     }
 
     @Test
@@ -75,13 +76,13 @@ class ToolCapabilityTest {
         val capability = ToolCapability(tool) { ToolResponse.Error(content, structured) }
 
         val response = capability.call(
-            McpTool.Call.Request(tool.name),
+            McpTool.Call.Request.Params(tool.name),
             NoOp,
             Request(GET, "/")
         )
 
         assertThat(response.isError, equalTo(true))
         assertThat(response.content, equalTo(content))
-        assertThat(response.structuredContent, equalTo(McpJson.convert(structured)))
+        assertThat(response.structuredContent, equalTo(structured.unwrap()))
     }
 }

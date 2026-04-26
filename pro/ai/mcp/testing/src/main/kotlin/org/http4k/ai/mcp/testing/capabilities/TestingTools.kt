@@ -14,7 +14,7 @@ import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.TestMcpSender
 import org.http4k.ai.mcp.testing.nextEvent
-import org.http4k.ai.mcp.testing.nextNotification
+import org.http4k.ai.mcp.testing.toMessage
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.model.ToolName
 import java.time.Duration
@@ -32,12 +32,13 @@ class TestingTools(
      * Force a list changed notification to be received and process it
      */
     fun expectNotification() =
-        sender.stream().nextNotification<McpTool.List.Changed.Notification>(McpTool.List.Changed)
+        sender.lastEvent()
+            .toMessage<McpTool.List.Changed.Notification>().params
             .also { notifications.forEach { it() } }
 
     override fun list(overrideDefaultTimeout: Duration?) =
-        sender(McpTool.List, McpTool.List.Request()).first()
-            .nextEvent<List<McpTool>, McpTool.List.Response>(fun McpTool.List.Response.() = tools)
+        sender(McpTool.List.Request(McpTool.List.Request.Params(), sender.nextId())).first()
+            .nextEvent<List<McpTool>, McpTool.List.Response.Result>(fun McpTool.List.Response.Result.() = tools)
             .map { it.second }
 
     override fun call(
@@ -45,12 +46,14 @@ class TestingTools(
         request: ToolRequest,
         overrideDefaultTimeout: Duration?
     ) = sender(
-        McpTool.Call, McpTool.Call.Request(
-            name,
-            request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
+        McpTool.Call.Request(
+            McpTool.Call.Request.Params(
+                name,
+                request.mapValues { McpJson.asJsonObject(it.value) }, request.meta
+            ), sender.nextId()
         )
     ).last()
-        .nextEvent<ToolResponse, McpTool.Call.Response> { toToolResponseOrError(this) }
+        .nextEvent<ToolResponse, McpTool.Call.Response.Result> { toToolResponseOrError(this) }
         .map { it.second }
         .flatMapFailure { toToolElicitationRequiredOrError(it) }
 }

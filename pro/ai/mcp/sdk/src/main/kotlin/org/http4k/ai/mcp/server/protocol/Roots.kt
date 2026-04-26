@@ -4,13 +4,16 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
+import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.model.CompletionStatus
 import org.http4k.ai.mcp.model.Root
 import org.http4k.ai.mcp.protocol.messages.McpRoot
+import org.http4k.core.Request
 
 /**
  * Handles protocol traffic for client provided roots.
  */
 interface Roots : Iterable<Root> {
-    fun update(req: McpRoot.List.Response): CompletionStatus
+    fun changed(params: McpRoot.Changed.Notification.Params, client: Client, http: Request)
+    fun update(req: McpRoot.List.Response.Result): CompletionStatus
 }

@@ -27,9 +27,9 @@ class CompletionCapability(
 
     fun toReference() = ref
 
-    fun complete(mcp: McpCompletion.Request, client: Client, http: Request) =
+    fun complete(mcp: McpCompletion.Request.Params, client: Client, http: Request) =
         when (val result = handler(CompletionRequest(mcp.argument, mcp.context, mcp._meta, client, http))) {
-            is Ok -> McpCompletion.Response(Completion(result.values, result.total, result.hasMore))
+            is Ok -> McpCompletion.Response.Result(Completion(result.values, result.total, result.hasMore))
             is Error -> throw McpException(DomainError(result.message))
         }
 

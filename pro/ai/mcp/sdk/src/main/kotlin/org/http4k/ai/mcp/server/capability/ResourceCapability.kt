@@ -37,9 +37,9 @@ class ResourceCapability(
 
     fun matches(uri: Uri) = resource.matches(uri)
 
-    fun read(mcp: McpResource.Read.Request, client: Client, http: Request) =
+    fun read(mcp: McpResource.Read.Request.Params, client: Client, http: Request) =
         when (val result = this(ResourceRequest(mcp.uri, mcp._meta, client, http))) {
-            is Ok -> McpResource.Read.Response(result.list, result.meta)
+            is Ok -> McpResource.Read.Response.Result(result.list, result.meta)
             is Error -> throw McpException(DomainError(result.message))
         }
 

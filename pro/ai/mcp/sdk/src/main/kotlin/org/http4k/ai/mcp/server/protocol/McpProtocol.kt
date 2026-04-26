@@ -4,60 +4,47 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result4k
-import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.get
-import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.InitializeHandler
 import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
-import org.http4k.ai.mcp.protocol.messages.McpCancelled
-import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpLogging
-import org.http4k.ai.mcp.protocol.messages.McpPing
-import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpResource.Updated.Notification
-import org.http4k.ai.mcp.protocol.messages.McpRoot
-import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.ServerMessage
-import org.http4k.ai.mcp.protocol.messages.fromJsonRpc
-import org.http4k.ai.mcp.protocol.messages.toJsonRpc
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
-import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.ServerCapability
-import org.http4k.ai.mcp.server.capability.completions
-import org.http4k.ai.mcp.server.capability.initializer
-import org.http4k.ai.mcp.server.capability.roots
-import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.ai.mcp.server.capability.cancellations
+import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.logger
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.capability.roots
+import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
+import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
+import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
+import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.Existing
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.New
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.asJsonObject
+import org.http4k.ai.mcp.util.McpJson.compact
 import org.http4k.ai.mcp.util.McpJson.nullNode
 import org.http4k.ai.mcp.util.McpJson.parse
-import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
+import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
-import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
@@ -70,14 +57,14 @@ class McpProtocol<Transport>(
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
-    private val completions: Completions = completions(),
+    completions: Completions = completions(),
     private val logger: Logger = logger(),
-    private val roots: Roots = roots(),
-    private val cancellations: Cancellations = cancellations(),
+    roots: Roots = roots(),
+    cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
-    private val mcpFilter: McpFilter = McpFilter.NoOp,
-    private val onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
-    private val random: Random = Random,
+    mcpFilter: McpFilter = McpFilter.NoOp,
+    onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
+    random: Random = Random,
 ) {
     constructor(
         metaData: ServerMetaData,
@@ -110,275 +97,123 @@ class McpProtocol<Transport>(
 
     private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
-    fun receive(transport: Transport, session: Session, httpReq: Request): Result4k<McpNodeType, McpNodeType> {
-        val rawPayload = runCatching { parse(httpReq.bodyString()) }.getOrElse { return error() }
+    private val mcpHandler = mcpFilter
+        .then(McpFilters.CatchAll(onError))
+        .then(
+            RoutingMcpHandler(
+                initializer,
+                clientTracking,
+                completions,
+                prompts,
+                resources,
+                tools,
+                logger,
+                tasks,
+                cancellations,
+                roots,
+                random,
+                sessions,
+            )
+        )
+
+    fun receive(
+        transport: Transport, sessionState: Valid
+, httpReq: Request): McpResponse {
+        val body = httpReq.bodyString()
+        val rawPayload = runCatching { parse(body) }
+            .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
 
         val payload = McpJson.fields(rawPayload).toMap()
 
-        val response = when {
+        return when {
             payload["method"] != null -> {
-                val jsonReq = JsonRpcRequest(McpJson, payload)
+                val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
+                    .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
-                val mcpRequest = McpRequest(session, jsonReq, httpReq)
+                val context = ClientCall(sessionState.session)
+                try {
+                    sessions.assign(context, transport, httpReq)
 
-                when (McpRpcMethod.of(jsonReq.method)) {
-                    McpInitialize.Method ->
-                        respond<McpInitialize.Request>(transport, session, { it, _ ->
-                            assign(Subscription(session), transport, httpReq)
-                            handleInitialize(it, httpReq, session)
-                        }, mcpRequest)
+                    val response = when (sessionState) {
+                        is Existing -> mcpHandler(McpRequest(sessionState.session, message, httpReq))
 
-
-                    McpCompletion.Method ->
-                        respond<McpCompletion.Request>(transport, session, { it, c ->
-                            completions.complete(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpPing.Method ->
-                        respond<McpPing.Request>(transport, session, { _, _ ->
-                            ServerMessage.Response.Empty
-                        }, mcpRequest)
-
-
-                    McpPrompt.Get.Method ->
-                        respond<McpPrompt.Get.Request>(transport, session, { it, c ->
-                            prompts.get(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpPrompt.List.Method ->
-                        respond<McpPrompt.List.Request>(transport, session, { it, c ->
-                            prompts.list(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpResource.ListTemplates.Method ->
-                        respond<McpResource.ListTemplates.Request>(transport, session, { it, c ->
-                            resources.listTemplates(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpResource.List.Method ->
-                        respond<McpResource.List.Request>(transport, session, { it, c ->
-                            resources.listResources(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpResource.Read.Method -> {
-                        respond<McpResource.Read.Request>(transport, session, { it, c ->
-                            resources.read(it, c, httpReq)
-                        }, mcpRequest)
-                    }
-
-                    McpResource.Subscribe.Method -> {
-                        respond<McpResource.Subscribe.Request>(transport, session, { _, _ ->
-                            when (resources) {
-                                is ObservableResources -> {
-                                    val subscribeRequest = jsonReq.fromJsonRpc(McpResource.Subscribe.Request::class)
-                                    resources.subscribe(session, subscribeRequest) {
-                                        sessions.request(
-                                            Subscription(session),
-                                            Notification(subscribeRequest.uri)
-                                                .toJsonRpc(McpResource.Updated)
-                                        )
-                                    }
-                                }
-                            }
-                            ServerMessage.Response.Empty
-                        }, mcpRequest)
-                    }
-
-                    McpLogging.SetLevel.Method ->
-                        respond<McpLogging.SetLevel.Request>(transport, session, { _, _ ->
-                            logger.setLevel(session, jsonReq.fromJsonRpc(McpLogging.SetLevel.Request::class).level)
-                            ServerMessage.Response.Empty
-                        }, mcpRequest)
-
-
-                    McpResource.Unsubscribe.Method ->
-                        respond<McpResource.Unsubscribe.Request>(transport, session, { _, _ ->
-                            when (resources) {
-                                is ObservableResources -> resources.unsubscribe(
-                                    session,
-                                    jsonReq.fromJsonRpc(McpResource.Unsubscribe.Request::class)
-                                )
-                            }
-                            ServerMessage.Response.Empty
-                        }, mcpRequest)
-
-
-                    McpInitialize.Initialized.Method -> ok()
-
-                    McpCancelled.Method -> {
-                        cancellations.cancel(jsonReq.fromJsonRpc(McpCancelled.Notification::class))
-                        ok()
-                    }
-
-                    McpProgress.Method -> ok()
-
-                    McpRoot.Changed.Method -> {
-                        clientTracking[session]?.let {
-                            if (it.supportsRoots) {
-                                val messageId = McpMessageId.random(random)
-                                it.trackRequest(messageId) { roots.update(it.fromJsonRpc(McpRoot.List.Response::class)) }
-
-                                sessions.respond(
-                                    transport,
-                                    ClientCall(session),
-                                    McpRoot.List.Request().toJsonRpc(McpRoot.List, asJsonObject(messageId))
-                                )
-                            }
+                        is New if message is McpInitialize.Request -> {
+                            runCatching {
+                                val response = Ok(McpInitialize.Response(initializer(message.params, httpReq), message.id))
+                                clientTracking[sessionState.session] = ClientTracking(message.params)
+                                response
+                            }.getOrElse { Unknown }
                         }
-                        ok()
+
+                        else -> Unknown
                     }
 
-                    McpTool.Call.Method ->
-                        respond<McpTool.Call.Request>(transport, session, { it, c ->
-                            tools.call(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpTool.List.Method ->
-                        respond<McpTool.List.Request>(transport, session, { it, c ->
-                            tools.list(it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpTask.Get.Method ->
-                        respond<McpTask.Get.Request>(transport, session, { it, c ->
-                            tasks.get(session, it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpTask.Result.Method ->
-                        respond<McpTask.Result.Request>(transport, session, { it, c ->
-                            tasks.result(session, it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpTask.Cancel.Method ->
-                        respond<McpTask.Cancel.Request>(transport, session, { it, c ->
-                            tasks.cancel(session, it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpTask.List.Method ->
-                        respond<McpTask.List.Request>(transport, session, { it, c ->
-                            tasks.list(session, it, c, httpReq)
-                        }, mcpRequest)
-
-
-                    McpTask.Status.Method -> {
-                        tasks.update(session, jsonReq.fromJsonRpc(McpTask.Status.Notification::class))
-                        ok()
-                    }
-
-                    else -> sessions.respond(transport, ClientCall(session), MethodNotFound.toJsonRpc(jsonReq.id))
+                    if (response is Ok) sessions.send(context, response.message)
+                    response
+                } finally {
+                    sessions.end(context)
                 }
             }
-
-            else -> {
-                val jsonResult = JsonRpcResult(McpJson, payload)
-                when {
-                    jsonResult.isError() -> ok()
-                    else -> with(McpJson) {
-                        val id = jsonResult.id?.let<McpNodeType, McpMessageId> { McpMessageId.parse(compact(it)) }
-                        when (id) {
-                            null -> error()
-                            else -> clientTracking[session]?.processResult(id, jsonResult)?.let { ok() }
-                                ?: error()
-                        }
-                    }
+            payload.containsKey("error") -> Accepted
+            else ->
+                when (val id = payload["id"]) {
+                    null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
+                    else -> clientTracking[sessionState.session]
+                        ?.processResult(McpMessageId.parse(compact(id)), payload["result"] ?: nullNode())
+                        ?.let { Accepted }
+                        ?: Unknown
                 }
-            }
-        }.get()
-
-        return Success(response)
-    }
-
-    private fun ok() = Success(nullNode())
-    private fun error() = Failure(nullNode())
-
-    private inline fun <reified IN : ClientMessage.Request> respond(
-        transport: Transport,
-        session: Session,
-        noinline fn: (IN, Client) -> ServerMessage.Response,
-        mcpRequest: McpRequest
-    ): Result4k<McpNodeType, McpNodeType> {
-        val callCtx = ClientCall(session)
-        val client = clientFor(callCtx)
-
-        val handler = mcpFilter
-            .then(AssignAndCloseSession(sessions, transport))
-            .then(AdaptingMcpHandler(onError)(IN::class, fn, client))
-
-        return sessions.respond(transport, callCtx, handler(mcpRequest).json)
-    }
-
-    private fun clientFor(context: ClientRequestContext): SessionBasedClient = SessionBasedClient(
-        { sessions.request(context, it) },
-        context.session,
-        logger,
-        tasks,
-        random,
-        { clientTracking[context.session] ?: throw McpException(ErrorMessage.InternalError) }
-    )
-
-    fun handleInitialize(request: McpInitialize.Request, http: Request, session: Session): McpInitialize.Response {
-        val response = initializer(request, http)
-
-        clientTracking[session] = ClientTracking(request)
-
-        val context = Subscription(session)
-
-        logger.subscribe(session, error) { data, level, logger ->
-            sessions.request(
-                context,
-                McpLogging.LoggingMessage.Notification(data, level, logger).toJsonRpc(McpLogging.LoggingMessage)
-            )
         }
-
-        prompts.onChange(session) {
-            sessions.request(
-                context,
-                McpPrompt.List.Changed.Notification.toJsonRpc(McpPrompt.List.Changed)
-            )
-        }
-
-        resources.onChange(session) {
-            sessions.request(
-                context,
-                McpResource.List.Changed.Notification.toJsonRpc(McpResource.List.Changed)
-            )
-        }
-
-        tools.onChange(session) {
-            sessions.request(
-                context,
-                McpTool.List.Changed.Notification.toJsonRpc(McpTool.List.Changed)
-            )
-        }
-
-        sessions.onClose(context) {
-            prompts.remove(session)
-            resources.remove(session)
-            tools.remove(session)
-            logger.unsubscribe(session)
-            tasks.remove(session)
-        }
-        return response
     }
 
     fun retrieveSession(req: Request) = sessions.retrieveSession(req)
 
-    fun end(context: ClientRequestContext) {
-        if (context is Subscription) clientTracking.remove(context.session)
+    fun unsubscribe(context: Subscription) {
+        clientTracking.remove(context.session)
         sessions.end(context)
     }
 
-    fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request) =
+    fun subscribe(context: Subscription, transport: Transport, connectRequest: Request) {
         sessions.assign(context, transport, connectRequest)
+
+        logger.subscribe(context.session, error) { data, level, logger ->
+            sessions.send(
+                context,
+                McpLogging.LoggingMessage.Notification(
+                    McpLogging.LoggingMessage.Notification.Params(data, level, logger)
+                )
+            )
+        }
+
+        prompts.onChange(context.session) {
+            sessions.send(
+                context,
+                McpPrompt.List.Changed.Notification(McpPrompt.List.Changed.Notification.Params())
+            )
+        }
+
+        resources.onChange(context.session) {
+            sessions.send(
+                context,
+                McpResource.List.Changed.Notification(McpResource.List.Changed.Notification.Params())
+            )
+        }
+
+        tools.onChange(context.session) {
+            sessions.send(
+                context,
+                McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params())
+            )
+        }
+
+        sessions.onClose(context) {
+            prompts.remove(context.session)
+            resources.remove(context.session)
+            tools.remove(context.session)
+            logger.unsubscribe(context.session)
+            tasks.remove(context.session)
+        }
+    }
 
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
 }

@@ -11,6 +11,6 @@ import org.http4k.core.Request
  * Handles protocol traffic for client server handshaking and session initialization.
  */
 interface Initializer {
-    operator fun invoke(req: McpInitialize.Request, http: Request): McpInitialize.Response
+    operator fun invoke(req: McpInitialize.Request.Params, http: Request): McpInitialize.Response.Result
 }
 

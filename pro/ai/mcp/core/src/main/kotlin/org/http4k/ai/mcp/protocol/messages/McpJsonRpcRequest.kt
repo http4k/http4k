@@ -5,7 +5,13 @@
 package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.protocol.McpRpcMethod
+import se.ansman.kotshi.JsonSerializable
+import se.ansman.kotshi.Polymorphic
 
-interface McpRpc {
-    val Method: McpRpcMethod
+@JsonSerializable
+@Polymorphic("method")
+sealed class McpJsonRpcRequest : McpJsonRpcMessage() {
+    abstract val method: McpRpcMethod
+    abstract val id: Any?
 }
+

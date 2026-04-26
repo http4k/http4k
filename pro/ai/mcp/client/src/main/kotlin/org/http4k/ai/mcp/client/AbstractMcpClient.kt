@@ -21,22 +21,19 @@ import org.http4k.ai.mcp.client.internal.ClientResources
 import org.http4k.ai.mcp.client.internal.ClientSampling
 import org.http4k.ai.mcp.client.internal.ClientTasks
 import org.http4k.ai.mcp.client.internal.ClientTools
-import org.http4k.ai.mcp.client.internal.McpCallback
+import org.http4k.ai.mcp.client.internal.McpCallbackRegistry
 import org.http4k.ai.mcp.client.internal.asOrFailure
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.ClientMessage
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
-import org.http4k.ai.mcp.protocol.messages.McpRpc
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.MoshiObject
-import org.http4k.jsonrpc.JsonRpcRequest
-import org.http4k.jsonrpc.JsonRpcResult
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
 import java.time.Duration
@@ -56,12 +53,12 @@ abstract class AbstractMcpClient(
 ) : McpClient {
     private val running = AtomicBoolean(false)
     protected val requests = ConcurrentHashMap<McpMessageId, CountDownLatch>()
-    private val callbacks = mutableMapOf<McpRpcMethod, MutableList<McpCallback<*>>>()
+    private val registry = McpCallbackRegistry()
     protected val messageQueues = ConcurrentHashMap<McpMessageId, BlockingQueue<McpNodeType>>()
 
     protected val id = AtomicLong(0)
 
-    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response> {
+    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response.Result> {
         val startLatch = CountDownLatch(1)
 
         thread(isDaemon = true) {
@@ -79,18 +76,14 @@ abstract class AbstractMcpClient(
                             val data = parse(it.data) as MoshiObject
 
                             when {
-                                data["method"] != null -> {
-                                    val message = JsonRpcRequest(this, data.attributes)
-                                    val id = message.id?.let { asA<McpMessageId>(compact(it)) }
-                                    callbacks[McpRpcMethod.of(message.method)]?.forEach { it(message, id) }
-                                }
+                                data["method"] != null -> registry.dispatch(asA<McpJsonRpcRequest>(it.data))
 
                                 else -> {
-                                    val message = JsonRpcResult(this, data.attributes)
-                                    val id = asA<McpMessageId>(compact(message.id ?: nullNode()))
+                                    val id = data["id"]?.let { asA<McpMessageId>(compact(it)) }
+                                        ?: error("no id in result: $data")
                                     messageQueues[id]?.offer(data) ?: error("no queue for $id: $data")
                                     val latch = requests[id] ?: error("no request found for $id: $data")
-                                    if (message.isError()) requests.remove(id)
+                                    if (data["error"] != null) requests.remove(id)
                                     latch.countDown()
                                 }
                             }
@@ -108,22 +101,22 @@ abstract class AbstractMcpClient(
         }
             .mapFailure { Timeout }
             .flatMap {
+                val messageId = McpMessageId.of(id.incrementAndGet())
                 sendMessage(
-                    McpInitialize,
-                    McpInitialize.Request(clientInfo, capabilities, protocolVersion),
+                    McpInitialize.Request(McpInitialize.Request.Params(clientInfo, capabilities, protocolVersion), messageId),
                     defaultTimeout,
-                    McpMessageId.of(id.incrementAndGet()),
+                    messageId,
                 )
                     .flatMap { reqId ->
                         val next = findQueue(reqId)
                             .poll(defaultTimeout.toMillis(), MILLISECONDS)
-                            ?.asOrFailure<McpInitialize.Response>()
+                            ?.asOrFailure<McpInitialize.Response.Result>()
 
                         when (next) {
                             null -> Failure(Timeout)
                             else -> next
                                 .flatMap { input ->
-                                    notify(McpInitialize.Initialized, McpInitialize.Initialized.Notification)
+                                    notify(McpInitialize.Initialized.Notification(McpInitialize.Initialized.Notification.Params()))
                                         .map { input }
                                         .also { tidyUp(reqId) }
                                 }
@@ -137,48 +130,33 @@ abstract class AbstractMcpClient(
     }
 
     override fun tools(): McpClient.Tools =
-        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout, registry)
 
     override fun prompts(): McpClient.Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, registry)
 
     override fun sampling(): McpClient.Sampling =
-        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage, registry)
 
     override fun elicitations(): McpClient.Elicitations =
-        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage, registry)
 
     override fun progress(): McpClient.RequestProgress =
-        ClientRequestProgress { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientRequestProgress(registry)
 
     override fun resources(): McpClient.Resources =
-        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, registry)
 
     override fun completions(): McpClient.Completions =
         ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())})
 
     override fun tasks(): McpClient.Tasks =
-        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout) { rpc, callback ->
-            callbacks.getOrPut(rpc.Method) { mutableListOf() }.add(callback)
-        }
+        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout, registry)
 
-    protected abstract fun notify(rpc: McpRpc, mcp: ClientMessage.Notification): McpResult<Unit>
+    protected abstract fun notify(message: McpJsonRpcMessage): McpResult<Unit>
 
     protected abstract fun sendMessage(
-        rpc: McpRpc,
-        message: ClientMessage,
+        message: McpJsonRpcMessage,
         timeout: Duration,
         messageId: McpMessageId,
         isComplete: (McpNodeType) -> Boolean = { true }
