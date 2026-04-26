@@ -14,6 +14,7 @@ import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object OpenAIMoshi : ConfigurableMoshi(
     Moshi.Builder()
+        .add(ResponseFormatAdapterFactory)
         .add(OpenAIJsonAdapterFactory)
         .add(MoshiNodeAdapter)
         .add(ListAdapter)

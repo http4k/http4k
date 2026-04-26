@@ -52,11 +52,58 @@ data class ChatCompletion(
     val parallel_tool_calls: Boolean? = null,
     val service_tier: String? = null,
     val seed: Int? = null,
-    val stream_options: StreamOptions? = null
+    val stream_options: StreamOptions? = null,
+    val logprobs: Boolean? = null,
+    val top_logprobs: Int? = null
 ) : OpenAIAction<Sequence<CompletionResponse>> {
+    @Deprecated("Retained for binary compatibility", level = DeprecationLevel.HIDDEN)
+    constructor(
+        model: ModelName,
+        messages: List<Message>,
+        max_tokens: MaxTokens? = null,
+        temperature: Temperature = Temperature.ONE,
+        top_p: Double? = null,
+        n: Int = 1,
+        stop: List<String>? = null,
+        presence_penalty: Double? = null,
+        frequency_penalty: Double? = null,
+        logit_bias: Map<TokenId, Double>? = null,
+        user: User? = null,
+        stream: Boolean = false,
+        response_format: ResponseFormat? = null,
+        tools: List<Tool>? = null,
+        tool_choice: Any? = null,
+        parallel_tool_calls: Boolean? = null,
+        service_tier: String? = null,
+        seed: Int? = null,
+        stream_options: StreamOptions? = null
+    ) : this(
+        model = model,
+        messages = messages,
+        max_tokens = max_tokens,
+        temperature = temperature,
+        top_p = top_p,
+        n = n,
+        stop = stop,
+        presence_penalty = presence_penalty,
+        frequency_penalty = frequency_penalty,
+        logit_bias = logit_bias,
+        user = user,
+        stream = stream,
+        response_format = response_format,
+        tools = tools,
+        tool_choice = tool_choice,
+        parallel_tool_calls = parallel_tool_calls,
+        service_tier = service_tier,
+        seed = seed,
+        stream_options = stream_options,
+        logprobs = null,
+        top_logprobs = null
+    )
+
     constructor(model: ModelName, messages: List<Message>, max_tokens: MaxTokens, stream: Boolean = true) : this(
-        model,
-        messages,
+        model = model,
+        messages = messages,
         max_tokens = max_tokens,
         temperature = Temperature.ONE,
         top_p = 1.0,
@@ -70,8 +117,8 @@ data class ChatCompletion(
     )
 
     constructor(model: ModelName, message: Message, max_tokens: MaxTokens, stream: Boolean = true) : this(
-        model,
-        listOf(message),
+        model = model,
+        messages = listOf(message),
         max_tokens = max_tokens,
         temperature = Temperature.ONE,
         top_p = 1.0,
@@ -107,8 +154,28 @@ sealed class ResponseFormat {
 
     @JsonSerializable
     @PolymorphicLabel("json_schema")
-    data class JsonSchema(val strict: Boolean?, val json_schema: Map<String, Any>) : ResponseFormat()
+    data class JsonSchema(val strict: Boolean?, val json_schema: Map<String, Any>) : ResponseFormat() {
+        internal var schemaName: String = "response"
+            private set
+
+        constructor(json_schema: JsonSchemaSpec) : this(json_schema.strict, json_schema.schema) {
+            schemaName = json_schema.name
+        }
+
+        internal constructor(name: String, strict: Boolean?, json_schema: Map<String, Any>) : this(strict, json_schema) {
+            schemaName = name
+        }
+
+        val name get() = schemaName
+    }
 }
+
+@JsonSerializable
+data class JsonSchemaSpec(
+    val name: String,
+    val schema: Map<String, Any>,
+    val strict: Boolean? = null
+)
 
 @JsonSerializable
 data class Message(
@@ -173,10 +240,31 @@ data class Choice(
     @JsonProperty(name = "message")
     internal val msg: ChoiceDetail?,
     internal val delta: ChoiceDetail?,
-    val finish_reason: StopReason?
+    val finish_reason: StopReason?,
+    val logprobs: ChoiceLogProbs? = null
 ) {
     val message get() = msg ?: delta ?: ChoiceDetail(Role.Assistant, "", emptyList())
 }
+
+@JsonSerializable
+data class ChoiceLogProbs(
+    val content: List<TokenLogProb>? = null
+)
+
+@JsonSerializable
+data class TokenLogProb(
+    val token: String,
+    val logprob: Double,
+    val bytes: List<Int>? = null,
+    val top_logprobs: List<TopLogProb>? = null
+)
+
+@JsonSerializable
+data class TopLogProb(
+    val token: String,
+    val logprob: Double,
+    val bytes: List<Int>? = null
+)
 
 @JsonSerializable
 data class ChoiceDetail(
@@ -184,6 +272,8 @@ data class ChoiceDetail(
     internal val r: Role?,
     val content: String? = null,
     val tool_calls: List<ToolCall>? = null,
+    val reasoning: String? = null,
+    val reasoning_content: String? = null
 ) {
     val role = r ?: Role.Assistant
 }
@@ -232,4 +322,3 @@ data class CompletionResponse(
     val model get() = ModelName.of(blankModel.takeIf { it.isNotBlank() } ?: "-")
     val objectType get() = ObjectType.of(blankObjectType.takeIf { it.isNotBlank() } ?: "-")
 }
-
