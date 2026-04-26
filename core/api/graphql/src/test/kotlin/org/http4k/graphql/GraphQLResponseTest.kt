@@ -2,8 +2,8 @@ package org.http4k.graphql
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import graphql.ExecutionResultImpl
-import graphql.GraphqlErrorBuilder
+import graphql.ExecutionResult
+import graphql.GraphQLError
 import org.http4k.format.Jackson
 import org.junit.jupiter.api.Test
 
@@ -11,19 +11,20 @@ class GraphQLResponseTest {
 
     @Test
     fun `convert from execution result`() {
-        val error = GraphqlErrorBuilder.newError()
-            .message("oh no!")
-            .build()
-
         val extensions: Map<Any, Any> = mapOf("foo" to mapOf("bar" to "baz"))
 
+        val e = GraphQLError.newError().message("hello").build()
+        val result = GraphQLResponse.from(
+            ExecutionResult.newExecutionResult().data("hello world")
+                .errors(listOf(e)).extensions(extensions).build()
+        )
+
         assertThat(
-            GraphQLResponse.from(ExecutionResultImpl("hello world", listOf(error), extensions)
-            ),
+            result,
             equalTo(
                 GraphQLResponse(
                     "hello world",
-                    listOf(Jackson.asA(Jackson.asFormatString(error))),
+                    listOf(Jackson.asA(Jackson.asFormatString(e))),
                     Jackson.asA(Jackson.asFormatString(extensions))
                 )
             ),
