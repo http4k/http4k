@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.44.0.0 (uncut)
+### v6.44.0.0
 - **http4k-***: Upgrade versions, including Kotlin to 2.3.21
 - **http4k-ai-mcp-sdk**: [Break] Unified JSON-RPC message handling. `McpHandler` now takes `McpRequest`/`McpResponse` (sealed: `Ok`/`Accepted`/`Unknown`). Custom `McpHandler` and `McpFilter` implementations will need adjusting.
 - **http4k-ai-mcp-sdk**: [Break] All MCP Message objects have _meta fields now. Conversion from `object` to class.
@@ -15,6 +15,7 @@ changes with their rationale when appropriate:
 - **http4k-ai-mcp-sdk**: [Fix] X402 and MPP payment filters fail with correct error message.
 - **http4k-testing-chaos**: Add `ReturnResponse` behaviour. H/T @jamieredding.
 - **http4k-connect-amazon-dynamodb-fake** [Fix] Condition expression to be properly evaluated when item is missing. H/T @oharaandrew314
+- **http4k-connect-openai-*** Add logprobs, structured output, and reasoning to OpenAI chat completions. H/T @torfinnberset
 
 ### v6.43.0.0 
 - **http4k-***: Upgrade versions
