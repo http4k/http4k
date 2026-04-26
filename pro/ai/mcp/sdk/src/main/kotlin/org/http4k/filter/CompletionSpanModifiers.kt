@@ -7,13 +7,13 @@ package org.http4k.filter
 import io.opentelemetry.api.trace.Span
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.server.protocol.McpRequest
 
 object CompletionSpanModifiers : McpOpenTelemetrySpanModifier {
-    override operator fun invoke(sb: Span, request: McpJsonRpcRequest) {
-        if (request is McpCompletion.Request) {
+    override operator fun invoke(sb: Span, request: McpRequest) {
+        if (request.message is McpCompletion.Request) {
             sb.setAttribute("gen_ai.operation.name", "complete")
-            val refLabel = when (val ref = request.params.ref) {
+            val refLabel = when (val ref = request.message.params.ref) {
                 is Reference.Prompt -> ref.name
                 is Reference.ResourceTemplate -> ref.uri.toString()
             }

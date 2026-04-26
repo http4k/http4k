@@ -23,7 +23,7 @@ class GetPromptSpanModifiersTest {
         GetPromptSpanModifiers(span, McpPrompt.Get.Request(
             McpPrompt.Get.Request.Params(PromptName.of("my-prompt")),
             id = 1
-        ))
+        ).asMcpRequest())
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("get_prompt"))
         assertThat(spanData.attributes.get(stringKey("gen_ai.prompt.name")), equalTo("my-prompt"))

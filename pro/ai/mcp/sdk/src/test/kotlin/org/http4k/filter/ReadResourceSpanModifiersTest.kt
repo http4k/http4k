@@ -23,7 +23,7 @@ class ReadResourceSpanModifiersTest {
         ReadResourceSpanModifiers(span, McpResource.Read.Request(
             McpResource.Read.Request.Params(Uri.of("file://test")),
             id = 1
-        ))
+        ).asMcpRequest())
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("read_resource"))
         assertThat(spanData.attributes.get(stringKey("mcp.resource.uri")), equalTo("file://test"))

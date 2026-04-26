@@ -12,7 +12,6 @@ import io.opentelemetry.api.trace.StatusCode.ERROR
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
@@ -63,22 +62,17 @@ fun McpFilters.OpenTelemetryTracing(
                 }
                 .startSpan()
 
-            spanModifiers.forEach { it(span, req.message) }
+            spanModifiers.forEach { it(span, req) }
 
             try {
                 span.makeCurrent().use { next(req) }
                     .also { resp ->
-                        if (resp is McpResponse.Ok) {
-                            val message = resp.message
-                            if (message is McpJsonRpcResponse) {
-                                spanModifiers.forEach { it(span, message) }
-                            }
+                        spanModifiers.forEach { it(span, resp) }
 
-                            if (resp.message is McpJsonRpcErrorResponse) {
-                                span.setStatus(ERROR)
-                                val code = McpJson.textValueOf(resp.message.error, "code")
-                                if (code != null) span.setAttribute("error.type", code)
-                            }
+                        if (resp is McpResponse.Ok && resp.message is McpJsonRpcErrorResponse) {
+                            span.setStatus(ERROR)
+                            val code = McpJson.textValueOf(resp.message.error, "code")
+                            if (code != null) span.setAttribute("error.type", code)
                         }
                     }
             } catch (e: Throwable) {

@@ -25,8 +25,6 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
@@ -230,11 +228,11 @@ class McpOpenTelemetryTracingTest {
         requestAttribute: Pair<String, String>,
         responseAttribute: Pair<String, String>,
     ) = object : McpOpenTelemetrySpanModifier {
-        override operator fun invoke(sb: Span, request: McpJsonRpcRequest) {
+        override operator fun invoke(sb: Span, request: McpRequest) {
             sb.setAttribute(requestAttribute.first, requestAttribute.second)
         }
 
-        override operator fun invoke(sb: Span, response: McpJsonRpcResponse) {
+        override operator fun invoke(sb: Span, response: McpResponse) {
             sb.setAttribute(responseAttribute.first, responseAttribute.second)
         }
     }

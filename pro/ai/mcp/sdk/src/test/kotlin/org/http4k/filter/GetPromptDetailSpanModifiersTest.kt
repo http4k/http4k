@@ -33,7 +33,7 @@ class GetPromptDetailSpanModifiersTest {
             McpPrompt.Get.Request.Params(PromptName.of("my-prompt"), mapOf("city" to "London")),
             id = 1
         )
-        GetPromptDetailSpanModifiers(span, request)
+        GetPromptDetailSpanModifiers(span, request.asMcpRequest())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.prompt.arguments"))!!, APPLICATION_JSON)
     }
@@ -44,7 +44,7 @@ class GetPromptDetailSpanModifiersTest {
             McpPrompt.Get.Response.Result(listOf(Message(Role.Assistant, Content.Text("hello world")))),
             id = 1
         )
-        GetPromptDetailSpanModifiers(span, response)
+        GetPromptDetailSpanModifiers(span, response.asMcpResponse())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.prompt.result"))!!, APPLICATION_JSON)
     }
@@ -55,7 +55,7 @@ class GetPromptDetailSpanModifiersTest {
             McpPrompt.Get.Response.Result(emptyList()),
             id = 1
         )
-        GetPromptDetailSpanModifiers(span, response)
+        GetPromptDetailSpanModifiers(span, response.asMcpResponse())
 
         // empty list is still serialized, so attribute should be set
         assertThat(spanData.attributes.get(stringKey("gen_ai.prompt.result"))!!.contains("[]"), equalTo(true))

@@ -5,8 +5,8 @@
 package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcResponse
 import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
 
 /**
@@ -15,9 +15,9 @@ import org.http4k.ai.mcp.util.McpJson
  * Note: gen_ai.resource.* attributes are http4k custom conventions, not official OTel semantic conventions.
  */
 object ReadResourceDetailSpanModifiers : McpOpenTelemetrySpanModifier {
-    override operator fun invoke(sb: Span, response: McpJsonRpcResponse) {
-        if (response is McpResource.Read.Response) {
-            sb.setAttribute("gen_ai.resource.result", McpJson.asFormatString(response.result.contents))
+    override operator fun invoke(sb: Span, response: McpResponse) {
+        if (response is McpResponse.Ok && response.message is McpResource.Read.Response) {
+            sb.setAttribute("gen_ai.resource.result", McpJson.asFormatString((response.message as McpResource.Read.Response).result.contents))
         }
     }
 }

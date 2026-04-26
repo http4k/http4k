@@ -29,7 +29,7 @@ class ReadResourceDetailSpanModifiersTest {
             McpResource.Read.Response.Result(listOf(Resource.Content.Text("article content", Uri.of("docs://test")))),
             id = 1
         )
-        ReadResourceDetailSpanModifiers(span, response)
+        ReadResourceDetailSpanModifiers(span, response.asMcpResponse())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.resource.result"))!!, APPLICATION_JSON)
     }

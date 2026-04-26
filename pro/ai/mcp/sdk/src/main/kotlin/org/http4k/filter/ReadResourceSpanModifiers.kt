@@ -5,14 +5,14 @@
 package org.http4k.filter
 
 import io.opentelemetry.api.trace.Span
-import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.server.protocol.McpRequest
 
 object ReadResourceSpanModifiers : McpOpenTelemetrySpanModifier {
-    override operator fun invoke(sb: Span, request: McpJsonRpcRequest) {
-        if (request is McpResource.Read.Request) {
+    override operator fun invoke(sb: Span, request: McpRequest) {
+        if (request.message is McpResource.Read.Request) {
             sb.setAttribute("gen_ai.operation.name", "read_resource")
-            sb.setAttribute("mcp.resource.uri", request.params.uri.toString())
+            sb.setAttribute("mcp.resource.uri", request.message.params.uri.toString())
         }
     }
 }

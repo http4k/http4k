@@ -25,7 +25,7 @@ class CompletionSpanModifiersTest {
         CompletionSpanModifiers(span, McpCompletion.Request(
             McpCompletion.Request.Params(ref = Reference.Prompt("my-prompt"), argument = CompletionArgument("arg", "val")),
             id = 1
-        ))
+        ).asMcpRequest())
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("complete"))
     }
@@ -35,7 +35,7 @@ class CompletionSpanModifiersTest {
         CompletionSpanModifiers(span, McpCompletion.Request(
             McpCompletion.Request.Params(ref = Reference.Prompt("my-prompt"), argument = CompletionArgument("arg", "val")),
             id = 1
-        ))
+        ).asMcpRequest())
 
         assertThat(spanData.attributes.get(stringKey("mcp.completion.ref")), equalTo("my-prompt"))
     }
@@ -45,7 +45,7 @@ class CompletionSpanModifiersTest {
         CompletionSpanModifiers(span, McpCompletion.Request(
             McpCompletion.Request.Params(ref = Reference.ResourceTemplate(Uri.of("docs://articles/{+topic}")), argument = CompletionArgument("arg", "val")),
             id = 1
-        ))
+        ).asMcpRequest())
 
         assertThat(spanData.attributes.get(stringKey("mcp.completion.ref")), equalTo("docs://articles/{+topic}"))
     }

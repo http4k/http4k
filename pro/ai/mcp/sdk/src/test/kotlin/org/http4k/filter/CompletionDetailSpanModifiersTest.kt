@@ -33,7 +33,7 @@ class CompletionDetailSpanModifiersTest {
             ),
             id = 1
         )
-        CompletionDetailSpanModifiers(span, request)
+        CompletionDetailSpanModifiers(span, request.asMcpRequest())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.completion.arguments"))!!, APPLICATION_JSON)
     }
@@ -44,7 +44,7 @@ class CompletionDetailSpanModifiersTest {
             McpCompletion.Response.Result(Completion("London", "Los Angeles")),
             id = 1
         )
-        CompletionDetailSpanModifiers(span, response)
+        CompletionDetailSpanModifiers(span, response.asMcpResponse())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.completion.result"))!!, APPLICATION_JSON)
     }

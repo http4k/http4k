@@ -32,7 +32,7 @@ class CallToolDetailSpanModifiersTest {
             McpTool.Call.Request.Params(ToolName.of("my-tool"), mapOf("city" to McpJson.string("London"))),
             id = 1
         )
-        CallToolDetailSpanModifiers(span, request)
+        CallToolDetailSpanModifiers(span, request.asMcpRequest())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.tool.call.arguments"))!!, APPLICATION_JSON)
     }
@@ -43,7 +43,7 @@ class CallToolDetailSpanModifiersTest {
             McpTool.Call.Response.Result(content = listOf(Content.Text("hello"))),
             id = 1
         )
-        CallToolDetailSpanModifiers(span, response)
+        CallToolDetailSpanModifiers(span, response.asMcpResponse())
 
         approver.assertApproved(spanData.attributes.get(stringKey("gen_ai.tool.call.result"))!!, APPLICATION_JSON)
     }
@@ -51,7 +51,7 @@ class CallToolDetailSpanModifiersTest {
     @Test
     fun `no result attribute when response has no content`() {
         val response = McpTool.Call.Response(McpTool.Call.Response.Result(), id = 1)
-        CallToolDetailSpanModifiers(span, response)
+        CallToolDetailSpanModifiers(span, response.asMcpResponse())
 
         assertThat(spanData.attributes.get(stringKey("gen_ai.tool.call.result")), equalTo(null))
     }
