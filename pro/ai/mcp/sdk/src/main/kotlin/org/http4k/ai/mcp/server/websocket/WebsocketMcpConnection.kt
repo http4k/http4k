@@ -6,8 +6,8 @@ package org.http4k.ai.mcp.server.websocket
 
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.SessionState.Invalid
-import org.http4k.ai.mcp.server.protocol.SessionState.Valid
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Invalid
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
 import org.http4k.ai.mcp.server.sse.sessionId
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

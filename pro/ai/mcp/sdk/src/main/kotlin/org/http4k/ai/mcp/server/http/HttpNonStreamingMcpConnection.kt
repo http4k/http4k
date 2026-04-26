@@ -7,8 +7,8 @@ package org.http4k.ai.mcp.server.http
 import org.http4k.ai.mcp.server.asHttp
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.McpProtocol
-import org.http4k.ai.mcp.server.protocol.SessionState.Invalid
-import org.http4k.ai.mcp.server.protocol.SessionState.Valid
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Invalid
+import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
 import org.http4k.core.ContentType
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET

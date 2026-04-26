@@ -12,7 +12,7 @@ import org.http4k.core.Request
  * transport to session, and the sending of messages to the client.
  */
 interface Sessions<Transport> {
-    fun retrieveSession(connectRequest: Request): SessionState
+    fun retrieveSession(connectRequest: Request): McpSessionState
     fun transportFor(context: ClientRequestContext): Transport
     fun send(context: ClientRequestContext, message: McpJsonRpcMessage)
     fun assign(context: ClientRequestContext, transport: Transport, connectRequest: Request)

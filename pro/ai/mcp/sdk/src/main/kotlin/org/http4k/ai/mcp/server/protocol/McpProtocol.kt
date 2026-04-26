@@ -113,7 +113,7 @@ class McpProtocol<Transport>(
             )
         )
 
-    fun receive(transport: Transport, sessionState: SessionState.Valid
+    fun receive(transport: Transport, sessionState: McpSessionState.Valid
 , httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }

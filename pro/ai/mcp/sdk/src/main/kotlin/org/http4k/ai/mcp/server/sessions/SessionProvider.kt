@@ -6,9 +6,9 @@ package org.http4k.ai.mcp.server.sessions
 
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.server.protocol.ExistingSession
+import org.http4k.ai.mcp.server.protocol.McpSessionState
 import org.http4k.ai.mcp.server.protocol.NewSession
 import org.http4k.ai.mcp.server.protocol.Session
-import org.http4k.ai.mcp.server.protocol.SessionState
 import org.http4k.core.Request
 import java.util.UUID
 import kotlin.random.Random
@@ -19,7 +19,7 @@ import kotlin.random.Random
  * if a particular request is authorised to connect to that session.
  */
 fun interface SessionProvider {
-    fun validate(connectRequest: Request, sessionId: SessionId?): SessionState
+    fun validate(connectRequest: Request, sessionId: SessionId?): McpSessionState
 
     companion object {
         /**
