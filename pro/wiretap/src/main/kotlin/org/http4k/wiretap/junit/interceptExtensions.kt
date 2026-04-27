@@ -24,7 +24,7 @@ import java.time.Clock
 import java.util.Random
 
 /**
- * Intercept an http4k MCP app.
+ * Intercept an http4k MCP ServerCapability. For whole MCP servers, use poly()
  */
 fun Intercept.Companion.mcp(
     renderMode: RenderMode = OnFailure,
