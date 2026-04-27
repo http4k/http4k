@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
+import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.McpFilters
@@ -26,7 +27,7 @@ import java.util.Random
 /**
  * Intercept an http4k MCP ServerCapability. For whole MCP servers, use poly()
  */
-fun Intercept.Companion.mcp(
+fun Intercept.Companion.mcpCapabilities(
     renderMode: RenderMode = OnFailure,
     redirectFilter: Filter = Filter.NoOp,
     clock: Clock = Clock.systemUTC(),
@@ -53,3 +54,17 @@ fun Intercept.Companion.mcp(
                 )
             ).http!!
     })
+
+
+/**
+ * Intercept an MCP Server. Synonym for poly().
+ */
+fun Intercept.Companion.mcp(
+    renderMode: RenderMode = OnFailure,
+    redirectFilter: Filter = Filter.NoOp,
+    clock: Clock = Clock.systemUTC(),
+    random: Random = SecureRandom(byteArrayOf()),
+    serverName: String = "http4k-server",
+    baseUrl: Uri = Uri.of(""),
+    appFn: Context.() -> PolyHandler
+) = poly(renderMode, redirectFilter, clock, random, serverName, baseUrl, appFn)

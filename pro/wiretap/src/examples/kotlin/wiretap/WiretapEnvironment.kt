@@ -31,7 +31,7 @@ object HttpAppWithOtelTracing : WiretapEnvironment {
     override fun invoke(): PolyHandler {
         val clientApp = HttpApp().asServer(Jetty(0)).start()
         return Wiretap(RemoteTarget {
-            HttpAppWithOtelTracing(clientApp.uri(), http(), otel()).asServer(Jetty(0)).start().uri()
+            HttpAppWithOtelTracing(clientApp.uri(), http()).asServer(Jetty(0)).start().uri()
         })
     }
 }
@@ -40,7 +40,7 @@ object LocalHttpAppWithOtelTracing : WiretapEnvironment {
     override fun invoke(): PolyHandler {
         val clientApp = HttpApp().asServer(Jetty(0)).start()
         return Wiretap(LocalTarget {
-            HttpAppWithOtelTracing(clientApp.uri(), http(), otel())
+            HttpAppWithOtelTracing(clientApp.uri(), http())
         })
     }
 }
@@ -59,13 +59,13 @@ object McpServer : WiretapEnvironment {
 
 object McpServerWithOtel : WiretapEnvironment {
     override fun invoke() = Wiretap(RemoteTarget {
-        McpServerWithOtelTracing(http(), otel()).asServer(Jetty(0)).start().uri()
+        McpServerWithOtelTracing(http()).asServer(Jetty(0)).start().uri()
     })
 }
 
 object LocalMcpServerWithOtel : WiretapEnvironment {
     override fun invoke() = Wiretap(LocalTarget {
-        McpServerWithOtelTracing(http(), otel()).http!!
+        McpServerWithOtelTracing(http()).http!!
     })
 }
 

@@ -35,7 +35,7 @@ class McpInterceptTest {
     private val uri = Uri.of("ui://a-ui")
 
     @RegisterExtension
-    val intercept = Intercept.mcp(Always) {
+    val intercept = Intercept.mcpCapabilities(Always) {
         capabilities(
             Tool("non_app", "") bind { ToolResponse.Ok("hello") },
             Resource.Static(uri, ResourceName.of("example ui")) bind { Ok(Text("hello world", uri)) },

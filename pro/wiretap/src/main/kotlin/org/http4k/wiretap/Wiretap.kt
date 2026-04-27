@@ -4,6 +4,7 @@
  */
 package org.http4k.wiretap
 
+import io.opentelemetry.api.GlobalOpenTelemetry
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.chaos.ChaosEngine
 import org.http4k.client.JavaHttpClient
@@ -39,6 +40,7 @@ import org.http4k.wiretap.mcp_api.DebugRequestPrompt
 import org.http4k.wiretap.mcp_api.WiretapMcp
 import org.http4k.wiretap.openapi.OpenApi
 import org.http4k.wiretap.otel.OTel
+import org.http4k.wiretap.otel.WiretapOpenTelemetry
 import org.http4k.wiretap.otel.breakdown.TabContentRenderer
 import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
 import org.http4k.wiretap.proxy.Proxy
@@ -69,6 +71,7 @@ object Wiretap {
         clock: Clock = Clock.systemUTC(),
         random: Random = SecureRandom(byteArrayOf()),
         bodyHydration: BodyHydration = All,
+        resetGlobalOtel: Boolean = true,
         livingDocSections: List<LivingDocSection> = defaultLivingDocSections,
         traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs
     ): PolyHandler {
@@ -83,6 +86,11 @@ object Wiretap {
         val trafficMetrics = TrafficMetrics(meterRegistry, clock = clock)
 
         fixedRateTimer("wiretap-snapshot", daemon = true, period = 5_000L) { trafficMetrics.snapshot() }
+
+        if(resetGlobalOtel) {
+            GlobalOpenTelemetry.resetForTest()
+            GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock, "http4k-server"))
+        }
 
         val (wiretapped, proxy, outboundHttp) = Proxy(
             target,
