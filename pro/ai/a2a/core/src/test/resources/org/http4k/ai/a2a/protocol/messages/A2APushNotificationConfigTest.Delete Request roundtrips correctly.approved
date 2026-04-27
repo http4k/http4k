@@ -1,0 +1,8 @@
+{
+  "method": "tasks/pushNotificationConfig/delete",
+  "params": {
+    "id": "config-456"
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

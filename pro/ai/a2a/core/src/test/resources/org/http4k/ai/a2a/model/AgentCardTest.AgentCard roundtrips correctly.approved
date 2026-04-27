@@ -1,0 +1,16 @@
+{
+  "name": "Test Agent",
+  "description": "A test agent",
+  "url": "https://example.com/agent",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": true
+  },
+  "skills": [
+    {
+      "id": "skill-1",
+      "name": "Test Skill",
+      "description": "Does something"
+    }
+  ]
+}

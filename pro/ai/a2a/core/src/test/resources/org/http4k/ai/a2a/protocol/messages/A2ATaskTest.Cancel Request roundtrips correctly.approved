@@ -1,0 +1,8 @@
+{
+  "method": "tasks/cancel",
+  "params": {
+    "id": "task-456"
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}
