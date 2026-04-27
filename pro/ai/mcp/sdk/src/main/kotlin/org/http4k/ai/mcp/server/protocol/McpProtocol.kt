@@ -53,7 +53,7 @@ import kotlin.random.Random
  */
 class McpProtocol<Transport>(
     private val sessions: Sessions<Transport>,
-    private val initializer: Initializer,
+    initializer: Initializer,
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
@@ -62,7 +62,7 @@ class McpProtocol<Transport>(
     roots: Roots = roots(),
     cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
-    mcpFilter: McpFilter = McpFilter.NoOp,
+    private val mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     random: Random = Random,
 ) {
@@ -137,13 +137,8 @@ class McpProtocol<Transport>(
                     val response = when (sessionState) {
                         is Existing -> mcpHandler(McpRequest(sessionState.session, message, httpReq))
 
-                        is New if message is McpInitialize.Request -> {
-                            runCatching {
-                                val response = Ok(McpInitialize.Response(initializer(message.params, httpReq), message.id))
-                                clientTracking[sessionState.session] = ClientTracking(message.params)
-                                response
-                            }.getOrElse { Unknown }
-                        }
+                        is New if message is McpInitialize.Request ->
+                            mcpHandler(McpRequest(sessionState.session, message, httpReq))
 
                         else -> Unknown
                     }
