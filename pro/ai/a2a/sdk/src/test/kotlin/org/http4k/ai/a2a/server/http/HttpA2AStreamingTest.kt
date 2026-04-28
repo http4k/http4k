@@ -55,7 +55,7 @@ class HttpA2AStreamingTest {
         }
 
         val protocol = A2AProtocol(agentCard, handler)
-        val httpHandler = a2aHttp(protocol)
+        val httpHandler = a2a(protocol)
 
         val message = Message(role = Role.User, parts = listOf(Part.Text("Hello")))
         val jsonRequest = A2AJson.asFormatString(
@@ -92,7 +92,7 @@ class HttpA2AStreamingTest {
         }
 
         val protocol = A2AProtocol(agentCard, handler)
-        val httpHandler = a2aHttp(protocol)
+        val httpHandler = a2a(protocol)
 
         val message = Message(role = Role.User, parts = listOf(Part.Text("Hello")))
         val jsonRequest = A2AJson.asFormatString(

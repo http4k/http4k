@@ -13,7 +13,7 @@ import org.http4k.routing.routes
 /**
  * Creates an HTTP handler for A2A protocol endpoints.
  */
-fun a2aHttp(protocol: A2AProtocol, rpcPath: String = "/", agentCardPath: String = "/.well-known/agent.json") =
+fun a2a(protocol: A2AProtocol, rpcPath: String = "/", agentCardPath: String = "/.well-known/agent.json") =
     CatchAll()
         .then(CatchLensFailure())
         .then(

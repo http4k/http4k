@@ -17,7 +17,7 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.server.http.a2aHttp
+import org.http4k.ai.a2a.server.http.a2a
 import org.http4k.ai.a2a.server.protocol.A2AProtocol
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
@@ -52,7 +52,7 @@ class TestA2AClientTest {
     }
 
     private val protocol = A2AProtocol(agentCard, messageHandler)
-    private val server = a2aHttp(protocol)
+    private val server = a2a(protocol)
     private val client = server.testA2AClient()
 
     @Test

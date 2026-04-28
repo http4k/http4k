@@ -20,7 +20,7 @@ import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.server.capability.pushNotificationConfigs
 import org.http4k.ai.a2a.server.capability.tasks
-import org.http4k.ai.a2a.server.http.a2aHttp
+import org.http4k.ai.a2a.server.http.a2a
 import org.http4k.ai.a2a.server.protocol.A2AProtocol
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
@@ -61,7 +61,7 @@ abstract class A2AClientContract {
     abstract fun clientFor(server: HttpHandler): A2AClient
 
     private fun withServer(test: A2AClient.() -> Unit) {
-        val server = a2aHttp(protocol)
+        val server = a2a(protocol)
         val client = clientFor(server)
         try {
             client.test()
@@ -136,7 +136,7 @@ abstract class A2AClientContract {
         }
 
         val messageProtocol = A2AProtocol(agentCard, messageResponseHandler, tasks)
-        val server = a2aHttp(messageProtocol)
+        val server = a2a(messageProtocol)
         val client = clientFor(server)
 
         try {
@@ -179,7 +179,7 @@ abstract class A2AClientContract {
 
         val streamingAgentCard = agentCard.copy(capabilities = AgentCapabilities(streaming = true))
         val streamingProtocol = A2AProtocol(streamingAgentCard, streamingHandler, tasks)
-        val server = a2aHttp(streamingProtocol)
+        val server = a2a(streamingProtocol)
         val client = clientFor(server)
 
         try {
