@@ -4,6 +4,6 @@
  */
 package org.http4k.ai.a2a.protocol.messages
 
-sealed class A2AJsonRpcResponse {
-    abstract val id: Any?
+sealed interface A2AJsonRpcResponse {
+    val id: Any?
 }

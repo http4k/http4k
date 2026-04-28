@@ -9,12 +9,20 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskState
+import org.http4k.ai.a2a.model.TaskStatus
 import java.util.concurrent.ConcurrentHashMap
 
 interface TaskStorage {
     fun store(task: Task)
     fun get(taskId: TaskId): Task?
     fun delete(taskId: TaskId)
+
+    fun cancel(taskId: TaskId): Task? {
+        val task = get(taskId) ?: return null
+        val cancelled = task.copy(status = TaskStatus(state = TaskState.canceled))
+        store(cancelled)
+        return cancelled
+    }
     fun list(
         contextId: ContextId? = null,
         status: TaskState? = null,

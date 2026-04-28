@@ -29,7 +29,7 @@ object A2ATask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(val task: Task)
         }
@@ -50,7 +50,7 @@ object A2ATask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(val task: Task)
         }
@@ -93,7 +93,7 @@ object A2ATask {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val tasks: kotlin.collections.List<Task>,

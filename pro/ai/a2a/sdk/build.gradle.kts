@@ -6,7 +6,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-ai-a2a-core"))
-    api(project(":http4k-security-core"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-server-jetty"))

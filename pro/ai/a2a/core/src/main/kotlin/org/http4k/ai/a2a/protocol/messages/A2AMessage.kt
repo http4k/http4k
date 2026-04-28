@@ -27,12 +27,20 @@ object A2AMessage {
             )
         }
 
-        sealed interface Response {
+        sealed interface Response : A2AJsonRpcResponse {
             @JsonSerializable
-            data class Task(val task: org.http4k.ai.a2a.model.Task) : Response
+            data class Task(
+                val result: org.http4k.ai.a2a.model.Task,
+                override val id: Any?,
+                val jsonrpc: String = "2.0"
+            ) : Response
 
             @JsonSerializable
-            data class Message(val message: org.http4k.ai.a2a.model.Message) : Response
+            data class Message(
+                val result: org.http4k.ai.a2a.model.Message,
+                override val id: Any?,
+                val jsonrpc: String = "2.0"
+            ) : Response
         }
     }
 

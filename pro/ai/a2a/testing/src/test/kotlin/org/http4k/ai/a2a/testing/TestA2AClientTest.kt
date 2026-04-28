@@ -17,12 +17,11 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.server.http.a2a
-import org.http4k.ai.a2a.server.protocol.A2AProtocol
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.model.Role
 import org.http4k.core.Uri
+import org.http4k.routing.a2a
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -51,8 +50,7 @@ class TestA2AClientTest {
         )
     }
 
-    private val protocol = A2AProtocol(agentCard, messageHandler)
-    private val server = a2a(protocol)
+    private val server = a2a(agentCard, messageHandler)
     private val client = server.testA2AClient()
 
     @Test
@@ -75,7 +73,7 @@ class TestA2AClientTest {
 
         assertThat(response is A2AMessage.Send.Response.Task, equalTo(true))
         val taskResponse = response as A2AMessage.Send.Response.Task
-        assertThat(taskResponse.task.status.state, equalTo(TaskState.completed))
+        assertThat(taskResponse.result.status.state, equalTo(TaskState.completed))
     }
 
 }

@@ -13,6 +13,6 @@ data class A2AJsonRpcErrorResponse(
     override val id: Any?,
     val error: A2ANodeType,
     val jsonrpc: String = "2.0"
-) : A2AJsonRpcResponse() {
+) : A2AJsonRpcResponse {
     constructor(id: Any?, error: ErrorMessage) : this(id, error(org.http4k.ai.a2a.util.A2AJson))
 }

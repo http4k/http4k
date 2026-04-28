@@ -31,7 +31,7 @@ object A2APushNotificationConfig {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val id: PushNotificationConfigId,
@@ -56,7 +56,7 @@ object A2APushNotificationConfig {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val id: PushNotificationConfigId,
@@ -81,7 +81,7 @@ object A2APushNotificationConfig {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(val configs: kotlin.collections.List<TaskPushNotificationConfig>)
         }
@@ -102,7 +102,7 @@ object A2APushNotificationConfig {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(val id: PushNotificationConfigId)
         }

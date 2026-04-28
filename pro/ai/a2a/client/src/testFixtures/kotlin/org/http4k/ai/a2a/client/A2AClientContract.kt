@@ -18,15 +18,14 @@ import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.model.PushNotificationConfig
-import org.http4k.ai.a2a.server.capability.pushNotificationConfigs
-import org.http4k.ai.a2a.server.capability.tasks
-import org.http4k.ai.a2a.server.http.a2a
-import org.http4k.ai.a2a.server.protocol.A2AProtocol
+import org.http4k.ai.a2a.server.storage.TaskStorage
+import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.model.Role
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
+import org.http4k.routing.a2a
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -39,8 +38,8 @@ abstract class A2AClientContract {
         capabilities = AgentCapabilities(streaming = false)
     )
 
-    protected val tasks = tasks()
-    protected val pushNotificationConfigs = pushNotificationConfigs()
+    protected val tasks = TaskStorage.InMemory()
+    protected val pushNotificationConfigs = PushNotificationConfigStorage.InMemory()
 
     protected val messageHandler: MessageHandler = { request ->
         val taskId = TaskId.of(UUID.randomUUID().toString())
@@ -56,12 +55,10 @@ abstract class A2AClientContract {
         MessageResponse.Task(sequenceOf(task))
     }
 
-    protected val protocol = A2AProtocol(agentCard, messageHandler, tasks, pushNotificationConfigs)
-
     abstract fun clientFor(server: HttpHandler): A2AClient
 
     private fun withServer(test: A2AClient.() -> Unit) {
-        val server = a2a(protocol)
+        val server = a2a(agentCard, messageHandler, tasks, pushNotificationConfigs)
         val client = clientFor(server)
         try {
             client.test()
@@ -90,7 +87,7 @@ abstract class A2AClientContract {
 
         assertThat(response is A2AMessage.Send.Response.Task, equalTo(true))
         val taskResponse = response as A2AMessage.Send.Response.Task
-        assertThat(taskResponse.task.status.state, equalTo(TaskState.completed))
+        assertThat(taskResponse.result.status.state, equalTo(TaskState.completed))
     }
 
     @Test
@@ -101,7 +98,7 @@ abstract class A2AClientContract {
         )
         val sendResult = message(message)
         val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.task.id
+        val taskId = taskResponse.result.id
 
         val result = tasks().get(taskId)
         val task = result.valueOrNull()!!
@@ -116,7 +113,7 @@ abstract class A2AClientContract {
         )
         val sendResult = message(message)
         val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.task.id
+        val taskId = taskResponse.result.id
 
         val result = tasks().cancel(taskId)
         val task = result.valueOrNull()!!
@@ -135,8 +132,7 @@ abstract class A2AClientContract {
             )
         }
 
-        val messageProtocol = A2AProtocol(agentCard, messageResponseHandler, tasks)
-        val server = a2a(messageProtocol)
+        val server = a2a(agentCard, messageResponseHandler, tasks)
         val client = clientFor(server)
 
         try {
@@ -178,8 +174,7 @@ abstract class A2AClientContract {
         }
 
         val streamingAgentCard = agentCard.copy(capabilities = AgentCapabilities(streaming = true))
-        val streamingProtocol = A2AProtocol(streamingAgentCard, streamingHandler, tasks)
-        val server = a2a(streamingProtocol)
+        val server = a2a(streamingAgentCard, streamingHandler, tasks)
         val client = clientFor(server)
 
         try {
@@ -194,11 +189,11 @@ abstract class A2AClientContract {
             assertThat(responses.size, equalTo(2))
             assertThat(responses[0] is A2AMessage.Send.Response.Task, equalTo(true))
             assertThat(
-                (responses[0] as A2AMessage.Send.Response.Task).task.status.state,
+                (responses[0] as A2AMessage.Send.Response.Task).result.status.state,
                 equalTo(TaskState.working)
             )
             assertThat(
-                (responses[1] as A2AMessage.Send.Response.Task).task.status.state,
+                (responses[1] as A2AMessage.Send.Response.Task).result.status.state,
                 equalTo(TaskState.completed)
             )
         } finally {
@@ -229,7 +224,7 @@ abstract class A2AClientContract {
         )
         val sendResult = message(message)
         val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.task.id
+        val taskId = taskResponse.result.id
 
         val config = PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
         val result = pushNotificationConfigs().set(taskId, config)
@@ -247,7 +242,7 @@ abstract class A2AClientContract {
         )
         val sendResult = message(message)
         val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.task.id
+        val taskId = taskResponse.result.id
 
         val config = PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
         val setResult = pushNotificationConfigs().set(taskId, config)
@@ -268,7 +263,7 @@ abstract class A2AClientContract {
         )
         val sendResult = message(message)
         val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.task.id
+        val taskId = taskResponse.result.id
 
         pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook1")))
         pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook2")))
@@ -287,7 +282,7 @@ abstract class A2AClientContract {
         )
         val sendResult = message(message)
         val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.task.id
+        val taskId = taskResponse.result.id
 
         val config = PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
         val setResult = pushNotificationConfigs().set(taskId, config)
