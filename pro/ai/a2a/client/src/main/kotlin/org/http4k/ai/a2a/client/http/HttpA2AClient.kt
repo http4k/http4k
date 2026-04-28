@@ -11,15 +11,15 @@ import org.http4k.ai.a2a.A2AResult
 import org.http4k.ai.a2a.client.A2AClient
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.model.PushNotificationConfig
-import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.ai.a2a.util.A2ANodeType
@@ -62,10 +62,7 @@ class HttpA2AClient(
 
     private fun nextId(): Any = requestId.incrementAndGet()
 
-    override fun agentCard(): A2AResult<AgentCard> {
-        val response = client(Request(GET, agentCardPath))
-        return Success(agentCardLens(response))
-    }
+    override fun agentCard() = Success(agentCardLens(client(Request(GET, agentCardPath))))
 
     override fun message(message: Message): A2AResult<A2AMessage.Send.Response> {
         val request = A2AMessage.Send.Request(
@@ -75,10 +72,11 @@ class HttpA2AClient(
 
         return sendRpc(request) { resultNode ->
             val resultFields = A2AJson.fields(resultNode).toMap()
-            if (resultFields.containsKey("task")) {
-                A2AJson.asA<A2AMessage.Send.Response.Task>(A2AJson.asFormatString(resultNode))
-            } else {
-                A2AJson.asA<A2AMessage.Send.Response.Message>(A2AJson.asFormatString(resultNode))
+            when {
+                resultFields.containsKey("task") ->
+                    A2AJson.asA<A2AMessage.Send.Response.Task>(A2AJson.asFormatString(resultNode))
+
+                else -> A2AJson.asA<A2AMessage.Send.Response.Message>(A2AJson.asFormatString(resultNode))
             }
         }
     }
@@ -95,15 +93,14 @@ class HttpA2AClient(
                 .header("Accept", "text/event-stream")
         )
 
-        if (!response.status.successful) {
-            return Failure(A2AError.Http(response))
+        return when {
+            response.status.successful ->
+                Success(
+                    response.body.stream.chunkedSseSequence()
+                        .filterIsInstance<SseMessage.Data>()
+                        .map { sseMessage -> parseStreamResponse(sseMessage.data) })
+            else -> Failure(A2AError.Http(response))
         }
-
-        val responseSequence = response.body.stream.chunkedSseSequence()
-            .filterIsInstance<SseMessage.Data>()
-            .map { sseMessage -> parseStreamResponse(sseMessage.data) }
-
-        return Success(responseSequence)
     }
 
     private fun parseStreamResponse(json: String): A2AMessage.Send.Response {
@@ -112,11 +109,9 @@ class HttpA2AClient(
             ?: throw IllegalStateException("Invalid stream response")
         val resultFields = A2AJson.fields(resultNode).toMap()
 
-        return if (resultFields.containsKey("task")) {
-            A2AJson.asA<A2AMessage.Send.Response.Task>(A2AJson.asFormatString(resultNode))
-        } else {
+        return if (resultFields.containsKey("task"))
+            A2AJson.asA<A2AMessage.Send.Response.Task>(A2AJson.asFormatString(resultNode)) else
             A2AJson.asA<A2AMessage.Send.Response.Message>(A2AJson.asFormatString(resultNode))
-        }
     }
 
     override fun tasks(): A2AClient.Tasks = HttpA2ATasks()
