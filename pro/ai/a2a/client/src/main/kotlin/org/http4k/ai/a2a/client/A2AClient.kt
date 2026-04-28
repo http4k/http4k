@@ -6,14 +6,16 @@ package org.http4k.ai.a2a.client
 
 import org.http4k.ai.a2a.A2AResult
 import org.http4k.ai.a2a.model.AgentCard
+import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
-import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.model.PushNotificationConfig
+import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.model.TaskState
+import org.http4k.ai.a2a.protocol.messages.A2AMessage
 
 interface A2AClient : AutoCloseable {
     fun agentCard(): A2AResult<AgentCard>
@@ -25,7 +27,12 @@ interface A2AClient : AutoCloseable {
     interface Tasks {
         fun get(taskId: TaskId): A2AResult<Task>
         fun cancel(taskId: TaskId): A2AResult<Task>
-        fun list(params: A2ATask.List.Request.Params = A2ATask.List.Request.Params()): A2AResult<A2ATask.List.Response.Result>
+        fun list(
+            contextId: ContextId? = null,
+            status: TaskState? = null,
+            pageSize: Int? = null,
+            pageToken: String? = null
+        ): A2AResult<TaskPage>
     }
 
     interface PushNotificationConfigs {

@@ -7,14 +7,9 @@ package org.http4k.ai.a2a.server.storage
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskState
 import java.util.concurrent.ConcurrentHashMap
-
-data class TaskPage(
-    val tasks: List<Task>,
-    val nextPageToken: String,
-    val totalSize: Int
-)
 
 interface TaskStorage {
     fun store(task: Task)
