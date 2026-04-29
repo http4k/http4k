@@ -14,6 +14,7 @@ import org.http4k.core.WwwAuthenticate
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.lens.Header.WWW_AUTHENTICATE
+import org.http4k.security.oauth.client.OAuthClientCredentials
 import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromKnownAuthServer
 import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromProtectedResource
 import org.http4k.security.oauth.client.AutoDiscoveryOAuthToken
@@ -27,6 +28,16 @@ import java.time.Clock
 fun ClientFilters.DiscoveredMcpOAuth(
     clientCredentials: Credentials,
     scopes: List<String> = emptyList(),
+    clock: Clock = Clock.systemUTC()
+) = DiscoveredMcpOAuth(
+    clientCredentials,
+    ClientFilters.OAuthClientCredentials(clientCredentials, scopes),
+    clock
+)
+
+fun ClientFilters.DiscoveredMcpOAuth(
+    clientCredentials: Credentials,
+    oAuthFlowFilter: Filter,
     clock: Clock = Clock.systemUTC()
 ) = object : Filter {
     private var auth = Filter.NoOp
@@ -70,8 +81,8 @@ fun ClientFilters.DiscoveredMcpOAuth(
             fromKnownAuthServer(Uri.of(wwwAuthenticate["auth_server"]!!)),
             clientCredentials,
             next,
+            oAuthFlowFilter,
             clock,
-            scopes
         )
 
     private fun authFromProtectedResource(
@@ -86,9 +97,9 @@ fun ClientFilters.DiscoveredMcpOAuth(
             fromProtectedResource(resourceMetadataUriWithSchema, resourceUri),
             clientCredentials,
             next,
+            oAuthFlowFilter,
             clock,
-            scopes,
-            resourceUri
+            resourceUri = resourceUri
         )
     }
 
@@ -97,8 +108,8 @@ fun ClientFilters.DiscoveredMcpOAuth(
             fromProtectedResource(resourceUri.path("/.well-known/oauth-protected-resource"), resourceUri),
             clientCredentials,
             next,
+            oAuthFlowFilter,
             clock,
-            scopes,
-            resourceUri
+            resourceUri = resourceUri
         )
 }

@@ -19,8 +19,27 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     scopes: List<String> = emptyList(),
     resourceUri: Uri? = null,
     gracePeriod: Duration = Duration.ofSeconds(10),
+) = AutoDiscoveryOAuthToken(
+    authServerDiscovery,
+    clientCredentials,
+    backend,
+    ClientFilters.OAuthClientCredentials(clientCredentials, scopes, resourceUri),
+    clock,
+    scopes,
+    resourceUri,
+    gracePeriod
+)
+
+fun ClientFilters.AutoDiscoveryOAuthToken(
+    authServerDiscovery: AuthServerDiscovery,
+    clientCredentials: Credentials,
+    backend: HttpHandler,
+    oAuthFlowFilter: Filter,
+    clock: Clock = Clock.systemUTC(),
+    scopes: List<String> = emptyList(),
+    resourceUri: Uri? = null,
+    gracePeriod: Duration = Duration.ofSeconds(10),
 ): Filter {
-    val oAuthFlowFilter = ClientFilters.OAuthClientCredentials(clientCredentials, scopes, resourceUri)
     val (authServerUri, metadata) = authServerDiscovery(backend)
         .onFailure { throw it.reason }
     val config = OAuthProviderConfig(
