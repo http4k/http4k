@@ -113,6 +113,11 @@ fun ClientFilters.RefreshingOAuthToken(
     return ClientFilters.BearerAuth(CredentialsProvider { refresher()?.value })
 }
 
+/**
+ * OAuth Resource Owner Password Credentials grant. Authenticates with both client credentials and
+ * end-user username/password. Generally discouraged in favour of authorization code flow, but
+ * useful for legacy systems or trusted first-party clients.
+ */
 fun ClientFilters.OAuthUserCredentials(
     config: OAuthProviderConfig,
     userCredentials: Credentials,
@@ -120,6 +125,9 @@ fun ClientFilters.OAuthUserCredentials(
     resourceUri: Uri? = null,
 ) = OAuthUserCredentials(config.credentials, userCredentials, scopes, resourceUri)
 
+/**
+ * OAuth Resource Owner Password Credentials grant with explicit client credentials.
+ */
 fun ClientFilters.OAuthUserCredentials(
     clientCredentials: Credentials,
     userCredentials: Credentials,
@@ -164,6 +172,29 @@ fun ClientFilters.OAuthClientCredentials(
                     clientSecret of clientCredentials.password,
                     OAuthWebForms.resource of resource,
                     scope of scopes.takeIf { scopes -> scopes.isNotEmpty() }?.joinToString(separator = " ")
+                )
+            )
+        )
+    }
+}
+
+/**
+ * OAuth JWT Bearer assertion grant (RFC 7523). Used for enterprise auth flows where the client
+ * authenticates with a JWT  instead of client credentials.
+ */
+fun ClientFilters.OAuthJwtAssertion(
+    assertion: String,
+    scopes: List<String> = emptyList(),
+    resource: Uri? = null,
+) = Filter { next ->
+    {
+        next(
+            it.with(
+                requestForm of WebForm().with(
+                    grantType of "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                    OAuthWebForms.assertion of assertion,
+                    OAuthWebForms.resource of resource,
+                    scope of scopes.takeIf { s -> s.isNotEmpty() }?.joinToString(separator = " ")
                 )
             )
         )

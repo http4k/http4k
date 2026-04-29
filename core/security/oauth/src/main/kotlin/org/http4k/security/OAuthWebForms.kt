@@ -24,6 +24,7 @@ object OAuthWebForms {
     val accessToken = FormField.optional("access_token")
     val username = FormField.optional("username")
     val password = FormField.optional("password")
+    val assertion = FormField.optional("assertion")
 
     val requestForm = Body.webForm(
         Validator.Strict,
@@ -38,6 +39,7 @@ object OAuthWebForms {
         username,
         password,
         resource,
+        assertion,
     ).toLens()
 
     val tokenType = FormField.defaulted("token_type", "Bearer")

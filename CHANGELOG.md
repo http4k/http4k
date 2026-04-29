@@ -4,8 +4,12 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.45.0.0 (uncut)
-- **http4k-security-oauth***: [Break] Refactor of excess parameters and splitting out of client filters into decomposed parts. The names of some parameters have changed.
+- **http4k-security-oauth**: [Break] `RefreshingOAuthToken`, `AutoDiscoveryOAuthToken` refactored with pluggable OAuth flow and refresh filters. The `oAuthFlowFilter` parameter no longer has a default — use the `OAuthProviderConfig` or `Credentials` overloads for the previous behaviour. Parameter `oauthCredentials` renamed to `clientCredentials`.
+- **http4k-security-oauth**: Add `ClientFilters.OAuthJwtAssertion` for RFC 7523 JWT assertion grants (SEP-990 ID-JAG enterprise auth).
 - **http4k-ai-mcp-sdk**: Add support for all recent `DRAFT-2026-v1` features (as of 04/26).
+- **http4k-ai-mcp-client**: `DiscoveredMcpOAuth` now supports pluggable OAuth flow and refresh filters for custom grant types (e.g. JWT assertion for enterprise IdP).
+- **http4k-core**: Add `Header.ALLOW` lens for RFC 9110 `Allow` header.
+- **http4k-realtime-core**: Add `Header.X_ACCEL_BUFFERING` lens with `XAccelBuffering` enum.
 
 ### v6.44.0.0
 - **http4k-***: Upgrade versions, including Kotlin to 2.3.21
