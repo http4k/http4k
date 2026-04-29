@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dataframe.io.JSON.TypeClashTactic.ARRAY_AND_VALUE_C
 import org.jetbrains.kotlinx.dataframe.io.readCsv
 import org.jetbrains.kotlinx.dataframe.io.readJson
 import java.io.InputStream
+import java.nio.charset.Charset
 
 /**
  * Represents the extraction format for taking data and converting it into a DataFrame.
@@ -41,13 +42,15 @@ data class CSV(
     val parseParallel: Boolean = true,
     val compression: Compression<*> = Compression.None,
     val adjustCsvSpecs: AdjustCsvSpecs = { it },
-    override val contentType: ContentType = TEXT_CSV
+    override val contentType: ContentType = TEXT_CSV,
+    val charset: Charset = Charsets.UTF_8,
 ) : DataFrameFormat {
     override operator fun invoke(input: InputStream) =
         DataFrame.readCsv(
             input,
             delimiter,
             header,
+            charset,
             hasFixedWidthColumns,
             fixedColumnWidths,
             colTypes,
