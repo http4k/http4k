@@ -17,6 +17,7 @@ import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.accepted
+import org.http4k.lens.ALLOW
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MCP_SESSION_ID
@@ -61,7 +62,7 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
             }
 
             else -> SseResponse(METHOD_NOT_ALLOWED,
-                listOf("Allow" to listOf(GET, POST, DELETE).joinToString(", "))
+                listOf(Header.ALLOW.meta.name to listOf(GET, POST, DELETE).joinToString(", "))
             ) { it.close() }
         }
     })
