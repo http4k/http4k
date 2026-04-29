@@ -55,6 +55,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
@@ -101,24 +102,27 @@ class HttpNonStreamingMcpClient(
     }
 
     override fun tools() = object : McpClient.Tools {
+
+        private var lastKnownTools = emptyList<McpTool>()
+
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()
 
         override fun list(overrideDefaultTimeout: Duration?) =
             http.send<McpTool.List.Response.Result>(McpTool.List.Request(McpTool.List.Request.Params(), nextId()))
-                .map { it.tools }
+                .map { it.tools.also { lastKnownTools = it } }
 
         override fun call(
             name: ToolName,
             request: ToolRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpTool.Call.Response.Result>(
-            McpTool.Call.Request(
-                McpTool.Call.Request.Params(name, request.mapValues { McpJson.asJsonObject(it.value) }),
-                nextId()
-            )
-        )
-            .map { toToolResponseOrError(it) }
-            .flatMapFailure { toToolElicitationRequiredOrError(it) }
+        ) = McpTool.Call.Request(
+            McpTool.Call.Request.Params(name, request.mapValues { McpJson.asJsonObject(it.value) }),
+            nextId()
+        ).let { mcpRequest ->
+            PopulateToolHeaders(lastKnownTools, mcpRequest.method, name, request).then(http).send<McpTool.Call.Response.Result>(mcpRequest)
+                .map { toToolResponseOrError(it) }
+                .flatMapFailure { toToolElicitationRequiredOrError(it) }
+        }
     }
 
     override fun prompts() = object : McpClient.Prompts {
@@ -132,9 +136,11 @@ class HttpNonStreamingMcpClient(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpPrompt.Get.Response.Result>(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request), nextId()))
-            .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
-            .flatMapFailure { toPromptErrorOrFailure(it) }
+        ) = McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request), nextId()).let { mcpRequest ->
+            PopulateMcpHeaders(mcpRequest.method, name.value).then(http).send<McpPrompt.Get.Response.Result>(mcpRequest)
+                .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
+                .flatMapFailure { toPromptErrorOrFailure(it) }
+        }
     }
 
     override fun sampling() = throw UnsupportedOperationException()
@@ -157,9 +163,11 @@ class HttpNonStreamingMcpClient(
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send<McpResource.Read.Response.Result>(McpResource.Read.Request(McpResource.Read.Request.Params(request.uri), nextId()))
-            .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
-            .flatMapFailure { toResourceErrorOrFailure(it) }
+        ) = McpResource.Read.Request(McpResource.Read.Request.Params(request.uri), nextId()).let { mcpRequest ->
+            PopulateMcpHeaders(mcpRequest.method, request.uri.toString()).then(http).send<McpResource.Read.Response.Result>(mcpRequest)
+                .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
+                .flatMapFailure { toResourceErrorOrFailure(it) }
+        }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) = throw UnsupportedOperationException()
 

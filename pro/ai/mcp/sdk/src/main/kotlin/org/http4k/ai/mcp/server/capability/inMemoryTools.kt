@@ -20,7 +20,7 @@ fun tools(list: Iterable<ToolCapability>): Tools = InMemoryTools(list)
 
 private class InMemoryTools(list: Iterable<ToolCapability>) : ObservableList<ToolCapability>(list), Tools {
     override fun list(req: McpTool.List.Request.Params, client: Client, http: Request): McpTool.List.Response.Result =
-        McpTool.List.Response.Result(items.map(ToolCapability::toTool))
+        McpTool.List.Response.Result(items.map(ToolCapability::toTool).sortedBy { it.name.value })
 
     override fun call(req: McpTool.Call.Request.Params, client: Client, http: Request): McpTool.Call.Response.Result = items
         .find { it.toTool().name == req.name }

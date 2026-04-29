@@ -81,6 +81,7 @@ class DirectoryResources(
 
             else -> {
                 val file = File(dir, path)
+                if (!file.canonicalPath.startsWith(dir.canonicalPath)) throw McpException(InvalidParams)
                 val contentType = mimeTypes.forFile(file.name)
 
                 return when {

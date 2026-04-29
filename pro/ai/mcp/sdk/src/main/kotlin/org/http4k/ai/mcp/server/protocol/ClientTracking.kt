@@ -12,6 +12,7 @@ import org.http4k.ai.mcp.util.McpNodeType
 import java.util.concurrent.ConcurrentHashMap
 
 class ClientTracking(initialize: McpInitialize.Request.Params) {
+    val protocolVersion = initialize.protocolVersion
     val supportsSampling = initialize.capabilities.sampling != null
     val supportsRoots = initialize.capabilities.roots?.listChanged == true
     val supportsElicitation = initialize.capabilities.elicitation != null

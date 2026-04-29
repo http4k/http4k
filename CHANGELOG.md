@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.44.1.0 (uncut)
+- **http4k-ai-mcp-sdk**: Add support for all recent `DRAFT-2026-v1` features (as of 04/26).
+
 ### v6.44.0.0
 - **http4k-***: Upgrade versions, including Kotlin to 2.3.21
 - **http4k-ai-mcp-sdk**: [Break] Unified JSON-RPC message handling. `McpHandler` now takes `McpRequest`/`McpResponse` (sealed: `Ok`/`Accepted`/`Unknown`). Custom `McpHandler` and `McpFilter` implementations will need adjusting.

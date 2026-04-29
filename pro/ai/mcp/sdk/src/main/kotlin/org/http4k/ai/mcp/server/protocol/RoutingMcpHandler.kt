@@ -5,6 +5,8 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.DRAFT
+import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpElicitations
@@ -24,6 +26,8 @@ import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.format.unwrap
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_NAME
 import kotlin.random.Random
 
 fun RoutingMcpHandler(
@@ -51,7 +55,17 @@ fun RoutingMcpHandler(
         { clientTracking[session] ?: throw McpException(ErrorMessage.InternalError) }
     )
 
-    return { mcp ->
+    fun McpRequest.isDraftProtocol() =
+        clientTracking[session]?.let { it.protocolVersion >= DRAFT } == true
+
+    fun McpRequest.validateMcpName(bodyName: String) = when {
+        isDraftProtocol() && Header.MCP_NAME(http) != bodyName ->
+            throw McpException(HeaderMismatchError("Mcp-Name header value does not match body value"))
+
+        else -> null
+    }
+
+    return ValidateMcpMethodHeader(clientTracking).then { mcp ->
         when (mcp.message) {
             is McpInitialize.Request -> {
                 val initialize = initializer(mcp.message.params, mcp.http)
@@ -70,7 +84,7 @@ fun RoutingMcpHandler(
                 )
             )
 
-            is McpPrompt.Get.Request -> McpResponse.Ok(
+            is McpPrompt.Get.Request -> mcp.validateMcpName(mcp.message.params.name.value) ?: McpResponse.Ok(
                 McpPrompt.Get.Response(
                     prompts.get(
                         mcp.message.params,
@@ -110,7 +124,7 @@ fun RoutingMcpHandler(
                 )
             )
 
-            is McpResource.Read.Request -> McpResponse.Ok(
+            is McpResource.Read.Request -> mcp.validateMcpName(mcp.message.params.uri.toString()) ?: McpResponse.Ok(
                 McpResource.Read.Response(
                     resources.read(
                         mcp.message.params,
@@ -142,7 +156,7 @@ fun RoutingMcpHandler(
                 McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             }
 
-            is McpTool.Call.Request -> McpResponse.Ok(
+            is McpTool.Call.Request -> mcp.validateMcpName(mcp.message.params.name.value) ?: McpResponse.Ok(
                 McpTool.Call.Response(
                     tools.call(
                         mcp.message.params,

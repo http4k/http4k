@@ -1,11 +1,15 @@
 package org.http4k.lens
 
 import org.http4k.core.ContentEncodingName
+import org.http4k.core.Method
 import org.http4k.core.PriorityList
 import org.http4k.core.fromSimpleRangeHeader
 import org.http4k.core.toSimpleRangeHeader
 import java.nio.charset.Charset
 import java.util.Locale
+
+// RFC 9110 Section 10.2.1
+val Header.ALLOW get() = Header.enum<Method>().multi.required("Allow")
 
 private data class PriorityListParam(val itemType: ParamMeta) :
     ParamMeta("priority list of " + itemType.description)

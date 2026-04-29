@@ -204,6 +204,17 @@ class DirectoryResourcesTest {
     }
 
     @Test
+    fun `cannot read with directory traversal`() {
+        assertThrows<McpException> {
+            DirectoryResources(File("$path/directory"), Recursive).read(
+                McpResource.Read.Request.Params(Uri.of("file://../plainfile.txt")),
+                NoOp,
+                Request(GET, "")
+            )
+        }
+    }
+
+    @Test
     fun `cannot read recursive when not`() {
         assertThrows<McpException> {
             DirectoryResources(File(path), Flat).read(

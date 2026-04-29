@@ -453,20 +453,6 @@ class McpProtocolTest {
                     McpTool.List.Response.Result(
                         listOf(
                             McpTool(
-                                ToolName.of("unstructured"), "description", "title",
-                                mapOf(
-                                    "type" to "object",
-                                    "required" to listOf("foo"),
-                                    "properties" to mapOf(
-                                        "foo" to mapOf("type" to "string", "description" to "description1"),
-                                        "bar" to mapOf("type" to "integer", "description" to "description2")
-                                    )
-                                ),
-                                null,
-                                null,
-                                icons
-                            ),
-                            McpTool(
                                 ToolName.of("structured"), "description", "title",
                                 mapOf(
                                     "type" to "object",
@@ -485,6 +471,20 @@ class McpProtocolTest {
                                     "type" to "object",
                                     "required" to listOf("foo")
                                 ),
+                                null,
+                                icons
+                            ),
+                            McpTool(
+                                ToolName.of("unstructured"), "description", "title",
+                                mapOf(
+                                    "type" to "object",
+                                    "required" to listOf("foo"),
+                                    "properties" to mapOf(
+                                        "foo" to mapOf("type" to "string", "description" to "description1"),
+                                        "bar" to mapOf("type" to "integer", "description" to "description2")
+                                    )
+                                ),
+                                null,
                                 null,
                                 icons
                             )

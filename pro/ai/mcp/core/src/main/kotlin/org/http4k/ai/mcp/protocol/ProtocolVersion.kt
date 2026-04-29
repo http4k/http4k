@@ -17,7 +17,7 @@ class ProtocolVersion private constructor(value: String) : StringValue(value), C
 
         val PUBLISHED = setOf(`2024-11-05`, `2025-03-26`, `2025-06-18`, `2025-11-25`)
 
-        val DRAFT = of("DRAFT")
+        val DRAFT = of("DRAFT-2026-v1")
 
         val LATEST_VERSION = PUBLISHED.max()
     }

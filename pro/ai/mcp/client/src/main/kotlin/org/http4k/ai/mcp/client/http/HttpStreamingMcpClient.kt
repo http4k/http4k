@@ -84,6 +84,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.MoshiObject
 import org.http4k.lens.Header
@@ -169,6 +170,9 @@ class HttpStreamingMcpClient(
     }
 
     override fun tools() = object : McpClient.Tools {
+
+        private var lastKnownTools = emptyList<McpTool>()
+
         override fun onChange(fn: () -> Unit) {
             registry.on(McpTool.List.Changed.Notification::class) { _, _ -> fn() }
         }
@@ -176,23 +180,23 @@ class HttpStreamingMcpClient(
         override fun list(overrideDefaultTimeout: Duration?) =
             http.send(McpTool.List.Request(McpTool.List.Request.Params(), nextId()))
                 .flatMap { it.first().asAOrFailure<McpTool.List.Response.Result>() }
-                .map { it.tools }
+                .map { it.tools.also { lastKnownTools = it } }
 
         override fun call(
             name: ToolName,
             request: ToolRequest,
             overrideDefaultTimeout: Duration?
         ): Result<ToolResponse, McpError> {
-            val incoming = http.send(
-                McpTool.Call.Request(
-                    McpTool.Call.Request.Params(
-                        name,
-                        request.mapValues { McpJson.asJsonObject(it.value) },
-                        request.meta
-                    ), nextId()
-                )
+            val mcpRequest = McpTool.Call.Request(
+                McpTool.Call.Request.Params(
+                    name,
+                    request.mapValues { McpJson.asJsonObject(it.value) },
+                    request.meta
+                ), nextId()
             )
-            return incoming
+            return PopulateToolHeaders(lastKnownTools, mcpRequest.method, name, request)
+                .then(http)
+                .send(mcpRequest)
                 .flatMap {
                     it.mapNotNull {
                         when ((McpJson.parse(it.data) as MoshiObject)["method"]) {
@@ -223,10 +227,13 @@ class HttpStreamingMcpClient(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send(McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request), nextId()))
-            .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response.Result>() }
-            .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
-            .flatMapFailure { toPromptErrorOrFailure(it) }
+        ): Result<PromptResponse, McpError> {
+            val mcpRequest = McpPrompt.Get.Request(McpPrompt.Get.Request.Params(name, request), nextId())
+            return PopulateMcpHeaders(mcpRequest.method, name.value).then(http).send(mcpRequest)
+                .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response.Result>() }
+                .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
+                .flatMapFailure { toPromptErrorOrFailure(it) }
+        }
     }
 
     override fun elicitations() = object : McpClient.Elicitations {
@@ -255,9 +262,7 @@ class HttpStreamingMcpClient(
                         )
                     )
                 }
-                http.send(
-                    McpElicitations.Response(response.toProtocol(), requestId)
-                )
+                http.send(McpElicitations.Response(response.toProtocol(), requestId))
             }
         }
 
@@ -330,10 +335,13 @@ class HttpStreamingMcpClient(
         override fun read(
             request: ResourceRequest,
             overrideDefaultTimeout: Duration?
-        ) = http.send(McpResource.Read.Request(McpResource.Read.Request.Params(request.uri), nextId()))
-            .flatMap { it.first().asAOrFailure<McpResource.Read.Response.Result>() }
-            .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
-            .flatMapFailure { toResourceErrorOrFailure(it) }
+        ): Result<ResourceResponse, McpError> {
+            val mcpRequest = McpResource.Read.Request(McpResource.Read.Request.Params(request.uri), nextId())
+            return PopulateMcpHeaders(mcpRequest.method, request.uri.toString()).then(http).send(mcpRequest)
+                .flatMap { it.first().asAOrFailure<McpResource.Read.Response.Result>() }
+                .map { ResourceResponse.Ok(it.contents) as ResourceResponse }
+                .flatMapFailure { toResourceErrorOrFailure(it) }
+        }
 
         override fun subscribe(uri: Uri, fn: () -> Unit) {
             registry.on(McpResource.Updated.Notification::class) { notification, _ ->

@@ -7,6 +7,10 @@ import org.http4k.sse.SseMessage.Data
 
 val Header.LAST_EVENT_ID get() = Header.map(::SseEventId, SseEventId::value).optional("Last-Event-ID")
 
+val Header.X_ACCEL_BUFFERING get() = Header.enum<XAccelBuffering>(caseSensitive = false).defaulted("X-Accel-Buffering", XAccelBuffering.no)
+
+enum class XAccelBuffering { yes, no }
+
 object SseMessage : BiDiLensSpec<org.http4k.sse.SseMessage, String>(
     "query", StringParam,
     LensGet { name, target: org.http4k.sse.SseMessage ->

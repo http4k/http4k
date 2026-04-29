@@ -16,13 +16,17 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.lens.ALLOW
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.contentType
+import org.http4k.routing.asRouter
 import org.http4k.routing.bind
+import org.http4k.routing.orElse
 import org.http4k.routing.routes
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
@@ -33,7 +37,7 @@ import org.http4k.sse.SseMessage
  */
 fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp") =
     path bind routes(
-        POST to { req ->
+        POST.asRouter() bind { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
                     is Valid
@@ -45,7 +49,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
                 }
             }
         },
-        GET to { req ->
+        GET.asRouter() bind { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
                     is Valid
@@ -56,7 +60,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
                 }
             }
         },
-        DELETE to { req ->
+        DELETE.asRouter() bind { req: Request ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
                     is Valid
@@ -69,7 +73,8 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
                     Invalid -> Response(NOT_FOUND)
                 }
             }
-        }
+        },
+        orElse bind { Response(METHOD_NOT_ALLOWED).with(Header.ALLOW of listOf(GET, POST, DELETE)) }
     )
 
 private class FakeSse(override val connectRequest: Request) : Sse {

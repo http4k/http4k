@@ -13,6 +13,9 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.XAccelBuffering.no
+import org.http4k.lens.X_ACCEL_BUFFERING
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
@@ -25,7 +28,7 @@ fun SseOutboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/sse" bind { req: Request ->
         when (val sessionState = protocol.retrieveSession(req)) {
             is Valid
- -> SseResponse(OK) {
+                -> SseResponse(OK, listOf(Header.X_ACCEL_BUFFERING.meta.name to no.name)) {
                 protocol.subscribe(Subscription(sessionState.session), it, req)
                 it.send(
                     SseMessage.Event(
