@@ -5,7 +5,8 @@
 package org.http4k.routing
 
 import org.http4k.ai.a2a.A2ARequest
-import org.http4k.ai.a2a.A2AResponse
+import org.http4k.ai.a2a.A2AResponse.Single
+import org.http4k.ai.a2a.A2AResponse.Stream
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
@@ -21,7 +22,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
@@ -54,15 +54,12 @@ fun a2a(
         .then(
             routes(
                 agentCardPath bind GET to { Response(OK).with(agentCardLens of agentCard) },
-                rpcPath bind POST to { httpReq ->
-                    val message = runCatching { A2AJson.asA<A2AJsonRpcRequest>(httpReq.bodyString()) }
-                        .getOrElse { return@to Response(BAD_REQUEST) }
-
-                    when (val result = handler(A2ARequest(message, httpReq))) {
-                        is A2AResponse.Single ->
+                rpcPath bind POST to {
+                    when (val result = handler(A2ARequest(Body.auto<A2AJsonRpcRequest>().toLens()(it), it))) {
+                        is Single ->
                             Response(OK).with(jsonRpcLens of A2AJson.asJsonObject(result.message))
 
-                        is A2AResponse.Stream ->
+                        is Stream ->
                             Response(OK)
                                 .contentType(ContentType.TEXT_EVENT_STREAM)
                                 .body(result.messages.toSseStream())
