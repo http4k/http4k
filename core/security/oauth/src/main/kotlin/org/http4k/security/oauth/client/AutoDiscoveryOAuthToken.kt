@@ -7,6 +7,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.filter.ClientFilters
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
 
@@ -39,25 +40,33 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     scopes: List<String> = emptyList(),
     resourceUri: Uri? = null,
     gracePeriod: Duration = Duration.ofSeconds(10),
+) = AutoDiscoveryOAuthToken(
+    authServerDiscovery,
+    backend,
+    oAuthFlowFilter,
+    { ClientFilters.OAuthRefreshToken(clientCredentials, it, scopes, resourceUri) },
+    clock,
+    gracePeriod
+)
+
+fun ClientFilters.AutoDiscoveryOAuthToken(
+    authServerDiscovery: AuthServerDiscovery,
+    backend: HttpHandler,
+    oAuthFlowFilter: Filter,
+    oAuthRefreshFilter: (RefreshToken) -> Filter,
+    clock: Clock = Clock.systemUTC(),
+    gracePeriod: Duration = Duration.ofSeconds(10),
 ): Filter {
     val (authServerUri, metadata) = authServerDiscovery(backend)
         .onFailure { throw it.reason }
-    val config = OAuthProviderConfig(
-        authBase = authServerUri,
-        authPath = metadata.authorization_endpoint.path,
-        tokenPath = metadata.token_endpoint.path,
-        credentials = clientCredentials
-    )
 
     return ClientFilters.RefreshingOAuthToken(
-        clientCredentials = clientCredentials,
-        tokenUri = config.tokenUri,
+        tokenUri = Uri.of(authServerUri.toString() + metadata.token_endpoint.path),
         backend = backend,
         oAuthFlowFilter = oAuthFlowFilter,
+        oAuthRefreshFilter = oAuthRefreshFilter,
         gracePeriod = gracePeriod,
         clock = clock,
-        scopes = scopes,
-        resourceUri = resourceUri
     )
 }
 

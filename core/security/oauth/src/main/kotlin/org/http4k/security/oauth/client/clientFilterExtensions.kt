@@ -66,10 +66,28 @@ fun ClientFilters.RefreshingOAuthToken(
     tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
     scopes: List<String> = emptyList(),
     resourceUri: Uri? = null,
+) = RefreshingOAuthToken(
+    tokenUri = tokenUri,
+    backend = backend,
+    oAuthFlowFilter = oAuthFlowFilter,
+    oAuthRefreshFilter = { ClientFilters.OAuthRefreshToken(clientCredentials, it, scopes, resourceUri) },
+    gracePeriod = gracePeriod,
+    clock = clock,
+    tokenExtractor = tokenExtractor,
+)
+
+fun ClientFilters.RefreshingOAuthToken(
+    tokenUri: Uri,
+    backend: HttpHandler,
+    oAuthFlowFilter: Filter,
+    oAuthRefreshFilter: (RefreshToken) -> Filter,
+    gracePeriod: Duration = Duration.ofSeconds(10),
+    clock: Clock = Clock.systemUTC(),
+    tokenExtractor: AccessTokenExtractor = ContentTypeJsonOrForm(),
 ): Filter {
     val refresher = CredentialsProvider.Refreshing<AccessToken>(gracePeriod, clock) { token ->
         val filter = token?.refreshToken
-            ?.let { ClientFilters.OAuthRefreshToken(clientCredentials, it, scopes, resourceUri) }
+            ?.let { oAuthRefreshFilter(it) }
             ?: oAuthFlowFilter
 
         filter
