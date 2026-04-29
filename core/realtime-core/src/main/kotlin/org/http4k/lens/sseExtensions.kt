@@ -11,15 +11,15 @@ val Header.X_ACCEL_BUFFERING get() = Header.enum<XAccelBuffering>(caseSensitive 
 
 enum class XAccelBuffering { yes, no }
 
-object SseMessage : BiDiLensSpec<org.http4k.sse.SseMessage, String>(
+object SseMessage : BiDiLensSpec<SseMessage, String>(
     "query", StringParam,
-    LensGet { name, target: org.http4k.sse.SseMessage ->
+    LensGet { _, target: SseMessage ->
         when (target) {
             is Data -> listOf(target.data)
             else -> error("cannot extract data from a ${target::class}")
         }
     },
-    LensSet { name, values, target ->
+    LensSet { _, values, target ->
         values.fold(target) { m, next ->
             when (m) {
                 is Data -> m.copy(data = m.data + next)
