@@ -2,6 +2,7 @@ package org.http4k.security.oauth.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Credentials
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -40,13 +41,12 @@ class RefreshingOAuthTokenTest {
         val clock = TickingClock()
 
         val app = ClientFilters.RefreshingOAuthToken(
-            config,
-            backend,
-            Duration.ofSeconds(10),
-            clock,
-            scopes = emptyList(),
-            resourceUri = null,
-            { next -> { next(it.body("auth")) } },
+            clientCredentials = config.credentials,
+            tokenUri = config.tokenUri,
+            backend = backend,
+            oAuthFlowFilter = Filter { next -> { next(it.body("auth")) } },
+            gracePeriod = Duration.ofSeconds(10),
+            clock = clock,
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
@@ -81,13 +81,13 @@ class RefreshingOAuthTokenTest {
         val clock = TickingClock()
 
         val app = ClientFilters.RefreshingOAuthToken(
-            config,
-            backend,
-            Duration.ofSeconds(10),
-            clock,
-            listOf("someactivity.read", "someactivity.write"),
-            resourceUri = null,
-            { next -> { next(it.body("auth")) } },
+            clientCredentials = config.credentials,
+            tokenUri = config.tokenUri,
+            backend = backend,
+            oAuthFlowFilter = Filter { next -> { next(it.body("auth")) } },
+            gracePeriod = Duration.ofSeconds(10),
+            clock = clock,
+            scopes = listOf("someactivity.read", "someactivity.write"),
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))
@@ -127,13 +127,12 @@ class RefreshingOAuthTokenTest {
         val clock = TickingClock()
 
         val app = ClientFilters.RefreshingOAuthToken(
-            config,
-            backend,
-            Duration.ofSeconds(10),
-            clock,
-            scopes = emptyList(),
-            resourceUri = null,
-            { next -> { next(it.body("auth")) } },
+            clientCredentials = config.credentials,
+            tokenUri = config.tokenUri,
+            backend = backend,
+            oAuthFlowFilter = Filter { next -> { next(it.body("auth")) } },
+            gracePeriod = Duration.ofSeconds(10),
+            clock = clock,
         ).then { req: Request -> Response(OK).body(req.header("Authorization")!!) }
 
         assertThat(app(Request(GET, "")), hasBody("Bearer auth0"))

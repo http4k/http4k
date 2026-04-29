@@ -3,7 +3,8 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.44.1.0 (uncut)
+### v6.45.0.0 (uncut)
+- **http4k-security-oauth***: [Break] Refactor of excess parameters and splitting out of client filters into decomposed parts. The names of some parameters have changed.
 - **http4k-ai-mcp-sdk**: Add support for all recent `DRAFT-2026-v1` features (as of 04/26).
 
 ### v6.44.0.0

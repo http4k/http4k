@@ -13,25 +13,26 @@ import java.time.Duration
 
 fun ClientFilters.AutoDiscoveryOAuthToken(
     authServerDiscovery: AuthServerDiscovery,
-    credentials: Credentials,
+    clientCredentials: Credentials,
     backend: HttpHandler,
     clock: Clock = Clock.systemUTC(),
     scopes: List<String> = emptyList(),
     resourceUri: Uri? = null,
-    oAuthFlowFilter: Filter = ClientFilters.OAuthClientCredentials(credentials, scopes, resourceUri),
     gracePeriod: Duration = Duration.ofSeconds(10),
 ): Filter {
+    val oAuthFlowFilter = ClientFilters.OAuthClientCredentials(clientCredentials, scopes, resourceUri)
     val (authServerUri, metadata) = authServerDiscovery(backend)
         .onFailure { throw it.reason }
     val config = OAuthProviderConfig(
         authBase = authServerUri,
         authPath = metadata.authorization_endpoint.path,
         tokenPath = metadata.token_endpoint.path,
-        credentials = credentials
+        credentials = clientCredentials
     )
 
     return ClientFilters.RefreshingOAuthToken(
-        config = config,
+        clientCredentials = clientCredentials,
+        tokenUri = config.tokenUri,
         backend = backend,
         oAuthFlowFilter = oAuthFlowFilter,
         gracePeriod = gracePeriod,
