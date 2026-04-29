@@ -88,6 +88,15 @@ class OpenApi3<NODE : Any>(
     ): Response {
         val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
+        val pathDefs = paths.flatMap { it.pathSpec.definitions() }
+        val webhookPaths = webhooks.takeIf { it.isNotEmpty() }?.mapValues { (_, webhooks) ->
+            webhooks.associate {
+                it.method.name.lowercase() to
+                    it.meta.apiPath(it.method, it.meta.requestParams.map { it.meta })
+            }
+        }
+        val webhookPathDefs = webhookPaths.orEmpty().values
+            .flatMap { it.values.flatMap { p -> p.definitions() } }
 
         val unextended = apiRenderer.api(
             Api(
@@ -101,18 +110,11 @@ class OpenApi3<NODE : Any>(
                     }
                     .toSortedMap(),
                 Components(
-                    json.obj(paths.flatMap { it.pathSpec.definitions() }),
+                    json.obj(pathDefs + webhookPathDefs),
                     json(allSecurities.filterNotNull().combineFull())
                 ),
                 servers,
-                webhooks.takeIf { it.isNotEmpty() }
-                    ?.mapValues { (_, webhooks) ->
-                        webhooks.associate {
-                            it.method.name.lowercase() to it.meta.apiPath(
-                                it.method,
-                                it.meta.requestParams.map { it.meta })
-                        }
-                    },
+                webhookPaths,
                 version.toString()
             )
         )
