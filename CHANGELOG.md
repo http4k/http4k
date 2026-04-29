@@ -3,8 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.45.0.0 (uncut)
+### v6.45.0.0
+- **http4k-***: Upgrade versions
 - **http4k-security-oauth**: [Break] `RefreshingOAuthToken`, `AutoDiscoveryOAuthToken` refactored with pluggable OAuth flow and refresh filters. The `oAuthFlowFilter` parameter no longer has a default — use the `OAuthProviderConfig` or `Credentials` overloads for the previous behaviour. Parameter `oauthCredentials` renamed to `clientCredentials`.
+- **http4k-api-openapi**: Include webhook schemas in contract spec. H/T @cies
 - **http4k-security-oauth**: Add `ClientFilters.OAuthJwtAssertion` for RFC 7523 JWT assertion grants (SEP-990 ID-JAG enterprise auth).
 - **http4k-ai-mcp-sdk**: Add support for all recent `DRAFT-2026-v1` features (as of 04/26).
 - **http4k-ai-mcp-client**: `DiscoveredMcpOAuth` now supports pluggable OAuth flow and refresh filters for custom grant types (e.g. JWT assertion for enterprise IdP).
