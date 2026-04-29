@@ -12,6 +12,10 @@ import java.time.Clock
 import java.time.Duration
 
 
+/**
+ * Discovers the authorization server and obtains tokens using the standard client_credentials grant.
+ * Suitable for machine-to-machine scenarios with a client ID and secret.
+ */
 fun ClientFilters.AutoDiscoveryOAuthToken(
     authServerDiscovery: AuthServerDiscovery,
     clientCredentials: Credentials,
@@ -31,6 +35,11 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     gracePeriod
 )
 
+/**
+ * Discovers the authorization server and obtains tokens using a custom initial grant flow
+ * but standard client_credentials-based refresh. Use when the initial grant is non-standard
+ * (e.g. JWT assertion) but refresh still uses client credentials.
+ */
 fun ClientFilters.AutoDiscoveryOAuthToken(
     authServerDiscovery: AuthServerDiscovery,
     clientCredentials: Credentials,
@@ -49,6 +58,10 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
     gracePeriod
 )
 
+/**
+ * Discovers the authorization server and obtains tokens with fully pluggable grant and refresh flows.
+ * Use for scenarios where neither the initial grant nor refresh use client credentials (e.g. JWT assertions).
+ */
 fun ClientFilters.AutoDiscoveryOAuthToken(
     authServerDiscovery: AuthServerDiscovery,
     backend: HttpHandler,

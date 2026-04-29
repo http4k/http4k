@@ -23,9 +23,9 @@ import org.http4k.security.oauth.client.AutoDiscoveryOAuthToken
 import java.time.Clock
 
 /**
- * MCP OAuth Client filter that handles the authentication process for MCP resources.
- * It expects the server to provide the authorization server URL or protected resource in the WWW-Authenticate header.
- * It then retrieves the token using the provided client credentials and retries the request.
+ * MCP OAuth Client filter using the standard client_credentials grant. Suitable for machine-to-machine
+ * scenarios where the client has a client ID and secret. Discovers the authorization server automatically
+ * from the MCP resource server's WWW-Authenticate header or .well-known endpoint (SEP-985 fallback).
  */
 fun ClientFilters.DiscoveredMcpOAuth(
     clientCredentials: Credentials,
@@ -37,6 +37,11 @@ fun ClientFilters.DiscoveredMcpOAuth(
     clock
 )
 
+/**
+ * MCP OAuth Client filter with a custom initial grant flow but standard client_credentials-based refresh.
+ * Use when the initial token acquisition uses a non-standard grant (e.g. JWT assertion for ID-JAG)
+ * but the client still has credentials for refreshing tokens.
+ */
 fun ClientFilters.DiscoveredMcpOAuth(
     clientCredentials: Credentials,
     oAuthFlowFilter: Filter,
@@ -47,6 +52,11 @@ fun ClientFilters.DiscoveredMcpOAuth(
     clock
 )
 
+/**
+ * MCP OAuth Client filter with fully pluggable grant and refresh flows. Use for enterprise auth scenarios
+ * where neither the initial grant nor the refresh use client credentials.
+ * Both the initial token acquisition and token refresh are controlled by the provided filters.
+ */
 fun ClientFilters.DiscoveredMcpOAuth(
     oAuthFlowFilter: Filter,
     oAuthRefreshFilter: (RefreshToken) -> Filter,

@@ -34,6 +34,10 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant.MAX
 
+/**
+ * Obtains and refreshes OAuth tokens using the standard client_credentials grant from the provider config.
+ * Suitable for machine-to-machine scenarios with a client ID and secret.
+ */
 fun ClientFilters.RefreshingOAuthToken(
     config: OAuthProviderConfig,
     backend: HttpHandler,
@@ -53,8 +57,8 @@ fun ClientFilters.RefreshingOAuthToken(
 )
 
 /**
- * Filter to authenticate and refresh against a OAuth server. Use the correct OAuth filter for your flow.
- * e.g. ClientFilters.ClientCredentials()
+ * Obtains and refreshes OAuth tokens with a custom initial grant flow but standard client_credentials-based
+ * refresh. Use when the initial grant is non-standard but the client has credentials for refreshing tokens.
  */
 fun ClientFilters.RefreshingOAuthToken(
     clientCredentials: Credentials,
@@ -76,6 +80,10 @@ fun ClientFilters.RefreshingOAuthToken(
     tokenExtractor = tokenExtractor,
 )
 
+/**
+ * Obtains and refreshes OAuth tokens with fully pluggable grant and refresh flows. Use for scenarios
+ * where neither the initial grant nor refresh use client credentials (e.g. JWT assertions, ID-JAG).
+ */
 fun ClientFilters.RefreshingOAuthToken(
     tokenUri: Uri,
     backend: HttpHandler,
