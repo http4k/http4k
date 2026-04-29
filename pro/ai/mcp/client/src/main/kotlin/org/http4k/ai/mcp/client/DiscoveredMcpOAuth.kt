@@ -37,7 +37,10 @@ fun ClientFilters.DiscoveredMcpOAuth(
             when {
                 response.status == UNAUTHORIZED ->
                     when (val wwwAuthenticate = WWW_AUTHENTICATE(response)) {
-                        null -> response
+                        null -> {
+                            auth = authFromWellKnown(next, it.uri)
+                            auth.then(next)(it)
+                        }
 
                         else -> when {
                             wwwAuthenticate["resource_metadata"] != null -> {
@@ -50,7 +53,10 @@ fun ClientFilters.DiscoveredMcpOAuth(
                                 auth.then(next)(it)
                             }
 
-                            else -> response
+                            else -> {
+                                auth = authFromWellKnown(next, it.uri)
+                                auth.then(next)(it)
+                            }
                         }
                     }
 
@@ -85,4 +91,14 @@ fun ClientFilters.DiscoveredMcpOAuth(
             resourceUri
         )
     }
+
+    private fun authFromWellKnown(next: HttpHandler, resourceUri: Uri) =
+        ClientFilters.AutoDiscoveryOAuthToken(
+            fromProtectedResource(resourceUri.path("/.well-known/oauth-protected-resource"), resourceUri),
+            clientCredentials,
+            next,
+            clock,
+            scopes,
+            resourceUri
+        )
 }

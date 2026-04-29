@@ -40,8 +40,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
         POST.asRouter() bind { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
-                    is Valid
- ->
+                    is Valid ->
                         receive(FakeSse(req), sessionState, req).asHttp(OK)
                             .with(Header.MCP_SESSION_ID of sessionState.session.id)
 
@@ -52,8 +51,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
         GET.asRouter() bind { req ->
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
-                    is Valid
- -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
+                    is Valid -> Response(OK).contentType(ContentType.TEXT_EVENT_STREAM)
                         .with(Header.MCP_SESSION_ID of sessionState.session.id)
 
                     Invalid -> Response(NOT_FOUND)
