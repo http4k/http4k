@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.45.1.0
+- **http4k-security-oauth**: Added missing OAuth client filter override.
+
 ### v6.45.0.0
 - **http4k-***: Upgrade versions
 - **http4k-security-oauth**: [Break] `RefreshingOAuthToken`, `AutoDiscoveryOAuthToken` refactored with pluggable OAuth flow and refresh filters. The `oAuthFlowFilter` parameter no longer has a default — use the `OAuthProviderConfig` or `Credentials` overloads for the previous behaviour. Parameter `oauthCredentials` renamed to `clientCredentials`.

@@ -49,7 +49,29 @@ fun ClientFilters.RefreshingOAuthToken(
     clientCredentials = config.credentials,
     tokenUri = config.tokenUri,
     backend = backend,
-    oAuthFlowFilter = ClientFilters.OAuthClientCredentials(config.credentials, scopes, resourceUri),
+    gracePeriod = gracePeriod,
+    clock = clock,
+    scopes = scopes,
+    resourceUri = resourceUri
+)
+
+/**
+ * Obtains and refreshes OAuth tokens using the standard client_credentials grant.
+ * Suitable for machine-to-machine scenarios with a client ID and secret.
+ */
+fun ClientFilters.RefreshingOAuthToken(
+    clientCredentials: Credentials,
+    tokenUri: Uri,
+    backend: HttpHandler,
+    gracePeriod: Duration = Duration.ofSeconds(10),
+    clock: Clock = Clock.systemUTC(),
+    scopes: List<String> = emptyList(),
+    resourceUri: Uri? = null,
+) = ClientFilters.RefreshingOAuthToken(
+    clientCredentials = clientCredentials,
+    tokenUri = tokenUri,
+    backend = backend,
+    oAuthFlowFilter = ClientFilters.OAuthClientCredentials(clientCredentials, scopes, resourceUri),
     gracePeriod = gracePeriod,
     clock = clock,
     scopes = scopes,
