@@ -11,5 +11,6 @@ import se.ansman.kotshi.JsonSerializable
 data class TaskConfiguration(
     val acceptedOutputModes: List<String>? = null,
     val historyLength: Int? = null,
-    val pushNotificationConfig: PushNotificationConfig? = null
+    val pushNotificationConfig: PushNotificationConfig? = null,
+    val returnImmediately: Boolean? = null
 )

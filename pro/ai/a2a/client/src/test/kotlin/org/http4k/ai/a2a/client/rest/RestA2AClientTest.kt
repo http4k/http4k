@@ -2,7 +2,7 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.ai.a2a.client.http
+package org.http4k.ai.a2a.client.rest
 
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.client.A2AClient
@@ -12,15 +12,16 @@ import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
-import org.http4k.routing.a2aJsonRpc
+import org.http4k.routing.a2aRest
 
-class HttpA2AClientTest : A2AClientContract() {
+class RestA2AClientTest : A2AClientContract() {
     override fun serverFor(
         cards: AgentCardProvider,
         handler: MessageHandler,
         tasks: TaskStorage,
         pushNotifications: PushNotificationConfigStorage
-    ) = a2aJsonRpc(cards, handler, tasks, pushNotifications)
+    ) = a2aRest(cards, handler, tasks, pushNotifications)
 
-    override fun clientFor(server: HttpHandler) = A2AClient.Http(Uri.of("http://test"), server)
+    override fun clientFor(server: HttpHandler) =
+        A2AClient.Rest(Uri.of("http://test"), server)
 }

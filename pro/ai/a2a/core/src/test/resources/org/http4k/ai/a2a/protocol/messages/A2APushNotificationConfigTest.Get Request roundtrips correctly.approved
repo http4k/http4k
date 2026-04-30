@@ -1,5 +1,5 @@
 {
-  "method": "tasks/pushNotificationConfig/get",
+  "method": "GetTaskPushNotificationConfig",
   "params": {
     "id": "config-456"
   },

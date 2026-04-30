@@ -1,5 +1,5 @@
 {
-  "method": "tasks/list",
+  "method": "ListTasks",
   "params": {
     "contextId": "ctx-123",
     "status": "working",

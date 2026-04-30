@@ -16,13 +16,13 @@ import se.ansman.kotshi.PolymorphicLabel
 object A2ATask {
     object Get {
         @JsonSerializable
-        @PolymorphicLabel("tasks/get")
+        @PolymorphicLabel("GetTask")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/get")
+            override val method = of("GetTask")
 
             @JsonSerializable
             data class Params(val id: TaskId, val historyLength: Int? = null)
@@ -37,13 +37,13 @@ object A2ATask {
 
     object Cancel {
         @JsonSerializable
-        @PolymorphicLabel("tasks/cancel")
+        @PolymorphicLabel("CancelTask")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/cancel")
+            override val method = of("CancelTask")
 
             @JsonSerializable
             data class Params(val id: TaskId)
@@ -58,13 +58,13 @@ object A2ATask {
 
     object Resubscribe {
         @JsonSerializable
-        @PolymorphicLabel("tasks/resubscribe")
+        @PolymorphicLabel("SubscribeToTask")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/resubscribe")
+            override val method = of("SubscribeToTask")
 
             @JsonSerializable
             data class Params(val id: TaskId)
@@ -73,13 +73,13 @@ object A2ATask {
 
     object List {
         @JsonSerializable
-        @PolymorphicLabel("tasks/list")
+        @PolymorphicLabel("ListTasks")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/list")
+            override val method = of("ListTasks")
 
             @JsonSerializable
             data class Params(

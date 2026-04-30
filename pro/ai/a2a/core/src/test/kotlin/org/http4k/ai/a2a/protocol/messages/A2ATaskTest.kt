@@ -63,7 +63,7 @@ class A2ATaskTest {
             A2ATask.Get.Request(
                 params = A2ATask.Get.Request.Params(id = TaskId.of("any")),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/get"))
+            ).method, equalTo(A2ARpcMethod.of("GetTask"))
         )
     }
 
@@ -73,7 +73,7 @@ class A2ATaskTest {
             A2ATask.Cancel.Request(
                 params = A2ATask.Cancel.Request.Params(id = TaskId.of("any")),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/cancel"))
+            ).method, equalTo(A2ARpcMethod.of("CancelTask"))
         )
     }
 
@@ -83,7 +83,7 @@ class A2ATaskTest {
             A2ATask.Resubscribe.Request(
                 params = A2ATask.Resubscribe.Request.Params(id = TaskId.of("any")),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/resubscribe"))
+            ).method, equalTo(A2ARpcMethod.of("SubscribeToTask"))
         )
     }
 
@@ -93,7 +93,7 @@ class A2ATaskTest {
             A2ATask.List.Request(
                 params = A2ATask.List.Request.Params(),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/list"))
+            ).method, equalTo(A2ARpcMethod.of("ListTasks"))
         )
     }
 

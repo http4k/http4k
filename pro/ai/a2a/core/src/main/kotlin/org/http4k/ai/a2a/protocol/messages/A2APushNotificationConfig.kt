@@ -15,13 +15,13 @@ import se.ansman.kotshi.PolymorphicLabel
 object A2APushNotificationConfig {
     object Set {
         @JsonSerializable
-        @PolymorphicLabel("tasks/pushNotificationConfig/set")
+        @PolymorphicLabel("CreateTaskPushNotificationConfig")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/pushNotificationConfig/set")
+            override val method = of("CreateTaskPushNotificationConfig")
 
             @JsonSerializable
             data class Params(
@@ -43,13 +43,13 @@ object A2APushNotificationConfig {
 
     object Get {
         @JsonSerializable
-        @PolymorphicLabel("tasks/pushNotificationConfig/get")
+        @PolymorphicLabel("GetTaskPushNotificationConfig")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/pushNotificationConfig/get")
+            override val method = of("GetTaskPushNotificationConfig")
 
             @JsonSerializable
             data class Params(val id: PushNotificationConfigId)
@@ -68,13 +68,13 @@ object A2APushNotificationConfig {
 
     object List {
         @JsonSerializable
-        @PolymorphicLabel("tasks/pushNotificationConfig/list")
+        @PolymorphicLabel("ListTaskPushNotificationConfigs")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/pushNotificationConfig/list")
+            override val method = of("ListTaskPushNotificationConfigs")
 
             @JsonSerializable
             data class Params(val taskId: TaskId)
@@ -89,13 +89,13 @@ object A2APushNotificationConfig {
 
     object Delete {
         @JsonSerializable
-        @PolymorphicLabel("tasks/pushNotificationConfig/delete")
+        @PolymorphicLabel("DeleteTaskPushNotificationConfig")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("tasks/pushNotificationConfig/delete")
+            override val method = of("DeleteTaskPushNotificationConfig")
 
             @JsonSerializable
             data class Params(val id: PushNotificationConfigId)

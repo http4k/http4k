@@ -21,7 +21,9 @@ import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
+import org.http4k.ai.a2a.protocol.messages.A2AAgentCard
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
+import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.util.A2AJson
@@ -54,14 +56,14 @@ fun A2AClient.Companion.Http(
     baseUri: Uri,
     http: HttpHandler = JavaHttpClient(),
     rpcPath: String = "/",
-    agentCardPath: String = "/.well-known/agent.json"
+    agentCardPath: String = "/.well-known/agent-card.json"
 ): A2AClient = HttpA2AClient(baseUri, http, rpcPath, agentCardPath)
 
 class HttpA2AClient(
     baseUri: Uri,
     http: HttpHandler,
     private val rpcPath: String = "/",
-    private val agentCardPath: String = "/.well-known/agent.json"
+    private val agentCardPath: String = "/.well-known/agent-card.json"
 ) : A2AClient {
 
     private val client = ClientFilters.SetBaseUriFrom(baseUri).then(http)
@@ -79,12 +81,15 @@ class HttpA2AClient(
         }
     }
 
-    override fun message(message: Message): A2AResult<A2AMessage.Send.Response> =
-        sendRpc<MoshiNode>(A2AMessage.Send.Request(A2AMessage.Send.Request.Params(message), nextId()))
+    override fun extendedAgentCard(): A2AResult<AgentCard> =
+        sendRpc<AgentCard>(A2AAgentCard.GetExtended.Request(nextId()))
+
+    override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<A2AMessage.Send.Response> =
+        sendRpc<MoshiNode>(A2AMessage.Send.Request(A2AMessage.Send.Request.Params(message, configuration), nextId()))
             .map { parseSendResponse(it as MoshiObject) }
 
-    override fun messageStream(message: Message): A2AResult<Sequence<A2AMessage.Send.Response>> {
-        val request = A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(message), nextId())
+    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<Sequence<A2AMessage.Send.Response>> {
+        val request = A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(message, configuration), nextId())
 
         val response = client(
             Request(POST, rpcPath)

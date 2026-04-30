@@ -1,5 +1,5 @@
 {
-  "method": "tasks/get",
+  "method": "GetTask",
   "params": {
     "id": "task-123",
     "historyLength": 10

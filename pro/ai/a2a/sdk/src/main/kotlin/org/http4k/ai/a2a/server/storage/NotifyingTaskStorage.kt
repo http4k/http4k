@@ -9,27 +9,21 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.server.notification.PushNotificationSender
-import java.util.concurrent.Executor
-import java.util.concurrent.ForkJoinPool
 
 fun TaskStorage.withPushNotifications(
     configStorage: PushNotificationConfigStorage,
-    sender: PushNotificationSender,
-    executor: Executor = ForkJoinPool.commonPool()
-): TaskStorage = NotifyingTaskStorage(this, configStorage, sender, executor)
+    sender: PushNotificationSender
+): TaskStorage = NotifyingTaskStorage(this, configStorage, sender)
 
 private class NotifyingTaskStorage(
     private val delegate: TaskStorage,
     private val configStorage: PushNotificationConfigStorage,
-    private val sender: PushNotificationSender,
-    private val executor: Executor
+    private val sender: PushNotificationSender
 ) : TaskStorage {
 
     override fun store(task: Task) {
         delegate.store(task)
-        configStorage.list(task.id).forEach { config ->
-            executor.execute { sender(task, config) }
-        }
+        configStorage.list(task.id).forEach { sender(task, it) }
     }
 
     override fun get(taskId: TaskId): Task? = delegate.get(taskId)

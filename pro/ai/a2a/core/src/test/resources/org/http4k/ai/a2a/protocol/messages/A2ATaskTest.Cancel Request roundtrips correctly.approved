@@ -1,5 +1,5 @@
 {
-  "method": "tasks/cancel",
+  "method": "CancelTask",
   "params": {
     "id": "task-456"
   },

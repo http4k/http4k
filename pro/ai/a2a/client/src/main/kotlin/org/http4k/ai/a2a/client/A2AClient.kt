@@ -16,11 +16,13 @@ import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
+import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 
 interface A2AClient : AutoCloseable {
     fun agentCard(): A2AResult<AgentCard>
-    fun message(message: Message): A2AResult<A2AMessage.Send.Response>
-    fun messageStream(message: Message): A2AResult<Sequence<A2AMessage.Send.Response>>
+    fun extendedAgentCard(): A2AResult<AgentCard>
+    fun message(message: Message, configuration: TaskConfiguration? = null): A2AResult<A2AMessage.Send.Response>
+    fun messageStream(message: Message, configuration: TaskConfiguration? = null): A2AResult<Sequence<A2AMessage.Send.Response>>
     fun tasks(): Tasks
     fun pushNotificationConfigs(): PushNotificationConfigs
 

@@ -15,7 +15,7 @@ import org.http4k.core.Uri
 class TestA2AClient(
     http: HttpHandler,
     rpcPath: String = "/",
-    agentCardPath: String = "/.well-known/agent.json"
+    agentCardPath: String = "/.well-known/agent-card.json"
 ) : A2AClient by HttpA2AClient(Uri.of("http://test"), http, rpcPath, agentCardPath)
 
 /**
@@ -23,5 +23,5 @@ class TestA2AClient(
  */
 fun HttpHandler.testA2AClient(
     rpcPath: String = "/",
-    agentCardPath: String = "/.well-known/agent.json"
+    agentCardPath: String = "/.well-known/agent-card.json"
 ) = TestA2AClient(this, rpcPath, agentCardPath)

@@ -1,5 +1,5 @@
 {
-  "method": "tasks/pushNotificationConfig/delete",
+  "method": "DeleteTaskPushNotificationConfig",
   "params": {
     "id": "config-456"
   },

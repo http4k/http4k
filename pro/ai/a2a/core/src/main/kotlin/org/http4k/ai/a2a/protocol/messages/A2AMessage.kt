@@ -12,13 +12,13 @@ import se.ansman.kotshi.PolymorphicLabel
 object A2AMessage {
     object Send {
         @JsonSerializable
-        @PolymorphicLabel("message/send")
+        @PolymorphicLabel("SendMessage")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("message/send")
+            override val method = of("SendMessage")
 
             @JsonSerializable
             data class Params(
@@ -46,13 +46,13 @@ object A2AMessage {
 
     object Stream {
         @JsonSerializable
-        @PolymorphicLabel("message/stream")
+        @PolymorphicLabel("SendStreamingMessage")
         data class Request(
             val params: Params,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("message/stream")
+            override val method = of("SendStreamingMessage")
 
             @JsonSerializable
             data class Params(

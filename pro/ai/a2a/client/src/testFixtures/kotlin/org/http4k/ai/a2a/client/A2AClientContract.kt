@@ -22,10 +22,10 @@ import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
+import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.model.Role
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
-import org.http4k.routing.a2a
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -55,10 +55,17 @@ abstract class A2AClientContract {
         MessageResponse.Task(sequenceOf(task))
     }
 
+    abstract fun serverFor(
+        cards: AgentCardProvider,
+        handler: MessageHandler,
+        tasks: TaskStorage,
+        pushNotifications: PushNotificationConfigStorage
+    ): HttpHandler
+
     abstract fun clientFor(server: HttpHandler): A2AClient
 
     private fun withServer(test: A2AClient.() -> Unit) {
-        val server = a2a(agentCard, messageHandler, tasks, pushNotificationConfigs)
+        val server = serverFor(AgentCardProvider(agentCard), messageHandler, tasks, pushNotificationConfigs)
         val client = clientFor(server)
         try {
             client.test()
@@ -132,7 +139,7 @@ abstract class A2AClientContract {
             )
         }
 
-        val server = a2a(agentCard, messageResponseHandler, tasks)
+        val server = serverFor(AgentCardProvider(agentCard), messageResponseHandler, tasks, pushNotificationConfigs)
         val client = clientFor(server)
 
         try {
@@ -174,7 +181,7 @@ abstract class A2AClientContract {
         }
 
         val streamingAgentCard = agentCard.copy(capabilities = AgentCapabilities(streaming = true))
-        val server = a2a(streamingAgentCard, streamingHandler, tasks)
+        val server = serverFor(AgentCardProvider(streamingAgentCard), streamingHandler, tasks, pushNotificationConfigs)
         val client = clientFor(server)
 
         try {
@@ -295,5 +302,30 @@ abstract class A2AClientContract {
 
         val listResult = pushNotificationConfigs().list(taskId)
         assertThat(listResult.valueOrNull()!!.size, equalTo(0))
+    }
+
+    @Test
+    fun `can get extended agent card`() {
+        val extendedCard = agentCard.copy(
+            capabilities = AgentCapabilities(streaming = true, extendedAgentCard = true),
+            skills = listOf(
+                org.http4k.ai.a2a.model.AgentSkill(
+                    id = org.http4k.ai.a2a.model.SkillId.of("secret"),
+                    name = "Secret Skill",
+                    description = "Only for authenticated users"
+                )
+            )
+        )
+
+        val server = serverFor(AgentCardProvider(agentCard, extendedCard), messageHandler, tasks, pushNotificationConfigs)
+        val client = clientFor(server)
+
+        try {
+            val result = client.extendedAgentCard()
+            val card = result.valueOrNull()!!
+            assertThat(card.skills!!.first().name, equalTo("Secret Skill"))
+        } finally {
+            client.close()
+        }
     }
 }

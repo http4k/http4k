@@ -1,5 +1,5 @@
 {
-  "method": "tasks/pushNotificationConfig/list",
+  "method": "ListTaskPushNotificationConfigs",
   "params": {
     "taskId": "task-123"
   },

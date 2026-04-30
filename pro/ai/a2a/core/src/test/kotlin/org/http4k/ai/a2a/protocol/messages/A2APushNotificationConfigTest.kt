@@ -39,7 +39,7 @@ class A2APushNotificationConfigTest {
                     pushNotificationConfig = pushConfig
                 ),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/pushNotificationConfig/set"))
+            ).method, equalTo(A2ARpcMethod.of("CreateTaskPushNotificationConfig"))
         )
     }
 
@@ -78,7 +78,7 @@ class A2APushNotificationConfigTest {
             A2APushNotificationConfig.Get.Request(
                 params = A2APushNotificationConfig.Get.Request.Params(id = configId),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/pushNotificationConfig/get"))
+            ).method, equalTo(A2ARpcMethod.of("GetTaskPushNotificationConfig"))
         )
     }
 
@@ -114,7 +114,7 @@ class A2APushNotificationConfigTest {
             A2APushNotificationConfig.List.Request(
                 params = A2APushNotificationConfig.List.Request.Params(taskId = taskId),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/pushNotificationConfig/list"))
+            ).method, equalTo(A2ARpcMethod.of("ListTaskPushNotificationConfigs"))
         )
     }
 
@@ -154,7 +154,7 @@ class A2APushNotificationConfigTest {
             A2APushNotificationConfig.Delete.Request(
                 params = A2APushNotificationConfig.Delete.Request.Params(id = configId),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("tasks/pushNotificationConfig/delete"))
+            ).method, equalTo(A2ARpcMethod.of("DeleteTaskPushNotificationConfig"))
         )
     }
 

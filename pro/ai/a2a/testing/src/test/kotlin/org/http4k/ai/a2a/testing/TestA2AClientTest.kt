@@ -21,7 +21,7 @@ import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.model.Role
 import org.http4k.core.Uri
-import org.http4k.routing.a2a
+import org.http4k.routing.a2aJsonRpc
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -50,7 +50,7 @@ class TestA2AClientTest {
         )
     }
 
-    private val server = a2a(agentCard, messageHandler)
+    private val server = a2aJsonRpc(agentCard, messageHandler)
     private val client = server.testA2AClient()
 
     @Test

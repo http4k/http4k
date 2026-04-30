@@ -4,13 +4,14 @@
  */
 package org.http4k.ai.a2a.server
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
-import org.http4k.ai.a2a.A2ARequest
-import org.http4k.ai.a2a.A2AResponse
+import com.natpryce.hamkrest.present
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.MessageResponse
+import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.Part
@@ -20,20 +21,18 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskState.*
 import org.http4k.ai.a2a.model.TaskStatus
-import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcErrorResponse
-import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
-import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.model.Role
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.protocol.A2A
 import org.junit.jupiter.api.Test
 
 class A2AHandlerTest {
 
+    private val testCard = AgentCard(name = "test", url = Uri.of("http://test"), version = "1.0")
     private val tasks = TaskStorage.InMemory()
     private val pushNotifications = PushNotificationConfigStorage.InMemory()
 
@@ -46,222 +45,113 @@ class A2AHandlerTest {
 
     private fun aMessage() = Message(role = Role.User, parts = listOf(Part.Text("hello")))
 
-    private fun handlerReturningTask(vararg taskStates: TaskState): MessageHandler = { request ->
-        val taskSeq = taskStates.map { state ->
+    private fun taskHandler(vararg states: TaskState): MessageHandler = { request ->
+        MessageResponse.Task(states.map { state ->
             Task(
                 id = TaskId.of("task-1"),
                 contextId = ContextId.of("ctx-1"),
                 status = TaskStatus(state = state),
                 history = listOf(request.message)
             )
-        }.asSequence()
-        MessageResponse.Task(taskSeq)
+        }.asSequence())
     }
 
-    private fun handlerReturningMessage(): MessageHandler = { request ->
+    private fun messageHandler(): MessageHandler = {
         MessageResponse.Message(Message(role = Role.Assistant, parts = listOf(Part.Text("response"))))
     }
 
-    private fun send(request: org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest): A2AResponse {
-        val handler = RoutingA2AHandler(handlerReturningTask(completed), tasks, pushNotifications)
-        return handler(A2ARequest(request, Request(POST, "/")))
+    @Test
+    fun `send returns task response`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
+        val result = protocol.send(aMessage(), Request(POST, "/"))
+
+        assertThat(result, isA<MessageResponse.Task>())
+        assertThat((result as MessageResponse.Task).tasks.first().status.state, equalTo(completed))
     }
 
     @Test
-    fun `message send returns task response`() {
-        val handler = RoutingA2AHandler(handlerReturningTask(completed), tasks, pushNotifications)
-        val result = handler(
-            A2ARequest(
-                A2AMessage.Send.Request(A2AMessage.Send.Request.Params(aMessage()), "1"),
-                Request(POST, "/")
-            )
-        )
+    fun `send returns message response`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, messageHandler())
+        val result = protocol.send(aMessage(), Request(POST, "/"))
 
-        assertThat(result, isA<A2AResponse.Single>())
-        val response = (result as A2AResponse.Single).message
-        assertThat(response, isA<A2AMessage.Send.Response.Task>())
-        assertThat((response as A2AMessage.Send.Response.Task).result.status.state, equalTo(completed))
+        assertThat(result, isA<MessageResponse.Message>())
     }
 
     @Test
-    fun `message send returns message response`() {
-        val handler = RoutingA2AHandler(handlerReturningMessage(), tasks, pushNotifications)
-        val result = handler(
-            A2ARequest(
-                A2AMessage.Send.Request(A2AMessage.Send.Request.Params(aMessage()), "1"),
-                Request(POST, "/")
-            )
-        )
+    fun `send returns streaming task responses`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(working, completed))
+        val result = protocol.send(aMessage(), Request(POST, "/"))
 
-        assertThat(result, isA<A2AResponse.Single>())
-        val response = (result as A2AResponse.Single).message
-        assertThat(response, isA<A2AMessage.Send.Response.Message>())
-    }
-
-    @Test
-    fun `message stream returns stream of task responses`() {
-        val handler = RoutingA2AHandler(handlerReturningTask(working, completed), tasks, pushNotifications)
-        val result = handler(
-            A2ARequest(
-                A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(aMessage()), "1"),
-                Request(POST, "/")
-            )
-        )
-
-        assertThat(result, isA<A2AResponse.Stream>())
-        val responses = (result as A2AResponse.Stream).messages.toList()
+        val responses = (result as MessageResponse.Task).tasks.toList()
         assertThat(responses.size, equalTo(2))
-        assertThat((responses[0] as A2AMessage.Send.Response.Task).result.status.state, equalTo(working))
-        assertThat((responses[1] as A2AMessage.Send.Response.Task).result.status.state, equalTo(completed))
+        assertThat(responses[0].status.state, equalTo(working))
+        assertThat(responses[1].status.state, equalTo(completed))
     }
 
     @Test
-    fun `tasks get returns stored task`() {
+    fun `getTask returns stored task`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
         val task = aTask()
         tasks.store(task)
 
-        val result = send(A2ATask.Get.Request(A2ATask.Get.Request.Params(task.id), "1"))
-
-        val response = (result as A2AResponse.Single).message as A2ATask.Get.Response
-        assertThat(response.result.task.id, equalTo(task.id))
+        assertThat(protocol.getTask(task.id), present(equalTo(task)))
     }
 
     @Test
-    fun `tasks get returns error for unknown task`() {
-        val result = send(A2ATask.Get.Request(A2ATask.Get.Request.Params(TaskId.of("unknown")), "1"))
-        assertThat((result as A2AResponse.Single).message, isA<A2AJsonRpcErrorResponse>())
+    fun `getTask returns null for unknown task`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
+        assertThat(protocol.getTask(TaskId.of("unknown")), absent())
     }
 
     @Test
-    fun `tasks cancel cancels task`() {
-        val task = aTask()
-        tasks.store(task)
+    fun `cancelTask sets state to canceled`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
+        tasks.store(aTask())
 
-        val result = send(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(task.id), "1"))
-
-        val response = (result as A2AResponse.Single).message as A2ATask.Cancel.Response
-        assertThat(response.result.task.status.state, equalTo(canceled))
+        val result = protocol.cancelTask(TaskId.of("task-1"))
+        assertThat(result!!.status.state, equalTo(canceled))
     }
 
     @Test
-    fun `tasks list returns stored tasks`() {
+    fun `listTasks returns stored tasks`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
         tasks.store(aTask("t1"))
         tasks.store(aTask("t2"))
 
-        val result = send(A2ATask.List.Request(A2ATask.List.Request.Params(), "1"))
-
-        val response = (result as A2AResponse.Single).message as A2ATask.List.Response
-        assertThat(response.result.tasks.size, equalTo(2))
-        assertThat(response.result.totalSize, equalTo(2))
+        val page = protocol.listTasks()
+        assertThat(page.tasks.size, equalTo(2))
+        assertThat(page.totalSize, equalTo(2))
     }
 
     @Test
-    fun `push notification config set and get`() {
-        tasks.store(aTask())
-        val handler = RoutingA2AHandler(handlerReturningTask(completed), tasks, pushNotifications)
+    fun `push config set and get`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
 
-        val setResult = handler(
-            A2ARequest(
-                A2APushNotificationConfig.Set.Request(
-                    A2APushNotificationConfig.Set.Request.Params(
-                        TaskId.of("task-1"),
-                        PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
-                    ), "1"
-                ),
-                Request(POST, "/")
-            )
-        )
+        val config = protocol.setPushConfig(TaskId.of("task-1"), PushNotificationConfig(url = Uri.of("https://example.com/webhook")))
+        assertThat(config.taskId, equalTo(TaskId.of("task-1")))
 
-        val setResponse = (setResult as A2AResponse.Single).message as A2APushNotificationConfig.Set.Response
-        assertThat(setResponse.result.taskId, equalTo(TaskId.of("task-1")))
-
-        val getResult = handler(
-            A2ARequest(
-                A2APushNotificationConfig.Get.Request(
-                    A2APushNotificationConfig.Get.Request.Params(setResponse.result.id), "2"
-                ),
-                Request(POST, "/")
-            )
-        )
-
-        val getResponse = (getResult as A2AResponse.Single).message as A2APushNotificationConfig.Get.Response
-        assertThat(getResponse.result.id, equalTo(setResponse.result.id))
+        val retrieved = protocol.getPushConfig(config.id)
+        assertThat(retrieved!!.id, equalTo(config.id))
     }
 
     @Test
-    fun `push notification config list`() {
-        val handler = RoutingA2AHandler(handlerReturningTask(completed), tasks, pushNotifications)
+    fun `push config list`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
         val taskId = TaskId.of("task-1")
 
-        handler(
-            A2ARequest(
-                A2APushNotificationConfig.Set.Request(
-                    A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))),
-                    "1"
-                ),
-                Request(POST, "/")
-            )
-        )
-        handler(
-            A2ARequest(
-                A2APushNotificationConfig.Set.Request(
-                    A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://b.com"))),
-                    "2"
-                ),
-                Request(POST, "/")
-            )
-        )
+        protocol.setPushConfig(taskId, PushNotificationConfig(url = Uri.of("https://a.com")))
+        protocol.setPushConfig(taskId, PushNotificationConfig(url = Uri.of("https://b.com")))
 
-        val listResult = handler(
-            A2ARequest(
-                A2APushNotificationConfig.List.Request(
-                    A2APushNotificationConfig.List.Request.Params(taskId), "3"
-                ),
-                Request(POST, "/")
-            )
-        )
-
-        val listResponse = (listResult as A2AResponse.Single).message as A2APushNotificationConfig.List.Response
-        assertThat(listResponse.result.configs.size, equalTo(2))
+        assertThat(protocol.listPushConfigs(taskId).size, equalTo(2))
     }
 
     @Test
-    fun `push notification config delete`() {
-        val handler = RoutingA2AHandler(handlerReturningTask(completed), tasks, pushNotifications)
+    fun `push config delete`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(completed))
         val taskId = TaskId.of("task-1")
 
-        val setResult = handler(
-            A2ARequest(
-                A2APushNotificationConfig.Set.Request(
-                    A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))),
-                    "1"
-                ),
-                Request(POST, "/")
-            )
-        )
-        val configId = ((setResult as A2AResponse.Single).message as A2APushNotificationConfig.Set.Response).result.id
-
-        val deleteResult = handler(
-            A2ARequest(
-                A2APushNotificationConfig.Delete.Request(
-                    A2APushNotificationConfig.Delete.Request.Params(configId), "2"
-                ),
-                Request(POST, "/")
-            )
-        )
-
-        val deleteResponse = (deleteResult as A2AResponse.Single).message as A2APushNotificationConfig.Delete.Response
-        assertThat(deleteResponse.result.id, equalTo(configId))
-
-        val listResult = handler(
-            A2ARequest(
-                A2APushNotificationConfig.List.Request(
-                    A2APushNotificationConfig.List.Request.Params(taskId), "3"
-                ),
-                Request(POST, "/")
-            )
-        )
-        val listResponse = (listResult as A2AResponse.Single).message as A2APushNotificationConfig.List.Response
-        assertThat(listResponse.result.configs.size, equalTo(0))
+        val config = protocol.setPushConfig(taskId, PushNotificationConfig(url = Uri.of("https://a.com")))
+        assertThat(protocol.deletePushConfig(config.id), present(equalTo(config.id)))
+        assertThat(protocol.listPushConfigs(taskId).size, equalTo(0))
     }
 }

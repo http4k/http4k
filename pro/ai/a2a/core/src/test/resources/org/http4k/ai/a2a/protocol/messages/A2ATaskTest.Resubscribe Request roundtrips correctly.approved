@@ -1,5 +1,5 @@
 {
-  "method": "tasks/resubscribe",
+  "method": "SubscribeToTask",
   "params": {
     "id": "task-789"
   },

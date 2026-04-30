@@ -7,13 +7,11 @@ package org.http4k.ai.a2a.server.notification
 import org.http4k.ai.a2a.model.AuthScheme
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
-import org.http4k.ai.a2a.util.A2AJson.auto
+import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.with
 
 fun interface PushNotificationSender {
     operator fun invoke(task: Task, config: TaskPushNotificationConfig)
@@ -23,7 +21,7 @@ fun interface PushNotificationSender {
             PushNotificationSender { task, config ->
                 http(
                     Request(POST, config.pushNotificationConfig.url)
-                        .with(Body.auto<Task>().toLens() of task)
+                        .json(task)
                         .withAuth(config)
                 )
             }

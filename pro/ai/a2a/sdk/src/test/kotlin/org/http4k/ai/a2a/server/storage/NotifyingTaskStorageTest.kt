@@ -18,7 +18,6 @@ import org.http4k.ai.a2a.server.notification.PushNotificationSender
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class NotifyingTaskStorageTest {
@@ -113,8 +112,7 @@ class NotifyingTaskStorageTest {
             sentNotifications.add(task to config)
         }
         val notifyingStorage = taskStorage.withPushNotifications(
-            configStorage, sender,
-            Executors.newSingleThreadExecutor()
+            configStorage, sender
         )
 
         val config = aConfig("config-1", "task-1")
@@ -141,8 +139,7 @@ class NotifyingTaskStorageTest {
             latch.countDown()
         }
         val notifyingStorage = taskStorage.withPushNotifications(
-            configStorage, sender,
-            Executors.newFixedThreadPool(2)
+            configStorage, sender
         )
 
         val config1 = aConfig("config-1", "task-1", "https://example.com/webhook1")
@@ -171,34 +168,7 @@ class NotifyingTaskStorageTest {
         val task = aTask("task-1")
         notifyingStorage.store(task)
 
-        Thread.sleep(100)
-
         assertThat(sentNotifications.size, equalTo(0))
     }
 
-    @Test
-    fun `notifications are async and do not block store`() {
-        val taskStorage = TaskStorage.InMemory()
-        val configStorage = PushNotificationConfigStorage.InMemory()
-        val latch = CountDownLatch(1)
-        val sender: PushNotificationSender = PushNotificationSender { _, _ ->
-            latch.await(5, TimeUnit.SECONDS)
-        }
-        val notifyingStorage = taskStorage.withPushNotifications(
-            configStorage, sender,
-            Executors.newSingleThreadExecutor()
-        )
-
-        val config = aConfig("config-1", "task-1")
-        configStorage.store(config)
-
-        val task = aTask("task-1")
-        val startTime = System.currentTimeMillis()
-        notifyingStorage.store(task)
-        val endTime = System.currentTimeMillis()
-
-        assertThat(endTime - startTime < 100, equalTo(true))
-
-        latch.countDown()
-    }
 }

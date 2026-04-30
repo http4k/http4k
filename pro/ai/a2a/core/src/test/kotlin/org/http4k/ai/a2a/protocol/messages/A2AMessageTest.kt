@@ -33,7 +33,7 @@ class A2AMessageTest {
 
     @Test
     fun `Send Request deserializes correctly`() {
-        val json = """{"params":{"message":{"role":"user","parts":[{"type":"text","text":"Hello"}],"kind":"message"}},"id":"1","jsonrpc":"2.0","method":"message/send"}"""
+        val json = """{"params":{"message":{"role":"user","parts":[{"type":"text","text":"Hello"}],"kind":"message"}},"id":"1","jsonrpc":"2.0","method":"SendMessage"}"""
         val request = A2AJson.asA<A2AMessage.Send.Request>(json)
         assertThat(request.params.message.role, equalTo(Role.User))
         assertThat((request.params.message.parts.first() as Part.Text).text, equalTo("Hello"))
@@ -47,7 +47,7 @@ class A2AMessageTest {
                     message = Message(role = Role.User, parts = emptyList())
                 ),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("message/send"))
+            ).method, equalTo(A2ARpcMethod.of("SendMessage"))
         )
     }
 
@@ -59,7 +59,7 @@ class A2AMessageTest {
                     message = Message(role = Role.User, parts = emptyList())
                 ),
                 id = "1"
-            ).method, equalTo(A2ARpcMethod.of("message/stream"))
+            ).method, equalTo(A2ARpcMethod.of("SendStreamingMessage"))
         )
     }
 }
