@@ -14,9 +14,14 @@ import org.http4k.core.NoOp
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.CallToolDetailSpanModifiers
+import org.http4k.filter.CompletionDetailSpanModifiers
+import org.http4k.filter.GetPromptDetailSpanModifiers
 import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
+import org.http4k.filter.ReadResourceDetailSpanModifiers
 import org.http4k.filter.ServerFilters
+import org.http4k.filter.defaultMcpOtelSpanModifiers
 import org.http4k.routing.mcp
 import org.http4k.wiretap.Context
 import org.http4k.wiretap.junit.RenderMode.OnFailure
@@ -50,10 +55,13 @@ fun Intercept.Companion.mcpCapabilities(
                     ServerMetaData(serverName, "0.0.0").withExtensions(*extensions),
                     NoMcpSecurity,
                     capabilities = capabilityFn().toList().toTypedArray(),
-                    mcpFilter = McpFilters.OpenTelemetryTracing(otel())
+                    mcpFilter = McpFilters.OpenTelemetryTracing(otel(), allModifiers)
                 )
             ).http!!
     })
+
+private val allModifiers =
+    defaultMcpOtelSpanModifiers + CallToolDetailSpanModifiers + CompletionDetailSpanModifiers + GetPromptDetailSpanModifiers + ReadResourceDetailSpanModifiers
 
 
 /**
