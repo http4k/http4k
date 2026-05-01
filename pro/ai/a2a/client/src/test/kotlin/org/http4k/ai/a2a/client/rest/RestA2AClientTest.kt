@@ -5,7 +5,6 @@
 package org.http4k.ai.a2a.client.rest
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.client.A2AClient
 import org.http4k.ai.a2a.client.A2AClientContract
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
@@ -23,5 +22,5 @@ class RestA2AClientTest : A2AClientContract() {
     ) = a2aRest(cards, handler, tasks, pushNotifications)
 
     override fun clientFor(server: HttpHandler) =
-        A2AClient.Rest(Uri.of("http://test"), server)
+        RestA2AClient(Uri.of("http://test"), server)
 }

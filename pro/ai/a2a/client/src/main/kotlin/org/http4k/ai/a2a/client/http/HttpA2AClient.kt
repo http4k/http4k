@@ -32,6 +32,7 @@ import org.http4k.ai.a2a.util.A2ANodeType
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Accept
 import org.http4k.core.Body
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -52,16 +53,9 @@ import java.util.concurrent.atomic.AtomicLong
 
 private val jsonRpcRequestLens = Body.auto<A2ANodeType>().toLens()
 
-fun A2AClient.Companion.Http(
-    baseUri: Uri,
-    http: HttpHandler = JavaHttpClient(),
-    rpcPath: String = "/",
-    agentCardPath: String = "/.well-known/agent-card.json"
-): A2AClient = HttpA2AClient(baseUri, http, rpcPath, agentCardPath)
-
 class HttpA2AClient(
     baseUri: Uri,
-    http: HttpHandler,
+    http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     private val rpcPath: String = "/",
     private val agentCardPath: String = "/.well-known/agent-card.json"
 ) : A2AClient {

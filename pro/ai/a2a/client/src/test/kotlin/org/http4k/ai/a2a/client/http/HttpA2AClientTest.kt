@@ -5,7 +5,6 @@
 package org.http4k.ai.a2a.client.http
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.client.A2AClient
 import org.http4k.ai.a2a.client.A2AClientContract
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
@@ -22,5 +21,5 @@ class HttpA2AClientTest : A2AClientContract() {
         pushNotifications: PushNotificationConfigStorage
     ) = a2aJsonRpc(cards, handler, tasks, pushNotifications)
 
-    override fun clientFor(server: HttpHandler) = A2AClient.Http(Uri.of("http://test"), server)
+    override fun clientFor(server: HttpHandler) = HttpA2AClient(Uri.of("http://test"), server)
 }

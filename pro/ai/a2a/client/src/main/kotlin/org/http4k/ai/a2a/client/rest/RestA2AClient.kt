@@ -26,6 +26,7 @@ import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -47,15 +48,9 @@ private val pushConfigLens = Body.auto<TaskPushNotificationConfig>().toLens()
 private val pushConfigListLens = Body.auto<List<TaskPushNotificationConfig>>().toLens()
 private val pushConfigInputLens = Body.auto<PushNotificationConfig>().toLens()
 
-fun A2AClient.Companion.Rest(
-    baseUri: Uri,
-    http: HttpHandler = JavaHttpClient(),
-    basePath: String = ""
-): A2AClient = RestA2AClient(baseUri, http, basePath)
-
 class RestA2AClient(
     baseUri: Uri,
-    http: HttpHandler,
+    http: HttpHandler = JavaHttpClient(),
     private val basePath: String = ""
 ) : A2AClient {
 
