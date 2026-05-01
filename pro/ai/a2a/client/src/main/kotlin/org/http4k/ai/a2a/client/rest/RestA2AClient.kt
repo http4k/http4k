@@ -6,7 +6,6 @@ package org.http4k.ai.a2a.client.rest
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.map
 import org.http4k.ai.a2a.A2AError
 import org.http4k.ai.a2a.A2AResult
 import org.http4k.ai.a2a.client.A2AClient
@@ -26,7 +25,6 @@ import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
-import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -48,18 +46,14 @@ private val pushConfigLens = Body.auto<TaskPushNotificationConfig>().toLens()
 private val pushConfigListLens = Body.auto<List<TaskPushNotificationConfig>>().toLens()
 private val pushConfigInputLens = Body.auto<PushNotificationConfig>().toLens()
 
-class RestA2AClient(
-    baseUri: Uri,
-    http: HttpHandler = JavaHttpClient(),
-    private val basePath: String = ""
-) : A2AClient {
+class RestA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient()) : A2AClient {
 
     private val client = ClientFilters.SetBaseUriFrom(baseUri).then(http)
     private val httpTasks: A2AClient.Tasks = RestTasks()
     private val httpPushConfigs: A2AClient.PushNotificationConfigs = RestPushNotificationConfigs()
 
     override fun agentCard(): A2AResult<AgentCard> {
-        val response = client(Request(GET, "$basePath/.well-known/agent-card.json"))
+        val response = client(Request(GET, "/.well-known/agent-card.json"))
         return when {
             response.status.successful -> Success(agentCardLens(response))
             else -> Failure(A2AError.Http(response))
@@ -67,7 +61,7 @@ class RestA2AClient(
     }
 
     override fun extendedAgentCard(): A2AResult<AgentCard> {
-        val response = client(Request(GET, "$basePath/extendedAgentCard"))
+        val response = client(Request(GET, "/extendedAgentCard"))
         return when {
             response.status.successful -> Success(agentCardLens(response))
             else -> Failure(A2AError.Http(response))
@@ -75,7 +69,14 @@ class RestA2AClient(
     }
 
     override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<A2AMessage.Send.Response> {
-        val response = client(Request(POST, "$basePath/message:send").with(sendMessageLens of A2AMessage.Send.Request.Params(message, configuration)))
+        val response = client(
+            Request(POST, "/message:send").with(
+                sendMessageLens of A2AMessage.Send.Request.Params(
+                    message,
+                    configuration
+                )
+            )
+        )
         return when {
             response.status.successful -> {
                 val fields = A2AJson.fields(A2AJson.parse(response.bodyString()) as MoshiObject).toMap()
@@ -95,7 +96,14 @@ class RestA2AClient(
     }
 
     override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<Sequence<A2AMessage.Send.Response>> {
-        val response = client(Request(POST, "$basePath/message:stream").with(sendMessageLens of A2AMessage.Send.Request.Params(message, configuration)))
+        val response = client(
+            Request(POST, "/message:stream").with(
+                sendMessageLens of A2AMessage.Send.Request.Params(
+                    message,
+                    configuration
+                )
+            )
+        )
         return when {
             response.status.successful -> Success(
                 response.body.stream.chunkedSseSequence()
@@ -118,7 +126,7 @@ class RestA2AClient(
 
     private inner class RestTasks : A2AClient.Tasks {
         override fun get(taskId: TaskId): A2AResult<Task> {
-            val response = client(Request(GET, "$basePath/tasks/${taskId.value}"))
+            val response = client(Request(GET, "/tasks/${taskId.value}"))
             return when {
                 response.status.successful -> Success(taskLens(response))
                 else -> Failure(A2AError.Http(response))
@@ -126,7 +134,7 @@ class RestA2AClient(
         }
 
         override fun cancel(taskId: TaskId): A2AResult<Task> {
-            val response = client(Request(POST, "$basePath/tasks/${taskId.value}:cancel"))
+            val response = client(Request(POST, "/tasks/${taskId.value}:cancel"))
             return when {
                 response.status.successful -> Success(taskLens(response))
                 else -> Failure(A2AError.Http(response))
@@ -134,7 +142,7 @@ class RestA2AClient(
         }
 
         override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?): A2AResult<TaskPage> {
-            var req = Request(GET, "$basePath/tasks")
+            var req = Request(GET, "/tasks")
             contextId?.let { req = req.query("contextId", it.value) }
             status?.let { req = req.query("status", it.name) }
             pageSize?.let { req = req.query("pageSize", it.toString()) }
@@ -151,7 +159,7 @@ class RestA2AClient(
     private inner class RestPushNotificationConfigs : A2AClient.PushNotificationConfigs {
         override fun set(taskId: TaskId, config: PushNotificationConfig): A2AResult<TaskPushNotificationConfig> {
             val response = client(
-                Request(POST, "$basePath/tasks/${taskId.value}/pushNotificationConfigs")
+                Request(POST, "/tasks/${taskId.value}/pushNotificationConfigs")
                     .with(pushConfigInputLens of config)
             )
             return when {
@@ -161,7 +169,7 @@ class RestA2AClient(
         }
 
         override fun get(id: PushNotificationConfigId): A2AResult<TaskPushNotificationConfig> {
-            val response = client(Request(GET, "$basePath/tasks/_/pushNotificationConfigs/${id.value}"))
+            val response = client(Request(GET, "/tasks/_/pushNotificationConfigs/${id.value}"))
             return when {
                 response.status.successful -> Success(pushConfigLens(response))
                 else -> Failure(A2AError.Http(response))
@@ -169,7 +177,7 @@ class RestA2AClient(
         }
 
         override fun list(taskId: TaskId): A2AResult<List<TaskPushNotificationConfig>> {
-            val response = client(Request(GET, "$basePath/tasks/${taskId.value}/pushNotificationConfigs"))
+            val response = client(Request(GET, "/tasks/${taskId.value}/pushNotificationConfigs"))
             return when {
                 response.status.successful -> Success(pushConfigListLens(response))
                 else -> Failure(A2AError.Http(response))
@@ -177,7 +185,7 @@ class RestA2AClient(
         }
 
         override fun delete(id: PushNotificationConfigId): A2AResult<PushNotificationConfigId> {
-            val response = client(Request(DELETE, "$basePath/tasks/_/pushNotificationConfigs/${id.value}"))
+            val response = client(Request(DELETE, "/tasks/_/pushNotificationConfigs/${id.value}"))
             return when {
                 response.status.successful -> Success(id)
                 else -> Failure(A2AError.Http(response))

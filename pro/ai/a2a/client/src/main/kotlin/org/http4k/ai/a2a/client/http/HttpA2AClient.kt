@@ -20,12 +20,12 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.TaskState
-import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
 import org.http4k.ai.a2a.protocol.messages.A2AAgentCard
+import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
+import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.ai.a2a.util.A2ANodeType
@@ -53,14 +53,9 @@ import java.util.concurrent.atomic.AtomicLong
 
 private val jsonRpcRequestLens = Body.auto<A2ANodeType>().toLens()
 
-class HttpA2AClient(
-    baseUri: Uri,
-    http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
-    private val rpcPath: String = "/",
-    private val agentCardPath: String = "/.well-known/agent-card.json"
-) : A2AClient {
+class HttpA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient(responseBodyMode = Stream)) : A2AClient {
 
-    private val client = ClientFilters.SetBaseUriFrom(baseUri).then(http)
+    private val client = ClientFilters.SetHostFrom(baseUri).then(http)
     private val requestId = AtomicLong(0)
     private val httpTasks: A2AClient.Tasks = ClientTasks()
     private val httpPushNotificationConfigs: A2AClient.PushNotificationConfigs = ClientPushNotificationConfigs()
@@ -68,7 +63,7 @@ class HttpA2AClient(
     private fun nextId() = requestId.incrementAndGet()
 
     override fun agentCard(): A2AResult<AgentCard> {
-        val response = client(Request(GET, agentCardPath))
+        val response = client(Request(GET, "/.well-known/agent-card.json"))
         return when {
             response.status.successful -> Success(A2AJson.asA(response.bodyString()))
             else -> Failure(A2AError.Http(response))
@@ -86,7 +81,7 @@ class HttpA2AClient(
         val request = A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(message, configuration), nextId())
 
         val response = client(
-            Request(POST, rpcPath)
+            Request(POST, "/")
                 .with(jsonRpcRequestLens of A2AJson.asJsonObject(request))
                 .with(Header.ACCEPT of Accept(listOf(QualifiedContent(ContentType.TEXT_EVENT_STREAM))))
         )
@@ -149,7 +144,7 @@ class HttpA2AClient(
     }
 
     private inline fun <reified T : Any> sendRpc(request: A2AJsonRpcRequest): A2AResult<T> {
-        val response = client(Request(POST, rpcPath).with(jsonRpcRequestLens of A2AJson.asJsonObject(request)))
+        val response = client(Request(POST, "/").with(jsonRpcRequestLens of A2AJson.asJsonObject(request)))
         val fields = A2AJson.fields(A2AJson.parse(response.bodyString()) as MoshiObject).toMap()
 
         return when {
