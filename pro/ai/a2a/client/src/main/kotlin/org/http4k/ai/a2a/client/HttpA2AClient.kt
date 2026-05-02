@@ -2,14 +2,13 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.ai.a2a.client.http
+package org.http4k.ai.a2a.client
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.map
 import org.http4k.ai.a2a.A2AError
 import org.http4k.ai.a2a.A2AResult
-import org.http4k.ai.a2a.client.A2AClient
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
