@@ -11,12 +11,13 @@ import se.ansman.kotshi.JsonSerializable
 data class PushNotificationConfig(
     val url: Uri,
     val token: String? = null,
-    val authentication: AgentAuthentication? = null
+    val authentication: AuthenticationInfo? = null
 )
 
 @JsonSerializable
 data class TaskPushNotificationConfig(
     val id: PushNotificationConfigId,
     val taskId: TaskId,
-    val pushNotificationConfig: PushNotificationConfig
+    val pushNotificationConfig: PushNotificationConfig,
+    val tenant: Tenant? = null
 )

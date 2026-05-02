@@ -1,11 +1,9 @@
 {
+  "messageId": "msg-123",
   "role": "user",
   "parts": [
     {
-      "type": "text",
       "text": "Hello"
     }
-  ],
-  "messageId": "msg-123",
-  "kind": "message"
+  ]
 }

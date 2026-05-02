@@ -44,12 +44,12 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
         .mapValues { (_, value) -> wrap(value) }
         .let { MoshiObject(it.toMutableMap()) }
 
-    is Number -> when {
-        obj is Double && obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
-        obj is Double && obj.isSafeToConvertToLong() -> MoshiLong(obj.toLong())
-        obj is Long && obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
-        obj is Long -> MoshiLong(obj)
-        obj is Int || obj is Short -> MoshiInteger(obj.toInt())
+    is Number -> when (obj) {
+        is Double if obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
+        is Double if obj.isSafeToConvertToLong() -> MoshiLong(obj.toLong())
+        is Long if obj.isSafeToConvertToInt() -> MoshiInteger(obj.toInt())
+        is Long -> MoshiLong(obj)
+        is Int, is Short -> MoshiInteger(obj.toInt())
         else -> MoshiDecimal(obj.toDouble())
     }
 

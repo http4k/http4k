@@ -4,10 +4,12 @@
  */
 package org.http4k.ai.a2a
 
+import org.http4k.ai.a2a.model.StreamMessage
+
 sealed interface MessageResponse {
-    data class Task(val tasks: Sequence<org.http4k.ai.a2a.model.Task>) : MessageResponse {
-        constructor(task: org.http4k.ai.a2a.model.Task) : this(sequenceOf(task))
-    }
+    data class Task(val task: org.http4k.ai.a2a.model.Task) : MessageResponse
 
     data class Message(val message: org.http4k.ai.a2a.model.Message) : MessageResponse
+
+    data class Stream(val responses: Sequence<StreamMessage>) : MessageResponse
 }

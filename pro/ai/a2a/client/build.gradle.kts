@@ -10,7 +10,7 @@ dependencies {
 
     testFixturesApi(project(":http4k-ai-a2a-sdk"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
+    testFixturesApi(project(":http4k-testing-approval"))
 
     testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation(project(":http4k-testing-approval"))
 }

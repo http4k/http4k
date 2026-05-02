@@ -4,6 +4,7 @@
  */
 package org.http4k.ai.a2a.model
 
+import org.http4k.connect.model.MimeType
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
@@ -12,5 +13,8 @@ data class AgentSkill(
     val name: String,
     val description: String? = null,
     val tags: List<String>? = null,
-    val examples: List<String>? = null
+    val examples: List<String>? = null,
+    val inputModes: List<MimeType>? = null,
+    val outputModes: List<MimeType>? = null,
+    val securityRequirements: List<SecurityRequirement>? = null
 )

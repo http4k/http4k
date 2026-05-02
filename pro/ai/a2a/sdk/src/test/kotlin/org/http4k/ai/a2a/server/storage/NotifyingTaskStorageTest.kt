@@ -25,7 +25,7 @@ class NotifyingTaskStorageTest {
     private fun aTask(
         id: String = "task-1",
         contextId: String = "ctx-1",
-        state: TaskState = TaskState.working
+        state: TaskState = TaskState.TASK_STATE_WORKING
     ) = Task(
         id = TaskId.of(id),
         contextId = ContextId.of(contextId),

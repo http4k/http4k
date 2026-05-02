@@ -24,7 +24,7 @@ class PushNotificationTest {
         val config = PushNotificationConfig(
             url = Uri.of("https://example.com/webhook"),
             token = "secret-token",
-            authentication = AgentAuthentication(schemes = listOf(BEARER))
+            authentication = AuthenticationInfo(scheme = BEARER)
         )
         val json = A2AJson.asFormatString(config)
         approver.assertApproved(json, APPLICATION_JSON)
@@ -47,11 +47,4 @@ class PushNotificationTest {
         assertThat(id.value, equalTo("config-123"))
     }
 
-    @Test
-    fun `AgentAuthentication roundtrips correctly`(approver: Approver) {
-        val auth = AgentAuthentication(schemes = listOf(BEARER, AuthScheme.OAUTH2))
-        val json = A2AJson.asFormatString(auth)
-        approver.assertApproved(json, APPLICATION_JSON)
-        assertThat(A2AJson.asA<AgentAuthentication>(json), equalTo(auth))
-    }
 }

@@ -22,7 +22,7 @@ class TaskStorageTest {
     private fun aTask(
         id: String = "task-1",
         contextId: String = "ctx-1",
-        state: TaskState = TaskState.completed
+        state: TaskState = TaskState.TASK_STATE_COMPLETED
     ) = Task(
         id = TaskId.of(id),
         contextId = ContextId.of(contextId),
@@ -51,13 +51,13 @@ class TaskStorageTest {
 
     @Test
     fun `cancel sets state to canceled`() {
-        val task = aTask(state = TaskState.working)
+        val task = aTask(state = TaskState.TASK_STATE_WORKING)
         storage.store(task)
 
         val cancelled = storage.cancel(task.id)
 
-        assertThat(cancelled!!.status.state, equalTo(TaskState.canceled))
-        assertThat(storage.get(task.id)!!.status.state, equalTo(TaskState.canceled))
+        assertThat(cancelled!!.status.state, equalTo(TaskState.TASK_STATE_CANCELED))
+        assertThat(storage.get(task.id)!!.status.state, equalTo(TaskState.TASK_STATE_CANCELED))
     }
 
     @Test
@@ -88,11 +88,11 @@ class TaskStorageTest {
 
     @Test
     fun `list filters by status`() {
-        storage.store(aTask("t1", state = TaskState.working))
-        storage.store(aTask("t2", state = TaskState.completed))
-        storage.store(aTask("t3", state = TaskState.working))
+        storage.store(aTask("t1", state = TaskState.TASK_STATE_WORKING))
+        storage.store(aTask("t2", state = TaskState.TASK_STATE_COMPLETED))
+        storage.store(aTask("t3", state = TaskState.TASK_STATE_WORKING))
 
-        val page = storage.list(status = TaskState.working)
+        val page = storage.list(status = TaskState.TASK_STATE_WORKING)
         assertThat(page.tasks.size, equalTo(2))
     }
 
@@ -114,12 +114,12 @@ class TaskStorageTest {
 
     @Test
     fun `list combines filters and pagination`() {
-        storage.store(aTask("t1", contextId = "ctx-a", state = TaskState.working))
-        storage.store(aTask("t2", contextId = "ctx-a", state = TaskState.completed))
-        storage.store(aTask("t3", contextId = "ctx-b", state = TaskState.working))
-        storage.store(aTask("t4", contextId = "ctx-a", state = TaskState.working))
+        storage.store(aTask("t1", contextId = "ctx-a", state = TaskState.TASK_STATE_WORKING))
+        storage.store(aTask("t2", contextId = "ctx-a", state = TaskState.TASK_STATE_COMPLETED))
+        storage.store(aTask("t3", contextId = "ctx-b", state = TaskState.TASK_STATE_WORKING))
+        storage.store(aTask("t4", contextId = "ctx-a", state = TaskState.TASK_STATE_WORKING))
 
-        val page = storage.list(contextId = ContextId.of("ctx-a"), status = TaskState.working, pageSize = 1)
+        val page = storage.list(contextId = ContextId.of("ctx-a"), status = TaskState.TASK_STATE_WORKING, pageSize = 1)
         assertThat(page.tasks.size, equalTo(1))
         assertThat(page.totalSize, equalTo(2))
         assertThat(page.nextPageToken.isNotEmpty(), equalTo(true))

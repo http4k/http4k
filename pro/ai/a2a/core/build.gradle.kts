@@ -16,6 +16,7 @@ dependencies {
     }
     api(libs.kotshi.api)
     api(project(":http4k-api-jsonrpc"))
+    api(project(":http4k-connect-core"))
     api(project(":http4k-ai-core"))
 
     api(libs.values4k)

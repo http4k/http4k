@@ -6,14 +6,22 @@ package org.http4k.ai.a2a.protocol.messages
 
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Cursor
-import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-object A2ATask {
+@JsonSerializable
+data class A2ATask(
+    val id: TaskId,
+    val contextId: ContextId,
+    val status: A2ATaskStatus,
+    val artifacts: List<A2AArtifact>? = null,
+    val history: List<A2AMessage>? = null,
+    val metadata: Map<String, Any>? = null
+) {
     object Get {
         @JsonSerializable
         @PolymorphicLabel("GetTask")
@@ -25,13 +33,13 @@ object A2ATask {
             override val method = of("GetTask")
 
             @JsonSerializable
-            data class Params(val id: TaskId, val historyLength: Int? = null)
+            data class Params(val id: TaskId, val historyLength: Int? = null, val tenant: Tenant? = null)
         }
 
         @JsonSerializable
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
-            data class Result(val task: Task)
+            data class Result(val task: A2ATask)
         }
     }
 
@@ -46,13 +54,13 @@ object A2ATask {
             override val method = of("CancelTask")
 
             @JsonSerializable
-            data class Params(val id: TaskId)
+            data class Params(val id: TaskId, val tenant: Tenant? = null)
         }
 
         @JsonSerializable
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
-            data class Result(val task: Task)
+            data class Result(val task: A2ATask)
         }
     }
 
@@ -67,11 +75,11 @@ object A2ATask {
             override val method = of("SubscribeToTask")
 
             @JsonSerializable
-            data class Params(val id: TaskId)
+            data class Params(val id: TaskId, val tenant: Tenant? = null)
         }
     }
 
-    object List {
+    object ListTasks {
         @JsonSerializable
         @PolymorphicLabel("ListTasks")
         data class Request(
@@ -88,7 +96,8 @@ object A2ATask {
                 val pageSize: Int? = null,
                 val pageToken: Cursor? = null,
                 val historyLength: Int? = null,
-                val includeArtifacts: Boolean? = null
+                val includeArtifacts: Boolean? = null,
+                val tenant: Tenant? = null
             )
         }
 
@@ -96,7 +105,7 @@ object A2ATask {
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(
-                val tasks: kotlin.collections.List<Task>,
+                val tasks: kotlin.collections.List<A2ATask>,
                 val nextPageToken: Cursor,
                 val pageSize: Int?,
                 val totalSize: Int

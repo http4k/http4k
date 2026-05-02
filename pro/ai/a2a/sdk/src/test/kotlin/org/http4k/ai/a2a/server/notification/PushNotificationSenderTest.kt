@@ -13,9 +13,10 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
-import org.http4k.ai.a2a.model.AgentAuthentication
+import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.protocol.messages.toWire
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -34,7 +35,7 @@ class PushNotificationSenderTest {
     private fun aTask(id: String = "task-1") = Task(
         id = TaskId.of(id),
         contextId = ContextId.of("ctx-1"),
-        status = TaskStatus(state = TaskState.working)
+        status = TaskStatus(state = TaskState.TASK_STATE_WORKING)
     )
 
     private fun aConfig(
@@ -42,7 +43,7 @@ class PushNotificationSenderTest {
         taskId: String = "task-1",
         url: String = "https://example.com/webhook",
         token: String? = null,
-        auth: AgentAuthentication? = null
+        auth: AuthenticationInfo? = null
     ) = TaskPushNotificationConfig(
         id = PushNotificationConfigId.of(id),
         taskId = TaskId.of(taskId),
@@ -69,7 +70,7 @@ class PushNotificationSenderTest {
 
         assertThat(capturedRequest.get(), hasMethod(POST))
         assertThat(capturedRequest.get().uri, equalTo(Uri.of("https://example.com/webhook")))
-        assertThat(capturedRequest.get(), hasBody(A2AJson.asFormatString(task)))
+        assertThat(capturedRequest.get(), hasBody(A2AJson.asFormatString(task.toWire())))
         assertThat(capturedRequest.get(), hasHeader("Content-Type", "application/json; charset=utf-8"))
     }
 
@@ -85,7 +86,7 @@ class PushNotificationSenderTest {
         val task = aTask()
         val config = aConfig(
             token = "my-secret-token",
-            auth = AgentAuthentication(schemes = listOf(AuthScheme.BEARER))
+            auth = AuthenticationInfo(scheme = AuthScheme.BEARER)
         )
 
         sender(task, config)
@@ -105,7 +106,7 @@ class PushNotificationSenderTest {
         val task = aTask()
         val config = aConfig(
             token = "my-api-key",
-            auth = AgentAuthentication(schemes = listOf(AuthScheme.API_KEY))
+            auth = AuthenticationInfo(scheme = AuthScheme.API_KEY)
         )
 
         sender(task, config)

@@ -13,6 +13,8 @@ import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.SkillId
 import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.Tenant
+import org.http4k.ai.a2a.model.Version
 import org.http4k.ai.a2a.protocol.A2ARpcMethod
 import org.http4k.ai.util.withAiMappings
 import org.http4k.connect.model.Base64Blob
@@ -68,4 +70,6 @@ fun <T> AutoMappingConfiguration<T>.withA2AMappings() = apply {
     value(PushNotificationConfigId)
     value(SkillId)
     value(TaskId)
+    value(Tenant)
+    value(Version)
 }

@@ -11,7 +11,9 @@ import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.a2a.client.A2AClient
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.Part
+import org.http4k.ai.a2a.model.Version
 import org.http4k.ai.model.Role
 import org.http4k.core.Uri
 import org.http4k.protocol.A2A
@@ -21,16 +23,18 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 class A2AInterceptTest {
 
-    private val message = MessageResponse.Message(Message(Role.Assistant, listOf()))
+    private val message = MessageResponse.Message(Message(MessageId.of("msg-1"), Role.Assistant, listOf()))
+    private val url = Uri.of("http://someuri/foobar")
+    private val version = Version.of("1.0.0")
 
     @RegisterExtension
-    val intercept = Intercept.a2a(Always, baseUrl = Uri.of("http://someuri/foobar")) {
-        A2A(AgentCard("name", Uri.of("http://someuri/foobar"), "0.0.0")) { message }
+    val intercept = Intercept.a2a(Always, baseUrl = url) {
+        A2A(AgentCard("name", url, version)) { message }
     }
 
     @Test
     fun `can pass through an a2a client`(a2AClient: A2AClient) {
-        assertThat(a2AClient.agentCard(), equalTo(Success(AgentCard("name", Uri.of("http://someuri/foobar"), "0.0.0"))))
-        assertThat(a2AClient.message(Message(Role.User, listOf(Part.Text("foo")))), equalTo(Success(message)))
+        assertThat(a2AClient.agentCard(), equalTo(Success(AgentCard("name", url, version))))
+        assertThat(a2AClient.message(Message(MessageId.of("msg-2"), Role.User, listOf(Part.Text("foo")))), equalTo(Success(message)))
     }
 }

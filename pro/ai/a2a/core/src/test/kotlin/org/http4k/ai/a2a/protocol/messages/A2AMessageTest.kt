@@ -6,8 +6,8 @@ package org.http4k.ai.a2a.protocol.messages
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.a2a.model.Message
-import org.http4k.ai.a2a.model.Part
+import org.http4k.ai.a2a.model.MessageId
+import java.util.UUID
 import org.http4k.ai.a2a.protocol.A2ARpcMethod
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.model.Role
@@ -19,9 +19,10 @@ class A2AMessageTest {
     fun `Send Request serializes correctly`() {
         val request = A2AMessage.Send.Request(
             params = A2AMessage.Send.Request.Params(
-                message = Message(
+                message = A2AMessage(
+                    messageId = MessageId.of(UUID.randomUUID().toString()),
                     role = Role.User,
-                    parts = listOf(Part.Text("Hello"))
+                    parts = listOf(A2APart(text = "Hello"))
                 )
             ),
             id = "1"
@@ -33,10 +34,10 @@ class A2AMessageTest {
 
     @Test
     fun `Send Request deserializes correctly`() {
-        val json = """{"params":{"message":{"role":"user","parts":[{"type":"text","text":"Hello"}],"kind":"message"}},"id":"1","jsonrpc":"2.0","method":"SendMessage"}"""
+        val json = """{"params":{"message":{"messageId":"msg-1","role":"user","parts":[{"type":"text","text":"Hello"}],"kind":"message"}},"id":"1","jsonrpc":"2.0","method":"SendMessage"}"""
         val request = A2AJson.asA<A2AMessage.Send.Request>(json)
         assertThat(request.params.message.role, equalTo(Role.User))
-        assertThat((request.params.message.parts.first() as Part.Text).text, equalTo("Hello"))
+        assertThat(request.params.message.parts.first().text, equalTo("Hello"))
     }
 
     @Test
@@ -44,7 +45,7 @@ class A2AMessageTest {
         assertThat(
             A2AMessage.Send.Request(
                 params = A2AMessage.Send.Request.Params(
-                    message = Message(role = Role.User, parts = emptyList())
+                    message = A2AMessage(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.User, parts = emptyList())
                 ),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("SendMessage"))
@@ -56,7 +57,7 @@ class A2AMessageTest {
         assertThat(
             A2AMessage.Stream.Request(
                 params = A2AMessage.Stream.Request.Params(
-                    message = Message(role = Role.User, parts = emptyList())
+                    message = A2AMessage(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.User, parts = emptyList())
                 ),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("SendStreamingMessage"))

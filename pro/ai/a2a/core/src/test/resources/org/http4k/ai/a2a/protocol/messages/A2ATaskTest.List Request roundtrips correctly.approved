@@ -2,7 +2,7 @@
   "method": "ListTasks",
   "params": {
     "contextId": "ctx-123",
-    "status": "working",
+    "status": "TASK_STATE_WORKING",
     "pageSize": 25,
     "pageToken": "token-abc"
   },

@@ -5,6 +5,7 @@
 package org.http4k.ai.a2a.protocol.messages
 
 import org.http4k.ai.a2a.model.AgentCard
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
@@ -12,12 +13,16 @@ import se.ansman.kotshi.PolymorphicLabel
 object A2AAgentCard {
     object GetExtended {
         @JsonSerializable
-        @PolymorphicLabel("getExtendedAgentCard")
+        @PolymorphicLabel("GetExtendedAgentCard")
         data class Request(
+            val params: Params? = null,
             override val id: Any?,
             val jsonrpc: String = "2.0"
         ) : A2AJsonRpcRequest() {
-            override val method = of("getExtendedAgentCard")
+            override val method = of("GetExtendedAgentCard")
+
+            @JsonSerializable
+            data class Params(val tenant: Tenant? = null)
         }
 
         @JsonSerializable

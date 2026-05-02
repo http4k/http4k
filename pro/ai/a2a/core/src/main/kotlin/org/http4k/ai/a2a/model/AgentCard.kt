@@ -4,6 +4,7 @@
  */
 package org.http4k.ai.a2a.model
 
+import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
@@ -11,25 +12,23 @@ import se.ansman.kotshi.JsonSerializable
 data class AgentCard(
     val name: String,
     val url: Uri,
-    val version: String,
+    val version: Version,
     val description: String? = null,
     val capabilities: AgentCapabilities? = null,
     val skills: List<AgentSkill>? = null,
-    val defaultInputModes: List<ContentMode>? = null,
-    val defaultOutputModes: List<ContentMode>? = null,
+    val defaultInputModes: List<MimeType>? = null,
+    val defaultOutputModes: List<MimeType>? = null,
     val provider: AgentProvider? = null,
     val documentationUrl: Uri? = null,
-    val authentication: AgentAuthentication? = null
+    val iconUrl: Uri? = null,
+    val supportedInterfaces: List<AgentInterface>? = null,
+    val securitySchemes: Map<String, SecurityScheme>? = null,
+    val securityRequirements: List<SecurityRequirement>? = null,
+    val signatures: List<AgentCardSignature>? = null
 )
 
 @JsonSerializable
 data class AgentProvider(
     val organization: String,
     val url: Uri? = null
-)
-
-@JsonSerializable
-data class AgentAuthentication(
-    val schemes: List<AuthScheme>,
-    val credentials: String? = null
 )

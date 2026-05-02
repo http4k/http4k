@@ -7,6 +7,7 @@ package org.http4k.ai.a2a.protocol.messages
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
@@ -26,7 +27,8 @@ object A2APushNotificationConfig {
             @JsonSerializable
             data class Params(
                 val taskId: TaskId,
-                val pushNotificationConfig: PushNotificationConfig
+                val pushNotificationConfig: PushNotificationConfig,
+                val tenant: Tenant? = null
             )
         }
 
@@ -52,7 +54,7 @@ object A2APushNotificationConfig {
             override val method = of("GetTaskPushNotificationConfig")
 
             @JsonSerializable
-            data class Params(val id: PushNotificationConfigId)
+            data class Params(val taskId: TaskId, val id: PushNotificationConfigId, val tenant: Tenant? = null)
         }
 
         @JsonSerializable
@@ -77,7 +79,7 @@ object A2APushNotificationConfig {
             override val method = of("ListTaskPushNotificationConfigs")
 
             @JsonSerializable
-            data class Params(val taskId: TaskId)
+            data class Params(val taskId: TaskId, val tenant: Tenant? = null)
         }
 
         @JsonSerializable
@@ -98,7 +100,7 @@ object A2APushNotificationConfig {
             override val method = of("DeleteTaskPushNotificationConfig")
 
             @JsonSerializable
-            data class Params(val id: PushNotificationConfigId)
+            data class Params(val taskId: TaskId, val id: PushNotificationConfigId, val tenant: Tenant? = null)
         }
 
         @JsonSerializable

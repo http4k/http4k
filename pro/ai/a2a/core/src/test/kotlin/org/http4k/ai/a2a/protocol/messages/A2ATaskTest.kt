@@ -90,8 +90,8 @@ class A2ATaskTest {
     @Test
     fun `List method is tasks_list`() {
         assertThat(
-            A2ATask.List.Request(
-                params = A2ATask.List.Request.Params(),
+            A2ATask.ListTasks.Request(
+                params = A2ATask.ListTasks.Request.Params(),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("ListTasks"))
         )
@@ -99,10 +99,10 @@ class A2ATaskTest {
 
     @Test
     fun `List Request roundtrips correctly`(approver: Approver) {
-        val request = A2ATask.List.Request(
-            params = A2ATask.List.Request.Params(
+        val request = A2ATask.ListTasks.Request(
+            params = A2ATask.ListTasks.Request.Params(
                 contextId = ContextId.of("ctx-123"),
-                status = TaskState.working,
+                status = TaskState.TASK_STATE_WORKING,
                 pageSize = 25,
                 pageToken = "token-abc"
             ),
@@ -110,13 +110,13 @@ class A2ATaskTest {
         )
         val json = A2AJson.asFormatString(request)
         approver.assertApproved(json, APPLICATION_JSON)
-        assertThat(A2AJson.asA<A2ATask.List.Request>(json), equalTo(request))
+        assertThat(A2AJson.asA<A2ATask.ListTasks.Request>(json), equalTo(request))
     }
 
     @Test
     fun `List Response roundtrips correctly`(approver: Approver) {
-        val response = A2ATask.List.Response(
-            result = A2ATask.List.Response.Result(
+        val response = A2ATask.ListTasks.Response(
+            result = A2ATask.ListTasks.Response.Result(
                 tasks = emptyList(),
                 nextPageToken = "next-token",
                 pageSize = 50,
@@ -126,6 +126,6 @@ class A2ATaskTest {
         )
         val json = A2AJson.asFormatString(response)
         approver.assertApproved(json, APPLICATION_JSON)
-        assertThat(A2AJson.asA<A2ATask.List.Response>(json), equalTo(response))
+        assertThat(A2AJson.asA<A2ATask.ListTasks.Response>(json), equalTo(response))
     }
 }

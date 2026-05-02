@@ -111,9 +111,10 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
                     override fun fromJson(p0: JsonReader) = MoshiNode.wrap(p0.readJsonValue())
 
                     override fun toJson(p0: JsonWriter, p1: MoshiNode?) {
-                        p1?.let {
-                            val value = it.unwrap()
-                            moshi.adapter(value?.javaClass ?: Any::class.java).toJson(p0, value) }
+                        when (p1) {
+                            null -> moshi.adapter(Any::class.java).toJson(p0, null)
+                            else -> moshi.adapter(p1.unwrap()?.javaClass ?: Any::class.java).toJson(p0, p1.unwrap())
+                        }
                     }
                 }
 

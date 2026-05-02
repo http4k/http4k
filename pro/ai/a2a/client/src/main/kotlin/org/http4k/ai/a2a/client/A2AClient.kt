@@ -22,7 +22,7 @@ interface A2AClient : AutoCloseable {
     fun agentCard(): A2AResult<AgentCard>
     fun extendedAgentCard(): A2AResult<AgentCard>
     fun message(message: Message, configuration: TaskConfiguration? = null): A2AResult<MessageResponse>
-    fun messageStream(message: Message, configuration: TaskConfiguration? = null): A2AResult<Sequence<MessageResponse>>
+    fun messageStream(message: Message, configuration: TaskConfiguration? = null): A2AResult<MessageResponse>
     fun tasks(): Tasks
     fun pushNotificationConfigs(): PushNotificationConfigs
 
@@ -39,8 +39,8 @@ interface A2AClient : AutoCloseable {
 
     interface PushNotificationConfigs {
         fun set(taskId: TaskId, config: PushNotificationConfig): A2AResult<TaskPushNotificationConfig>
-        fun get(id: PushNotificationConfigId): A2AResult<TaskPushNotificationConfig>
+        fun get(taskId: TaskId, id: PushNotificationConfigId): A2AResult<TaskPushNotificationConfig>
         fun list(taskId: TaskId): A2AResult<List<TaskPushNotificationConfig>>
-        fun delete(id: PushNotificationConfigId): A2AResult<PushNotificationConfigId>
+        fun delete(taskId: TaskId, id: PushNotificationConfigId): A2AResult<PushNotificationConfigId>
     }
 }

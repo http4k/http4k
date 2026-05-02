@@ -1,6 +1,7 @@
 {
   "method": "GetTaskPushNotificationConfig",
   "params": {
+    "taskId": "task-123",
     "id": "config-456"
   },
   "id": "1",

@@ -7,6 +7,7 @@ package org.http4k.ai.a2a.server.notification
 import org.http4k.ai.a2a.model.AuthScheme
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.protocol.messages.toWire
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
@@ -21,7 +22,7 @@ fun interface PushNotificationSender {
             PushNotificationSender { task, config ->
                 http(
                     Request(POST, config.pushNotificationConfig.url)
-                        .json(task)
+                        .json(task.toWire())
                         .withAuth(config)
                 )
             }
@@ -34,9 +35,8 @@ private fun Request.withAuth(config: TaskPushNotificationConfig): Request {
     val pushConfig = config.pushNotificationConfig
     val token = pushConfig.token ?: return this
     val auth = pushConfig.authentication ?: return this
-    val scheme = auth.schemes.firstOrNull() ?: return this
 
-    return when (scheme) {
+    return when (auth.scheme) {
         AuthScheme.BEARER -> header("Authorization", "Bearer $token")
         AuthScheme.API_KEY -> header("X-API-Key", token)
         else -> this

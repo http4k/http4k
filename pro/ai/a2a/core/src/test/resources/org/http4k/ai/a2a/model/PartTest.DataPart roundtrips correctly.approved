@@ -1,7 +1,6 @@
 {
-  "type": "data",
   "data": {
     "key": "value",
-    "number": 42.0
+    "number": 42
   }
 }

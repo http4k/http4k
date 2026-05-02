@@ -8,6 +8,7 @@ import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.server.notification.PushNotificationSender
 
 fun TaskStorage.withPushNotifications(
@@ -21,19 +22,20 @@ private class NotifyingTaskStorage(
     private val sender: PushNotificationSender
 ) : TaskStorage {
 
-    override fun store(task: Task) {
-        delegate.store(task)
-        configStorage.list(task.id).forEach { sender(task, it) }
+    override fun store(task: Task, tenant: Tenant?) {
+        delegate.store(task, tenant)
+        configStorage.list(task.id, tenant).forEach { sender(task, it) }
     }
 
-    override fun get(taskId: TaskId): Task? = delegate.get(taskId)
+    override fun get(taskId: TaskId, tenant: Tenant?) = delegate.get(taskId, tenant)
 
-    override fun delete(taskId: TaskId) = delegate.delete(taskId)
+    override fun delete(taskId: TaskId, tenant: Tenant?) = delegate.delete(taskId, tenant)
 
     override fun list(
         contextId: ContextId?,
         status: TaskState?,
         pageSize: Int?,
-        pageToken: String?
-    ) = delegate.list(contextId, status, pageSize, pageToken)
+        pageToken: String?,
+        tenant: Tenant?
+    ) = delegate.list(contextId, status, pageSize, pageToken, tenant)
 }

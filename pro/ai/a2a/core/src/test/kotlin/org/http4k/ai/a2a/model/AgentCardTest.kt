@@ -24,7 +24,7 @@ class AgentCardTest {
             name = "Test Agent",
             description = "A test agent",
             url = Uri.of("https://example.com/agent"),
-            version = "1.0.0",
+            version = Version.of("1.0.0"),
             capabilities = AgentCapabilities(streaming = true),
             skills = listOf(
                 AgentSkill(

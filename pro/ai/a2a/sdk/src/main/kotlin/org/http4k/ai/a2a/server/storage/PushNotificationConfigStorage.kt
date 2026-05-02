@@ -7,29 +7,34 @@ package org.http4k.ai.a2a.server.storage
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.model.Tenant
 import java.util.concurrent.ConcurrentHashMap
 
 interface PushNotificationConfigStorage {
     fun store(config: TaskPushNotificationConfig)
-    fun get(id: PushNotificationConfigId): TaskPushNotificationConfig?
-    fun delete(id: PushNotificationConfigId)
-    fun list(taskId: TaskId): List<TaskPushNotificationConfig>
+    fun get(id: PushNotificationConfigId, tenant: Tenant? = null): TaskPushNotificationConfig?
+    fun delete(id: PushNotificationConfigId, tenant: Tenant? = null)
+    fun list(taskId: TaskId, tenant: Tenant? = null): List<TaskPushNotificationConfig>
 
     companion object {
         fun InMemory() = object : PushNotificationConfigStorage {
-            private val configs = ConcurrentHashMap<PushNotificationConfigId, TaskPushNotificationConfig>()
+            private val NO_TENANT = Tenant.of("__no_tenant__")
+            private val tenants = ConcurrentHashMap<Tenant, ConcurrentHashMap<PushNotificationConfigId, TaskPushNotificationConfig>>()
+
+            private fun configsFor(tenant: Tenant?) = tenants.getOrPut(tenant ?: NO_TENANT) { ConcurrentHashMap() }
 
             override fun store(config: TaskPushNotificationConfig) {
-                configs[config.id] = config
+                configsFor(config.tenant)[config.id] = config
             }
 
-            override fun get(id: PushNotificationConfigId) = configs[id]
+            override fun get(id: PushNotificationConfigId, tenant: Tenant?) = configsFor(tenant)[id]
 
-            override fun delete(id: PushNotificationConfigId) {
-                configs.remove(id)
+            override fun delete(id: PushNotificationConfigId, tenant: Tenant?) {
+                configsFor(tenant).remove(id)
             }
 
-            override fun list(taskId: TaskId) = configs.values.filter { it.taskId == taskId }
+            override fun list(taskId: TaskId, tenant: Tenant?) =
+                configsFor(tenant).values.filter { it.taskId == taskId }
         }
     }
 }

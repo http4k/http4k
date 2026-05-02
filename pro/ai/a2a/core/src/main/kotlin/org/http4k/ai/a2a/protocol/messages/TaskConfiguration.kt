@@ -4,13 +4,13 @@
  */
 package org.http4k.ai.a2a.protocol.messages
 
-import org.http4k.ai.a2a.model.PushNotificationConfig
+import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class TaskConfiguration(
     val acceptedOutputModes: List<String>? = null,
     val historyLength: Int? = null,
-    val pushNotificationConfig: PushNotificationConfig? = null,
+    val taskPushNotificationConfig: TaskPushNotificationConfig? = null,
     val returnImmediately: Boolean? = null
 )

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "stream-task-1",
+    "contextId": "stream-context-1",
+    "status": {
+      "state": "TASK_STATE_WORKING"
+    },
+    "history": [
+      {
+        "messageId": "msg-1",
+        "role": "user",
+        "parts": [
+          {
+            "text": "Hello, streaming agent!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "stream-task-1",
+    "contextId": "stream-context-1",
+    "status": {
+      "state": "TASK_STATE_COMPLETED"
+    },
+    "history": [
+      {
+        "messageId": "msg-1",
+        "role": "user",
+        "parts": [
+          {
+            "text": "Hello, streaming agent!"
+          }
+        ]
+      }
+    ]
+  }
+]

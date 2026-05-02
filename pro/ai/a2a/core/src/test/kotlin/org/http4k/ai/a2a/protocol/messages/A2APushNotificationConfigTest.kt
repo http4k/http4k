@@ -76,7 +76,7 @@ class A2APushNotificationConfigTest {
     fun `Get method is tasks_pushNotificationConfig_get`() {
         assertThat(
             A2APushNotificationConfig.Get.Request(
-                params = A2APushNotificationConfig.Get.Request.Params(id = configId),
+                params = A2APushNotificationConfig.Get.Request.Params(taskId = taskId, id = configId),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("GetTaskPushNotificationConfig"))
         )
@@ -85,7 +85,7 @@ class A2APushNotificationConfigTest {
     @Test
     fun `Get Request roundtrips correctly`(approver: Approver) {
         val request = A2APushNotificationConfig.Get.Request(
-            params = A2APushNotificationConfig.Get.Request.Params(id = configId),
+            params = A2APushNotificationConfig.Get.Request.Params(taskId = taskId, id = configId),
             id = "1"
         )
         val json = A2AJson.asFormatString(request)
@@ -152,7 +152,7 @@ class A2APushNotificationConfigTest {
     fun `Delete method is tasks_pushNotificationConfig_delete`() {
         assertThat(
             A2APushNotificationConfig.Delete.Request(
-                params = A2APushNotificationConfig.Delete.Request.Params(id = configId),
+                params = A2APushNotificationConfig.Delete.Request.Params(taskId = taskId, id = configId),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("DeleteTaskPushNotificationConfig"))
         )
@@ -161,7 +161,7 @@ class A2APushNotificationConfigTest {
     @Test
     fun `Delete Request roundtrips correctly`(approver: Approver) {
         val request = A2APushNotificationConfig.Delete.Request(
-            params = A2APushNotificationConfig.Delete.Request.Params(id = configId),
+            params = A2APushNotificationConfig.Delete.Request.Params(taskId = taskId, id = configId),
             id = "1"
         )
         val json = A2AJson.asFormatString(request)

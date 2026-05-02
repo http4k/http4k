@@ -19,7 +19,11 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.protocol.messages.A2AStream
+import org.http4k.ai.a2a.protocol.messages.toDomain
+import org.http4k.ai.a2a.protocol.messages.toWire
 import org.http4k.ai.a2a.model.TaskState
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AAgentCard
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
@@ -54,7 +58,11 @@ import java.util.concurrent.atomic.AtomicLong
 
 private val jsonRpcRequestLens = Body.auto<A2ANodeType>().toLens()
 
-class HttpA2AClient(private val baseUri: Uri, http: HttpHandler = JavaHttpClient(responseBodyMode = Stream)) : A2AClient {
+class HttpA2AClient(
+    private val baseUri: Uri,
+    http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
+    private val tenant: Tenant? = null
+) : A2AClient {
 
     private val client = ClientFilters.SetHostFrom(baseUri).then(http)
     private val requestId = AtomicLong(0)
@@ -72,14 +80,14 @@ class HttpA2AClient(private val baseUri: Uri, http: HttpHandler = JavaHttpClient
     }
 
     override fun extendedAgentCard(): A2AResult<AgentCard> =
-        sendRpc<AgentCard>(A2AAgentCard.GetExtended.Request(nextId()))
+        sendRpc<AgentCard>(A2AAgentCard.GetExtended.Request(params = A2AAgentCard.GetExtended.Request.Params(tenant = tenant), id = nextId()))
 
     override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<MessageResponse> =
-        sendRpc<MoshiNode>(A2AMessage.Send.Request(A2AMessage.Send.Request.Params(message, configuration), nextId()))
+        sendRpc<MoshiNode>(A2AMessage.Send.Request(A2AMessage.Send.Request.Params(message.toWire(), configuration, tenant = tenant), nextId()))
             .map { parseSendResponse(it as MoshiObject) }
 
-    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<Sequence<MessageResponse>> {
-        val request = A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(message, configuration), nextId())
+    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<MessageResponse> {
+        val request = A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(message.toWire(), configuration, tenant = tenant), nextId())
 
         val response = client(
             Request(POST, baseUri.path)
@@ -90,9 +98,11 @@ class HttpA2AClient(private val baseUri: Uri, http: HttpHandler = JavaHttpClient
         return when {
             response.status.successful ->
                 Success(
-                    response.body.stream.chunkedSseSequence()
-                        .filterIsInstance<SseMessage.Data>()
-                        .map { parseStreamChunk(it.data) })
+                    MessageResponse.Stream(
+                        response.body.stream.chunkedSseSequence()
+                            .filterIsInstance<SseMessage.Data>()
+                            .map { A2AJson.asA<A2AStream>(it.data).toDomain() }
+                    ))
 
             else -> Failure(A2AError.Http(response))
         }
@@ -103,44 +113,39 @@ class HttpA2AClient(private val baseUri: Uri, http: HttpHandler = JavaHttpClient
     override fun pushNotificationConfigs() = httpPushNotificationConfigs
 
     private fun parseSendResponse(resultNode: MoshiObject): MessageResponse = when {
-        resultNode["status"] != null -> MessageResponse.Task(A2AJson.asA(resultNode, Task::class))
-        else -> MessageResponse.Message(A2AJson.asA(resultNode, Message::class))
-    }
-
-    private fun parseStreamChunk(json: String): MessageResponse {
-        val fields = A2AJson.fields(A2AJson.parse(json) as MoshiObject).toMap()
-        return parseSendResponse(fields["result"] as MoshiObject)
+        resultNode["status"] != null -> MessageResponse.Task(A2AJson.asA(resultNode, A2ATask::class).toDomain())
+        else -> MessageResponse.Message(A2AJson.asA(resultNode, A2AMessage::class).toDomain())
     }
 
     private inner class ClientTasks : A2AClient.Tasks {
         override fun get(taskId: TaskId) =
-            sendRpc<A2ATask.Get.Response.Result>(A2ATask.Get.Request(A2ATask.Get.Request.Params(taskId), nextId()))
-                .map { it.task }
+            sendRpc<A2ATask.Get.Response.Result>(A2ATask.Get.Request(A2ATask.Get.Request.Params(taskId, tenant = tenant), nextId()))
+                .map { it.task.toDomain() }
 
         override fun cancel(taskId: TaskId) =
-            sendRpc<A2ATask.Cancel.Response.Result>(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(taskId), nextId()))
-                .map { it.task }
+            sendRpc<A2ATask.Cancel.Response.Result>(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(taskId, tenant = tenant), nextId()))
+                .map { it.task.toDomain() }
 
         override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?) =
-            sendRpc<A2ATask.List.Response.Result>(A2ATask.List.Request(A2ATask.List.Request.Params(contextId, status, pageSize, pageToken), nextId()))
-                .map { TaskPage(it.tasks, it.nextPageToken, it.totalSize) }
+            sendRpc<A2ATask.ListTasks.Response.Result>(A2ATask.ListTasks.Request(A2ATask.ListTasks.Request.Params(contextId, status, pageSize, pageToken, tenant = tenant), nextId()))
+                .map { TaskPage(it.tasks.map { t -> t.toDomain() }, it.nextPageToken, it.totalSize) }
     }
 
     private inner class ClientPushNotificationConfigs : A2AClient.PushNotificationConfigs {
         override fun set(taskId: TaskId, config: PushNotificationConfig) =
-            sendRpc<A2APushNotificationConfig.Set.Response.Result>(A2APushNotificationConfig.Set.Request(A2APushNotificationConfig.Set.Request.Params(taskId, config), nextId()))
+            sendRpc<A2APushNotificationConfig.Set.Response.Result>(A2APushNotificationConfig.Set.Request(A2APushNotificationConfig.Set.Request.Params(taskId, config, tenant = tenant), nextId()))
                 .map { TaskPushNotificationConfig(it.id, it.taskId, it.pushNotificationConfig) }
 
-        override fun get(id: PushNotificationConfigId) =
-            sendRpc<A2APushNotificationConfig.Get.Response.Result>(A2APushNotificationConfig.Get.Request(A2APushNotificationConfig.Get.Request.Params(id), nextId()))
+        override fun get(taskId: TaskId, id: PushNotificationConfigId) =
+            sendRpc<A2APushNotificationConfig.Get.Response.Result>(A2APushNotificationConfig.Get.Request(A2APushNotificationConfig.Get.Request.Params(taskId, id, tenant = tenant), nextId()))
                 .map { TaskPushNotificationConfig(it.id, it.taskId, it.pushNotificationConfig) }
 
         override fun list(taskId: TaskId) =
-            sendRpc<A2APushNotificationConfig.List.Response.Result>(A2APushNotificationConfig.List.Request(A2APushNotificationConfig.List.Request.Params(taskId), nextId()))
+            sendRpc<A2APushNotificationConfig.List.Response.Result>(A2APushNotificationConfig.List.Request(A2APushNotificationConfig.List.Request.Params(taskId, tenant = tenant), nextId()))
                 .map { it.configs }
 
-        override fun delete(id: PushNotificationConfigId) =
-            sendRpc<A2APushNotificationConfig.Delete.Response.Result>(A2APushNotificationConfig.Delete.Request(A2APushNotificationConfig.Delete.Request.Params(id), nextId()))
+        override fun delete(taskId: TaskId, id: PushNotificationConfigId) =
+            sendRpc<A2APushNotificationConfig.Delete.Response.Result>(A2APushNotificationConfig.Delete.Request(A2APushNotificationConfig.Delete.Request.Params(taskId, id, tenant = tenant), nextId()))
                 .map { it.id }
     }
 
