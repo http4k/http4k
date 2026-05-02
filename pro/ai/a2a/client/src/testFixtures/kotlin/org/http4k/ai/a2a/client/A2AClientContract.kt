@@ -16,7 +16,6 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
-import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
@@ -92,9 +91,9 @@ abstract class A2AClientContract {
         val result = message(message)
         val response = result.valueOrNull()!!
 
-        assertThat(response is A2AMessage.Send.Response.Task, equalTo(true))
-        val taskResponse = response as A2AMessage.Send.Response.Task
-        assertThat(taskResponse.result.status.state, equalTo(TaskState.completed))
+        assertThat(response is MessageResponse.Task, equalTo(true))
+        val taskResponse = response as MessageResponse.Task
+        assertThat(taskResponse.tasks.first().status.state, equalTo(TaskState.completed))
     }
 
     @Test
@@ -104,8 +103,8 @@ abstract class A2AClientContract {
             parts = listOf(Part.Text("Hello"))
         )
         val sendResult = message(message)
-        val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.result.id
+        val taskResponse = sendResult.valueOrNull()!! as MessageResponse.Task
+        val taskId = taskResponse.tasks.first().id
 
         val result = tasks().get(taskId)
         val task = result.valueOrNull()!!
@@ -119,8 +118,8 @@ abstract class A2AClientContract {
             parts = listOf(Part.Text("Hello"))
         )
         val sendResult = message(message)
-        val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.result.id
+        val taskResponse = sendResult.valueOrNull()!! as MessageResponse.Task
+        val taskId = taskResponse.tasks.first().id
 
         val result = tasks().cancel(taskId)
         val task = result.valueOrNull()!!
@@ -150,7 +149,7 @@ abstract class A2AClientContract {
             val result = client.message(message)
             val response = result.valueOrNull()!!
 
-            assertThat(response is A2AMessage.Send.Response.Message, equalTo(true))
+            assertThat(response is MessageResponse.Message, equalTo(true))
         } finally {
             client.close()
         }
@@ -194,13 +193,13 @@ abstract class A2AClientContract {
             val responses = result.valueOrNull()!!.toList()
 
             assertThat(responses.size, equalTo(2))
-            assertThat(responses[0] is A2AMessage.Send.Response.Task, equalTo(true))
+            assertThat(responses[0] is MessageResponse.Task, equalTo(true))
             assertThat(
-                (responses[0] as A2AMessage.Send.Response.Task).result.status.state,
+                (responses[0] as MessageResponse.Task).tasks.first().status.state,
                 equalTo(TaskState.working)
             )
             assertThat(
-                (responses[1] as A2AMessage.Send.Response.Task).result.status.state,
+                (responses[1] as MessageResponse.Task).tasks.first().status.state,
                 equalTo(TaskState.completed)
             )
         } finally {
@@ -230,8 +229,8 @@ abstract class A2AClientContract {
             parts = listOf(Part.Text("Hello"))
         )
         val sendResult = message(message)
-        val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.result.id
+        val taskResponse = sendResult.valueOrNull()!! as MessageResponse.Task
+        val taskId = taskResponse.tasks.first().id
 
         val config = PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
         val result = pushNotificationConfigs().set(taskId, config)
@@ -248,8 +247,8 @@ abstract class A2AClientContract {
             parts = listOf(Part.Text("Hello"))
         )
         val sendResult = message(message)
-        val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.result.id
+        val taskResponse = sendResult.valueOrNull()!! as MessageResponse.Task
+        val taskId = taskResponse.tasks.first().id
 
         val config = PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
         val setResult = pushNotificationConfigs().set(taskId, config)
@@ -269,8 +268,8 @@ abstract class A2AClientContract {
             parts = listOf(Part.Text("Hello"))
         )
         val sendResult = message(message)
-        val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.result.id
+        val taskResponse = sendResult.valueOrNull()!! as MessageResponse.Task
+        val taskId = taskResponse.tasks.first().id
 
         pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook1")))
         pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook2")))
@@ -288,8 +287,8 @@ abstract class A2AClientContract {
             parts = listOf(Part.Text("Hello"))
         )
         val sendResult = message(message)
-        val taskResponse = sendResult.valueOrNull()!! as A2AMessage.Send.Response.Task
-        val taskId = taskResponse.result.id
+        val taskResponse = sendResult.valueOrNull()!! as MessageResponse.Task
+        val taskId = taskResponse.tasks.first().id
 
         val config = PushNotificationConfig(url = Uri.of("https://example.com/webhook"))
         val setResult = pushNotificationConfigs().set(taskId, config)

@@ -131,7 +131,7 @@ class Intercept @JvmOverloads constructor(
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
             McpClient::class.java -> HttpNonStreamingMcpClient(baseUrl.extend(Uri.of("/mcp")), http = state.get().http)
-            A2AClient::class.java -> HttpA2AClient(baseUrl.extend(Uri.of("/mcp")), http = state.get().http)
+            A2AClient::class.java -> HttpA2AClient(baseUrl, http = state.get().http)
             else -> state.get().http
         }
 

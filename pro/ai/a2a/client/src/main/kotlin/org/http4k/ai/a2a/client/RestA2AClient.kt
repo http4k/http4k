@@ -8,6 +8,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.a2a.A2AError
 import org.http4k.ai.a2a.A2AResult
+import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
@@ -67,7 +68,7 @@ class RestA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient()) : A2ACli
         }
     }
 
-    override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<A2AMessage.Send.Response> {
+    override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<MessageResponse> {
         val response = client(
             Request(POST, "/message:send").with(
                 sendMessageLens of A2AMessage.Send.Request.Params(
@@ -81,11 +82,9 @@ class RestA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient()) : A2ACli
                 val fields = A2AJson.fields(A2AJson.parse(response.bodyString()) as MoshiObject).toMap()
                 Success(
                     when {
-                        fields.containsKey("status") -> A2AMessage.Send.Response.Task(
-                            A2AJson.asA(response.bodyString()), null
-                        )
+                        fields.containsKey("status") -> MessageResponse.Task(A2AJson.asA<Task>(response.bodyString()))
 
-                        else -> A2AMessage.Send.Response.Message(A2AJson.asA(response.bodyString()), null)
+                        else -> MessageResponse.Message(A2AJson.asA<Message>(response.bodyString()))
                     }
                 )
             }
@@ -94,7 +93,7 @@ class RestA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient()) : A2ACli
         }
     }
 
-    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<Sequence<A2AMessage.Send.Response>> {
+    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<Sequence<MessageResponse>> {
         val response = client(
             Request(POST, "/message:stream").with(
                 sendMessageLens of A2AMessage.Send.Request.Params(
@@ -109,8 +108,8 @@ class RestA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient()) : A2ACli
                     .filterIsInstance<SseMessage.Event>()
                     .map { event ->
                         when (event.event) {
-                            "task" -> A2AMessage.Send.Response.Task(A2AJson.asA(event.data), null)
-                            else -> A2AMessage.Send.Response.Message(A2AJson.asA(event.data), null)
+                            "task" -> MessageResponse.Task(A2AJson.asA<Task>(event.data))
+                            else -> MessageResponse.Message(A2AJson.asA<Message>(event.data))
                         }
                     }
             )

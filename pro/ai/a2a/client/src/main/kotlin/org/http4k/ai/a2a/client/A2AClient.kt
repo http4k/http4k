@@ -5,6 +5,7 @@
 package org.http4k.ai.a2a.client
 
 import org.http4k.ai.a2a.A2AResult
+import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
@@ -15,14 +16,13 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.TaskState
-import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 
 interface A2AClient : AutoCloseable {
     fun agentCard(): A2AResult<AgentCard>
     fun extendedAgentCard(): A2AResult<AgentCard>
-    fun message(message: Message, configuration: TaskConfiguration? = null): A2AResult<A2AMessage.Send.Response>
-    fun messageStream(message: Message, configuration: TaskConfiguration? = null): A2AResult<Sequence<A2AMessage.Send.Response>>
+    fun message(message: Message, configuration: TaskConfiguration? = null): A2AResult<MessageResponse>
+    fun messageStream(message: Message, configuration: TaskConfiguration? = null): A2AResult<Sequence<MessageResponse>>
     fun tasks(): Tasks
     fun pushNotificationConfigs(): PushNotificationConfigs
 
@@ -43,6 +43,4 @@ interface A2AClient : AutoCloseable {
         fun list(taskId: TaskId): A2AResult<List<TaskPushNotificationConfig>>
         fun delete(id: PushNotificationConfigId): A2AResult<PushNotificationConfigId>
     }
-
-    companion object
 }
