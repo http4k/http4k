@@ -10,9 +10,9 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class AgentCard(
     val name: String,
-    val description: String? = null,
     val url: Uri,
     val version: String,
+    val description: String? = null,
     val capabilities: AgentCapabilities? = null,
     val skills: List<AgentSkill>? = null,
     val defaultInputModes: List<ContentMode>? = null,

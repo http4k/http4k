@@ -5,6 +5,8 @@
 package org.http4k.wiretap.junit
 
 import io.opentelemetry.api.GlobalOpenTelemetry
+import org.http4k.ai.a2a.client.A2AClient
+import org.http4k.ai.a2a.client.HttpA2AClient
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.chaos.ChaosEngine
@@ -44,6 +46,7 @@ import java.security.SecureRandom
 import java.time.Clock
 import java.util.Random
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.jvm.java
 
 enum class RenderMode { Never, OnFailure, Always }
 
@@ -117,9 +120,10 @@ class Intercept @JvmOverloads constructor(
     private var originalOut: PrintStream? = null
     private var originalErr: PrintStream? = null
 
+    private val supportedParams = setOf(ChaosEngine::class.java, McpClient::class.java, A2AClient::class.java)
+
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
-        pc.parameter.type == ChaosEngine::class.java ||
-            pc.parameter.type == McpClient::class.java ||
+        supportedParams.contains(pc.parameter.type) ||
         pc.parameter.parameterizedType.typeName ==
             "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
 
@@ -127,6 +131,7 @@ class Intercept @JvmOverloads constructor(
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
             McpClient::class.java -> HttpNonStreamingMcpClient(baseUrl.extend(Uri.of("/mcp")), http = state.get().http)
+            A2AClient::class.java -> HttpA2AClient(baseUrl.extend(Uri.of("/mcp")), http = state.get().http)
             else -> state.get().http
         }
 
