@@ -1,0 +1,12 @@
+{
+  "result": {
+    "id": "config-456",
+    "taskId": "task-123",
+    "pushNotificationConfig": {
+      "url": "https://example.com/webhook",
+      "token": "secret-token"
+    }
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

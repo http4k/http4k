@@ -1,0 +1,6 @@
+{
+  "type": "file",
+  "uri": "https://example.com/file.txt",
+  "mimeType": "text/plain",
+  "name": "file.txt"
+}

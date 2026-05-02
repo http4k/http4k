@@ -1,0 +1,195 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.a2a.client
+
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
+import org.http4k.ai.a2a.A2AError
+import org.http4k.ai.a2a.A2AResult
+import org.http4k.ai.a2a.MessageResponse
+import org.http4k.ai.a2a.model.AgentCard
+import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.PushNotificationConfig
+import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.Task
+import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.TaskPage
+import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.model.TaskState
+import org.http4k.ai.a2a.protocol.messages.A2AMessage
+import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.ai.a2a.util.A2AJson
+import org.http4k.ai.a2a.util.A2AJson.auto
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.filter.ClientFilters
+import org.http4k.format.MoshiObject
+import org.http4k.sse.SseMessage
+import org.http4k.sse.chunkedSseSequence
+
+private val agentCardLens = Body.auto<AgentCard>().toLens()
+private val sendMessageLens = Body.auto<A2AMessage.Send.Request.Params>().toLens()
+private val taskLens = Body.auto<Task>().toLens()
+private val taskPageLens = Body.auto<TaskPage>().toLens()
+private val pushConfigLens = Body.auto<TaskPushNotificationConfig>().toLens()
+private val pushConfigListLens = Body.auto<List<TaskPushNotificationConfig>>().toLens()
+private val pushConfigInputLens = Body.auto<PushNotificationConfig>().toLens()
+
+class RestA2AClient(baseUri: Uri, http: HttpHandler = JavaHttpClient()) : A2AClient {
+
+    private val client = ClientFilters.SetBaseUriFrom(baseUri).then(http)
+    private val httpTasks: A2AClient.Tasks = RestTasks()
+    private val httpPushConfigs: A2AClient.PushNotificationConfigs = RestPushNotificationConfigs()
+
+    override fun agentCard(): A2AResult<AgentCard> {
+        val response = client(Request(GET, "/.well-known/agent-card.json"))
+        return when {
+            response.status.successful -> Success(agentCardLens(response))
+            else -> Failure(A2AError.Http(response))
+        }
+    }
+
+    override fun extendedAgentCard(): A2AResult<AgentCard> {
+        val response = client(Request(GET, "/extendedAgentCard"))
+        return when {
+            response.status.successful -> Success(agentCardLens(response))
+            else -> Failure(A2AError.Http(response))
+        }
+    }
+
+    override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<MessageResponse> {
+        val response = client(
+            Request(POST, "/message:send").with(
+                sendMessageLens of A2AMessage.Send.Request.Params(
+                    message,
+                    configuration
+                )
+            )
+        )
+        return when {
+            response.status.successful -> {
+                val fields = A2AJson.fields(A2AJson.parse(response.bodyString()) as MoshiObject).toMap()
+                Success(
+                    when {
+                        fields.containsKey("status") -> MessageResponse.Task(A2AJson.asA<Task>(response.bodyString()))
+
+                        else -> MessageResponse.Message(A2AJson.asA<Message>(response.bodyString()))
+                    }
+                )
+            }
+
+            else -> Failure(A2AError.Http(response))
+        }
+    }
+
+    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<Sequence<MessageResponse>> {
+        val response = client(
+            Request(POST, "/message:stream").with(
+                sendMessageLens of A2AMessage.Send.Request.Params(
+                    message,
+                    configuration
+                )
+            )
+        )
+        return when {
+            response.status.successful -> Success(
+                response.body.stream.chunkedSseSequence()
+                    .filterIsInstance<SseMessage.Event>()
+                    .map { event ->
+                        when (event.event) {
+                            "task" -> MessageResponse.Task(A2AJson.asA<Task>(event.data))
+                            else -> MessageResponse.Message(A2AJson.asA<Message>(event.data))
+                        }
+                    }
+            )
+
+            else -> Failure(A2AError.Http(response))
+        }
+    }
+
+    override fun tasks() = httpTasks
+
+    override fun pushNotificationConfigs() = httpPushConfigs
+
+    private inner class RestTasks : A2AClient.Tasks {
+        override fun get(taskId: TaskId): A2AResult<Task> {
+            val response = client(Request(GET, "/tasks/${taskId.value}"))
+            return when {
+                response.status.successful -> Success(taskLens(response))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
+        override fun cancel(taskId: TaskId): A2AResult<Task> {
+            val response = client(Request(POST, "/tasks/${taskId.value}:cancel"))
+            return when {
+                response.status.successful -> Success(taskLens(response))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
+        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?): A2AResult<TaskPage> {
+            var req = Request(GET, "/tasks")
+            contextId?.let { req = req.query("contextId", it.value) }
+            status?.let { req = req.query("status", it.name) }
+            pageSize?.let { req = req.query("pageSize", it.toString()) }
+            pageToken?.let { req = req.query("pageToken", it) }
+
+            val response = client(req)
+            return when {
+                response.status.successful -> Success(taskPageLens(response))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+    }
+
+    private inner class RestPushNotificationConfigs : A2AClient.PushNotificationConfigs {
+        override fun set(taskId: TaskId, config: PushNotificationConfig): A2AResult<TaskPushNotificationConfig> {
+            val response = client(
+                Request(POST, "/tasks/${taskId.value}/pushNotificationConfigs")
+                    .with(pushConfigInputLens of config)
+            )
+            return when {
+                response.status.successful -> Success(pushConfigLens(response))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
+        override fun get(id: PushNotificationConfigId): A2AResult<TaskPushNotificationConfig> {
+            val response = client(Request(GET, "/tasks/_/pushNotificationConfigs/${id.value}"))
+            return when {
+                response.status.successful -> Success(pushConfigLens(response))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
+        override fun list(taskId: TaskId): A2AResult<List<TaskPushNotificationConfig>> {
+            val response = client(Request(GET, "/tasks/${taskId.value}/pushNotificationConfigs"))
+            return when {
+                response.status.successful -> Success(pushConfigListLens(response))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
+        override fun delete(id: PushNotificationConfigId): A2AResult<PushNotificationConfigId> {
+            val response = client(Request(DELETE, "/tasks/_/pushNotificationConfigs/${id.value}"))
+            return when {
+                response.status.successful -> Success(id)
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+    }
+
+    override fun close() {}
+}

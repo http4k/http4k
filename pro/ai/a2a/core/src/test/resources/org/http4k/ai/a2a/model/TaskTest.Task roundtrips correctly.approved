@@ -1,0 +1,8 @@
+{
+  "id": "task-123",
+  "contextId": "context-456",
+  "status": {
+    "state": "submitted"
+  },
+  "kind": "task"
+}

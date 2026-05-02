@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-ai-a2a-client"))
     api(project(":http4k-ai-mcp-testing"))
     api(project(":http4k-api-openapi"))
     api(project(":http4k-format-moshi"))
