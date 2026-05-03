@@ -1,0 +1,6 @@
+{
+  "schemes": [
+    "bearer",
+    "oauth2"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "method": "SendMessage",
+  "params": {
+    "message": {
+      "messageId": "msg-1",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "Hello"
+        }
+      ]
+    }
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

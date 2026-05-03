@@ -1,0 +1,9 @@
+{
+  "id": "config-1",
+  "taskId": "task-1",
+  "url": "https://example.com/webhook",
+  "token": "secret-token",
+  "authentication": {
+    "scheme": "bearer"
+  }
+}

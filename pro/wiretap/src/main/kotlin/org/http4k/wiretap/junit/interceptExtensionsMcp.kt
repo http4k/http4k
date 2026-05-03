@@ -19,8 +19,8 @@ import org.http4k.filter.CompletionDetailSpanModifiers
 import org.http4k.filter.GetPromptDetailSpanModifiers
 import org.http4k.filter.McpFilters
 import org.http4k.filter.OpenTelemetryTracing
+import org.http4k.filter.PolyFilters
 import org.http4k.filter.ReadResourceDetailSpanModifiers
-import org.http4k.filter.ServerFilters
 import org.http4k.filter.defaultMcpOtelSpanModifiers
 import org.http4k.routing.mcp
 import org.http4k.wiretap.Context
@@ -41,7 +41,7 @@ fun Intercept.Companion.mcpCapabilities(
     baseUrl: Uri = Uri.of(""),
     vararg extensions: McpExtension,
     capabilityFn: Context.() -> Iterable<ServerCapability>
-) = Intercept.http(
+) = Intercept.poly(
     renderMode,
     redirectFilter,
     clock,
@@ -49,7 +49,7 @@ fun Intercept.Companion.mcpCapabilities(
     serverName,
     baseUrl,
     appFn = {
-        ServerFilters.OpenTelemetryTracing(otel())
+        PolyFilters.OpenTelemetryTracing(otel())
             .then(
                 mcp(
                     ServerMetaData(serverName, "0.0.0").withExtensions(*extensions),
@@ -57,7 +57,7 @@ fun Intercept.Companion.mcpCapabilities(
                     capabilities = capabilityFn().toList().toTypedArray(),
                     mcpFilter = McpFilters.OpenTelemetryTracing(otel(), allModifiers)
                 )
-            ).http!!
+            )
     })
 
 private val allModifiers =

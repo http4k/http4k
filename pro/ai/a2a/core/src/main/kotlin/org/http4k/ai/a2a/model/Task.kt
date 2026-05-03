@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.a2a.model
+
+import se.ansman.kotshi.JsonSerializable
+
+@JsonSerializable
+data class Task(
+    val id: TaskId,
+    val status: TaskStatus,
+    val contextId: ContextId? = null,
+    val artifacts: List<Artifact>? = null,
+    val history: List<Message>? = null,
+    val metadata: Map<String, Any>? = null
+) : StreamItem, MessageResponse

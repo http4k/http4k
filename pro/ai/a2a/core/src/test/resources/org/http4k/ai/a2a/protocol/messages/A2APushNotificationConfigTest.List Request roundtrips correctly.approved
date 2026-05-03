@@ -1,0 +1,8 @@
+{
+  "method": "ListTaskPushNotificationConfigs",
+  "params": {
+    "taskId": "task-123"
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

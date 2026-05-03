@@ -1,0 +1,10 @@
+{
+  "result": {
+    "id": "config-456",
+    "taskId": "task-123",
+    "url": "https://example.com/webhook",
+    "token": "secret-token"
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

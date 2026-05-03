@@ -1,0 +1,18 @@
+{
+  "id": "task-1",
+  "contextId": "context-1",
+  "status": {
+    "state": "TASK_STATE_COMPLETED"
+  },
+  "history": [
+    {
+      "messageId": "msg-1",
+      "role": "user",
+      "parts": [
+        {
+          "text": "Hello, agent!"
+        }
+      ]
+    }
+  ]
+}

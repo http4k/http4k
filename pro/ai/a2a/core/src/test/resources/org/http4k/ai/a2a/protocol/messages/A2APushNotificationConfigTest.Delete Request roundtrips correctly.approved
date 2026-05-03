@@ -1,0 +1,9 @@
+{
+  "method": "DeleteTaskPushNotificationConfig",
+  "params": {
+    "taskId": "task-123",
+    "id": "config-456"
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

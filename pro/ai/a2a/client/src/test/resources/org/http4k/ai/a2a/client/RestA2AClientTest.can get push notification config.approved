@@ -1,0 +1,7 @@
+{
+  "id": "<config-id>",
+  "taskId": "task-1",
+  "pushNotificationConfig": {
+    "url": "https://example.com/webhook"
+  }
+}

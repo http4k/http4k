@@ -1,0 +1,16 @@
+{
+  "method": "SendStreamingMessage",
+  "params": {
+    "message": {
+      "messageId": "msg-2",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "text": "Hello streaming"
+        }
+      ]
+    }
+  },
+  "id": "2",
+  "jsonrpc": "2.0"
+}

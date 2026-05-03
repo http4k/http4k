@@ -1,0 +1,23 @@
+{
+  "name": "Test Agent",
+  "version": "1.0.0",
+  "description": "A test agent",
+  "capabilities": {
+    "streaming": true
+  },
+  "skills": [
+    {
+      "id": "skill-1",
+      "name": "Test Skill",
+      "description": "Does something",
+      "tags": [
+      ]
+    }
+  ],
+  "defaultInputModes": [
+  ],
+  "defaultOutputModes": [
+  ],
+  "supportedInterfaces": [
+  ]
+}

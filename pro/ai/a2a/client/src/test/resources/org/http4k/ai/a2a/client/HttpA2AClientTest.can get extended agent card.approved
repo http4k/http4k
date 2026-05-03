@@ -1,0 +1,16 @@
+{
+  "name": "Test Agent",
+  "url": "http://localhost:8080",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": true,
+    "extendedAgentCard": true
+  },
+  "skills": [
+    {
+      "id": "secret",
+      "name": "Secret Skill",
+      "description": "Only for authenticated users"
+    }
+  ]
+}

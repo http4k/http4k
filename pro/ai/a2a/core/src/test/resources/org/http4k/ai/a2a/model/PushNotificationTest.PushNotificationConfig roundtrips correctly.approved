@@ -1,0 +1,7 @@
+{
+  "url": "https://example.com/webhook",
+  "token": "secret-token",
+  "authentication": {
+    "scheme": "bearer"
+  }
+}

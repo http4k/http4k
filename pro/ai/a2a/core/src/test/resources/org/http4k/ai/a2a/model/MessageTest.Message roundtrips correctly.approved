@@ -1,0 +1,9 @@
+{
+  "messageId": "msg-123",
+  "role": "ROLE_USER",
+  "parts": [
+    {
+      "text": "Hello"
+    }
+  ]
+}

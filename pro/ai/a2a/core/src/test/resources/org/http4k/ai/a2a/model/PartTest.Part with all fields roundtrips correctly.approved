@@ -1,0 +1,13 @@
+{
+  "text": "Hello",
+  "raw": "ZmlsZSBjb250ZW50",
+  "url": "https://example.com/file.txt",
+  "data": {
+    "key": "value"
+  },
+  "metadata": {
+    "source": "test"
+  },
+  "filename": "test.txt",
+  "mediaType": "text/plain"
+}
