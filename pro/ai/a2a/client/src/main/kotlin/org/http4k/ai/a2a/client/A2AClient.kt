@@ -19,6 +19,7 @@ import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.core.Uri
+import java.time.Instant
 
 interface A2AClient : AutoCloseable {
     fun agentCard(): A2AResult<AgentCard>
@@ -30,7 +31,7 @@ interface A2AClient : AutoCloseable {
 
     interface Tasks {
         fun get(taskId: TaskId, historyLength: Int? = null): A2AResult<Task>
-        fun cancel(taskId: TaskId): A2AResult<Task>
+        fun cancel(taskId: TaskId, metadata: Map<String, Any>? = null): A2AResult<Task>
         fun subscribe(taskId: TaskId): A2AResult<MessageResponse>
         fun list(
             contextId: ContextId? = null,
@@ -38,6 +39,7 @@ interface A2AClient : AutoCloseable {
             pageSize: Int? = null,
             pageToken: PageToken? = null,
             historyLength: Int? = null,
+            statusTimestampAfter: Instant? = null,
             includeArtifacts: Boolean? = null
         ): A2AResult<TaskPage>
     }

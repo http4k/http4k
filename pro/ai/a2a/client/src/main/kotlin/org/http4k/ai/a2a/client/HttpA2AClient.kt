@@ -57,6 +57,7 @@ import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.Header
 import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
 
 private val jsonRpcRequestLens = Body.auto<A2ANodeType>().toLens()
@@ -147,12 +148,12 @@ class HttpA2AClient(
             }
         }
 
-        override fun cancel(taskId: TaskId) =
-            sendRpc<A2ATask.Cancel.Response.Result>(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(taskId, tenant = tenant), nextId()))
+        override fun cancel(taskId: TaskId, metadata: Map<String, Any>?) =
+            sendRpc<A2ATask.Cancel.Response.Result>(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(taskId, metadata, tenant = tenant), nextId()))
                 .map { it.task }
 
-        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, includeArtifacts: Boolean?) =
-            sendRpc<A2ATask.ListTasks.Response.Result>(A2ATask.ListTasks.Request(A2ATask.ListTasks.Request.Params(contextId, status, pageSize, pageToken, historyLength, includeArtifacts = includeArtifacts, tenant = tenant), nextId()))
+        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, statusTimestampAfter: Instant?, includeArtifacts: Boolean?) =
+            sendRpc<A2ATask.ListTasks.Response.Result>(A2ATask.ListTasks.Request(A2ATask.ListTasks.Request.Params(contextId, status, pageSize, pageToken, historyLength, statusTimestampAfter, includeArtifacts, tenant = tenant), nextId()))
                 .map { TaskPage(it.tasks, it.nextPageToken, it.totalSize) }
     }
 

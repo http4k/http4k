@@ -49,10 +49,12 @@ import org.http4k.format.MoshiObject
 import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.enum
+import org.http4k.lens.instant
 import org.http4k.lens.int
 import org.http4k.lens.value
 import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
+import java.time.Instant
 
 private val agentCardLens = Body.auto<AgentCard>().toLens()
 private val sendMessageLens = Body.auto<A2AMessage.Send.Request.Params>().toLens()
@@ -67,6 +69,7 @@ private val pageSizeQuery = Query.int().optional("pageSize")
 private val pageTokenQuery = Query.value(PageToken).optional("pageToken")
 private val historyLengthQuery = Query.int().optional("historyLength")
 private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")
+private val statusTimestampAfterQuery = Query.instant().optional("statusTimestampAfter")
 
 class RestA2AClient(
     baseUri: Uri,
@@ -180,15 +183,18 @@ class RestA2AClient(
             }
         }
 
-        override fun cancel(taskId: TaskId): A2AResult<Task> {
-            val response = client(Request(POST, "$prefix/tasks/${taskId.value}:cancel"))
+        override fun cancel(taskId: TaskId, metadata: Map<String, Any>?): A2AResult<Task> {
+            val request = Request(POST, "$prefix/tasks/${taskId.value}:cancel")
+            val response = client(
+                if (metadata != null) request.json(metadata) else request
+            )
             return when {
                 response.status.successful -> Success(taskLens(response))
                 else -> Failure(A2AError.Http(response))
             }
         }
 
-        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, includeArtifacts: Boolean?): A2AResult<TaskPage> {
+        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, statusTimestampAfter: Instant?, includeArtifacts: Boolean?): A2AResult<TaskPage> {
             val response = client(
                 Request(GET, "$prefix/tasks")
                     .with(contextIdQuery of contextId)
@@ -196,6 +202,7 @@ class RestA2AClient(
                     .with(pageSizeQuery of pageSize)
                     .with(pageTokenQuery of pageToken)
                     .with(historyLengthQuery of historyLength)
+                    .with(statusTimestampAfterQuery of statusTimestampAfter)
                     .with(includeArtifactsQuery of includeArtifacts)
             )
             return when {

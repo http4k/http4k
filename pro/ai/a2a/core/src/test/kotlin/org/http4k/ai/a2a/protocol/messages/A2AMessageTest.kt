@@ -6,23 +6,28 @@ package org.http4k.ai.a2a.protocol.messages
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.Part
-import java.util.UUID
 import org.http4k.ai.a2a.protocol.A2ARpcMethod
 import org.http4k.ai.a2a.util.A2AJson
-import org.http4k.ai.a2a.model.A2ARole
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
+import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(JsonApprovalTest::class)
 class A2AMessageTest {
 
     @Test
-    fun `Send Request serializes correctly`() {
+    fun `Send Request roundtrips correctly`(approver: Approver) {
         val request = A2AMessage.Send.Request(
             params = A2AMessage.Send.Request.Params(
                 message = Message(
-                    messageId = MessageId.of(UUID.randomUUID().toString()),
+                    messageId = MessageId.of("msg-1"),
                     role = A2ARole.ROLE_USER,
                     parts = listOf(Part.Text("Hello"))
                 )
@@ -30,24 +35,33 @@ class A2AMessageTest {
             id = "1"
         )
         val json = A2AJson.asFormatString(request)
-        assertThat(json.contains("\"role\":\"ROLE_USER\""), equalTo(true))
-        assertThat(json.contains("\"text\":\"Hello\""), equalTo(true))
+        approver.assertApproved(json, APPLICATION_JSON)
+        assertThat(A2AJson.asA<A2AMessage.Send.Request>(json), equalTo(request))
     }
 
     @Test
-    fun `Send Request deserializes correctly`() {
-        val json = """{"params":{"message":{"messageId":"msg-1","role":"ROLE_USER","parts":[{"type":"text","text":"Hello"}],"kind":"message"}},"id":"1","jsonrpc":"2.0","method":"SendMessage"}"""
-        val request = A2AJson.asA<A2AMessage.Send.Request>(json)
-        assertThat(request.params.message.role, equalTo(A2ARole.ROLE_USER))
-        assertThat((request.params.message.parts.first() as Part.Text).text, equalTo("Hello"))
+    fun `Stream Request roundtrips correctly`(approver: Approver) {
+        val request = A2AMessage.Stream.Request(
+            params = A2AMessage.Stream.Request.Params(
+                message = Message(
+                    messageId = MessageId.of("msg-2"),
+                    role = A2ARole.ROLE_USER,
+                    parts = listOf(Part.Text("Hello streaming"))
+                )
+            ),
+            id = "2"
+        )
+        val json = A2AJson.asFormatString(request)
+        approver.assertApproved(json, APPLICATION_JSON)
+        assertThat(A2AJson.asA<A2AMessage.Stream.Request>(json), equalTo(request))
     }
 
     @Test
-    fun `Send method is message_send`() {
+    fun `Send method is SendMessage`() {
         assertThat(
             A2AMessage.Send.Request(
                 params = A2AMessage.Send.Request.Params(
-                    message = Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = A2ARole.ROLE_USER, parts = emptyList())
+                    message = Message(messageId = MessageId.of("msg-1"), role = A2ARole.ROLE_USER, parts = emptyList())
                 ),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("SendMessage"))
@@ -55,11 +69,11 @@ class A2AMessageTest {
     }
 
     @Test
-    fun `Stream method is message_stream`() {
+    fun `Stream method is SendStreamingMessage`() {
         assertThat(
             A2AMessage.Stream.Request(
                 params = A2AMessage.Stream.Request.Params(
-                    message = Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = A2ARole.ROLE_USER, parts = emptyList())
+                    message = Message(messageId = MessageId.of("msg-1"), role = A2ARole.ROLE_USER, parts = emptyList())
                 ),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("SendStreamingMessage"))
