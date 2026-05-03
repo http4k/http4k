@@ -16,8 +16,8 @@ import org.http4k.core.NoOp
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.testing.toHttpHandler
 import org.http4k.filter.ResponseFilters
+import org.http4k.testing.toHttpHandler
 import org.http4k.wiretap.Context
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
@@ -53,7 +53,7 @@ enum class RenderMode { Never, OnFailure, Always }
  * Wiretap Intercept is a JUnit Extension that records all traffic and telemetry inside an application
  * in order that it can be visualised post-test.
  */
-class Intercept @JvmOverloads constructor(
+class Intercept(
     private val renderMode: RenderMode = OnFailure,
     private val redirectFilter: Filter = Filter.NoOp,
     private val clock: Clock = Clock.systemUTC(),
