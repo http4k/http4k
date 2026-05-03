@@ -20,10 +20,12 @@ import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.A2AProtocolNegotiation
+import org.http4k.ai.a2a.server.TaskSubscriptions
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.core.ContentType
+import org.http4k.core.PolyHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
@@ -43,9 +45,10 @@ fun a2aJsonRpc(
     agentCard: AgentCard,
     messageHandler: MessageHandler,
     tasks: TaskStorage = TaskStorage.InMemory(),
+    subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     rpcPath: String = "/",
-) = a2aJsonRpc(A2A(agentCard, tasks, pushNotifications, messageHandler), rpcPath)
+) = a2aJsonRpc(A2A(agentCard, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.
@@ -55,26 +58,30 @@ fun a2aJsonRpc(
     messageHandler: MessageHandler,
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
+    subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     rpcPath: String = "/",
-) = a2aJsonRpc(A2A(cards, tasks, pushNotifications, messageHandler), rpcPath)
+) = a2aJsonRpc(A2A(cards, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.
  */
-fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/") = CatchAll()
-    .then(CatchLensFailure())
-    .then(A2AProtocolNegotiation(a2a.cards.standard().capabilities))
-    .then(
-        routes(
-            "/.well-known/agent-card.json" bind GET to { Response(OK).json(a2a.cards.standard()) },
-            rpcPath bind POST to { httpReq ->
-                val message = runCatching { httpReq.json<A2AJsonRpcRequest>() }
-                    .getOrElse { return@to Response(BAD_REQUEST) }
+fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/"): PolyHandler {
+    val httpHandler = CatchAll()
+        .then(CatchLensFailure())
+        .then(A2AProtocolNegotiation(a2a.cards.standard().capabilities))
+        .then(
+            routes(
+                "/.well-known/agent-card.json" bind GET to { Response(OK).json(a2a.cards.standard()) },
+                rpcPath bind POST to { httpReq ->
+                    val message = runCatching { httpReq.json<A2AJsonRpcRequest>() }
+                        .getOrElse { return@to Response(BAD_REQUEST) }
 
-                a2a.dispatchJsonRpc(message, httpReq)
-            }
+                    a2a.dispatchJsonRpc(message, httpReq)
+                }
+            )
         )
-    )
+    return PolyHandler(http = httpHandler)
+}
 
 private fun A2A.dispatchJsonRpc(
     message: A2AJsonRpcRequest,

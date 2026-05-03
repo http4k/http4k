@@ -21,6 +21,7 @@ import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.A2AProtocolNegotiation
+import org.http4k.ai.a2a.server.TaskSubscriptions
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson.json
@@ -28,6 +29,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.CREATED
@@ -42,10 +44,12 @@ import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.contentType
 import org.http4k.lens.enum
+import org.http4k.lens.instant
 import org.http4k.lens.int
 import org.http4k.lens.value
 import org.http4k.protocol.A2A
 import org.http4k.protocol.toSseStream
+import org.http4k.sse.SseResponse
 
 
 /**
@@ -56,16 +60,18 @@ fun a2aRest(
     messageHandler: MessageHandler,
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
+    subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     basePath: String = ""
-) = a2aRest(A2A(agentCard, tasks, pushNotifications, messageHandler), basePath)
+) = a2aRest(A2A(agentCard, tasks, pushNotifications, subscriptions, messageHandler), basePath)
 
 fun a2aRest(
     cards: AgentCardProvider,
     messageHandler: MessageHandler,
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
+    subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     basePath: String = ""
-) = a2aRest(A2A(cards, tasks, pushNotifications, messageHandler), basePath)
+) = a2aRest(A2A(cards, tasks, pushNotifications, subscriptions, messageHandler), basePath)
 
 /**
  * Create an A2A server using the HTTP/REST protocol binding.
@@ -73,25 +79,50 @@ fun a2aRest(
 fun a2aRest(
     protocol: A2A,
     basePath: String = ""
-) = CatchAll()
+): PolyHandler {
+    val capabilities = protocol.cards.extended().capabilities
+    val httpHandler = CatchAll()
         .then(CatchLensFailure())
-        .then(A2AProtocolNegotiation(protocol.cards.standard().capabilities))
+        .then(A2AProtocolNegotiation(capabilities))
         .then(
             routes(
                 basePath bind routes(
-                    a2aEndpoints(protocol),
-                    "{tenant}" bind a2aEndpoints(protocol)
+                    a2aHttpEndpoints(protocol),
+                    "{tenant}" bind a2aHttpEndpoints(protocol)
                 )
             )
         )
 
-private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
-    val capabilities = protocol.cards.standard().capabilities
+    val sseHandler = basePath bindSse sse(
+        a2aSseEndpoints(protocol),
+        "{tenant}" bindSse a2aSseEndpoints(protocol)
+    )
+
+    return poly(httpHandler, sseHandler)
+}
+
+private fun a2aSseEndpoints(protocol: A2A) = "tasks/{taskId}:subscribe" bindSse { req ->
+    when (protocol.cards.extended().capabilities.streaming) {
+        true -> {
+            val taskId = TaskId.of(req.path("taskId")!!)
+            val tenant = req.path("tenant")?.let { Tenant.of(it) }
+            SseResponse { sse ->
+                if (protocol.subscribe(taskId, sse, tenant) == null) {
+                    sse.close()
+                }
+            }
+        }
+
+        else -> SseResponse { it.close() }
+    }
+}
+
+private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
     return routes(
-        "/.well-known/agent-card.json" bind GET to { Response(OK).json(protocol.cards.standard()) },
+        "/.well-known/agent-card.json" bind GET to { Response(OK).json(protocol.cards.extended()) },
 
         "extendedAgentCard" bind GET to {
-            when (capabilities.extendedAgentCard) {
+            when (protocol.cards.extended().capabilities.extendedAgentCard) {
                 true -> protocol.cards.extended().let { Response(OK).json(it) }
                 else -> Response(BAD_REQUEST)
             }
@@ -107,7 +138,7 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
         },
 
         "message:stream" bind POST to { req ->
-            if (capabilities.streaming != true) Response(BAD_REQUEST)
+            if (protocol.cards.extended().capabilities.streaming != true) Response(BAD_REQUEST)
             else {
                 val params = A2AMessage.Stream.Request.Params(
                     req.json<A2AMessage.Send.Request.Params>().message,
@@ -140,7 +171,7 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
             },
 
             "{taskId}/pushNotificationConfigs" bind POST to { req ->
-                when (capabilities.pushNotifications) {
+                when (protocol.cards.extended().capabilities.pushNotifications) {
                     true -> Response(CREATED).json(
                         protocol.setPushConfig(
                             A2APushNotificationConfig.Set.Request.Params(
@@ -156,7 +187,7 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
             },
 
             "{taskId}/pushNotificationConfigs/{configId}" bind GET to { req ->
-                when (capabilities.pushNotifications) {
+                when (protocol.cards.extended().capabilities.pushNotifications) {
                     true -> protocol.getPushConfig(
                         A2APushNotificationConfig.Get.Request.Params(
                             taskIdPath(req),
@@ -172,7 +203,7 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
             },
 
             "{taskId}/pushNotificationConfigs" bind GET to { req ->
-                when (capabilities.pushNotifications) {
+                when (protocol.cards.extended().capabilities.pushNotifications) {
                     true -> Response(OK).json(
                         protocol.listPushConfigs(
                             A2APushNotificationConfig.List.Request.Params(
@@ -189,7 +220,7 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
             },
 
             "{taskId}/pushNotificationConfigs/{configId}" bind DELETE to { req ->
-                when (capabilities.pushNotifications) {
+                when (protocol.cards.extended().capabilities.pushNotifications) {
                     true ->
                         if (protocol.deletePushConfig(
                                 A2APushNotificationConfig.Delete.Request.Params(
@@ -212,6 +243,7 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
                         pageSize = pageSizeQuery(req),
                         pageToken = pageTokenQuery(req),
                         historyLength = historyLengthQuery(req),
+                        statusTimestampAfter = statusTimestampAfterQuery(req),
                         includeArtifacts = includeArtifactsQuery(req),
                         tenant = req.tenant()
                     )
@@ -234,4 +266,5 @@ private val statusQuery = Query.enum<TaskState>().optional("status")
 private val pageSizeQuery = Query.int().optional("pageSize")
 private val pageTokenQuery = Query.value(PageToken).optional("pageToken")
 private val historyLengthQuery = Query.int().optional("historyLength")
+private val statusTimestampAfterQuery = Query.instant().optional("statusTimestampAfter")
 private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")

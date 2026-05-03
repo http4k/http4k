@@ -33,14 +33,20 @@ import org.http4k.connect.model.MimeType
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.model.Role
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
+import org.http4k.ai.a2a.server.TaskSubscriptions
+import org.http4k.ai.a2a.server.storage.withSubscriptions
 import org.http4k.protocol.A2A
+import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CopyOnWriteArrayList
 
 class A2ATest {
 
@@ -83,7 +89,7 @@ class A2ATest {
 
     @Test
     fun `send returns task response`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val result = protocol.send(A2AMessage.Send.Request.Params(aMessage()), Request(POST, "/"))
 
         assertThat(result, isA<Task>())
@@ -92,7 +98,7 @@ class A2ATest {
 
     @Test
     fun `send returns message response`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, messageHandler())
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = messageHandler())
         val result = protocol.send(A2AMessage.Send.Request.Params(aMessage()), Request(POST, "/"))
 
         assertThat(result, isA<Message>())
@@ -100,7 +106,7 @@ class A2ATest {
 
     @Test
     fun `stream returns streaming task responses`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, streamHandler(TASK_STATE_WORKING, TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = streamHandler(TASK_STATE_WORKING, TASK_STATE_COMPLETED))
         val responses = protocol.stream(A2AMessage.Stream.Request.Params(aMessage()), Request(POST, "/")).toList()
         assertThat(responses.size, equalTo(2))
         assertThat((responses[0] as Task).status.state, equalTo(TASK_STATE_WORKING))
@@ -109,7 +115,7 @@ class A2ATest {
 
     @Test
     fun `getTask returns stored task`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val task = aTask()
         tasks.store(task)
 
@@ -118,13 +124,13 @@ class A2ATest {
 
     @Test
     fun `getTask returns null for unknown task`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         assertThat(protocol.getTask(A2ATask.Get.Request.Params(TaskId.of("unknown"))), absent())
     }
 
     @Test
     fun `cancelTask sets state to canceled`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         tasks.store(aTask())
 
         val result = protocol.cancelTask(A2ATask.Cancel.Request.Params(TaskId.of("task-1")))
@@ -133,7 +139,7 @@ class A2ATest {
 
     @Test
     fun `listTasks returns stored tasks`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         tasks.store(aTask("t1"))
         tasks.store(aTask("t2"))
 
@@ -155,7 +161,7 @@ class A2ATest {
             Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.Assistant, parts = listOf(Part.Text("ok")))
         }
 
-        val protocol = A2A(testCard, tasks, pushNotifications, handler)
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = handler)
         protocol.send(A2AMessage.Send.Request.Params(aMessage(), configuration = config, metadata = metadata), Request(POST, "/"))
 
         assertThat(receivedConfig, equalTo(config))
@@ -164,7 +170,7 @@ class A2ATest {
 
     @Test
     fun `getTask with historyLength trims history`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val messages = (1..5).map { Message(messageId = MessageId.of("msg-$it"), role = Role.User, parts = listOf(Part.Text("msg $it"))) }
         val task = Task(id = TaskId.of("task-1"), contextId = ContextId.of("ctx-1"), status = TaskStatus(state = TASK_STATE_COMPLETED), history = messages)
         tasks.store(task)
@@ -176,7 +182,7 @@ class A2ATest {
 
     @Test
     fun `listTasks with historyLength trims history`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val messages = (1..3).map { Message(messageId = MessageId.of("msg-$it"), role = Role.User, parts = listOf(Part.Text("msg $it"))) }
         tasks.store(Task(id = TaskId.of("t1"), contextId = ContextId.of("ctx-1"), status = TaskStatus(state = TASK_STATE_COMPLETED), history = messages))
 
@@ -186,7 +192,7 @@ class A2ATest {
 
     @Test
     fun `listTasks with includeArtifacts false strips artifacts`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         tasks.store(Task(
             id = TaskId.of("t1"), contextId = ContextId.of("ctx-1"),
             status = TaskStatus(state = TASK_STATE_COMPLETED),
@@ -199,7 +205,7 @@ class A2ATest {
 
     @Test
     fun `push config set and get`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
 
         val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(TaskId.of("task-1"), PushNotificationConfig(url = Uri.of("https://example.com/webhook"))))
         assertThat(config.taskId, equalTo(TaskId.of("task-1")))
@@ -210,7 +216,7 @@ class A2ATest {
 
     @Test
     fun `push config list`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val taskId = TaskId.of("task-1")
 
         protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))))
@@ -221,11 +227,61 @@ class A2ATest {
 
     @Test
     fun `push config delete`() {
-        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val taskId = TaskId.of("task-1")
 
         val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))))
         assertThat(protocol.deletePushConfig(A2APushNotificationConfig.Delete.Request.Params(taskId, config.id)), present(equalTo(config.id)))
         assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).configs.size, equalTo(0))
+    }
+
+    @Test
+    fun `subscribe sends current task and returns it`() {
+        val subscriptions = TaskSubscriptions.InMemory()
+        val subscribingTasks = tasks.withSubscriptions(subscriptions)
+        val protocol = A2A(testCard, subscribingTasks, pushNotifications, subscriptions, handler = taskHandler(TASK_STATE_COMPLETED))
+        val task = aTask()
+        subscribingTasks.store(task)
+
+        val sse = RecordingSse()
+        val result = protocol.subscribe(TaskId.of("task-1"), sse)
+
+        assertThat(result, present())
+        assertThat(result!!.id, equalTo(TaskId.of("task-1")))
+        assertThat(sse.messages.size, equalTo(1))
+    }
+
+    @Test
+    fun `subscribe returns null for unknown task`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
+        val sse = RecordingSse()
+        assertThat(protocol.subscribe(TaskId.of("unknown"), sse), absent())
+    }
+
+    @Test
+    fun `subscribe receives updates when task stored`() {
+        val subscriptions = TaskSubscriptions.InMemory()
+        val subscribingTasks = tasks.withSubscriptions(subscriptions)
+        val protocol = A2A(testCard, subscribingTasks, pushNotifications, subscriptions, handler = taskHandler(TASK_STATE_COMPLETED))
+        val task = aTask()
+        subscribingTasks.store(task)
+
+        val sse = RecordingSse()
+        protocol.subscribe(TaskId.of("task-1"), sse)
+
+        val updated = task.copy(status = TaskStatus(state = TASK_STATE_WORKING))
+        subscribingTasks.store(updated)
+
+        assertThat(sse.messages.size, equalTo(2))
+    }
+
+    private class RecordingSse : Sse {
+        val messages = CopyOnWriteArrayList<SseMessage>()
+        private val closeHandlers = mutableListOf<() -> Unit>()
+
+        override val connectRequest = Request(GET, "/")
+        override fun send(message: SseMessage) = apply { messages.add(message) }
+        override fun close() { closeHandlers.forEach { it() } }
+        override fun onClose(fn: () -> Unit) = apply { closeHandlers.add(fn) }
     }
 }

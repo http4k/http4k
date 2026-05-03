@@ -9,7 +9,7 @@ import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.routing.a2aJsonRpc
-import org.http4k.server.ServerConfig
+import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 
 /**
@@ -17,7 +17,8 @@ import org.http4k.server.asServer
  * Tasks and
  */
 fun MessageHandler.asServer(
-    cfg: ServerConfig, agentCard: AgentCard,
+    cfg: PolyServerConfig,
+    agentCard: AgentCard,
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     rpcPath: String = "/",

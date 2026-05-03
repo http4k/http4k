@@ -33,7 +33,7 @@ import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.model.Role
 import org.http4k.connect.model.MimeType
-import org.http4k.core.HttpHandler
+import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 
@@ -75,9 +75,9 @@ abstract class A2AClientContract {
         handler: MessageHandler,
         tasks: TaskStorage,
         pushNotifications: PushNotificationConfigStorage
-    ): HttpHandler
+    ): PolyHandler
 
-    abstract fun clientFor(server: HttpHandler): A2AClient
+    abstract fun clientFor(server: PolyHandler): A2AClient
 
     private fun withServer(test: A2AClient.() -> Unit) {
         val server = serverFor(AgentCardProvider(agentCard), messageHandler, tasks, pushNotificationConfigs)
@@ -157,7 +157,7 @@ abstract class A2AClientContract {
             )
         }
 
-        val server = serverFor(AgentCardProvider(agentCard.copy(capabilities = AgentCapabilities(streaming = true))), streamingHandler, tasks, pushNotificationConfigs)
+        val server = serverFor(AgentCardProvider(agentCard.copy(capabilities = agentCard.capabilities.copy(streaming = true))), streamingHandler, tasks, pushNotificationConfigs)
         val client = clientFor(server)
 
         try {

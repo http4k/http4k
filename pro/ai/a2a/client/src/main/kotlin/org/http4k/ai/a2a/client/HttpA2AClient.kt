@@ -128,6 +128,25 @@ class HttpA2AClient(
             sendRpc<A2ATask.Get.Response.Result>(A2ATask.Get.Request(A2ATask.Get.Request.Params(taskId, historyLength, tenant = tenant), nextId()))
                 .map { it.task }
 
+        override fun subscribe(taskId: TaskId): A2AResult<MessageResponse> {
+            val request = A2ATask.Resubscribe.Request(A2ATask.Resubscribe.Request.Params(taskId, tenant = tenant), nextId())
+            val response = client(
+                Request(POST, baseUri.path)
+                    .with(jsonRpcRequestLens of A2AJson.asJsonObject(request))
+                    .with(Header.ACCEPT of Accept(listOf(QualifiedContent(ContentType.TEXT_EVENT_STREAM))))
+            )
+            return when {
+                response.status.successful ->
+                    Success(
+                        ResponseStream(
+                            response.body.stream.chunkedSseSequence()
+                                .filterIsInstance<SseMessage.Data>()
+                                .map { A2AJson.asA<StreamItem>(it.data) }
+                        ))
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
         override fun cancel(taskId: TaskId) =
             sendRpc<A2ATask.Cancel.Response.Result>(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(taskId, tenant = tenant), nextId()))
                 .map { it.task }

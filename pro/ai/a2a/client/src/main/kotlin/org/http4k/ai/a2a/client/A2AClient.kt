@@ -30,6 +30,7 @@ interface A2AClient : AutoCloseable {
     interface Tasks {
         fun get(taskId: TaskId, historyLength: Int? = null): A2AResult<Task>
         fun cancel(taskId: TaskId): A2AResult<Task>
+        fun subscribe(taskId: TaskId): A2AResult<MessageResponse>
         fun list(
             contextId: ContextId? = null,
             status: TaskState? = null,

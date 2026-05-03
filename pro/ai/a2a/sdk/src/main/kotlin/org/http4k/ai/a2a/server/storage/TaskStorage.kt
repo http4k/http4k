@@ -12,6 +12,7 @@ import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.Tenant
+import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
 private fun Task.trimHistory(historyLength: Int?): Task {
@@ -37,6 +38,7 @@ interface TaskStorage {
         pageSize: Int? = null,
         pageToken: PageToken? = null,
         historyLength: Int? = null,
+        statusTimestampAfter: Instant? = null,
         includeArtifacts: Boolean? = null,
         tenant: Tenant? = null
     ): TaskPage
@@ -65,12 +67,14 @@ interface TaskStorage {
                 pageSize: Int?,
                 pageToken: PageToken?,
                 historyLength: Int?,
+                statusTimestampAfter: Instant?,
                 includeArtifacts: Boolean?,
                 tenant: Tenant?
             ): TaskPage {
                 val filtered = tasksFor(tenant).values
                     .filter { contextId == null || it.contextId == contextId }
                     .filter { status == null || it.status.state == status }
+                    .filter { statusTimestampAfter == null || it.status.timestamp?.let { ts -> !ts.isBefore(statusTimestampAfter) } == true }
                     .sortedBy { it.id.value }
                     .map { it.trimHistory(historyLength) }
                     .map { if (includeArtifacts == false) it.copy(artifacts = null) else it }

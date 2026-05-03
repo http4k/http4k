@@ -161,6 +161,20 @@ class RestA2AClient(
             }
         }
 
+        override fun subscribe(taskId: TaskId): A2AResult<MessageResponse> {
+            val response = client(Request(GET, "$prefix/tasks/${taskId.value}:subscribe"))
+            return when {
+                response.status.successful -> Success(
+                    ResponseStream(
+                        response.body.stream.chunkedSseSequence()
+                            .filterIsInstance<SseMessage.Data>()
+                            .map { A2AJson.asA<StreamItem>(it.data) }
+                    )
+                )
+                else -> Failure(A2AError.Http(response))
+            }
+        }
+
         override fun cancel(taskId: TaskId): A2AResult<Task> {
             val response = client(Request(POST, "$prefix/tasks/${taskId.value}:cancel"))
             return when {
