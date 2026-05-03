@@ -224,7 +224,6 @@ class OpenTelemetryTracingTest {
         app(Request(GET, "http://localhost:8080/foo/bar?a=b"))
 
         with(createdContext!!) {
-            println(attributes.asMap())
             assertThat(name, equalTo("GET http://localhost:8080/foo/bar?a=b"))
             assertThat(attributes.get(stringKey(method)), equalTo("GET"))
             assertThat(attributes.get(stringKey(clientUrl)), equalTo("http://localhost:8080/foo/bar?a=b"))
