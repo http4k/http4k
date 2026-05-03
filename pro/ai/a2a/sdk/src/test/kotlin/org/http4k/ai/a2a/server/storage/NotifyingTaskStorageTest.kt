@@ -12,7 +12,6 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
-import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.server.notification.PushNotificationSender
 import org.http4k.core.Uri
@@ -39,7 +38,7 @@ class NotifyingTaskStorageTest {
     ) = TaskPushNotificationConfig(
         id = PushNotificationConfigId.of(id),
         taskId = TaskId.of(taskId),
-        pushNotificationConfig = PushNotificationConfig(url = Uri.of(url))
+        url = Uri.of(url)
     )
 
     @Test

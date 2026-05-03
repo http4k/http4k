@@ -13,7 +13,8 @@ import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.PageToken
-import org.http4k.ai.a2a.model.PushNotificationConfig
+import org.http4k.ai.a2a.model.AuthenticationInfo
+import org.http4k.ai.a2a.model.CreateTaskPushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.StreamItem
@@ -26,7 +27,7 @@ import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.ProtocolVersion
 import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.ai.a2a.util.A2AJson.json
@@ -58,7 +59,7 @@ private val taskLens = Body.auto<Task>().toLens()
 private val taskPageLens = Body.auto<TaskPage>().toLens()
 private val pushConfigLens = Body.auto<TaskPushNotificationConfig>().toLens()
 private val pushConfigListLens = Body.auto<List<TaskPushNotificationConfig>>().toLens()
-private val pushConfigInputLens = Body.auto<PushNotificationConfig>().toLens()
+private val createPushConfigLens = Body.auto<CreateTaskPushNotificationConfig>().toLens()
 private val contextIdQuery = Query.value(ContextId).optional("contextId")
 private val statusQuery = Query.enum<TaskState>().optional("status")
 private val pageSizeQuery = Query.int().optional("pageSize")
@@ -96,7 +97,7 @@ class RestA2AClient(
         }
     }
 
-    override fun message(message: Message, configuration: TaskConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
+    override fun message(message: Message, configuration: SendMessageConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
         val response = client(
             Request(POST, "$prefix/message:send").with(
                 sendMessageLens of A2AMessage.Send.Request.Params(
@@ -122,7 +123,7 @@ class RestA2AClient(
         }
     }
 
-    override fun messageStream(message: Message, configuration: TaskConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
+    override fun messageStream(message: Message, configuration: SendMessageConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
         val response = client(
             Request(POST, "$prefix/message:stream").with(
                 sendMessageLens of A2AMessage.Send.Request.Params(
@@ -204,10 +205,11 @@ class RestA2AClient(
     }
 
     private inner class RestPushNotificationConfigs : A2AClient.PushNotificationConfigs {
-        override fun set(taskId: TaskId, config: PushNotificationConfig): A2AResult<TaskPushNotificationConfig> {
+        override fun set(taskId: TaskId, url: Uri, token: String?, authentication: AuthenticationInfo?): A2AResult<TaskPushNotificationConfig> {
+            val create = CreateTaskPushNotificationConfig(taskId, url, token, authentication)
             val response = client(
                 Request(POST, "$prefix/tasks/${taskId.value}/pushNotificationConfigs")
-                    .with(pushConfigInputLens of config)
+                    .with(createPushConfigLens of create)
             )
             return when {
                 response.status.successful -> Success(pushConfigLens(response))

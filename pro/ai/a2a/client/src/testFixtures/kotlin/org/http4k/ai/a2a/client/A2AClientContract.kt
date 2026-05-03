@@ -20,7 +20,6 @@ import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.Part
-import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.SkillId
 import org.http4k.ai.a2a.model.Task
@@ -28,7 +27,7 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState.*
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.Version
-import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.model.A2ARole
@@ -183,7 +182,7 @@ abstract class A2AClientContract {
     @Test
     fun `can set push notification config`() = withServer {
         val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
-        val config = pushNotificationConfigs().set(taskResponse.id, PushNotificationConfig(url = Uri.of("https://example.com/webhook"))).valueOrNull()!!
+        val config = pushNotificationConfigs().set(taskResponse.id, Uri.of("https://example.com/webhook")).valueOrNull()!!
         assertThat(config.taskId, equalTo(taskResponse.id))
     }
 
@@ -191,7 +190,7 @@ abstract class A2AClientContract {
     fun `can get push notification config`() = withServer {
         val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val taskId = taskResponse.id
-        val setResponse = pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook"))).valueOrNull()!!
+        val setResponse = pushNotificationConfigs().set(taskId, Uri.of("https://example.com/webhook")).valueOrNull()!!
         val config = pushNotificationConfigs().get(taskId, setResponse.id).valueOrNull()!!
         assertThat(config.id, equalTo(setResponse.id))
     }
@@ -200,8 +199,8 @@ abstract class A2AClientContract {
     fun `can list push notification configs`() = withServer {
         val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val taskId = taskResponse.id
-        pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://a.com")))
-        pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://b.com")))
+        pushNotificationConfigs().set(taskId, Uri.of("https://a.com"))
+        pushNotificationConfigs().set(taskId, Uri.of("https://b.com"))
         assertThat(pushNotificationConfigs().list(taskId).valueOrNull()!!.size, equalTo(2))
     }
 
@@ -209,16 +208,16 @@ abstract class A2AClientContract {
     fun `can delete push notification config`() = withServer {
         val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val taskId = taskResponse.id
-        val setResponse = pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook"))).valueOrNull()!!
+        val setResponse = pushNotificationConfigs().set(taskId, Uri.of("https://example.com/webhook")).valueOrNull()!!
         pushNotificationConfigs().delete(taskId, setResponse.id).valueOrNull()!!
         assertThat(pushNotificationConfigs().list(taskId).valueOrNull()!!.size, equalTo(0))
     }
 
     @Test
     fun `send passes configuration and metadata through`() {
-        val config = TaskConfiguration(acceptedOutputModes = listOf(MimeType.of("text/plain")))
+        val config = SendMessageConfiguration(acceptedOutputModes = listOf(MimeType.of("text/plain")))
         val metadata = mapOf("key" to "value")
-        var receivedConfig: TaskConfiguration? = null
+        var receivedConfig: SendMessageConfiguration? = null
         var receivedMetadata: Map<String, Any>? = null
 
         withServer(handler = { request ->

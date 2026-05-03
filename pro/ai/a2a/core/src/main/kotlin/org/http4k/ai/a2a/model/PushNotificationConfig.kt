@@ -8,7 +8,8 @@ import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class PushNotificationConfig(
+data class CreateTaskPushNotificationConfig(
+    val taskId: TaskId,
     val url: Uri,
     val token: String? = null,
     val authentication: AuthenticationInfo? = null
@@ -18,6 +19,8 @@ data class PushNotificationConfig(
 data class TaskPushNotificationConfig(
     val id: PushNotificationConfigId,
     val taskId: TaskId,
-    val pushNotificationConfig: PushNotificationConfig,
+    val url: Uri,
+    val token: String? = null,
+    val authentication: AuthenticationInfo? = null,
     val tenant: Tenant? = null
 )

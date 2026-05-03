@@ -102,8 +102,8 @@ object A2ATask {
             data class Result(
                 val tasks: List<Task>,
                 val totalSize: Int,
-                val nextPageToken: PageToken? = null,
-                val pageSize: Int? = null
+                val nextPageToken: PageToken = PageToken.END,
+                val pageSize: Int = 0
             )
         }
     }

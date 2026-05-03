@@ -17,7 +17,7 @@ import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.protocol.ProtocolVersion
 import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.a2a.model.PushNotificationConfig
+import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
@@ -31,7 +31,7 @@ import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.ai.a2a.util.A2AJson.json
@@ -88,11 +88,11 @@ class HttpA2AClient(
     override fun extendedAgentCard(): A2AResult<AgentCard> =
         sendRpc<AgentCard>(A2AAgentCard.GetExtended.Request(params = A2AAgentCard.GetExtended.Request.Params(tenant = tenant), id = nextId()))
 
-    override fun message(message: Message, configuration: TaskConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> =
+    override fun message(message: Message, configuration: SendMessageConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> =
         sendRpc<MoshiNode>(A2AMessage.Send.Request(A2AMessage.Send.Request.Params(message, configuration, metadata, tenant = tenant), nextId()))
             .map { parseSendResponse(it as MoshiObject) }
 
-    override fun messageStream(message: Message, configuration: TaskConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
+    override fun messageStream(message: Message, configuration: SendMessageConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
         val request = A2AMessage.Stream.Request(A2AMessage.Stream.Request.Params(message, configuration, metadata, tenant = tenant), nextId())
 
         val response = client(
@@ -157,13 +157,11 @@ class HttpA2AClient(
     }
 
     private inner class ClientPushNotificationConfigs : A2AClient.PushNotificationConfigs {
-        override fun set(taskId: TaskId, config: PushNotificationConfig) =
-            sendRpc<A2APushNotificationConfig.Set.Response.Result>(A2APushNotificationConfig.Set.Request(A2APushNotificationConfig.Set.Request.Params(taskId, config, tenant = tenant), nextId()))
-                .map { TaskPushNotificationConfig(it.id, it.taskId, it.pushNotificationConfig) }
+        override fun set(taskId: TaskId, url: Uri, token: String?, authentication: AuthenticationInfo?) =
+            sendRpc<TaskPushNotificationConfig>(A2APushNotificationConfig.Set.Request(A2APushNotificationConfig.Set.Request.Params(taskId, url, token, authentication, tenant), nextId()))
 
         override fun get(taskId: TaskId, id: PushNotificationConfigId) =
-            sendRpc<A2APushNotificationConfig.Get.Response.Result>(A2APushNotificationConfig.Get.Request(A2APushNotificationConfig.Get.Request.Params(taskId, id, tenant = tenant), nextId()))
-                .map { TaskPushNotificationConfig(it.id, it.taskId, it.pushNotificationConfig) }
+            sendRpc<TaskPushNotificationConfig>(A2APushNotificationConfig.Get.Request(A2APushNotificationConfig.Get.Request.Params(taskId, id, tenant = tenant), nextId()))
 
         override fun list(taskId: TaskId, pageSize: Int?, pageToken: PageToken?) =
             sendRpc<A2APushNotificationConfig.List.Response.Result>(A2APushNotificationConfig.List.Request(A2APushNotificationConfig.List.Request.Params(taskId, pageSize, pageToken, tenant = tenant), nextId()))

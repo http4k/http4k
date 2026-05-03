@@ -83,9 +83,9 @@ interface TaskStorage {
                 val (pageTasks, nextToken) = if (pageSize != null) {
                     val startIndex = pageToken?.value?.toIntOrNull() ?: 0
                     val endIndex = minOf(startIndex + pageSize, totalSize)
-                    filtered.subList(startIndex, endIndex) to if (endIndex < totalSize) PageToken.of(endIndex.toString()) else null
+                    filtered.subList(startIndex, endIndex) to if (endIndex < totalSize) PageToken.of(endIndex.toString()) else PageToken.END
                 } else {
-                    filtered to null
+                    filtered to PageToken.END
                 }
 
                 return TaskPage(pageTasks, nextToken, totalSize)

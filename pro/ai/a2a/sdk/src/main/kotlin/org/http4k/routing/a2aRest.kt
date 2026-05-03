@@ -8,6 +8,7 @@ import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.CreateTaskPushNotificationConfig
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfigId
@@ -140,11 +141,14 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
         "message:stream" bind POST to { req ->
             if (protocol.cards.extended().capabilities.streaming != true) Response(BAD_REQUEST)
             else {
-                val params = A2AMessage.Stream.Request.Params(
-                    req.json<A2AMessage.Send.Request.Params>().message,
-                    tenant = req.tenant()
-                )
-                val responses = protocol.stream(params, req)
+                val json = req.json<A2AMessage.Send.Request.Params>()
+                val responses = protocol.stream(
+                    A2AMessage.Stream.Request.Params(
+                        json.message,
+                        json.configuration,
+                        json.metadata,
+                        req.tenant()
+                    ), req)
                 Response(OK)
                     .contentType(ContentType.TEXT_EVENT_STREAM)
                     .body(responses.toSseStream())
@@ -156,8 +160,8 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
                 protocol.getTask(
                     A2ATask.Get.Request.Params(
                         taskIdPath(req),
-                        historyLength = historyLengthQuery(req),
-                        tenant = req.tenant()
+                        historyLengthQuery(req),
+                        req.tenant()
                     )
                 )
                     ?.let { Response(OK).json(it) }
@@ -172,15 +176,22 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
 
             "{taskId}/pushNotificationConfigs" bind POST to { req ->
                 when (protocol.cards.extended().capabilities.pushNotifications) {
-                    true -> Response(CREATED).json(
-                        protocol.setPushConfig(
-                            A2APushNotificationConfig.Set.Request.Params(
-                                taskIdPath(req),
-                                req.json(),
-                                tenant = req.tenant()
+                    true -> {
+                        val pathTaskId = taskIdPath(req)
+                        val create = req.json<CreateTaskPushNotificationConfig>()
+                        if (create.taskId != pathTaskId) Response(BAD_REQUEST)
+                        else Response(CREATED).json(
+                            protocol.setPushConfig(
+                                A2APushNotificationConfig.Set.Request.Params(
+                                    pathTaskId,
+                                    create.url,
+                                    create.token,
+                                    create.authentication,
+                                    req.tenant()
+                                )
                             )
                         )
-                    )
+                    }
 
                     else -> Response(BAD_REQUEST)
                 }
@@ -192,7 +203,7 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
                         A2APushNotificationConfig.Get.Request.Params(
                             taskIdPath(req),
                             configIdPath(req),
-                            tenant = req.tenant()
+                            req.tenant()
                         )
                     )
                         ?.let { Response(OK).json(it) }
@@ -210,7 +221,7 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
                                 taskIdPath(req),
                                 pageSizeQuery(req),
                                 pageTokenQuery(req),
-                                tenant = req.tenant()
+                                req.tenant()
                             )
                         ).configs
                     )
@@ -226,7 +237,7 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
                                 A2APushNotificationConfig.Delete.Request.Params(
                                     taskIdPath(req),
                                     configIdPath(req),
-                                    tenant = req.tenant()
+                                    req.tenant()
                                 )
                             ) != null
                         ) Response(NO_CONTENT)
@@ -244,8 +255,8 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
                         pageToken = pageTokenQuery(req),
                         historyLength = historyLengthQuery(req),
                         statusTimestampAfter = statusTimestampAfterQuery(req),
-                        includeArtifacts = includeArtifactsQuery(req),
-                        tenant = req.tenant()
+                        includeArtifactsQuery(req),
+                        req.tenant()
                     )
                 )
                 Response(OK).json(TaskPage(page.tasks, page.nextPageToken, page.totalSize))

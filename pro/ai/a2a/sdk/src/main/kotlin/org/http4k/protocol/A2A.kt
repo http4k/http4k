@@ -5,16 +5,18 @@
 package org.http4k.protocol
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.model.MessageRequest
-import org.http4k.ai.a2a.model.MessageResponse
-import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.MessageRequest
+import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.Task
+import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
@@ -22,15 +24,13 @@ import org.http4k.ai.a2a.server.TaskSubscriptions
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson
-import org.http4k.ai.a2a.model.TaskId
-import org.http4k.ai.a2a.model.Tenant
 import org.http4k.core.Request
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.io.InputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
-import java.util.UUID
+import java.security.SecureRandom
 import kotlin.concurrent.thread
 
 class A2A(
@@ -40,6 +40,8 @@ class A2A(
     private val subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     private val handler: MessageHandler
 ) {
+    private val random = SecureRandom()
+
     constructor(
         agentCard: AgentCard,
         tasks: TaskStorage = TaskStorage.InMemory(),
@@ -80,11 +82,13 @@ class A2A(
         tasks.list(params.contextId, params.status, params.pageSize, params.pageToken, params.historyLength, params.statusTimestampAfter, params.includeArtifacts, params.tenant)
 
     fun setPushConfig(params: A2APushNotificationConfig.Set.Request.Params): TaskPushNotificationConfig {
-        val configId = PushNotificationConfigId.of(UUID.randomUUID().toString())
+        val configId = PushNotificationConfigId.random(random)
         val taskConfig = TaskPushNotificationConfig(
             id = configId,
             taskId = params.taskId,
-            pushNotificationConfig = params.pushNotificationConfig,
+            url = params.url,
+            token = params.token,
+            authentication = params.authentication,
             tenant = params.tenant
         )
         pushNotifications.store(taskConfig)

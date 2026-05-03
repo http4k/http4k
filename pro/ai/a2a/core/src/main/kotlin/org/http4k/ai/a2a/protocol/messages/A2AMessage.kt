@@ -25,7 +25,7 @@ object A2AMessage {
             @JsonSerializable
             data class Params(
                 val message: Message,
-                val configuration: TaskConfiguration? = null,
+                val configuration: SendMessageConfiguration? = null,
                 val metadata: Map<String, Any>? = null,
                 val tenant: Tenant? = null
             )
@@ -61,7 +61,7 @@ object A2AMessage {
             @JsonSerializable
             data class Params(
                 val message: Message,
-                val configuration: TaskConfiguration? = null,
+                val configuration: SendMessageConfiguration? = null,
                 val metadata: Map<String, Any>? = null,
                 val tenant: Tenant? = null
             )

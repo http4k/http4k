@@ -20,7 +20,7 @@ fun interface PushNotificationSender {
         fun Http(http: HttpHandler = JavaHttpClient()) =
             PushNotificationSender { task, config ->
                 http(
-                    Request(POST, config.pushNotificationConfig.url)
+                    Request(POST, config.url)
                         .json(task)
                         .withAuth(config)
                 )
@@ -31,9 +31,8 @@ fun interface PushNotificationSender {
 }
 
 private fun Request.withAuth(config: TaskPushNotificationConfig): Request {
-    val pushConfig = config.pushNotificationConfig
-    val token = pushConfig.token ?: return this
-    val auth = pushConfig.authentication ?: return this
+    val token = config.token ?: return this
+    val auth = config.authentication ?: return this
 
     return when (auth.scheme) {
         AuthScheme.BEARER -> header("Authorization", "Bearer $token")

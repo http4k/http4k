@@ -20,25 +20,29 @@ import org.junit.jupiter.api.extension.ExtendWith
 class PushNotificationTest {
 
     @Test
-    fun `PushNotificationConfig roundtrips correctly`(approver: Approver) {
-        val config = PushNotificationConfig(
+    fun `TaskPushNotificationConfig roundtrips correctly`(approver: Approver) {
+        val config = TaskPushNotificationConfig(
+            id = PushNotificationConfigId.of("config-1"),
+            taskId = TaskId.of("task-1"),
             url = Uri.of("https://example.com/webhook"),
             token = "secret-token",
             authentication = AuthenticationInfo(scheme = BEARER)
         )
         val json = A2AJson.asFormatString(config)
         approver.assertApproved(json, APPLICATION_JSON)
-        assertThat(A2AJson.asA<PushNotificationConfig>(json), equalTo(config))
+        assertThat(A2AJson.asA<TaskPushNotificationConfig>(json), equalTo(config))
     }
 
     @Test
-    fun `PushNotificationConfig without optional fields roundtrips correctly`(approver: Approver) {
-        val config = PushNotificationConfig(
+    fun `TaskPushNotificationConfig without optional fields roundtrips correctly`(approver: Approver) {
+        val config = TaskPushNotificationConfig(
+            id = PushNotificationConfigId.of("config-1"),
+            taskId = TaskId.of("task-1"),
             url = Uri.of("https://example.com/webhook")
         )
         val json = A2AJson.asFormatString(config)
         approver.assertApproved(json, APPLICATION_JSON)
-        assertThat(A2AJson.asA<PushNotificationConfig>(json), equalTo(config))
+        assertThat(A2AJson.asA<TaskPushNotificationConfig>(json), equalTo(config))
     }
 
     @Test
@@ -46,5 +50,4 @@ class PushNotificationTest {
         val id = PushNotificationConfigId.of("config-123")
         assertThat(id.value, equalTo("config-123"))
     }
-
 }

@@ -9,7 +9,7 @@ import org.http4k.connect.model.MimeType
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class TaskConfiguration(
+data class SendMessageConfiguration(
     val acceptedOutputModes: List<MimeType>? = null,
     val historyLength: Int? = null,
     val taskPushNotificationConfig: TaskPushNotificationConfig? = null,

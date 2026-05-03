@@ -153,7 +153,7 @@ private fun A2A.dispatchJsonRpc(
                 page.tasks,
                 page.totalSize,
                 page.nextPageToken,
-                message.params.pageSize
+                message.params.pageSize ?: 0
             ), message.id))
         }
 
@@ -164,15 +164,7 @@ private fun A2A.dispatchJsonRpc(
             when (capabilities.pushNotifications) {
                 true -> {
                     val config = setPushConfig(message.params)
-                    Response(OK).json(
-                        A2APushNotificationConfig.Set.Response(
-                            A2APushNotificationConfig.Set.Response.Result(
-                                config.id,
-                                config.taskId,
-                                config.pushNotificationConfig
-                            ), message.id
-                        )
-                    )
+                    Response(OK).json(A2APushNotificationConfig.Set.Response(config, message.id))
                 }
 
                 else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.PushNotificationNotSupported))
@@ -181,17 +173,7 @@ private fun A2A.dispatchJsonRpc(
         is A2APushNotificationConfig.Get.Request ->
             when (capabilities.pushNotifications) {
                 true -> getPushConfig(message.params)
-                    ?.let {
-                        Response(OK).json(
-                            A2APushNotificationConfig.Get.Response(
-                                A2APushNotificationConfig.Get.Response.Result(
-                                    it.id,
-                                    it.taskId,
-                                    it.pushNotificationConfig
-                                ), message.id
-                            )
-                        )
-                    }
+                    ?.let { Response(OK).json(A2APushNotificationConfig.Get.Response(it, message.id)) }
                     ?: Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.TaskNotFound))
 
                 else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.PushNotificationNotSupported))

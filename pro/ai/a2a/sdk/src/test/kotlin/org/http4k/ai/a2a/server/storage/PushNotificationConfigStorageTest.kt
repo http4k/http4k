@@ -9,7 +9,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
-import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -25,7 +24,7 @@ class PushNotificationConfigStorageTest {
     ) = TaskPushNotificationConfig(
         id = PushNotificationConfigId.of(id),
         taskId = TaskId.of(taskId),
-        pushNotificationConfig = PushNotificationConfig(url = Uri.of(url))
+        url = Uri.of(url)
     )
 
     @Test
@@ -49,7 +48,7 @@ class PushNotificationConfigStorageTest {
     fun `store updates existing config`() {
         val config = aConfig()
         val updatedConfig = config.copy(
-            pushNotificationConfig = PushNotificationConfig(url = Uri.of("https://updated.com/webhook"))
+            url = Uri.of("https://updated.com/webhook")
         )
 
         storage.store(config)

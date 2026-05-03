@@ -4,9 +4,11 @@
  */
 package org.http4k.ai.a2a.model
 
-import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import dev.forkhandles.values.StringValueFactory
 
 class PageToken private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<PageToken>(::PageToken)
+    companion object : StringValueFactory<PageToken>(::PageToken) {
+        val END = of("")
+    }
 }

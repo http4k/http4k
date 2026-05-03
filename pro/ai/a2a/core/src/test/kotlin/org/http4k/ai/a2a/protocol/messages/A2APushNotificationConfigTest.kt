@@ -6,7 +6,6 @@ package org.http4k.ai.a2a.protocol.messages
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
@@ -25,18 +24,15 @@ class A2APushNotificationConfigTest {
 
     private val taskId = TaskId.of("task-123")
     private val configId = PushNotificationConfigId.of("config-456")
-    private val pushConfig = PushNotificationConfig(
-        url = Uri.of("https://example.com/webhook"),
-        token = "secret-token"
-    )
+    private val webhookUrl = Uri.of("https://example.com/webhook")
 
     @Test
-    fun `Set method is tasks_pushNotificationConfig_set`() {
+    fun `Set method is CreateTaskPushNotificationConfig`() {
         assertThat(
             A2APushNotificationConfig.Set.Request(
                 params = A2APushNotificationConfig.Set.Request.Params(
                     taskId = taskId,
-                    pushNotificationConfig = pushConfig
+                    url = webhookUrl
                 ),
                 id = "1"
             ).method, equalTo(A2ARpcMethod.of("CreateTaskPushNotificationConfig"))
@@ -48,7 +44,8 @@ class A2APushNotificationConfigTest {
         val request = A2APushNotificationConfig.Set.Request(
             params = A2APushNotificationConfig.Set.Request.Params(
                 taskId = taskId,
-                pushNotificationConfig = pushConfig
+                url = webhookUrl,
+                token = "secret-token"
             ),
             id = "1"
         )
@@ -60,10 +57,11 @@ class A2APushNotificationConfigTest {
     @Test
     fun `Set Response roundtrips correctly`(approver: Approver) {
         val response = A2APushNotificationConfig.Set.Response(
-            result = A2APushNotificationConfig.Set.Response.Result(
+            result = TaskPushNotificationConfig(
                 id = configId,
                 taskId = taskId,
-                pushNotificationConfig = pushConfig
+                url = webhookUrl,
+                token = "secret-token"
             ),
             id = "1"
         )
@@ -73,7 +71,7 @@ class A2APushNotificationConfigTest {
     }
 
     @Test
-    fun `Get method is tasks_pushNotificationConfig_get`() {
+    fun `Get method is GetTaskPushNotificationConfig`() {
         assertThat(
             A2APushNotificationConfig.Get.Request(
                 params = A2APushNotificationConfig.Get.Request.Params(taskId = taskId, id = configId),
@@ -96,10 +94,10 @@ class A2APushNotificationConfigTest {
     @Test
     fun `Get Response roundtrips correctly`(approver: Approver) {
         val response = A2APushNotificationConfig.Get.Response(
-            result = A2APushNotificationConfig.Get.Response.Result(
+            result = TaskPushNotificationConfig(
                 id = configId,
                 taskId = taskId,
-                pushNotificationConfig = pushConfig
+                url = webhookUrl
             ),
             id = "1"
         )
@@ -109,7 +107,7 @@ class A2APushNotificationConfigTest {
     }
 
     @Test
-    fun `List method is tasks_pushNotificationConfig_list`() {
+    fun `List method is ListTaskPushNotificationConfigs`() {
         assertThat(
             A2APushNotificationConfig.List.Request(
                 params = A2APushNotificationConfig.List.Request.Params(taskId = taskId),
@@ -137,7 +135,7 @@ class A2APushNotificationConfigTest {
                     TaskPushNotificationConfig(
                         id = configId,
                         taskId = taskId,
-                        pushNotificationConfig = pushConfig
+                        url = webhookUrl
                     )
                 )
             ),
@@ -149,7 +147,7 @@ class A2APushNotificationConfigTest {
     }
 
     @Test
-    fun `Delete method is tasks_pushNotificationConfig_delete`() {
+    fun `Delete method is DeleteTaskPushNotificationConfig`() {
         assertThat(
             A2APushNotificationConfig.Delete.Request(
                 params = A2APushNotificationConfig.Delete.Request.Params(taskId = taskId, id = configId),

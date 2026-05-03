@@ -19,7 +19,6 @@ import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.Part
 import java.util.UUID
-import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
@@ -28,7 +27,7 @@ import org.http4k.ai.a2a.model.TaskState.TASK_STATE_COMPLETED
 import org.http4k.ai.a2a.model.TaskState.TASK_STATE_WORKING
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.Version
-import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.connect.model.MimeType
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
@@ -150,9 +149,9 @@ class A2ATest {
 
     @Test
     fun `send passes configuration and metadata to handler`() {
-        val config = TaskConfiguration(acceptedOutputModes = listOf(MimeType.of("text/plain")), historyLength = 5)
+        val config = SendMessageConfiguration(acceptedOutputModes = listOf(MimeType.of("text/plain")), historyLength = 5)
         val metadata = mapOf("key" to "value")
-        var receivedConfig: TaskConfiguration? = null
+        var receivedConfig: SendMessageConfiguration? = null
         var receivedMetadata: Map<String, Any>? = null
 
         val handler: MessageHandler = { request ->
@@ -207,7 +206,7 @@ class A2ATest {
     fun `push config set and get`() {
         val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
 
-        val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(TaskId.of("task-1"), PushNotificationConfig(url = Uri.of("https://example.com/webhook"))))
+        val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(TaskId.of("task-1"), Uri.of("https://example.com/webhook")))
         assertThat(config.taskId, equalTo(TaskId.of("task-1")))
 
         val retrieved = protocol.getPushConfig(A2APushNotificationConfig.Get.Request.Params(TaskId.of("task-1"), config.id))
@@ -219,8 +218,8 @@ class A2ATest {
         val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val taskId = TaskId.of("task-1")
 
-        protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))))
-        protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://b.com"))))
+        protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, Uri.of("https://a.com")))
+        protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, Uri.of("https://b.com")))
 
         assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).configs.size, equalTo(2))
     }
@@ -230,7 +229,7 @@ class A2ATest {
         val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
         val taskId = TaskId.of("task-1")
 
-        val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))))
+        val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, Uri.of("https://a.com")))
         assertThat(protocol.deletePushConfig(A2APushNotificationConfig.Delete.Request.Params(taskId, config.id)), present(equalTo(config.id)))
         assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).configs.size, equalTo(0))
     }

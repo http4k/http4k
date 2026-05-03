@@ -4,12 +4,12 @@
  */
 package org.http4k.ai.a2a.model
 
-import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.core.Request
 
 data class MessageRequest(
     val message: Message,
-    val configuration: TaskConfiguration? = null,
+    val configuration: SendMessageConfiguration? = null,
     val metadata: Map<String, Any>? = null,
     val http: Request
 )

@@ -4,11 +4,8 @@
  */
 package org.http4k.ai.a2a.model
 
-import se.ansman.kotshi.JsonSerializable
-
-@JsonSerializable
-data class TaskPage(
-    val tasks: List<Task>,
-    val nextPageToken: PageToken = PageToken.END,
-    val totalSize: Int
-)
+enum class A2ARole {
+    ROLE_UNSPECIFIED,
+    ROLE_USER,
+    ROLE_AGENT
+}

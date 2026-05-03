@@ -4,13 +4,14 @@
  */
 package org.http4k.ai.a2a.protocol.messages
 
+import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.PageToken
-import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
-import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
+import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
+import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
@@ -28,20 +29,15 @@ object A2APushNotificationConfig {
             @JsonSerializable
             data class Params(
                 val taskId: TaskId,
-                val pushNotificationConfig: PushNotificationConfig,
+                val url: Uri,
+                val token: String? = null,
+                val authentication: AuthenticationInfo? = null,
                 val tenant: Tenant? = null
             )
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
-            @JsonSerializable
-            data class Result(
-                val id: PushNotificationConfigId,
-                val taskId: TaskId,
-                val pushNotificationConfig: PushNotificationConfig
-            )
-        }
+        data class Response(val result: TaskPushNotificationConfig, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse
     }
 
     object Get {
@@ -59,14 +55,7 @@ object A2APushNotificationConfig {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
-            @JsonSerializable
-            data class Result(
-                val id: PushNotificationConfigId,
-                val taskId: TaskId,
-                val pushNotificationConfig: PushNotificationConfig
-            )
-        }
+        data class Response(val result: TaskPushNotificationConfig, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse
     }
 
     object List {
