@@ -11,8 +11,8 @@ import se.ansman.kotshi.JsonSerializable
 data class AgentSkill(
     val id: SkillId,
     val name: String,
-    val description: String? = null,
-    val tags: List<String>? = null,
+    val description: String,
+    val tags: List<String> = emptyList(),
     val examples: List<String>? = null,
     val inputModes: List<MimeType>? = null,
     val outputModes: List<MimeType>? = null,

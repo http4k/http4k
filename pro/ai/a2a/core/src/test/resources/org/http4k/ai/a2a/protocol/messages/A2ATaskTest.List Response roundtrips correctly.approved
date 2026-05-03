@@ -2,9 +2,9 @@
   "result": {
     "tasks": [
     ],
+    "totalSize": 100,
     "nextPageToken": "next-token",
-    "pageSize": 50,
-    "totalSize": 100
+    "pageSize": 50
   },
   "id": "1",
   "jsonrpc": "2.0"

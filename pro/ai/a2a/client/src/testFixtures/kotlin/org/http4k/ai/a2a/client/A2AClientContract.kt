@@ -19,7 +19,7 @@ import org.http4k.ai.a2a.model.ArtifactId
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageId
-import org.http4k.ai.a2a.model.MessageStream
+import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.Part
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.SkillId
@@ -48,7 +48,8 @@ abstract class A2AClientContract {
         name = "Test Agent",
         url = Uri.of("http://localhost:8080"),
         version = Version.of("1.0.0"),
-        capabilities = AgentCapabilities(streaming = false)
+        description = "Test agent for contract tests",
+        capabilities = AgentCapabilities(streaming = false, pushNotifications = true, extendedAgentCard = true)
     )
 
     protected val tasks = TaskStorage.InMemory()
@@ -138,7 +139,7 @@ abstract class A2AClientContract {
         var streamCounter = 0
         val streamingHandler: MessageHandler = { request ->
             val count = ++streamCounter
-            MessageStream(
+            ResponseStream(
                 sequenceOf(
                     Task(
                         TaskId.of("st-$count"),
@@ -161,7 +162,7 @@ abstract class A2AClientContract {
 
         try {
             val response = client.messageStream(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
-            val streamTasks = (response as MessageStream).toList().filterIsInstance<Task>()
+            val streamTasks = (response as ResponseStream).toList().filterIsInstance<Task>()
             assertThat(streamTasks.size, equalTo(2))
             assertThat(streamTasks[0].status.state, equalTo(TASK_STATE_WORKING))
             assertThat(streamTasks[1].status.state, equalTo(TASK_STATE_COMPLETED))

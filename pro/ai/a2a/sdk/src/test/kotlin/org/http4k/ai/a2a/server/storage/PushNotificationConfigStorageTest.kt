@@ -79,7 +79,7 @@ class PushNotificationConfigStorageTest {
     fun `listByTask returns empty list when no configs for task`() {
         val result = storage.list(TaskId.of("task-1"))
 
-        assertThat(result, equalTo(emptyList()))
+        assertThat(result.configs, equalTo(emptyList()))
     }
 
     @Test
@@ -94,7 +94,7 @@ class PushNotificationConfigStorageTest {
 
         val result = storage.list(TaskId.of("task-1"))
 
-        assertThat(result.size, equalTo(2))
-        assertThat(result.map { it.id }.toSet(), equalTo(setOf(config1.id, config2.id)))
+        assertThat(result.configs.size, equalTo(2))
+        assertThat(result.configs.map { it.id }.toSet(), equalTo(setOf(config1.id, config2.id)))
     }
 }

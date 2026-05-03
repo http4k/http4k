@@ -7,7 +7,7 @@ package org.http4k.protocol
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.model.MessageRequest
 import org.http4k.ai.a2a.model.MessageResponse
-import org.http4k.ai.a2a.model.MessageStream
+import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.model.Message
@@ -44,7 +44,7 @@ class A2A(
 
     fun send(params: A2AMessage.Send.Request.Params, http: Request): MessageResponse =
         when (val response = handler(MessageRequest(params.message, params.configuration, params.metadata, http))) {
-            is MessageStream -> when (val last = response.last()) {
+            is ResponseStream -> when (val last = response.last()) {
                 is Task -> last
                 is Message -> last
                 else -> error("Stream ended without task or message")
@@ -54,7 +54,7 @@ class A2A(
 
     fun stream(params: A2AMessage.Stream.Request.Params, http: Request): Sequence<StreamItem> =
         when (val response = handler(MessageRequest(params.message, params.configuration, params.metadata, http))) {
-            is MessageStream -> response
+            is ResponseStream -> response
             is Task -> sequenceOf(response)
             is Message -> sequenceOf(response)
         }
@@ -82,7 +82,7 @@ class A2A(
         pushNotifications.get(params.id, params.tenant)
 
     fun listPushConfigs(params: A2APushNotificationConfig.List.Request.Params) =
-        pushNotifications.list(params.taskId, params.tenant)
+        pushNotifications.list(params.taskId, params.pageSize, params.pageToken, params.tenant)
 
     fun deletePushConfig(params: A2APushNotificationConfig.Delete.Request.Params): PushNotificationConfigId? {
         val existing = pushNotifications.get(params.id, params.tenant) ?: return null

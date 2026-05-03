@@ -12,6 +12,7 @@ import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.PartJsonAdapterFactory
 import org.http4k.ai.a2a.model.StreamItemJsonAdapterFactory
 import org.http4k.ai.a2a.model.MessageId
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.SkillId
 import org.http4k.ai.a2a.model.TaskId
@@ -71,6 +72,7 @@ fun <T> AutoMappingConfiguration<T>.withA2AMappings() = apply {
     value(ContextId)
     value(MessageId)
     value(MimeType)
+    value(PageToken)
     value(PushNotificationConfigId)
     value(SkillId)
     value(TaskId)

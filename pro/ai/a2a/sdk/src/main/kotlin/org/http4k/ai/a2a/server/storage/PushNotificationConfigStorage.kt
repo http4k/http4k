@@ -4,17 +4,23 @@
  */
 package org.http4k.ai.a2a.server.storage
 
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.Tenant
 import java.util.concurrent.ConcurrentHashMap
 
+data class PushNotificationConfigPage(
+    val configs: List<TaskPushNotificationConfig>,
+    val nextPageToken: PageToken? = null
+)
+
 interface PushNotificationConfigStorage {
     fun store(config: TaskPushNotificationConfig)
     fun get(id: PushNotificationConfigId, tenant: Tenant? = null): TaskPushNotificationConfig?
     fun delete(id: PushNotificationConfigId, tenant: Tenant? = null)
-    fun list(taskId: TaskId, tenant: Tenant? = null): List<TaskPushNotificationConfig>
+    fun list(taskId: TaskId, pageSize: Int? = null, pageToken: PageToken? = null, tenant: Tenant? = null): PushNotificationConfigPage
 
     companion object {
         fun InMemory() = object : PushNotificationConfigStorage {
@@ -33,8 +39,16 @@ interface PushNotificationConfigStorage {
                 configsFor(tenant).remove(id)
             }
 
-            override fun list(taskId: TaskId, tenant: Tenant?) =
-                configsFor(tenant).values.filter { it.taskId == taskId }
+            override fun list(taskId: TaskId, pageSize: Int?, pageToken: PageToken?, tenant: Tenant?): PushNotificationConfigPage {
+                val all = configsFor(tenant).values.filter { it.taskId == taskId }.sortedBy { it.id.value }
+                return if (pageSize != null) {
+                    val startIndex = pageToken?.value?.toIntOrNull() ?: 0
+                    val endIndex = minOf(startIndex + pageSize, all.size)
+                    PushNotificationConfigPage(all.subList(startIndex, endIndex), if (endIndex < all.size) PageToken.of(endIndex.toString()) else null)
+                } else {
+                    PushNotificationConfigPage(all)
+                }
+            }
         }
     }
 }

@@ -9,6 +9,6 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class TaskPage(
     val tasks: List<Task>,
-    val nextPageToken: String,
+    val nextPageToken: PageToken? = null,
     val totalSize: Int
 )

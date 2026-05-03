@@ -4,5 +4,4 @@
  */
 package org.http4k.ai.a2a.model
 
-sealed interface MessageResponse {
-}
+sealed interface MessageResponse

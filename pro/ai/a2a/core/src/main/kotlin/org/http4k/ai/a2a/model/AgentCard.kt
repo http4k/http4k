@@ -13,15 +13,15 @@ data class AgentCard(
     val name: String,
     val url: Uri,
     val version: Version,
-    val description: String? = null,
-    val capabilities: AgentCapabilities? = null,
-    val skills: List<AgentSkill>? = null,
-    val defaultInputModes: List<MimeType>? = null,
-    val defaultOutputModes: List<MimeType>? = null,
+    val description: String,
+    val capabilities: AgentCapabilities = AgentCapabilities(),
+    val skills: List<AgentSkill> = emptyList(),
+    val defaultInputModes: List<MimeType> = emptyList(),
+    val defaultOutputModes: List<MimeType> = emptyList(),
     val provider: AgentProvider? = null,
     val documentationUrl: Uri? = null,
     val iconUrl: Uri? = null,
-    val supportedInterfaces: List<AgentInterface>? = null,
+    val supportedInterfaces: List<AgentInterface> = emptyList(),
     val securitySchemes: Map<String, SecurityScheme>? = null,
     val securityRequirements: List<SecurityRequirement>? = null,
     val signatures: List<AgentCardSignature>? = null
@@ -30,5 +30,5 @@ data class AgentCard(
 @JsonSerializable
 data class AgentProvider(
     val organization: String,
-    val url: Uri? = null
+    val url: Uri
 )

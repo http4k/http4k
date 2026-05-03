@@ -16,7 +16,7 @@ import org.http4k.ai.a2a.model.ArtifactId
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageId
-import org.http4k.ai.a2a.model.MessageStream
+import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.Part
 import java.util.UUID
 import org.http4k.ai.a2a.model.PushNotificationConfig
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test
 
 class A2ATest {
 
-    private val testCard = AgentCard(name = "test", url = Uri.of("http://test"), version = Version.of("1.0.0"))
+    private val testCard = AgentCard(name = "test", url = Uri.of("http://test"), version = Version.of("1.0.0"), description = "test agent")
     private val tasks = TaskStorage.InMemory()
     private val pushNotifications = PushNotificationConfigStorage.InMemory()
 
@@ -67,7 +67,7 @@ class A2ATest {
     }
 
     private fun streamHandler(vararg states: TaskState): MessageHandler = { request ->
-        MessageStream(states.map { state ->
+        ResponseStream(states.map { state ->
             Task(
                 id = TaskId.of("task-1"),
                 contextId = ContextId.of("ctx-1"),
@@ -216,7 +216,7 @@ class A2ATest {
         protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))))
         protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://b.com"))))
 
-        assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).size, equalTo(2))
+        assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).configs.size, equalTo(2))
     }
 
     @Test
@@ -226,6 +226,6 @@ class A2ATest {
 
         val config = protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, PushNotificationConfig(url = Uri.of("https://a.com"))))
         assertThat(protocol.deletePushConfig(A2APushNotificationConfig.Delete.Request.Params(taskId, config.id)), present(equalTo(config.id)))
-        assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).size, equalTo(0))
+        assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).configs.size, equalTo(0))
     }
 }

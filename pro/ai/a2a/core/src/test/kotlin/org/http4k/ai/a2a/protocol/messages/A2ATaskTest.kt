@@ -7,6 +7,7 @@ package org.http4k.ai.a2a.protocol.messages
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.protocol.A2ARpcMethod
@@ -104,7 +105,7 @@ class A2ATaskTest {
                 contextId = ContextId.of("ctx-123"),
                 status = TaskState.TASK_STATE_WORKING,
                 pageSize = 25,
-                pageToken = "token-abc"
+                pageToken = PageToken.of("token-abc")
             ),
             id = "1"
         )
@@ -118,9 +119,9 @@ class A2ATaskTest {
         val response = A2ATask.ListTasks.Response(
             result = A2ATask.ListTasks.Response.Result(
                 tasks = emptyList(),
-                nextPageToken = "next-token",
-                pageSize = 50,
-                totalSize = 100
+                totalSize = 100,
+                nextPageToken = PageToken.of("next-token"),
+                pageSize = 50
             ),
             id = "1"
         )

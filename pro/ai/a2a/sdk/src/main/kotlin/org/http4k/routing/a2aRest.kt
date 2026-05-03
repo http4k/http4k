@@ -5,11 +5,14 @@
 package org.http4k.routing
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.model.MessageStream
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.ResponseStream
+import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskState
@@ -17,6 +20,7 @@ import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
+import org.http4k.ai.a2a.server.A2AProtocolNegotiation
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson.json
@@ -25,6 +29,7 @@ import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NO_CONTENT
@@ -32,13 +37,12 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
-import org.http4k.lens.boolean
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.lens.boolean
 import org.http4k.lens.contentType
 import org.http4k.lens.enum
 import org.http4k.lens.int
-import org.http4k.lens.string
 import org.http4k.lens.value
 import org.http4k.protocol.A2A
 import org.http4k.protocol.toSseStream
@@ -71,6 +75,7 @@ fun a2aRest(
     basePath: String = ""
 ) = CatchAll()
         .then(CatchLensFailure())
+        .then(A2AProtocolNegotiation(protocol.cards.standard().capabilities))
         .then(
             routes(
                 basePath bind routes(
@@ -80,80 +85,142 @@ fun a2aRest(
             )
         )
 
-private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler = routes(
-    "/.well-known/agent-card.json" bind GET to { Response(OK).json(protocol.cards.standard()) },
+private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler {
+    val capabilities = protocol.cards.standard().capabilities
+    return routes(
+        "/.well-known/agent-card.json" bind GET to { Response(OK).json(protocol.cards.standard()) },
 
-    "extendedAgentCard" bind GET to { protocol.cards.extended().let { Response(OK).json(it) } },
-
-    "message:send" bind POST to { req ->
-        val params = req.json<A2AMessage.Send.Request.Params>().withTenant(req)
-        when (val response = protocol.send(params, req)) {
-            is org.http4k.ai.a2a.model.Task -> Response(OK).json(response)
-            is org.http4k.ai.a2a.model.Message -> Response(OK).json(response)
-            is MessageStream -> error("unreachable")
-        }
-    },
-
-    "message:stream" bind POST to { req ->
-        val params = A2AMessage.Stream.Request.Params(req.json<A2AMessage.Send.Request.Params>().message, tenant = req.tenant())
-        val responses = protocol.stream(params, req)
-        Response(OK)
-            .contentType(ContentType.TEXT_EVENT_STREAM)
-            .body(responses.toSseStream())
-    },
-
-    "tasks" bind routes(
-        "{taskId}" bind GET to { req ->
-            protocol.getTask(A2ATask.Get.Request.Params(taskIdPath(req), historyLength = historyLengthQuery(req), tenant = req.tenant()))
-                ?.let { Response(OK).json(it) }
-                ?: Response(NOT_FOUND)
+        "extendedAgentCard" bind GET to {
+            when (capabilities.extendedAgentCard) {
+                true -> protocol.cards.extended().let { Response(OK).json(it) }
+                else -> Response(BAD_REQUEST)
+            }
         },
 
-        "{taskId}:cancel" bind POST to { req ->
-            protocol.cancelTask(A2ATask.Cancel.Request.Params(taskIdPath(req), tenant = req.tenant()))
-                ?.let { Response(OK).json(it) }
-                ?: Response(NOT_FOUND)
+        "message:send" bind POST to { req ->
+            val params = req.json<A2AMessage.Send.Request.Params>().withTenant(req)
+            when (val response = protocol.send(params, req)) {
+                is Task -> Response(OK).json(response)
+                is Message -> Response(OK).json(response)
+                is ResponseStream -> error("unreachable")
+            }
         },
 
-        "{taskId}/pushNotificationConfigs" bind POST to { req ->
-            Response(CREATED).json(
-                protocol.setPushConfig(
-                    A2APushNotificationConfig.Set.Request.Params(taskIdPath(req), req.json(), tenant = req.tenant())
-                )
-            )
-        },
-
-        "{taskId}/pushNotificationConfigs/{configId}" bind GET to { req ->
-            protocol.getPushConfig(A2APushNotificationConfig.Get.Request.Params(taskIdPath(req), configIdPath(req), tenant = req.tenant()))
-                ?.let { Response(OK).json(it) }
-                ?: Response(NOT_FOUND)
-        },
-
-        "{taskId}/pushNotificationConfigs" bind GET to { req ->
-            Response(OK).json(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskIdPath(req), tenant = req.tenant())))
-        },
-
-        "{taskId}/pushNotificationConfigs/{configId}" bind DELETE to { req ->
-            if (protocol.deletePushConfig(A2APushNotificationConfig.Delete.Request.Params(taskIdPath(req), configIdPath(req), tenant = req.tenant())) != null) Response(NO_CONTENT)
-            else Response(NOT_FOUND)
-        },
-
-        "" bind GET to { req ->
-            val page = protocol.listTasks(
-                A2ATask.ListTasks.Request.Params(
-                    contextId = contextIdQuery(req),
-                    status = statusQuery(req),
-                    pageSize = pageSizeQuery(req),
-                    pageToken = pageTokenQuery(req),
-                    historyLength = historyLengthQuery(req),
-                    includeArtifacts = includeArtifactsQuery(req),
+        "message:stream" bind POST to { req ->
+            if (capabilities.streaming != true) Response(BAD_REQUEST)
+            else {
+                val params = A2AMessage.Stream.Request.Params(
+                    req.json<A2AMessage.Send.Request.Params>().message,
                     tenant = req.tenant()
                 )
-            )
-            Response(OK).json(TaskPage(page.tasks, page.nextPageToken, page.totalSize))
-        }
+                val responses = protocol.stream(params, req)
+                Response(OK)
+                    .contentType(ContentType.TEXT_EVENT_STREAM)
+                    .body(responses.toSseStream())
+            }
+        },
+
+        "tasks" bind routes(
+            "{taskId}" bind GET to { req ->
+                protocol.getTask(
+                    A2ATask.Get.Request.Params(
+                        taskIdPath(req),
+                        historyLength = historyLengthQuery(req),
+                        tenant = req.tenant()
+                    )
+                )
+                    ?.let { Response(OK).json(it) }
+                    ?: Response(NOT_FOUND)
+            },
+
+            "{taskId}:cancel" bind POST to { req ->
+                protocol.cancelTask(A2ATask.Cancel.Request.Params(taskIdPath(req), tenant = req.tenant()))
+                    ?.let { Response(OK).json(it) }
+                    ?: Response(NOT_FOUND)
+            },
+
+            "{taskId}/pushNotificationConfigs" bind POST to { req ->
+                when (capabilities.pushNotifications) {
+                    true -> Response(CREATED).json(
+                        protocol.setPushConfig(
+                            A2APushNotificationConfig.Set.Request.Params(
+                                taskIdPath(req),
+                                req.json(),
+                                tenant = req.tenant()
+                            )
+                        )
+                    )
+
+                    else -> Response(BAD_REQUEST)
+                }
+            },
+
+            "{taskId}/pushNotificationConfigs/{configId}" bind GET to { req ->
+                when (capabilities.pushNotifications) {
+                    true -> protocol.getPushConfig(
+                        A2APushNotificationConfig.Get.Request.Params(
+                            taskIdPath(req),
+                            configIdPath(req),
+                            tenant = req.tenant()
+                        )
+                    )
+                        ?.let { Response(OK).json(it) }
+                        ?: Response(NOT_FOUND)
+
+                    else -> Response(BAD_REQUEST)
+                }
+            },
+
+            "{taskId}/pushNotificationConfigs" bind GET to { req ->
+                when (capabilities.pushNotifications) {
+                    true -> Response(OK).json(
+                        protocol.listPushConfigs(
+                            A2APushNotificationConfig.List.Request.Params(
+                                taskIdPath(req),
+                                pageSizeQuery(req),
+                                pageTokenQuery(req),
+                                tenant = req.tenant()
+                            )
+                        ).configs
+                    )
+
+                    else -> Response(BAD_REQUEST)
+                }
+            },
+
+            "{taskId}/pushNotificationConfigs/{configId}" bind DELETE to { req ->
+                when (capabilities.pushNotifications) {
+                    true ->
+                        if (protocol.deletePushConfig(
+                                A2APushNotificationConfig.Delete.Request.Params(
+                                    taskIdPath(req),
+                                    configIdPath(req),
+                                    tenant = req.tenant()
+                                )
+                            ) != null
+                        ) Response(NO_CONTENT)
+                        else Response(NOT_FOUND)
+                    else -> Response(BAD_REQUEST)
+                }
+            },
+
+            "" bind GET to { req ->
+                val page = protocol.listTasks(
+                    A2ATask.ListTasks.Request.Params(
+                        contextId = contextIdQuery(req),
+                        status = statusQuery(req),
+                        pageSize = pageSizeQuery(req),
+                        pageToken = pageTokenQuery(req),
+                        historyLength = historyLengthQuery(req),
+                        includeArtifacts = includeArtifactsQuery(req),
+                        tenant = req.tenant()
+                    )
+                )
+                Response(OK).json(TaskPage(page.tasks, page.nextPageToken, page.totalSize))
+            }
+        )
     )
-)
+}
 
 private fun A2AMessage.Send.Request.Params.withTenant(req: org.http4k.core.Request) =
     copy(tenant = req.tenant())
@@ -165,6 +232,6 @@ private val configIdPath = Path.value(PushNotificationConfigId).of("configId")
 private val contextIdQuery = Query.value(ContextId).optional("contextId")
 private val statusQuery = Query.enum<TaskState>().optional("status")
 private val pageSizeQuery = Query.int().optional("pageSize")
-private val pageTokenQuery = Query.string().optional("pageToken")
+private val pageTokenQuery = Query.value(PageToken).optional("pageToken")
 private val historyLengthQuery = Query.int().optional("historyLength")
 private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")

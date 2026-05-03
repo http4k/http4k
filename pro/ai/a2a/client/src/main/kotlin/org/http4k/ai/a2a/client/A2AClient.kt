@@ -9,6 +9,7 @@ import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
@@ -33,7 +34,7 @@ interface A2AClient : AutoCloseable {
             contextId: ContextId? = null,
             status: TaskState? = null,
             pageSize: Int? = null,
-            pageToken: String? = null,
+            pageToken: PageToken? = null,
             historyLength: Int? = null,
             includeArtifacts: Boolean? = null
         ): A2AResult<TaskPage>
@@ -42,7 +43,7 @@ interface A2AClient : AutoCloseable {
     interface PushNotificationConfigs {
         fun set(taskId: TaskId, config: PushNotificationConfig): A2AResult<TaskPushNotificationConfig>
         fun get(taskId: TaskId, id: PushNotificationConfigId): A2AResult<TaskPushNotificationConfig>
-        fun list(taskId: TaskId): A2AResult<List<TaskPushNotificationConfig>>
+        fun list(taskId: TaskId, pageSize: Int? = null, pageToken: PageToken? = null): A2AResult<List<TaskPushNotificationConfig>>
         fun delete(taskId: TaskId, id: PushNotificationConfigId): A2AResult<PushNotificationConfigId>
     }
 }

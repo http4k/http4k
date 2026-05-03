@@ -5,17 +5,21 @@
 package org.http4k.routing
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.model.MessageResponse
-import org.http4k.ai.a2a.model.MessageStream
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
+import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.MessageResponse
+import org.http4k.ai.a2a.model.ResponseStream
+import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.protocol.messages.A2AAgentCard
+import org.http4k.ai.a2a.protocol.messages.A2AErrors
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcErrorResponse
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcRequest
 import org.http4k.ai.a2a.protocol.messages.A2AJsonRpcResponse
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
+import org.http4k.ai.a2a.server.A2AProtocolNegotiation
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson.json
@@ -28,7 +32,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.contentType
 import org.http4k.protocol.A2A
 import org.http4k.protocol.toSseStream
@@ -60,6 +63,7 @@ fun a2aJsonRpc(
  */
 fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/") = CatchAll()
     .then(CatchLensFailure())
+    .then(A2AProtocolNegotiation(a2a.cards.standard().capabilities))
     .then(
         routes(
             "/.well-known/agent-card.json" bind GET to { Response(OK).json(a2a.cards.standard()) },
@@ -75,66 +79,136 @@ fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/") = CatchAll()
 private fun A2A.dispatchJsonRpc(
     message: A2AJsonRpcRequest,
     httpReq: org.http4k.core.Request,
-): Response =
-    when (message) {
+): Response {
+    val capabilities = cards.standard().capabilities
+    return when (message) {
         is A2AAgentCard.GetExtended.Request ->
-            cards.extended().let { Response(OK).json(A2AAgentCard.GetExtended.Response(it, message.id)) }
+            when (capabilities.extendedAgentCard) {
+                true -> cards.extended()
+                    .let { Response(OK).json(A2AAgentCard.GetExtended.Response(it, message.id)) }
 
-        is A2AMessage.Send.Request -> {
-            val response = send(message.params, httpReq)
-            Response(OK).json(response.toSendResponse(message.id))
-        }
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.UnsupportedOperation))
+            }
 
-        is A2AMessage.Stream.Request -> {
-            val responses = stream(message.params, httpReq)
-            Response(OK)
-                .contentType(ContentType.TEXT_EVENT_STREAM)
-                .body(responses.toSseStream())
-        }
+        is A2AMessage.Send.Request -> Response(OK).json(send(message.params, httpReq).toSendResponse(message.id))
+
+        is A2AMessage.Stream.Request ->
+            when (capabilities.streaming) {
+                true -> Response(OK)
+                    .contentType(ContentType.TEXT_EVENT_STREAM)
+                    .body(stream(message.params, httpReq).toSseStream())
+
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.UnsupportedOperation))
+            }
 
         is A2ATask.Get.Request ->
-            respondJsonRpc(message.id) { getTask(message.params)?.let { A2ATask.Get.Response(A2ATask.Get.Response.Result(it), message.id) } }
+            getTask(message.params)
+                ?.let { Response(OK).json(A2ATask.Get.Response(A2ATask.Get.Response.Result(it), message.id)) }
+                ?: Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.TaskNotFound))
 
         is A2ATask.Cancel.Request ->
-            respondJsonRpc(message.id) { cancelTask(message.params)?.let { A2ATask.Cancel.Response(A2ATask.Cancel.Response.Result(it), message.id) } }
+            cancelTask(message.params)
+                ?.let { Response(OK).json(A2ATask.Cancel.Response(A2ATask.Cancel.Response.Result(it), message.id)) }
+                ?: Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.TaskNotFound))
 
         is A2ATask.ListTasks.Request -> {
             val page = listTasks(message.params)
-            Response(OK).json(A2ATask.ListTasks.Response(A2ATask.ListTasks.Response.Result(page.tasks, page.nextPageToken, message.params.pageSize, page.totalSize), message.id))
+            Response(OK).json(A2ATask.ListTasks.Response(A2ATask.ListTasks.Response.Result(
+                page.tasks,
+                page.totalSize,
+                page.nextPageToken,
+                message.params.pageSize
+            ), message.id))
         }
 
         is A2ATask.Resubscribe.Request ->
-            Response(OK).json(A2AJsonRpcErrorResponse(message.id, InvalidParams))
+            when (capabilities.streaming) {
+                true -> Response(OK).json(
+                    A2AJsonRpcErrorResponse(
+                        message.id,
+                        A2AErrors.UnsupportedOperation
+                    )
+                )
 
-        is A2APushNotificationConfig.Set.Request -> {
-            val config = setPushConfig(message.params)
-            Response(OK).json(A2APushNotificationConfig.Set.Response(A2APushNotificationConfig.Set.Response.Result(config.id, config.taskId, config.pushNotificationConfig), message.id))
-        }
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.UnsupportedOperation))
+            }
+
+        is A2APushNotificationConfig.Set.Request ->
+            when (capabilities.pushNotifications) {
+                true -> {
+                    val config = setPushConfig(message.params)
+                    Response(OK).json(
+                        A2APushNotificationConfig.Set.Response(
+                            A2APushNotificationConfig.Set.Response.Result(
+                                config.id,
+                                config.taskId,
+                                config.pushNotificationConfig
+                            ), message.id
+                        )
+                    )
+                }
+
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.PushNotificationNotSupported))
+            }
 
         is A2APushNotificationConfig.Get.Request ->
-            respondJsonRpc(message.id) {
-                getPushConfig(message.params)?.let {
-                    A2APushNotificationConfig.Get.Response(A2APushNotificationConfig.Get.Response.Result(it.id, it.taskId, it.pushNotificationConfig), message.id)
-                }
+            when (capabilities.pushNotifications) {
+                true -> getPushConfig(message.params)
+                    ?.let {
+                        Response(OK).json(
+                            A2APushNotificationConfig.Get.Response(
+                                A2APushNotificationConfig.Get.Response.Result(
+                                    it.id,
+                                    it.taskId,
+                                    it.pushNotificationConfig
+                                ), message.id
+                            )
+                        )
+                    }
+                    ?: Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.TaskNotFound))
+
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.PushNotificationNotSupported))
             }
 
         is A2APushNotificationConfig.List.Request ->
-            Response(OK).json(A2APushNotificationConfig.List.Response(A2APushNotificationConfig.List.Response.Result(listPushConfigs(message.params)), message.id))
+            when (capabilities.pushNotifications) {
+                true -> {
+                    val page = listPushConfigs(message.params)
+                    Response(OK).json(
+                        A2APushNotificationConfig.List.Response(
+                            A2APushNotificationConfig.List.Response.Result(
+                                page.configs,
+                                page.nextPageToken
+                            ), message.id
+                        )
+                    )
+                }
+
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.PushNotificationNotSupported))
+            }
 
         is A2APushNotificationConfig.Delete.Request ->
-            respondJsonRpc(message.id) {
-                deletePushConfig(message.params)?.let {
-                    A2APushNotificationConfig.Delete.Response(A2APushNotificationConfig.Delete.Response.Result(it), message.id)
-                }
+            when (capabilities.pushNotifications) {
+                true -> deletePushConfig(message.params)
+                    ?.let {
+                        Response(OK).json(
+                            A2APushNotificationConfig.Delete.Response(
+                                A2APushNotificationConfig.Delete.Response.Result(
+                                    it
+                                ), message.id
+                            )
+                        )
+                    }
+                    ?: Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.TaskNotFound))
+
+                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.PushNotificationNotSupported))
             }
     }
-
-private fun respondJsonRpc(id: Any?, handler: () -> A2AJsonRpcResponse?): Response =
-    Response(OK).json(handler() ?: A2AJsonRpcErrorResponse(id, InvalidParams))
+}
 
 private fun MessageResponse.toSendResponse(id: Any?): A2AJsonRpcResponse =
     when (this) {
-        is org.http4k.ai.a2a.model.Task -> A2AMessage.Send.Response.Task(this, id)
-        is org.http4k.ai.a2a.model.Message -> A2AMessage.Send.Response.Message(this, id)
-        is MessageStream -> error("unreachable")
+        is Task -> A2AMessage.Send.Response.Task(this, id)
+        is Message -> A2AMessage.Send.Response.Message(this, id)
+        is ResponseStream -> error("unreachable")
     }

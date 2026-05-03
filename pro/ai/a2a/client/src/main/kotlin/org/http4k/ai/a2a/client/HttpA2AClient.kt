@@ -13,7 +13,10 @@ import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
-import org.http4k.ai.a2a.model.MessageStream
+import org.http4k.ai.a2a.model.PageToken
+import org.http4k.ai.a2a.model.ResponseStream
+import org.http4k.ai.a2a.protocol.ProtocolVersion
+import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
@@ -37,6 +40,7 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.core.Accept
 import org.http4k.core.Body
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.Filter
 import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -60,10 +64,13 @@ private val jsonRpcRequestLens = Body.auto<A2ANodeType>().toLens()
 class HttpA2AClient(
     private val baseUri: Uri,
     http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
-    private val tenant: Tenant? = null
+    private val tenant: Tenant? = null,
+    protocolVersion: ProtocolVersion = LATEST_VERSION
 ) : A2AClient {
 
-    private val client = ClientFilters.SetHostFrom(baseUri).then(http)
+    private val client = ClientFilters.SetHostFrom(baseUri)
+        .then(Filter { next -> { next(it.header("A2A-Version", protocolVersion.value)) } })
+        .then(http)
     private val requestId = AtomicLong(0)
     private val httpTasks: A2AClient.Tasks = ClientTasks()
     private val httpPushNotificationConfigs: A2AClient.PushNotificationConfigs = ClientPushNotificationConfigs()
@@ -97,7 +104,7 @@ class HttpA2AClient(
         return when {
             response.status.successful ->
                 Success(
-                    MessageStream(
+                    ResponseStream(
                         response.body.stream.chunkedSseSequence()
                             .filterIsInstance<SseMessage.Data>()
                             .map { A2AJson.asA<StreamItem>(it.data) }
@@ -125,8 +132,8 @@ class HttpA2AClient(
             sendRpc<A2ATask.Cancel.Response.Result>(A2ATask.Cancel.Request(A2ATask.Cancel.Request.Params(taskId, tenant = tenant), nextId()))
                 .map { it.task }
 
-        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?, historyLength: Int?, includeArtifacts: Boolean?) =
-            sendRpc<A2ATask.ListTasks.Response.Result>(A2ATask.ListTasks.Request(A2ATask.ListTasks.Request.Params(contextId, status, pageSize, pageToken, historyLength, includeArtifacts, tenant = tenant), nextId()))
+        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, includeArtifacts: Boolean?) =
+            sendRpc<A2ATask.ListTasks.Response.Result>(A2ATask.ListTasks.Request(A2ATask.ListTasks.Request.Params(contextId, status, pageSize, pageToken, historyLength, includeArtifacts = includeArtifacts, tenant = tenant), nextId()))
                 .map { TaskPage(it.tasks, it.nextPageToken, it.totalSize) }
     }
 
@@ -139,8 +146,8 @@ class HttpA2AClient(
             sendRpc<A2APushNotificationConfig.Get.Response.Result>(A2APushNotificationConfig.Get.Request(A2APushNotificationConfig.Get.Request.Params(taskId, id, tenant = tenant), nextId()))
                 .map { TaskPushNotificationConfig(it.id, it.taskId, it.pushNotificationConfig) }
 
-        override fun list(taskId: TaskId) =
-            sendRpc<A2APushNotificationConfig.List.Response.Result>(A2APushNotificationConfig.List.Request(A2APushNotificationConfig.List.Request.Params(taskId, tenant = tenant), nextId()))
+        override fun list(taskId: TaskId, pageSize: Int?, pageToken: PageToken?) =
+            sendRpc<A2APushNotificationConfig.List.Response.Result>(A2APushNotificationConfig.List.Request(A2APushNotificationConfig.List.Request.Params(taskId, pageSize, pageToken, tenant = tenant), nextId()))
                 .map { it.configs }
 
         override fun delete(taskId: TaskId, id: PushNotificationConfigId) =

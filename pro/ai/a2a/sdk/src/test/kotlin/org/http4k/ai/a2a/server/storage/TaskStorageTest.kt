@@ -105,11 +105,11 @@ class TaskStorageTest {
         val page1 = storage.list(pageSize = 2)
         assertThat(page1.tasks.size, equalTo(2))
         assertThat(page1.totalSize, equalTo(3))
-        assertThat(page1.nextPageToken.isNotEmpty(), equalTo(true))
+        assertThat(page1.nextPageToken, present())
 
         val page2 = storage.list(pageSize = 2, pageToken = page1.nextPageToken)
         assertThat(page2.tasks.size, equalTo(1))
-        assertThat(page2.nextPageToken, equalTo(""))
+        assertThat(page2.nextPageToken, absent())
     }
 
     @Test
@@ -122,6 +122,6 @@ class TaskStorageTest {
         val page = storage.list(contextId = ContextId.of("ctx-a"), status = TaskState.TASK_STATE_WORKING, pageSize = 1)
         assertThat(page.tasks.size, equalTo(1))
         assertThat(page.totalSize, equalTo(2))
-        assertThat(page.nextPageToken.isNotEmpty(), equalTo(true))
+        assertThat(page.nextPageToken, present())
     }
 }

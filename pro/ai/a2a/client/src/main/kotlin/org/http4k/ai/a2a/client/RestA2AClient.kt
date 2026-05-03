@@ -12,7 +12,10 @@ import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
-import org.http4k.ai.a2a.model.MessageStream
+import org.http4k.ai.a2a.model.PageToken
+import org.http4k.ai.a2a.model.ResponseStream
+import org.http4k.ai.a2a.protocol.ProtocolVersion
+import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
@@ -29,6 +32,7 @@ import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -58,17 +62,20 @@ private val pushConfigInputLens = Body.auto<PushNotificationConfig>().toLens()
 private val contextIdQuery = Query.value(ContextId).optional("contextId")
 private val statusQuery = Query.enum<TaskState>().optional("status")
 private val pageSizeQuery = Query.int().optional("pageSize")
-private val pageTokenQuery = Query.string().optional("pageToken")
+private val pageTokenQuery = Query.value(PageToken).optional("pageToken")
 private val historyLengthQuery = Query.int().optional("historyLength")
 private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")
 
 class RestA2AClient(
     baseUri: Uri,
     http: HttpHandler = JavaHttpClient(),
-    tenant: Tenant? = null
+    tenant: Tenant? = null,
+    protocolVersion: ProtocolVersion = LATEST_VERSION
 ) : A2AClient {
 
-    private val client = ClientFilters.SetBaseUriFrom(baseUri).then(http)
+    private val client = ClientFilters.SetBaseUriFrom(baseUri)
+        .then(Filter { next -> { next(it.header("A2A-Version", protocolVersion.value)) } })
+        .then(http)
     private val prefix = tenant?.let { "/${it.value}" } ?: ""
     private val httpTasks: A2AClient.Tasks = RestTasks()
     private val httpPushConfigs: A2AClient.PushNotificationConfigs = RestPushNotificationConfigs()
@@ -127,7 +134,7 @@ class RestA2AClient(
         )
         return when {
             response.status.successful -> Success(
-                MessageStream(
+                ResponseStream(
                     response.body.stream.chunkedSseSequence()
                         .filterIsInstance<SseMessage.Data>()
                         .map { A2AJson.asA<StreamItem>(it.data) }
@@ -162,7 +169,7 @@ class RestA2AClient(
             }
         }
 
-        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?, historyLength: Int?, includeArtifacts: Boolean?): A2AResult<TaskPage> {
+        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, includeArtifacts: Boolean?): A2AResult<TaskPage> {
             val response = client(
                 Request(GET, "$prefix/tasks")
                     .with(contextIdQuery of contextId)
@@ -199,8 +206,12 @@ class RestA2AClient(
             }
         }
 
-        override fun list(taskId: TaskId): A2AResult<List<TaskPushNotificationConfig>> {
-            val response = client(Request(GET, "$prefix/tasks/${taskId.value}/pushNotificationConfigs"))
+        override fun list(taskId: TaskId, pageSize: Int?, pageToken: PageToken?): A2AResult<List<TaskPushNotificationConfig>> {
+            val response = client(
+                Request(GET, "$prefix/tasks/${taskId.value}/pushNotificationConfigs")
+                    .with(pageSizeQuery of pageSize)
+                    .with(pageTokenQuery of pageToken)
+            )
             return when {
                 response.status.successful -> Success(pushConfigListLens(response))
                 else -> Failure(A2AError.Http(response))

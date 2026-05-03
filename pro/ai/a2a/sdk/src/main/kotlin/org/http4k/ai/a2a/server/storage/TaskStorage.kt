@@ -5,6 +5,7 @@
 package org.http4k.ai.a2a.server.storage
 
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
@@ -34,7 +35,7 @@ interface TaskStorage {
         contextId: ContextId? = null,
         status: TaskState? = null,
         pageSize: Int? = null,
-        pageToken: String? = null,
+        pageToken: PageToken? = null,
         historyLength: Int? = null,
         includeArtifacts: Boolean? = null,
         tenant: Tenant? = null
@@ -62,7 +63,7 @@ interface TaskStorage {
                 contextId: ContextId?,
                 status: TaskState?,
                 pageSize: Int?,
-                pageToken: String?,
+                pageToken: PageToken?,
                 historyLength: Int?,
                 includeArtifacts: Boolean?,
                 tenant: Tenant?
@@ -76,11 +77,11 @@ interface TaskStorage {
 
                 val totalSize = filtered.size
                 val (pageTasks, nextToken) = if (pageSize != null) {
-                    val startIndex = pageToken?.toIntOrNull() ?: 0
+                    val startIndex = pageToken?.value?.toIntOrNull() ?: 0
                     val endIndex = minOf(startIndex + pageSize, totalSize)
-                    filtered.subList(startIndex, endIndex) to if (endIndex < totalSize) endIndex.toString() else ""
+                    filtered.subList(startIndex, endIndex) to if (endIndex < totalSize) PageToken.of(endIndex.toString()) else null
                 } else {
-                    filtered to ""
+                    filtered to null
                 }
 
                 return TaskPage(pageTasks, nextToken, totalSize)

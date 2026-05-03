@@ -10,7 +10,15 @@
     {
       "id": "skill-1",
       "name": "Test Skill",
-      "description": "Does something"
+      "description": "Does something",
+      "tags": [
+      ]
     }
+  ],
+  "defaultInputModes": [
+  ],
+  "defaultOutputModes": [
+  ],
+  "supportedInterfaces": [
   ]
 }

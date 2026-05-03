@@ -4,6 +4,7 @@
  */
 package org.http4k.ai.a2a.protocol.messages
 
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
@@ -79,13 +80,13 @@ object A2APushNotificationConfig {
             override val method = of("ListTaskPushNotificationConfigs")
 
             @JsonSerializable
-            data class Params(val taskId: TaskId, val tenant: Tenant? = null)
+            data class Params(val taskId: TaskId, val pageSize: Int? = null, val pageToken: PageToken? = null, val tenant: Tenant? = null)
         }
 
         @JsonSerializable
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
-            data class Result(val configs: kotlin.collections.List<TaskPushNotificationConfig>)
+            data class Result(val configs: kotlin.collections.List<TaskPushNotificationConfig>, val nextPageToken: PageToken? = null)
         }
     }
 

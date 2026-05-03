@@ -5,6 +5,7 @@
 package org.http4k.ai.a2a.server.storage
 
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
@@ -24,7 +25,7 @@ private class NotifyingTaskStorage(
 
     override fun store(task: Task, tenant: Tenant?) {
         delegate.store(task, tenant)
-        configStorage.list(task.id, tenant).forEach { sender(task, it) }
+        configStorage.list(task.id, tenant = tenant).configs.forEach { sender(task, it) }
     }
 
     override fun get(taskId: TaskId, historyLength: Int?, tenant: Tenant?) = delegate.get(taskId, historyLength, tenant)
@@ -35,7 +36,7 @@ private class NotifyingTaskStorage(
         contextId: ContextId?,
         status: TaskState?,
         pageSize: Int?,
-        pageToken: String?,
+        pageToken: PageToken?,
         historyLength: Int?,
         includeArtifacts: Boolean?,
         tenant: Tenant?

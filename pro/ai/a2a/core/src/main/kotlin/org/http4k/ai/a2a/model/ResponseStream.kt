@@ -4,4 +4,4 @@
  */
 package org.http4k.ai.a2a.model
 
-data class MessageStream(private val items: Sequence<StreamItem>) : MessageResponse, Sequence<StreamItem> by items
+data class ResponseStream(private val items: Sequence<StreamItem>) : MessageResponse, Sequence<StreamItem> by items
