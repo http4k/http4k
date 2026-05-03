@@ -10,6 +10,17 @@ import org.http4k.ai.a2a.model.MessageResponse
 /**
  * Handles incoming messages and produces responses.
  * This is the main extension point for implementing agent behavior.
- * Returns either a Task (with streaming updates) or a direct Message response.
  */
 typealias MessageHandler = (MessageRequest) -> MessageResponse
+
+fun interface MessageFilter {
+    operator fun invoke(handler: MessageHandler): MessageHandler
+
+    companion object
+}
+
+val MessageFilter.Companion.NoOp: MessageFilter get() = MessageFilter { it }
+
+fun MessageFilter.then(next: MessageHandler): MessageHandler = this(next)
+
+fun MessageFilter.then(next: MessageFilter): MessageFilter = { this(next(it)) }

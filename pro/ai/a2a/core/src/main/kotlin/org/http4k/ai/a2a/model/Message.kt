@@ -16,5 +16,5 @@ data class Message(
     val taskId: TaskId? = null,
     val metadata: Map<String, Any>? = null,
     val extensions: List<String>? = null,
-    val referenceTaskIds: List<String>? = null
+    val referenceTaskIds: List<TaskId>? = null
 ) : StreamItem, MessageResponse
